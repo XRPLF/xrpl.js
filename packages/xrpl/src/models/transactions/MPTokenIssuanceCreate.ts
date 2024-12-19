@@ -155,7 +155,7 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  if (typeof tx.TransferFee === 'number') {
+  if (typeof tx.TransferFee === 'number' && tx.TransferFee != null) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
     const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
     const isTfMPTCanTransfer =
