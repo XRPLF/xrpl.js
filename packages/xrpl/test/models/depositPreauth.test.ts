@@ -79,7 +79,7 @@ describe('DepositPreauth', function () {
     )
     assert.throws(() => validate(depositPreauth), ValidationError, errorMessage)
 
-    delete depositPreauth.Authorize
+    depositPreauth.Authorize = undefined
     assert.throws(
       () => validateDepositPreauth(depositPreauth),
       ValidationError,
@@ -87,7 +87,7 @@ describe('DepositPreauth', function () {
     )
     assert.throws(() => validate(depositPreauth), ValidationError, errorMessage)
 
-    delete depositPreauth.UnauthorizeCredentials
+    depositPreauth.UnauthorizeCredentials = undefined
     assert.throws(
       () => validateDepositPreauth(depositPreauth),
       ValidationError,

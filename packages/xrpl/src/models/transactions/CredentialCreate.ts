@@ -68,7 +68,7 @@ function validateURI(URI: unknown): void {
   }
 
   if (URI.length === 0) {
-    throw new ValidationError('CredentialCreate: URI length must be > 0')
+    throw new ValidationError('CredentialCreate: URI cannot be an empty string')
   } else if (URI.length > MAX_URI_LENGTH) {
     throw new ValidationError(
       `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,

@@ -30,7 +30,7 @@ describe('CredentialDelete', function () {
   })
 
   it(`throws w/ missing field Account`, function () {
-    delete credentialDelete.Account
+    credentialDelete.Account = undefined
     const errorMessage = 'CredentialDelete: missing field Account'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),
@@ -90,8 +90,8 @@ describe('CredentialDelete', function () {
   })
 
   it(`throws w/ missing field Subject and Issuer`, function () {
-    delete credentialDelete.Subject
-    delete credentialDelete.Issuer
+    credentialDelete.Subject = undefined
+    credentialDelete.Issuer = undefined
     const errorMessage =
       'CredentialDelete: Either `Issuer` or `Subject` must be provided'
     assert.throws(
@@ -107,7 +107,7 @@ describe('CredentialDelete', function () {
   })
 
   it(`throws w/ missing field credentialType`, function () {
-    delete credentialDelete.CredentialType
+    credentialDelete.CredentialType = undefined
     const errorMessage = 'CredentialDelete: missing field CredentialType'
     assert.throws(
       () => validateCredentialDelete(credentialDelete),

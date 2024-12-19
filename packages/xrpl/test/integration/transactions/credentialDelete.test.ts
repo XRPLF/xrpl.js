@@ -40,6 +40,15 @@ describe('CredentialDelete', function () {
       testContext.wallet,
     )
 
+    const createAccountObjectsResponse: AccountObjectsResponse =
+      await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'credential',
+      })
+
+    assert.equal(createAccountObjectsResponse.result.account_objects.length, 1)
+
     const credentialAcceptTx: CredentialAccept = {
       TransactionType: 'CredentialAccept',
       Account: subjectWallet.classicAddress,
@@ -48,6 +57,16 @@ describe('CredentialDelete', function () {
     }
 
     await testTransaction(testContext.client, credentialAcceptTx, subjectWallet)
+
+    // Credential is now an object in recipient's wallet after accept
+    const acceptAccountObjectsResponse: AccountObjectsResponse =
+      await testContext.client.request({
+        command: 'account_objects',
+        account: subjectWallet.classicAddress,
+        type: 'credential',
+      })
+
+    assert.equal(acceptAccountObjectsResponse.result.account_objects.length, 1)
 
     const credentialDeleteTx: CredentialDelete = {
       TransactionType: 'CredentialDelete',

@@ -31,7 +31,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ missing field Account`, function () {
-    delete credentialCreate.Account
+    credentialCreate.Account = undefined
     const errorMessage = 'CredentialCreate: missing field Account'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
@@ -61,7 +61,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ missing field Subject`, function () {
-    delete credentialCreate.Subject
+    credentialCreate.Subject = undefined
     const errorMessage = 'CredentialCreate: missing field Subject'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
@@ -91,7 +91,7 @@ describe('credentialCreate', function () {
   })
 
   it(`throws w/ missing field credentialType`, function () {
-    delete credentialCreate.CredentialType
+    credentialCreate.CredentialType = undefined
     const errorMessage = 'CredentialCreate: missing field CredentialType'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
@@ -185,7 +185,7 @@ describe('credentialCreate', function () {
 
   it(`throws w/ URI field empty`, function () {
     credentialCreate.URI = ''
-    const errorMessage = 'CredentialCreate: URI length must be > 0'
+    const errorMessage = 'CredentialCreate: URI cannot be an empty string'
     assert.throws(
       () => validateCredentialCreate(credentialCreate),
       ValidationError,

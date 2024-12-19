@@ -29,7 +29,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field Account`, function () {
-    delete credentialAccept.Account
+    credentialAccept.Account = undefined
     const errorMessage = 'CredentialAccept: missing field Account'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
@@ -59,7 +59,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field Issuer`, function () {
-    delete credentialAccept.Issuer
+    credentialAccept.Issuer = undefined
     const errorMessage = 'CredentialAccept: missing field Issuer'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
@@ -89,7 +89,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`throws w/ missing field CredentialType`, function () {
-    delete credentialAccept.CredentialType
+    credentialAccept.CredentialType = undefined
     const errorMessage = 'CredentialAccept: missing field CredentialType'
     assert.throws(
       () => validateCredentialAccept(credentialAccept),
