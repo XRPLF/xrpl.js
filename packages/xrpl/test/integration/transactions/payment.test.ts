@@ -151,6 +151,7 @@ describe('Payment', function () {
       const authTx: MPTokenAuthorize = {
         TransactionType: 'MPTokenAuthorize',
         Account: wallet2.classicAddress,
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- needed for successful tests
         MPTokenIssuanceID: mptID!,
       }
 
@@ -173,6 +174,7 @@ describe('Payment', function () {
         Account: testContext.wallet.classicAddress,
         Destination: wallet2.classicAddress,
         Amount: {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- needed for successful tests
           mpt_issuance_id: mptID!,
           value: '100',
         },
