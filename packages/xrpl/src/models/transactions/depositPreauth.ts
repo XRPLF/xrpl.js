@@ -97,7 +97,7 @@ function validateSingleAuthorizationFieldProvided(
 
   if (countProvided !== 1) {
     throw new ValidationError(
-      'DepositPreauth: Requires exactly one input amongst Authorize, Unauthorize, AuthorizeCredentials and UnauthorizeCredentials.',
+      'DepositPreauth: Requires exactly one field of the following: Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials.',
     )
   }
 }

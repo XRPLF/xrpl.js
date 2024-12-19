@@ -52,7 +52,7 @@ describe('DepositPreauth', function () {
 
   it('throws when multiple of Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials are provided', function () {
     const errorMessage =
-      'DepositPreauth: Requires exactly one input amongst Authorize, Unauthorize, AuthorizeCredentials and UnauthorizeCredentials.'
+      'DepositPreauth: Requires exactly one field of the following: Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials.'
 
     depositPreauth.Authorize = 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW'
     depositPreauth.UnauthorizeCredentials = [validCredential]
@@ -98,7 +98,7 @@ describe('DepositPreauth', function () {
 
   it('throws when none of Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials are provided', function () {
     const errorMessage =
-      'DepositPreauth: Requires exactly one input amongst Authorize, Unauthorize, AuthorizeCredentials and UnauthorizeCredentials.'
+      'DepositPreauth: Requires exactly one field of the following: Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials.'
     assert.throws(
       () => validateDepositPreauth(depositPreauth),
       ValidationError,
