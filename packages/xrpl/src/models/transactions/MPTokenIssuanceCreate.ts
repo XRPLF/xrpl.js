@@ -155,14 +155,14 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-  const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
-  const isTfMPTCanTransfer =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-      : flags.tfMPTCanTransfer ?? false
-
   if (typeof tx.TransferFee === 'number') {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
+    const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
+    const isTfMPTCanTransfer =
+      typeof flags === 'number'
+        ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
+        : flags.tfMPTCanTransfer ?? false
+
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
         `MPTokenIssuanceCreate: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
