@@ -68,6 +68,7 @@ const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
+const AUTHORIZE_CREDENTIAL_SIZE = 1
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
@@ -125,6 +126,22 @@ export function isIssuedCurrency(
     typeof input.value === 'string' &&
     typeof input.issuer === 'string' &&
     typeof input.currency === 'string'
+  )
+}
+
+/**
+ * Verify the form and type of an AuthorizeCredential at runtime
+ *
+ * @param input - The input to check the form and type of
+ * @returns Whether the AuthorizeCredential is properly formed
+ */
+function isAuthorizeCredential(input: unknown): input is AuthorizeCredential {
+  return (
+    isRecord(input) &&
+    isRecord(input.Credential) &&
+    Object.keys(input).length === AUTHORIZE_CREDENTIAL_SIZE &&
+    typeof input.Credential.CredentialType === 'string' &&
+    typeof input.Credential.Issuer === 'string'
   )
 }
 
@@ -441,7 +458,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- dumb
+// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
@@ -482,15 +499,6 @@ export function validateCredentialsList(
       `${transactionType}: Credentials cannot contain duplicate elements`,
     )
   }
-}
-
-function isAuthorizeCredential(
-  value: AuthorizeCredential,
-): value is AuthorizeCredential {
-  if (value.Credential.CredentialType && value.Credential.Issuer) {
-    return true
-  }
-  return false
 }
 
 function containsDuplicates(objectList: object[]): boolean {
