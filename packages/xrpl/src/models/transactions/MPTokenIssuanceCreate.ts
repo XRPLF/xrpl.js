@@ -115,7 +115,6 @@ export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
 }
 
 /* eslint-disable max-lines-per-function -- Not needed to reduce function */
-
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
