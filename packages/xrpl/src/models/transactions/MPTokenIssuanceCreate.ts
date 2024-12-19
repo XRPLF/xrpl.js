@@ -7,6 +7,7 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   isString,
+  isNumber,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -127,6 +128,8 @@ export function validateMPTokenIssuanceCreate(
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'MaximumAmount', isString)
   validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(tx, 'AssetScale', isNumber)
 
   if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
     throw new ValidationError(
