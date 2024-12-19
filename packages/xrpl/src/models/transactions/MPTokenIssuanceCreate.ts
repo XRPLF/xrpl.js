@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -12,6 +12,7 @@ import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
+const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -112,6 +113,8 @@ export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
   mpt_issuance_id?: string
 }
 
+/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
@@ -150,12 +153,25 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  const MAX_TRANSFER_FEE = 50000
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
+  const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
+  const isTfMPTCanTransfer =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
+      : flags.tfMPTCanTransfer ?? false
+
   if (typeof tx.TransferFee === 'number') {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
-        'MPTokenIssuanceCreate: TransferFee out of range',
+        `MPTokenIssuanceCreate: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+      )
+    }
+
+    if (tx.TransferFee && !isTfMPTCanTransfer) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
       )
     }
   }
 }
+/* eslint-enable max-lines-per-function */
