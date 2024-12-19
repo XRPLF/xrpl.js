@@ -163,8 +163,7 @@ export function validateMPTokenIssuanceCreate(
   if (typeof tx.TransferFee === 'number') {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
-        'MPTokenIssuanceCreate: TransferFee must be between 0 and ' +
-          MAX_TRANSFER_FEE,
+        `MPTokenIssuanceCreate: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
       )
     }
 
