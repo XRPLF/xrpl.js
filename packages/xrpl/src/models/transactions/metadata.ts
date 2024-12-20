@@ -1,5 +1,6 @@
 import { Amount, MPTAmount } from '../common'
 
+import { Batch, BatchMetadata } from './batch'
 import { BaseTransaction } from './common'
 import {
   MPTokenIssuanceCreate,
@@ -103,4 +104,6 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenCancelOfferMetadata
     : T extends MPTokenIssuanceCreate
     ? MPTokenIssuanceCreateMetadata
+    : T extends Batch
+    ? BatchMetadata
     : TransactionMetadataBase
