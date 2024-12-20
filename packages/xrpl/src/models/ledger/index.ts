@@ -6,6 +6,7 @@ import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
+import Credential from './Credential'
 import DepositPreauth from './DepositPreauth'
 import DID from './DID'
 import DirectoryNode from './DirectoryNode'
@@ -41,6 +42,7 @@ export {
   AMM,
   Bridge,
   Check,
+  Credential,
   DepositPreauth,
   DirectoryNode,
   DID,
