@@ -162,6 +162,16 @@ export interface AuthAccount {
   }
 }
 
+export interface AuthorizeCredential {
+  Credential: {
+    /** The issuer of the credential. */
+    Issuer: string
+
+    /** A hex-encoded value to identify the type of credential from the issuer. */
+    CredentialType: string
+  }
+}
+
 export interface XChainBridge {
   LockingChainDoor: string
   LockingChainIssue: Currency

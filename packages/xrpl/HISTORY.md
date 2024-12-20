@@ -5,9 +5,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased Changes
 
 ### Added
-* parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Added new MPT transaction definitions (XLS-33)
 * New `MPTAmount` type support for `Payment` and `Clawback` transactions
+* `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Support for XLS-70d (Credentials)
 
 ### Fixed
 * `TransactionStream` model supports APIv2

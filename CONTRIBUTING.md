@@ -64,18 +64,20 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b4 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:2.3.0-rc1 -c 'rippled -a'
 npm run build
 npm run test:integration
 ```
 
 Breaking down the command:
 * `docker run -p 6006:6006` starts a Docker container with an open port for admin WebSocket requests.
-* `--interactive` allows you to interact with the container.
-* `-t` starts a terminal in the container for you to send commands to.
-* `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
+ `--rm` tells docker to close the container after processes are done running.
+* `-it` allows you to interact with the container.
+   `--name rippled_standalone` is an instance name for clarity
+* `--volume $PWD/.ci-config:/etc/opt/ripple/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
 * `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
-* `/opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg` starts `rippled` in standalone mode
+* `--entrypoint bash rippleci/rippled:2.3.0-rc1` manually overrides the entrypoint (for versions of rippled >= 2.3.0)
+*  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
 
 ### Browser Tests
 
@@ -90,7 +92,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.2.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:2.3.0-rc1 -c 'rippled -a'
 npm run test:browser
 ```
 

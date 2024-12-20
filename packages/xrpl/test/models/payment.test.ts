@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- need additional tests for optional fields */
 import { assert } from 'chai'
 
 import { validate, PaymentFlags, ValidationError } from '../../src'
@@ -271,5 +272,108 @@ describe('Payment', function () {
     } as any
     assert.doesNotThrow(() => validatePayment(mptPaymentTransaction))
     assert.doesNotThrow(() => validate(mptPaymentTransaction))
+  })
+
+  it(`throws w/ non-array CredentialIDs`, function () {
+    paymentTransaction.CredentialIDs =
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
+
+    const errorMessage = 'Payment: Credentials must be an array'
+
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws CredentialIDs length exceeds max length`, function () {
+    paymentTransaction.CredentialIDs = [
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66B',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66C',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66D',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66E',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66F',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F660',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F661',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
+    ]
+
+    const errorMessage = 'Payment: Credentials length cannot exceed 8 elements'
+
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws w/ empty CredentialIDs`, function () {
+    paymentTransaction.CredentialIDs = []
+
+    const errorMessage = 'Payment: Credentials cannot be an empty array'
+
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws w/ non-string CredentialIDs`, function () {
+    paymentTransaction.CredentialIDs = [
+      123123,
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
+    ]
+
+    const errorMessage = 'Payment: Invalid Credentials ID list format'
+
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+  })
+
+  it(`throws w/ duplicate CredentialIDs`, function () {
+    paymentTransaction.CredentialIDs = [
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
+      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
+    ]
+
+    const errorMessage =
+      'Payment: Credentials cannot contain duplicate elements'
+
+    assert.throws(
+      () => validatePayment(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
+    assert.throws(
+      () => validate(paymentTransaction),
+      ValidationError,
+      errorMessage,
+    )
   })
 })
