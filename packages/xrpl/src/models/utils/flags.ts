@@ -55,6 +55,12 @@ const txToFlag = {
   XChainModifyBridge: XChainModifyBridgeFlags,
 }
 
+function istxToFlagKey(
+  transactionType: string,
+): transactionType is keyof typeof txToFlag {
+  return transactionType in txToFlag
+}
+
 /**
  * Sets a transaction's flags to its numeric representation.
  *
@@ -71,7 +77,7 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
   )
 
   if (tx.Flags) {
-    // eslint-disable-next-line no-param-reassign -- intended param reassign in setter
+    // eslint-disable-next-line no-param-reassign -- intended param reassign in setter, retain old functionality for compatibility
     tx.Flags = convertTxFlagsToNumber(tx)
   }
 }
@@ -87,22 +93,23 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
     return tx.Flags
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- safe member access
-  const flagEnum = txToFlag[tx.TransactionType]
+  if (istxToFlagKey(tx.TransactionType)) {
+    const flagEnum = txToFlag[tx.TransactionType]
+    if (tx.Flags) {
+      return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+        if (flagEnum[flag] == null) {
+          throw new ValidationError(
+            `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(
+              flagEnum,
+            )}`,
+          )
+        }
 
-  if (flagEnum && tx.Flags) {
-    return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
-      if (flagEnum[flag] == null) {
-        throw new ValidationError(
-          `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
-        )
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
-      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
-    }, 0)
+        return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
+      }, 0)
+    }
   }
+
   return 0
 }
 
@@ -120,17 +127,17 @@ export function parseTransactionFlags(tx: Transaction): object {
 
   const booleanFlagMap = {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- safe member access
-  const transactionTypeFlags = txToFlag[tx.TransactionType]
-  Object.values(transactionTypeFlags).forEach((flag) => {
-    if (
-      typeof flag === 'string' &&
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
-      isFlagEnabled(flags, transactionTypeFlags[flag])
-    ) {
-      booleanFlagMap[flag] = true
-    }
-  })
+  if (istxToFlagKey(tx.TransactionType)) {
+    const transactionTypeFlags = txToFlag[tx.TransactionType]
+    Object.values(transactionTypeFlags).forEach((flag) => {
+      if (
+        typeof flag === 'string' &&
+        isFlagEnabled(flags, transactionTypeFlags[flag])
+      ) {
+        booleanFlagMap[flag] = true
+      }
+    })
+  }
 
   return booleanFlagMap
 }
