@@ -502,9 +502,5 @@ export function validateCredentialsList(
 
 function containsDuplicates(objectList: object[]): boolean {
   const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
-  if (objSet.size !== objectList.length) {
-    return true
-  }
-
-  return false
+  return objSet.size !== objectList.length
 }
