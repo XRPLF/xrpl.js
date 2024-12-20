@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -166,6 +167,37 @@ export function isAmount(amount: unknown): amount is Amount {
     isIssuedCurrency(amount) ||
     isMPTAmount(amount)
   )
+}
+
+/**
+ * Check if two amounts are equal.
+ *
+ * @param amount1 - The first amount to compare.
+ * @param amount2 - The second amount to compare.
+ * @returns Whether the two amounts are equal.
+ * @throws When the amounts are not valid.
+ */
+export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
+  const isAmount1Invalid = !isAmount(amount1)
+  if (isAmount1Invalid || !isAmount(amount2)) {
+    throw new ValidationError(
+      `Amount: invalid field. Expected Amount but received ${JSON.stringify(
+        isAmount1Invalid ? amount1 : amount2,
+      )}`,
+    )
+  }
+
+  if (isString(amount1) && isString(amount2)) {
+    return new BigNumber(amount1).eq(amount2)
+  }
+
+  if (isRecord(amount1) && isRecord(amount2)) {
+    return Object.entries(amount1).every(
+      ([key, value]) => amount2[key] === value,
+    )
+  }
+
+  return false
 }
 
 /**

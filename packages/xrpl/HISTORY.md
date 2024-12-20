@@ -8,11 +8,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Added new MPT transaction definitions (XLS-33)
 * New `MPTAmount` type support for `Payment` and `Clawback` transactions
+* New util `areAmountsEqual` to check if 2 amounts are strictly equal
 
 ### Fixed
 * `TransactionStream` model supports APIv2
 * `TransactionStream` model includes `close_time_iso` field
 * `Ledger` model includes `close_time_iso` field
+* `autofill` function in client not validating amounts correctly
 
 ## 4.0.0 (2024-07-15)
 
