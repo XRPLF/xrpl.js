@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 2.2.0 (2024-12-16)
+## 2.2.0 (2024-12-20)
 
 ### Added
 * Support for the Multi-Purpose Token amendment (XLS-33)
