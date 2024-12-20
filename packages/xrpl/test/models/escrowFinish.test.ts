@@ -120,20 +120,6 @@ describe('EscrowFinish', function () {
     assert.throws(() => validate(escrow), ValidationError, errorMessage)
   })
 
-  it(`throws w/ non-array CredentialIDs`, function () {
-    escrow.CredentialIDs =
-      'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
-
-    const errorMessage = 'EscrowFinish: Credentials must be an array'
-
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
-  })
-
   it(`throws CredentialIDs length exceeds max length`, function () {
     escrow.CredentialIDs = [
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
@@ -147,7 +133,8 @@ describe('EscrowFinish', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'Credentials length cannot exceed 8 elements'
+    const errorMessage =
+      'EscrowFinish: Credentials length cannot exceed 8 elements'
 
     assert.throws(
       () => validateEscrowFinish(escrow),
@@ -186,7 +173,7 @@ describe('EscrowFinish', function () {
     assert.throws(() => validate(escrow), ValidationError, errorMessage)
   })
 
-  it(`throws w/ non-string CredentialIDs`, function () {
+  it(`throws w/ duplicate CredentialIDs`, function () {
     escrow.CredentialIDs = [
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
