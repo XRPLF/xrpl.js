@@ -61,7 +61,7 @@ const capitalizationExceptions = {
 function translate(inp) {
   try {
     if (inp.match(/^UINT/m))
-      if (inp.match(/256/m) || inp.match(/160/m) || inp.match(/128/m))
+      if (inp.match(/256/m) || inp.match(/160/m) || inp.match(/128/m) || inp.match(/192/m))
         return inp.replace('UINT', 'Hash')
       else return inp.replace('UINT', 'UInt')
     if (inp == 'OBJECT' || inp == 'ARRAY')
