@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased Changes
 
-## 4.1.0 (2024-12-20)
+## 4.1.0 (2024-12-23)
 
 ### Added
 * Added new MPT transaction definitions (XLS-33)
