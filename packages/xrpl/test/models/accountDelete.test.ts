@@ -20,7 +20,7 @@ describe('AccountDelete', function () {
       Fee: '5000000',
       Sequence: 2470665,
       Flags: 2147483648,
-      CredentialIds: [
+      CredentialIDs: [
         'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
       ],
     } as any
