@@ -19,12 +19,14 @@ import {
 export interface PaymentChannelCreate extends BaseTransaction {
   TransactionType: 'PaymentChannelCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and set aside
-   * in this channel. While the channel is open, the XRP can only go to the
+   * Amount of currency to deduct from the sender's balance and set aside
+   * in this channel. Can either be a string
+   * value of XRP in drops or an issued currency dictionary with string
+   * keys and string values. While the channel is open, the XRP can only go to the
    * Destination address. When the channel closes, any unclaimed XRP is returned
    * to the source address's balance.
    */
-  Amount: string
+  Amount: string | Record<string, string>
   /**
    * Address to receive XRP claims against this channel. This is also known as
    * the "destination address" for the channel.
@@ -57,9 +59,9 @@ export interface PaymentChannelCreate extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of an PaymentChannelCreate at runtime.
+ * Verify the form and type of a PaymentChannelCreate at runtime.
  *
- * @param tx - An PaymentChannelCreate Transaction.
+ * @param tx - A PaymentChannelCreate Transaction.
  * @throws When the PaymentChannelCreate is Malformed.
  */
 export function validatePaymentChannelCreate(
@@ -71,8 +73,16 @@ export function validatePaymentChannelCreate(
     throw new ValidationError('PaymentChannelCreate: missing Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelCreate: Amount must be a string')
+  if (
+    typeof tx.Amount !== 'string' &&
+    !(typeof tx.Amount === 'object' && tx.Amount !== null && !Array.isArray(tx.Amount) &&
+      Object.entries(tx.Amount).every(
+        ([key, value]) => typeof key === 'string' && typeof value === 'string'
+      ))
+  ) {
+    throw new ValidationError(
+      'PaymentChannelCreate: Amount must be a string or an object with string keys and string values',
+    )
   }
 
   validateRequiredField(tx, 'Destination', isAccount)

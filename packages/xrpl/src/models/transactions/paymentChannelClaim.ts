@@ -114,11 +114,13 @@ export interface PaymentChannelClaim extends BaseTransaction {
    */
   Balance?: string
   /**
-   * The amount of XRP, in drops, authorized by the Signature. This must match
-   * the amount in the signed message. This is the cumulative amount of XRP that
-   * can be dispensed by the channel, including XRP previously redeemed.
+   * The amount of currency authorized by the Signature. Can either be a string
+   * value of XRP in drops or a issued currency dictionary with string
+   * keys and string values.  This must match the amount in the signed message.
+   * This is the cumulative amount of currency that can be dispensed by the
+   * channel, including currency previously redeemed.
    */
-  Amount?: string
+  Amount?: string | Record<string, string>
   /**
    * The signature of this claim, as hexadecimal. The signed message contains
    * the channel ID and the amount of the claim. Required unless the sender of
@@ -140,9 +142,9 @@ export interface PaymentChannelClaim extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of an PaymentChannelClaim at runtime.
+ * Verify the form and type of a PaymentChannelClaim at runtime.
  *
- * @param tx - An PaymentChannelClaim Transaction.
+ * @param tx - A PaymentChannelClaim Transaction.
  * @throws When the PaymentChannelClaim is Malformed.
  */
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
@@ -167,8 +169,19 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentChannelClaim: Balance must be a string')
   }
 
-  if (tx.Amount !== undefined && typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Amount must be a string')
+  if (
+    tx.Amount !== undefined &&
+    !(typeof tx.Amount === 'string' ||
+      (typeof tx.Amount === 'object' &&
+        tx.Amount !== null &&
+        !Array.isArray(tx.Amount) &&
+        Object.entries(tx.Amount).every(
+          ([key, value]) => typeof key === 'string' && typeof value === 'string',
+        )))
+  ) {
+    throw new ValidationError(
+      'PaymentChannelClaim: Amount must be a string or an object with string keys and string values',
+    )
   }
 
   if (tx.Signature !== undefined && typeof tx.Signature !== 'string') {

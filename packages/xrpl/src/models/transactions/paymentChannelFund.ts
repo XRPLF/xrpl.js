@@ -17,10 +17,11 @@ export interface PaymentChannelFund extends BaseTransaction {
    */
   Channel: string
   /**
-   * Amount of XRP in drops to add to the channel. Must be a positive amount
-   * of XRP.
+   * Amount of currency to add to the channel. Can either be a string
+   * value of XRP in drops or a issued currency dictionary with string
+   * keys and string values.
    */
-  Amount: string
+  Amount: string | Record<string, string>
   /**
    * New Expiration time to set for the channel in seconds since the Ripple
    * Epoch. This must be later than either the current time plus the SettleDelay
@@ -35,9 +36,9 @@ export interface PaymentChannelFund extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of an PaymentChannelFund at runtime.
+ * Verify the form and type of a PaymentChannelFund at runtime.
  *
- * @param tx - An PaymentChannelFund Transaction.
+ * @param tx - A PaymentChannelFund Transaction.
  * @throws When the PaymentChannelFund is Malformed.
  */
 export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
@@ -55,8 +56,16 @@ export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentChannelFund: missing Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelFund: Amount must be a string')
+  if (
+    typeof tx.Amount !== 'string' &&
+    !(typeof tx.Amount === 'object' && tx.Amount !== null && !Array.isArray(tx.Amount) &&
+      Object.entries(tx.Amount).every(
+        ([key, value]) => typeof key === 'string' && typeof value === 'string'
+      ))
+  ) {
+    throw new ValidationError(
+      'PaymentChannelFund: Amount must be a string or an object with string keys and string values'
+    )
   }
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
