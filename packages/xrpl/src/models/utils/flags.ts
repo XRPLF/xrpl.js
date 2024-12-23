@@ -89,25 +89,24 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
  * @returns A numerical representation of a transaction's flags
  */
 export function convertTxFlagsToNumber(tx: Transaction): number {
+  if (!tx.Flags) {
+    return 0
+  }
   if (typeof tx.Flags === 'number') {
     return tx.Flags
   }
 
   if (istxToFlagKey(tx.TransactionType)) {
     const flagEnum = txToFlag[tx.TransactionType]
-    if (tx.Flags) {
-      return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
-        if (flagEnum[flag] == null) {
-          throw new ValidationError(
-            `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(
-              flagEnum,
-            )}`,
-          )
-        }
+    return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+      if (flagEnum[flag] == null) {
+        throw new ValidationError(
+          `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
+        )
+      }
 
-        return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
-      }, 0)
-    }
+      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
+    }, 0)
   }
 
   return 0
