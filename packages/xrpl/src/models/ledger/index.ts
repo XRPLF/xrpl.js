@@ -6,6 +6,7 @@ import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
+import Credential from './Credential'
 import DepositPreauth from './DepositPreauth'
 import DID from './DID'
 import DirectoryNode from './DirectoryNode'
@@ -18,6 +19,8 @@ import FeeSettings, {
 import { Ledger, LedgerV1 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
+import { MPToken } from './MPToken'
+import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
 import { NFToken, NFTokenPage } from './NFTokenPage'
@@ -39,6 +42,7 @@ export {
   AMM,
   Bridge,
   Check,
+  Credential,
   DepositPreauth,
   DirectoryNode,
   DID,
@@ -55,6 +59,8 @@ export {
   Majority,
   NEGATIVE_UNL_ID,
   NegativeUNL,
+  MPTokenIssuance,
+  MPToken,
   NFTokenOffer,
   NFTokenPage,
   NFToken,

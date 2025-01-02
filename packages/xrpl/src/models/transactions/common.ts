@@ -1,18 +1,25 @@
+/* eslint-disable max-lines -- common utility file */
+import { HEX_REGEX } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import {
   Amount,
+  AuthorizeCredential,
   Currency,
   IssuedCurrencyAmount,
   Memo,
   Signer,
   XChainBridge,
+  MPTAmount,
 } from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
+const MAX_CREDENTIALS_LIST_LENGTH = 8
+const MAX_CREDENTIAL_BYTE_LENGTH = 64
+const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
 function isMemo(obj: { Memo?: unknown }): boolean {
   if (obj.Memo == null) {
@@ -59,6 +66,8 @@ const XRP_CURRENCY_SIZE = 1
 const ISSUE_SIZE = 2
 const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
+const MPTOKEN_SIZE = 2
+const AUTHORIZE_CREDENTIAL_SIZE = 1
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
@@ -120,6 +129,37 @@ export function isIssuedCurrency(
 }
 
 /**
+ * Verify the form and type of an AuthorizeCredential at runtime
+ *
+ * @param input - The input to check the form and type of
+ * @returns Whether the AuthorizeCredential is properly formed
+ */
+function isAuthorizeCredential(input: unknown): input is AuthorizeCredential {
+  return (
+    isRecord(input) &&
+    isRecord(input.Credential) &&
+    Object.keys(input).length === AUTHORIZE_CREDENTIAL_SIZE &&
+    typeof input.Credential.CredentialType === 'string' &&
+    typeof input.Credential.Issuer === 'string'
+  )
+}
+
+/**
+ * Verify the form and type of an MPT at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the MPTAmount is properly formed.
+ */
+export function isMPTAmount(input: unknown): input is MPTAmount {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === MPTOKEN_SIZE &&
+    typeof input.value === 'string' &&
+    typeof input.mpt_issuance_id === 'string'
+  )
+}
+
+/**
  * Must be a valid account address
  */
 export type Account = string
@@ -144,7 +184,11 @@ export function isAccount(account: unknown): account is Account {
  * @returns Whether the Amount is properly formed.
  */
 export function isAmount(amount: unknown): amount is Amount {
-  return typeof amount === 'string' || isIssuedCurrency(amount)
+  return (
+    typeof amount === 'string' ||
+    isIssuedCurrency(amount) ||
+    isMPTAmount(amount)
+  )
 }
 
 /**
@@ -369,4 +413,98 @@ export function parseAmountValue(amount: unknown): bigint {
     return BigInt(amount)
   }
   return BigInt(amount.value)
+}
+
+/**
+ * Verify the form and type of a CredentialType at runtime.
+ *
+ * @param tx A CredentialType Transaction.
+ * @throws when the CredentialType is malformed.
+ */
+export function validateCredentialType(tx: Record<string, unknown>): void {
+  if (typeof tx.TransactionType !== 'string') {
+    throw new ValidationError('Invalid TransactionType')
+  }
+  if (tx.CredentialType === undefined) {
+    throw new ValidationError(
+      `${tx.TransactionType}: missing field CredentialType`,
+    )
+  }
+
+  if (!isString(tx.CredentialType)) {
+    throw new ValidationError(
+      `${tx.TransactionType}: CredentialType must be a string`,
+    )
+  }
+  if (tx.CredentialType.length === 0) {
+    throw new ValidationError(
+      `${tx.TransactionType}: CredentialType cannot be an empty string`,
+    )
+  } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
+    throw new ValidationError(
+      `${tx.TransactionType}: CredentialType length cannot be > ${MAX_CREDENTIAL_TYPE_LENGTH}`,
+    )
+  }
+
+  if (!HEX_REGEX.test(tx.CredentialType)) {
+    throw new ValidationError(
+      `${tx.TransactionType}: CredentialType must be encoded in hex`,
+    )
+  }
+}
+
+/**
+ * Check a CredentialAuthorize array for parameter errors
+ *
+ * @param credentials An array of credential IDs to check for errors
+ * @param transactionType The transaction type to include in error messages
+ * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
+ * @throws Validation Error if the formatting is incorrect
+ */
+// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
+export function validateCredentialsList(
+  credentials: unknown,
+  transactionType: string,
+  isStringID: boolean,
+): void {
+  if (credentials == null) {
+    return
+  }
+  if (!Array.isArray(credentials)) {
+    throw new ValidationError(
+      `${transactionType}: Credentials must be an array`,
+    )
+  }
+  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
+    throw new ValidationError(
+      `${transactionType}: Credentials length cannot exceed ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
+    )
+  } else if (credentials.length === 0) {
+    throw new ValidationError(
+      `${transactionType}: Credentials cannot be an empty array`,
+    )
+  }
+  credentials.forEach((credential) => {
+    if (isStringID) {
+      if (!isString(credential)) {
+        throw new ValidationError(
+          `${transactionType}: Invalid Credentials ID list format`,
+        )
+      }
+    } else if (!isAuthorizeCredential(credential)) {
+      throw new ValidationError(
+        `${transactionType}: Invalid Credentials format`,
+      )
+    }
+  })
+  if (containsDuplicates(credentials)) {
+    throw new ValidationError(
+      `${transactionType}: Credentials cannot contain duplicate elements`,
+    )
+  }
+}
+
+function containsDuplicates(objectList: object[]): boolean {
+  const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+  return objSet.size !== objectList.length
 }
