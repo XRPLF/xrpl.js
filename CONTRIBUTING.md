@@ -12,7 +12,7 @@
 
 ### Requirements
 
-We use Node v16 for development - that is the version that our linters require.
+We use Node v18 for development - that is the version that our linters require.
 You must also use `npm` v7. You can check your `npm` version with:
 
 ```bash
@@ -64,18 +64,20 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.0.0-b4 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:2.3.0-rc1 -c 'rippled -a'
 npm run build
 npm run test:integration
 ```
 
 Breaking down the command:
 * `docker run -p 6006:6006` starts a Docker container with an open port for admin WebSocket requests.
-* `--interactive` allows you to interact with the container.
-* `-t` starts a terminal in the container for you to send commands to.
-* `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
+ `--rm` tells docker to close the container after processes are done running.
+* `-it` allows you to interact with the container.
+   `--name rippled_standalone` is an instance name for clarity
+* `--volume $PWD/.ci-config:/etc/opt/ripple/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
 * `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
-* `/opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg` starts `rippled` in standalone mode
+* `--entrypoint bash rippleci/rippled:2.3.0-rc1` manually overrides the entrypoint (for versions of rippled >= 2.3.0)
+*  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
 
 ### Browser Tests
 
@@ -90,7 +92,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.2.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:2.3.0-rc1 -c 'rippled -a'
 npm run test:browser
 ```
 
@@ -104,6 +106,8 @@ The 4 packages currently here are:
 2. ripple-binary-codec - A library for serializing and deserializing transactions for the ledger.
 3. ripple-keypairs - A library for generating and using cryptographic keypairs.
 4. ripple-address-codec - A library for encoding and decoding XRP Ledger addresses and seeds.
+5. isomorphic - A collection of isomorphic implementations of crypto and utility functions.
+6. secret-numbers - Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits.
 
 Each package has it's own README which dives deeper into what it's main purpose is, and the core functionality it offers.
 They also run tests independently as they were originally in separate repositories.
@@ -128,13 +132,13 @@ For every file in `src`, we try to have a corresponding file in `test` with unit
 
 The goal is to maintain above 80% code coverage, and generally any new feature or bug fix should be accompanied by unit tests, and integration tests if applicable.
 
-For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.ts).
+For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.test.ts).
 
 If your code connects to the ledger (ex. Adding a new transaction type) it's handy to write integration tests to ensure that you can successfully interact with the ledger. Integration tests are generally run against a docker instance of rippled which contains the latest updates. Since standalone mode allows us to manually close ledgers, this allows us to run integration tests at a much faster rate than if we had to wait 4-5 seconds per transaction for the ledger to validate the transaction. [See above](#running-tests) for how to start up the docker container to run integration tests.
 
 All integration tests should be written in the `test/integration` folder, with new `Requests` and `Transactions` tests being in their respective folders.
 
-For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.ts).
+For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.test.ts).
 
 ## Generate reference docs
 

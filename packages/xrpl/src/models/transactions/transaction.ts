@@ -19,6 +19,9 @@ import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { BaseTransaction, isIssuedCurrency } from './common'
+import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -27,6 +30,19 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -109,12 +125,19 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | CredentialAccept
+  | CredentialCreate
+  | CredentialDelete
   | DIDDelete
   | DIDSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | MPTokenAuthorize
+  | MPTokenIssuanceCreate
+  | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -282,6 +305,18 @@ export function validate(transaction: Record<string, unknown>): void {
       validateClawback(tx)
       break
 
+    case 'CredentialAccept':
+      validateCredentialAccept(tx)
+      break
+
+    case 'CredentialCreate':
+      validateCredentialCreate(tx)
+      break
+
+    case 'CredentialDelete':
+      validateCredentialDelete(tx)
+      break
+
     case 'DIDDelete':
       validateDIDDelete(tx)
       break
@@ -304,6 +339,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
+      break
+
+    case 'MPTokenIssuanceCreate':
+      validateMPTokenIssuanceCreate(tx)
+      break
+
+    case 'MPTokenIssuanceDestroy':
+      validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
       break
 
     case 'NFTokenAcceptOffer':

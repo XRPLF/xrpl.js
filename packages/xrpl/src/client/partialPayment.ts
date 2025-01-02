@@ -4,22 +4,35 @@ import { decode } from 'ripple-binary-codec'
 import type {
   TransactionEntryResponse,
   TransactionStream,
+  TransactionV1Stream,
   TxResponse,
 } from '..'
-import type { Amount, APIVersion, DEFAULT_API_VERSION } from '../models/common'
+import type {
+  Amount,
+  IssuedCurrency,
+  APIVersion,
+  DEFAULT_API_VERSION,
+  MPTAmount,
+} from '../models/common'
 import type {
   AccountTxTransaction,
   RequestResponseMap,
 } from '../models/methods'
 import { AccountTxVersionResponseMap } from '../models/methods/accountTx'
 import { BaseRequest, BaseResponse } from '../models/methods/baseMethod'
-import { PaymentFlags, Transaction } from '../models/transactions'
+import { PaymentFlags, Transaction, isMPTAmount } from '../models/transactions'
 import type { TransactionMetadata } from '../models/transactions/metadata'
 import { isFlagEnabled } from '../models/utils'
 
 const WARN_PARTIAL_PAYMENT_CODE = 2001
 
-function amountsEqual(amt1: Amount, amt2: Amount): boolean {
+/* eslint-disable complexity -- check different token types */
+/* eslint-disable @typescript-eslint/consistent-type-assertions -- known currency type */
+function amountsEqual(
+  amt1: Amount | MPTAmount,
+  amt2: Amount | MPTAmount,
+): boolean {
+  // Compare XRP
   if (typeof amt1 === 'string' && typeof amt2 === 'string') {
     return amt1 === amt2
   }
@@ -28,15 +41,32 @@ function amountsEqual(amt1: Amount, amt2: Amount): boolean {
     return false
   }
 
+  // Compare MPTs
+  if (isMPTAmount(amt1) && isMPTAmount(amt2)) {
+    const aValue = new BigNumber(amt1.value)
+    const bValue = new BigNumber(amt2.value)
+
+    return (
+      amt1.mpt_issuance_id === amt2.mpt_issuance_id && aValue.isEqualTo(bValue)
+    )
+  }
+
+  if (isMPTAmount(amt1) || isMPTAmount(amt2)) {
+    return false
+  }
+
+  // Compare issued currency (IOU)
   const aValue = new BigNumber(amt1.value)
   const bValue = new BigNumber(amt2.value)
 
   return (
-    amt1.currency === amt2.currency &&
-    amt1.issuer === amt2.issuer &&
+    (amt1 as IssuedCurrency).currency === (amt2 as IssuedCurrency).currency &&
+    (amt1 as IssuedCurrency).issuer === (amt2 as IssuedCurrency).issuer &&
     aValue.isEqualTo(bValue)
   )
 }
+/* eslint-enable complexity */
+/* eslint-enable @typescript-eslint/consistent-type-assertions */
 
 function isPartialPayment(
   tx?: Transaction,
@@ -159,10 +189,10 @@ export function handlePartialPayment<
  * @param log - The method used for logging by the connection (to report the partial payment).
  */
 export function handleStreamPartialPayment(
-  stream: TransactionStream,
+  stream: TransactionStream | TransactionV1Stream,
   log: (id: string, message: string) => void,
 ): void {
-  if (isPartialPayment(stream.transaction, stream.meta)) {
+  if (isPartialPayment(stream.tx_json ?? stream.transaction, stream.meta)) {
     const warnings = stream.warnings ?? []
 
     const warning = {

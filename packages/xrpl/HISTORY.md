@@ -2,20 +2,42 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## Unreleased
-* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
+## Unreleased Changes
+
+## 4.1.0 (2024-12-23)
+
+### Added
+* Added new MPT transaction definitions (XLS-33)
+* New `MPTAmount` type support for `Payment` and `Clawback` transactions
+* `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Support for XLS-70d (Credentials)
+
+### Fixed
+* `TransactionStream` model supports APIv2
+* `TransactionStream` model includes `close_time_iso` field
+* `Ledger` model includes `close_time_iso` field
+
+## 4.0.0 (2024-07-15)
 
 ### BREAKING CHANGES
 * Use rippled api_version v2 as default while maintaining support for v1.
 
 ### Added
 * Add `nfts_by_issuer` clio-only API definition
+* Add `include_deleted` to ledgerEntry request and `deleted_ledger_index` to ledgerEntry response
 * Support for the `fixPreviousTxnID` amendment.
+* Support for the user version of the `feature` RPC.
+* Add `hash` field to `ledger` command response
+
+### Removed
+* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
 
 ## 3.1.0 (2024-06-03)
 
 ### BREAKING CHANGES
 * Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
+* Node.js has been upgraded to a minimum version of 18
+* `fetch` now relies on the native javascript environment in browsers and Node.js
 
 ### Added
 * Support for the Price Oracles amendment (XLS-47).
@@ -30,6 +52,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## 3.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
+* The default signing algorithm in the `Wallet` was changed from secp256k1 to ed25519
 * Bump typescript to 5.x
 * Remove Node 14 support
 * Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`

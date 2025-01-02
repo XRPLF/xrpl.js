@@ -33,7 +33,7 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "@types/node": "^16.18.38",
+    "@types/node": "^18.18.38",
     "@types/ws": "^8.5.6"
   },
   "repository": {
@@ -43,6 +43,6 @@
   "license": "ISC",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   }
 }

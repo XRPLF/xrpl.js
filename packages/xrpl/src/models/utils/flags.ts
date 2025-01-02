@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
-
 import { ValidationError } from '../../errors'
 import {
   AccountRootFlagsInterface,
@@ -10,6 +9,9 @@ import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { GlobalFlags } from '../transactions/common'
+import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
+import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
@@ -49,6 +51,9 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  MPTokenAuthorize: MPTokenAuthorizeFlags,
+  MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
   OfferCreate: OfferCreateFlags,
@@ -89,4 +94,31 @@ function convertFlagsToNumber(flags: GlobalFlags, flagEnum: any): number {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
     return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
   }, 0)
+}
+
+/**
+ * Convert a Transaction flags property into a map for easy interpretation.
+ *
+ * @param tx - A transaction to parse flags for.
+ * @returns A map with all flags as booleans.
+ */
+export function parseTransactionFlags(tx: Transaction): object {
+  setTransactionFlagsToNumber(tx)
+  if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags === 0) {
+    return {}
+  }
+
+  const flags = tx.Flags
+  const flagsMap = {}
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- safe member access
+  const flagEnum = txToFlag[tx.TransactionType]
+  Object.values(flagEnum).forEach((flag) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
+    if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
+      flagsMap[flag] = true
+    }
+  })
+
+  return flagsMap
 }
