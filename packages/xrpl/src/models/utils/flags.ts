@@ -7,6 +7,10 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
+import { GlobalFlags } from '../transactions/common'
+import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
+import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
@@ -46,6 +50,9 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  MPTokenAuthorize: MPTokenAuthorizeFlags,
+  MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
+  MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
   NFTokenCreateOffer: NFTokenCreateOfferFlags,
   NFTokenMint: NFTokenMintFlags,
   OfferCreate: OfferCreateFlags,
