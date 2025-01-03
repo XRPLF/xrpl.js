@@ -105,7 +105,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
         )
       }
 
-      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
+      return resultFlags | flagEnum[flag]
     }, 0)
   }
 
