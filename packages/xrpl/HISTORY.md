@@ -5,7 +5,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
-* `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * `convertTxFlagsToNumber` as a utility function in xrpl to return the number conversion of a transaction's flags
 
 ### Fixed
