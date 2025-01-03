@@ -7,7 +7,6 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
-import { GlobalFlags } from '../transactions/common'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
@@ -112,7 +111,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
         )
       }
 
-      return resultFlags | flagEnum[flag]
+      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
     }, 0)
   }
 
