@@ -40,6 +40,8 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
+  SimulateResponse,
+  SimulateRequest,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
 import type {
@@ -74,7 +76,7 @@ import {
   separateBuySellOrders,
   sortAndLimitOffers,
 } from '../sugar/getOrderbook'
-import { dropsToXrp, hashes, isValidClassicAddress } from '../utils'
+import { decode, dropsToXrp, hashes, isValidClassicAddress } from '../utils'
 import { Wallet } from '../Wallet'
 import {
   type FaucetRequestBody,
@@ -762,6 +764,70 @@ class Client extends EventEmitter<EventTypes> {
   ): Promise<SubmitResponse> {
     const signedTx = await getSignedTx(this, transaction, opts)
     return submitRequest(this, signedTx, opts?.failHard)
+  }
+
+  /**
+   * Simulates an unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
+   * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.binary - If true, return the metadata in a binary encoding.
+   *
+   * @returns A promise that contains SimulateResponse.
+   * @throws RippledError if the simulate request fails.
+   */
+  public async simulate(
+    transaction: SubmittableTransaction | string,
+    opts?: {
+      // If true, return the binary-encoded representation of the results.
+      binary?: boolean
+    },
+  ): Promise<SimulateResponse> {
+    // verify that the transaction isn't signed
+    const decodedTx =
+      typeof transaction === 'string'
+        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed for typing
+          (decode(transaction) as unknown as SubmittableTransaction)
+        : transaction
+    if (typeof decodedTx === 'string') {
+      throw new ValidationError(
+        'Provided transaction is not a valid transaction.',
+      )
+    }
+    if (decodedTx.TxnSignature !== '' && decodedTx.TxnSignature != null) {
+      throw new ValidationError('Transaction must not be signed.')
+    }
+    if (
+      decodedTx.Signers?.some(
+        (signer) =>
+          signer.Signer.TxnSignature !== '' &&
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+          signer.Signer.TxnSignature != null,
+      )
+    ) {
+      throw new ValidationError('Transaction must not be signed.')
+    }
+
+    setValidAddresses(decodedTx)
+    setTransactionFlagsToNumber(decodedTx)
+
+    if (decodedTx.NetworkID == null) {
+      decodedTx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
+    }
+
+    // send request
+    const binary = opts?.binary ?? false
+    const request: SimulateRequest =
+      typeof transaction === 'string'
+        ? { command: 'simulate', tx_blob: transaction, binary }
+        : { command: 'simulate', tx_json: transaction, binary }
+    return this.request(request)
   }
 
   /**

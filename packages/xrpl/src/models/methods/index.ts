@@ -211,6 +211,7 @@ type Request =
   | LedgerDataRequest
   | LedgerEntryRequest
   // transaction methods
+  | SimulateRequest
   | SubmitRequest
   | SubmitMultisignedRequest
   | TransactionEntryRequest
@@ -269,6 +270,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | LedgerDataResponse
   | LedgerEntryResponse
   // transaction methods
+  | SimulateResponse
   | SubmitResponse
   | SubmitMultisignedVersionResponseMap<Version>
   | TransactionEntryResponse
