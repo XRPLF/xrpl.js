@@ -85,4 +85,45 @@ describe('TrustSet', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'Create a Deep-Frozen trust line',
+    async () => {
+      assert(wallet2 != null)
+      // preemptively deep-freeze a trust line with the specified counter-party/currency-code
+      const tx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: testContext.wallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: wallet2.classicAddress,
+          value: '10',
+        },
+        Flags: {
+          tfSetFreeze: true,
+          tfSetDeepFreeze: true,
+        },
+      }
+
+      const response = await testTransaction(
+        testContext.client,
+        tx,
+        testContext.wallet,
+      )
+      assert.equal(response.result.engine_result, 'tesSUCCESS')
+
+      // assert that the trust line is deep-frozen
+      const trustLine = await testContext.client.request({
+        command: 'account_lines',
+        account: testContext.wallet.classicAddress,
+      })
+
+      // assert that the TrustLine is deep-frozen
+      assert.equal(trustLine.result.lines[0].freeze, true)
+
+      // Keshava: ensure that account_lines RPC response contains a deep_freeze flag
+      // assert.equal(trustLine.result.lines[0].deep_freeze, true)
+    },
+    TIMEOUT,
+  )
 })

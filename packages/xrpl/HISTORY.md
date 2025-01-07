@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased Changes
 
+### Added
+* Support for XLS-77d Deep-Freeze amendment
+
 ## 4.1.0 (2024-12-23)
 
 ### Added
