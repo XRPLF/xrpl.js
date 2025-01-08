@@ -911,6 +911,26 @@
       }
     ],
     [
+      "IssuerNode",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "SubjectNode",
+      {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "UInt64"
+      }
+    ],
+    [
       "EmailHash",
       {
         "isSerialized": true,
@@ -1811,6 +1831,16 @@
       }
     ],
     [
+      "CredentialType",
+      {
+        "nth": 31,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "isSerialized": true,
@@ -1977,6 +2007,16 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 23,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Subject",
+      {
+        "nth": 24,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
         "type": "AccountID"
       }
     ],
@@ -2271,6 +2311,16 @@
       }
     ],
     [
+      "Credential",
+      {
+        "nth": 33,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -2461,6 +2511,26 @@
       }
     ],
     [
+      "AuthorizeCredentials",
+      {
+        "nth": 26,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "UnauthorizeCredentials",
+      {
+        "nth": 27,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -2641,6 +2711,16 @@
       }
     ],
     [
+      "CredentialIDs",
+      {
+        "nth": 5,
+        "isVLEncoded": true,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Vector256"
+      }
+    ],
+    [
       "MPTokenIssuanceID",
       {
         "isSerialized": true,
@@ -2781,6 +2861,7 @@
     "NegativeUNL": 78,
     "Offer": 111,
     "Oracle": 128,
+    "Credential": 129,
     "PayChannel": 120,
     "RippleState": 114,
     "SignerList": 83,
@@ -2797,6 +2878,7 @@
     "tecAMM_NOT_EMPTY": 167,
     "tecARRAY_EMPTY": 190,
     "tecARRAY_TOO_LARGE": 191,
+    "tecBAD_CREDENTIALS": 193,
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecCLAIM": 100,
     "tecCRYPTOCONDITION_ERROR": 146,
@@ -2982,6 +3064,9 @@
     "CheckCash": 17,
     "CheckCreate": 16,
     "Clawback": 30,
+    "CredentialCreate": 58,
+    "CredentialAccept": 59,
+    "CredentialDelete": 60,
     "DIDDelete": 50,
     "DIDSet": 49,
     "DepositPreauth": 19,

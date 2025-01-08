@@ -19,6 +19,7 @@ describe('MPTokenIssuanceSet', function () {
     } as any
 
     assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+
     validMPTokenIssuanceSet = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -54,15 +55,23 @@ describe('MPTokenIssuanceSet', function () {
   })
 
   it(`throws w/ conflicting flags`, function () {
-    /* eslint-disable no-bitwise -- Bitwise operation needed for flag combination */
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      Flags:
-        MPTokenIssuanceSetFlags.tfMPTLock | MPTokenIssuanceSetFlags.tfMPTUnlock,
     } as any
-    /* eslint-enable no-bitwise -- Re-enable bitwise rule */
+
+    invalid.Flags =
+      // eslint-disable-next-line no-bitwise -- not needed
+      MPTokenIssuanceSetFlags.tfMPTLock | MPTokenIssuanceSetFlags.tfMPTUnlock
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceSet: flag conflict',
+    )
+
+    invalid.Flags = { tfMPTLock: true, tfMPTUnlock: true }
 
     assert.throws(
       () => validate(invalid),
