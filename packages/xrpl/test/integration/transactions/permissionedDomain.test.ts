@@ -72,8 +72,6 @@ describe('PermissionedDomainSet', function () {
         DomainID: pd.index
       }
 
-      console.log(pd)
-
       await testTransaction(testContext.client, tx_pd_delete, testContext.wallet)
     },
     TIMEOUT,

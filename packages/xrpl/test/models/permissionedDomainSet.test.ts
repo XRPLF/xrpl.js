@@ -12,16 +12,14 @@ import { validate, ValidationError } from '../../src'
  */
 describe('PermissionedDomainSet', function () {
   let tx
+  const sampleCredential: Credential = {
+    Credential: {
+      CredentialType: stringToHex('Passport'),
+      Issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8'
+    }
+  }
 
   beforeEach(function () {
-
-    const sampleCredential: Credential = {
-      Credential: {
-        CredentialType: stringToHex('Passport'),
-        Issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8'
-      }
-    }
-
     tx = {
       TransactionType: 'PermissionedDomainSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
@@ -47,5 +45,23 @@ describe('PermissionedDomainSet', function () {
     const errorMessage = 'PermissionedDomainSet: missing field AcceptedCredentials'
     assert.throws(() => validatePermissionedDomainSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it('throws when AcceptedCredentials exceeds maximum length', function () {
+    tx.AcceptedCredentials = Array(11).fill(sampleCredential)
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      'PermissionedDomainSet: AcceptedCredentials must have at most 10 Credential objects'
+    )
+  })
+
+  it('throws when AcceptedCredentials is empty', function () {
+    tx.AcceptedCredentials = []
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      'PermissionedDomainSet: AcceptedCredentials must have at least one Credential object'
+    )
   })
 })
