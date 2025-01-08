@@ -135,7 +135,7 @@ describe('Payment', function () {
       const meta = txResponse.result
         .meta as TransactionMetadata<MPTokenIssuanceCreate>
 
-      const mptID = meta.mpt_issuance_id
+      const mptID = meta.mpt_issuance_id!
 
       let accountObjectsResponse = await testContext.client.request({
         command: 'account_objects',
@@ -151,7 +151,7 @@ describe('Payment', function () {
       const authTx: MPTokenAuthorize = {
         TransactionType: 'MPTokenAuthorize',
         Account: wallet2.classicAddress,
-        MPTokenIssuanceID: mptID!,
+        MPTokenIssuanceID: mptID,
       }
 
       await testTransaction(testContext.client, authTx, wallet2)
@@ -173,7 +173,7 @@ describe('Payment', function () {
         Account: testContext.wallet.classicAddress,
         Destination: wallet2.classicAddress,
         Amount: {
-          mpt_issuance_id: mptID!,
+          mpt_issuance_id: mptID,
           value: '100',
         },
       }
