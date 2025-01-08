@@ -78,7 +78,7 @@ export interface Batch extends BaseTransaction {
   /**
    * Optional because it can be autofilled.
    */
-  TxIDs?: string[]
+  TransactionIDs?: string[]
 }
 
 export interface BatchMetadata extends TransactionMetadataBase {
@@ -167,5 +167,5 @@ export function validateBatch(tx: Record<string, unknown>): void {
     )
   })
 
-  validateOptionalField(tx, 'TxIDs', isArray)
+  validateOptionalField(tx, 'TransactionIDs', isArray)
 }

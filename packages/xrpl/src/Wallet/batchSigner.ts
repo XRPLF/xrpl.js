@@ -50,7 +50,7 @@ export function signMultiBatch(
   validate(transaction as unknown as Record<string, unknown>)
   const fieldsToSign = {
     flags: transaction.Flags,
-    txIDs: transaction.TxIDs,
+    txIDs: transaction.TransactionIDs,
   }
   let batchSigner: BatchSigner
   if (multisignAddress) {
@@ -150,19 +150,21 @@ export function combineBatchSigners(
 function validateBatchTransactionEquivalence(transactions: Batch[]): void {
   const exampleTransaction = JSON.stringify({
     Flags: transactions[0].Flags,
-    TxIDs: transactions[0].TxIDs,
+    TransactionIDs: transactions[0].TransactionIDs,
   })
   if (
     transactions
       .slice(1)
       .some(
         (tx) =>
-          JSON.stringify({ Flags: tx.Flags, TxIDs: tx.TxIDs }) !==
-          exampleTransaction,
+          JSON.stringify({
+            Flags: tx.Flags,
+            TransactionIDs: tx.TransactionIDs,
+          }) !== exampleTransaction,
       )
   ) {
     throw new ValidationError(
-      'Flags and TxIDs is not the same for all provided transactions.',
+      'Flags and TransactionIDs is not the same for all provided transactions.',
     )
   }
 }

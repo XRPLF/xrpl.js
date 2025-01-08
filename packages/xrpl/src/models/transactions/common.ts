@@ -388,7 +388,9 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   }
 
   if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
-    throw new ValidationError('BaseTransaction: Unknown TransactionType')
+    throw new ValidationError(
+      `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
+    )
   }
 
   validateRequiredField(common, 'Account', isString)

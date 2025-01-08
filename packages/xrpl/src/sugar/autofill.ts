@@ -491,8 +491,8 @@ export async function autofillBatchTxn(
 
     txIds.push(hashSignedTx(txn))
   }
-  if (tx.TxIDs == null) {
+  if (tx.TransactionIDs == null) {
     // eslint-disable-next-line no-param-reassign -- okay for autofilling
-    tx.TxIDs = txIds
+    tx.TransactionIDs = txIds
   }
 }

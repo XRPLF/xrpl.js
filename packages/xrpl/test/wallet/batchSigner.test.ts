@@ -65,7 +65,7 @@ describe('Wallet batch operations', function () {
           },
         ],
         TransactionType: 'Batch',
-        TxIDs: [
+        TransactionIDs: [
           'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
           '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
         ],
@@ -156,7 +156,7 @@ describe('Wallet batch operations', function () {
       ],
       Sequence: 215,
       TransactionType: 'Batch',
-      TxIDs: [
+      TransactionIDs: [
         'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
         '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
       ],
@@ -201,12 +201,16 @@ describe('Wallet batch operations', function () {
         },
       }
       const rawTxs = originalTx.RawTransactions.concat(rawTx3)
-      const txIds = originalTx.TxIDs?.concat([
+      const txIds = originalTx.TransactionIDs?.concat([
         hashSignedTx(rawTx3.RawTransaction),
       ])
 
       // set up all the transactions again (repeat what's done in `beforeEach`)
-      const newTx = { ...originalTx, RawTransactions: rawTxs, TxIDs: txIds }
+      const newTx = {
+        ...originalTx,
+        RawTransactions: rawTxs,
+        TransactionIDs: txIds,
+      }
       tx1 = { ...newTx }
       tx2 = { ...newTx }
       const tx3 = { ...newTx }

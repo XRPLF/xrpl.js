@@ -63,7 +63,7 @@ describe('Batch', function () {
         },
       ],
       TransactionType: 'Batch',
-      TxIDs: [
+      TransactionIDs: [
         'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
         '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
       ],
@@ -119,18 +119,18 @@ describe('Batch', function () {
     )
   })
 
-  it('throws w/ invalid TxIDs', function () {
-    tx.TxIDs = 0
+  it('throws w/ invalid TransactionIDs', function () {
+    tx.TransactionIDs = 0
 
     assert.throws(
       () => validateBatch(tx),
       ValidationError,
-      'Batch: invalid field TxIDs',
+      'Batch: invalid field TransactionIDs',
     )
     assert.throws(
       () => validate(tx),
       ValidationError,
-      'Batch: invalid field TxIDs',
+      'Batch: invalid field TransactionIDs',
     )
   })
 })
