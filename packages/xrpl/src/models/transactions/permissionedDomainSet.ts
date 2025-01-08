@@ -1,5 +1,4 @@
 import { ValidationError } from '../../errors'
-
 import {
   BaseTransaction,
   isString,
@@ -8,8 +7,7 @@ import {
   validateRequiredField,
 } from './common'
 
-import {Credential} from '../ledger/PermissionedDomain'
-
+import { Credential } from '../ledger/PermissionedDomain'
 const ACCEPTED_CREDENTIALS_MAX_LENGTH = 10
 
 export interface PermissionedDomainSet extends BaseTransaction {
@@ -36,7 +34,7 @@ export function validatePermissionedDomainSet(tx: Record<string, unknown>): void
         `PermissionedDomainSet: AcceptedCredentials must have at most ${ACCEPTED_CREDENTIALS_MAX_LENGTH} Credential objects`,
       )
     }
-    else if (value.length == 0) {
+    else if (value.length === 0) {
       throw new ValidationError(
         `PermissionedDomainSet: AcceptedCredentials must have at least one Credential object`,
       )

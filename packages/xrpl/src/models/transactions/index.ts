@@ -106,5 +106,5 @@ export {
   XChainModifyBridgeFlagsInterface,
 } from './XChainModifyBridge'
 
-export {PermissionedDomainSet} from './permissionedDomainSet'
-export {PermissionedDomainDelete} from './permissionedDomainDelete'
+export { PermissionedDomainSet } from './permissionedDomainSet'
+export { PermissionedDomainDelete } from './permissionedDomainDelete'
