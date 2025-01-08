@@ -214,9 +214,18 @@ export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
     return new BigNumber(amount1).eq(amount2)
   }
 
-  if (isRecord(amount1) && isRecord(amount2)) {
-    return Object.entries(amount1).every(
-      ([key, value]) => amount2[key] === value,
+  if (isIssuedCurrency(amount1) && isIssuedCurrency(amount2)) {
+    return (
+      amount1.currency === amount2.currency &&
+      amount1.issuer === amount2.issuer &&
+      new BigNumber(amount1.value).eq(amount2.value)
+    )
+  }
+
+  if (isMPTAmount(amount1) && isMPTAmount(amount2)) {
+    return (
+      amount1.mpt_issuance_id === amount2.mpt_issuance_id &&
+      new BigNumber(amount1.value).eq(amount2.value)
     )
   }
 
