@@ -99,7 +99,7 @@ describe('client.autofill', function () {
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
-  it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields using amount objects', async function () {
+  it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields using amount objects', async function () {
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = {
       currency: 'USD',
