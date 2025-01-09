@@ -11,7 +11,7 @@ Functions to encode/decode to/from the ripple [binary serialization format](http
 
 
 ### decode(binary: string, definitions?: XrplDefinitionsBase): object
-Decode a hex-string into a transaction object.
+Decode a hex-string into a transaction object. Optionally, a custom definition may be provided and utilized during the decoding process
 ```js
 > api.decode('1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337')
 {
@@ -27,7 +27,7 @@ Decode a hex-string into a transaction object.
 ```
 
 ### encode(json: object, definitions?: XrplDefinitionsBase): string
-Encode a transaction object into a hex-string. Note that encode filters out fields with undefined values.
+Encode a transaction object into a hex-string. Note that encode filters out fields with undefined values. Optionally, a custom definition may be provided and utilized during the encoding process
 ```js
 > api.encode({
   LedgerEntryType: 'AccountRoot',
@@ -56,7 +56,7 @@ Encode a transaction object into a hex-string. Note that encode filters out fiel
 
 ### encodeForSigning(json: object, definitions?: XrplDefinitionsBase): string
 
-Encode the transaction object for signing.
+Encode the transaction object for signing. Optionally, a custom definition may be provided and utilized during the encoding process
 
 ### encodeForSigningClaim(json: object): string
 
@@ -64,7 +64,7 @@ Encode the transaction object for payment channel claim.
 
 ### encodeForMultisigning(json: object, signer: string, definitions?: XrplDefinitionsBase): string
 
-Encode the transaction object for multi-signing.
+Encode the transaction object for multi-signing. Optionally, a custom definition may be provided and utilized during the encoding process
 
 ### encodeQuality(value: string): string
 ```js
