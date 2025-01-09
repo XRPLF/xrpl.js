@@ -534,33 +534,6 @@ class Client extends EventEmitter<EventTypes> {
   }
 
   /**
-   * Get Definitions from server_definitions
-   *
-   * @returns void
-   * @example
-   * ```ts
-   * const { Client } = require('xrpl')
-   * const client = new Client('wss://s.altnet.rippletest.net:51233')
-   * await client.getDefinitions()
-   * console.log(client.definitions)
-   * ```
-   */
-  public async getDefinitions(): Promise<void> {
-    try {
-      const response = await this.request({
-        command: 'server_definitions',
-      })
-      this.definitions = new XrplDefinitionsBase(
-        JSON.parse(JSON.stringify(response.result)),
-        {},
-      )
-    } catch (error) {
-      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
-      console.error(error)
-    }
-  }
-
-  /**
    * Tells the Client instance to connect to its rippled server.
    *
    * @example
