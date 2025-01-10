@@ -1,6 +1,5 @@
 import { Amount, MPTAmount } from '../common'
 
-import { Batch, BatchMetadata } from './batch'
 import { BaseTransaction } from './common'
 import {
   MPTokenIssuanceCreate,
@@ -89,6 +88,8 @@ export interface TransactionMetadataBase {
   delivered_amount?: Amount | MPTAmount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
+
+  ParentBatchID?: string
 }
 
 export type TransactionMetadata<T extends BaseTransaction = Transaction> =
@@ -104,6 +105,4 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenCancelOfferMetadata
     : T extends MPTokenIssuanceCreate
     ? MPTokenIssuanceCreateMetadata
-    : T extends Batch
-    ? BatchMetadata
     : TransactionMetadataBase

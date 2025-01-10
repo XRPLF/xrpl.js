@@ -81,14 +81,6 @@ export interface Batch extends BaseTransaction {
   TransactionIDs?: string[]
 }
 
-export interface BatchMetadata extends TransactionMetadataBase {
-  BatchExecutions: Array<{
-    InnerResult: string
-
-    TransactionHash: string
-  }>
-}
-
 /**
  * Verify the form and type of a Batch at runtime.
  *
