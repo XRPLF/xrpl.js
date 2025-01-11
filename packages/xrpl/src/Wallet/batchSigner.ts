@@ -31,6 +31,12 @@ export function signMultiBatch(
   } else if (multisign) {
     multisignAddress = wallet.classicAddress
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+  if (transaction.TransactionType !== 'Batch') {
+    throw new ValidationError('Must be a Batch transaction.')
+  }
+
   const involvedAccounts = transaction.RawTransactions.map(
     (raw) => raw.RawTransaction.Account,
   )
@@ -38,11 +44,6 @@ export function signMultiBatch(
     throw new ValidationError(
       'Must be signing for an address included in the Batch.',
     )
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
-  if (transaction.TransactionType !== 'Batch') {
-    throw new ValidationError('Must be a Batch transaction.')
   }
   /*
    * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
@@ -104,14 +105,12 @@ export function combineBatchSigners(
   transactions: Array<Batch | string>,
 ): string {
   if (transactions.length === 0) {
-    throw new ValidationError('There were 0 transactions to combine.')
+    throw new ValidationError('There are 0 transactions to combine.')
   }
 
-  const decodedTransactions: Transaction[] = transactions.map(
-    (txOrBlob: string | Transaction) => {
-      return getDecodedTransaction(txOrBlob)
-    },
-  )
+  const decodedTransactions: Transaction[] = transactions.map((txOrBlob) => {
+    return getDecodedTransaction(txOrBlob)
+  })
 
   decodedTransactions.forEach((tx) => {
     if (tx.TransactionType !== 'Batch') {
@@ -128,11 +127,8 @@ export function combineBatchSigners(
       )
     }
 
-    if (
-      tx.SigningPubKey !== '' &&
-      (tx.TxnSignature != null || tx.Signers != null)
-    ) {
-      throw new ValidationError('Transaction must be unsigned.')
+    if (tx.TxnSignature != null || tx.Signers != null) {
+      throw new ValidationError('Batch transaction must be unsigned.')
     }
   })
 
@@ -169,7 +165,7 @@ function validateBatchTransactionEquivalence(transactions: Batch[]): void {
     )
   ) {
     throw new ValidationError(
-      'Flags and transaction hashes is not the same for all provided transactions.',
+      'Flags and transaction hashes are not the same for all provided transactions.',
     )
   }
 }

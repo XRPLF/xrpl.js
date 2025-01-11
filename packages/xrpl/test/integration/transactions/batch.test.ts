@@ -7,7 +7,11 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  generateFundedWallet,
+  testTransaction,
+  verifySubmittedTransaction,
+} from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -16,6 +20,24 @@ describe('Batch', function () {
   let testContext: XrplIntegrationTestContext
   let destination: Wallet
   let wallet2: Wallet
+
+  async function testBatchTransaction(
+    batch: Batch,
+    wallet: Wallet,
+    retry?: {
+      count: number
+      delayMs: number
+    },
+  ): Promise<void> {
+    await testTransaction(testContext.client, batch, wallet, retry)
+    const promises: Array<Promise<void>> = []
+    for (const rawTx of batch.RawTransactions) {
+      promises.push(
+        verifySubmittedTransaction(testContext.client, rawTx.RawTransaction),
+      )
+    }
+    await Promise.all(promises)
+  }
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
@@ -51,7 +73,7 @@ describe('Batch', function () {
         ],
       }
       const autofilled = await testContext.client.autofill(tx)
-      await testTransaction(testContext.client, autofilled, testContext.wallet)
+      await testBatchTransaction(autofilled, testContext.wallet)
     },
     TIMEOUT,
   )
@@ -85,7 +107,7 @@ describe('Batch', function () {
       }
       const autofilled = await testContext.client.autofill(tx)
       // signMultiBatch(wallet2, autofilled)
-      await testTransaction(testContext.client, autofilled, testContext.wallet)
+      await testBatchTransaction(autofilled, testContext.wallet)
     },
     TIMEOUT,
   )

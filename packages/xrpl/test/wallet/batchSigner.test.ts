@@ -9,6 +9,7 @@ import {
   Wallet,
 } from '../../src'
 import {
+  BatchFlags,
   BatchInnerTransaction,
   BatchSigner,
 } from '../../src/models/transactions/batch'
@@ -27,6 +28,13 @@ const submitWallet = Wallet.fromSeed('sEd7HmQFsoyj5TAm6d98gytM9LJA1MF', {
   algorithm: ECDSA.ed25519,
 })
 const otherWallet = Wallet.generate()
+
+const nonBatchTx = {
+  TransactionType: 'Payment',
+  Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+  Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+  Amount: '1000',
+}
 
 interface RawTransaction {
   RawTransaction: BatchInnerTransaction
@@ -116,6 +124,15 @@ describe('Wallet batch operations', function () {
         'Must be signing for an address included in the Batch.',
       )
     })
+
+    it('fails with non-Batch transaction', function () {
+      assert.throws(
+        // @ts-expect-error - needed for JS/codecov
+        () => signMultiBatch(otherWallet, nonBatchTx),
+        ValidationError,
+        'Must be a Batch transaction.',
+      )
+    })
   })
 
   describe('combineBatchSigners', function () {
@@ -123,14 +140,13 @@ describe('Wallet batch operations', function () {
     let tx2: Batch
     const originalTx: Batch = {
       Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-      Flags: 1,
+      Flags: BatchFlags.tfAllOrNothing,
       LastLedgerSequence: 14973,
       NetworkID: 21336,
       RawTransactions: [
         {
           RawTransaction: {
             Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
-            Flags: 0x40000000,
             Amount: '5000000',
             Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
             Fee: '0',
@@ -142,7 +158,6 @@ describe('Wallet batch operations', function () {
         {
           RawTransaction: {
             Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
-            Flags: 0x40000000,
             Amount: '1000000',
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
@@ -212,6 +227,59 @@ describe('Wallet batch operations', function () {
       const result = combineBatchSigners([tx1, tx2, tx3])
       const expected = (tx1.BatchSigners ?? []).concat(tx2.BatchSigners ?? [])
       assert.deepEqual(decode(result).BatchSigners, expected)
+    })
+
+    it('fails with no transactions provided', function () {
+      assert.throws(
+        () => combineBatchSigners([]),
+        ValidationError,
+        'There are 0 transactions to combine.',
+      )
+    })
+
+    it('fails with non-Batch transaction provided', function () {
+      assert.throws(
+        // @ts-expect-error - needed for JS/codecov
+        () => combineBatchSigners([tx1, tx2, nonBatchTx]),
+        ValidationError,
+        'TransactionType must be `Batch`.',
+      )
+    })
+
+    it('fails with no BatchSigners provided in a transaction', function () {
+      const badTx1 = { ...tx1 }
+      delete badTx1.BatchSigners
+      assert.throws(
+        () => combineBatchSigners([badTx1, tx2]),
+        ValidationError,
+        'For combining Batch transaction signatures, all transactions must include a BatchSigners field containing an array of signatures.',
+      )
+
+      badTx1.BatchSigners = []
+      assert.throws(
+        () => combineBatchSigners([badTx1, tx2]),
+        ValidationError,
+        'For combining Batch transaction signatures, all transactions must include a BatchSigners field containing an array of signatures.',
+      )
+    })
+
+    it('fails with signed inner transaction', function () {
+      assert.throws(
+        () => combineBatchSigners([secpWallet.sign(tx1).tx_blob, tx2]),
+        ValidationError,
+        'Batch transaction must be unsigned.',
+      )
+    })
+
+    it('fails with different inner transactions', function () {
+      const badTx2 = { ...tx2 }
+      badTx2.Flags = BatchFlags.tfIndependent
+      signMultiBatch(secpWallet, tx2)
+      assert.throws(
+        () => combineBatchSigners([tx1, badTx2]),
+        ValidationError,
+        'Flags and transaction hashes are not the same for all provided transactions.',
+      )
     })
   })
 })

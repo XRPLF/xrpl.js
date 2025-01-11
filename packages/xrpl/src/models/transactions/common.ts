@@ -236,7 +236,7 @@ export function isArray(input: unknown): boolean {
  * @param tx - The object input to check the form and type of.
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @param paramName - The name of the object parameter (if different from the parameter).
+ * @param errorOpts - Extra values to make the error message readable.
  * @throws
  */
 // eslint-disable-next-line max-params -- helper function
@@ -244,19 +244,19 @@ export function validateRequiredField(
   tx: Record<string, unknown>,
   param: string,
   checkValidity: (inp: unknown) => boolean,
-  paramName: string | undefined = undefined,
+  errorOpts: {
+    paramName?: string
+    txType?: string
+  } = {},
 ): void {
-  const paramNameStr = paramName ?? param
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] == null) {
-    throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramNameStr}`,
-    )
+    throw new ValidationError(`${txType}: missing field ${paramNameStr}`)
   }
 
   if (!checkValidity(tx[param])) {
-    throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramNameStr}`,
-    )
+    throw new ValidationError(`${txType}: invalid field ${paramNameStr}`)
   }
 }
 
@@ -266,7 +266,7 @@ export function validateRequiredField(
  * @param tx - The transaction input to check the form and type of.
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @param paramName - The name of the object parameter (if different from the parameter).
+ * @param errorOpts - Extra values to make the error message readable.
  * @throws
  */
 // eslint-disable-next-line max-params -- helper function
@@ -274,13 +274,15 @@ export function validateOptionalField(
   tx: Record<string, unknown>,
   param: string,
   checkValidity: (inp: unknown) => boolean,
-  paramName: string | undefined = undefined,
+  errorOpts: {
+    paramName?: string
+    txType?: string
+  } = {},
 ): void {
-  const paramNameStr = paramName ?? param
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] !== undefined && !checkValidity(tx[param])) {
-    throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramNameStr}`,
-    )
+    throw new ValidationError(`${txType}: invalid field ${paramNameStr}`)
   }
 }
 

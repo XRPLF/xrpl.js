@@ -1,7 +1,8 @@
 import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
+import { validate } from '../../src'
 import { validateBatch } from '../../src/models/transactions/batch'
+import { assertTxValidationError } from '../testUtils'
 
 /**
  * Batch Transaction Verification Testing.
@@ -73,45 +74,55 @@ describe('Batch', function () {
 
   it('throws w/ invalid BatchSigners', function () {
     tx.BatchSigners = 0
-
-    assert.throws(
-      () => validateBatch(tx),
-      ValidationError,
-      'Batch: invalid field BatchSigners',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertTxValidationError(
+      tx,
+      validateBatch,
       'Batch: invalid field BatchSigners',
     )
   })
 
   it('throws w/ missing RawTransactions', function () {
     delete tx.RawTransactions
-
-    assert.throws(
-      () => validateBatch(tx),
-      ValidationError,
-      'Batch: missing field RawTransactions',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertTxValidationError(
+      tx,
+      validateBatch,
       'Batch: missing field RawTransactions',
     )
   })
 
   it('throws w/ invalid RawTransactions', function () {
     tx.RawTransactions = 0
-    assert.throws(
-      () => validateBatch(tx),
-      ValidationError,
+    assertTxValidationError(
+      tx,
+      validateBatch,
       'Batch: invalid field RawTransactions',
     )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'Batch: invalid field RawTransactions',
+  })
+
+  it('throws w/ invalid RawTransactions object', function () {
+    tx.RawTransactions = [0]
+    assertTxValidationError(
+      tx,
+      validateBatch,
+      'Batch: RawTransactions[0] is not object',
+    )
+  })
+
+  it('throws w/ invalid RawTransactions.RawTransaction object', function () {
+    tx.RawTransactions = [{ RawTransaction: 0 }]
+    assertTxValidationError(
+      tx,
+      validateBatch,
+      'Batch: invalid field RawTransactions[0].RawTransaction',
+    )
+  })
+
+  it('throws w/ nested Batch', function () {
+    tx.RawTransactions = [{ RawTransaction: tx }]
+    assertTxValidationError(
+      tx,
+      validateBatch,
+      'Batch: RawTransactions[0] is a Batch transaction. Cannot nest Batch transactions.',
     )
   })
 })
