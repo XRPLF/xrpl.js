@@ -7,6 +7,7 @@ import { sign } from 'ripple-keypairs'
 import { ValidationError } from '../errors'
 import { Batch, Signer, Transaction, validate } from '../models'
 import { BatchSigner, validateBatch } from '../models/transactions/batch'
+import { hashSignedTx } from '../utils/hashes'
 
 import { Wallet } from '.'
 
@@ -50,7 +51,9 @@ export function signMultiBatch(
   validate(transaction as unknown as Record<string, unknown>)
   const fieldsToSign = {
     flags: transaction.Flags,
-    txIDs: transaction.TransactionIDs,
+    txIDs: transaction.RawTransactions.map((rawTx) =>
+      hashSignedTx(rawTx.RawTransaction),
+    ),
   }
   let batchSigner: BatchSigner
   if (multisignAddress) {
@@ -149,22 +152,24 @@ export function combineBatchSigners(
  */
 function validateBatchTransactionEquivalence(transactions: Batch[]): void {
   const exampleTransaction = JSON.stringify({
-    Flags: transactions[0].Flags,
-    TransactionIDs: transactions[0].TransactionIDs,
+    flags: transactions[0].Flags,
+    transactionIDs: transactions[0].RawTransactions.map((rawTx) =>
+      hashSignedTx(rawTx.RawTransaction),
+    ),
   })
   if (
-    transactions
-      .slice(1)
-      .some(
-        (tx) =>
-          JSON.stringify({
-            Flags: tx.Flags,
-            TransactionIDs: tx.TransactionIDs,
-          }) !== exampleTransaction,
-      )
+    transactions.slice(1).some(
+      (tx) =>
+        JSON.stringify({
+          flags: tx.Flags,
+          transactionIDs: tx.RawTransactions.map((rawTx) =>
+            hashSignedTx(rawTx.RawTransaction),
+          ),
+        }) !== exampleTransaction,
+    )
   ) {
     throw new ValidationError(
-      'Flags and TransactionIDs is not the same for all provided transactions.',
+      'Flags and transaction hashes is not the same for all provided transactions.',
     )
   }
 }

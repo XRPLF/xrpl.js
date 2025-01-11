@@ -8,8 +8,10 @@ import {
   ValidationError,
   Wallet,
 } from '../../src'
-import { BatchInnerTransaction } from '../../src/models/transactions/batch'
-import { hashSignedTx } from '../../src/utils/hashes'
+import {
+  BatchInnerTransaction,
+  BatchSigner,
+} from '../../src/models/transactions/batch'
 import {
   combineBatchSigners,
   signMultiBatch,
@@ -65,10 +67,6 @@ describe('Wallet batch operations', function () {
           },
         ],
         TransactionType: 'Batch',
-        TransactionIDs: [
-          'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
-          '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
-        ],
       }
     })
     it('succeeds with secp256k1 seed', function () {
@@ -80,7 +78,7 @@ describe('Wallet batch operations', function () {
             SigningPubKey:
               '02691AC5AE1C4C333AE5DF8A93BDC495F0EEBFC6DB0DA7EB6EF808F3AFC006E3FE',
             TxnSignature:
-              '30450221008E595499C334127A23190F61FB9ADD8B8C501D543E37945B11FABB66B097A6130220138C908E8C4929B47E994A46D611FAC17AB295CFB8D9E0828B32F2947B97394B',
+              '304402207E8238D3D2B24B98BA925D69DDAFA3E7D07F85C8ABF1C040B3D1BEBE2C36E92B02200C122F7F3F86AB8FF89207539CAFB4613D665FF336796F99283ED94C66FB3094',
           },
         },
       ]
@@ -100,7 +98,7 @@ describe('Wallet batch operations', function () {
             SigningPubKey:
               'ED3CC3D14FD80C213BC92A98AFE13A405A030F845EDCFD5E395286A6E9E62BA638',
             TxnSignature:
-              'E3337EE8C746523B5F96BEBE1190164B8B384EE2DC99F327D95ABC14E27F3AE16CC00DA7D61FC535DBFF0ADA3AF06394F8A703EE952A141BD871B75166C5CD0A',
+              '744FF09C11399F3AC1484F909A92F2D836EA979CB7655BC8F6BC3793F18892F92A16FE41C60EDCD6C2B757FF85D179F1589824ECA397EEA208B94C9D108CDF0A',
           },
         },
       ]
@@ -156,12 +154,8 @@ describe('Wallet batch operations', function () {
       ],
       Sequence: 215,
       TransactionType: 'Batch',
-      TransactionIDs: [
-        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
-        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
-      ],
     }
-    let expectedValid
+    let expectedValid: BatchSigner[]
 
     beforeEach(() => {
       tx1 = { ...originalTx }
@@ -201,15 +195,11 @@ describe('Wallet batch operations', function () {
         },
       }
       const rawTxs = originalTx.RawTransactions.concat(rawTx3)
-      const txIds = originalTx.TransactionIDs?.concat([
-        hashSignedTx(rawTx3.RawTransaction),
-      ])
 
       // set up all the transactions again (repeat what's done in `beforeEach`)
       const newTx = {
         ...originalTx,
         RawTransactions: rawTxs,
-        TransactionIDs: txIds,
       }
       tx1 = { ...newTx }
       tx2 = { ...newTx }

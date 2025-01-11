@@ -9,7 +9,7 @@ import { validateBatch } from '../../src/models/transactions/batch'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('Batch', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -63,11 +63,7 @@ describe('Batch', function () {
         },
       ],
       TransactionType: 'Batch',
-      TransactionIDs: [
-        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
-        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
-      ],
-    } as any
+    }
   })
 
   it('verifies valid Batch', function () {
@@ -116,21 +112,6 @@ describe('Batch', function () {
       () => validate(tx),
       ValidationError,
       'Batch: invalid field RawTransactions',
-    )
-  })
-
-  it('throws w/ invalid TransactionIDs', function () {
-    tx.TransactionIDs = 0
-
-    assert.throws(
-      () => validateBatch(tx),
-      ValidationError,
-      'Batch: invalid field TransactionIDs',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'Batch: invalid field TransactionIDs',
     )
   })
 })

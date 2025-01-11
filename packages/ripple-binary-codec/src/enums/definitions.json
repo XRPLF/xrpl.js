@@ -58,7 +58,8 @@
     "Oracle": 128,
     "MPTokenIssuance": 126,
     "MPToken": 127,
-    "Credential": 129
+    "Credential": 129,
+    "PermissionedDomain": 130
   },
   "FIELDS": [
     [
@@ -1512,9 +1513,19 @@
       }
     ],
     [
-      "BatchTransactionID",
+      "DomainID",
       {
         "nth": 34,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ParentBatchID",
+      {
+        "nth": 35,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -2332,16 +2343,6 @@
       }
     ],
     [
-      "TransactionIDs",
-      {
-        "nth": 6,
-        "isVLEncoded": true,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "Vector256"
-      }
-    ],
-    [
       "Paths",
       {
         "nth": 1,
@@ -2952,7 +2953,7 @@
       }
     ],
     [
-      "RawTransactions",
+      "AcceptedCredentials",
       {
         "nth": 28,
         "isVLEncoded": false,
@@ -2962,9 +2963,19 @@
       }
     ],
     [
-      "BatchSigners",
+      "RawTransactions",
       {
         "nth": 29,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
+      "BatchSigners",
+      {
+        "nth": 30,
         "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
@@ -3215,7 +3226,10 @@
     "CredentialCreate": 58,
     "CredentialAccept": 59,
     "CredentialDelete": 60,
-    "Batch": 61,
+    "NFTokenModify": 61,
+    "PermissionedDomainSet": 62,
+    "PermissionedDomainDelete": 63,
+    "Batch": 64,
     "EnableAmendment": 100,
     "SetFee": 101,
     "UNLModify": 102

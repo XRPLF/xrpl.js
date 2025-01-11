@@ -11,7 +11,6 @@ import {
   validateOptionalField,
   validateRequiredField,
 } from './common'
-import type { TransactionMetadataBase } from './metadata'
 import type { Transaction } from './transaction'
 
 /**
@@ -74,11 +73,6 @@ export interface Batch extends BaseTransaction {
   RawTransactions: Array<{
     RawTransaction: BatchInnerTransaction
   }>
-
-  /**
-   * Optional because it can be autofilled.
-   */
-  TransactionIDs?: string[]
 }
 
 /**
@@ -158,6 +152,4 @@ export function validateBatch(tx: Record<string, unknown>): void {
       `BatchSigners[${index}].TxnSignature`,
     )
   })
-
-  validateOptionalField(tx, 'TransactionIDs', isArray)
 }

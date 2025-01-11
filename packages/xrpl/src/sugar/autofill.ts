@@ -8,7 +8,6 @@ import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
 import { GlobalFlags } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
-import { hashSignedTx } from '../utils/hashes'
 
 import getFeeXrp from './getFeeXrp'
 
@@ -422,7 +421,6 @@ export async function autofillBatchTxn(
   tx: Batch,
 ): Promise<void> {
   const accountSequences: Record<string, number> = {}
-  const txIds: string[] = []
 
   for await (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
@@ -488,11 +486,5 @@ export async function autofillBatchTxn(
     if (txn.NetworkID == null) {
       txn.NetworkID = txNeedsNetworkID(client) ? client.networkID : undefined
     }
-
-    txIds.push(hashSignedTx(txn))
-  }
-  if (tx.TransactionIDs == null) {
-    // eslint-disable-next-line no-param-reassign -- okay for autofilling
-    tx.TransactionIDs = txIds
   }
 }

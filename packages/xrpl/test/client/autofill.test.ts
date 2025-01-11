@@ -477,15 +477,6 @@ describe('client.autofill', function () {
       const rawTx = rawTxOuter.RawTransaction
       assert.strictEqual(rawTx.Sequence, 23 + index + 1)
     })
-    assert.strictEqual(txResult.TransactionIDs?.length, 2)
-    assert.strictEqual(
-      txResult.TransactionIDs?.[0],
-      'E0EA0CCB12ABC736B7A0757613B2C51A6FB4818B9DBD0678F9DAEB797825ABDE',
-    )
-    assert.strictEqual(
-      txResult.TransactionIDs?.[1],
-      '2101F5F58F2FDDBF28530702EAE0F63784752BAD6D690EEFE49577BF4107D2C1',
-    )
   })
 
   it('should autofill Batch transaction with single account', async function () {
@@ -526,14 +517,5 @@ describe('client.autofill', function () {
     const txResult = await testContext.client.autofill(tx)
     assert.strictEqual(txResult.RawTransactions[0].RawTransaction.Sequence, 24)
     assert.strictEqual(txResult.RawTransactions[1].RawTransaction.Sequence, 23)
-    assert.strictEqual(txResult.TransactionIDs?.length, 2)
-    assert.strictEqual(
-      txResult.TransactionIDs?.[0],
-      'E0EA0CCB12ABC736B7A0757613B2C51A6FB4818B9DBD0678F9DAEB797825ABDE',
-    )
-    assert.strictEqual(
-      txResult.TransactionIDs?.[1],
-      '5F7DA80D86F1933B08FF6FD68AC21A50C81777D8A05BF015FE64F328FF9DA233',
-    )
   })
 })
