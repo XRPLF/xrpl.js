@@ -30,7 +30,6 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
-import { LedgerStateFix, validateLedgerStateFix } from './ledgerStateFix'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -137,7 +136,6 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
-  | LedgerStateFix
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
@@ -356,10 +354,6 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
-      break
-
-    case 'LedgerStateFix':
-      validateLedgerStateFix(tx)
       break
 
     case 'MPTokenAuthorize':
