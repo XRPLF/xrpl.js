@@ -236,7 +236,9 @@ export function isArray(input: unknown): boolean {
  * @param tx - The object input to check the form and type of.
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @param errorOpts - Extra values to make the error message readable.
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
  * @throws
  */
 // eslint-disable-next-line max-params -- helper function
@@ -245,8 +247,8 @@ export function validateRequiredField(
   param: string,
   checkValidity: (inp: unknown) => boolean,
   errorOpts: {
-    paramName?: string
     txType?: string
+    paramName?: string
   } = {},
 ): void {
   const paramNameStr = errorOpts.paramName ?? param
@@ -266,7 +268,9 @@ export function validateRequiredField(
  * @param tx - The transaction input to check the form and type of.
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @param errorOpts - Extra values to make the error message readable.
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
  * @throws
  */
 // eslint-disable-next-line max-params -- helper function
@@ -275,8 +279,8 @@ export function validateOptionalField(
   param: string,
   checkValidity: (inp: unknown) => boolean,
   errorOpts: {
-    paramName?: string
     txType?: string
+    paramName?: string
   } = {},
 ): void {
   const paramNameStr = errorOpts.paramName ?? param
