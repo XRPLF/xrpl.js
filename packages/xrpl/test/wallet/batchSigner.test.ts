@@ -27,6 +27,9 @@ const edWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
 const submitWallet = Wallet.fromSeed('sEd7HmQFsoyj5TAm6d98gytM9LJA1MF', {
   algorithm: ECDSA.ed25519,
 })
+const regkeyWallet = Wallet.fromSeed('sEdStM1pngFcLQqVfH3RQcg2Qr6ov9e', {
+  algorithm: ECDSA.ed25519,
+})
 const otherWallet = Wallet.generate()
 
 const nonBatchTx = {
@@ -107,6 +110,88 @@ describe('Wallet batch operations', function () {
               'ED3CC3D14FD80C213BC92A98AFE13A405A030F845EDCFD5E395286A6E9E62BA638',
             TxnSignature:
               '744FF09C11399F3AC1484F909A92F2D836EA979CB7655BC8F6BC3793F18892F92A16FE41C60EDCD6C2B757FF85D179F1589824ECA397EEA208B94C9D108CDF0A',
+          },
+        },
+      ]
+      assert.property(transaction, 'BatchSigners')
+      assert.strictEqual(
+        JSON.stringify(transaction.BatchSigners),
+        JSON.stringify(expected),
+      )
+    })
+
+    it('succeeds with a different account', function () {
+      signMultiBatch(regkeyWallet, transaction, {
+        batchAccount: edWallet.address,
+      })
+      const expected = [
+        {
+          BatchSigner: {
+            Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+            SigningPubKey:
+              'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
+            TxnSignature:
+              'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+          },
+        },
+      ]
+      assert.property(transaction, 'BatchSigners')
+      assert.strictEqual(
+        JSON.stringify(transaction.BatchSigners),
+        JSON.stringify(expected),
+      )
+    })
+
+    it('succeeds with multisign', function () {
+      signMultiBatch(regkeyWallet, transaction, {
+        batchAccount: edWallet.address,
+        multisign: true,
+      })
+      const expected = [
+        {
+          BatchSigner: {
+            Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+            Signers: [
+              {
+                Signer: {
+                  Account: 'rwRNeznwHzdfYeKWpevYmax2NSDioyeEtT',
+                  SigningPubKey:
+                    'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
+                  TxnSignature:
+                    'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+                },
+              },
+            ],
+          },
+        },
+      ]
+      assert.property(transaction, 'BatchSigners')
+      assert.strictEqual(
+        JSON.stringify(transaction.BatchSigners),
+        JSON.stringify(expected),
+      )
+    })
+
+    it('succeeds with multisign + regular key', function () {
+      signMultiBatch(regkeyWallet, transaction, {
+        batchAccount: edWallet.address,
+        multisign: submitWallet.address,
+      })
+      const expected = [
+        {
+          BatchSigner: {
+            Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
+            Signers: [
+              {
+                Signer: {
+                  Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+                  SigningPubKey:
+                    'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
+                  TxnSignature:
+                    'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+                },
+              },
+            ],
           },
         },
       ]

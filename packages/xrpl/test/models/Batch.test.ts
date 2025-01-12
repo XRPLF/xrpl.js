@@ -32,11 +32,6 @@ describe('Batch', function () {
           RawTransaction: {
             Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Amount: '5000000',
-            BatchTxn: {
-              BatchIndex: 1,
-              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-              Sequence: 215,
-            },
             Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
             Fee: '0',
             NetworkID: 21336,
@@ -49,11 +44,6 @@ describe('Batch', function () {
           RawTransaction: {
             Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
             Amount: '1000000',
-            BatchTxn: {
-              BatchIndex: 0,
-              OuterAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
-              Sequence: 470,
-            },
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
             NetworkID: 21336,
@@ -68,6 +58,42 @@ describe('Batch', function () {
   })
 
   it('verifies valid Batch', function () {
+    assert.doesNotThrow(() => validateBatch(tx))
+    assert.doesNotThrow(() => validate(tx))
+  })
+
+  it('verifies single-account Batch', function () {
+    tx = {
+      Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+      Flags: 1,
+      RawTransactions: [
+        {
+          RawTransaction: {
+            Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            Amount: '5000000',
+            Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+            Fee: '0',
+            NetworkID: 21336,
+            Sequence: 0,
+            SigningPubKey: '',
+            TransactionType: 'Payment',
+          },
+        },
+        {
+          RawTransaction: {
+            Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
+            Amount: '1000000',
+            Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+            Fee: '0',
+            NetworkID: 21336,
+            Sequence: 0,
+            SigningPubKey: '',
+            TransactionType: 'Payment',
+          },
+        },
+      ],
+      TransactionType: 'Batch',
+    }
     assert.doesNotThrow(() => validateBatch(tx))
     assert.doesNotThrow(() => validate(tx))
   })
@@ -123,6 +149,15 @@ describe('Batch', function () {
       tx,
       validateBatch,
       'Batch: RawTransactions[0] is a Batch transaction. Cannot nest Batch transactions.',
+    )
+  })
+
+  it('throws w/ non-object in BatchSigner list', function () {
+    tx.BatchSigners = [1]
+    assertTxValidationError(
+      tx,
+      validateBatch,
+      'Batch: BatchSigners[0] is not object.',
     )
   })
 })

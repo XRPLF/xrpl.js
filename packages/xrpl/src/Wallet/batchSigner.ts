@@ -5,7 +5,7 @@ import { decode, encode, encodeForSigningBatch } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
-import { Batch, Signer, Transaction, validate } from '../models'
+import { Batch, Transaction, validate } from '../models'
 import { BatchSigner, validateBatch } from '../models/transactions/batch'
 import { hashSignedTx } from '../utils/hashes'
 
@@ -16,19 +16,22 @@ import { Wallet } from '.'
  *
  * @param wallet - Wallet instance.
  * @param transaction - The Batch transaction to sign.
- * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
+ * @param opts - Additional options for regular key and multi-signing complexity.
+ * @param opts.batchAccount - The account submitting the inner Batch transaction, on behalf of which is this signature.
+ * @param opts.multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
  * @throws ValidationError if the transaction is malformed.
  */
 // eslint-disable-next-line max-lines-per-function -- TODO: refactor
 export function signMultiBatch(
   wallet: Wallet,
   transaction: Batch,
-  multisign?: boolean | string,
+  opts: { batchAccount?: string; multisign?: boolean | string } = {},
 ): void {
+  const batchAccount = opts.batchAccount ?? wallet.classicAddress
   let multisignAddress: boolean | string = false
-  if (typeof multisign === 'string' && multisign.startsWith('X')) {
-    multisignAddress = multisign
-  } else if (multisign) {
+  if (typeof opts.multisign === 'string') {
+    multisignAddress = opts.multisign
+  } else if (opts.multisign) {
     multisignAddress = wallet.classicAddress
   }
 
@@ -40,7 +43,7 @@ export function signMultiBatch(
   const involvedAccounts = transaction.RawTransactions.map(
     (raw) => raw.RawTransaction.Account,
   )
-  if (!involvedAccounts.includes(multisignAddress || wallet.address)) {
+  if (!involvedAccounts.includes(batchAccount)) {
     throw new ValidationError(
       'Must be signing for an address included in the Batch.',
     )
@@ -58,26 +61,27 @@ export function signMultiBatch(
   }
   let batchSigner: BatchSigner
   if (multisignAddress) {
-    const signer: Signer = {
-      Signer: {
-        Account: multisignAddress,
-        SigningPubKey: wallet.publicKey,
-        TxnSignature: sign(
-          encodeForSigningBatch(fieldsToSign),
-          wallet.privateKey,
-        ),
-      },
-    }
     batchSigner = {
       BatchSigner: {
-        Account: multisignAddress,
-        Signers: [signer],
+        Account: batchAccount,
+        Signers: [
+          {
+            Signer: {
+              Account: multisignAddress,
+              SigningPubKey: wallet.publicKey,
+              TxnSignature: sign(
+                encodeForSigningBatch(fieldsToSign),
+                wallet.privateKey,
+              ),
+            },
+          },
+        ],
       },
     }
   } else {
     batchSigner = {
       BatchSigner: {
-        Account: wallet.address,
+        Account: batchAccount,
         SigningPubKey: wallet.publicKey,
         TxnSignature: sign(
           encodeForSigningBatch(fieldsToSign),
