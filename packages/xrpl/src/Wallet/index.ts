@@ -383,7 +383,7 @@ export class Wallet {
     hash: string
   } {
     let multisignAddress: boolean | string = false
-    if (typeof multisign === 'string' && multisign.startsWith('X')) {
+    if (typeof multisign === 'string') {
       multisignAddress = multisign
     } else if (multisign) {
       multisignAddress = this.classicAddress
