@@ -237,7 +237,7 @@ export function isArray(input: unknown): boolean {
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
  * @param errorOpts - Extra values to make the error message easier to understand.
- * @param txType - The transaction type throwing the error.
+ * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
  * @throws
  */
@@ -269,7 +269,7 @@ export function validateRequiredField(
  * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
  * @param errorOpts - Extra values to make the error message easier to understand.
- * @param txType - The transaction type throwing the error.
+ * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
  * @throws
  */
