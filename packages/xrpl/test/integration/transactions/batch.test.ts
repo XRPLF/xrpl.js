@@ -1,6 +1,6 @@
 import { Batch, Wallet } from '../../../src'
 import { BatchFlags } from '../../../src/models/transactions/batch'
-// import { signMultiBatch } from '../../../src/Wallet/batchSigner'
+import { signMultiBatch } from '../../../src/Wallet/batchSigner'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -106,7 +106,7 @@ describe('Batch', function () {
         ],
       }
       const autofilled = await testContext.client.autofill(tx)
-      // signMultiBatch(wallet2, autofilled)
+      signMultiBatch(wallet2, autofilled)
       await testBatchTransaction(autofilled, testContext.wallet)
     },
     TIMEOUT,
