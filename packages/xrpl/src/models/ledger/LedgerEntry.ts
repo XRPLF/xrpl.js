@@ -3,6 +3,7 @@ import Amendments from './Amendments'
 import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
+import Credential from './Credential'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
@@ -24,6 +25,7 @@ type LedgerEntry =
   | AMM
   | Bridge
   | Check
+  | Credential
   | DepositPreauth
   | DirectoryNode
   | Escrow
@@ -45,6 +47,7 @@ type LedgerEntryFilter =
   | 'amm'
   | 'bridge'
   | 'check'
+  | 'credential'
   | 'deposit_preauth'
   | 'did'
   | 'directory'

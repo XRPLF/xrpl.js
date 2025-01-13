@@ -21,7 +21,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '9223372036854775807',
       AssetScale: 2,
       TransferFee: 1,
-      Flags: 2,
+      Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
       MPTokenMetadata: convertStringToHex('http://xrpl.org'),
     } as any
 
@@ -106,7 +106,7 @@ describe('MPTokenIssuanceCreate', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'MPTokenIssuanceCreate: TransferFee out of range',
+      'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
     invalid = {
@@ -118,7 +118,32 @@ describe('MPTokenIssuanceCreate', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'MPTokenIssuanceCreate: TransferFee out of range',
+      'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
+    )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      TransferFee: 100,
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+    )
+
+    invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      TransferFee: 100,
+      Flags: { tfMPTCanClawback: true },
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
   })
 })
