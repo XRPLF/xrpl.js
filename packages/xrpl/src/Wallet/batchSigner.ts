@@ -19,6 +19,7 @@ import { Wallet } from '.'
  * @param opts - Additional options for regular key and multi-signing complexity.
  * @param opts.batchAccount - The account submitting the inner Batch transaction, on behalf of which is this signature.
  * @param opts.multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
+ *                       The actual address is only needed in the case of regular key usage.
  * @throws ValidationError if the transaction is malformed.
  */
 // eslint-disable-next-line max-lines-per-function -- TODO: refactor
