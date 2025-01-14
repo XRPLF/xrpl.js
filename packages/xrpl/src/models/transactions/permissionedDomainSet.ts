@@ -20,6 +20,12 @@ export interface PermissionedDomainSet extends BaseTransaction {
   AcceptedCredentials: Credential[]
 }
 
+/**
+ * Validate a PermissionedDomainSet transaction.
+ *
+ * @param tx - The transaction to validate.
+ * @throws {ValidationError} When the transaction is invalid.
+ */
 export function validatePermissionedDomainSet(
   tx: Record<string, unknown>,
 ): void {
