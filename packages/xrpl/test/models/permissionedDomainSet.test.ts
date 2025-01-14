@@ -1,8 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
-import { Credential } from '../../src/models/ledger/PermissionedDomain'
+import { AuthorizeCredential, validate, ValidationError } from '../../src'
 import { validatePermissionedDomainSet } from '../../src/models/transactions/permissionedDomainSet'
 
 /**
@@ -12,7 +11,7 @@ import { validatePermissionedDomainSet } from '../../src/models/transactions/per
  */
 describe('PermissionedDomainSet', function () {
   let tx
-  const sampleCredential: Credential = {
+  const sampleCredential: AuthorizeCredential = {
     Credential: {
       CredentialType: stringToHex('Passport'),
       Issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
@@ -35,7 +34,8 @@ describe('PermissionedDomainSet', function () {
   })
 
   it(`throws with invalid field DomainID`, function () {
-    tx.DomainID = 1234 // DomainID is expected to be a string
+    // DomainID is expected to be a string
+    tx.DomainID = 1234
     const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
     assert.throws(
       () => validatePermissionedDomainSet(tx),

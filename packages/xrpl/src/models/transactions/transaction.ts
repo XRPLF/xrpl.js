@@ -74,8 +74,14 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
-import { PermissionedDomainDelete, validatePermissionedDomainDelete } from './permissionedDomainDelete'
-import { PermissionedDomainSet, validatePermissionedDomainSet } from './permissionedDomainSet'
+import {
+  PermissionedDomainDelete,
+  validatePermissionedDomainDelete,
+} from './permissionedDomainDelete'
+import {
+  PermissionedDomainSet,
+  validatePermissionedDomainSet,
+} from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'

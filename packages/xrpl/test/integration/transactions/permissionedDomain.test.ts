@@ -1,8 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { LedgerEntryRequest, PermissionedDomainDelete, PermissionedDomainSet } from '../../../src'
-import PermissionedDomain, { Credential } from '../../../src/models/ledger/PermissionedDomain'
+import {
+  LedgerEntryRequest,
+  PermissionedDomainDelete,
+  PermissionedDomainSet,
+  AuthorizeCredential,
+} from '../../../src'
+import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -25,18 +30,18 @@ describe('PermissionedDomainSet', function () {
   it(
     'Lifecycle of PermissionedDomain ledger object',
     async () => {
-      const sampleCredential: Credential = {
+      const sampleCredential: AuthorizeCredential = {
         Credential: {
           CredentialType: stringToHex('Passport'),
-          Issuer: testContext.wallet.classicAddress
-        }
+          Issuer: testContext.wallet.classicAddress,
+        },
       }
 
       // Step-1: Test the PermissionedDomainSet transaction
       const tx_pd_set: PermissionedDomainSet = {
         TransactionType: 'PermissionedDomainSet',
         Account: testContext.wallet.classicAddress,
-        AcceptedCredentials: [sampleCredential]
+        AcceptedCredentials: [sampleCredential],
       }
 
       await testTransaction(testContext.client, tx_pd_set, testContext.wallet)
@@ -59,9 +64,11 @@ describe('PermissionedDomainSet', function () {
       const ledger_entry_request: LedgerEntryRequest = {
         command: 'ledger_entry',
         // fetch the PD `index` from the previous account_objects RPC response
-        index: pd.index
+        index: pd.index,
       }
-      const ledger_entry_result = await testContext.client.request(ledger_entry_request)
+      const ledger_entry_result = await testContext.client.request(
+        ledger_entry_request,
+      )
       assert.deepEqual(pd, ledger_entry_result.result.node)
 
       // Step-3: Test the PDDelete transaction
@@ -69,10 +76,14 @@ describe('PermissionedDomainSet', function () {
         TransactionType: 'PermissionedDomainDelete',
         Account: testContext.wallet.classicAddress,
         // fetch the PD `index` from the previous account_objects RPC response
-        DomainID: pd.index
+        DomainID: pd.index,
       }
 
-      await testTransaction(testContext.client, tx_pd_delete, testContext.wallet)
+      await testTransaction(
+        testContext.client,
+        tx_pd_delete,
+        testContext.wallet,
+      )
     },
     TIMEOUT,
   )

@@ -502,6 +502,12 @@ export function validateCredentialsList(
   }
 }
 
+/**
+ * Check if an array of objects contains any duplicates.
+ *
+ * @param objectList - Array of objects to check for duplicates
+ * @returns True if duplicates exist, false otherwise
+ */
 export function containsDuplicates(objectList: object[]): boolean {
   const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
   return objSet.size !== objectList.length

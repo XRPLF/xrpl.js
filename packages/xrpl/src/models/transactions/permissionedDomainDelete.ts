@@ -2,7 +2,7 @@ import {
   BaseTransaction,
   isString,
   validateBaseTransaction,
-  validateRequiredField
+  validateRequiredField,
 } from './common'
 
 export interface PermissionedDomainDelete extends BaseTransaction {
@@ -11,7 +11,15 @@ export interface PermissionedDomainDelete extends BaseTransaction {
   DomainID: string
 }
 
-export function validatePermissionedDomainDelete(tx: Record<string, unknown>): void {
+/**
+ * Verify the form and type of a PermissionedDomainDelete transaction.
+ *
+ * @param tx - The transaction to verify.
+ * @throws When the transaction is malformed.
+ */
+export function validatePermissionedDomainDelete(
+  tx: Record<string, unknown>,
+): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'DomainID', isString)

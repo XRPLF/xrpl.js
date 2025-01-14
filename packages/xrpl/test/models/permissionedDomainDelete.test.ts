@@ -15,7 +15,8 @@ describe('PermissionedDomainDelete', function () {
     tx = {
       TransactionType: 'PermissionedDomainDelete',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
-      DomainID: 'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737',
+      DomainID:
+        'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737',
     } as any
   })
 
@@ -27,14 +28,22 @@ describe('PermissionedDomainDelete', function () {
   it(`throws w/ missing field DomainID`, function () {
     delete tx.DomainID
     const errorMessage = 'PermissionedDomainDelete: missing field DomainID'
-    assert.throws(() => validatePermissionedDomainDelete(tx), ValidationError, errorMessage)
+    assert.throws(
+      () => validatePermissionedDomainDelete(tx),
+      ValidationError,
+      errorMessage,
+    )
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
   it(`throws w/ invalid DomainID`, function () {
     tx.DomainID = 1234
     const errorMessage = 'PermissionedDomainDelete: invalid field DomainID'
-    assert.throws(() => validatePermissionedDomainDelete(tx), ValidationError, errorMessage)
+    assert.throws(
+      () => validatePermissionedDomainDelete(tx),
+      ValidationError,
+      errorMessage,
+    )
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 })

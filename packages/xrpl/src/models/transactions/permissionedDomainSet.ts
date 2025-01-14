@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Credential } from '../ledger/PermissionedDomain'
+import { AuthorizeCredential } from '../common'
 
 import {
   BaseTransaction,
@@ -17,7 +17,7 @@ export interface PermissionedDomainSet extends BaseTransaction {
   TransactionType: 'PermissionedDomainSet'
 
   DomainID?: string
-  AcceptedCredentials: Credential[]
+  AcceptedCredentials: AuthorizeCredential[]
 }
 
 /**

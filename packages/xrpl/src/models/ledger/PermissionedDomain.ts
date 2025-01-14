@@ -1,11 +1,6 @@
-import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
+import { AuthorizeCredential } from '../common'
 
-export interface Credential {
-  Credential: {
-    Issuer: string
-    CredentialType: string
-  }
-}
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export default interface PermissionedDomain
   extends BaseLedgerEntry,
@@ -20,5 +15,5 @@ export default interface PermissionedDomain
 
   Sequence: number
 
-  AcceptedCredentials: Credential[]
+  AcceptedCredentials: AuthorizeCredential[]
 }
