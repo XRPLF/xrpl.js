@@ -134,7 +134,9 @@ export function isIssuedCurrency(
  * @param input - The input to check the form and type of
  * @returns Whether the AuthorizeCredential is properly formed
  */
-function isAuthorizeCredential(input: unknown): input is AuthorizeCredential {
+export function isAuthorizeCredential(
+  input: unknown,
+): input is AuthorizeCredential {
   return (
     isRecord(input) &&
     isRecord(input.Credential) &&
@@ -500,7 +502,7 @@ export function validateCredentialsList(
   }
 }
 
-function containsDuplicates(objectList: object[]): boolean {
+export function containsDuplicates(objectList: object[]): boolean {
   const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
   return objSet.size !== objectList.length
 }

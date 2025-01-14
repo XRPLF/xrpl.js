@@ -1,9 +1,9 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
+import { validate, ValidationError } from '../../src'
 import { Credential } from '../../src/models/ledger/PermissionedDomain'
 import { validatePermissionedDomainSet } from '../../src/models/transactions/permissionedDomainSet'
-import { validate, ValidationError } from '../../src'
 
 /**
  * PermissionedDomainSet Transaction Verification Testing.
@@ -15,16 +15,17 @@ describe('PermissionedDomainSet', function () {
   const sampleCredential: Credential = {
     Credential: {
       CredentialType: stringToHex('Passport'),
-      Issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8'
-    }
+      Issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+    },
   }
 
   beforeEach(function () {
     tx = {
       TransactionType: 'PermissionedDomainSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
-      DomainID: 'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737',
-      AcceptedCredentials: [sampleCredential]
+      DomainID:
+        'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737',
+      AcceptedCredentials: [sampleCredential],
     } as any
   })
 
@@ -36,14 +37,23 @@ describe('PermissionedDomainSet', function () {
   it(`throws with invalid field DomainID`, function () {
     tx.DomainID = 1234 // DomainID is expected to be a string
     const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
-    assert.throws(() => validatePermissionedDomainSet(tx), ValidationError, errorMessage)
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      errorMessage,
+    )
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
   it(`throws w/ missing field AcceptedCredentials`, function () {
     delete tx.AcceptedCredentials
-    const errorMessage = 'PermissionedDomainSet: missing field AcceptedCredentials'
-    assert.throws(() => validatePermissionedDomainSet(tx), ValidationError, errorMessage)
+    const errorMessage =
+      'PermissionedDomainSet: missing field AcceptedCredentials'
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      errorMessage,
+    )
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
@@ -52,7 +62,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials must have at most 10 Credential objects'
+      'PermissionedDomainSet: AcceptedCredentials must have at most 10 Credential objects',
     )
   })
 
@@ -61,7 +71,34 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials must have at least one Credential object'
+      'PermissionedDomainSet: AcceptedCredentials must have at least one Credential object',
+    )
+  })
+
+  it('throws when AcceptedCredentials is not an array type', function () {
+    tx.AcceptedCredentials = 'AcceptedCredentials is not an array'
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      'PermissionedDomainSet: AcceptedCredentials must be an array',
+    )
+  })
+
+  it('throws when AcceptedCredentials contains duplicates', function () {
+    tx.AcceptedCredentials = [sampleCredential, sampleCredential]
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      'PermissionedDomainSet: AcceptedCredentials cannot contain duplicate elements',
+    )
+  })
+
+  it('throws when AcceptedCredentials contains invalid format', function () {
+    tx.AcceptedCredentials = [{ Field1: 'Value1', Field2: 'Value2' }]
+    assert.throws(
+      () => validatePermissionedDomainSet(tx),
+      ValidationError,
+      'PermissionedDomainSet: Invalid AcceptedCredentials format',
     )
   })
 })
