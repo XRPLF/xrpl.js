@@ -62,7 +62,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials must have at most 10 Credential objects',
+      'PermissionedDomainSet: Credentials length cannot exceed 10 elements',
     )
   })
 
@@ -71,7 +71,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials must have at least one Credential object',
+      'PermissionedDomainSet: Credentials cannot be an empty array',
     )
   })
 
@@ -80,7 +80,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials must be an array',
+      'PermissionedDomainSet: invalid field AcceptedCredentials',
     )
   })
 
@@ -89,7 +89,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: AcceptedCredentials cannot contain duplicate elements',
+      'PermissionedDomainSet: Credentials cannot contain duplicate elements',
     )
   })
 
@@ -98,7 +98,7 @@ describe('PermissionedDomainSet', function () {
     assert.throws(
       () => validatePermissionedDomainSet(tx),
       ValidationError,
-      'PermissionedDomainSet: Invalid AcceptedCredentials format',
+      'PermissionedDomainSet: Invalid Credentials format',
     )
   })
 })

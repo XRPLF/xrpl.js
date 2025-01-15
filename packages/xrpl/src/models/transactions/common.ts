@@ -457,6 +457,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param credentials An array of credential IDs to check for errors
  * @param transactionType The transaction type to include in error messages
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
+ * @param maxLengthCredentialsArray
  * @throws Validation Error if the formatting is incorrect
  */
 // eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
@@ -464,6 +465,7 @@ export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
+  maxLengthCredentialsArray: number = MAX_CREDENTIALS_LIST_LENGTH,
 ): void {
   if (credentials == null) {
     return
@@ -473,9 +475,9 @@ export function validateCredentialsList(
       `${transactionType}: Credentials must be an array`,
     )
   }
-  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
+  if (credentials.length > maxLengthCredentialsArray) {
     throw new ValidationError(
-      `${transactionType}: Credentials length cannot exceed ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
+      `${transactionType}: Credentials length cannot exceed ${maxLengthCredentialsArray} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(
