@@ -18,16 +18,19 @@ const TIMEOUT = 20000
 
 describe('OfferCreate', function () {
   let testContext: XrplIntegrationTestContext
-  let wallet2: Wallet | undefined
+  let wallet_deep_freeze_trustline: Wallet | undefined
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     testContext = await setupClient(serverUrl)
-    if (!wallet2) {
+    if (!wallet_deep_freeze_trustline) {
       // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
-      wallet2 = await generateFundedWallet(testContext.client)
+      wallet_deep_freeze_trustline = await generateFundedWallet(
+        testContext.client,
+      )
     }
   })
-  afterEach(async () => teardownClient(testContext))
+
+  afterAll(async () => teardownClient(testContext))
 
   it(
     'base',
@@ -62,7 +65,7 @@ describe('OfferCreate', function () {
   it(
     'OfferCreate with Deep-Frozen trust-line must fail',
     async () => {
-      assert(wallet2 != null)
+      assert(wallet_deep_freeze_trustline != null)
 
       // deep-freeze the trust line
       const trust_set_tx: TrustSet = {
@@ -70,7 +73,7 @@ describe('OfferCreate', function () {
         Account: testContext.wallet.classicAddress,
         LimitAmount: {
           currency: 'USD',
-          issuer: wallet2.classicAddress,
+          issuer: wallet_deep_freeze_trustline.classicAddress,
           value: '10',
         },
         Flags: {
@@ -91,7 +94,7 @@ describe('OfferCreate', function () {
         TakerGets: '13100000',
         TakerPays: {
           currency: 'USD',
-          issuer: wallet2.classicAddress,
+          issuer: wallet_deep_freeze_trustline.classicAddress,
           value: '10',
         },
       }
