@@ -107,7 +107,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
     return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
       if (flagEnum[flag] == null) {
         throw new ValidationError(
-          Invalid flag ${flag}. Valid flags are ${JSON.stringify(flagEnum)}`,
+          `Invalid flag ${flag}. Valid flags are ${JSON.stringify(flagEnum)}`,
         )
       }
 
@@ -132,7 +132,7 @@ export function parseTransactionFlags(tx: Transaction): object {
 
   const booleanFlagMap = {}
 
-  if (istxToFlagKey(tx.TransactionType)) {
+  if (isTxToFlagKey(tx.TransactionType)) {
     const transactionTypeFlags = txToFlag[tx.TransactionType]
     Object.values(transactionTypeFlags).forEach((flag) => {
       if (
