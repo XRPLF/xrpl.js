@@ -1,5 +1,3 @@
-import { isArray } from 'lodash'
-
 import { AuthorizeCredential } from '../common'
 
 import {
@@ -32,7 +30,7 @@ export function validatePermissionedDomainSet(
   validateBaseTransaction(tx)
 
   validateOptionalField(tx, 'DomainID', isString)
-  validateRequiredField(tx, 'AcceptedCredentials', isArray)
+  validateRequiredField(tx, 'AcceptedCredentials', () => tx.AcceptedCredentials instanceof Array)
 
   validateCredentialsList(
     tx.AcceptedCredentials,
