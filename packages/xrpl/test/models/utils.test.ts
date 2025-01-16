@@ -50,7 +50,7 @@ describe('Models Utils', function () {
 
   describe('parseAccountRootFlags', function () {
     // eslint-disable-next-line complexity -- Simpler to list them all out at once.
-    it('parseAccountRootFlags all enabled', function () {
+    it('all flags enabled', function () {
       const accountRootFlags =
         AccountRootFlags.lsfDefaultRipple |
         AccountRootFlags.lsfDepositAuth |
