@@ -72,7 +72,7 @@ function isTxToFlagKey(
  *
  * @deprecated
  * This utility function is deprecated.
- * Use convertTxFlagsToNumber() instead and use the returned value to modify the tx.Flags from the caller.
+ * Use convertTxFlagsToNumber() instead and use the returned value to modify the Transaction.Flags from the caller.
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
