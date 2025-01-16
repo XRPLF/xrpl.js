@@ -28,7 +28,6 @@ import {
   AccountOffersRequest,
   AccountOffersResponse,
   AccountTxRequest,
-  AccountTxResponse,
   // ledger methods
   LedgerDataRequest,
   LedgerDataResponse,
@@ -40,7 +39,9 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
+  BaseRequest,
 } from '../models/methods'
+import { AccountTxResponseBase } from '../models/methods/accountTx'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
 import type {
   EventTypes,
@@ -130,7 +131,10 @@ type RequestNextPageType =
   | AccountTxRequest
   | LedgerDataRequest
 
-type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
+type RequestNextPageReturnMap<
+  T extends BaseRequest,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
   ? AccountLinesResponse
@@ -139,7 +143,7 @@ type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   : T extends AccountOffersRequest
   ? AccountOffersResponse
   : T extends AccountTxRequest
-  ? AccountTxResponse
+  ? AccountTxResponseBase<V>
   : T extends LedgerDataRequest
   ? LedgerDataResponse
   : never
@@ -392,8 +396,8 @@ class Client<
    */
   public async requestNextPage<
     T extends RequestNextPageType,
-    U extends RequestNextPageReturnMap<T>,
-  >(req: T, resp: U): Promise<RequestNextPageReturnMap<T>> {
+    U extends RequestNextPageReturnMap<T, ClientAPIVersion>,
+  >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new NotFoundError('response does not have a next page'),
