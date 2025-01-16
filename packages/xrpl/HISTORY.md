@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
-* `convertTxFlagsToNumber` as a utility function in xrpl to return the number conversion of a transaction's flags
+* Adds utility function `convertTxFlagsToNumber`
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
