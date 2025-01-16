@@ -92,7 +92,7 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
  * Returns a Transaction's Flags as its numeric representation.
  *
  * @param tx - A Transaction to parse Flags for
- * @returns A numerical representation of a transaction's flags
+ * @returns A numerical representation of a Transaction's Flags
  */
 export function convertTxFlagsToNumber(tx: Transaction): number {
   if (!tx.Flags) {
