@@ -102,7 +102,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
     return tx.Flags
   }
 
-  if (istxToFlagKey(tx.TransactionType)) {
+  if (isTxToFlagKey(tx.TransactionType)) {
     const flagEnum = txToFlag[tx.TransactionType]
     return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
       if (flagEnum[flag] == null) {
