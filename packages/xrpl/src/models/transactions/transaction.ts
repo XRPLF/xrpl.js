@@ -4,7 +4,7 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
-import { setTransactionFlagsToNumber } from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
@@ -265,7 +265,7 @@ export function validate(transaction: Record<string, unknown>): void {
   })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-  setTransactionFlagsToNumber(tx as unknown as Transaction)
+  tx.Flags = convertTxFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
