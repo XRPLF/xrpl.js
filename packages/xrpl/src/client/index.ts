@@ -432,7 +432,10 @@ class Client<
   public on<
     T extends EventTypes,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-    U extends (...args: any[]) => void = OnEventToListenerMap<T>,
+    U extends (...args: any[]) => void = OnEventToListenerMap<
+      T,
+      ClientAPIVersion
+    >,
   >(eventName: T, listener: U): this {
     return super.on(eventName, listener)
   }
