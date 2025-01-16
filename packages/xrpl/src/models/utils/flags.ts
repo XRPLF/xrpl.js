@@ -107,7 +107,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
     return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
       if (flagEnum[flag] == null) {
         throw new ValidationError(
-          `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
+          Invalid flag ${flag}. Valid flags are ${JSON.stringify(flagEnum)}`,
         )
       }
 
