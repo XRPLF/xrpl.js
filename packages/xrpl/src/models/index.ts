@@ -8,8 +8,9 @@
  */
 export * as LedgerEntry from './ledger'
 export {
-  setTransactionFlagsToNumber,
   parseAccountRootFlags,
+  setTransactionFlagsToNumber,
+  convertTxFlagsToNumber,
   parseTransactionFlags,
 } from './utils/flags'
 export * from './methods'

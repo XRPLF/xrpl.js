@@ -2,7 +2,13 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## Unreleased Changes
+## Unreleased
+
+### Added
+* Adds utility function `convertTxFlagsToNumber`
+
+### Changed
+* Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
 ## 4.1.0 (2024-12-23)
 
