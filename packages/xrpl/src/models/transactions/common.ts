@@ -15,6 +15,7 @@ import {
   MPTAmount,
 } from '../common'
 import { onlyHasFields } from '../utils'
+import { assert } from 'chai'
 
 const MEMO_SIZE = 3
 const MAX_CREDENTIALS_LIST_LENGTH = 8
@@ -511,7 +512,32 @@ export function validateCredentialsList(
  * @param objectList - Array of objects to check for duplicates
  * @returns True if duplicates exist, false otherwise
  */
-export function containsDuplicates(objectList: object[]): boolean {
-  const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
-  return objSet.size !== objectList.length
+export function containsDuplicates(
+  objectList: AuthorizeCredential[] | string[],
+): boolean {
+  let objSet: Set<string | object>
+  // Case-1: Process a list of string-IDs
+  if (typeof objectList[0] === 'string') {
+    objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+    return objSet.size !== objectList.length
+  } else {
+    // Case-2: Process a list of nested objects
+    const seen = new Set<string>();
+    for (const item of objectList) {
+      let key: string;
+      assert(typeof item === 'object')
+      assert('Credential' in item)
+      assert('Issuer' in item.Credential && 'CredentialType' in item.Credential)
+      key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`;
+
+      if (seen.has(key)) {
+        // Found a duplicate
+        return true;
+      }
+
+      seen.add(key);
+    }
+
+    return false
+  }
 }
