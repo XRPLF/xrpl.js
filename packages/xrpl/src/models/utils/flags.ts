@@ -79,7 +79,7 @@ function isTxToFlagKey(
 export function setTransactionFlagsToNumber(tx: Transaction): void {
   // eslint-disable-next-line no-console -- intended deprecation warning
   console.warn(
-    'This function is deprecated. Use convertTxFlagsToNumber() instead and use the returned value to modify the tx.Flags from the caller.',
+    'This function is deprecated. Use convertTxFlagsToNumber() instead and use the returned value to modify the Transaction.Flags from the caller.',
   )
 
   if (tx.Flags) {
