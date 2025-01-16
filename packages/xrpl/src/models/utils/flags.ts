@@ -61,7 +61,7 @@ const txToFlag = {
   XChainModifyBridge: XChainModifyBridgeFlags,
 }
 
-function istxToFlagKey(
+function isTxToFlagKey(
   transactionType: string,
 ): transactionType is keyof typeof txToFlag {
   return transactionType in txToFlag
