@@ -87,7 +87,7 @@ describe('Models Utils', function () {
       )
     })
 
-    it('all flags not set', function () {
+    it('no flags set', function () {
       const parsed = parseAccountRootFlags(0)
 
       assert.isUndefined(parsed.lsfDefaultRipple)
