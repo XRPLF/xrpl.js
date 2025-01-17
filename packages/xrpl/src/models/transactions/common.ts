@@ -262,7 +262,7 @@ export function validateOptionalField(
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
-export interface GlobalFlags {}
+export interface GlobalFlags { }
 
 /**
  * Every transaction has the same set of common fields.
@@ -517,24 +517,29 @@ export function containsDuplicates(
 ): boolean {
   // Case-1: Process a list of string-IDs
   if (typeof objectList[0] === 'string') {
-    let objSet: Set<string>
-    objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+    const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
     return objSet.size !== objectList.length
   }
+
   // Case-2: Process a list of nested objects
   const seen = new Set<string>()
-  for (const item of objectList) {
-    // @ts-expect-error -- The previous if-block handles the string-inputs
-    item satisfies AuthorizeCredential['Credential']
-    // @ts-expect-error -- The previous satisfies assertion checks the type requirements
-    const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
 
-    if (seen.has(key)) {
-      // Found a duplicate
-      return true
+  // Type guard to ensure we're working with AuthorizeCredential[]
+  // Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
+  const isAuthorizeCredential = (
+    list: AuthorizeCredential[] | string[],
+  ): list is AuthorizeCredential[] => {
+    return typeof list[0] !== 'string'
+  }
+
+  if (isAuthorizeCredential(objectList)) {
+    for (const item of objectList) {
+      const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
+      if (seen.has(key)) {
+        return true
+      }
+      seen.add(key)
     }
-
-    seen.add(key)
   }
 
   return false
