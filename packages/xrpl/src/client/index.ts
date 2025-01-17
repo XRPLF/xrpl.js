@@ -48,7 +48,7 @@ import type {
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
 import type { SubmittableTransaction } from '../models/transactions'
-import { setTransactionFlagsToNumber } from '../models/utils/flags'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
   submitRequest,
@@ -688,7 +688,7 @@ class Client<
     const tx = { ...transaction }
 
     setValidAddresses(tx)
-    setTransactionFlagsToNumber(tx)
+    tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
     if (tx.NetworkID == null) {
