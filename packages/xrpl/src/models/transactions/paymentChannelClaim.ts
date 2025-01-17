@@ -5,6 +5,7 @@ import {
   GlobalFlags,
   validateBaseTransaction,
   validateCredentialsList,
+  MAX_CREDENTIALS_LIST_LENGTH,
 } from './common'
 
 /**
@@ -153,6 +154,7 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     tx.TransactionType as string,
     true,
+    MAX_CREDENTIALS_LIST_LENGTH,
   )
 
   if (tx.Channel === undefined) {
