@@ -856,7 +856,7 @@ class Client<
       // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
       wallet?: Wallet
     },
-  ): Promise<TxResponse<T>> {
+  ): Promise<TxResponse<T, ClientAPIVersion>> {
     const signedTx = await getSignedTx(this, transaction, opts)
 
     const lastLedger = getLastLedgerSequence(signedTx)
