@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateCredentialsList,
-  MAX_CREDENTIALS_LIST_LENGTH
+  MAX_CREDENTIALS_LIST_LENGTH,
 } from './common'
 
 /**

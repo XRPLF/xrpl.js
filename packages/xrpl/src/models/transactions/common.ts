@@ -9,12 +9,11 @@ import {
   AuthorizeCredential,
   Currency,
   IssuedCurrencyAmount,
+  MPTAmount,
   Memo,
   Signer,
   XChainBridge,
-  MPTAmount,
 } from '../common'
-
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
@@ -262,7 +261,7 @@ export function validateOptionalField(
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
-export interface GlobalFlags { }
+export interface GlobalFlags {}
 
 /**
  * Every transaction has the same set of common fields.
@@ -462,12 +461,12 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-lines-per-function, max-params -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
-  maxLengthCredentialsArray: number
+  maxLengthCredentialsArray: number,
 ): void {
   if (credentials == null) {
     return
@@ -526,15 +525,16 @@ export function containsDuplicates(
 
   // Type guard to ensure we're working with AuthorizeCredential[]
   // Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
-  const isAuthorizeCredential = (
+  function isAuthorizeCredentialArray(
     list: AuthorizeCredential[] | string[],
-  ): list is AuthorizeCredential[] => {
+  ): list is AuthorizeCredential[] {
     return typeof list[0] !== 'string'
   }
 
-  if (isAuthorizeCredential(objectList)) {
+  if (isAuthorizeCredentialArray(objectList)) {
     for (const item of objectList) {
       const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
+      // eslint-disable-next-line max-depth -- necessary to check for type-guards
       if (seen.has(key)) {
         return true
       }
