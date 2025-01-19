@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import type { Client } from '..'
+import { type Client } from '..'
 import { XrplError } from '../errors'
 
 const NUM_DECIMAL_PLACES = 6
@@ -20,8 +20,11 @@ export default async function getFeeXrp(
 ): Promise<string> {
   const feeCushion = cushion ?? client.feeCushion
 
-  const serverInfo = (await client.request({ command: 'server_info' })).result
-    .info
+  const serverInfo = (
+    await client.request({
+      command: 'server_info',
+    })
+  ).result.info
 
   const baseFee = serverInfo.validated_ledger?.base_fee_xrp
 

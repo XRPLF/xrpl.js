@@ -1,6 +1,6 @@
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
-import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
 
 export interface VoteSlot {
   VoteEntry: {
@@ -15,7 +15,7 @@ export interface VoteSlot {
  *
  * @category Ledger Entries
  */
-export default interface AMM extends BaseLedgerEntry, MissingPreviousTxnID {
+export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'AMM'
   /**
    * The address of the special account that holds this AMM's assets.
@@ -60,7 +60,7 @@ export default interface AMM extends BaseLedgerEntry, MissingPreviousTxnID {
    * The holders of these tokens can vote on the AMM's trading fee in proportion to their holdings,
    * or redeem the tokens for a share of the AMM's assets which grows with the trading fees collected.
    */
-  LPTokenBalance: Currency
+  LPTokenBalance: IssuedCurrencyAmount
   /**
    * The percentage fee to be charged for trades against this AMM instance, in units of 1/100,000.
    * The maximum value is 1000, for a 1% fee.

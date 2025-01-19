@@ -1,8 +1,114 @@
-# xrpl.js (ripple-lib) Release History
+# xrpl.js Release History
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
 ## Unreleased
+
+### Added
+* Adds utility function `convertTxFlagsToNumber`
+
+### Changed
+* Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
+
+## 4.1.0 (2024-12-23)
+
+### Added
+* Added new MPT transaction definitions (XLS-33)
+* New `MPTAmount` type support for `Payment` and `Clawback` transactions
+* `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
+* Support for XLS-70d (Credentials)
+
+### Fixed
+* `TransactionStream` model supports APIv2
+* `TransactionStream` model includes `close_time_iso` field
+* `Ledger` model includes `close_time_iso` field
+
+## 4.0.0 (2024-07-15)
+
+### BREAKING CHANGES
+* Use rippled api_version v2 as default while maintaining support for v1.
+
+### Added
+* Add `nfts_by_issuer` clio-only API definition
+* Add `include_deleted` to ledgerEntry request and `deleted_ledger_index` to ledgerEntry response
+* Support for the `fixPreviousTxnID` amendment.
+* Support for the user version of the `feature` RPC.
+* Add `hash` field to `ledger` command response
+
+### Removed
+* Remove references to the Hooks testnet faucet in the xrpl.js code repository.
+
+## 3.1.0 (2024-06-03)
+
+### BREAKING CHANGES
+* Small fix in the API to use a new flag name `tfNoDirectRipple` instead of the existing flag name `tfNoRippleDirect`
+* Node.js has been upgraded to a minimum version of 18
+* `fetch` now relies on the native javascript environment in browsers and Node.js
+
+### Added
+* Support for the Price Oracles amendment (XLS-47).
+
+### Fixed
+* Typo in `Channel` type `source_tab` -> `source_tag`
+* Fix `client.requestAll` to handle filters better
+* Add the missing `AMMDeposit` flag `tfTwoAssetIfEmpty`
+* Add missing `lsfAMMNode` flag to `RippleState` ledger object
+* Add `PreviousFields` to `DeletedNode` metadata type
+
+## 3.0.0 (2024-02-01)
+
+### BREAKING CHANGES
+* The default signing algorithm in the `Wallet` was changed from secp256k1 to ed25519
+* Bump typescript to 5.x
+* Remove Node 14 support
+* Remove `crypto` polyfills, `create-hash`, `elliptic`, `hash.js`, and their many dependencies in favor of `@noble/hashes` and `@nobel/curves`
+* Remove `bip32` and `bip39` in favor of `@scure/bip32` and `@scure/bip39`
+* Remove `assert` dependency. If you were catching `AssertionError` you need to change to `Error`
+* Configuring a proxy:
+  * Instead of passing various parameters on the `ConnectionsOptions` you know specify the `agent` parameter. This object can use be created by libraries such as `https-proxy-agent` or any that implements the `http.Agent`.
+  * This was changed to both support the latest `https-proxy-agent` and to remove the need to include the package in bundlers.   Tests will still be done using `https-proxy-agent` and only tested in a node environment which was the only way it was previously supported anyway
+* Remove `BroadcastClient` which was deprecated
+* Uses `@xrplf/secret-numbers` instead of `xrpl-secret-numbers`
+* Improve key algorithm detection. It will now throw Errors with helpful messages
+* Move `authorizeChannel` from `wallet/signer` to `wallet/authorizeChannel` to solve a circular dependency issue.
+* When using a bundler you must remove the mapping of `ws` to `WSWrapper`. ex. `ws: 'xrpl/dist/npm/client/WSWrapper'`. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* `Transaction` type has been redefined to include all transactions and `SubmittableTransaction` was created to define the old value. The following functions which only handle transactions to be submitted now use `SubmittableTransaction`:
+  * `Client.autofill`
+  * `Client.submit`
+  * `Client.submitAndWait`
+  * `Client.prepareTransaction`
+  * `getSignedTx`
+  * `isAccountDelete`
+* `dropsToXRP` and `Client.getXrpBalance` now return a `number` instead of a `string`
+* `Buffer` has been replaced with `UInt8Array` for both params and return values.  `Buffer` may continue to work with params since they extend `UInt8Arrays`.
+
+### Bundling Changes
+Bundler configurations are much more simplified. See [../UNIQUE_STEPS](Unique Steps) for the new, much smaller, configs.
+* removed the following polyfills:
+  * `buffer`
+  * `assert`
+  * `crypto-browserify`
+  * `https-browserify`
+  * `os-browserify`
+  * `process`
+  * `stream-browserify`
+  * `stream-http`
+  * `url`
+  * `util` - previously added automatically by `webpack`
+  * `events` - previously added automatically by `webpack` but manual for `vite`**
+* Removed mappings for:
+  * `ws` to `WsWrapper`
+  * Excluding `https-proxy-agent`
+
+### Non-Breaking Changes
+* Deprecated:
+  * `convertHexToString` in favor of `@xrplf/isomorphic/utils`'s `hexToString`
+  * `convertStringToHex` in favor of `@xrplf/isomorphic/utils`'s `stringToHex`
+
+## 2.14.1 (2024-02-01)
+
+### Fixed
+* Fix `AMM` ledger object's `LPTokenBalance` type to `IssuedCurrencyAmount`.
 
 ## 2.14.0 (2023-11-30)
 
@@ -168,9 +274,6 @@ Wallet.fromMmnemonic()
 * `Wallet.fromMnemonic` now allows lowercase for RFC1751 mnemonics (#2046)
 * `Wallet.fromMnemonic` detects when an invalid encoding is provided, and throws an error
 * Made unexpected errors in `submitAndWait` more verbose to make them easier to debug.
-
-### Added
-* Support for Automated Market Maker (AMM) transactions and requests as defined in XLS-30.
 
 ## 2.3.1 (2022-06-27)
 ### Fixed

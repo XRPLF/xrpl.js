@@ -1,16 +1,17 @@
 import { Comparable } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
+import { hexToBytes } from '@xrplf/isomorphic/utils'
+import { compare } from '../utils'
 
 /**
  * Base class defining how to encode and decode hashes
  */
-class Hash extends Comparable {
+class Hash extends Comparable<Hash | string> {
   static readonly width: number
 
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
-    if (this.bytes.byteLength !== (this.constructor as typeof Hash).width) {
+    if (this.bytes.length !== (this.constructor as typeof Hash).width) {
       throw new Error(`Invalid Hash length ${this.bytes.byteLength}`)
     }
   }
@@ -26,7 +27,7 @@ class Hash extends Comparable {
     }
 
     if (typeof value === 'string') {
-      return new this(Buffer.from(value, 'hex'))
+      return new this(hexToBytes(value))
     }
 
     throw new Error('Cannot construct Hash from given value')
@@ -48,7 +49,8 @@ class Hash extends Comparable {
    * @param other The Hash to compare this to
    */
   compareTo(other: Hash): number {
-    return this.bytes.compare(
+    return compare(
+      this.bytes,
       (this.constructor as typeof Hash).from(other).bytes,
     )
   }

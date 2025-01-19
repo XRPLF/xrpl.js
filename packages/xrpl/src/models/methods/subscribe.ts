@@ -4,12 +4,17 @@ import type {
   Path,
   StreamType,
   ResponseOnlyTxInfo,
+  APIVersion,
+  DEFAULT_API_VERSION,
+  RIPPLED_API_V1,
+  RIPPLED_API_V2,
 } from '../common'
 import { Offer } from '../ledger'
 import { OfferCreate, Transaction } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
+import { ManifestRequest } from './manifest'
 
 export interface SubscribeBook {
   /**
@@ -261,9 +266,16 @@ export interface ValidationStream extends BaseStream {
  *
  * @category Streams
  */
-export interface TransactionStream extends BaseStream {
+interface TransactionStreamBase<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseStream {
   status: string
   type: 'transaction'
+  /**
+   * The approximate time this ledger was closed, in date time string format.
+   * Always uses the UTC time zone.
+   */
+  close_time_iso: string
   /** String Transaction result code. */
   engine_result: string
   /** Numeric transaction response code, if applicable. */
@@ -284,8 +296,14 @@ export interface TransactionStream extends BaseStream {
    * in detail.
    */
   meta?: TransactionMetadata
-  /** The definition of the transaction in JSON format. */
-  transaction: Transaction & ResponseOnlyTxInfo
+  /** JSON object defining the transaction. */
+  tx_json?: Version extends typeof RIPPLED_API_V2
+    ? Transaction & ResponseOnlyTxInfo
+    : never
+  /** JSON object defining the transaction in rippled API v1. */
+  transaction?: Version extends typeof RIPPLED_API_V1
+    ? Transaction & ResponseOnlyTxInfo
+    : never
   /**
    * If true, this transaction is included in a validated ledger and its
    * outcome is final. Responses from the transaction stream should always be
@@ -294,6 +312,20 @@ export interface TransactionStream extends BaseStream {
   validated?: boolean
   warnings?: Array<{ id: number; message: string }>
 }
+
+/**
+ * Expected response from an {@link AccountTxRequest}.
+ *
+ * @category Streams
+ */
+export type TransactionStream = TransactionStreamBase
+
+/**
+ * Expected response from an {@link AccountTxRequest} with `api_version` set to 1.
+ *
+ * @category Streams
+ */
+export type TransactionV1Stream = TransactionStreamBase<typeof RIPPLED_API_V1>
 
 /**
  * The admin-only `peer_status` stream reports a large amount of information on
@@ -433,3 +465,38 @@ export type Stream =
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream
+
+export type EventTypes =
+  | 'connected'
+  | 'disconnected'
+  | 'ledgerClosed'
+  | 'validationReceived'
+  | 'transaction'
+  | 'peerStatusChange'
+  | 'consensusPhase'
+  | 'manifestReceived'
+  | 'path_find'
+  | 'error'
+
+export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
+  ? () => void
+  : T extends 'disconnected'
+  ? (code: number) => void
+  : T extends 'ledgerClosed'
+  ? (ledger: LedgerStream) => void
+  : T extends 'validationReceived'
+  ? (validation: ValidationStream) => void
+  : T extends 'transaction'
+  ? (transaction: TransactionStream) => void
+  : T extends 'peerStatusChange'
+  ? (peerStatus: PeerStatusStream) => void
+  : T extends 'consensusPhase'
+  ? (consensus: ConsensusStream) => void
+  : T extends 'manifestReceived'
+  ? (manifest: ManifestRequest) => void
+  : T extends 'path_find'
+  ? (path: PathFindStream) => void
+  : T extends 'error'
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
+    (...err: any[]) => void
+  : (...args: never[]) => void

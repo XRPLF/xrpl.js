@@ -1,8 +1,7 @@
 import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
-import bigInt = require('big-integer')
-import { Buffer } from 'buffer/'
 import { XrplDefinitionsBase } from '../enums'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
 
@@ -12,10 +11,10 @@ type JsonObject = { [key: string]: JSON }
  * The base class for all binary-codec types
  */
 class SerializedType {
-  protected readonly bytes: Buffer = Buffer.alloc(0)
+  protected readonly bytes: Uint8Array = new Uint8Array(0)
 
-  constructor(bytes: Buffer) {
-    this.bytes = bytes ?? Buffer.alloc(0)
+  constructor(bytes?: Uint8Array) {
+    this.bytes = bytes ?? new Uint8Array(0)
   }
 
   static fromParser(parser: BinaryParser, hint?: number): SerializedType {
@@ -23,9 +22,7 @@ class SerializedType {
     return this.fromParser(parser, hint)
   }
 
-  static from(
-    value: SerializedType | JSON | bigInt.BigInteger,
-  ): SerializedType {
+  static from(value: SerializedType | JSON | bigint): SerializedType {
     throw new Error('from not implemented')
     return this.from(value)
   }
@@ -45,15 +42,15 @@ class SerializedType {
    * @returns hex String of this.bytes
    */
   toHex(): string {
-    return this.toBytes().toString('hex').toUpperCase()
+    return bytesToHex(this.toBytes())
   }
 
   /**
    * Get the bytes representation of a SerializedType
    *
-   * @returns A buffer of the bytes
+   * @returns A Uint8Array of the bytes
    */
-  toBytes(): Buffer {
+  toBytes(): Uint8Array {
     if (this.bytes) {
       return this.bytes
     }
@@ -70,7 +67,7 @@ class SerializedType {
    *                          Can be customized for sidechains and amendments.
    * @returns any type, if not overloaded returns hexString representation of bytes
    */
-  toJSON(_definitions?: XrplDefinitionsBase): JSON {
+  toJSON(_definitions?: XrplDefinitionsBase, _fieldName?: string): JSON {
     return this.toHex()
   }
 
@@ -83,26 +80,31 @@ class SerializedType {
 }
 
 /**
- * Base class for SerializedTypes that are comparable
+ * Base class for SerializedTypes that are comparable.
+ *
+ * @template T - What types you want to allow comparisons between. You must specify all types. Primarily used to allow
+ * comparisons between built-in types (like `string`) and SerializedType subclasses (like `Hash`).
+ *
+ * Ex. `class Hash extends Comparable<Hash | string>`
  */
-class Comparable extends SerializedType {
-  lt(other: Comparable): boolean {
+class Comparable<T extends Object> extends SerializedType {
+  lt(other: T): boolean {
     return this.compareTo(other) < 0
   }
 
-  eq(other: Comparable): boolean {
+  eq(other: T): boolean {
     return this.compareTo(other) === 0
   }
 
-  gt(other: Comparable): boolean {
+  gt(other: T): boolean {
     return this.compareTo(other) > 0
   }
 
-  gte(other: Comparable): boolean {
+  gte(other: T): boolean {
     return this.compareTo(other) > -1
   }
 
-  lte(other: Comparable): boolean {
+  lte(other: T): boolean {
     return this.compareTo(other) < 1
   }
 
@@ -112,7 +114,7 @@ class Comparable extends SerializedType {
    * @param other The comparable object to compare this to
    * @returns A number denoting the relationship of this and other
    */
-  compareTo(other: Comparable): number {
+  compareTo(other: T): number {
     throw new Error(`cannot compare ${this.toString()} and ${other.toString()}`)
   }
 }

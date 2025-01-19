@@ -1,9 +1,9 @@
 /* eslint-disable max-lines -- Connection is a large file w/ lots of imports/exports */
-import { EventEmitter } from 'events'
-import { Agent } from 'http'
+import type { Agent } from 'http'
 
-import omitBy from 'lodash/omitBy'
-import WebSocket from 'ws'
+import { bytesToHex, hexToString } from '@xrplf/isomorphic/utils'
+import WebSocket, { ClientOptions } from '@xrplf/isomorphic/ws'
+import { EventEmitter } from 'eventemitter3'
 
 import {
   DisconnectedError,
@@ -11,6 +11,7 @@ import {
   ConnectionError,
   XrplError,
 } from '../errors'
+import type { APIVersion, RequestResponseMap } from '../models'
 import { BaseRequest } from '../models/methods/baseMethod'
 
 import ConnectionManager from './ConnectionManager'
@@ -26,17 +27,11 @@ const CONNECTION_TIMEOUT = 5
  */
 interface ConnectionOptions {
   trace?: boolean | ((id: string, message: string) => void)
-  proxy?: string
-  proxyAuthorization?: string
-  authorization?: string
-  trustedCertificates?: string[]
-  key?: string
-  passphrase?: string
-  certificate?: string
-  // request timeout
-  timeout: number
-  connectionTimeout: number
   headers?: { [key: string]: string }
+  agent?: Agent
+  authorization?: string
+  connectionTimeout: number
+  timeout: number
 }
 
 /**
@@ -55,52 +50,6 @@ export const INTENTIONAL_DISCONNECT_CODE = 4000
 
 type WebsocketState = 0 | 1 | 2 | 3
 
-function getAgent(url: string, config: ConnectionOptions): Agent | undefined {
-  if (config.proxy == null) {
-    return undefined
-  }
-
-  const parsedURL = new URL(url)
-  const parsedProxyURL = new URL(config.proxy)
-
-  const proxyOptions = omitBy(
-    {
-      secureEndpoint: parsedURL.protocol === 'wss:',
-      secureProxy: parsedProxyURL.protocol === 'https:',
-      auth: config.proxyAuthorization,
-      ca: config.trustedCertificates,
-      key: config.key,
-      passphrase: config.passphrase,
-      cert: config.certificate,
-      href: parsedProxyURL.href,
-      origin: parsedProxyURL.origin,
-      protocol: parsedProxyURL.protocol,
-      username: parsedProxyURL.username,
-      password: parsedProxyURL.password,
-      host: parsedProxyURL.host,
-      hostname: parsedProxyURL.hostname,
-      port: parsedProxyURL.port,
-      pathname: parsedProxyURL.pathname,
-      search: parsedProxyURL.search,
-      hash: parsedProxyURL.hash,
-    },
-    (value) => value == null,
-  )
-
-  let HttpsProxyAgent: new (opt: typeof proxyOptions) => Agent
-  try {
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports,
-      node/global-require, global-require, -- Necessary for the `require` */
-    HttpsProxyAgent = require('https-proxy-agent')
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports,
-      node/global-require, global-require, */
-  } catch (_error) {
-    throw new Error('"proxy" option is not supported in the browser')
-  }
-
-  return new HttpsProxyAgent(proxyOptions)
-}
-
 /**
  * Create a new websocket given your URL and optional proxy/certificate
  * configuration.
@@ -113,37 +62,20 @@ function createWebSocket(
   url: string,
   config: ConnectionOptions,
 ): WebSocket | null {
-  const options: WebSocket.ClientOptions = {}
-  options.agent = getAgent(url, config)
+  const options: ClientOptions = {
+    agent: config.agent,
+  }
   if (config.headers) {
     options.headers = config.headers
   }
   if (config.authorization != null) {
-    const base64 = Buffer.from(config.authorization).toString('base64')
     options.headers = {
       ...options.headers,
-      Authorization: `Basic ${base64}`,
+      Authorization: `Basic ${btoa(config.authorization)}`,
     }
   }
-  const optionsOverrides = omitBy(
-    {
-      ca: config.trustedCertificates,
-      key: config.key,
-      passphrase: config.passphrase,
-      cert: config.certificate,
-    },
-    (value) => value == null,
-  )
-  const websocketOptions = { ...options, ...optionsOverrides }
-  const websocket = new WebSocket(url, websocketOptions)
-  /*
-   * we will have a listener for each outstanding request,
-   * so we have to raise the limit (the default is 10)
-   */
-  if (typeof websocket.setMaxListeners === 'function') {
-    websocket.setMaxListeners(Infinity)
-  }
-  return websocket
+  const websocketOptions = { ...options }
+  return new WebSocket(url, websocketOptions)
 }
 
 /**
@@ -177,7 +109,7 @@ export class Connection extends EventEmitter {
   private ws: WebSocket | null = null
   // Typing necessary for Jest tests running in browser
   private reconnectTimeoutID: null | ReturnType<typeof setTimeout> = null
-  // Typing necessary for Jest tetsts running in browser
+  // Typing necessary for Jest tests running in browser
   private heartbeatIntervalID: null | ReturnType<typeof setTimeout> = null
   private readonly retryConnectionBackoff = new ExponentialBackoff({
     min: 100,
@@ -196,7 +128,6 @@ export class Connection extends EventEmitter {
    */
   public constructor(url?: string, options: ConnectionUserOptions = {}) {
     super()
-    this.setMaxListeners(Infinity)
     this.url = url
     this.config = {
       timeout: TIMEOUT * 1000,
@@ -336,6 +267,7 @@ export class Connection extends EventEmitter {
 
   /**
    * Disconnect the websocket, then connect again.
+   *
    */
   public async reconnect(): Promise<void> {
     /*
@@ -356,17 +288,17 @@ export class Connection extends EventEmitter {
    * @returns The response from the rippled server.
    * @throws NotConnectedError if the Connection isn't connected to a server.
    */
-  public async request<T extends BaseRequest>(
-    request: T,
-    timeout?: number,
-  ): Promise<unknown> {
+  public async request<
+    R extends BaseRequest,
+    T = RequestResponseMap<R, APIVersion>,
+  >(request: R, timeout?: number): Promise<T> {
     if (!this.shouldBeConnected || this.ws == null) {
       throw new NotConnectedError(JSON.stringify(request), request)
     }
-    const [id, message, responsePromise] = this.requestManager.createRequest(
-      request,
-      timeout ?? this.config.timeout,
-    )
+    const [id, message, responsePromise] = this.requestManager.createRequest<
+      R,
+      T
+    >(request, timeout ?? this.config.timeout)
     this.trace('send', message)
     websocketSendAsync(this.ws, message).catch((error) => {
       this.requestManager.reject(id, error)
@@ -451,7 +383,7 @@ export class Connection extends EventEmitter {
       this.emit('error', 'websocket', error.message, error),
     )
     // Handle a closed connection: reconnect if it was unexpected
-    this.ws.once('close', (code?: number, reason?: Buffer) => {
+    this.ws.once('close', (code?: number, reason?: Uint8Array) => {
       if (this.ws == null) {
         throw new XrplError('onceClose: ws is null')
       }
@@ -459,7 +391,9 @@ export class Connection extends EventEmitter {
       this.clearHeartbeatInterval()
       this.requestManager.rejectAll(
         new DisconnectedError(
-          `websocket was closed, ${new TextDecoder('utf-8').decode(reason)}`,
+          `websocket was closed, ${
+            reason ? hexToString(bytesToHex(reason)) : ''
+          }`,
         ),
       )
       this.ws.removeAllListeners()
@@ -535,6 +469,7 @@ export class Connection extends EventEmitter {
 
   /**
    * Starts a heartbeat to check the connection with the server.
+   *
    */
   private startHeartbeatInterval(): void {
     this.clearHeartbeatInterval()

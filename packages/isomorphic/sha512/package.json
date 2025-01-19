@@ -1,0 +1,7 @@
+{
+  "name": "@xrplf/isomorphic/sha512",
+  "private": true,
+  "main": "../dist/sha512",
+  "types": "../dist/sha512",
+  "browser": "../dist/sha512/browser.js"
+}

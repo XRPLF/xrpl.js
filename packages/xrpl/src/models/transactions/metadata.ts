@@ -1,4 +1,25 @@
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
+
+import { BaseTransaction } from './common'
+import {
+  MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateMetadata,
+} from './MPTokenIssuanceCreate'
+import {
+  NFTokenAcceptOffer,
+  NFTokenAcceptOfferMetadata,
+} from './NFTokenAcceptOffer'
+import {
+  NFTokenCancelOffer,
+  NFTokenCancelOfferMetadata,
+} from './NFTokenCancelOffer'
+import {
+  NFTokenCreateOffer,
+  NFTokenCreateOfferMetadata,
+} from './NFTokenCreateOffer'
+import { NFTokenMint, NFTokenMintMetadata } from './NFTokenMint'
+import { Payment, PaymentMetadata } from './payment'
+import type { Transaction } from './transaction'
 
 export interface CreatedNode {
   CreatedNode: {
@@ -23,6 +44,7 @@ export interface DeletedNode {
   DeletedNode: {
     LedgerEntryType: string
     LedgerIndex: string
+    PreviousFields?: { [field: string]: unknown }
     FinalFields: { [field: string]: unknown }
   }
 }
@@ -59,11 +81,26 @@ export function isDeletedNode(node: Node): node is DeletedNode {
   return Object.prototype.hasOwnProperty.call(node, `DeletedNode`)
 }
 
-export interface TransactionMetadata {
+export interface TransactionMetadataBase {
   AffectedNodes: Node[]
-  DeliveredAmount?: Amount
+  DeliveredAmount?: Amount | MPTAmount
   // "unavailable" possible for transactions before 2014-01-20
-  delivered_amount?: Amount | 'unavailable'
+  delivered_amount?: Amount | MPTAmount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
 }
+
+export type TransactionMetadata<T extends BaseTransaction = Transaction> =
+  T extends Payment
+    ? PaymentMetadata
+    : T extends NFTokenMint
+    ? NFTokenMintMetadata
+    : T extends NFTokenCreateOffer
+    ? NFTokenCreateOfferMetadata
+    : T extends NFTokenAcceptOffer
+    ? NFTokenAcceptOfferMetadata
+    : T extends NFTokenCancelOffer
+    ? NFTokenCancelOfferMetadata
+    : T extends MPTokenIssuanceCreate
+    ? MPTokenIssuanceCreateMetadata
+    : TransactionMetadataBase

@@ -1,17 +1,16 @@
-import * as assert from 'assert'
 import {
   XrplDefinitionsBase,
   DEFAULT_DEFINITIONS,
   FieldInstance,
 } from '../enums'
 import { type SerializedType } from '../types/serialized-type'
-import { Buffer } from 'buffer/'
+import { hexToBytes } from '@xrplf/isomorphic/utils'
 
 /**
  * BinaryParser is used to compute fields and values from a HexString
  */
 class BinaryParser {
-  private bytes: Buffer
+  private bytes: Uint8Array
   definitions: XrplDefinitionsBase
 
   /**
@@ -25,7 +24,7 @@ class BinaryParser {
     hexBytes: string,
     definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
   ) {
-    this.bytes = Buffer.from(hexBytes, 'hex')
+    this.bytes = hexToBytes(hexBytes)
     this.definitions = definitions
   }
 
@@ -35,7 +34,9 @@ class BinaryParser {
    * @returns The first byte of the BinaryParser
    */
   peek(): number {
-    assert.ok(this.bytes.byteLength !== 0)
+    if (this.bytes.byteLength === 0) {
+      throw new Error()
+    }
     return this.bytes[0]
   }
 
@@ -45,7 +46,9 @@ class BinaryParser {
    * @param n the number of bytes to skip
    */
   skip(n: number): void {
-    assert.ok(n <= this.bytes.byteLength)
+    if (n > this.bytes.byteLength) {
+      throw new Error()
+    }
     this.bytes = this.bytes.slice(n)
   }
 
@@ -55,8 +58,10 @@ class BinaryParser {
    * @param n The number of bytes to read
    * @return The bytes
    */
-  read(n: number): Buffer {
-    assert.ok(n <= this.bytes.byteLength)
+  read(n: number): Uint8Array {
+    if (n > this.bytes.byteLength) {
+      throw new Error()
+    }
 
     const slice = this.bytes.slice(0, n)
     this.skip(n)
@@ -70,7 +75,9 @@ class BinaryParser {
    * @return The number represented by those bytes
    */
   readUIntN(n: number): number {
-    assert.ok(0 < n && n <= 4, 'invalid n')
+    if (0 >= n || n > 4) {
+      throw new Error('invalid n')
+    }
     return this.read(n).reduce((a, b) => (a << 8) | b) >>> 0
   }
 
@@ -100,7 +107,7 @@ class BinaryParser {
    *
    * @return The variable length bytes
    */
-  readVariableLength(): Buffer {
+  readVariableLength(): Uint8Array {
     return this.read(this.readVariableLengthLength())
   }
 
@@ -137,14 +144,18 @@ class BinaryParser {
     if (type === 0) {
       type = this.readUInt8()
       if (type === 0 || type < 16) {
-        throw new Error('Cannot read FieldOrdinal, type_code out of range')
+        throw new Error(
+          `Cannot read FieldOrdinal, type_code ${type} out of range`,
+        )
       }
     }
 
     if (nth === 0) {
       nth = this.readUInt8()
       if (nth === 0 || nth < 16) {
-        throw new Error('Cannot read FieldOrdinal, field_code out of range')
+        throw new Error(
+          `Cannot read FieldOrdinal, field_code ${nth} out of range`,
+        )
       }
     }
 

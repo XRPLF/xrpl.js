@@ -1,16 +1,14 @@
-import { strict as assert } from 'assert'
 import { coreTypes } from './types'
 import { HashPrefix } from './hash-prefixes'
 import { Sha512Half } from './hashes'
 import { Hash256 } from './types/hash-256'
 import { BytesList } from './serdes/binary-serializer'
-import { Buffer } from 'buffer/'
 
 /**
  * Abstract class describing a SHAMapNode
  */
 abstract class ShaMapNode {
-  abstract hashPrefix(): Buffer
+  abstract hashPrefix(): Uint8Array
   abstract isLeaf(): boolean
   abstract isInner(): boolean
   abstract toBytesSink(list: BytesList): void
@@ -42,10 +40,10 @@ class ShaMapLeaf extends ShaMapNode {
   /**
    * Get the prefix of the this.item
    *
-   * @returns The hash prefix, unless this.item is undefined, then it returns an empty Buffer
+   * @returns The hash prefix, unless this.item is undefined, then it returns an empty Uint8Array
    */
-  hashPrefix(): Buffer {
-    return this.item === undefined ? Buffer.alloc(0) : this.item.hashPrefix()
+  hashPrefix(): Uint8Array {
+    return this.item === undefined ? new Uint8Array(0) : this.item.hashPrefix()
   }
 
   /**
@@ -101,7 +99,7 @@ class ShaMapInner extends ShaMapNode {
    *
    * @returns hash prefix describing an inner node
    */
-  hashPrefix(): Buffer {
+  hashPrefix(): Uint8Array {
     return HashPrefix.innerNode
   }
 
@@ -160,7 +158,9 @@ class ShaMapInner extends ShaMapNode {
    * @param leaf Leaf node to insert when branch doesn't exist
    */
   addItem(index?: Hash256, item?: ShaMapNode, leaf?: ShaMapLeaf): void {
-    assert.ok(index !== undefined)
+    if (index === undefined) {
+      throw new Error()
+    }
     if (index !== undefined) {
       const nibble = index.nibblet(this.depth)
       const existing = this.branches[nibble]

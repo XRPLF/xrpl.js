@@ -4,7 +4,7 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
-import { setTransactionFlagsToNumber } from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
@@ -18,7 +18,10 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { isIssuedCurrency } from './common'
+import { BaseTransaction, isIssuedCurrency } from './common'
+import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -27,6 +30,19 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -43,6 +59,8 @@ import {
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
+import { OracleDelete, validateOracleDelete } from './oracleDelete'
+import { OracleSet, validateOracleSet } from './oracleSet'
 import { Payment, validatePayment } from './payment'
 import {
   PaymentChannelClaim,
@@ -90,9 +108,11 @@ import {
 } from './XChainModifyBridge'
 
 /**
+ * Transactions that can be submitted by clients
+ *
  * @category Transaction Models
  */
-export type Transaction =
+export type SubmittableTransaction =
   | AMMBid
   | AMMCreate
   | AMMDelete
@@ -105,12 +125,19 @@ export type Transaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | CredentialAccept
+  | CredentialCreate
+  | CredentialDelete
   | DIDDelete
   | DIDSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | MPTokenAuthorize
+  | MPTokenIssuanceCreate
+  | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
@@ -118,6 +145,8 @@ export type Transaction =
   | NFTokenMint
   | OfferCancel
   | OfferCreate
+  | OracleDelete
+  | OracleSet
   | Payment
   | PaymentChannelClaim
   | PaymentChannelCreate
@@ -135,14 +164,28 @@ export type Transaction =
   | XChainCreateClaimID
   | XChainModifyBridge
 
+/**
+ * Transactions that can only be created by validators.
+ *
+ * @category Transaction Models
+ */
 export type PseudoTransaction = EnableAmendment | SetFee | UNLModify
+
+/**
+ * All transactions that can live on the XRPL
+ *
+ * @category Transaction Models
+ */
+export type Transaction = SubmittableTransaction | PseudoTransaction
 
 /**
  * @category Transaction Models
  */
-export interface TransactionAndMetadata {
-  transaction: Transaction
-  metadata: TransactionMetadata
+export interface TransactionAndMetadata<
+  T extends BaseTransaction = Transaction,
+> {
+  transaction: T
+  metadata: TransactionMetadata<T>
 }
 
 /**
@@ -212,7 +255,7 @@ export function validate(transaction: Record<string, unknown>): void {
   })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-  setTransactionFlagsToNumber(tx as unknown as Transaction)
+  tx.Flags = convertTxFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
@@ -262,6 +305,18 @@ export function validate(transaction: Record<string, unknown>): void {
       validateClawback(tx)
       break
 
+    case 'CredentialAccept':
+      validateCredentialAccept(tx)
+      break
+
+    case 'CredentialCreate':
+      validateCredentialCreate(tx)
+      break
+
+    case 'CredentialDelete':
+      validateCredentialDelete(tx)
+      break
+
     case 'DIDDelete':
       validateDIDDelete(tx)
       break
@@ -284,6 +339,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
+      break
+
+    case 'MPTokenIssuanceCreate':
+      validateMPTokenIssuanceCreate(tx)
+      break
+
+    case 'MPTokenIssuanceDestroy':
+      validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
       break
 
     case 'NFTokenAcceptOffer':
@@ -312,6 +383,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'OfferCreate':
       validateOfferCreate(tx)
+      break
+
+    case 'OracleDelete':
+      validateOracleDelete(tx)
+      break
+
+    case 'OracleSet':
+      validateOracleSet(tx)
       break
 
     case 'Payment':

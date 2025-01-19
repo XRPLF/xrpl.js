@@ -1,8 +1,7 @@
 import { Hash160 } from './hash-160'
-import { Buffer } from 'buffer/'
 import { nativeAsset } from '../nativeasset'
-
-const NATIVE_ASSET_HEX_REGEX = /^0{40}$/
+import { bytesToHex, hexToBytes, hexToString } from '@xrplf/isomorphic/utils'
+const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
 const HEX_REGEX = /^[A-F0-9]{40}$/
 // eslint-disable-next-line no-control-regex
@@ -11,8 +10,8 @@ const STANDARD_FORMAT_HEX_REGEX = /^0{24}[\x00-\x7F]{6}0{10}$/
 /**
  * Convert an ISO code to a currency bytes representation
  */
-function isoToBytes(iso: string): Buffer {
-  const bytes = Buffer.alloc(20)
+function isoToBytes(iso: string): Uint8Array {
+  const bytes = new Uint8Array(20)
   if (iso !== nativeAsset.get()) {
     const isoBytes = iso.split('').map((c) => c.charCodeAt(0))
     bytes.set(isoBytes, 12)
@@ -27,8 +26,8 @@ function isIsoCode(iso: string): boolean {
   return ISO_REGEX.test(iso)
 }
 
-function isoCodeFromHex(code: Buffer): string | null {
-  const iso = code.toString()
+function isoCodeFromHex(code: Uint8Array): string | null {
+  const iso = hexToString(bytesToHex(code))
   if (iso === nativeAsset.get()) {
     return null
   }
@@ -53,43 +52,43 @@ function isStringRepresentation(input: string): boolean {
 }
 
 /**
- * Tests if a Buffer is a valid representation of a currency
+ * Tests if a Uint8Array is a valid representation of a currency
  */
-function isBytesArray(bytes: Buffer): boolean {
+function isBytesArray(bytes: Uint8Array): boolean {
   return bytes.byteLength === 20
 }
 
 /**
  * Ensures that a value is a valid representation of a currency
  */
-function isValidRepresentation(input: Buffer | string): boolean {
-  return input instanceof Buffer
+function isValidRepresentation(input: Uint8Array | string): boolean {
+  return input instanceof Uint8Array
     ? isBytesArray(input)
     : isStringRepresentation(input)
 }
 
 /**
- * Generate bytes from a string or buffer representation of a currency
+ * Generate bytes from a string or UInt8Array representation of a currency
  */
-function bytesFromRepresentation(input: string): Buffer {
+function bytesFromRepresentation(input: string): Uint8Array {
   if (!isValidRepresentation(input)) {
     throw new Error(`Unsupported Currency representation: ${input}`)
   }
-  return input.length === 3 ? isoToBytes(input) : Buffer.from(input, 'hex')
+  return input.length === 3 ? isoToBytes(input) : hexToBytes(input)
 }
 
 /**
  * Class defining how to encode and decode Currencies
  */
 class Currency extends Hash160 {
-  static readonly NATIVE_ASSET = new Currency(Buffer.alloc(20))
+  static readonly XRP = new Currency(new Uint8Array(20))
   private readonly _iso: string | null
 
-  constructor(byteBuf: Buffer) {
-    super(byteBuf ?? Currency.NATIVE_ASSET.bytes)
-    const hex = this.bytes.toString('hex')
+  constructor(byteBuf: Uint8Array) {
+    super(byteBuf ?? Currency.XRP.bytes)
+    const hex = bytesToHex(this.bytes)
 
-    if (NATIVE_ASSET_HEX_REGEX.test(hex)) {
+    if (XRP_HEX_REGEX.test(hex)) {
       this._iso = nativeAsset.get()
     } else if (STANDARD_FORMAT_HEX_REGEX.test(hex)) {
       this._iso = isoCodeFromHex(this.bytes.slice(12, 15))
@@ -134,7 +133,7 @@ class Currency extends Hash160 {
     if (iso !== null) {
       return iso
     }
-    return this.bytes.toString('hex').toUpperCase()
+    return bytesToHex(this.bytes).toUpperCase()
   }
 }
 

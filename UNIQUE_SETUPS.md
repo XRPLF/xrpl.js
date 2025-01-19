@@ -1,6 +1,6 @@
 # Unique Setup Steps for Xrpl.js
 
-For when you need to do more than just install `xrpl.js` for it to work (especially for React projects in the browser).
+Starting in 3.0 xrpl and all the packages in this repo no longer require custom configurations (ex. polyfills) to run.
 
 ### Using xrpl.js from a CDN
 
@@ -13,183 +13,49 @@ Ensure that the full path is provided so the browser can find the sourcemaps.
 
 ### Using xrpl.js with `create-react-app`
 
-To use `xrpl.js` with React, you need to install shims for core NodeJS modules. Starting with version 5, Webpack stopped including shims by default, so you must modify your Webpack configuration to add the shims you need. Either you can eject your config and modify it, or you can use a library such as `react-app-rewired`. The example below uses `react-app-rewired`.
-
-1. Install shims (you can use `yarn` as well):
-
-   ```shell
-   npm install --save-dev \
-       assert \
-       buffer \
-       crypto-browserify \
-       https-browserify \
-       os-browserify \
-       process \
-       stream-browserify \
-       stream-http \
-       url
-   ```
-
-2. Modify your webpack configuration
-
-   1. Install `react-app-rewired`
-
-      ```shell
-      npm install --save-dev react-app-rewired
-      ```
-
-   2. At the project root, add a file named `config-overrides.js` with the following content:
-
-      ```javascript
-      const webpack = require("webpack");
-
-      module.exports = function override(config) {
-        const fallback = config.resolve.fallback || {};
-        Object.assign(fallback, {
-          assert: require.resolve("assert"),
-          crypto: require.resolve("crypto-browserify"),
-          http: require.resolve("stream-http"),
-          https: require.resolve("https-browserify"),
-          os: require.resolve("os-browserify"),
-          stream: require.resolve("stream-browserify"),
-          url: require.resolve("url"),
-          ws: require.resolve("xrpl/dist/npm/client/WSWrapper"),
-        });
-        config.resolve.fallback = fallback;
-        config.plugins = (config.plugins || []).concat([
-          new webpack.ProvidePlugin({
-            process: "process/browser",
-            Buffer: ["buffer", "Buffer"],
-          }),
-        ]);
-
-        // This is deprecated in webpack 5 but alias false does not seem to work
-        config.module.rules.push({
-          test: /node_modules[\\\/]https-proxy-agent[\\\/]/,
-          use: "null-loader",
-        });
-        return config;
-      };
-      ```
-
-   3. Update package.json scripts section with
-
-      ```
-      "start": "react-app-rewired start",
-      "build": "react-app-rewired build",
-      "test": "react-app-rewired test",
-      ```
+Starting in 3.0 xrpl and its related packages no longer require custom configurations (ex. polyfills) to run.
 
 This online template uses these steps to run xrpl.js with React in the browser:
 https://codesandbox.io/s/xrpl-intro-pxgdjr?file=/src/App.js
 
 ### Using xrpl.js with React Native
 
-If you want to use `xrpl.js` with React Native you will need to install shims for core NodeJS modules. To help with this you can use a module like [rn-nodeify](https://github.com/tradle/rn-nodeify).
+If you want to use `xrpl.js` with React Native you will need to install polyfills for core NodeJS modules.
 
 1. Install dependencies (you can use `yarn` as well):
 
    ```shell
-   npm install react-native-crypto
-   npm install xrpl
-   # install peer deps
-   npm install react-native-randombytes
-   # install latest rn-nodeify
-   npm install rn-nodeify@latest --dev
+   npm install xrpl \
+       fast-text-encoding \
+       react-native-get-random-values
    ```
 
-2. After that, run the following command:
+2. After that, run the following commands:
 
    ```shell
-   # install node core shims and recursively hack package.json files
-   # in ./node_modules to add/update the "browser"/"react-native" field with relevant mappings
-   ./node_modules/.bin/rn-nodeify --hack --install
+   # compile `react-native-get-random-values` pods see https://www.npmjs.com/package/react-native-get-random-values#installation
+   npx pod-install
    ```
-
-3. Enable `crypto`:
-
-   `rn-nodeify` will create a `shim.js` file in the project root directory.
-   Open it and uncomment the line that requires the crypto module:
-
-   ```javascript
-   // If using the crypto shim, uncomment the following line to ensure
-   // crypto is loaded first, so it can populate global.crypto
-   require("crypto");
-   ```
-
-4. Import `shim` in your project (it must be the first line):
+   
+3. Create `polyfills.js` and add
 
 ```javascript
-import './shim'
+// Required for TextEncoder/TextDecoder
+import 'fast-text-encoding'
+// Required for `crypto.getRandomValues`
+import 'react-native-get-random-values'
+```
+
+4. Import `polyfills` in index file your project (it must be the first line):
+
+```javascript
+import './polyfills'
 ...
 ```
 
 ### Using xrpl.js with Vite React
 
-Similar to above, to get xrpl.js to work with Vite you need to set up a couple aliases in the vite.config.ts file.
-
-1. If it's a fresh project you can use `npm create vite@latest` then choose the React and TypeScript options.
-
-2. Copy these settings into your `vite.config.ts` file.
-
-```
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
-import polyfillNode from 'rollup-plugin-polyfill-node'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  define: {
-    'process.env': {}
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-
-        define: {
-          global: 'globalThis',
-        },
-        plugins: [
-            NodeGlobalsPolyfillPlugin({
-                process: true,
-                buffer: true,
-            }),
-        ],
-    },
-},
-build: {
-  rollupOptions: {
-      plugins: [
-          polyfillNode(),
-      ]
-  }
-},
-resolve: {
-  alias: {
-    events: 'events',
-    crypto: 'crypto-browserify',
-    stream: 'stream-browserify',
-    http: 'stream-http',
-    https: 'https-browserify',
-    ws: 'xrpl/dist/npm/client/WSWrapper',
-  },
-}})
-```
-
-3. Install the config dependencies and xrpl (e.g. using this command)
-
-```
-npm install --save-dev @esbuild-plugins/node-globals-polyfill \
-		rollup-plugin-polyfill-node \
-		&& npm install
-		events \
-		crypto-browserify \
-		stream-browserify \
-		stream-http \
-		https-browserify \
-		xrpl
-```
+Starting in 3.0 xrpl and all the packages in this repo no longer require custom configurations (ex. polyfills) to run.
 
 ### Using xrpl.js with Deno
 

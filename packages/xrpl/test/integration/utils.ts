@@ -10,6 +10,7 @@ import {
   type SubmitResponse,
   TimeoutError,
   NotConnectedError,
+  ECDSA,
   AccountLinesRequest,
   IssuedCurrency,
   Currency,
@@ -19,6 +20,7 @@ import {
   AccountSet,
   AccountSetAsfFlags,
   Payment,
+  SubmittableTransaction,
   Transaction,
   TrustSet,
   TrustSetFlags,
@@ -97,7 +99,7 @@ export async function submitTransaction({
   retry = { count: 5, delayMs: 1000 },
 }: {
   client: Client
-  transaction: Transaction
+  transaction: SubmittableTransaction
   wallet: Wallet
   retry?: {
     count: number
@@ -157,7 +159,7 @@ export async function fundAccount(
     // 2 times the amount needed for a new account (20 XRP)
     Amount: '400000000',
   }
-  const wal = Wallet.fromSeed(GENESIS_SECRET)
+  const wal = Wallet.fromSeed(GENESIS_SECRET, { algorithm: ECDSA.secp256k1 })
   const response = await submitTransaction({
     client,
     wallet: wal,
@@ -196,11 +198,12 @@ export async function verifySubmittedTransaction(
   const decodedTx: any = typeof tx === 'string' ? decode(tx) : tx
   if (decodedTx.TransactionType === 'Payment') {
     decodedTx.DeliverMax = decodedTx.Amount
+    delete decodedTx.Amount
   }
 
   assert(data.result)
   assert.deepEqual(
-    omit(data.result, [
+    omit(data.result.tx_json, [
       'ctid',
       'date',
       'hash',
@@ -233,7 +236,7 @@ export async function verifySubmittedTransaction(
 // eslint-disable-next-line max-params -- Test function, many params are needed
 export async function testTransaction(
   client: Client,
-  transaction: Transaction,
+  transaction: SubmittableTransaction,
   wallet: Wallet,
   retry?: {
     count: number

@@ -1,7 +1,12 @@
 import { assert } from 'chai'
-import { TransactionMetadata, TxRequest } from 'xrpl'
 
-import { convertStringToHex, getNFTokenID, NFTokenMint } from '../../../src'
+import {
+  convertStringToHex,
+  getNFTokenID,
+  NFTokenMint,
+  TransactionMetadata,
+  TxRequest,
+} from '../../../src'
 import { hashSignedTx } from '../../../src/utils/hashes'
 import serverUrl from '../serverUrl'
 import {
@@ -55,8 +60,9 @@ describe('NFTokenMint', function () {
       })
 
       const nftokenID =
-        getNFTokenID(txResponse.result.meta as TransactionMetadata) ??
-        'undefined'
+        getNFTokenID(
+          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
+        ) ?? 'undefined'
 
       const accountHasNFT = accountNFTs.result.account_nfts.some(
         (value) => value.NFTokenID === nftokenID,
@@ -79,7 +85,7 @@ describe('NFTokenMint', function () {
 
       assert.equal(
         nftokenID,
-        getNFTokenID(binaryTxResponse.result.meta) ?? 'undefined',
+        getNFTokenID(binaryTxResponse.result.meta_blob) ?? 'undefined',
         `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
       )
     },

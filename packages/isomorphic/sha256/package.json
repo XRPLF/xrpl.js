@@ -1,0 +1,7 @@
+{
+  "name": "@xrplf/isomorphic/sha256",
+  "private": true,
+  "main": "../dist/sha256",
+  "types": "../dist/sha256",
+  "browser": "../dist/sha256/browser.js"
+}

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers -- Doing hex string parsing. */
+import { hexToBytes } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { encodeAccountID } from 'ripple-address-codec'
 
@@ -85,7 +86,7 @@ export default function parseNFTokenID(nftokenID: string): {
     NFTokenID: nftokenID,
     Flags: new BigNumber(nftokenID.substring(0, 4), 16).toNumber(),
     TransferFee: new BigNumber(nftokenID.substring(4, 8), 16).toNumber(),
-    Issuer: encodeAccountID(Buffer.from(nftokenID.substring(8, 48), 'hex')),
+    Issuer: encodeAccountID(hexToBytes(nftokenID.substring(8, 48))),
     Taxon: unscrambleTaxon(scrambledTaxon, sequence),
     Sequence: sequence,
   }

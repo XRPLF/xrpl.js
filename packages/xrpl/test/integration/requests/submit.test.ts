@@ -6,7 +6,7 @@ import {
   SubmitRequest,
   SubmitResponse,
   hashes,
-  Transaction,
+  SubmittableTransaction,
 } from '../../../src'
 import { convertStringToHex } from '../../../src/utils'
 import serverUrl from '../serverUrl'
@@ -54,6 +54,7 @@ describe('submit', function () {
       )
 
       const expectedResponse: SubmitResponse = {
+        api_version: 2,
         id: submitResponse.id,
         type: 'response',
         result: {
@@ -63,7 +64,7 @@ describe('submit', function () {
             'The transaction was applied. Only final in a validated ledger.',
           tx_blob: signedTx.tx_blob,
           tx_json: {
-            ...(decode(signedTx.tx_blob) as unknown as Transaction),
+            ...(decode(signedTx.tx_blob) as unknown as SubmittableTransaction),
             hash: hashSignedTx(signedTx.tx_blob),
           },
           accepted: true,

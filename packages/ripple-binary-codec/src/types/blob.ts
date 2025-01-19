@@ -1,12 +1,12 @@
 import { SerializedType } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
-import { Buffer } from 'buffer/'
+import { hexToBytes } from '@xrplf/isomorphic/utils'
 
 /**
  * Variable length encoded type
  */
 class Blob extends SerializedType {
-  constructor(bytes: Buffer) {
+  constructor(bytes: Uint8Array) {
     super(bytes)
   }
 
@@ -33,7 +33,10 @@ class Blob extends SerializedType {
     }
 
     if (typeof value === 'string') {
-      return new Blob(Buffer.from(value, 'hex'))
+      if (!/^[A-F0-9]*$/iu.test(value)) {
+        throw new Error('Cannot construct Blob from a non-hex string')
+      }
+      return new Blob(hexToBytes(value))
     }
 
     throw new Error('Cannot construct Blob from value given')

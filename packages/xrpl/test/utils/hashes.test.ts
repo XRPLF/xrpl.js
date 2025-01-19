@@ -4,7 +4,12 @@ import path from 'path'
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
 
-import { OfferCreate, Transaction, ValidationError } from '../../src'
+import {
+  EnableAmendment,
+  OfferCreate,
+  Transaction,
+  ValidationError,
+} from '../../src'
 import {
   hashStateTree,
   hashTxTree,
@@ -166,6 +171,7 @@ describe('Hashes', function () {
   it('Throw an error when hashing an unsigned transaction', function () {
     const offerCreateWithNoSignature: OfferCreate = {
       ...(fixtures.tx.OfferCreateSell.result as OfferCreate),
+      SigningPubKey: undefined,
       TxnSignature: undefined,
     }
 
@@ -178,12 +184,31 @@ describe('Hashes', function () {
   it('Throw when hashing an unsigned transaction blob', function () {
     const encodedOfferCreateWithNoSignature: string = encode({
       ...fixtures.tx.OfferCreateSell.result,
+      SigningPubKey: undefined,
       TxnSignature: undefined,
     })
 
     assert.throws(
       () => hashSignedTx(encodedOfferCreateWithNoSignature),
       ValidationError,
+    )
+  })
+
+  it('hashSignedTx - pseudo-transaction', function () {
+    const transaction: EnableAmendment = {
+      Account: 'rrrrrrrrrrrrrrrrrrrrrhoLvTp',
+      Amendment:
+        'AE35ABDEFBDE520372B31C957020B34A7A4A9DC3115A69803A44016477C84D6E',
+      Fee: '0',
+      LedgerSequence: 84206081,
+      Sequence: 0,
+      SigningPubKey: '',
+      TransactionType: 'EnableAmendment',
+    }
+
+    assert.equal(
+      hashSignedTx(transaction),
+      'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF',
     )
   })
 })

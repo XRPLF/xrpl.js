@@ -14,9 +14,16 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
-import * as rbc from 'ripple-binary-codec'
+import {
+  encode as rbcEncode,
+  decode as rbcDecode,
+  encodeForMultisigning as rbcEncodeForMultisigning,
+  encodeForSigning as rbcEncodeForSigning,
+  encodeForSigningClaim as rbcEncodeForSigningClaim,
+} from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
+import type { APIVersion } from '../models'
 import { LedgerEntry } from '../models/ledger'
 import { Response } from '../models/methods'
 import { PaymentChannelClaim } from '../models/transactions/paymentChannelClaim'
@@ -83,7 +90,7 @@ function isValidSecret(secret: string): boolean {
  * @returns A hex string representing the encoded object.
  */
 function encode(object: Transaction | LedgerEntry): string {
-  return rbc.encode(object)
+  return rbcEncode(object)
 }
 
 /**
@@ -93,7 +100,7 @@ function encode(object: Transaction | LedgerEntry): string {
  * @returns A hex string representing the encoded object.
  */
 function encodeForSigning(object: Transaction): string {
-  return rbc.encodeForSigning(object)
+  return rbcEncodeForSigning(object)
 }
 
 /**
@@ -103,7 +110,7 @@ function encodeForSigning(object: Transaction): string {
  * @returns A hex string representing the encoded object.
  */
 function encodeForSigningClaim(object: PaymentChannelClaim): string {
-  return rbc.encodeForSigningClaim(object)
+  return rbcEncodeForSigningClaim(object)
 }
 
 /**
@@ -114,7 +121,7 @@ function encodeForSigningClaim(object: PaymentChannelClaim): string {
  * @returns A hex string representing the encoded object.
  */
 function encodeForMultiSigning(object: Transaction, signer: string): string {
-  return rbc.encodeForMultisigning(object, signer)
+  return rbcEncodeForMultisigning(object, signer)
 }
 
 /**
@@ -124,7 +131,7 @@ function encodeForMultiSigning(object: Transaction, signer: string): string {
  * @returns The hex string decoded according to XRPL serialization format.
  */
 function decode(hex: string): Record<string, unknown> {
-  return rbc.decode(hex)
+  return rbcDecode(hex)
 }
 
 /**
@@ -151,7 +158,7 @@ function isValidAddress(address: string): boolean {
  * @returns Whether the response has more pages of data.
  * @category Utilities
  */
-function hasNextPage(response: Response): boolean {
+function hasNextPage(response: Response<APIVersion>): boolean {
   // eslint-disable-next-line @typescript-eslint/dot-notation -- only checking if it exists
   return Boolean(response.result['marker'])
 }

@@ -3,6 +3,7 @@ import Amendments from './Amendments'
 import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
+import Credential from './Credential'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
@@ -10,6 +11,7 @@ import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
+import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
@@ -23,6 +25,7 @@ type LedgerEntry =
   | AMM
   | Bridge
   | Check
+  | Credential
   | DepositPreauth
   | DirectoryNode
   | Escrow
@@ -30,6 +33,7 @@ type LedgerEntry =
   | LedgerHashes
   | NegativeUNL
   | Offer
+  | Oracle
   | PayChannel
   | RippleState
   | SignerList
@@ -43,15 +47,19 @@ type LedgerEntryFilter =
   | 'amm'
   | 'bridge'
   | 'check'
+  | 'credential'
   | 'deposit_preauth'
   | 'did'
   | 'directory'
   | 'escrow'
   | 'fee'
   | 'hashes'
+  | 'mpt_issuance'
+  | 'mptoken'
   | 'nft_offer'
   | 'nft_page'
   | 'offer'
+  | 'oracle'
   | 'payment_channel'
   | 'signer_list'
   | 'state'
