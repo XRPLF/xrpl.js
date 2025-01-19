@@ -19,8 +19,8 @@ interface DefinitionsData {
   FIELDS: (string | FieldInfo)[][]
   TRANSACTION_RESULTS: Record<string, number>
   TRANSACTION_TYPES: Record<string, number>
-  TRANSACTION_FLAGS_INDICES: TxFlags
-  TRANSACTION_FLAGS: TxFlags
+  TRANSACTION_FLAGS_INDICES?: TxFlags
+  TRANSACTION_FLAGS?: TxFlags
   native_currency_code?: string
   hash?: string
 }
@@ -45,9 +45,9 @@ class XrplDefinitionsBase {
   // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
   // Tx Set/Unset flags
-  transactionFlagsIndices: TxFlags
+  transactionFlagsIndices?: TxFlags
   // Tx flags
-  transactionFlags: TxFlags
+  transactionFlags?: TxFlags
   // Native asset code (native_currency_code)
   nativeAsset?: string
   // Hash for the Definitions, can be passed fetching again & suppress output if equal
