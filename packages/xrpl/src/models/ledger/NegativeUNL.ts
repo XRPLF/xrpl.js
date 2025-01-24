@@ -1,4 +1,4 @@
-import { BaseLedgerEntry, MissingPreviousTxnID } from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The unique id for the nUNL object https://xrpl.org/negativeunl.html#negativeunl-id-format
@@ -14,7 +14,7 @@ export const NEGATIVE_UNL_ID =
  */
 export default interface NegativeUNL
   extends BaseLedgerEntry,
-    MissingPreviousTxnID {
+    HasOptionalPreviousTxnID {
   LedgerEntryType: 'NegativeUNL'
   /**
    * A list of trusted validators that are currently disabled.

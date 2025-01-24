@@ -66,6 +66,14 @@ import {
   DepositAuthorizedRequest,
   DepositAuthorizedResponse,
 } from './depositAuthorized'
+import {
+  FeatureAllRequest,
+  FeatureAllResponse,
+  FeatureOneRequest,
+  FeatureOneResponse,
+  FeatureRequest,
+  FeatureResponse,
+} from './feature'
 import { FeeRequest, FeeResponse } from './fee'
 import {
   GatewayBalance,
@@ -160,6 +168,7 @@ import {
   SubscribeRequest,
   SubscribeResponse,
   TransactionStream,
+  TransactionV1Stream,
   ValidationStream,
 } from './subscribe'
 import {
@@ -214,6 +223,7 @@ type Request =
   | ServerDefinitionsRequest
   | ServerInfoRequest
   | ServerStateRequest
+  | FeatureRequest
   // utility methods
   | PingRequest
   | RandomRequest
@@ -271,6 +281,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | ServerDefinitionsResponse
   | ServerInfoResponse
   | ServerStateResponse
+  | FeatureResponse
   // utility methods
   | PingResponse
   | RandomResponse
@@ -419,6 +430,10 @@ export type RequestResponseMap<
   ? ServerStateResponse
   : T extends ServerDefinitionsRequest
   ? ServerDefinitionsResponse
+  : T extends FeatureAllRequest
+  ? FeatureAllResponse
+  : T extends FeatureOneRequest
+  ? FeatureOneResponse
   : T extends PingRequest
   ? PingResponse
   : T extends RandomRequest
@@ -569,6 +584,7 @@ export {
   LedgerStreamResponse,
   ValidationStream,
   TransactionStream,
+  TransactionV1Stream,
   PathFindStream,
   PeerStatusStream,
   OrderBookStream,
@@ -591,6 +607,8 @@ export {
   ServerState,
   StateAccountingFinal,
   StateAccounting,
+  FeatureRequest,
+  FeatureResponse,
   // utility methods
   PingRequest,
   PingResponse,
