@@ -21,6 +21,22 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  */
 export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
+
+  /**
+   * Retrieve a MPTokenIssuance object from the ledger.
+   */
+  mpt_issuance?: string
+
+  /**
+   * Retrieve a MPToken object from the ledger.
+   */
+  mptoken?:
+    | {
+        mpt_issuance_id: string
+        account: string
+      }
+    | string
+
   /**
    * Retrieve an Automated Market Maker (AMM) object from the ledger.
    * This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.
@@ -66,6 +82,23 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
 
   /** The object ID of a Check object to retrieve. */
   check?: string
+
+  /* Specify the Credential to retrieve. If a string, must be the ledger entry ID of
+   * the entry, as hexadecimal. If an object, requires subject, issuer, and
+   * credential_type sub-fields.
+   */
+  credential?:
+    | {
+        /** The account that is the subject of the credential. */
+        subject: string
+
+        /** The account that issued the credential. */
+        issuer: string
+
+        /** The type of the credential, as issued. */
+        credentialType: string
+      }
+    | string
 
   /**
    * Specify a DepositPreauth object to retrieve. If a string, must be the
