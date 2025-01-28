@@ -412,6 +412,8 @@ export type RequestResponseMap<
   ? SimulateBinaryResponse
   : T extends SimulateJsonRequest
   ? SimulateJsonResponse
+  : T extends SimulateRequest
+  ? SimulateResponse
   : T extends SubmitRequest
   ? SubmitResponse
   : T extends SubmitMultisignedRequest

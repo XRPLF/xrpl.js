@@ -793,7 +793,7 @@ class Client extends EventEmitter<EventTypes> {
       binary?: Binary
     },
   ): Promise<
-    Binary extends false ? SimulateJsonResponse : SimulateBinaryResponse
+    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
   > {
     // verify that the transaction isn't signed
     const decodedTx =

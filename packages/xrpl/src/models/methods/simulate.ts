@@ -12,21 +12,20 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export type SimulateRequest = SimulateRequestBase &
-  (
-    | {
-        tx_blob: string
-      }
-    | {
-        tx_json: Transaction
-      }
-  )
-
-export interface SimulateRequestBase extends BaseRequest {
+export type SimulateRequest = BaseRequest & {
   command: 'simulate'
 
   binary?: boolean
-}
+} & (
+    | {
+        tx_blob: string
+        tx_json?: never
+      }
+    | {
+        tx_json: Transaction
+        tx_blob?: never
+      }
+  )
 
 export type SimulateBinaryRequest = SimulateRequest & {
   binary: true
@@ -36,10 +35,23 @@ export type SimulateJsonRequest = SimulateRequest & {
   binary?: false
 }
 
+/**
+ * Response expected from an {@link SimulateRequest}.
+ *
+ * @category Responses
+ */
 export type SimulateResponse = SimulateBinaryResponse | SimulateJsonResponse
 
 export interface SimulateBinaryResponse extends BaseResponse {
   result: {
+    applied: false
+
+    engine_result: string
+
+    engine_result_code: number
+
+    engine_result_message: string
+
     tx_blob: string
 
     meta_blob: string
