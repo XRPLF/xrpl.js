@@ -40,10 +40,13 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
-  SimulateResponse,
   SimulateRequest,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
+import {
+  SimulateBinaryResponse,
+  SimulateJsonResponse,
+} from '../models/methods/simulate'
 import type {
   EventTypes,
   OnEventToListenerMap,
@@ -782,13 +785,16 @@ class Client extends EventEmitter<EventTypes> {
    * @returns A promise that contains SimulateResponse.
    * @throws RippledError if the simulate request fails.
    */
-  public async simulate(
+  // eslint-disable-next-line max-lines-per-function -- simulate needs a bit complex logic
+  public async simulate<Binary extends boolean = false>(
     transaction: SubmittableTransaction | string,
     opts?: {
       // If true, return the binary-encoded representation of the results.
-      binary?: boolean
+      binary?: Binary
     },
-  ): Promise<SimulateResponse> {
+  ): Promise<
+    Binary extends false ? SimulateJsonResponse : SimulateBinaryResponse
+  > {
     // verify that the transaction isn't signed
     const decodedTx =
       typeof transaction === 'string'
