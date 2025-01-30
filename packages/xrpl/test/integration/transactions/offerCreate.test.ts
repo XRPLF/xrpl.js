@@ -63,7 +63,7 @@ describe('OfferCreate', function () {
   )
 
   it(
-    'OfferCreate with Deep-Frozen trust-line must fail',
+    'OfferCreate with Deep-Frozen trustline must fail',
     async () => {
       assert(wallet_deep_freeze_trustline != null)
 

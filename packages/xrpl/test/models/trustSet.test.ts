@@ -22,7 +22,7 @@ describe('TrustSet', function () {
       },
       QualityIn: 1234,
       QualityOut: 4321,
-      // an example of deep-frozen trust line
+      // an example of deep-frozen trustline
       Flags: {
         tfSetFreeze: true,
         tfSetDeepFreeze: true,
