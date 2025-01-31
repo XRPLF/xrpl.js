@@ -31,6 +31,7 @@ export enum TrustSetFlags {
   /** Unfreeze the trust line. */
   tfClearFreeze = 0x00200000,
   /** Deep-Freeze the trust line -- disallow sending and recieving the said IssuedCurrency */
+  /** Allowed only if the trustline is already regularly frozen, or if tfSetFreeze is set in the same transaction. */
   tfSetDeepFreeze = 0x00400000,
   /** Clear a Deep-Frozen trust line */
   tfClearDeepFreeze = 0x00800000,
@@ -94,6 +95,7 @@ export interface TrustSetFlagsInterface extends GlobalFlags {
   /** Unfreeze the trust line. */
   tfClearFreeze?: boolean
   /** Deep-Freeze the trust line -- disallow sending and recieving the said IssuedCurrency */
+  /** Allowed only if the trustline is already regularly frozen, or if tfSetFreeze is set in the same transaction. */
   tfSetDeepFreeze?: boolean
   /** Clear a Deep-Frozen trust line */
   tfClearDeepFreeze?: boolean
