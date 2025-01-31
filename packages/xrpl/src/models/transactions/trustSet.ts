@@ -94,7 +94,7 @@ export interface TrustSetFlagsInterface extends GlobalFlags {
   tfSetFreeze?: boolean
   /** Unfreeze the trust line. */
   tfClearFreeze?: boolean
-  /** Deep-Freeze the trust line -- disallow sending and recieving the said IssuedCurrency */
+  /** Deep-Freeze the trustline -- disallow sending and receiving the said IssuedCurrency */
   /** Allowed only if the trustline is already regularly frozen, or if tfSetFreeze is set in the same transaction. */
   tfSetDeepFreeze?: boolean
   /** Clear a Deep-Frozen trust line */
