@@ -35,11 +35,7 @@ describe('PermissionedDomainSet', function () {
     // DomainID is expected to be a string
     tx.DomainID = 1234
     const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      errorMessage,
-    )
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
@@ -47,11 +43,7 @@ describe('PermissionedDomainSet', function () {
     delete tx.AcceptedCredentials
     const errorMessage =
       'PermissionedDomainSet: missing field AcceptedCredentials'
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      errorMessage,
-    )
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 

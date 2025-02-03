@@ -18,7 +18,9 @@ export interface PermissionedDomainSet extends BaseTransaction {
   /* The domain to modify. Must be included if modifying an existing domain. */
   DomainID?: string
 
-  /* The credentials that are accepted by the domain. Ownership of one of these credentials automatically makes you a member of the domain. An empty array means deleting the field. */
+  /* The credentials that are accepted by the domain. Ownership of one
+  of these credentials automatically makes you a member of the domain.
+  An empty array means deleting the field. */
   AcceptedCredentials: AuthorizeCredential[]
 }
 
