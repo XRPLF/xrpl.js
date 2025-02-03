@@ -11,6 +11,9 @@ export default interface PermissionedDomain
   /* The account that controls the settings of the domain. */
   Owner: string
 
+  /* The credentials that are accepted by the domain. Ownership of one of these credentials automatically makes you a member of the domain. */
+  AcceptedCredentials: AuthorizeCredential[]
+
   /*  Flag values associated with this object. */
   Flags: 0
 
@@ -19,7 +22,4 @@ export default interface PermissionedDomain
 
   /* The Sequence value of the PermissionedDomainSet transaction that created this domain. Used in combination with the Account to identify this domain. */
   Sequence: number
-
-  /* The credentials that are accepted by the domain. Ownership of one of these credentials automatically makes you a member of the domain. */
-  AcceptedCredentials: AuthorizeCredential[]
 }

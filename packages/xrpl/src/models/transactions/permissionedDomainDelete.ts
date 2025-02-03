@@ -6,8 +6,10 @@ import {
 } from './common'
 
 export interface PermissionedDomainDelete extends BaseTransaction {
+  /* The transaction type (PermissionedDomainDelete). */
   TransactionType: 'PermissionedDomainDelete'
 
+  /* The domain to delete. */
   DomainID: string
 }
 

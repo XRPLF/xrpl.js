@@ -31,20 +31,23 @@ import {
  */
 describe('Models Utils', function () {
   describe('validate containsDuplicates utility method', function () {
-    it(`use nested-objects for input parameters`, function () {
-      const list_without_dups: AuthorizeCredential[] = [
-        { Credential: { Issuer: 'alice', CredentialType: 'Passport' } },
-        { Credential: { CredentialType: 'DMV_license', Issuer: 'bob' } },
-      ]
-
-      // changing the order of the inner-objects in the list
+    it(`use nested-objects for input parameters, list contains duplicates`, function () {
+      // change the order of the inner-objects in the list
       const list_with_duplicates: AuthorizeCredential[] = [
         { Credential: { Issuer: 'alice', CredentialType: 'Passport' } },
         { Credential: { CredentialType: 'Passport', Issuer: 'alice' } },
       ]
 
-      assert.isFalse(containsDuplicates(list_without_dups))
       assert.isTrue(containsDuplicates(list_with_duplicates))
+    })
+
+    it(`use nested-objects for input parameters, no duplicates`, function () {
+      const list_without_dups: AuthorizeCredential[] = [
+        { Credential: { Issuer: 'alice', CredentialType: 'Passport' } },
+        { Credential: { CredentialType: 'DMV_license', Issuer: 'bob' } },
+      ]
+
+      assert.isFalse(containsDuplicates(list_without_dups))
     })
 
     it(`use string-IDs for input parameters`, function () {

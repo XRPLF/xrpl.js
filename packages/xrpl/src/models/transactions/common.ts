@@ -17,7 +17,7 @@ import {
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
-export const MAX_CREDENTIALS_LIST_LENGTH = 8
+export const MAX_CREDENTIALS_ARRAY_LENGTH = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
