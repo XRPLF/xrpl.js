@@ -505,6 +505,14 @@ export function validateCredentialsList(
   }
 }
 
+// Type guard to ensure we're working with AuthorizeCredential[]
+// Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
+function isAuthorizeCredentialArray(
+  list: AuthorizeCredential[] | string[],
+): list is AuthorizeCredential[] {
+  return typeof list[0] !== 'string'
+}
+
 /**
  * Check if an array of objects contains any duplicates.
  *
@@ -522,14 +530,6 @@ export function containsDuplicates(
 
   // Case-2: Process a list of nested objects
   const seen = new Set<string>()
-
-  // Type guard to ensure we're working with AuthorizeCredential[]
-  // Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
-  function isAuthorizeCredentialArray(
-    list: AuthorizeCredential[] | string[],
-  ): list is AuthorizeCredential[] {
-    return typeof list[0] !== 'string'
-  }
 
   if (isAuthorizeCredentialArray(objectList)) {
     for (const item of objectList) {
