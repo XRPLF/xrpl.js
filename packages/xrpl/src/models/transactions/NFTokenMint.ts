@@ -38,6 +38,10 @@ export enum NFTokenMintFlags {
    * issuer.
    */
   tfTransferable = 0x00000008,
+  /**
+   * If set, indicates that this NFT's URI can be modified.
+   */
+  tfMutable = 0x00000010,
 }
 
 /**
@@ -51,6 +55,7 @@ export interface NFTokenMintFlagsInterface extends GlobalFlags {
   tfOnlyXRP?: boolean
   tfTrustLine?: boolean
   tfTransferable?: boolean
+  tfMutable?: boolean
 }
 
 /**
