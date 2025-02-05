@@ -785,7 +785,7 @@ class Client extends EventEmitter<EventTypes> {
    * @returns A promise that contains SimulateResponse.
    * @throws RippledError if the simulate request fails.
    */
-  // eslint-disable-next-line max-lines-per-function -- simulate needs a bit complex logic
+
   public async simulate<Binary extends boolean = false>(
     transaction: SubmittableTransaction | string,
     opts?: {
@@ -795,38 +795,6 @@ class Client extends EventEmitter<EventTypes> {
   ): Promise<
     Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
   > {
-    // verify that the transaction isn't signed
-    const decodedTx =
-      typeof transaction === 'string'
-        ? // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed for typing
-          (decode(transaction) as unknown as SubmittableTransaction)
-        : transaction
-    if (typeof decodedTx === 'string') {
-      throw new ValidationError(
-        'Provided transaction is not a valid transaction.',
-      )
-    }
-    if (decodedTx.TxnSignature !== '' && decodedTx.TxnSignature != null) {
-      throw new ValidationError('Transaction must not be signed.')
-    }
-    if (
-      decodedTx.Signers?.some(
-        (signer) =>
-          signer.Signer.TxnSignature !== '' &&
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
-          signer.Signer.TxnSignature != null,
-      )
-    ) {
-      throw new ValidationError('Transaction must not be signed.')
-    }
-
-    setValidAddresses(decodedTx)
-    setTransactionFlagsToNumber(decodedTx)
-
-    if (decodedTx.NetworkID == null) {
-      decodedTx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
-
     // send request
     const binary = opts?.binary ?? false
     const request: SimulateRequest =
