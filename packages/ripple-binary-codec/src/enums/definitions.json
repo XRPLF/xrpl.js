@@ -3085,6 +3085,7 @@
     "NFTokenCancelOffer": 28,
     "NFTokenCreateOffer": 27,
     "NFTokenMint": 25,
+    "NFTokenModify": 61,
     "OfferCancel": 8,
     "OfferCreate": 7,
     "OracleDelete": 52,
