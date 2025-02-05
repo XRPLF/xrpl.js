@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Support for the AMMClawback amendment (XLS-73)
 * Adds utility function `convertTxFlagsToNumber`
 
 ### Changed

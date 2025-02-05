@@ -913,20 +913,20 @@
     [
       "IssuerNode",
       {
-        "nth": 27,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 27,
         "type": "UInt64"
       }
     ],
     [
       "SubjectNode",
       {
-        "nth": 28,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
         "type": "UInt64"
       }
     ],
@@ -1247,6 +1247,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 33,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "DomainID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
         "type": "Hash256"
       }
     ],
@@ -1833,10 +1843,10 @@
     [
       "CredentialType",
       {
-        "nth": 31,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 31,
         "type": "Blob"
       }
     ],
@@ -2013,11 +2023,21 @@
     [
       "Subject",
       {
-        "nth": 24,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 24,
         "type": "AccountID"
+      }
+    ],
+    [
+      "Number",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
+        "type": "Number"
       }
     ],
     [
@@ -2313,10 +2333,10 @@
     [
       "Credential",
       {
-        "nth": 33,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
         "type": "STObject"
       }
     ],
@@ -2513,20 +2533,30 @@
     [
       "AuthorizeCredentials",
       {
-        "nth": 26,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 26,
         "type": "STArray"
       }
     ],
     [
       "UnauthorizeCredentials",
       {
-        "nth": 27,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 27,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AcceptedCredentials",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
         "type": "STArray"
       }
     ],
@@ -2713,10 +2743,10 @@
     [
       "CredentialIDs",
       {
-        "nth": 5,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 5,
         "type": "Vector256"
       }
     ],
@@ -2847,6 +2877,7 @@
     "Amendments": 102,
     "Bridge": 105,
     "Check": 67,
+    "Credential": 129,
     "DID": 73,
     "DepositPreauth": 112,
     "DirectoryNode": 100,
@@ -2861,8 +2892,8 @@
     "NegativeUNL": 78,
     "Offer": 111,
     "Oracle": 128,
-    "Credential": 129,
     "PayChannel": 120,
+    "PermissionedDomain": 130,
     "RippleState": 114,
     "SignerList": 83,
     "Ticket": 84,
@@ -3053,6 +3084,7 @@
   },
   "TRANSACTION_TYPES": {
     "AMMBid": 39,
+    "AMMClawback": 31,
     "AMMCreate": 35,
     "AMMDelete": 40,
     "AMMDeposit": 36,
@@ -3064,8 +3096,8 @@
     "CheckCash": 17,
     "CheckCreate": 16,
     "Clawback": 30,
-    "CredentialCreate": 58,
     "CredentialAccept": 59,
+    "CredentialCreate": 58,
     "CredentialDelete": 60,
     "DIDDelete": 50,
     "DIDSet": 49,
@@ -3094,6 +3126,8 @@
     "PaymentChannelClaim": 15,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
+    "PermissionedDomainDelete": 63,
+    "PermissionedDomainSet": 62,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
@@ -3119,18 +3153,19 @@
     "Hash160": 17,
     "Hash192": 21,
     "Hash256": 5,
+    "Hash384": 22,
+    "Hash512": 23,
     "Issue": 24,
     "LedgerEntry": 10002,
     "Metadata": 10004,
     "NotPresent": 0,
+    "Number": 9,
     "PathSet": 18,
     "STArray": 15,
     "STObject": 14,
     "Transaction": 10001,
     "UInt16": 1,
     "UInt32": 2,
-    "UInt384": 22,
-    "UInt512": 23,
     "UInt64": 3,
     "UInt8": 16,
     "UInt96": 20,
