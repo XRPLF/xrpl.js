@@ -1,7 +1,9 @@
 import { decode, encode } from 'ripple-binary-codec'
 
 import type {
+  APIVersion,
   Client,
+  DEFAULT_API_VERSION,
   SubmitRequest,
   SubmitResponse,
   SubmittableTransaction,
@@ -46,8 +48,10 @@ async function sleep(ms: number): Promise<void> {
  * const signedTransactionString = encode(signedTransaction);
  * const response2 = await submitRequest(client, signedTransactionString, true);
  */
-export async function submitRequest(
-  client: Client,
+export async function submitRequest<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(
+  client: Client<V>,
   signedTransaction: SubmittableTransaction | string,
   failHard = false,
 ): Promise<SubmitResponse> {
@@ -111,12 +115,13 @@ export async function submitRequest(
 // eslint-disable-next-line max-params, max-lines-per-function -- this function needs to display and do with more information.
 export async function waitForFinalTransactionOutcome<
   T extends BaseTransaction = SubmittableTransaction,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
 >(
-  client: Client,
+  client: Client<V>,
   txHash: string,
   lastLedger: number,
   submissionResult: string,
-): Promise<TxResponse<T>> {
+): Promise<TxResponse<T, V>> {
   await sleep(LEDGER_CLOSE_TIME)
 
   const latestLedger = await client.getLedgerIndex()
@@ -138,7 +143,7 @@ export async function waitForFinalTransactionOutcome<
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions,@typescript-eslint/no-unsafe-member-access -- ^
       const message = error?.data?.error as string
       if (message === 'txnNotFound') {
-        return waitForFinalTransactionOutcome<T>(
+        return waitForFinalTransactionOutcome<T, V>(
           client,
           txHash,
           lastLedger,
@@ -155,10 +160,10 @@ export async function waitForFinalTransactionOutcome<
   if (txResponse.result.validated) {
     // TODO: resolve the type assertion below
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that txResponse is of type TxResponse
-    return txResponse as TxResponse<T>
+    return txResponse as TxResponse<T, V>
   }
 
-  return waitForFinalTransactionOutcome<T>(
+  return waitForFinalTransactionOutcome<T, V>(
     client,
     txHash,
     lastLedger,
@@ -224,8 +229,10 @@ function isSigned(transaction: SubmittableTransaction | string): boolean {
  * // Example 2: Retrieving a string representation of the signed transaction
  * const signedTxString = await getSignedTx(client, encode(transaction), options);
  */
-export async function getSignedTx(
-  client: Client,
+export async function getSignedTx<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(
+  client: Client<V>,
   transaction: SubmittableTransaction | string,
   {
     autofill = true,
