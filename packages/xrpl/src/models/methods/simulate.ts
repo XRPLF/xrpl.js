@@ -40,7 +40,7 @@ export type SimulateJsonRequest = SimulateRequest & {
  *
  * @category Responses
  */
-export type SimulateResponse = SimulateBinaryResponse | SimulateJsonResponse
+export type SimulateResponse = SimulateJsonResponse | SimulateBinaryResponse
 
 export interface SimulateBinaryResponse extends BaseResponse {
   result: {

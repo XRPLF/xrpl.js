@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
-import { SimulateRequest } from '../../../src'
+import { AccountSet, SimulateRequest } from '../../../src'
+import { SimulateBinaryRequest } from '../../../src/models/methods/simulate'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -34,6 +35,7 @@ describe('simulate', function () {
 
       assert.equal(simulateResponse.type, 'response')
       assert.typeOf(simulateResponse.result.meta, 'object')
+      assert.equal(simulateResponse.result.tx_json, simulateRequest.tx_json)
       assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
       assert.isFalse(simulateResponse.result.applied)
     },
@@ -43,7 +45,7 @@ describe('simulate', function () {
   it(
     'binary',
     async () => {
-      const simulateRequest: SimulateRequest = {
+      const simulateRequest: SimulateBinaryRequest = {
         command: 'simulate',
         tx_json: {
           TransactionType: 'AccountSet',
@@ -56,6 +58,25 @@ describe('simulate', function () {
       assert.equal(simulateResponse.type, 'response')
       assert.typeOf(simulateResponse.result.meta_blob, 'string')
       assert.equal(simulateResponse.result.tx_blob, 'string')
+      assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
+      assert.isFalse(simulateResponse.result.applied)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'sugar',
+    async () => {
+      const tx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: testContext.wallet.address,
+        NFTokenMinter: testContext.wallet.address,
+      }
+      const simulateResponse = await testContext.client.simulate(tx)
+
+      assert.equal(simulateResponse.type, 'response')
+      assert.typeOf(simulateResponse.result.meta, 'object')
+      assert.equal(simulateResponse.result.tx_json, tx)
       assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
       assert.isFalse(simulateResponse.result.applied)
     },
