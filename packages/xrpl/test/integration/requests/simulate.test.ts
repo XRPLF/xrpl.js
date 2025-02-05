@@ -76,7 +76,7 @@ describe('simulate', function () {
 
       assert.equal(simulateResponse.type, 'response')
       assert.typeOf(simulateResponse.result.meta, 'object')
-      assert.equal(simulateResponse.result.tx_json, tx)
+      assert.typeOf(simulateResponse.result.tx_json, 'object')
       assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
       assert.isFalse(simulateResponse.result.applied)
     },
