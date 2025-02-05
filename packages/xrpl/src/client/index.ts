@@ -79,7 +79,7 @@ import {
   separateBuySellOrders,
   sortAndLimitOffers,
 } from '../sugar/getOrderbook'
-import { decode, dropsToXrp, hashes, isValidClassicAddress } from '../utils'
+import { dropsToXrp, hashes, isValidClassicAddress } from '../utils'
 import { Wallet } from '../Wallet'
 import {
   type FaucetRequestBody,
