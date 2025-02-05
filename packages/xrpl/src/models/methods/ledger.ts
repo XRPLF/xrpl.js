@@ -203,13 +203,13 @@ export interface LedgerQueueData {
 }
 
 export interface LedgerBinary
-  extends Omit<Omit<Ledger, 'transactions'>, 'accountState'> {
+  extends Omit<Ledger, 'transactions' | 'accountState'> {
   accountState?: string[]
   transactions?: string[]
 }
 
 export interface LedgerBinaryV1
-  extends Omit<Omit<LedgerV1, 'transactions'>, 'accountState'> {
+  extends Omit<LedgerV1, 'transactions' | 'accountState'> {
   accountState?: string[]
   transactions?: string[]
 }
