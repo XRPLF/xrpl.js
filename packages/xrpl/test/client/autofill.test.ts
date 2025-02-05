@@ -6,6 +6,7 @@ import {
   EscrowFinish,
   Payment,
   Transaction,
+  IssuedCurrencyAmount,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -98,10 +99,45 @@ describe('client.autofill', function () {
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
+  it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields using amount objects', async function () {
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = {
+      currency: 'USD',
+      value: AMOUNT,
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+    paymentTx.Amount = {
+      currency: 'USD',
+      value: AMOUNT,
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.strictEqual((txResult.Amount as IssuedCurrencyAmount).value, AMOUNT)
+    assert.strictEqual('DeliverMax' in txResult, false)
+  })
+
   it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = '6789'
     paymentTx.Amount = '1234'
+
+    await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields using objects', async function () {
+    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
+    paymentTx.DeliverMax = {
+      currency: 'USD',
+      value: '31415',
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+    paymentTx.Amount = {
+      currency: 'USD',
+      value: '27182',
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
 
     await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
   })

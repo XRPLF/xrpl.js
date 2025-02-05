@@ -47,6 +47,7 @@ import type {
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
 import type { SubmittableTransaction } from '../models/transactions'
+import { areAmountsEqual } from '../models/transactions/common'
 import { convertTxFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
@@ -699,7 +700,7 @@ class Client extends EventEmitter<EventTypes> {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
       // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
-      if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+      if (tx.Amount != null && !areAmountsEqual(tx.Amount, tx.DeliverMax)) {
         return Promise.reject(
           new ValidationError(
             'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
