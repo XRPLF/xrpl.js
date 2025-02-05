@@ -17,7 +17,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * New `MPTAmount` type support for `Payment` and `Clawback` transactions
 * `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Support for XLS-70d (Credentials)
-* Add `NFTokenModify` transaction and add `tfMutable` flag in `NFTokenMint`
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * `TransactionStream` model supports APIv2
