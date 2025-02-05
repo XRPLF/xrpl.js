@@ -35,7 +35,7 @@ describe('simulate', function () {
 
       assert.equal(simulateResponse.type, 'response')
       assert.typeOf(simulateResponse.result.meta, 'object')
-      assert.equal(simulateResponse.result.tx_json, simulateRequest.tx_json)
+      assert.typeOf(simulateResponse.result.tx_json, 'object')
       assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
       assert.isFalse(simulateResponse.result.applied)
     },
@@ -57,7 +57,7 @@ describe('simulate', function () {
 
       assert.equal(simulateResponse.type, 'response')
       assert.typeOf(simulateResponse.result.meta_blob, 'string')
-      assert.equal(simulateResponse.result.tx_blob, 'string')
+      assert.typeOf(simulateResponse.result.tx_blob, 'string')
       assert.equal(simulateResponse.result.engine_result, 'tesSUCCESS')
       assert.isFalse(simulateResponse.result.applied)
     },
