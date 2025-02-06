@@ -11,6 +11,7 @@
 
 ### Added
 * Support for the Price Oracles amendment (XLS-47).
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * Better error handling/error messages for serialization/deserialization errors.

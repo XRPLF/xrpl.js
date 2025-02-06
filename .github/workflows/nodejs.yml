@@ -4,7 +4,7 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:2.3.0-rc1
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
 
 on:
   push:
