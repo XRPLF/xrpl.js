@@ -61,7 +61,12 @@ const capitalizationExceptions = {
 function translate(inp) {
   try {
     if (inp.match(/^UINT/m))
-      if (inp.match(/256/m) || inp.match(/160/m) || inp.match(/128/m) || inp.match(/192/m))
+      if (
+        inp.match(/256/m) ||
+        inp.match(/160/m) ||
+        inp.match(/128/m) ||
+        inp.match(/192/m)
+      )
         return inp.replace('UINT', 'Hash')
       else return inp.replace('UINT', 'UInt')
     if (inp == 'OBJECT' || inp == 'ARRAY')
@@ -94,13 +99,15 @@ function addLine(line) {
   output += line + '\n'
 }
 
-////////////////////////////////////////////////////////////////////////
-//  Serialized type processing
-////////////////////////////////////////////////////////////////////////
-addLine('{')
-addLine('  "TYPES": {')
-addLine('    "Done": -1,')
+function sorter(a, b) {
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
 
+addLine('{')
+
+// process STypes
 let stypeHits = [
   ...sfieldHeaderFile.matchAll(
     /^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/gm,
@@ -110,46 +117,10 @@ if (stypeHits.length === 0)
   stypeHits = [
     ...sfieldHeaderFile.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/gm),
   ]
-for (let x = 0; x < stypeHits.length; ++x) {
-  addLine(
-    '    "' +
-      translate(stypeHits[x][1]) +
-      '": ' +
-      stypeHits[x][2] +
-      (x < stypeHits.length - 1 ? ',' : ''),
-  )
-}
-
-addLine('  },')
-
-////////////////////////////////////////////////////////////////////////
-//  Ledger entry type processing
-////////////////////////////////////////////////////////////////////////
-addLine('  "LEDGER_ENTRY_TYPES": {')
-addLine('    "Any": -3,')
-addLine('    "Child": -2,')
-addLine('    "Invalid": -1,')
-
-const unhex = (x) => {
-  x = ('' + x).trim()
-  if (x.substr(0, 2) == '0x') return '' + parseInt(x)
-  if (x.substr(0, 1) == "'" && x.length == 3) return x.charCodeAt(1)
-  return x
-}
-hits = [
-  ...ledgerFormatsMacroFile.matchAll(
-    /^ *LEDGER_ENTRY\(lt[A-Z_]+ *, *([x0-9a-f]+) *, *([^,]+), \({$/gm,
-  ),
-]
-for (let x = 0; x < hits.length; ++x)
-  addLine(
-    '    "' +
-      hits[x][2] +
-      '": ' +
-      unhex(hits[x][1]) +
-      (x < hits.length - 1 ? ',' : ''),
-  )
-addLine('  },')
+const stypeMap = {}
+stypeHits.forEach(([_, key, value]) => {
+  stypeMap[key] = value
+})
 
 ////////////////////////////////////////////////////////////////////////
 //  SField processing
@@ -159,80 +130,60 @@ addLine('  "FIELDS": [')
 addLine(`    [
       "Generic",
       {
-        "nth": 0,
-        "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 0,
         "type": "Unknown"
       }
     ],
     [
       "Invalid",
       {
-        "nth": -1,
-        "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": -1,
         "type": "Unknown"
       }
     ],
     [
       "ObjectEndMarker",
       {
-        "nth": 1,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
         "type": "STObject"
       }
     ],
     [
       "ArrayEndMarker",
       {
-        "nth": 1,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
         "type": "STArray"
-      }
-    ],
-    [
-      "hash",
-      {
-        "nth": 257,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "index",
-      {
-        "nth": 258,
-        "isVLEncoded": false,
-        "isSerialized": false,
-        "isSigningField": false,
-        "type": "Hash256"
       }
     ],
     [
       "taker_gets_funded",
       {
-        "nth": 258,
-        "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 258,
         "type": "Amount"
       }
     ],
     [
       "taker_pays_funded",
       {
-        "nth": 259,
-        "isVLEncoded": false,
         "isSerialized": false,
         "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 259,
         "type": "Amount"
       }
     ],`)
@@ -242,7 +193,7 @@ const isVLEncoded = (t) => {
   return 'false'
 }
 
-const isSerialized = (t) => {
+const isSerialized = (t, field) => {
   if (
     t == 'LEDGERENTRY' ||
     t == 'TRANSACTION' ||
@@ -250,6 +201,7 @@ const isSerialized = (t) => {
     t == 'METADATA'
   )
     return 'false'
+  if (field == 'hash' || field == 'index') return 'false'
   return 'true'
 }
 
@@ -271,24 +223,69 @@ let sfieldHits = [
     /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
   ),
 ]
+sfieldHits.push(
+  ...[
+    ['', 'hash', 'UINT256', '257', '', 'notSigning'],
+    ['', 'index', 'UINT256', '258', '', 'notSigning'],
+  ],
+)
+sfieldHits.sort((a, b) => {
+  const aValue = parseInt(stypeMap[a[2]]) * 2 ** 16 + parseInt(a[3])
+  const bValue = parseInt(stypeMap[b[2]]) * 2 ** 16 + parseInt(b[3])
+  return aValue - bValue // Ascending order
+})
+console.log(stypeMap)
+console.log(sfieldHits.map((x) => [x[1], x[2], x[3], x[5]]))
 for (let x = 0; x < sfieldHits.length; ++x) {
   addLine('    [')
   addLine('      "' + sfieldHits[x][1] + '",')
   addLine('      {')
-  addLine('        "nth": ' + sfieldHits[x][3] + ',')
-  addLine('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
-  addLine('        "isSerialized": ' + isSerialized(sfieldHits[x][2]) + ',')
+  addLine(
+    '        "isSerialized": ' +
+      isSerialized(sfieldHits[x][2], sfieldHits[x][1]) +
+      ',',
+  )
   addLine(
     '        "isSigningField": ' +
       isSigningField(sfieldHits[x][2], sfieldHits[x][5]) +
       ',',
   )
+  addLine('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
+  addLine('        "nth": ' + sfieldHits[x][3] + ',')
   addLine('        "type": "' + translate(sfieldHits[x][2]) + '"')
   addLine('      }')
   addLine('    ]' + (x < sfieldHits.length - 1 ? ',' : ''))
 }
 
 addLine('  ],')
+
+////////////////////////////////////////////////////////////////////////
+//  Ledger entry type processing
+////////////////////////////////////////////////////////////////////////
+addLine('  "LEDGER_ENTRY_TYPES": {')
+
+const unhex = (x) => {
+  x = ('' + x).trim()
+  if (x.substr(0, 2) == '0x') return '' + parseInt(x)
+  if (x.substr(0, 1) == "'" && x.length == 3) return x.charCodeAt(1)
+  return x
+}
+hits = [
+  ...ledgerFormatsMacroFile.matchAll(
+    /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+ *, *([x0-9a-f]+) *, *([^,]+), *([^,]+), \({$/gm,
+  ),
+]
+hits.push(['', '-1', 'Invalid'])
+hits.sort((a, b) => sorter(a[2], b[2]))
+for (let x = 0; x < hits.length; ++x)
+  addLine(
+    '    "' +
+      hits[x][2] +
+      '": ' +
+      unhex(hits[x][1]) +
+      (x < hits.length - 1 ? ',' : ''),
+  )
+addLine('  },')
 
 ////////////////////////////////////////////////////////////////////////
 //  TER code processing
@@ -302,23 +299,29 @@ let terHits = [
   ),
 ]
 let upto = -1
-let last = ''
+const terCodes = []
 for (let x = 0; x < terHits.length; ++x) {
-  if (terHits[x][4] !== undefined) upto = terHits[x][4]
+  if (terHits[x][4] !== undefined) upto = parseInt(terHits[x][4])
+  terCodes.push([terHits[x][1], upto])
+  upto++
+}
 
-  let current = terHits[x][2]
-  if (current != last && last != '') addLine('')
-  last = current
-
+terCodes.sort((a, b) => sorter(a[0], b[0]))
+let currentType = ''
+for (let x = 0; x < terCodes.length; ++x) {
+  if (currentType === '') {
+    currentType = terCodes[x][0].substr(0, 3)
+  } else if (currentType != terCodes[x][0].substr(0, 3)) {
+    addLine('')
+    currentType = terCodes[x][0].substr(0, 3)
+  }
   addLine(
     '    "' +
-      terHits[x][1] +
+      terCodes[x][0] +
       '": ' +
-      upto +
-      (x < terHits.length - 1 ? ',' : ''),
+      terCodes[x][1] +
+      (x < terCodes.length - 1 ? ',' : ''),
   )
-
-  upto++
 }
 
 addLine('  },')
@@ -327,13 +330,14 @@ addLine('  },')
 //  Transaction type processing
 ////////////////////////////////////////////////////////////////////////
 addLine('  "TRANSACTION_TYPES": {')
-addLine('    "Invalid": -1,')
 
 let txHits = [
   ...transactionsMacroFile.matchAll(
     /^ *TRANSACTION\(tt[A-Z_]+ *,* ([0-9]+) *, *([A-Za-z]+).*$/gm,
   ),
 ]
+txHits.push(['', '-1', 'Invalid'])
+txHits.sort((a, b) => sorter(a[2], b[2]))
 for (let x = 0; x < txHits.length; ++x) {
   addLine(
     '    "' +
@@ -341,6 +345,25 @@ for (let x = 0; x < txHits.length; ++x) {
       '": ' +
       txHits[x][1] +
       (x < txHits.length - 1 ? ',' : ''),
+  )
+}
+
+addLine('  },')
+
+////////////////////////////////////////////////////////////////////////
+//  Serialized type processing
+////////////////////////////////////////////////////////////////////////
+addLine('  "TYPES": {')
+
+stypeHits.push(['', 'DONE', -1])
+stypeHits.sort((a, b) => sorter(translate(a[1]), translate(b[1])))
+for (let x = 0; x < stypeHits.length; ++x) {
+  addLine(
+    '    "' +
+      translate(stypeHits[x][1]) +
+      '": ' +
+      stypeHits[x][2] +
+      (x < stypeHits.length - 1 ? ',' : ''),
   )
 }
 
