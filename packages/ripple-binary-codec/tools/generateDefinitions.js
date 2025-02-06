@@ -6,6 +6,13 @@ if (process.argv.length != 3 && process.argv.length != 4) {
       process.argv[1] +
       ' path/to/rippled [path/to/pipe/to]',
   )
+  console.error(
+    'Usage: ' +
+      process.argv[0] +
+      ' ' +
+      process.argv[1] +
+      ' github.com/user/rippled [path/to/pipe/to]',
+  )
   process.exit(1)
 }
 
@@ -15,7 +22,10 @@ if (process.argv.length != 3 && process.argv.length != 4) {
 const path = require('path')
 
 const fs = require('fs')
-function readFile(filename) {
+const fetch = require('node-fetch')
+
+async function readFile(folder, file) {
+  const filename = path.join(folder, file)
   try {
     return fs.readFileSync(filename).toString('utf-8')
   } catch (err) {
@@ -24,26 +34,46 @@ function readFile(filename) {
   }
 }
 
-const sfieldHeaderFile = readFile(
-  path.join(process.argv[2], '/include/xrpl/protocol/SField.h'),
+async function readFileFromRepo(repo, filename) {
+  let url = repo.replace('github.com', 'raw.githubusercontent.com')
+  url = repo.replace('tree', 'refs/heads')
+  url += filename
+  console.log(url)
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch ${filename} from ${repo}: ${response.statusText}`,
+      )
+    }
+    const result = await response.text()
+    return result
+  } catch (err) {
+    console.error(`Error fetching file ${filename} from ${repo}:`, err.message)
+    process.exit(1)
+  }
+}
+
+const readFunction = process.argv[2].includes('github.com')
+  ? readFileFromRepo
+  : readFile
+
+const sfieldHeaderFile = readFunction(
+  process.argv[2],
+  '/include/xrpl/protocol/SField.h',
 )
-const sfieldMacroFile = readFile(
-  path.join(process.argv[2], '/include/xrpl/protocol/detail/sfields.macro'),
+const sfieldMacroFile = readFunction(
+  process.argv[2],
+  '/include/xrpl/protocol/detail/sfields.macro',
 )
-const ledgerFormatsMacroFile = readFile(
-  path.join(
-    process.argv[2],
-    '/include/xrpl/protocol/detail/ledger_entries.macro',
-  ),
+const ledgerFormatsMacroFile = readFunction(
+  process.argv[2],
+  '/include/xrpl/protocol/detail/ledger_entries.macro',
 )
-const terFile = readFile(
-  path.join(process.argv[2], '/include/xrpl/protocol/TER.h'),
-)
-const transactionsMacroFile = readFile(
-  path.join(
-    process.argv[2],
-    '/include/xrpl/protocol/detail/transactions.macro',
-  ),
+const terFile = readFunction(process.argv[2], '/include/xrpl/protocol/TER.h')
+const transactionsMacroFile = readFunction(
+  process.argv[2],
+  '/include/xrpl/protocol/detail/transactions.macro',
 )
 
 const capitalizationExceptions = {
@@ -234,8 +264,6 @@ sfieldHits.sort((a, b) => {
   const bValue = parseInt(stypeMap[b[2]]) * 2 ** 16 + parseInt(b[3])
   return aValue - bValue // Ascending order
 })
-console.log(stypeMap)
-console.log(sfieldHits.map((x) => [x[1], x[2], x[3], x[5]]))
 for (let x = 0; x < sfieldHits.length; ++x) {
   addLine('    [')
   addLine('      "' + sfieldHits[x][1] + '",')
