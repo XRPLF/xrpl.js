@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign -- param reassign is safe */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
 import { ValidationError } from '../../errors'
 import {
@@ -65,37 +64,68 @@ const txToFlag = {
   XChainModifyBridge: XChainModifyBridgeFlags,
 }
 
+function isTxToFlagKey(
+  transactionType: string,
+): transactionType is keyof typeof txToFlag {
+  return transactionType in txToFlag
+}
+
 /**
  * Sets a transaction's flags to its numeric representation.
+ *
+ * @deprecated
+ * This utility function is deprecated.
+ * Use convertTxFlagsToNumber() instead and use the returned value to modify the Transaction.Flags from the caller.
  *
  * @param tx - A transaction to set its flags to its numeric representation.
  */
 export function setTransactionFlagsToNumber(tx: Transaction): void {
-  if (tx.Flags == null) {
-    tx.Flags = 0
-    return
-  }
-  if (typeof tx.Flags === 'number') {
-    return
-  }
+  // eslint-disable-next-line no-console -- intended deprecation warning
+  console.warn(
+    'This function is deprecated. Use convertTxFlagsToNumber() instead and use the returned value to modify the Transaction.Flags from the caller.',
+  )
 
-  tx.Flags = txToFlag[tx.TransactionType]
-    ? convertFlagsToNumber(tx.Flags, txToFlag[tx.TransactionType])
-    : 0
+  if (tx.Flags) {
+    // eslint-disable-next-line no-param-reassign -- intended param reassign in setter, retain old functionality for compatibility
+    tx.Flags = convertTxFlagsToNumber(tx)
+  }
 }
 
-function convertFlagsToNumber(
-  flags: GlobalFlagsInterface,
-  flagEnum: object,
-): number {
-  return Object.keys(flags).reduce((resultFlags, flag) => {
-    if (flagEnum[flag] == null) {
+/**
+ * Returns a Transaction's Flags as its numeric representation.
+ *
+ * @param tx - A Transaction to parse Flags for
+ * @returns A numerical representation of a Transaction's Flags
+ */
+export function convertTxFlagsToNumber(tx: Transaction): number {
+  if (!tx.Flags) {
+    return 0
+  }
+  if (typeof tx.Flags === 'number') {
+    return tx.Flags
+  }
+
+  if (isTxToFlagKey(tx.TransactionType)) {
+    const flagEnum = txToFlag[tx.TransactionType]
+    return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+      if (flagEnum[flag] == null) {
+        throw new ValidationError(
+          `Invalid flag ${flag}. Valid flags are ${JSON.stringify(flagEnum)}`,
+        )
+      }
+
+      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
+    }, 0)
+  }
+
+  return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+    if (GlobalFlags[flag] == null) {
       throw new ValidationError(
-        `flag ${flag} doesn't exist in flagEnum: ${JSON.stringify(flagEnum)}`,
+        `Invalid flag ${flag}. Valid flags are ${JSON.stringify(GlobalFlags)}`,
       )
     }
 
-    return flags[flag] ? resultFlags | flagEnum[flag] : resultFlags
+    return tx.Flags?.[flag] ? resultFlags | GlobalFlags[flag] : resultFlags
   }, 0)
 }
 
@@ -106,24 +136,26 @@ function convertFlagsToNumber(
  * @returns A map with all flags as booleans.
  */
 export function parseTransactionFlags(tx: Transaction): object {
-  setTransactionFlagsToNumber(tx)
-  if (typeof tx.Flags !== 'number' || !tx.Flags || tx.Flags === 0) {
+  const flags = convertTxFlagsToNumber(tx)
+  if (flags === 0) {
     return {}
   }
 
-  const flags = tx.Flags
-  const flagsMap = {}
+  const booleanFlagMap = {}
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- safe member access
-  const flagEnum = txToFlag[tx.TransactionType]
-  Object.values(flagEnum).forEach((flag) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- safe member access
-    if (typeof flag === 'string' && isFlagEnabled(flags, flagEnum[flag])) {
-      flagsMap[flag] = true
-    }
-  })
+  if (isTxToFlagKey(tx.TransactionType)) {
+    const transactionTypeFlags = txToFlag[tx.TransactionType]
+    Object.values(transactionTypeFlags).forEach((flag) => {
+      if (
+        typeof flag === 'string' &&
+        isFlagEnabled(flags, transactionTypeFlags[flag])
+      ) {
+        booleanFlagMap[flag] = true
+      }
+    })
+  }
 
-  return flagsMap
+  return booleanFlagMap
 }
 
 /**
@@ -140,9 +172,6 @@ export function hasFlag(tx: Transaction, flag: number): boolean {
   if (typeof tx.Flags === 'number') {
     return isFlagEnabled(tx.Flags, flag)
   }
-  const txFlagNum = convertFlagsToNumber(
-    tx.Flags,
-    txToFlag[tx.TransactionType] ?? GlobalFlags,
-  )
+  const txFlagNum = convertTxFlagsToNumber(tx)
   return isFlagEnabled(txFlagNum, flag)
 }

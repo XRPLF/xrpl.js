@@ -4,7 +4,7 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
-import { setTransactionFlagsToNumber } from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
@@ -58,6 +58,7 @@ import {
   validateNFTokenCreateOffer,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
+import { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
@@ -145,6 +146,7 @@ export type SubmittableTransaction =
   | NFTokenCancelOffer
   | NFTokenCreateOffer
   | NFTokenMint
+  | NFTokenModify
   | OfferCancel
   | OfferCreate
   | OracleDelete
@@ -257,7 +259,7 @@ export function validate(transaction: Record<string, unknown>): void {
   })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-  setTransactionFlagsToNumber(tx as unknown as Transaction)
+  tx.Flags = convertTxFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
@@ -390,6 +392,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'NFTokenMint':
       validateNFTokenMint(tx)
+      break
+
+    case 'NFTokenModify':
+      validateNFTokenModify(tx)
       break
 
     case 'OfferCancel':

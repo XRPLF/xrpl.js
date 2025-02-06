@@ -2978,7 +2978,7 @@
         "nth": 30,
         "isVLEncoded": false,
         "isSerialized": true,
-        "isSigningField": true,
+        "isSigningField": false,
         "type": "STArray"
       }
     ]
@@ -3051,7 +3051,7 @@
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
     "temBAD_TRANSFER_FEE": -251,
-    "temINVALID_BATCH": -250,
+    "temINVALID_INNER_BATCH": -250,
 
     "tefFAILURE": -199,
     "tefALREADY": -198,

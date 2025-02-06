@@ -2,7 +2,13 @@
 
 Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xrpl-announce) for release announcements. We recommend that xrpl.js (ripple-lib) users stay up-to-date with the latest stable release.
 
-## Unreleased Changes
+## Unreleased
+
+### Added
+* Adds utility function `convertTxFlagsToNumber`
+
+### Changed
+* Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
 ### Added
 * Add support for `Batch` amendment (XLS-56).
@@ -14,6 +20,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * New `MPTAmount` type support for `Payment` and `Clawback` transactions
 * `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Support for XLS-70d (Credentials)
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * `TransactionStream` model supports APIv2
