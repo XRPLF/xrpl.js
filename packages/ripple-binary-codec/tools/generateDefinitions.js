@@ -1,3 +1,8 @@
+const path = require('path')
+
+const fs = require('fs')
+const fetch = require('node-fetch')
+
 if (process.argv.length != 3 && process.argv.length != 4) {
   console.error(
     'Usage: ' +
@@ -19,10 +24,6 @@ if (process.argv.length != 3 && process.argv.length != 4) {
 ////////////////////////////////////////////////////////////////////////
 //  Get all necessary files from rippled
 ////////////////////////////////////////////////////////////////////////
-const path = require('path')
-
-const fs = require('fs')
-const fetch = require('node-fetch')
 
 async function readFile(folder, file) {
   const filename = path.join(folder, file)
