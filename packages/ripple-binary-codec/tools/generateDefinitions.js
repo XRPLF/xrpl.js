@@ -47,14 +47,7 @@ const transactionsMacroFile = readFile(
 )
 
 const capitalizationExceptions = {
-  NFTOKEN: 'NFToken',
-  URITOKEN: 'URIToken',
-  URI: 'URI',
-  UNL: 'UNL',
   XCHAIN: 'XChain',
-  DID: 'DID',
-  ID: 'ID',
-  AMM: 'AMM',
 }
 
 // Translate from rippled string format to what the binary codecs expect
@@ -69,16 +62,20 @@ function translate(inp) {
       )
         return inp.replace('UINT', 'Hash')
       else return inp.replace('UINT', 'UInt')
-    if (inp == 'OBJECT' || inp == 'ARRAY')
-      return 'ST' + inp.substr(0, 1).toUpperCase() + inp.substr(1).toLowerCase()
-    if (inp == 'AMM') return inp
-    if (inp == 'ACCOUNT') return 'AccountID'
-    if (inp == 'LEDGERENTRY') return 'LedgerEntry'
-    if (inp == 'NOTPRESENT') return 'NotPresent'
-    if (inp == 'PATHSET') return 'PathSet'
-    if (inp == 'VL') return 'Blob'
-    if (inp == 'DIR_NODE') return 'DirectoryNode'
-    if (inp == 'PAYCHAN') return 'PayChannel'
+
+    const nonstandardRenames = {
+      OBJECT: 'STObject',
+      ARRAY: 'STArray',
+      AMM: 'AMM',
+      ACCOUNT: 'AccountID',
+      LEDGERENTRY: 'LedgerEntry',
+      NOTPRESENT: 'NotPresent',
+      PATHSET: 'PathSet',
+      VL: 'Blob',
+      DIR_NODE: 'DirectoryNode',
+      PAYCHAN: 'PayChannel',
+    }
+    if (nonstandardRenames[inp] != null) return nonstandardRenames[inp]
 
     const parts = inp.split('_')
     let result = ''
@@ -234,8 +231,6 @@ sfieldHits.sort((a, b) => {
   const bValue = parseInt(stypeMap[b[2]]) * 2 ** 16 + parseInt(b[3])
   return aValue - bValue // Ascending order
 })
-console.log(stypeMap)
-console.log(sfieldHits.map((x) => [x[1], x[2], x[3], x[5]]))
 for (let x = 0; x < sfieldHits.length; ++x) {
   addLine('    [')
   addLine('      "' + sfieldHits[x][1] + '",')
