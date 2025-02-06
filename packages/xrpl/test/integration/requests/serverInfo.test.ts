@@ -125,6 +125,7 @@ describe('server_info (rippled)', function () {
         'build_version',
         'node_size',
         'initial_sync_duration_us',
+        'git',
       ]
       assert.deepEqual(
         omit(response.result.info, removeKeys),
