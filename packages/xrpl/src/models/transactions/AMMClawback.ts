@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount, Currency, IssuedCurrency } from '../common'
+import { Currency, IssuedCurrency, IssuedCurrencyAmount } from '../common'
 
 import {
   Account,
@@ -67,7 +67,7 @@ export interface AMMClawback extends BaseTransaction {
    * the Asset subfields. If this field isn't specified, or the value subfield exceeds the holder's available
    * tokens in the AMM, all of the holder's tokens will be clawed back.
    */
-  Amount?: Amount
+  Amount?: IssuedCurrencyAmount
 }
 
 /**
@@ -79,21 +79,20 @@ export interface AMMClawback extends BaseTransaction {
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
+  const txAMMClawback = tx as unknown as AMMClawback
+
   validateRequiredField(tx, 'Holder', isAccount)
 
   validateRequiredField(tx, 'Asset', isCurrency)
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for comparing tx.Asset.issuer
-  // @ts-expect-error -- used for comparing tx.Asset.issuer
-  if (tx.Holder === tx.Asset.issuer) {
+  if (txAMMClawback.Holder === txAMMClawback.Asset.issuer) {
     throw new ValidationError(
       'AMMClawback: Holder and Asset.issuer must be distinct',
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for comparing tx.Asset.issuer
-  // @ts-expect-error -- used for comparing tx.Asset.issuer
-  if (tx.Account !== tx.Asset.issuer) {
+  if (txAMMClawback.Account !== txAMMClawback.Asset.issuer) {
     throw new ValidationError(
       'AMMClawback: Account must be the same as Asset.issuer',
     )
@@ -103,18 +102,14 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'Amount', isAmount)
 
-  if (tx.Amount != null) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for comparing tx.Asset.currency
-    // @ts-expect-error -- used for comparing tx.Asset.currency
-    if (tx.Amount.currency !== tx.Asset.currency) {
+  if (txAMMClawback.Amount != null) {
+    if (txAMMClawback.Amount.currency !== txAMMClawback.Asset.currency) {
       throw new ValidationError(
         'AMMClawback: currency for both Amount and Asset must be the same',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for comparing tx.Asset.issuer
-    // @ts-expect-error -- used for comparing tx.Asset.issuer
-    if (tx.Amount.issuer !== tx.Asset.issuer) {
+    if (txAMMClawback.Amount.issuer !== txAMMClawback.Asset.issuer) {
       throw new ValidationError(
         'AMMClawback: issuer must be identical for both Amount and Asset',
       )
