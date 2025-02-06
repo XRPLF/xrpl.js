@@ -40,7 +40,6 @@ describe('AMMClawback', function () {
       TransactionType: 'AMMClawback',
       Account: issuerWallet.address,
       Holder: holderWallet.address,
-      // @ts-expect-error -- this is an IssuedCurrency
       Asset: asset,
       Asset2: asset2,
     }
