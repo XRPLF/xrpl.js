@@ -3053,6 +3053,7 @@
   },
   "TRANSACTION_TYPES": {
     "AMMBid": 39,
+    "AMMClawback": 31,
     "AMMCreate": 35,
     "AMMDelete": 40,
     "AMMDeposit": 36,
