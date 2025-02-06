@@ -7,6 +7,8 @@ import {
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
+import { BatchFlags } from '../transactions/batch'
+import { GlobalFlags, GlobalFlagsInterface } from '../transactions/common'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
@@ -49,6 +51,7 @@ const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  Batch: BatchFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,
   MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
@@ -115,7 +118,15 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
     }, 0)
   }
 
-  return 0
+  return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+    if (GlobalFlags[flag] == null) {
+      throw new ValidationError(
+        `Invalid flag ${flag}. Valid flags are ${JSON.stringify(GlobalFlags)}`,
+      )
+    }
+
+    return tx.Flags?.[flag] ? resultFlags | GlobalFlags[flag] : resultFlags
+  }, 0)
 }
 
 /**
@@ -145,4 +156,22 @@ export function parseTransactionFlags(tx: Transaction): object {
   }
 
   return booleanFlagMap
+}
+
+/**
+ * Determines whether a transaction has a certain flag enabled.
+ *
+ * @param tx The transaction.
+ * @param flag The flag to check.
+ * @returns Whether `flag` is enabled on `tx`.
+ */
+export function hasFlag(tx: Transaction, flag: number): boolean {
+  if (tx.Flags == null) {
+    return false
+  }
+  if (typeof tx.Flags === 'number') {
+    return isFlagEnabled(tx.Flags, flag)
+  }
+  const txFlagNum = convertTxFlagsToNumber(tx)
+  return isFlagEnabled(txFlagNum, flag)
 }

@@ -106,3 +106,4 @@ export {
   XChainModifyBridgeFlags,
   XChainModifyBridgeFlagsInterface,
 } from './XChainModifyBridge'
+export { Batch } from './batch'

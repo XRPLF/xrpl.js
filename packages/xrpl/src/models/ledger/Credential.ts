@@ -1,8 +1,8 @@
-import { GlobalFlags } from '../transactions/common'
+import { GlobalFlagsInterface } from '../transactions/common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
-export interface CredentialFlags extends GlobalFlags {
+export interface CredentialFlags extends GlobalFlagsInterface {
   lsfAccepted?: boolean
 }
 

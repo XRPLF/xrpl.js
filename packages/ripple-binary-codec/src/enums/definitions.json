@@ -913,20 +913,20 @@
     [
       "IssuerNode",
       {
-        "nth": 27,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 27,
         "type": "UInt64"
       }
     ],
     [
       "SubjectNode",
       {
-        "nth": 28,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
         "type": "UInt64"
       }
     ],
@@ -1247,6 +1247,26 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 33,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "DomainID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ParentBatchID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 35,
         "type": "Hash256"
       }
     ],
@@ -1833,10 +1853,10 @@
     [
       "CredentialType",
       {
-        "nth": 31,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 31,
         "type": "Blob"
       }
     ],
@@ -2013,11 +2033,21 @@
     [
       "Subject",
       {
-        "nth": 24,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 24,
         "type": "AccountID"
+      }
+    ],
+    [
+      "Number",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
+        "type": "Number"
       }
     ],
     [
@@ -2313,10 +2343,30 @@
     [
       "Credential",
       {
-        "nth": 33,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
+        "type": "STObject"
+      }
+    ],
+    [
+      "RawTransaction",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BatchSigner",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 35,
         "type": "STObject"
       }
     ],
@@ -2513,20 +2563,50 @@
     [
       "AuthorizeCredentials",
       {
-        "nth": 26,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 26,
         "type": "STArray"
       }
     ],
     [
       "UnauthorizeCredentials",
       {
-        "nth": 27,
-        "isVLEncoded": false,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 27,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AcceptedCredentials",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
+        "type": "STArray"
+      }
+    ],
+    [
+      "RawTransactions",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 29,
+        "type": "STArray"
+      }
+    ],
+    [
+      "BatchSigners",
+      {
+        "isSerialized": true,
+        "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 30,
         "type": "STArray"
       }
     ],
@@ -2713,10 +2793,10 @@
     [
       "CredentialIDs",
       {
-        "nth": 5,
-        "isVLEncoded": true,
         "isSerialized": true,
         "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 5,
         "type": "Vector256"
       }
     ],
@@ -2847,6 +2927,7 @@
     "Amendments": 102,
     "Bridge": 105,
     "Check": 67,
+    "Credential": 129,
     "DID": 73,
     "DepositPreauth": 112,
     "DirectoryNode": 100,
@@ -2861,8 +2942,8 @@
     "NegativeUNL": 78,
     "Offer": 111,
     "Oracle": 128,
-    "Credential": 129,
     "PayChannel": 120,
+    "PermissionedDomain": 130,
     "RippleState": 114,
     "SignerList": 83,
     "Ticket": 84,
@@ -2890,6 +2971,7 @@
     "tecFAILED_PROCESSING": 105,
     "tecFROZEN": 137,
     "tecHAS_OBLIGATIONS": 151,
+    "tecHOOK_REJECTED": 153,
     "tecINCOMPLETE": 169,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecINSUFFICIENT_PAYMENT": 161,
@@ -2948,6 +3030,7 @@
     "tecXCHAIN_SELF_COMMIT": 184,
     "tecXCHAIN_SENDING_ACCOUNT_MISMATCH": 179,
     "tecXCHAIN_WRONG_CHAIN": 176,
+
     "tefALREADY": -198,
     "tefBAD_ADD_AUTH": -197,
     "tefBAD_AUTH": -196,
@@ -2970,6 +3053,7 @@
     "tefPAST_SEQ": -190,
     "tefTOO_BIG": -181,
     "tefWRONG_PRIOR": -189,
+
     "telBAD_DOMAIN": -398,
     "telBAD_PATH_COUNT": -397,
     "telBAD_PUBLIC_KEY": -396,
@@ -2987,6 +3071,7 @@
     "telNO_DST_PARTIAL": -393,
     "telREQUIRES_NETWORK_ID": -385,
     "telWRONG_NETWORK": -386,
+
     "temARRAY_EMPTY": -253,
     "temARRAY_TOO_LARGE": -252,
     "temBAD_AMM_TOKENS": -261,
@@ -3024,6 +3109,7 @@
     "temINVALID_ACCOUNT_ID": -268,
     "temINVALID_COUNT": -266,
     "temINVALID_FLAG": -276,
+    "temINVALID_INNER_BATCH": -250,
     "temMALFORMED": -299,
     "temREDUNDANT": -275,
     "temRIPPLE_EMPTY": -274,
@@ -3036,6 +3122,7 @@
     "temXCHAIN_BRIDGE_BAD_REWARD_AMOUNT": -255,
     "temXCHAIN_BRIDGE_NONDOOR_OWNER": -257,
     "temXCHAIN_EQUAL_DOOR_ACCOUNTS": -260,
+
     "terFUNDS_SPENT": -98,
     "terINSUF_FEE_B": -97,
     "terLAST": -91,
@@ -3049,10 +3136,12 @@
     "terPRE_TICKET": -88,
     "terQUEUED": -89,
     "terRETRY": -99,
+
     "tesSUCCESS": 0
   },
   "TRANSACTION_TYPES": {
     "AMMBid": 39,
+    "AMMClawback": 31,
     "AMMCreate": 35,
     "AMMDelete": 40,
     "AMMDeposit": 36,
@@ -3060,12 +3149,13 @@
     "AMMWithdraw": 37,
     "AccountDelete": 21,
     "AccountSet": 3,
+    "Batch": 64,
     "CheckCancel": 18,
     "CheckCash": 17,
     "CheckCreate": 16,
     "Clawback": 30,
-    "CredentialCreate": 58,
     "CredentialAccept": 59,
+    "CredentialCreate": 58,
     "CredentialDelete": 60,
     "DIDDelete": 50,
     "DIDSet": 49,
@@ -3094,6 +3184,8 @@
     "PaymentChannelClaim": 15,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
+    "PermissionedDomainDelete": 63,
+    "PermissionedDomainSet": 62,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
@@ -3123,6 +3215,7 @@
     "LedgerEntry": 10002,
     "Metadata": 10004,
     "NotPresent": 0,
+    "Number": 9,
     "PathSet": 18,
     "STArray": 15,
     "STObject": 14,
