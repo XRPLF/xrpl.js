@@ -118,6 +118,7 @@ describe('server_state', function () {
         'initial_sync_duration_us',
         'ports',
         'git',
+        'network_id',
       ]
       assert.deepEqual(
         omit(response.result.state, removeKeys),
