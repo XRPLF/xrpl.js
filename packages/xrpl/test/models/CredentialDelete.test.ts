@@ -2,7 +2,7 @@ import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
-import { validateCredentialDelete } from '../../src/models/transactions/CredentialDelete'
+import { validateCredentialDelete } from '../../src/models/transactions/credentialDelete'
 
 /**
  * CredentialDelete Transaction Verification Testing.

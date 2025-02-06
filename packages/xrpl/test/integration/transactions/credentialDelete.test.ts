@@ -6,7 +6,7 @@ import {
   CredentialAccept,
   CredentialCreate,
 } from '../../../src'
-import { CredentialDelete } from '../../../src/models/transactions/CredentialDelete'
+import { CredentialDelete } from '../../../src/models/transactions/credentialDelete'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

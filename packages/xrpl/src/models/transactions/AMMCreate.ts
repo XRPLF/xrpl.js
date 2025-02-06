@@ -1,7 +1,12 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
-import { BaseTransaction, isAmount, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAmount,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 export const AMM_MAX_TRADING_FEE = 1000
 
@@ -48,21 +53,8 @@ export interface AMMCreate extends BaseTransaction {
 export function validateAMMCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount == null) {
-    throw new ValidationError('AMMCreate: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('AMMCreate: Amount must be an Amount')
-  }
-
-  if (tx.Amount2 == null) {
-    throw new ValidationError('AMMCreate: missing field Amount2')
-  }
-
-  if (!isAmount(tx.Amount2)) {
-    throw new ValidationError('AMMCreate: Amount2 must be an Amount')
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'Amount2', isAmount)
 
   if (tx.TradingFee == null) {
     throw new ValidationError('AMMCreate: missing field TradingFee')

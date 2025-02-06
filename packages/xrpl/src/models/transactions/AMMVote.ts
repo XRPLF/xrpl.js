@@ -2,7 +2,12 @@ import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
-import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isCurrency,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * Vote on the trading fee for an Automated Market Maker (AMM) instance.
@@ -39,21 +44,8 @@ export interface AMMVote extends BaseTransaction {
 export function validateAMMVote(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMVote: missing field Asset')
-  }
-
-  if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMVote: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMVote: missing field Asset2')
-  }
-
-  if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMVote: Asset2 must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
 
   if (tx.TradingFee == null) {
     throw new ValidationError('AMMVote: missing field TradingFee')

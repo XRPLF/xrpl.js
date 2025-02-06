@@ -4,6 +4,8 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -171,7 +173,6 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -186,17 +187,9 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.Domain !== undefined && typeof tx.Domain !== 'string') {
-    throw new ValidationError('AccountSet: invalid Domain')
-  }
-
-  if (tx.EmailHash !== undefined && typeof tx.EmailHash !== 'string') {
-    throw new ValidationError('AccountSet: invalid EmailHash')
-  }
-
-  if (tx.MessageKey !== undefined && typeof tx.MessageKey !== 'string') {
-    throw new ValidationError('AccountSet: invalid MessageKey')
-  }
+  validateOptionalField(tx, 'Domain', isString)
+  validateOptionalField(tx, 'EmailHash', isString)
+  validateOptionalField(tx, 'MessageKey', isString)
 
   if (tx.SetFlag !== undefined) {
     if (typeof tx.SetFlag !== 'number') {
@@ -207,9 +200,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.TransferRate !== undefined && typeof tx.TransferRate !== 'number') {
-    throw new ValidationError('AccountSet: invalid TransferRate')
-  }
+  validateOptionalField(tx, 'TransferRate', isNumber)
 
   if (tx.TickSize !== undefined) {
     if (typeof tx.TickSize !== 'number') {
