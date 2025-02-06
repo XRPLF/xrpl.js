@@ -9,6 +9,7 @@ import { convertTxFlagsToNumber } from '../utils/flags'
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMClawback, validateAMMClawback } from './AMMClawback'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
 import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
@@ -115,6 +116,7 @@ import {
  */
 export type SubmittableTransaction =
   | AMMBid
+  | AMMClawback
   | AMMCreate
   | AMMDelete
   | AMMDeposit
@@ -261,6 +263,10 @@ export function validate(transaction: Record<string, unknown>): void {
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMClawback':
+      validateAMMClawback(tx)
       break
 
     case 'AMMCreate':
