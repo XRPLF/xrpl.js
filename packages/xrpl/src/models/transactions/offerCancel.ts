@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isNumber,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * An OfferCancel transaction removes an Offer object from the XRP Ledger.
@@ -27,11 +32,5 @@ export interface OfferCancel extends BaseTransaction {
 export function validateOfferCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.OfferSequence === undefined) {
-    throw new ValidationError('OfferCancel: missing field OfferSequence')
-  }
-
-  if (typeof tx.OfferSequence !== 'number') {
-    throw new ValidationError('OfferCancel: OfferSequence must be a number')
-  }
+  validateRequiredField(tx, 'OfferSequence', isNumber)
 }

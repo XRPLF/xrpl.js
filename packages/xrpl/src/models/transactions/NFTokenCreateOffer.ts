@@ -11,6 +11,9 @@ import {
   isAccount,
   validateOptionalField,
   Account,
+  validateRequiredField,
+  isString,
+  isNumber,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -135,16 +138,11 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  validateOptionalField(tx, 'Destination', isAccount)
+  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Owner', isAccount)
-
-  if (tx.NFTokenID == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('NFTokenCreateOffer: invalid Amount')
-  }
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'Destination', isAccount)
 
   if (
     typeof tx.Flags === 'number' &&

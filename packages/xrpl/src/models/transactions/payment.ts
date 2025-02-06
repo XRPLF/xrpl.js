@@ -13,6 +13,7 @@ import {
   isNumber,
   Account,
   validateCredentialsList,
+  isString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -172,27 +173,10 @@ export interface PaymentMetadata extends TransactionMetadataBase {
 export function validatePayment(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
-    throw new ValidationError('PaymentTransaction: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('PaymentTransaction: invalid Amount')
-  }
-
+  validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
-  validateCredentialsList(
-    tx.CredentialIDs,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
-    true,
-  )
-
-  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
-    throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
-  }
+  validateOptionalField(tx, 'InvoiceID', isString)
 
   if (
     tx.Paths !== undefined &&
@@ -202,9 +186,15 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Paths')
   }
 
-  if (tx.SendMax !== undefined && !isAmount(tx.SendMax)) {
-    throw new ValidationError('PaymentTransaction: invalid SendMax')
-  }
+  validateOptionalField(tx, 'SendMax', isAmount)
+  validateOptionalField(tx, 'DeliverMin', isAmount)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
+    tx.TransactionType as string,
+    true,
+  )
 
   checkPartialPayment(tx)
 }

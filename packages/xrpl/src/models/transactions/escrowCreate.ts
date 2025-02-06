@@ -4,7 +4,9 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isAmount,
   isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -66,8 +68,12 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: Amount must be a string')
   }
 
+  validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'CancelAfter', isNumber)
+  validateOptionalField(tx, 'FinishAfter', isNumber)
+  validateOptionalField(tx, 'Condition', isString)
 
   if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
     throw new ValidationError(
@@ -79,17 +85,5 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: CancelAfter must be a number')
-  }
-
-  if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: FinishAfter must be a number')
-  }
-
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowCreate: Condition must be a string')
   }
 }

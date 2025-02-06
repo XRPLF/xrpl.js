@@ -6,8 +6,11 @@ import {
   BaseTransaction,
   GlobalFlags,
   isAccount,
+  isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
+  validateRequiredField,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -121,13 +124,16 @@ export interface NFTokenMintMetadata extends TransactionMetadataBase {
 export function validateNFTokenMint(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'NFTokenTaxon', isNumber)
+  validateOptionalField(tx, 'Issuer', isAccount)
+  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(tx, 'URI', isString)
+
   if (tx.Account === tx.Issuer) {
     throw new ValidationError(
       'NFTokenMint: Issuer must not be equal to Account',
     )
   }
-
-  validateOptionalField(tx, 'Issuer', isAccount)
 
   if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')
@@ -135,9 +141,5 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
 
   if (typeof tx.URI === 'string' && !isHex(tx.URI)) {
     throw new ValidationError('NFTokenMint: URI must be in hex format')
-  }
-
-  if (tx.NFTokenTaxon == null) {
-    throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
   }
 }
