@@ -79,11 +79,7 @@ describe('PermissionedDomainSet', function () {
         DomainID: pd.index,
       }
 
-      await testTransaction(
-        testContext.client,
-        txPDDelete,
-        testContext.wallet,
-      )
+      await testTransaction(testContext.client, txPDDelete, testContext.wallet)
     },
     TIMEOUT,
   )
