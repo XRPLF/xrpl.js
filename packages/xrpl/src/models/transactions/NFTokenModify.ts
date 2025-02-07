@@ -38,7 +38,7 @@ export interface NFTokenModify extends BaseTransaction {
    * convert this field to the proper encoding.
    *
    * This field must not be an empty string. Omit it from the transaction or
-   * set to `undefined` value if you do not use it.
+   * set to `null` if you do not use it.
    */
   URI?: string | null
 }

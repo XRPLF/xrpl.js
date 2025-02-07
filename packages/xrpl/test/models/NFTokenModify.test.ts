@@ -38,4 +38,38 @@ describe('NFTokenModify', function () {
       'NFTokenModify: missing field NFTokenID',
     )
   })
+
+  it(`throws w/ URI being an empty string`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenModify',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NFTokenID: TOKEN_ID,
+      Fee: '5000000',
+      Sequence: 2470665,
+      URI: '',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'NFTokenModify: URI must not be empty string',
+    )
+  })
+
+  it(`throws w/ URI not in hex format`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenModify',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NFTokenID: TOKEN_ID,
+      Fee: '5000000',
+      Sequence: 2470665,
+      URI: '--',
+    } as any
+
+    assert.throws(
+      () => validate(invalid),
+      ValidationError,
+      'NFTokenModify: URI must be in hex format',
+    )
+  })
 })
