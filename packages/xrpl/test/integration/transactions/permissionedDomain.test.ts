@@ -44,7 +44,7 @@ describe('PermissionedDomainSet', function () {
         AcceptedCredentials: [sampleCredential],
       }
 
-      await testTransaction(testContext.client, txPDSet, testContext.wallet)
+      await testTransaction(testContext.client, pdSet, testContext.wallet)
 
       // Step-2: Validate the ledger_entry, account_objects RPC methods
       // validate the account_objects RPC
@@ -79,7 +79,7 @@ describe('PermissionedDomainSet', function () {
         DomainID: pd.index,
       }
 
-      await testTransaction(testContext.client, txPDDelete, testContext.wallet)
+      await testTransaction(testContext.client, pdDelete, testContext.wallet)
     },
     TIMEOUT,
   )
