@@ -13,7 +13,7 @@ import {
   isNumber,
   Account,
   validateCredentialsList,
-  MAX_CREDENTIALS_ARRAY_LENGTH,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -189,7 +189,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     tx.TransactionType as string,
     true,
-    MAX_CREDENTIALS_ARRAY_LENGTH,
+    MAX_AUTHORIZED_CREDENTIALS,
   )
 
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {

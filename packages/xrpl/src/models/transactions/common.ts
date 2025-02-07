@@ -17,7 +17,7 @@ import {
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
-export const MAX_CREDENTIALS_ARRAY_LENGTH = 8
+export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
@@ -457,7 +457,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param credentials An array of credential IDs to check for errors
  * @param transactionType The transaction type to include in error messages
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
- * @param maxLengthCredentialsArray The maximum length of the credentials array.
+ * @param maxCredentials The maximum length of the credentials array.
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
@@ -466,7 +466,7 @@ export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
-  maxLengthCredentialsArray: number,
+  maxCredentials: number,
 ): void {
   if (credentials == null) {
     return
@@ -476,9 +476,9 @@ export function validateCredentialsList(
       `${transactionType}: Credentials must be an array`,
     )
   }
-  if (credentials.length > maxLengthCredentialsArray) {
+  if (credentials.length > maxCredentials) {
     throw new ValidationError(
-      `${transactionType}: Credentials length cannot exceed ${maxLengthCredentialsArray} elements`,
+      `${transactionType}: Credentials length cannot exceed ${maxCredentials} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(

@@ -9,7 +9,7 @@ import {
   validateCredentialsList,
 } from './common'
 
-const ACCEPTED_CREDENTIALS_MAX_LENGTH = 10
+const MAX_ACCEPTED_CREDENTIALS = 10
 
 export interface PermissionedDomainSet extends BaseTransaction {
   /* The transaction type (PermissionedDomainSet). */
@@ -49,6 +49,6 @@ export function validatePermissionedDomainSet(
     // PermissionedDomainSet uses AuthorizeCredential nested objects only, strings are not allowed
     false,
     // PermissionedDomainSet uses at most 10 accepted credentials. This is different from Credential-feature transactions.
-    ACCEPTED_CREDENTIALS_MAX_LENGTH,
+    MAX_ACCEPTED_CREDENTIALS,
   )
 }

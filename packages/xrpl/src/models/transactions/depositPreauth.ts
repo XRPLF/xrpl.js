@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateCredentialsList,
-  MAX_CREDENTIALS_ARRAY_LENGTH,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -73,7 +73,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
       tx.TransactionType as string,
       false,
-      MAX_CREDENTIALS_ARRAY_LENGTH,
+      MAX_AUTHORIZED_CREDENTIALS,
     )
   } else if (tx.UnauthorizeCredentials !== undefined) {
     validateCredentialsList(
@@ -81,7 +81,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
       tx.TransactionType as string,
       false,
-      MAX_CREDENTIALS_ARRAY_LENGTH,
+      MAX_AUTHORIZED_CREDENTIALS,
     )
   }
 }
