@@ -85,7 +85,6 @@ describe('Batch', function () {
         TransactionType: 'Batch',
         Account: testContext.wallet.classicAddress,
         Flags: BatchFlags.tfAllOrNothing,
-        Fee: '50',
         RawTransactions: [
           {
             RawTransaction: {
