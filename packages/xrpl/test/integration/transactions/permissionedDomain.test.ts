@@ -72,7 +72,7 @@ describe('PermissionedDomainSet', function () {
       assert.deepEqual(pd, ledgerEntryResult.result.node)
 
       // Step-3: Test the PDDelete transaction
-      const txPDDelete: PermissionedDomainDelete = {
+      const pdDelete: PermissionedDomainDelete = {
         TransactionType: 'PermissionedDomainDelete',
         Account: testContext.wallet.classicAddress,
         // fetch the PD `index` from the previous account_objects RPC response
