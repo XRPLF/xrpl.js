@@ -6,12 +6,15 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Adds utility function `convertTxFlagsToNumber`
+* Implementation of XLS-80d PermissionedDomain feature.
+* Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
-### Added
-* Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
+### Fixed
+* Include `network_id` field in the `server_state` response interface.
+
 
 ## 4.1.0 (2024-12-23)
 

@@ -7,6 +7,7 @@ import {
   validateCredentialsList,
   validateOptionalField,
   validateRequiredField,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -54,5 +55,6 @@ export function validateAccountDelete(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     tx.TransactionType as string,
     true,
+    MAX_AUTHORIZED_CREDENTIALS,
   )
 }
