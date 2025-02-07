@@ -38,7 +38,7 @@ describe('PermissionedDomainSet', function () {
       }
 
       // Step-1: Test the PermissionedDomainSet transaction
-      const txPDSet: PermissionedDomainSet = {
+      const pdSet: PermissionedDomainSet = {
         TransactionType: 'PermissionedDomainSet',
         Account: testContext.wallet.classicAddress,
         AcceptedCredentials: [sampleCredential],
