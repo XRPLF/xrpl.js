@@ -6,9 +6,15 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Adds utility function `convertTxFlagsToNumber`
+* Implementation of XLS-80d PermissionedDomain feature.
+* Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
+
+### Fixed
+* Include `network_id` field in the `server_state` response interface.
+
 
 ## 4.1.0 (2024-12-23)
 
@@ -17,7 +23,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * New `MPTAmount` type support for `Payment` and `Clawback` transactions
 * `parseTransactionFlags` as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Support for XLS-70d (Credentials)
-* Add `NFTokenModify` transaction and add `tfMutable` flag in `NFTokenMint`
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * `TransactionStream` model supports APIv2

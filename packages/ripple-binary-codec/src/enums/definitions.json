@@ -1251,6 +1251,16 @@
       }
     ],
     [
+      "DomainID",
+      {
+        "nth": 34,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -2531,6 +2541,15 @@
       }
     ],
     [
+      "AcceptedCredentials", {
+        "nth": 28,
+        "isVLEncoded": false,
+        "isSerialized": true,
+        "isSigningField": true,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -2863,6 +2882,7 @@
     "Oracle": 128,
     "Credential": 129,
     "PayChannel": 120,
+    "PermissionedDomain": 130,
     "RippleState": 114,
     "SignerList": 83,
     "Ticket": 84,
@@ -3094,6 +3114,8 @@
     "PaymentChannelClaim": 15,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
+    "PermissionedDomainSet": 62,
+    "PermissionedDomainDelete": 63,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
