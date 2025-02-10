@@ -575,7 +575,6 @@ export function containsDuplicates(
   if (isAuthorizeCredentialArray(objectList)) {
     for (const item of objectList) {
       const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
-      // eslint-disable-next-line max-depth -- necessary to check for type-guards
       if (seen.has(key)) {
         return true
       }
