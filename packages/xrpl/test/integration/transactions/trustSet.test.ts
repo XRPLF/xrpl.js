@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { TrustSet, percentToQuality, Wallet, TrustSetFlags } from '../../../src'
+import RippleState from '../../../src/models/ledger/RippleState'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -8,7 +9,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import RippleState from '../../../src/models/ledger/RippleState'
 // how long before each test case times out
 const TIMEOUT = 20000
 
@@ -125,8 +125,12 @@ describe('TrustSet', function () {
         command: 'account_objects',
         account: testContext.wallet.classicAddress,
       })
-      assert.isTrue(((account_objects.result.account_objects[0] as RippleState).Flags & TrustSetFlags.tfSetDeepFreeze) != 0)
 
+      const rippleState = account_objects.result
+        .account_objects[0] as RippleState
+      // eslint-disable-next-line no-bitwise -- required to validate the flag
+      const hasDeepFreeze = rippleState.Flags & TrustSetFlags.tfSetDeepFreeze
+      assert.isTrue(hasDeepFreeze !== 0)
     },
     TIMEOUT,
   )
