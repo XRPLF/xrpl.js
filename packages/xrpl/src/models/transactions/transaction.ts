@@ -57,6 +57,7 @@ import {
   validateNFTokenCreateOffer,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
+import { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
@@ -74,6 +75,14 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import {
+  PermissionedDomainDelete,
+  validatePermissionedDomainDelete,
+} from './permissionedDomainDelete'
+import {
+  PermissionedDomainSet,
+  validatePermissionedDomainSet,
+} from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -143,6 +152,7 @@ export type SubmittableTransaction =
   | NFTokenCancelOffer
   | NFTokenCreateOffer
   | NFTokenMint
+  | NFTokenModify
   | OfferCancel
   | OfferCreate
   | OracleDelete
@@ -151,6 +161,8 @@ export type SubmittableTransaction =
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
+  | PermissionedDomainSet
+  | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
   | TicketCreate
@@ -377,6 +389,10 @@ export function validate(transaction: Record<string, unknown>): void {
       validateNFTokenMint(tx)
       break
 
+    case 'NFTokenModify':
+      validateNFTokenModify(tx)
+      break
+
     case 'OfferCancel':
       validateOfferCancel(tx)
       break
@@ -407,6 +423,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PaymentChannelFund':
       validatePaymentChannelFund(tx)
+      break
+
+    case 'PermissionedDomainSet':
+      validatePermissionedDomainSet(tx)
+      break
+
+    case 'PermissionedDomainDelete':
+      validatePermissionedDomainDelete(tx)
       break
 
     case 'SetRegularKey':

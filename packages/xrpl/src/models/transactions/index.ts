@@ -71,6 +71,7 @@ export {
   NFTokenMintFlags,
   NFTokenMintFlagsInterface,
 } from './NFTokenMint'
+export { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 export { OfferCancel } from './offerCancel'
 export {
   OfferCreateFlags,
@@ -105,3 +106,6 @@ export {
   XChainModifyBridgeFlags,
   XChainModifyBridgeFlagsInterface,
 } from './XChainModifyBridge'
+
+export { PermissionedDomainSet } from './permissionedDomainSet'
+export { PermissionedDomainDelete } from './permissionedDomainDelete'
