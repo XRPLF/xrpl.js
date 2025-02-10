@@ -13,7 +13,9 @@ import {
   TrustSet,
   TrustSetFlags,
 } from '../../src'
+import { AuthorizeCredential } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
+import { containsDuplicates } from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
   setTransactionFlagsToNumber,
@@ -28,6 +30,43 @@ import {
  * Provides tests for utils used in models.
  */
 describe('Models Utils', function () {
+  describe('validate containsDuplicates utility method', function () {
+    it(`use nested-objects for input parameters, list contains duplicates`, function () {
+      // change the order of the inner-objects in the list
+      const list_with_duplicates: AuthorizeCredential[] = [
+        { Credential: { Issuer: 'alice', CredentialType: 'Passport' } },
+        { Credential: { CredentialType: 'Passport', Issuer: 'alice' } },
+      ]
+
+      assert.isTrue(containsDuplicates(list_with_duplicates))
+    })
+
+    it(`use nested-objects for input parameters, no duplicates`, function () {
+      const list_without_dups: AuthorizeCredential[] = [
+        { Credential: { Issuer: 'alice', CredentialType: 'Passport' } },
+        { Credential: { CredentialType: 'DMV_license', Issuer: 'bob' } },
+      ]
+
+      assert.isFalse(containsDuplicates(list_without_dups))
+    })
+
+    it(`use string-IDs for input parameters`, function () {
+      const list_without_dups: string[] = [
+        'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
+        'F9F89FBB1426210D58D6A06E5EEF1783D6A90EE403B79AEDF0FED36A6DE238D2',
+        '5328F2D1D6EBBC6093DC10F1EA3DD630666F5B2491EB9BDD7DF9A6C45AC12C46',
+      ]
+
+      const list_with_duplicates: string[] = [
+        'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
+        'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
+      ]
+
+      assert.isFalse(containsDuplicates(list_without_dups))
+      assert.isTrue(containsDuplicates(list_with_duplicates))
+    })
+  })
+
   describe('isFlagEnabled', function () {
     let flags: number
     const flag1 = 0x00010000
