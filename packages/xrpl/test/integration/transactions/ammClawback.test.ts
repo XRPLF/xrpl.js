@@ -52,10 +52,6 @@ describe('AMMClawback', function () {
       Asset2: asset2,
     }
 
-    const res = await testTransaction(
-      testContext.client,
-      ammClawback,
-      issuerWallet,
-    )
+    await testTransaction(testContext.client, ammClawback, issuerWallet)
   })
 })
