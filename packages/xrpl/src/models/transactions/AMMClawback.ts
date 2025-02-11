@@ -74,7 +74,7 @@ export interface AMMClawback extends BaseTransaction {
  * Verify the form and type of an AMMClawback at runtime.
  *
  * @param tx - An AMMClawback Transaction.
- * @throws When the AMMClawback is Malformed.
+ * @throws {ValidationError} When the transaction is malformed.
  */
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
@@ -107,13 +107,13 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
   if (tx.Amount != null) {
     if (amount.currency !== asset.currency) {
       throw new ValidationError(
-        'AMMClawback: currency must be identical for Amount and Asset',
+        'AMMClawback: Amount.currency must match Asset.currency',
       )
     }
 
     if (amount.issuer !== asset.issuer) {
       throw new ValidationError(
-        'AMMClawback: issuer must be identical for Amount and Asset',
+        'AMMClawback: Amount.issuer must match Amount.issuer',
       )
     }
   }

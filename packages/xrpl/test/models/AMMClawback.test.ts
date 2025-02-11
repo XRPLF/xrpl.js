@@ -151,10 +151,10 @@ describe('AMMClawback', function () {
     assert.throws(() => validate(ammClawback), ValidationError, errorMessage)
   })
 
-  it(`throws w/ currency must be identical for Amount and Asset`, function () {
+  it(`throws w/ Amount.currency must match Asset.currency`, function () {
     ammClawback.Amount.currency = 'ETH'
     const errorMessage =
-      'AMMClawback: currency must be identical for Amount and Asset'
+      'AMMClawback: Amount.currency must match Asset.currency'
     assert.throws(
       () => validateAMMClawback(ammClawback),
       ValidationError,
@@ -163,10 +163,9 @@ describe('AMMClawback', function () {
     assert.throws(() => validate(ammClawback), ValidationError, errorMessage)
   })
 
-  it(`throws w/ issuer must be identical for Amount and Asset`, function () {
+  it(`throws w/ Amount.issuer must match Amount.issuer`, function () {
     ammClawback.Amount.issuer = 'rnYgaEtpqpNRt3wxE39demVpDAA817rQEY'
-    const errorMessage =
-      'AMMClawback: issuer must be identical for Amount and Asset'
+    const errorMessage = 'AMMClawback: Amount.issuer must match Amount.issuer'
     assert.throws(
       () => validateAMMClawback(ammClawback),
       ValidationError,
