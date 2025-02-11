@@ -1,7 +1,8 @@
 import { assert } from 'chai'
 
-import { TrustSet, percentToQuality, Wallet, TrustSetFlags } from '../../../src'
-import RippleState from '../../../src/models/ledger/RippleState'
+import { TrustSet, percentToQuality, Wallet } from '../../../src'
+import { RippleState } from '../../../src/models/ledger/index'
+import { RippleStateFlags } from '../../../src/models/ledger/RippleState'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -9,6 +10,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
+
 // how long before each test case times out
 const TIMEOUT = 20000
 
@@ -128,8 +130,15 @@ describe('TrustSet', function () {
 
       const rippleState = account_objects.result
         .account_objects[0] as RippleState
-      // eslint-disable-next-line no-bitwise -- required to validate the flag
-      const hasDeepFreeze = rippleState.Flags & TrustSetFlags.tfSetDeepFreeze
+
+      // Depending on the pseudo-random generation of accounts,
+      // either of the below leger-object flags must be set
+
+      const hasDeepFreeze =
+        // eslint-disable-next-line no-bitwise -- required to validate flag
+        (rippleState.Flags & RippleStateFlags.lsfHighDeepFreeze) |
+        // eslint-disable-next-line no-bitwise -- required to validate flag
+        (rippleState.Flags & RippleStateFlags.lsfLowDeepFreeze)
       assert.isTrue(hasDeepFreeze !== 0)
     },
     TIMEOUT,
