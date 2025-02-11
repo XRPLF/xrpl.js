@@ -375,7 +375,7 @@ export async function getIOUBalance(
 
 export async function createAMMPool(
   client: Client,
-  enableClawback = false,
+  enableAMMClawback = false,
 ): Promise<{
   issuerWallet: Wallet
   lpWallet: Wallet
@@ -386,19 +386,23 @@ export async function createAMMPool(
   const issuerWallet = await generateFundedWallet(client)
   const currencyCode = 'USD'
 
-  let accountSetFlags = AccountSetAsfFlags.asfDefaultRipple
-  if (enableClawback) {
-    // eslint-disable-next-line no-bitwise -- required
-    accountSetFlags |= AccountSetAsfFlags.asfAllowTrustLineClawback
-  }
-
   const accountSetTx: AccountSet = {
     TransactionType: 'AccountSet',
     Account: issuerWallet.classicAddress,
-    SetFlag: accountSetFlags,
+    SetFlag: AccountSetAsfFlags.asfDefaultRipple,
   }
 
   await testTransaction(client, accountSetTx, issuerWallet)
+
+  if (enableAMMClawback) {
+    const accountSetTx2: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: issuerWallet.classicAddress,
+      SetFlag: AccountSetAsfFlags.asfAllowTrustLineClawback,
+    }
+
+    await testTransaction(client, accountSetTx2, issuerWallet)
+  }
 
   const trustSetTx: TrustSet = {
     TransactionType: 'TrustSet',

@@ -1,4 +1,4 @@
-import { AMMClawback, AMMDeposit, AMMDepositFlags } from 'xrpl'
+import { AMMClawback, AMMDeposit, AMMDepositFlags, XRP } from 'xrpl'
 
 import serverUrl from '../serverUrl'
 import {
@@ -18,8 +18,16 @@ describe('AMMClawback', function () {
 
   it('base', async function () {
     const ammPool = await createAMMPool(testContext.client, true)
-    const { asset, asset2, issuerWallet } = ammPool
+    const { issuerWallet } = ammPool
     const holderWallet = ammPool.lpWallet
+
+    const asset = {
+      currency: 'USD',
+      issuer: issuerWallet.classicAddress,
+    }
+    const asset2 = {
+      currency: 'XRP',
+    } as XRP
 
     const ammDepositTx: AMMDeposit = {
       TransactionType: 'AMMDeposit',
