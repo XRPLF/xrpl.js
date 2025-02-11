@@ -52,6 +52,14 @@ describe('AMMClawback', function () {
       Asset2: asset2,
     }
 
-    await testTransaction(testContext.client, ammClawback, issuerWallet)
+    const res = await testTransaction(
+      testContext.client,
+      ammClawback,
+      issuerWallet,
+    )
+    console.log('tx_blob:')
+    console.log(res.result.tx_blob)
+    console.log('tx_json:')
+    console.log(res.result.tx_json)
   })
 })
