@@ -57,9 +57,13 @@ describe('AMMClawback', function () {
       ammClawback,
       issuerWallet,
     )
+    // eslint-disable-next-line no-console -- temp
     console.log('tx_blob:')
+    // eslint-disable-next-line no-console -- temp
     console.log(res.result.tx_blob)
+    // eslint-disable-next-line no-console -- temp
     console.log('tx_json:')
+    // eslint-disable-next-line no-console -- temp
     console.log(res.result.tx_json)
   })
 })
