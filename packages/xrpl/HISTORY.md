@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Adds utility function `convertTxFlagsToNumber`
 * Implementation of XLS-80d PermissionedDomain feature.
 * Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
+* Support for XLS-77d Deep-Freeze amendment
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
