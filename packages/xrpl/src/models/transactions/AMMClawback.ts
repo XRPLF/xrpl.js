@@ -79,20 +79,22 @@ export interface AMMClawback extends BaseTransaction {
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
-  const txAMMClawback = tx as unknown as AMMClawback
-
   validateRequiredField(tx, 'Holder', isAccount)
 
   validateRequiredField(tx, 'Asset', isCurrency)
 
-  if (txAMMClawback.Holder === txAMMClawback.Asset.issuer) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
+  const asset = tx.Asset as IssuedCurrency
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
+  const amount = tx.Amount as IssuedCurrencyAmount
+
+  if (tx.Holder === asset.issuer) {
     throw new ValidationError(
       'AMMClawback: Holder and Asset.issuer must be distinct',
     )
   }
 
-  if (txAMMClawback.Account !== txAMMClawback.Asset.issuer) {
+  if (tx.Account !== asset.issuer) {
     throw new ValidationError(
       'AMMClawback: Account must be the same as Asset.issuer',
     )
@@ -102,14 +104,14 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'Amount', isAmount)
 
-  if (txAMMClawback.Amount != null) {
-    if (txAMMClawback.Amount.currency !== txAMMClawback.Asset.currency) {
+  if (tx.Amount != null) {
+    if (amount.currency !== asset.currency) {
       throw new ValidationError(
         'AMMClawback: currency for both Amount and Asset must be the same',
       )
     }
 
-    if (txAMMClawback.Amount.issuer !== txAMMClawback.Asset.issuer) {
+    if (amount.issuer !== asset.issuer) {
       throw new ValidationError(
         'AMMClawback: issuer must be identical for both Amount and Asset',
       )
