@@ -107,13 +107,13 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
   if (tx.Amount != null) {
     if (amount.currency !== asset.currency) {
       throw new ValidationError(
-        'AMMClawback: currency for both Amount and Asset must be the same',
+        'AMMClawback: currency must be identical for Amount and Asset',
       )
     }
 
     if (amount.issuer !== asset.issuer) {
       throw new ValidationError(
-        'AMMClawback: issuer must be identical for both Amount and Asset',
+        'AMMClawback: issuer must be identical for Amount and Asset',
       )
     }
   }
