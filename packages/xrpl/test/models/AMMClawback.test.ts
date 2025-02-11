@@ -1,7 +1,10 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
-import { validateAMMClawback } from '../../src/models/transactions/AMMClawback'
+import {
+  AMMClawbackFlags,
+  validateAMMClawback,
+} from '../../src/models/transactions/AMMClawback'
 
 /**
  * AMMClawback Transaction Verification Testing.
@@ -39,6 +42,12 @@ describe('AMMClawback', function () {
 
   it(`verifies valid AMMClawback without Amount`, function () {
     delete ammClawback.Amount
+    assert.doesNotThrow(() => validateAMMClawback(ammClawback))
+    assert.doesNotThrow(() => validate(ammClawback))
+  })
+
+  it(`verifies valid AMMClawback with tfClawTwoAssets`, function () {
+    ammClawback.flags = AMMClawbackFlags.tfClawTwoAssets
     assert.doesNotThrow(() => validateAMMClawback(ammClawback))
     assert.doesNotThrow(() => validate(ammClawback))
   })
