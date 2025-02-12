@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Adds utility function `convertTxFlagsToNumber`
 
+### Fixed
+* Better error handling for model validation
+
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
