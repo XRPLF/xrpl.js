@@ -9,6 +9,7 @@ import { convertTxFlagsToNumber } from '../utils/flags'
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMClawback, validateAMMClawback } from './AMMClawback'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
 import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
@@ -75,6 +76,14 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import {
+  PermissionedDomainDelete,
+  validatePermissionedDomainDelete,
+} from './permissionedDomainDelete'
+import {
+  PermissionedDomainSet,
+  validatePermissionedDomainSet,
+} from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -115,6 +124,7 @@ import {
  */
 export type SubmittableTransaction =
   | AMMBid
+  | AMMClawback
   | AMMCreate
   | AMMDelete
   | AMMDeposit
@@ -153,6 +163,8 @@ export type SubmittableTransaction =
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
+  | PermissionedDomainSet
+  | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
   | TicketCreate
@@ -261,6 +273,10 @@ export function validate(transaction: Record<string, unknown>): void {
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMClawback':
+      validateAMMClawback(tx)
       break
 
     case 'AMMCreate':
@@ -413,6 +429,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PaymentChannelFund':
       validatePaymentChannelFund(tx)
+      break
+
+    case 'PermissionedDomainSet':
+      validatePermissionedDomainSet(tx)
+      break
+
+    case 'PermissionedDomainDelete':
+      validatePermissionedDomainDelete(tx)
       break
 
     case 'SetRegularKey':
