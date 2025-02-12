@@ -45,7 +45,7 @@ describe('AMMDelete', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     ammDelete.Asset = 1234
-    const errorMessage = 'AMMDelete: Asset must be a Currency'
+    const errorMessage = 'AMMDelete: invalid field Asset'
     assert.throws(
       () => validateAMMDelete(ammDelete),
       ValidationError,
@@ -67,7 +67,7 @@ describe('AMMDelete', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     ammDelete.Asset2 = 1234
-    const errorMessage = 'AMMDelete: Asset2 must be a Currency'
+    const errorMessage = 'AMMDelete: invalid field Asset2'
     assert.throws(
       () => validateAMMDelete(ammDelete),
       ValidationError,

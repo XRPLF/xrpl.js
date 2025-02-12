@@ -90,7 +90,7 @@ export function isString(str: unknown): str is string {
  * @returns Whether the number is properly formed.
  */
 export function isNumber(num: unknown): num is number {
-  return typeof num === 'number' || Number.isNaN(Number(num))
+  return typeof num === 'number' || !Number.isNaN(Number(num))
 }
 
 /**
@@ -457,7 +457,6 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
@@ -467,9 +466,7 @@ export function validateCredentialsList(
     return
   }
   if (!Array.isArray(credentials)) {
-    throw new ValidationError(
-      `${transactionType}: Credentials must be an array`,
-    )
+    throw new ValidationError(`${transactionType}: invalid field Credentials`)
   }
   if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
     throw new ValidationError(

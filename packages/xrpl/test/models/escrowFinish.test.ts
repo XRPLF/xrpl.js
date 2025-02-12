@@ -67,12 +67,12 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => validateEscrowFinish(escrow),
       ValidationError,
-      'EscrowFinish: OfferSequence must be a number',
+      'EscrowFinish: invalid field OfferSequence',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowFinish: OfferSequence must be a number',
+      'EscrowFinish: invalid field OfferSequence',
     )
   })
 
@@ -82,12 +82,12 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => validateEscrowFinish(escrow),
       ValidationError,
-      'EscrowFinish: Condition must be a string',
+      'EscrowFinish: invalid field Condition',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowFinish: Condition must be a string',
+      'EscrowFinish: invalid field Condition',
     )
   })
 
@@ -97,12 +97,12 @@ describe('EscrowFinish', function () {
     assert.throws(
       () => validateEscrowFinish(escrow),
       ValidationError,
-      'EscrowFinish: Fulfillment must be a string',
+      'EscrowFinish: invalid field Fulfillment',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowFinish: Fulfillment must be a string',
+      'EscrowFinish: invalid field Fulfillment',
     )
   })
 
@@ -110,7 +110,7 @@ describe('EscrowFinish', function () {
     escrow.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'EscrowFinish: Credentials must be an array'
+    const errorMessage = 'EscrowFinish: invalid field Credentials'
 
     assert.throws(
       () => validateEscrowFinish(escrow),

@@ -39,7 +39,7 @@ describe('OfferCancel', function () {
   })
 
   it(`throws w/ OfferSequence must be a number`, function () {
-    offer.OfferSequence = '99'
+    offer.OfferSequence = 'abcd'
     assert.throws(
       () => validateOfferCancel(offer),
       ValidationError,

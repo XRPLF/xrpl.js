@@ -40,12 +40,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validatePaymentChannelFund(channel),
       ValidationError,
-      'PaymentChannelFund: missing Amount',
+      'PaymentChannelFund: missing field Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: missing Amount',
+      'PaymentChannelFund: missing field Amount',
     )
   })
 
@@ -55,12 +55,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validatePaymentChannelFund(channel),
       ValidationError,
-      'PaymentChannelFund: missing Channel',
+      'PaymentChannelFund: missing field Channel',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: missing Channel',
+      'PaymentChannelFund: missing field Channel',
     )
   })
 
@@ -70,12 +70,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validatePaymentChannelFund(channel),
       ValidationError,
-      'PaymentChannelFund: Amount must be a string',
+      'PaymentChannelFund: invalid field Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: Amount must be a string',
+      'PaymentChannelFund: invalid field Amount',
     )
   })
 
@@ -85,12 +85,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validatePaymentChannelFund(channel),
       ValidationError,
-      'PaymentChannelFund: Channel must be a string',
+      'PaymentChannelFund: invalid field Channel',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: Channel must be a string',
+      'PaymentChannelFund: Channel',
     )
   })
 
@@ -100,12 +100,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validatePaymentChannelFund(channel),
       ValidationError,
-      'PaymentChannelFund: Expiration must be a number',
+      'PaymentChannelFund: invalid field Expiration',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: Expiration must be a number',
+      'PaymentChannelFund: invalid field Expiration',
     )
   })
 })

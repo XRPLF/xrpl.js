@@ -45,7 +45,7 @@ describe('Clawback', function () {
     assert.throws(
       () => validate(invalidAmount),
       ValidationError,
-      'Clawback: invalid Amount',
+      'Clawback: invalid field Amount',
     )
 
     const invalidStrAmount = {
@@ -57,7 +57,7 @@ describe('Clawback', function () {
     assert.throws(
       () => validate(invalidStrAmount),
       ValidationError,
-      'Clawback: invalid Amount',
+      'Clawback: invalid field Amount',
     )
   })
 
@@ -124,7 +124,7 @@ describe('Clawback', function () {
     assert.throws(
       () => validate(invalidAccount),
       ValidationError,
-      'Clawback: missing Holder',
+      'Clawback: missing field Holder',
     )
   })
 

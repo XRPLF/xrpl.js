@@ -35,8 +35,7 @@ export function validateTicketCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'TicketCount', isNumber)
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const ticketCount = tx.TicketCount as number
+  const ticketCount = Number(tx.TicketCount)
   if (
     !Number.isInteger(ticketCount) ||
     ticketCount < 1 ||

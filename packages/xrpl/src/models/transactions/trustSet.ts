@@ -1,10 +1,8 @@
-import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
   GlobalFlags,
-  isAmount,
   isIssuedCurrency,
   isNumber,
   validateBaseTransaction,

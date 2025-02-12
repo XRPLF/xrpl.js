@@ -53,12 +53,12 @@ describe('EscrowCancel', function () {
     assert.throws(
       () => validateEscrowCancel(cancel),
       ValidationError,
-      'EscrowCancel: missing OfferSequence',
+      'EscrowCancel: missing field OfferSequence',
     )
     assert.throws(
       () => validate(cancel),
       ValidationError,
-      'EscrowCancel: missing OfferSequence',
+      'EscrowCancel: missing field OfferSequence',
     )
   })
 
@@ -83,12 +83,12 @@ describe('EscrowCancel', function () {
     assert.throws(
       () => validateEscrowCancel(cancel),
       ValidationError,
-      'EscrowCancel: OfferSequence must be a number',
+      'EscrowCancel: invalid field OfferSequence',
     )
     assert.throws(
       () => validate(cancel),
       ValidationError,
-      'EscrowCancel: OfferSequence must be a number',
+      'EscrowCancel: invalid field OfferSequence',
     )
   })
 })

@@ -41,7 +41,7 @@ describe('AMMVote', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     vote.Asset = 1234
-    const errorMessage = 'AMMVote: Asset must be a Currency'
+    const errorMessage = 'AMMVote: invalid field Asset'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
@@ -55,7 +55,7 @@ describe('AMMVote', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     vote.Asset2 = 1234
-    const errorMessage = 'AMMVote: Asset2 must be a Currency'
+    const errorMessage = 'AMMVote: invalid field Asset2'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })
@@ -69,7 +69,7 @@ describe('AMMVote', function () {
 
   it(`throws w/ TradingFee must be a number`, function () {
     vote.TradingFee = '25'
-    const errorMessage = 'AMMVote: TradingFee must be a number'
+    const errorMessage = 'AMMVote: invalid field TradingFee'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)
   })

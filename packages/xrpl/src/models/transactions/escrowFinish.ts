@@ -58,7 +58,11 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
     true,
   )
 
-  validateRequiredField(tx, 'OfferSequence', isNumber)
+  validateRequiredField(
+    tx,
+    'OfferSequence',
+    (inp) => isNumber(inp) || isString(inp),
+  )
   validateOptionalField(tx, 'Condition', isString)
   validateOptionalField(tx, 'Fulfillment', isString)
 }

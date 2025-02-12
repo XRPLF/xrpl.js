@@ -1,5 +1,3 @@
-import { ValidationError } from '../../errors'
-
 import {
   BaseTransaction,
   isNumber,

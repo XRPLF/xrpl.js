@@ -38,12 +38,12 @@ describe('SetRegularKey', function () {
     assert.throws(
       () => validateSetRegularKey(account),
       ValidationError,
-      'SetRegularKey: RegularKey must be a string',
+      'SetRegularKey: invalid field RegularKey',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'SetRegularKey: RegularKey must be a string',
+      'SetRegularKey: invalid field RegularKey',
     )
   })
 })

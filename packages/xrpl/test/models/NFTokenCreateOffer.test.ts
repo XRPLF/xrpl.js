@@ -135,7 +135,7 @@ describe('NFTokenCreateOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenCreateOffer: invalid Amount',
+      'NFTokenCreateOffer: invalid field Amount',
     )
   })
 
@@ -154,7 +154,7 @@ describe('NFTokenCreateOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenCreateOffer: invalid Amount',
+      'NFTokenCreateOffer: missing field Amount',
     )
   })
 

@@ -43,12 +43,12 @@ describe('TicketCreate', function () {
     assert.throws(
       () => validateTicketCreate(ticketCreate),
       ValidationError,
-      'TicketCreate: TicketCount must be a number',
+      'TicketCreate: invalid field TicketCount',
     )
     assert.throws(
       () => validate(ticketCreate),
       ValidationError,
-      'TicketCreate: TicketCount must be a number',
+      'TicketCreate: invalid field TicketCount',
     )
   })
 

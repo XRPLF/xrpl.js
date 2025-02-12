@@ -4,6 +4,7 @@ import { Amount } from '../common'
 import {
   BaseTransaction,
   isAmount,
+  isNumber,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -55,16 +56,11 @@ export function validateAMMCreate(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Amount2', isAmount)
+  validateRequiredField(tx, 'TradingFee', isNumber)
 
-  if (tx.TradingFee == null) {
-    throw new ValidationError('AMMCreate: missing field TradingFee')
-  }
+  const tradingFee = Number(tx.TradingFee)
 
-  if (typeof tx.TradingFee !== 'number') {
-    throw new ValidationError('AMMCreate: TradingFee must be a number')
-  }
-
-  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
+  if (tradingFee < 0 || tradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
       `AMMCreate: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )

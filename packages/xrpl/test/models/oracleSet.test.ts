@@ -47,7 +47,7 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid OracleDocumentID`, function () {
-    tx.OracleDocumentID = '1234'
+    tx.OracleDocumentID = 'abcd'
     const errorMessage = 'OracleSet: invalid field OracleDocumentID'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
@@ -61,7 +61,7 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid LastUpdateTime`, function () {
-    tx.LastUpdateTime = '768062172'
+    tx.LastUpdateTime = 'abcd'
     const errorMessage = 'OracleSet: invalid field LastUpdateTime'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
@@ -167,14 +167,14 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {
-    tx.PriceDataSeries[0].PriceData.AssetPrice = '1234'
+    tx.PriceDataSeries[0].PriceData.AssetPrice = 'abcd'
     const errorMessage = 'OracleSet: invalid field AssetPrice'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
   it(`throws w/ invalid Scale of PriceDataSeries`, function () {
-    tx.PriceDataSeries[0].PriceData.Scale = '1234'
+    tx.PriceDataSeries[0].PriceData.Scale = 'abcd'
     const errorMessage = 'OracleSet: invalid field Scale'
     assert.throws(() => validateOracleSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
