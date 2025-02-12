@@ -1,7 +1,12 @@
 import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isNumber,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * The SignerListSet transaction creates, replaces, or removes a list of
@@ -39,40 +44,30 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SignerQuorum === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerQuorum')
-  }
-
-  if (typeof tx.SignerQuorum !== 'number') {
-    throw new ValidationError('SignerListSet: invalid SignerQuorum')
-  }
+  validateRequiredField(tx, 'SignerQuorum', isNumber)
 
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
   }
 
-  if (tx.SignerEntries === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerEntries')
-  }
+  validateRequiredField(tx, 'SignerEntries', Array.isArray)
 
-  if (!Array.isArray(tx.SignerEntries)) {
-    throw new ValidationError('SignerListSet: invalid SignerEntries')
-  }
-
-  if (tx.SignerEntries.length === 0) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  const signerEntries = tx.SignerEntries as unknown[]
+  if (signerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',
     )
   }
 
-  if (tx.SignerEntries.length > MAX_SIGNERS) {
+  if (signerEntries.length > MAX_SIGNERS) {
     throw new ValidationError(
       `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
     )
   }
 
-  for (const entry of tx.SignerEntries) {
+  for (const entry of signerEntries) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
     const signerEntry = entry as SignerEntry
     const { WalletLocator } = signerEntry.SignerEntry

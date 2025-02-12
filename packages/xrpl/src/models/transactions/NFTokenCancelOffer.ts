@@ -1,6 +1,10 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 /**
@@ -41,11 +45,11 @@ export interface NFTokenCancelOfferMetadata extends TransactionMetadataBase {
 export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!Array.isArray(tx.NFTokenOffers)) {
-    throw new ValidationError('NFTokenCancelOffer: missing field NFTokenOffers')
-  }
+  validateRequiredField(tx, 'NFTokenOffers', Array.isArray)
 
-  if (tx.NFTokenOffers.length < 1) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  const offers = tx.NFTokenOffers as unknown[]
+  if (offers.length < 1) {
     throw new ValidationError('NFTokenCancelOffer: empty field NFTokenOffers')
   }
 }
