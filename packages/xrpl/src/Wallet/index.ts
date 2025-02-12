@@ -416,9 +416,8 @@ export class Wallet {
 
     const txToSignAndEncode = { ...tx }
 
-    txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
-
     if (multisignAddress) {
+      txToSignAndEncode.SigningPubKey = ''
       const signer = {
         Account: multisignAddress,
         SigningPubKey: this.publicKey,
@@ -430,6 +429,7 @@ export class Wallet {
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
     } else {
+      txToSignAndEncode.SigningPubKey = this.publicKey
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
