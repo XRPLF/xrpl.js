@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validatePaymentChannelFund } from '../../src/models/transactions/paymentChannelFund'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validatePaymentChannelFund)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePaymentChannelFund, message)
 
 /**
  * PaymentChannelFund Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validatePaymentChannelFund } from '../../src/models/transactions/paymen
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('PaymentChannelFund', function () {
-  let channel
+  let channel: any
 
   beforeEach(function () {
     channel = {
@@ -23,89 +26,42 @@ describe('PaymentChannelFund', function () {
   })
 
   it(`verifies valid PaymentChannelFund`, function () {
-    assert.doesNotThrow(() => validatePaymentChannelFund(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`verifies valid PaymentChannelFund w/o optional`, function () {
     delete channel.Expiration
 
-    assert.doesNotThrow(() => validatePaymentChannelFund(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`throws w/ missing Amount`, function () {
     delete channel.Amount
 
-    assert.throws(
-      () => validatePaymentChannelFund(channel),
-      ValidationError,
-      'PaymentChannelFund: missing field Amount',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelFund: missing field Amount',
-    )
+    assertInvalid(channel, 'PaymentChannelFund: missing field Amount')
   })
 
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
-    assert.throws(
-      () => validatePaymentChannelFund(channel),
-      ValidationError,
-      'PaymentChannelFund: missing field Channel',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelFund: missing field Channel',
-    )
+    assertInvalid(channel, 'PaymentChannelFund: missing field Channel')
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 100
 
-    assert.throws(
-      () => validatePaymentChannelFund(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Amount',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Amount',
-    )
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Amount')
   })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 1000
 
-    assert.throws(
-      () => validatePaymentChannelFund(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Channel',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Channel',
-    )
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Channel')
   })
 
   it(`throws w/ invalid Expiration`, function () {
     channel.Expiration = 'abcd'
 
-    assert.throws(
-      () => validatePaymentChannelFund(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Expiration',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelFund: invalid field Expiration',
-    )
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Expiration')
   })
 })

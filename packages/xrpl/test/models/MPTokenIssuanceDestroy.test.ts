@@ -1,7 +1,3 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
-
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
 /**
@@ -26,9 +22,8 @@ describe('MPTokenIssuanceDestroy', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceDestroy: missing field MPTokenIssuanceID',
     )
   })

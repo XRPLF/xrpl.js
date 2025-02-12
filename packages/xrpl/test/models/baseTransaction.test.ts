@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
 import { ValidationError } from '../../src'
-import { validateBaseTransaction } from '../../src/models/transactions/common'
+import { validateBaseTransaction } from '../../src/models/transactions/BaseTransaction'
 
 /**
  * Transaction Verification Testing.
@@ -10,7 +10,7 @@ import { validateBaseTransaction } from '../../src/models/transactions/common'
  */
 describe('BaseTransaction', function () {
   it(`Verifies all optional BaseTransaction`, function () {
-    const txJson = {
+    const txJson: any = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
       Fee: '12',

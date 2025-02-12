@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateCheckCash } from '../../src/models/transactions/checkCash'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateCheckCash)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateCheckCash, message)
 
 /**
  * CheckCash Transaction Verification Testing.
@@ -19,8 +21,7 @@ describe('CheckCash', function () {
       Fee: '12',
     } as any
 
-    assert.doesNotThrow(() => validateCheckCash(validCheckCash))
-    assert.doesNotThrow(() => validate(validCheckCash))
+    assertValid(validCheckCash)
   })
 
   it(`throws w/ invalid CheckID`, function () {
@@ -31,16 +32,7 @@ describe('CheckCash', function () {
       CheckID: 83876645678567890,
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidCheckID),
-      ValidationError,
-      'CheckCash: invalid field CheckID',
-    )
-    assert.throws(
-      () => validate(invalidCheckID),
-      ValidationError,
-      'CheckCash: invalid field CheckID',
-    )
+    assertInvalid(invalidCheckID, 'CheckCash: invalid field CheckID')
   })
 
   it(`throws w/ invalid Amount`, function () {
@@ -52,16 +44,7 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidAmount),
-      ValidationError,
-      'CheckCash: invalid field Amount',
-    )
-    assert.throws(
-      () => validate(invalidAmount),
-      ValidationError,
-      'CheckCash: invalid field Amount',
-    )
+    assertInvalid(invalidAmount, 'CheckCash: invalid field Amount')
   })
 
   it(`throws w/ having both Amount and DeliverMin`, function () {
@@ -74,14 +57,8 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: cannot have both Amount and DeliverMin',
-    )
-    assert.throws(
-      () => validate(invalidDeliverMin),
-      ValidationError,
+    assertInvalid(
+      invalidDeliverMin,
       'CheckCash: cannot have both Amount and DeliverMin',
     )
   })
@@ -95,15 +72,6 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: invalid field DeliverMin',
-    )
-    assert.throws(
-      () => validate(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: invalid field DeliverMin',
-    )
+    assertInvalid(invalidDeliverMin, 'CheckCash: invalid field DeliverMin')
   })
 })

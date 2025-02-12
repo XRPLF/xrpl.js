@@ -1,8 +1,12 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
-import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
 import { validateCredentialAccept } from '../../src/models/transactions/credentialAccept'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateCredentialAccept)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateCredentialAccept, message)
 
 /**
  * CredentialAccept Transaction Verification Testing.
@@ -10,7 +14,7 @@ import { validateCredentialAccept } from '../../src/models/transactions/credenti
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('CredentialAccept', function () {
-  let credentialAccept
+  let credentialAccept: any
 
   beforeEach(function () {
     credentialAccept = {
@@ -24,8 +28,7 @@ describe('CredentialAccept', function () {
   })
 
   it(`verifies valid CredentialAccept`, function () {
-    assert.doesNotThrow(() => validateCredentialAccept(credentialAccept))
-    assert.doesNotThrow(() => validate(credentialAccept))
+    assertValid(credentialAccept)
   })
 
   it(`throws w/ missing field Account`, function () {

@@ -1,11 +1,12 @@
-import { assert } from 'chai'
+import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import {
-  convertStringToHex,
-  validate,
-  ValidationError,
-  NFTokenMintFlags,
-} from '../../src'
+import { NFTokenMintFlags } from '../../src'
+import { validateNFTokenMint } from '../../src/models/transactions/nftokenMint'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateNFTokenMint)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenMint, message)
 
 /**
  * NFTokenMint Transaction Verification Testing.
@@ -25,10 +26,10 @@ describe('NFTokenMint', function () {
       NFTokenTaxon: 0,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenMint))
+    assertValid(validNFTokenMint)
   })
 
   it(`throws w/ missing NFTokenTaxon`, function () {
@@ -40,14 +41,10 @@ describe('NFTokenMint', function () {
       Flags: NFTokenMintFlags.tfTransferable,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenMint: missing field NFTokenTaxon',
-    )
+    assertInvalid(invalid, 'NFTokenMint: missing field NFTokenTaxon')
   })
 
   it(`throws w/ Account === Issuer`, function () {
@@ -60,14 +57,10 @@ describe('NFTokenMint', function () {
       Issuer: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       TransferFee: 1,
       NFTokenTaxon: 0,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenMint: Issuer must not be equal to Account',
-    )
+    assertInvalid(invalid, 'NFTokenMint: Issuer must not be equal to Account')
   })
 
   it(`throws w/ URI being an empty string`, function () {
@@ -83,11 +76,7 @@ describe('NFTokenMint', function () {
       URI: '',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenMint: URI must not be empty string',
-    )
+    assertInvalid(invalid, 'NFTokenMint: URI must not be empty string')
   })
 
   it(`throws w/ URI not in hex format`, function () {
@@ -103,10 +92,6 @@ describe('NFTokenMint', function () {
       URI: 'http://xrpl.org',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenMint: URI must be in hex format',
-    )
+    assertInvalid(invalid, 'NFTokenMint: URI must be in hex format')
   })
 })

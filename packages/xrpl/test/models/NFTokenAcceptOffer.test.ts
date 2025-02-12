@@ -1,7 +1,3 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
-
 const NFTOKEN_BUY_OFFER =
   'AED08CC1F50DD5F23A1948AF86153A3F3B7593E5EC77D65A02BB1B29E05AB6AF'
 const NFTOKEN_SELL_OFFER =
@@ -48,9 +44,8 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenAcceptOffer: must set either NFTokenSellOffer or NFTokenBuyOffer',
     )
   })
@@ -66,9 +61,8 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenAcceptOffer: both NFTokenSellOffer and NFTokenBuyOffer must be set if using brokered mode',
     )
   })
@@ -84,9 +78,8 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenAcceptOffer: both NFTokenSellOffer and NFTokenBuyOffer must be set if using brokered mode',
     )
   })
@@ -132,9 +125,8 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   })
@@ -151,9 +143,8 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenAcceptOffer: NFTokenBrokerFee must be greater than 0; omit if there is no fee',
     )
   })
@@ -170,10 +161,6 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee',
-    )
+    assertInvalid(invalid, 'NFTokenAcceptOffer: invalid field NFTokenBrokerFee')
   })
 })

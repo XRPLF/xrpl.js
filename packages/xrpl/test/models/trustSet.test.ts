@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateTrustSet } from '../../src/models/transactions/trustSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateTrustSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateTrustSet, message)
 
 /**
  * TrustSet Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateTrustSet } from '../../src/models/transactions/trustSet'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('TrustSet', function () {
-  let trustSet
+  let trustSet: any
 
   beforeEach(function () {
     trustSet = {
@@ -27,67 +29,30 @@ describe('TrustSet', function () {
         tfSetFreeze: true,
         tfSetDeepFreeze: true,
       },
-    } as any
+    }
   })
 
   it('verifies valid TrustSet', function () {
-    assert.doesNotThrow(() => validateTrustSet(trustSet))
-    assert.doesNotThrow(() => validate(trustSet))
+    assertValid(trustSet)
   })
 
   it('throws when LimitAmount is missing', function () {
     delete trustSet.LimitAmount
-    assert.throws(
-      () => validateTrustSet(trustSet),
-      ValidationError,
-      'TrustSet: missing field LimitAmount',
-    )
-    assert.throws(
-      () => validate(trustSet),
-      ValidationError,
-      'TrustSet: missing field LimitAmount',
-    )
+    assertInvalid(trustSet, 'TrustSet: missing field LimitAmount')
   })
 
   it('throws when LimitAmount is invalid', function () {
     trustSet.LimitAmount = 1234
-    assert.throws(
-      () => validateTrustSet(trustSet),
-      ValidationError,
-      'TrustSet: invalid field LimitAmount',
-    )
-    assert.throws(
-      () => validate(trustSet),
-      ValidationError,
-      'TrustSet: invalid field LimitAmount',
-    )
+    assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
   })
 
   it('throws when QualityIn is not a number', function () {
     trustSet.QualityIn = 'abcd'
-    assert.throws(
-      () => validateTrustSet(trustSet),
-      ValidationError,
-      'TrustSet: invalid field QualityIn',
-    )
-    assert.throws(
-      () => validate(trustSet),
-      ValidationError,
-      'TrustSet: invalid field QualityIn',
-    )
+    assertInvalid(trustSet, 'TrustSet: invalid field QualityIn')
   })
 
   it('throws when QualityOut is not a number', function () {
     trustSet.QualityOut = 'dcba'
-    assert.throws(
-      () => validateTrustSet(trustSet),
-      ValidationError,
-      'TrustSet: invalid field QualityOut',
-    )
-    assert.throws(
-      () => validate(trustSet),
-      ValidationError,
-      'TrustSet: invalid field QualityOut',
-    )
+    assertInvalid(trustSet, 'TrustSet: invalid field QualityOut')
   })
 })

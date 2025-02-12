@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateSetRegularKey } from '../../src/models/transactions/setRegularKey'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateSetRegularKey)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateSetRegularKey, message)
 
 /**
  * SetRegularKey Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateSetRegularKey } from '../../src/models/transactions/setRegularK
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('SetRegularKey', function () {
-  let account
+  let account: any
 
   beforeEach(function () {
     account = {
@@ -22,28 +25,17 @@ describe('SetRegularKey', function () {
   })
 
   it(`verifies valid SetRegularKey`, function () {
-    assert.doesNotThrow(() => validateSetRegularKey(account))
-    assert.doesNotThrow(() => validate(account))
+    assertValid(account)
   })
 
   it(`verifies w/o SetRegularKey`, function () {
     account.RegularKey = undefined
-    assert.doesNotThrow(() => validateSetRegularKey(account))
-    assert.doesNotThrow(() => validate(account))
+    assertValid(account)
   })
 
   it(`throws w/ invalid RegularKey`, function () {
     account.RegularKey = 12369846963
 
-    assert.throws(
-      () => validateSetRegularKey(account),
-      ValidationError,
-      'SetRegularKey: invalid field RegularKey',
-    )
-    assert.throws(
-      () => validate(account),
-      ValidationError,
-      'SetRegularKey: invalid field RegularKey',
-    )
+    assertInvalid(account, 'SetRegularKey: invalid field RegularKey')
   })
 })

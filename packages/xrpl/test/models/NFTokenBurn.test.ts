@@ -1,7 +1,3 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
-
 const TOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
 
@@ -33,10 +29,6 @@ describe('NFTokenBurn', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenBurn: missing field NFTokenID',
-    )
+    assertInvalid(invalid, 'NFTokenBurn: missing field NFTokenID')
   })
 })

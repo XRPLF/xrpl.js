@@ -1,8 +1,12 @@
 /* eslint-disable max-statements -- need additional tests for optional fields */
-import { assert } from 'chai'
 
-import { validate, PaymentFlags, ValidationError } from '../../src'
+import { PaymentFlags } from '../../src'
 import { validatePayment } from '../../src/models/transactions/payment'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validatePayment)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePayment, message)
 
 /**
  * Payment Verification Testing.
@@ -10,7 +14,7 @@ import { validatePayment } from '../../src/models/transactions/payment'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('Payment', function () {
-  let payment
+  let payment: any
 
   beforeEach(function () {
     payment = {
@@ -37,8 +41,7 @@ describe('Payment', function () {
   })
 
   it(`verifies valid Payment`, function () {
-    assert.doesNotThrow(() => validatePayment(payment))
-    assert.doesNotThrow(() => validate(payment))
+    assertValid(payment)
   })
 
   it(`Verifies memos correctly`, function () {
@@ -50,7 +53,7 @@ describe('Payment', function () {
       },
     ]
 
-    assert.doesNotThrow(() => validate(payment))
+    assertValid(payment)
   })
 
   it(`Verifies memos correctly`, function () {
@@ -63,198 +66,86 @@ describe('Payment', function () {
       },
     ]
 
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'BaseTransaction: invalid field Memos',
-    )
+    assertInvalid(payment, 'BaseTransaction: invalid field Memos')
   })
 
   it(`throws when Amount is missing`, function () {
     delete payment.Amount
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: missing field Amount',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: missing field Amount',
-    )
+    assertInvalid(payment, 'Payment: missing field Amount')
   })
 
   it(`throws when Amount is invalid`, function () {
     payment.Amount = 1234
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field Amount',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field Amount',
-    )
+    assertInvalid(payment, 'Payment: invalid field Amount')
   })
 
   it(`throws when Destination is missing`, function () {
     delete payment.Destination
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: missing field Destination',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: missing field Destination',
-    )
+    assertInvalid(payment, 'Payment: missing field Destination')
   })
 
   it(`throws when Destination is invalid`, function () {
     payment.Destination = 7896214
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
+    assertInvalid(payment, 'Payment: invalid field Destination')
   })
 
   it(`throws when Destination is invalid classic address`, function () {
     payment.Destination = 'rABCD'
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
+    assertInvalid(payment, 'Payment: invalid field Destination')
   })
 
   it(`does not throw when Destination is a valid x-address`, function () {
     payment.Destination = 'X7WZKEeNVS2p9Tire9DtNFkzWBZbFtSiS2eDBib7svZXuc2'
-    assert.doesNotThrow(() => validatePayment(payment))
-    assert.doesNotThrow(() => validate(payment))
+    assertValid(payment)
   })
 
   it(`throws when Destination is an empty string`, function () {
     payment.Destination = ''
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field Destination',
-    )
+    assertInvalid(payment, 'Payment: invalid field Destination')
   })
 
   it(`throws when DestinationTag is not a number`, function () {
     payment.DestinationTag = 'abcd'
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field DestinationTag',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field DestinationTag',
-    )
+    assertInvalid(payment, 'Payment: invalid field DestinationTag')
   })
 
   it(`throws when InvoiceID is not a string`, function () {
     payment.InvoiceID = 19832
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field InvoiceID',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field InvoiceID',
-    )
+    assertInvalid(payment, 'Payment: invalid field InvoiceID')
   })
 
   it(`throws when Paths is invalid`, function () {
     payment.Paths = [[{ account: 123 }]]
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field Paths',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field Paths',
-    )
+    assertInvalid(payment, 'Payment: invalid field Paths')
   })
 
   it(`throws when SendMax is invalid`, function () {
     payment.SendMax = 100000000
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field SendMax',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field SendMax',
-    )
+    assertInvalid(payment, 'Payment: invalid field SendMax')
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
     payment.DeliverMin = '10000'
     payment.Flags = PaymentFlags.tfPartialPayment
-    assert.doesNotThrow(() => validatePayment(payment))
-    assert.doesNotThrow(() => validate(payment))
+    assertValid(payment)
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a boolean`, function () {
     payment.DeliverMin = '10000'
     payment.Flags = { tfPartialPayment: true }
-    assert.doesNotThrow(() => validatePayment(payment))
-    assert.doesNotThrow(() => validate(payment))
+    assertValid(payment)
   })
 
   it(`throws when DeliverMin is invalid`, function () {
     payment.DeliverMin = 10000
     payment.Flags = { tfPartialPayment: true }
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: invalid field DeliverMin',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
-      'Payment: invalid field DeliverMin',
-    )
+    assertInvalid(payment, 'Payment: invalid field DeliverMin')
   })
 
   it(`throws when tfPartialPayment flag is missing with valid DeliverMin`, function () {
     payment.DeliverMin = '10000'
-    assert.throws(
-      () => validatePayment(payment),
-      ValidationError,
-      'Payment: tfPartialPayment flag required with DeliverMin',
-    )
-    assert.throws(
-      () => validate(payment),
-      ValidationError,
+    assertInvalid(
+      payment,
       'Payment: tfPartialPayment flag required with DeliverMin',
     )
   })
@@ -269,8 +160,7 @@ describe('Payment', function () {
       },
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
-    assert.doesNotThrow(() => validatePayment(mptPayment))
-    assert.doesNotThrow(() => validate(mptPayment))
+    assertValid(mptPayment)
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
@@ -279,8 +169,7 @@ describe('Payment', function () {
 
     const errorMessage = 'Payment: invalid field Credentials'
 
-    assert.throws(() => validatePayment(payment), ValidationError, errorMessage)
-    assert.throws(() => validate(payment), ValidationError, errorMessage)
+    assertInvalid(payment, errorMessage)
   })
 
   it(`throws CredentialIDs length exceeds max length`, function () {
@@ -298,8 +187,7 @@ describe('Payment', function () {
 
     const errorMessage = 'Payment: Credentials length cannot exceed 8 elements'
 
-    assert.throws(() => validatePayment(payment), ValidationError, errorMessage)
-    assert.throws(() => validate(payment), ValidationError, errorMessage)
+    assertInvalid(payment, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
@@ -307,8 +195,7 @@ describe('Payment', function () {
 
     const errorMessage = 'Payment: Credentials cannot be an empty array'
 
-    assert.throws(() => validatePayment(payment), ValidationError, errorMessage)
-    assert.throws(() => validate(payment), ValidationError, errorMessage)
+    assertInvalid(payment, errorMessage)
   })
 
   it(`throws w/ non-string CredentialIDs`, function () {
@@ -319,8 +206,7 @@ describe('Payment', function () {
 
     const errorMessage = 'Payment: Invalid Credentials ID list format'
 
-    assert.throws(() => validatePayment(payment), ValidationError, errorMessage)
-    assert.throws(() => validate(payment), ValidationError, errorMessage)
+    assertInvalid(payment, errorMessage)
   })
 
   it(`throws w/ duplicate CredentialIDs`, function () {
@@ -332,7 +218,6 @@ describe('Payment', function () {
     const errorMessage =
       'Payment: Credentials cannot contain duplicate elements'
 
-    assert.throws(() => validatePayment(payment), ValidationError, errorMessage)
-    assert.throws(() => validate(payment), ValidationError, errorMessage)
+    assertInvalid(payment, errorMessage)
   })
 })

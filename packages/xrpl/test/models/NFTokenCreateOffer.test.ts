@@ -1,6 +1,4 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError, NFTokenCreateOfferFlags } from '../../src'
+import { NFTokenCreateOfferFlags } from '../../src'
 
 const NFTOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
@@ -73,9 +71,8 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenCreateOffer: Owner and Account must not be equal',
     )
   })
@@ -93,9 +90,8 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenCreateOffer: Destination and Account must not be equal',
     )
   })
@@ -112,11 +108,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenCreateOffer: missing field NFTokenID',
-    )
+    assertInvalid(invalid, 'NFTokenCreateOffer: missing field NFTokenID')
   })
 
   it(`throws w/ invalid Amount`, function () {
@@ -132,11 +124,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenCreateOffer: invalid field Amount',
-    )
+    assertInvalid(invalid, 'NFTokenCreateOffer: invalid field Amount')
   })
 
   it(`throws w/ missing Amount`, function () {
@@ -151,11 +139,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenCreateOffer: missing field Amount',
-    )
+    assertInvalid(invalid, 'NFTokenCreateOffer: missing field Amount')
   })
 
   it(`throws w/ Owner for sell offer`, function () {
@@ -171,9 +155,8 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenCreateOffer: Owner must not be present for sell offers',
     )
   })
@@ -189,9 +172,8 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenCreateOffer: Owner must be present for buy offers',
     )
   })
@@ -208,9 +190,8 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'NFTokenCreateOffer: Amount must be greater than 0 for buy offers',
     )
   })

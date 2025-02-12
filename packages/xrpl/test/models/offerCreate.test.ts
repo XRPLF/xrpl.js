@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateOfferCreate } from '../../src/models/transactions/offerCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateOfferCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateOfferCreate, message)
 
 /**
  * OfferCreate Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateOfferCreate } from '../../src/models/transactions/offerCreate'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('OfferCreate', function () {
-  let offer
+  let offer: any
 
   beforeEach(function () {
     offer = {
@@ -34,8 +36,7 @@ describe('OfferCreate', function () {
     } as any
   })
   it(`verifies valid OfferCreate`, function () {
-    assert.doesNotThrow(() => validateOfferCreate(offer))
-    assert.doesNotThrow(() => validate(offer))
+    assertValid(offer)
 
     const offer2 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
@@ -89,60 +90,24 @@ describe('OfferCreate', function () {
   it(`throws w/ invalid Expiration`, function () {
     offer.Expiration = 'abcd'
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid field Expiration',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid field Expiration',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid field Expiration')
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
     offer.OfferSequence = 'abcd'
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid field OfferSequence',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid field OfferSequence',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid field OfferSequence')
   })
 
   it(`throws w/ invalid TakerPays`, function () {
     offer.TakerPays = 10
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid field TakerPays',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid field TakerPays',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid field TakerPays')
   })
 
   it(`throws w/ invalid TakerGets`, function () {
     offer.TakerGets = 11
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid field TakerGets',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid field TakerGets',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid field TakerGets')
   })
 })

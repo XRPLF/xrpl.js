@@ -1,6 +1,4 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError, MPTokenIssuanceSetFlags } from '../../src'
+import { MPTokenIssuanceSetFlags } from '../../src'
 
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
@@ -47,9 +45,8 @@ describe('MPTokenIssuanceSet', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceSet: missing field MPTokenIssuanceID',
     )
   })
@@ -65,18 +62,10 @@ describe('MPTokenIssuanceSet', function () {
       // eslint-disable-next-line no-bitwise -- not needed
       MPTokenIssuanceSetFlags.tfMPTLock | MPTokenIssuanceSetFlags.tfMPTUnlock
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceSet: flag conflict',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
 
     invalid.Flags = { tfMPTLock: true, tfMPTUnlock: true }
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceSet: flag conflict',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
   })
 })
