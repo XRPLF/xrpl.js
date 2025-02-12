@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Support for the AMMClawback amendment (XLS-73)
 * Adds utility function `convertTxFlagsToNumber`
 * Implementation of XLS-80d PermissionedDomain feature.
 * Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
