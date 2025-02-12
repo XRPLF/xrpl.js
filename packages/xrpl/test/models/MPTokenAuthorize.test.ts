@@ -1,5 +1,5 @@
 import { MPTokenAuthorizeFlags } from '../../src'
-import { validateMPTokenAuthorize } from '../../src/models/transactions/mptokenAuthorize'
+import { validateMPTokenAuthorize } from '../../src/models/transactions/MPTokenAuthorize'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>

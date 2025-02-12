@@ -1,5 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
+import { validateNFTokenModify } from '../../src'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateNFTokenModify)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenModify, message)
+
 const TOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
 
@@ -19,7 +27,7 @@ describe('NFTokenModify', function () {
       URI: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenModify))
+    assertValid(validNFTokenModify)
   })
 
   it(`throws w/ missing NFTokenID`, function () {

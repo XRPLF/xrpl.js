@@ -1,3 +1,11 @@
+import { validateNFTokenAcceptOffer } from '../../src/models/transactions/NFTokenAcceptOffer'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateNFTokenAcceptOffer)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenAcceptOffer, message)
+
 const NFTOKEN_BUY_OFFER =
   'AED08CC1F50DD5F23A1948AF86153A3F3B7593E5EC77D65A02BB1B29E05AB6AF'
 const NFTOKEN_SELL_OFFER =
@@ -19,7 +27,7 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
+    assertValid(validNFTokenAcceptOffer)
   })
 
   it(`verifies valid NFTokenAcceptOffer with NFTokenSellOffer`, function () {
@@ -32,7 +40,7 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
+    assertValid(validNFTokenAcceptOffer)
   })
 
   it(`throws w/ missing NFTokenSellOffer and NFTokenBuyOffer`, function () {
@@ -95,7 +103,7 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
+    assertValid(validNFTokenAcceptOffer)
   })
 
   it(`verifies valid NFTokenAcceptOffer with NFTokenBrokerFee`, function () {
@@ -110,7 +118,7 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenAcceptOffer))
+    assertValid(validNFTokenAcceptOffer)
   })
 
   it(`throws w/ NFTokenBrokerFee === 0`, function () {

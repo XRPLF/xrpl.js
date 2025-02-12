@@ -118,16 +118,7 @@ describe('SignerListSet', function () {
 
     const errorMessage =
       'SignerListSet: maximum of 32 members allowed in SignerEntries'
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(signerListSetTx, errorMessage)
   })
 
   it(`verifies valid WalletLocator in SignerEntries`, function () {
@@ -179,15 +170,6 @@ describe('SignerListSet', function () {
     ]
     const errorMessage =
       'SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value'
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(signerListSetTx, errorMessage)
   })
 })

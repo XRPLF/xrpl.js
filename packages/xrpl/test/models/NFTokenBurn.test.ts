@@ -1,3 +1,10 @@
+import { validateNFTokenBurn } from '../../src/models/transactions/NFTokenBurn'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateNFTokenBurn)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenBurn, message)
+
 const TOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
 
@@ -17,7 +24,7 @@ describe('NFTokenBurn', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenBurn))
+    assertValid(validNFTokenBurn)
   })
 
   it(`throws w/ missing NFTokenID`, function () {

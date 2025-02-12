@@ -1,4 +1,11 @@
 import { NFTokenCreateOfferFlags } from '../../src'
+import { validateNFTokenCreateOffer } from '../../src/models/transactions/NFTokenCreateOffer'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateNFTokenCreateOffer)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenCreateOffer, message)
 
 const NFTOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
@@ -22,7 +29,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
+    assertValid(validNFTokenCreateOffer)
   })
 
   it(`verifies valid NFTokenCreateOffer sellside`, function () {
@@ -40,7 +47,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
+    assertValid(validNFTokenCreateOffer)
   })
 
   it(`verifies w/ 0 Amount NFTokenCreateOffer sellside`, function () {
@@ -56,7 +63,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenCreateOffer))
+    assertValid(validNFTokenCreateOffer)
   })
 
   it(`throws w/ Account === Owner`, function () {

@@ -1,3 +1,11 @@
+import { validateMPTokenIssuanceDestroy } from '../../src/models/transactions/MPTokenIssuanceDestroy'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenIssuanceDestroy)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenIssuanceDestroy, message)
+
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
 /**
@@ -13,7 +21,7 @@ describe('MPTokenIssuanceDestroy', function () {
       MPTokenIssuanceID: TOKEN_ID,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceDestroy))
+    assertValid(validMPTokenIssuanceDestroy)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {

@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 
 import { ValidationError } from '../../src'
-import { validateBaseTransaction } from '../../src/models/transactions/BaseTransaction'
+import { validateBaseTransaction } from '../../src/models/transactions/common'
 
 /**
  * Transaction Verification Testing.

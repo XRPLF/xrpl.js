@@ -22,8 +22,7 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.doesNotThrow(() => validate(validClawback))
-    assert.doesNotThrow(() => validateClawback(validClawback))
+    assertValid(validClawback)
   })
 
   it(`throws w/ missing Amount`, function () {
@@ -78,7 +77,7 @@ describe('Clawback', function () {
       Holder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
 
-    assert.doesNotThrow(() => validate(validClawback))
+    assertValid(validClawback)
   })
 
   it(`throws w/ invalid Holder Account`, function () {

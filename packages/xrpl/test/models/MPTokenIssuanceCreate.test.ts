@@ -1,12 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags } from '../../src'
+import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
-  assertTxIsValid(tx, validatePermissionedDomainSet)
+  assertTxIsValid(tx, validateMPTokenIssuanceCreate)
 const assertInvalid = (tx: any, message: string): void =>
-  assertTxValidationError(tx, validatePermissionedDomainSet, message)
+  assertTxValidationError(tx, validateMPTokenIssuanceCreate, message)
 
 /**
  * MPTokenIssuanceCreate Transaction Verification Testing.

@@ -370,6 +370,12 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
 
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
+  validateOptionalField(
+    common,
+    'Flags',
+    (inp) => isNumber(inp) || typeof inp === 'object',
+  )
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
   if (memos !== undefined && !memos.every(isMemo)) {

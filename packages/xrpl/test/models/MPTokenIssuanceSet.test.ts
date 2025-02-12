@@ -1,4 +1,11 @@
 import { MPTokenIssuanceSetFlags } from '../../src'
+import { validateMPTokenIssuanceSet } from '../../src/models/transactions/MPTokenIssuanceSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenIssuanceSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenIssuanceSet, message)
 
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
@@ -16,7 +23,7 @@ describe('MPTokenIssuanceSet', function () {
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
 
     validMPTokenIssuanceSet = {
       TransactionType: 'MPTokenIssuanceSet',
@@ -26,7 +33,7 @@ describe('MPTokenIssuanceSet', function () {
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
 
     // It's fine to not specify any flag, it means only tx fee is deducted
     validMPTokenIssuanceSet = {
@@ -36,7 +43,7 @@ describe('MPTokenIssuanceSet', function () {
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {

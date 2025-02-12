@@ -1,7 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { NFTokenMintFlags } from '../../src'
-import { validateNFTokenMint } from '../../src/models/transactions/nftokenMint'
+import { validateNFTokenMint } from '../../src/models/transactions/NFTokenMint'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateNFTokenMint)
