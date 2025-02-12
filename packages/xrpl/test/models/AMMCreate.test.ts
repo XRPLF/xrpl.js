@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateAMMCreate } from '../../src/models/transactions/AMMCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateAMMCreate, message)
 
 /**
  * AMMCreate Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateAMMCreate } from '../../src/models/transactions/AMMCreate'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AMMCreate', function () {
-  let ammCreate
+  let ammCreate: any
 
   beforeEach(function () {
     ammCreate = {
@@ -23,99 +25,58 @@ describe('AMMCreate', function () {
       },
       TradingFee: 12,
       Sequence: 1337,
-    } as any
+    }
   })
 
   it(`verifies valid AMMCreate`, function () {
-    assert.doesNotThrow(() => validateAMMCreate(ammCreate))
-    assert.doesNotThrow(() => validate(ammCreate))
+    assertValid(ammCreate)
   })
 
   it(`throws w/ missing Amount`, function () {
     delete ammCreate.Amount
     const errorMessage = 'AMMCreate: missing field Amount'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws w/ Amount must be an Amount`, function () {
     ammCreate.Amount = 1000
     const errorMessage = 'AMMCreate: Amount must be an Amount'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws w/ missing Amount2`, function () {
     delete ammCreate.Amount2
     const errorMessage = 'AMMCreate: missing field Amount2'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     ammCreate.Amount2 = 1000
     const errorMessage = 'AMMCreate: Amount2 must be an Amount'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws w/ missing TradingFee`, function () {
     delete ammCreate.TradingFee
     const errorMessage = 'AMMCreate: missing field TradingFee'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws w/ TradingFee must be a number`, function () {
     ammCreate.TradingFee = '12'
     const errorMessage = 'AMMCreate: TradingFee must be a number'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws when TradingFee is greater than 1000`, function () {
     ammCreate.TradingFee = 1001
     const errorMessage = 'AMMCreate: TradingFee must be between 0 and 1000'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     ammCreate.TradingFee = -1
     const errorMessage = 'AMMCreate: TradingFee must be between 0 and 1000'
-    assert.throws(
-      () => validateAMMCreate(ammCreate),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(ammCreate), ValidationError, errorMessage)
+    assertInvalid(ammCreate, errorMessage)
   })
 })

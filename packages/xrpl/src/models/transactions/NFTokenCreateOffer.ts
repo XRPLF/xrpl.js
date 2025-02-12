@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 import { isFlagEnabled } from '../utils'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import {
   BaseTransaction,
@@ -13,6 +14,7 @@ import {
   Account,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
+import type { Transaction } from './transaction'
 
 /**
  * Transaction Flags for an NFTokenCreateOffer Transaction.
@@ -147,8 +149,11 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   }
 
   if (
-    typeof tx.Flags === 'number' &&
-    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
+    isFlagEnabled(
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
+      convertTxFlagsToNumber(tx as unknown as Transaction),
+      NFTokenCreateOfferFlags.tfSellNFToken,
+    )
   ) {
     validateNFTokenSellOfferCases(tx)
   } else {

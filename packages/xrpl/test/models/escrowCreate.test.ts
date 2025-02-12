@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateEscrowCreate } from '../../src/models/transactions/escrowCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateEscrowCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateEscrowCreate, message)
 
 /**
  * EscrowCreate Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateEscrowCreate } from '../../src/models/transactions/escrowCreate
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('EscrowCreate', function () {
-  let escrow
+  let escrow: any
 
   beforeEach(function () {
     escrow = {
@@ -27,137 +29,63 @@ describe('EscrowCreate', function () {
   })
 
   it(`verifies valid EscrowCreate`, function () {
-    assert.doesNotThrow(() => validateEscrowCreate(escrow))
-    assert.doesNotThrow(() => validate(escrow))
+    assertValid(escrow)
   })
 
   it(`Missing amount`, function () {
     delete escrow.Amount
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: missing field Amount',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: missing field Amount',
-    )
+    assertInvalid(escrow, 'EscrowCreate: missing field Amount')
   })
 
   it(`Missing destination`, function () {
     delete escrow.Destination
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: missing field Destination',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: missing field Destination',
-    )
+    assertInvalid(escrow, 'EscrowCreate: missing field Destination')
   })
 
   it(`throws w/ invalid Destination`, function () {
     escrow.Destination = 10
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: invalid field Destination',
-    )
+    assertInvalid(escrow, 'EscrowCreate: invalid field Destination')
   })
 
   it(`throws w/ invalid Amount`, function () {
     escrow.Amount = 1000
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: Amount must be a string',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: Amount must be a string',
-    )
+    assertInvalid(escrow, 'EscrowCreate: Amount must be a string')
   })
 
   it(`invalid CancelAfter`, function () {
     escrow.CancelAfter = '100'
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: CancelAfter must be a number',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: CancelAfter must be a number',
-    )
+    assertInvalid(escrow, 'EscrowCreate: CancelAfter must be a number')
   })
 
   it(`invalid FinishAfter`, function () {
     escrow.FinishAfter = '1000'
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: FinishAfter must be a number',
-    )
+    assertInvalid(escrow, 'EscrowCreate: FinishAfter must be a number')
   })
 
   it(`invalid Condition`, function () {
     escrow.Condition = 0x141243
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: Condition must be a string',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: Condition must be a string',
-    )
+    assertInvalid(escrow, 'EscrowCreate: Condition must be a string')
   })
 
   it(`invalid DestinationTag`, function () {
     escrow.DestinationTag = '100'
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: invalid field DestinationTag',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowCreate: invalid field DestinationTag',
-    )
+    assertInvalid(escrow, 'EscrowCreate: invalid field DestinationTag')
   })
 
   it(`Missing both CancelAfter and FinishAfter`, function () {
     delete escrow.CancelAfter
     delete escrow.FinishAfter
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
+    assertInvalid(
+      escrow,
       'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
     )
   })
@@ -166,14 +94,8 @@ describe('EscrowCreate', function () {
     delete escrow.Condition
     delete escrow.FinishAfter
 
-    assert.throws(
-      () => validateEscrowCreate(escrow),
-      ValidationError,
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
+    assertInvalid(
+      escrow,
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
   })

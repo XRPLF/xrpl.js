@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateOfferCreate } from '../../src/models/transactions/offerCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateOfferCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateOfferCreate, message)
 
 /**
  * OfferCreate Transaction Verification Testing.
@@ -29,11 +31,12 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
       TxnSignature:
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
-    } as any
+    }
 
-    assert.doesNotThrow(() => validateOfferCreate(offer))
-    assert.doesNotThrow(() => validate(offer))
+    assertValid(offer)
+  })
 
+  it(`verifies valid OfferCreate with flags`, function () {
     const offer2 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
@@ -53,9 +56,10 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.doesNotThrow(() => validateOfferCreate(offer2))
-    assert.doesNotThrow(() => validate(offer2))
+    assertValid(offer2)
+  })
 
+  it(`verifies valid OfferCreate with TakerGets and TakerPays as IOUs`, function () {
     const offer3 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
@@ -79,8 +83,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.doesNotThrow(() => validateOfferCreate(offer3))
-    assert.doesNotThrow(() => validate(offer3))
+    assertValid(offer3)
   })
 
   it(`throws w/ invalid Expiration`, function () {
@@ -104,16 +107,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid Expiration',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid Expiration',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid Expiration')
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
@@ -137,16 +131,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid OfferSequence',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid OfferSequence',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid OfferSequence')
   })
 
   it(`throws w/ invalid TakerPays`, function () {
@@ -166,16 +151,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid TakerPays',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid TakerPays',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid TakerPays')
   })
 
   it(`throws w/ invalid TakerGets`, function () {
@@ -199,15 +175,6 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assert.throws(
-      () => validateOfferCreate(offer),
-      ValidationError,
-      'OfferCreate: invalid TakerGets',
-    )
-    assert.throws(
-      () => validate(offer),
-      ValidationError,
-      'OfferCreate: invalid TakerGets',
-    )
+    assertInvalid(offer, 'OfferCreate: invalid TakerGets')
   })
 })
