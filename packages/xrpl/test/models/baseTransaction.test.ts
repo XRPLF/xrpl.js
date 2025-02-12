@@ -57,6 +57,10 @@ describe('BaseTransaction', function () {
     }
 
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
+
+    // check flag map
+    txJson.Flags = { tfSellToken: true }
+    assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
   it(`Verifies only required BaseTransaction`, function () {
@@ -135,6 +139,20 @@ describe('BaseTransaction', function () {
       () => validateBaseTransaction(invalidSourceTag),
       ValidationError,
       'Payment: invalid field SourceTag',
+    )
+  })
+
+  it(`Handles invalid Flags`, function () {
+    const invalidFlags = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: 'abcd',
+    } as any
+
+    assert.throws(
+      () => validateBaseTransaction(invalidFlags),
+      ValidationError,
+      'Payment: invalid field Flags',
     )
   })
 
