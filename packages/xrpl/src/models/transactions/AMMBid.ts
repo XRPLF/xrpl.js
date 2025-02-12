@@ -6,6 +6,8 @@ import {
   isAmount,
   isCurrency,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
@@ -61,29 +63,10 @@ export interface AMMBid extends BaseTransaction {
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMBid: missing field Asset')
-  }
-
-  if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMBid: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMBid: missing field Asset2')
-  }
-
-  if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMBid: Asset2 must be a Currency')
-  }
-
-  if (tx.BidMin != null && !isAmount(tx.BidMin)) {
-    throw new ValidationError('AMMBid: BidMin must be an Amount')
-  }
-
-  if (tx.BidMax != null && !isAmount(tx.BidMax)) {
-    throw new ValidationError('AMMBid: BidMax must be an Amount')
-  }
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
+  validateOptionalField(tx, 'BidMin', isAmount)
+  validateOptionalField(tx, 'BidMax', isAmount)
 
   if (tx.AuthAccounts != null) {
     if (!Array.isArray(tx.AuthAccounts)) {
@@ -114,17 +97,17 @@ function validateAuthAccounts(
       authAccount.AuthAccount == null ||
       typeof authAccount.AuthAccount !== 'object'
     ) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
     if (authAccount.AuthAccount.Account == null) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
     if (typeof authAccount.AuthAccount.Account !== 'string') {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check

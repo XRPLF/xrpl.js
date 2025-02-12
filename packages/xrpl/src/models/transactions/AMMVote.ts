@@ -5,6 +5,7 @@ import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import {
   BaseTransaction,
   isCurrency,
+  isNumber,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -46,16 +47,10 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Asset', isCurrency)
   validateRequiredField(tx, 'Asset2', isCurrency)
+  validateRequiredField(tx, 'TradingFee', isNumber)
 
-  if (tx.TradingFee == null) {
-    throw new ValidationError('AMMVote: missing field TradingFee')
-  }
-
-  if (typeof tx.TradingFee !== 'number') {
-    throw new ValidationError('AMMVote: TradingFee must be a number')
-  }
-
-  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
+  const tradingFee = Number(tx.TradingFee)
+  if (tradingFee < 0 || tradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
       `AMMVote: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
     )

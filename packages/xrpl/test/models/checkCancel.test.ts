@@ -31,12 +31,12 @@ describe('CheckCancel', function () {
     assert.throws(
       () => validateCheckCancel(invalidCheckID),
       ValidationError,
-      'CheckCancel: invalid CheckID',
+      'CheckCancel: invalid field CheckID',
     )
     assert.throws(
       () => validate(invalidCheckID),
       ValidationError,
-      'CheckCancel: invalid CheckID',
+      'CheckCancel: invalid field CheckID',
     )
   })
 })

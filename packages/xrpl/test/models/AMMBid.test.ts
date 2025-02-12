@@ -72,7 +72,7 @@ describe('AMMBid', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     bid.Asset = 1234
-    const errorMessage = 'AMMBid: Asset must be a Currency'
+    const errorMessage = 'AMMBid: invalid field Asset'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -86,21 +86,21 @@ describe('AMMBid', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     bid.Asset2 = 1234
-    const errorMessage = 'AMMBid: Asset2 must be a Currency'
+    const errorMessage = 'AMMBid: invalid field Asset2'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ BidMin must be an Amount`, function () {
     bid.BidMin = 5
-    const errorMessage = 'AMMBid: BidMin must be an Amount'
+    const errorMessage = 'AMMBid: invalid field BidMin'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
 
   it(`throws w/ BidMax must be an Amount`, function () {
     bid.BidMax = 10
-    const errorMessage = 'AMMBid: BidMax must be an Amount'
+    const errorMessage = 'AMMBid: invalid field BidMax'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -128,7 +128,7 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: null,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage = 'AMMBid: invalid field AuthAccounts'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -137,7 +137,7 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: undefined,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage = 'AMMBid: invalid field AuthAccounts'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -146,7 +146,7 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: 1234,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage = 'AMMBid: invalid field AuthAccounts'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })
@@ -157,7 +157,7 @@ describe('AMMBid', function () {
         Account: 1234,
       },
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage = 'AMMBid: invalid field AuthAccounts'
     assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
     assert.throws(() => validate(bid), ValidationError, errorMessage)
   })

@@ -83,7 +83,7 @@ describe('AccountDelete', function () {
     validAccountDelete.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'AccountDelete: Credentials must be an array'
+    const errorMessage = 'AccountDelete: invalid field Credentials'
 
     assert.throws(
       () => validateAccountDelete(validAccountDelete),

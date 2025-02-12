@@ -39,7 +39,7 @@ describe('TicketCreate', function () {
   })
 
   it('throws when TicketCount is not a number', function () {
-    ticketCreate.TicketCount = '150'
+    ticketCreate.TicketCount = 'abcd'
     assert.throws(
       () => validateTicketCreate(ticketCreate),
       ValidationError,

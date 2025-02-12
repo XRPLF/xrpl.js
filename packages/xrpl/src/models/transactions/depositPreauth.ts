@@ -48,7 +48,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 
   if (tx.Authorize !== undefined) {
     if (typeof tx.Authorize !== 'string') {
-      throw new ValidationError('DepositPreauth: Authorize must be a string')
+      throw new ValidationError('DepositPreauth: invalid field Authorize')
     }
 
     if (tx.Account === tx.Authorize) {
@@ -58,7 +58,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
     }
   } else if (tx.Unauthorize !== undefined) {
     if (typeof tx.Unauthorize !== 'string') {
-      throw new ValidationError('DepositPreauth: Unauthorize must be a string')
+      throw new ValidationError('DepositPreauth: invalid field Unauthorize')
     }
 
     if (tx.Account === tx.Unauthorize) {

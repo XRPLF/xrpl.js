@@ -43,12 +43,12 @@ describe('OfferCancel', function () {
     assert.throws(
       () => validateOfferCancel(offer),
       ValidationError,
-      'OfferCancel: OfferSequence must be a number',
+      'OfferCancel: invalid field OfferSequence',
     )
     assert.throws(
       () => validate(offer),
       ValidationError,
-      'OfferCancel: OfferSequence must be a number',
+      'OfferCancel: invalid field OfferSequence',
     )
   })
 

@@ -34,12 +34,12 @@ describe('CheckCash', function () {
     assert.throws(
       () => validateCheckCash(invalidCheckID),
       ValidationError,
-      'CheckCash: invalid CheckID',
+      'CheckCash: invalid field CheckID',
     )
     assert.throws(
       () => validate(invalidCheckID),
       ValidationError,
-      'CheckCash: invalid CheckID',
+      'CheckCash: invalid field CheckID',
     )
   })
 
@@ -55,12 +55,12 @@ describe('CheckCash', function () {
     assert.throws(
       () => validateCheckCash(invalidAmount),
       ValidationError,
-      'CheckCash: invalid Amount',
+      'CheckCash: invalid field Amount',
     )
     assert.throws(
       () => validate(invalidAmount),
       ValidationError,
-      'CheckCash: invalid Amount',
+      'CheckCash: invalid field Amount',
     )
   })
 
@@ -69,7 +69,7 @@ describe('CheckCash', function () {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
       Amount: '100000000',
-      DeliverMin: 852156963,
+      DeliverMin: '852156963',
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
@@ -98,12 +98,12 @@ describe('CheckCash', function () {
     assert.throws(
       () => validateCheckCash(invalidDeliverMin),
       ValidationError,
-      'CheckCash: invalid DeliverMin',
+      'CheckCash: invalid field DeliverMin',
     )
     assert.throws(
       () => validate(invalidDeliverMin),
       ValidationError,
-      'CheckCash: invalid DeliverMin',
+      'CheckCash: invalid field DeliverMin',
     )
   })
 })

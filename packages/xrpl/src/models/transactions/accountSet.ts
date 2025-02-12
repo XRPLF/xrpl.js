@@ -180,10 +180,10 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError('AccountSet: invalid field ClearFlag')
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError('AccountSet: invalid field ClearFlag')
     }
   }
 
@@ -193,10 +193,10 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (tx.SetFlag !== undefined) {
     if (typeof tx.SetFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError('AccountSet: invalid field SetFlag')
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError('AccountSet: invalid field SetFlag')
     }
   }
 
@@ -204,13 +204,13 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (tx.TickSize !== undefined) {
     if (typeof tx.TickSize !== 'number') {
-      throw new ValidationError('AccountSet: invalid TickSize')
+      throw new ValidationError('AccountSet: invalid field TickSize')
     }
     if (
       tx.TickSize !== 0 &&
       (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
     ) {
-      throw new ValidationError('AccountSet: invalid TickSize')
+      throw new ValidationError('AccountSet: invalid field TickSize')
     }
   }
 }

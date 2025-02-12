@@ -371,7 +371,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
   if (memos !== undefined && !memos.every(isMemo)) {
-    throw new ValidationError('BaseTransaction: invalid Memos')
+    throw new ValidationError('BaseTransaction: invalid field Memos')
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
@@ -381,7 +381,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     signers !== undefined &&
     (signers.length === 0 || !signers.every(isSigner))
   ) {
-    throw new ValidationError('BaseTransaction: invalid Signers')
+    throw new ValidationError('BaseTransaction: invalid field Signers')
   }
 
   validateOptionalField(common, 'SourceTag', isNumber)

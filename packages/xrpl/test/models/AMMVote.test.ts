@@ -68,7 +68,7 @@ describe('AMMVote', function () {
   })
 
   it(`throws w/ TradingFee must be a number`, function () {
-    vote.TradingFee = '25'
+    vote.TradingFee = 'abcd'
     const errorMessage = 'AMMVote: invalid field TradingFee'
     assert.throws(() => validateAMMVote(vote), ValidationError, errorMessage)
     assert.throws(() => validate(vote), ValidationError, errorMessage)

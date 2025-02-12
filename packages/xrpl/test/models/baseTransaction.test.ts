@@ -86,7 +86,7 @@ describe('BaseTransaction', function () {
     const invalidSeq = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      Sequence: '145',
+      Sequence: 'abcd',
     } as any
 
     assert.throws(
@@ -114,7 +114,7 @@ describe('BaseTransaction', function () {
     const invalidLastLedgerSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      LastLedgerSequence: '1000',
+      LastLedgerSequence: 'abcd',
     } as any
 
     assert.throws(
@@ -156,7 +156,7 @@ describe('BaseTransaction', function () {
     const invalidTicketSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      TicketSequence: '1000',
+      TicketSequence: 'abcd',
     } as any
 
     assert.throws(
@@ -190,7 +190,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSigners),
       ValidationError,
-      'BaseTransaction: invalid Signers',
+      'BaseTransaction: invalid field Signers',
     )
 
     const invalidSigners2 = {
@@ -208,7 +208,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSigners2),
       ValidationError,
-      'BaseTransaction: invalid Signers',
+      'BaseTransaction: invalid field Signers',
     )
   })
 
@@ -229,7 +229,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidMemo),
       ValidationError,
-      'BaseTransaction: invalid Memos',
+      'BaseTransaction: invalid field Memos',
     )
   })
 
@@ -237,7 +237,7 @@ describe('BaseTransaction', function () {
     const invalidNetworkID = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      NetworkID: '1024',
+      NetworkID: 'abcd',
     }
     assert.throws(
       () => validateBaseTransaction(invalidNetworkID),

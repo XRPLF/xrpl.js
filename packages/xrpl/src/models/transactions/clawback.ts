@@ -64,7 +64,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
     }
 
     if (!tx.Holder) {
-      throw new ValidationError('Clawback: missing Holder')
+      throw new ValidationError('Clawback: missing field Holder')
     }
   }
 }

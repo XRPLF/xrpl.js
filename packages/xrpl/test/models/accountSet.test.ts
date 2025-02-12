@@ -35,12 +35,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid SetFlag',
+      'AccountSet: invalid field SetFlag',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid SetFlag',
+      'AccountSet: invalid field SetFlag',
     )
   })
 
@@ -50,12 +50,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid SetFlag',
+      'AccountSet: invalid field SetFlag',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid SetFlag',
+      'AccountSet: invalid field SetFlag',
     )
   })
 
@@ -65,12 +65,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid ClearFlag',
+      'AccountSet: invalid field ClearFlag',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid ClearFlag',
+      'AccountSet: invalid field ClearFlag',
     )
   })
 
@@ -80,12 +80,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid Domain',
+      'AccountSet: invalid field Domain',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid Domain',
+      'AccountSet: invalid field Domain',
     )
   })
 
@@ -95,12 +95,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid EmailHash',
+      'AccountSet: invalid field EmailHash',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid EmailHash',
+      'AccountSet: invalid field EmailHash',
     )
   })
 
@@ -110,27 +110,27 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid MessageKey',
+      'AccountSet: invalid field MessageKey',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid MessageKey',
+      'AccountSet: invalid field MessageKey',
     )
   })
 
   it(`throws w/ invalid TransferRate`, function () {
-    account.TransferRate = '1000000001'
+    account.TransferRate = 'abcd'
 
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid TransferRate',
+      'AccountSet: invalid field TransferRate',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid TransferRate',
+      'AccountSet: invalid field TransferRate',
     )
   })
 
@@ -140,12 +140,12 @@ describe('AccountSet', function () {
     assert.throws(
       () => validateAccountSet(account),
       ValidationError,
-      'AccountSet: invalid TickSize',
+      'AccountSet: invalid field TickSize',
     )
     assert.throws(
       () => validate(account),
       ValidationError,
-      'AccountSet: invalid TickSize',
+      'AccountSet: invalid field TickSize',
     )
   })
 

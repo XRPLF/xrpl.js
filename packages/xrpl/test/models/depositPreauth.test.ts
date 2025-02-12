@@ -112,12 +112,12 @@ describe('DepositPreauth', function () {
     assert.throws(
       () => validateDepositPreauth(depositPreauth),
       ValidationError,
-      'DepositPreauth: Authorize must be a string',
+      'DepositPreauth: invalid field Authorize',
     )
     assert.throws(
       () => validate(depositPreauth),
       ValidationError,
-      'DepositPreauth: Authorize must be a string',
+      'DepositPreauth: invalid field Authorize',
     )
   })
 
@@ -135,12 +135,12 @@ describe('DepositPreauth', function () {
     assert.throws(
       () => validateDepositPreauth(depositPreauth),
       ValidationError,
-      'DepositPreauth: Unauthorize must be a string',
+      'DepositPreauth: invalid field Unauthorize',
     )
     assert.throws(
       () => validate(depositPreauth),
       ValidationError,
-      'DepositPreauth: Unauthorize must be a string',
+      'DepositPreauth: invalid field Unauthorize',
     )
   })
 
@@ -159,7 +159,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when AuthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials must be an array'
+    const errorMessage = 'DepositPreauth: invalid field Credentials'
     depositPreauth.AuthorizeCredentials = validCredential
 
     assert.throws(
@@ -171,7 +171,7 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when UnauthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials must be an array'
+    const errorMessage = 'DepositPreauth: invalid field Credentials'
     depositPreauth.UnauthorizeCredentials = validCredential
 
     assert.throws(

@@ -90,12 +90,12 @@ describe('PaymentChannelFund', function () {
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelFund: Channel',
+      'PaymentChannelFund: invalid field Channel',
     )
   })
 
   it(`throws w/ invalid Expiration`, function () {
-    channel.Expiration = '1000'
+    channel.Expiration = 'abcd'
 
     assert.throws(
       () => validatePaymentChannelFund(channel),

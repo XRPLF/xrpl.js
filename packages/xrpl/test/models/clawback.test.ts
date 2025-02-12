@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { validate, ValidationError } from '../../src'
+import { validateClawback } from '../../src/models/transactions/clawback'
 
 /**
  * Clawback Transaction Verification Testing.
@@ -20,6 +21,7 @@ describe('Clawback', function () {
     } as any
 
     assert.doesNotThrow(() => validate(validClawback))
+    assert.doesNotThrow(() => validateClawback(validClawback))
   })
 
   it(`throws w/ missing Amount`, function () {
@@ -47,6 +49,11 @@ describe('Clawback', function () {
       ValidationError,
       'Clawback: invalid field Amount',
     )
+    assert.throws(
+      () => validateClawback(invalidAmount),
+      ValidationError,
+      'Clawback: invalid field Amount',
+    )
 
     const invalidStrAmount = {
       TransactionType: 'Clawback',
@@ -56,6 +63,11 @@ describe('Clawback', function () {
 
     assert.throws(
       () => validate(invalidStrAmount),
+      ValidationError,
+      'Clawback: invalid field Amount',
+    )
+    assert.throws(
+      () => validateClawback(invalidStrAmount),
       ValidationError,
       'Clawback: invalid field Amount',
     )
@@ -74,6 +86,11 @@ describe('Clawback', function () {
 
     assert.throws(
       () => validate(invalidAccount),
+      ValidationError,
+      'Clawback: invalid holder Account',
+    )
+    assert.throws(
+      () => validateClawback(invalidAccount),
       ValidationError,
       'Clawback: invalid holder Account',
     )
@@ -109,6 +126,11 @@ describe('Clawback', function () {
       ValidationError,
       'Clawback: invalid holder Account',
     )
+    assert.throws(
+      () => validateClawback(invalidAccount),
+      ValidationError,
+      'Clawback: invalid holder Account',
+    )
   })
 
   it(`throws w/ invalid Holder`, function () {
@@ -123,6 +145,11 @@ describe('Clawback', function () {
 
     assert.throws(
       () => validate(invalidAccount),
+      ValidationError,
+      'Clawback: missing field Holder',
+    )
+    assert.throws(
+      () => validateClawback(invalidAccount),
       ValidationError,
       'Clawback: missing field Holder',
     )
@@ -142,6 +169,11 @@ describe('Clawback', function () {
 
     assert.throws(
       () => validate(invalidAccount),
+      ValidationError,
+      'Clawback: cannot have Holder for currency',
+    )
+    assert.throws(
+      () => validateClawback(invalidAccount),
       ValidationError,
       'Clawback: cannot have Holder for currency',
     )

@@ -87,8 +87,8 @@ describe('AMMCreate', function () {
   })
 
   it(`throws w/ TradingFee must be a number`, function () {
-    ammCreate.TradingFee = '12'
-    const errorMessage = 'AMMCreate: invalid TradingFee'
+    ammCreate.TradingFee = 'abcd'
+    const errorMessage = 'AMMCreate: invalid field TradingFee'
     assert.throws(
       () => validateAMMCreate(ammCreate),
       ValidationError,

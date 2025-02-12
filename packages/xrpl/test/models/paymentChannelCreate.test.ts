@@ -46,12 +46,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing Amount',
+      'PaymentChannelCreate: missing field Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing Amount',
+      'PaymentChannelCreate: missing field Amount',
     )
   })
 
@@ -76,12 +76,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing SettleDelay',
+      'PaymentChannelCreate: missing field SettleDelay',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing SettleDelay',
+      'PaymentChannelCreate: missing field SettleDelay',
     )
   })
 
@@ -91,12 +91,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing PublicKey',
+      'PaymentChannelCreate: missing field PublicKey',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: missing PublicKey',
+      'PaymentChannelCreate: missing field PublicKey',
     )
   })
 
@@ -106,12 +106,12 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
+      'PaymentChannelCreate: invalid field Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
+      'PaymentChannelCreate: invalid field Amount',
     )
   })
 
@@ -131,17 +131,17 @@ describe('PaymentChannelCreate', function () {
   })
 
   it(`invalid SettleDelay`, function () {
-    channel.SettleDelay = '10'
+    channel.SettleDelay = 'abcd'
 
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: SettleDelay must be a number',
+      'PaymentChannelCreate: invalid field SettleDelay',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: SettleDelay must be a number',
+      'PaymentChannelCreate: invalid field SettleDelay',
     )
   })
 
@@ -151,17 +151,17 @@ describe('PaymentChannelCreate', function () {
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: PublicKey must be a string',
+      'PaymentChannelCreate: invalid field PublicKey',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: PublicKey must be a string',
+      'PaymentChannelCreate: invalid field PublicKey',
     )
   })
 
   it(`invalid DestinationTag`, function () {
-    channel.DestinationTag = '10'
+    channel.DestinationTag = 'abcd'
 
     assert.throws(
       () => validatePaymentChannelCreate(channel),
@@ -176,17 +176,17 @@ describe('PaymentChannelCreate', function () {
   })
 
   it(`invalid CancelAfter`, function () {
-    channel.CancelAfter = '100'
+    channel.CancelAfter = 'abcd'
 
     assert.throws(
       () => validatePaymentChannelCreate(channel),
       ValidationError,
-      'PaymentChannelCreate: CancelAfter must be a number',
+      'PaymentChannelCreate: invalid field CancelAfter',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelCreate: CancelAfter must be a number',
+      'PaymentChannelCreate: invalid field CancelAfter',
     )
   })
 })

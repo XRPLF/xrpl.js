@@ -47,12 +47,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: missing Channel',
+      'PaymentChannelClaim: missing field Channel',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: missing Channel',
+      'PaymentChannelClaim: missing field Channel',
     )
   })
 
@@ -62,12 +62,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Channel must be a string',
+      'PaymentChannelClaim: invalid field Channel',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Channel must be a string',
+      'PaymentChannelClaim: invalid field Channel',
     )
   })
 
@@ -77,12 +77,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
+      'PaymentChannelClaim: invalid field Balance',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
+      'PaymentChannelClaim: invalid field Balance',
     )
   })
 
@@ -92,12 +92,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
+      'PaymentChannelClaim: invalid field Amount',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
+      'PaymentChannelClaim: invalid field Amount',
     )
   })
 
@@ -107,12 +107,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: Signature must be a string',
+      'PaymentChannelClaim: invalid field Signature',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: Signature must be a string',
+      'PaymentChannelClaim: invalid field Signature',
     )
   })
 
@@ -122,12 +122,12 @@ describe('PaymentChannelClaim', function () {
     assert.throws(
       () => validatePaymentChannelClaim(channel),
       ValidationError,
-      'PaymentChannelClaim: PublicKey must be a string',
+      'PaymentChannelClaim: invalid field PublicKey',
     )
     assert.throws(
       () => validate(channel),
       ValidationError,
-      'PaymentChannelClaim: PublicKey must be a string',
+      'PaymentChannelClaim: invalid field PublicKey',
     )
   })
 })

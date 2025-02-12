@@ -183,7 +183,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
     !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
   ) {
-    throw new ValidationError('PaymentTransaction: invalid Paths')
+    throw new ValidationError('Payment: invalid field Paths')
   }
 
   validateOptionalField(tx, 'SendMax', isAmount)
@@ -203,7 +203,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
   if (tx.DeliverMin != null) {
     if (tx.Flags == null) {
       throw new ValidationError(
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+        'Payment: tfPartialPayment flag required with DeliverMin',
       )
     }
 
@@ -216,12 +216,12 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+        'Payment: tfPartialPayment flag required with DeliverMin',
       )
     }
 
     if (!isAmount(tx.DeliverMin)) {
-      throw new ValidationError('PaymentTransaction: invalid DeliverMin')
+      throw new ValidationError('Payment: invalid field DeliverMin')
     }
   }
 }

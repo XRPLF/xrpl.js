@@ -49,40 +49,40 @@ describe('TrustSet', function () {
     assert.throws(
       () => validateTrustSet(trustSet),
       ValidationError,
-      'TrustSet: invalid LimitAmount',
+      'TrustSet: invalid field LimitAmount',
     )
     assert.throws(
       () => validate(trustSet),
       ValidationError,
-      'TrustSet: invalid LimitAmount',
+      'TrustSet: invalid field LimitAmount',
     )
   })
 
   it('throws when QualityIn is not a number', function () {
-    trustSet.QualityIn = '1234'
+    trustSet.QualityIn = 'abcd'
     assert.throws(
       () => validateTrustSet(trustSet),
       ValidationError,
-      'TrustSet: QualityIn must be a number',
+      'TrustSet: invalid field QualityIn',
     )
     assert.throws(
       () => validate(trustSet),
       ValidationError,
-      'TrustSet: QualityIn must be a number',
+      'TrustSet: invalid field QualityIn',
     )
   })
 
   it('throws when QualityOut is not a number', function () {
-    trustSet.QualityOut = '4321'
+    trustSet.QualityOut = 'dcba'
     assert.throws(
       () => validateTrustSet(trustSet),
       ValidationError,
-      'TrustSet: QualityOut must be a number',
+      'TrustSet: invalid field QualityOut',
     )
     assert.throws(
       () => validate(trustSet),
       ValidationError,
-      'TrustSet: QualityOut must be a number',
+      'TrustSet: invalid field QualityOut',
     )
   })
 })

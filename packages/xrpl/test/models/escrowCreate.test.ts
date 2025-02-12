@@ -82,37 +82,37 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: Amount must be a string',
+      'EscrowCreate: invalid field Amount',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: Amount must be a string',
+      'EscrowCreate: invalid field Amount',
     )
   })
 
   it(`invalid CancelAfter`, function () {
-    escrow.CancelAfter = '100'
+    escrow.CancelAfter = 'abcd'
 
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: CancelAfter must be a number',
+      'EscrowCreate: invalid field CancelAfter',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: CancelAfter must be a number',
+      'EscrowCreate: invalid field CancelAfter',
     )
   })
 
   it(`invalid FinishAfter`, function () {
-    escrow.FinishAfter = '1000'
+    escrow.FinishAfter = 'abcd'
 
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: FinishAfter must be a number',
+      'EscrowCreate: invalid field FinishAfter',
     )
   })
 
@@ -122,17 +122,17 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: Condition must be a string',
+      'EscrowCreate: invalid field Condition',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: Condition must be a string',
+      'EscrowCreate: invalid field Condition',
     )
   })
 
   it(`invalid DestinationTag`, function () {
-    escrow.DestinationTag = '100'
+    escrow.DestinationTag = 'abcd'
 
     assert.throws(
       () => validateEscrowCreate(escrow),

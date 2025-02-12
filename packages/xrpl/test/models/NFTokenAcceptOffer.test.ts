@@ -173,7 +173,7 @@ describe('NFTokenAcceptOffer', function () {
     assert.throws(
       () => validate(invalid),
       ValidationError,
-      'NFTokenAcceptOffer: invalid NFTokenBrokerFee',
+      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee',
     )
   })
 })
