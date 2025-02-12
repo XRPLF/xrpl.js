@@ -14,6 +14,7 @@ import {
   validateRequiredField,
   isString,
   isNumber,
+  isRecord,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -145,11 +146,10 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Destination', isAccount)
 
   let isSellOffer = false
-  if (typeof tx.Flags === 'number') {
+  if (isNumber(tx.Flags)) {
     isSellOffer = isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
-  } else if (typeof tx.Flags === 'object') {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Needed here
-    isSellOffer = (tx.Flags as Record<string, unknown>).tfSellNFToken === true
+  } else if (isRecord(tx.Flags)) {
+    isSellOffer = tx.Flags.tfSellNFToken === true
   }
 
   if (isSellOffer) {

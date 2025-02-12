@@ -68,8 +68,13 @@ const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
-
-function isRecord(value: unknown): value is Record<string, unknown> {
+/**
+ * Verify the form and type of an object/record at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
 
@@ -373,7 +378,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateOptionalField(
     common,
     'Flags',
-    (inp) => isNumber(inp) || typeof inp === 'object',
+    (inp) => isNumber(inp) || isRecord(inp),
   )
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS

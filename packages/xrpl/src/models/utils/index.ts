@@ -22,13 +22,7 @@ export function onlyHasFields(
  * @param checkFlag - A specific flag to check if it's enabled within flags.
  * @returns True if checkFlag is enabled within flags.
  */
-export function isFlagEnabled(
-  flags: number | object,
-  checkFlag: number,
-): boolean {
-  if (typeof flags === 'object') {
-    return false
-  }
+export function isFlagEnabled(flags: number, checkFlag: number): boolean {
   // eslint-disable-next-line no-bitwise -- flags need bitwise
   return (BigInt(checkFlag) & BigInt(flags)) === BigInt(checkFlag)
 }
