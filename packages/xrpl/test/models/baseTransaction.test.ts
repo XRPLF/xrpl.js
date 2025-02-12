@@ -59,9 +59,17 @@ describe('BaseTransaction', function () {
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
 
     // check flag map
-    txJson.Flags = { tfSellToken: true }
-    assert.doesNotThrow(() => validateBaseTransaction(txJson))
+
   })
+
+  it('Verifies flag map', function () {
+    const txJson = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: { tfSellToken: true }
+    }
+    assert.doesNotThrow(() => validateBaseTransaction(txJson))
+  }
 
   it(`Verifies only required BaseTransaction`, function () {
     const txJson = {

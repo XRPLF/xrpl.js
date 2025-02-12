@@ -89,7 +89,8 @@ export function isString(str: unknown): str is string {
 }
 
 /**
- * Verify the form and type of a number at runtime.
+ * Verify the form and type of a number at runtime. Includes
+ * numbers in the form of strings (e.g. `"7"`).
  *
  * @param num - The object to check the form and type of.
  * @returns Whether the number is properly formed.
