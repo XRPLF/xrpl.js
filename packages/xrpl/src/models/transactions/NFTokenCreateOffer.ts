@@ -4,7 +4,7 @@ import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
   parseAmountValue,
@@ -33,7 +33,7 @@ export enum NFTokenCreateOfferFlags {
  *
  * @category Transaction Flags
  */
-export interface NFTokenCreateOfferFlagsInterface extends GlobalFlags {
+export interface NFTokenCreateOfferFlagsInterface extends GlobalFlagsInterface {
   tfSellNFToken?: boolean
 }
 
