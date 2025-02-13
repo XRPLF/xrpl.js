@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateCheckCreate } from '../../src/models/transactions/checkCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateCheckCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateCheckCreate, message)
 
 /**
  * CheckCreate Transaction Verification Testing.
@@ -22,8 +24,7 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assert.doesNotThrow(() => validateCheckCreate(validCheck))
-    assert.doesNotThrow(() => validate(validCheck))
+    assertValid(validCheck)
   })
 
   it(`throws w/ invalid Destination`, function () {
@@ -39,16 +40,7 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assert.throws(
-      () => validateCheckCreate(invalidDestination),
-      ValidationError,
-      'CheckCreate: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(invalidDestination),
-      ValidationError,
-      'CheckCreate: invalid field Destination',
-    )
+    assertInvalid(invalidDestination, 'CheckCreate: invalid field Destination')
   })
 
   it(`throws w/ invalid SendMax`, function () {
@@ -64,16 +56,7 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assert.throws(
-      () => validateCheckCreate(invalidSendMax),
-      ValidationError,
-      'CheckCreate: invalid SendMax',
-    )
-    assert.throws(
-      () => validate(invalidSendMax),
-      ValidationError,
-      'CheckCreate: invalid SendMax',
-    )
+    assertInvalid(invalidSendMax, 'CheckCreate: invalid field SendMax')
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
@@ -85,18 +68,12 @@ describe('CheckCreate', function () {
       Expiration: 570113521,
       InvoiceID:
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      DestinationTag: '1',
+      DestinationTag: 'abcd',
       Fee: '12',
     } as any
 
-    assert.throws(
-      () => validateCheckCreate(invalidDestinationTag),
-      ValidationError,
-      'CheckCreate: invalid field DestinationTag',
-    )
-    assert.throws(
-      () => validate(invalidDestinationTag),
-      ValidationError,
+    assertInvalid(
+      invalidDestinationTag,
       'CheckCreate: invalid field DestinationTag',
     )
   })
@@ -107,23 +84,14 @@ describe('CheckCreate', function () {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       SendMax: '100000000',
-      Expiration: '570113521',
+      Expiration: 'abcd',
       InvoiceID:
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
     } as any
 
-    assert.throws(
-      () => validateCheckCreate(invalidExpiration),
-      ValidationError,
-      'CheckCreate: invalid Expiration',
-    )
-    assert.throws(
-      () => validate(invalidExpiration),
-      ValidationError,
-      'CheckCreate: invalid Expiration',
-    )
+    assertInvalid(invalidExpiration, 'CheckCreate: invalid field Expiration')
   })
 
   it(`throws w/ invalid InvoiceID`, function () {
@@ -138,15 +106,6 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assert.throws(
-      () => validateCheckCreate(invalidInvoiceID),
-      ValidationError,
-      'CheckCreate: invalid InvoiceID',
-    )
-    assert.throws(
-      () => validate(invalidInvoiceID),
-      ValidationError,
-      'CheckCreate: invalid InvoiceID',
-    )
+    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid field InvoiceID')
   })
 })

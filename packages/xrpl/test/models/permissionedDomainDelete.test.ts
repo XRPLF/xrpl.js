@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validatePermissionedDomainDelete } from '../../src/models/transactions/permissionedDomainDelete'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validatePermissionedDomainDelete)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePermissionedDomainDelete, message)
 
 /**
  * PermissionedDomainDelete Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validatePermissionedDomainDelete } from '../../src/models/transactions/
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('PermissionedDomainDelete', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -21,29 +24,18 @@ describe('PermissionedDomainDelete', function () {
   })
 
   it('verifies valid PermissionedDomainDelete', function () {
-    assert.doesNotThrow(() => validatePermissionedDomainDelete(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it(`throws w/ missing field DomainID`, function () {
     delete tx.DomainID
     const errorMessage = 'PermissionedDomainDelete: missing field DomainID'
-    assert.throws(
-      () => validatePermissionedDomainDelete(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ invalid DomainID`, function () {
     tx.DomainID = 1234
     const errorMessage = 'PermissionedDomainDelete: invalid field DomainID'
-    assert.throws(
-      () => validatePermissionedDomainDelete(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 })

@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isNumber,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * A TicketCreate transaction sets aside one or more sequence numbers as
@@ -28,20 +33,13 @@ const MAX_TICKETS = 250
  */
 export function validateTicketCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  const { TicketCount } = tx
 
-  if (TicketCount === undefined) {
-    throw new ValidationError('TicketCreate: missing field TicketCount')
-  }
-
-  if (typeof TicketCount !== 'number') {
-    throw new ValidationError('TicketCreate: TicketCount must be a number')
-  }
-
+  validateRequiredField(tx, 'TicketCount', isNumber)
+  const ticketCount = Number(tx.TicketCount)
   if (
-    !Number.isInteger(TicketCount) ||
-    TicketCount < 1 ||
-    TicketCount > MAX_TICKETS
+    !Number.isInteger(ticketCount) ||
+    ticketCount < 1 ||
+    ticketCount > MAX_TICKETS
   ) {
     throw new ValidationError(
       'TicketCreate: TicketCount must be an integer from 1 to 250',
