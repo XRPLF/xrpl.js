@@ -5,6 +5,7 @@ import {
   AccountRootFlags,
 } from '../ledger/AccountRoot'
 import { AccountSetTfFlags } from '../transactions/accountSet'
+import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BatchFlags } from '../transactions/batch'
@@ -49,6 +50,7 @@ export function parseAccountRootFlags(
 
 const txToFlag = {
   AccountSet: AccountSetTfFlags,
+  AMMClawback: AMMClawbackFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
   Batch: BatchFlags,
