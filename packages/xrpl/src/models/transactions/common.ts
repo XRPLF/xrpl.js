@@ -354,15 +354,10 @@ export interface BaseTransaction {
  * @throws When the common param is malformed.
  */
 export function validateBaseTransaction(common: Record<string, unknown>): void {
-  if (common.TransactionType === undefined) {
-    throw new ValidationError('BaseTransaction: missing field TransactionType')
-  }
+  validateRequiredField(common, 'TransactionType', isString)
 
-  if (typeof common.TransactionType !== 'string') {
-    throw new ValidationError('BaseTransaction: TransactionType not string')
-  }
-
-  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Checked above
+  if (!TRANSACTION_TYPES.includes(common.TransactionType as string)) {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 

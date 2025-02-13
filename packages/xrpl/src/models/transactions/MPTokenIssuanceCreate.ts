@@ -130,19 +130,19 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 
-  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
+  if (isString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
     throw new ValidationError(
       'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
     )
   }
 
-  if (typeof tx.MPTokenMetadata === 'string' && !isHex(tx.MPTokenMetadata)) {
+  if (isString(tx.MPTokenMetadata) && !isHex(tx.MPTokenMetadata)) {
     throw new ValidationError(
       'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
     )
   }
 
-  if (typeof tx.MaximumAmount === 'string') {
+  if (isString(tx.MaximumAmount)) {
     if (!INTEGER_SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
@@ -157,13 +157,11 @@ export function validateMPTokenIssuanceCreate(
 
   if (typeof tx.TransferFee === 'number') {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-    const flags = (tx.Flags ?? 0) as
-      | number
-      | MPTokenIssuanceCreateFlagsInterface
+    const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
     const isTfMPTCanTransfer =
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-        : flags.tfMPTCanTransfer ?? false
+        : flags.tfMPTCanTransfer === true
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(

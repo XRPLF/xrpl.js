@@ -69,16 +69,16 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Holder', isAccount)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-  const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
-  const isTfMPTLock =
+  const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
+  const isTfMPTLock: boolean =
     typeof flags === 'number'
       ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : flags.tfMPTLock ?? false
+      : flags.tfMPTLock === true
 
   const isTfMPTUnlock =
     typeof flags === 'number'
       ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : flags.tfMPTUnlock ?? false
+      : flags.tfMPTUnlock === true
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
