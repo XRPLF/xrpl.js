@@ -7,15 +7,18 @@
         "hostid",
         "keypair",
         "keypairs",
+        "mptoken",
         "multisign",
         "multisigned",
         "multisigning",
+        "Permissioned",
         "preauthorization",
         "rippletest",
         "secp256k1",
         "Setf",
         "Sidechains",
-        "xchain"
+        "xchain",
+        "xrplf"
     ],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

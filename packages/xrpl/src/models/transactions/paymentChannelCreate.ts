@@ -1,10 +1,9 @@
-import { ValidationError } from '../../errors'
-
 import {
   Account,
   BaseTransaction,
   isAccount,
   isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -31,6 +30,11 @@ export interface PaymentChannelCreate extends BaseTransaction {
    */
   Destination: Account
   /**
+   * Arbitrary tag to further specify the destination for this payment channel,
+   * such as a hosted recipient at the destination address.
+   */
+  DestinationTag?: number
+  /**
    * Amount of time the source address must wait before closing the channel if
    * it has unclaimed XRP.
    */
@@ -49,11 +53,6 @@ export interface PaymentChannelCreate extends BaseTransaction {
    * this time.
    */
   CancelAfter?: number
-  /**
-   * Arbitrary tag to further specify the destination for this payment channel,
-   * such as a hosted recipient at the destination address.
-   */
-  DestinationTag?: number
 }
 
 /**
@@ -67,40 +66,10 @@ export function validatePaymentChannelCreate(
 ): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing Amount')
-  }
-
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelCreate: Amount must be a string')
-  }
-
+  validateRequiredField(tx, 'Amount', isString)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
-  if (tx.SettleDelay === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing SettleDelay')
-  }
-
-  if (typeof tx.SettleDelay !== 'number') {
-    throw new ValidationError(
-      'PaymentChannelCreate: SettleDelay must be a number',
-    )
-  }
-
-  if (tx.PublicKey === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing PublicKey')
-  }
-
-  if (typeof tx.PublicKey !== 'string') {
-    throw new ValidationError(
-      'PaymentChannelCreate: PublicKey must be a string',
-    )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError(
-      'PaymentChannelCreate: CancelAfter must be a number',
-    )
-  }
+  validateRequiredField(tx, 'SettleDelay', isNumber)
+  validateRequiredField(tx, 'PublicKey', isString)
+  validateOptionalField(tx, 'CancelAfter', isNumber)
 }
