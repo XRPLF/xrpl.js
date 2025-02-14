@@ -1,4 +1,5 @@
 import { validateAccountSet } from '../../src/models/transactions/accountSet'
+import { isNumberWithBounds } from '../../src/models/transactions/common'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateAccountSet)

@@ -1,4 +1,3 @@
-import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
@@ -6,6 +5,7 @@ import {
   BaseTransaction,
   isCurrency,
   isNumber,
+  isNumberWithBounds,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -48,11 +48,9 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Asset', isCurrency)
   validateRequiredField(tx, 'Asset2', isCurrency)
   validateRequiredField(tx, 'TradingFee', isNumber)
-
-  const tradingFee = Number(tx.TradingFee)
-  if (tradingFee < 0 || tradingFee > AMM_MAX_TRADING_FEE) {
-    throw new ValidationError(
-      `AMMVote: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
-    )
-  }
+  validateRequiredField(
+    tx,
+    'TradingFee',
+    isNumberWithBounds(0, AMM_MAX_TRADING_FEE),
+  )
 }

@@ -70,13 +70,13 @@ describe('AMMCreate', function () {
 
   it(`throws when TradingFee is greater than 1000`, function () {
     ammCreate.TradingFee = 1001
-    const errorMessage = 'AMMCreate: TradingFee must be between 0 and 1000'
+    const errorMessage = 'AMMCreate: invalid field TradingFee'
     assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     ammCreate.TradingFee = -1
-    const errorMessage = 'AMMCreate: TradingFee must be between 0 and 1000'
+    const errorMessage = 'AMMCreate: invalid field TradingFee'
     assertInvalid(ammCreate, errorMessage)
   })
 })

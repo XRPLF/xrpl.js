@@ -5,6 +5,7 @@ import {
   BaseTransaction,
   isAccount,
   isNumber,
+  isNumberWithBounds,
   isString,
   validateBaseTransaction,
   validateOptionalField,
@@ -202,15 +203,9 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'TransferRate', isNumber)
 
-  if (tx.TickSize !== undefined) {
-    if (typeof tx.TickSize !== 'number') {
-      throw new ValidationError('AccountSet: invalid field TickSize')
-    }
-    if (
-      tx.TickSize !== 0 &&
-      (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
-    ) {
-      throw new ValidationError('AccountSet: invalid field TickSize')
-    }
-  }
+  validateOptionalField(
+    tx,
+    'TickSize',
+    isNumberWithBounds(MIN_TICK_SIZE, MAX_TICK_SIZE),
+  )
 }

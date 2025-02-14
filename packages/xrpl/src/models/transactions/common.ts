@@ -96,7 +96,29 @@ export function isString(str: unknown): str is string {
  * @returns Whether the number is properly formed.
  */
 export function isNumber(num: unknown): num is number {
-  return typeof num === 'number' || !Number.isNaN(Number(num))
+  return (
+    (typeof num === 'number' || !Number.isNaN(Number(num))) &&
+    Number.isInteger(Number(num))
+  )
+}
+
+/**
+ * Verify the form and type of a number at runtime. Includes
+ * numbers in the form of strings (e.g. `"7"`).
+ *
+ * @param num - The object to check the form and type of.
+ * @param lower
+ * @param upper
+ * @returns Whether the number is properly formed.
+ */
+export function isNumberWithBounds(
+  lower: number,
+  upper: number,
+): (num: unknown) => num is number {
+  // eslint-disable-next-line func-style -- returning a function
+  const func = (num: unknown): num is number =>
+    isNumber(num) && num >= lower && num <= upper
+  return func
 }
 
 /**

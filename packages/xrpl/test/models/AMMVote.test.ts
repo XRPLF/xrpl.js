@@ -71,13 +71,13 @@ describe('AMMVote', function () {
 
   it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
     vote.TradingFee = 1001
-    const errorMessage = 'AMMVote: TradingFee must be between 0 and 1000'
+    const errorMessage = 'AMMVote: invalid field TradingFee'
     assertInvalid(vote, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     vote.TradingFee = -1
-    const errorMessage = 'AMMVote: TradingFee must be between 0 and 1000'
+    const errorMessage = 'AMMVote: invalid field TradingFee'
     assertInvalid(vote, errorMessage)
   })
 })
