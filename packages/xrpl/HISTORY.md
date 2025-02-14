@@ -4,10 +4,12 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 4.2.0 (2025-2-13)
+
 ### Added
 * Support for the AMMClawback amendment (XLS-73)
 * Adds utility function `convertTxFlagsToNumber`
-* Implementation of XLS-80d PermissionedDomain feature.
+* Support for the Permissioned Domains amendment (XLS-80).
 * Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
 * Support for XLS-77d Deep-Freeze amendment
 
@@ -16,7 +18,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Include `network_id` field in the `server_state` response interface.
-
 
 ## 4.1.0 (2024-12-23)
 
