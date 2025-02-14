@@ -103,13 +103,13 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
- * Verify the form and type of a number at runtime. Includes
- * numbers in the form of strings (e.g. `"7"`).
+ * Verify the form and type of a number at runtime, and ensures that the
+ * number is within the provided bounds. Includes numbers in the form of
+ * strings (e.g. `"7"`).
  *
- * @param num - The object to check the form and type of.
- * @param lower
- * @param upper
- * @returns Whether the number is properly formed.
+ * @param lower The lower bound (inclusive).
+ * @param upper The upper bound (inclusive).
+ * @returns Whether the number is properly formed and within the bounds.
  */
 export function isNumberWithBounds(
   lower: number,
@@ -117,7 +117,7 @@ export function isNumberWithBounds(
 ): (num: unknown) => num is number {
   // eslint-disable-next-line func-style -- returning a function
   const func = (num: unknown): num is number =>
-    isNumber(num) && num >= lower && num <= upper
+    isNumber(num) && Number(num) >= lower && Number(num) <= upper
   return func
 }
 
