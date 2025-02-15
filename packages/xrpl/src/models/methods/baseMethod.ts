@@ -3,7 +3,6 @@ import { LedgerIndex } from '../common'
 import type { Request } from '.'
 
 export interface BaseRequest {
-  [x: string]: unknown
   /**
    * A unique value to identify this request. The response to this request uses
    * the same id field. This way, even if responses arrive out of order, you
