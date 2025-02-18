@@ -60,6 +60,7 @@ describe('server_state', function () {
             load_factor_fee_queue: 256,
             load_factor_fee_reference: 256,
             load_factor_server: 256,
+            network_id: 63456,
             peer_disconnects: '0',
             peer_disconnects_resources: '0',
             peers: 0,

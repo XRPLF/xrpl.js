@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.3.0 (2025-2-13)
+
+### Added
+* Support for the AMMClawback amendment (XLS-73)
+* Support for the Permissioned Domains amendment (XLS-80).
+
 ## 2.2.0 (2024-12-23)
 
 ### Added

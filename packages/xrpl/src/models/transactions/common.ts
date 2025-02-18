@@ -9,15 +9,15 @@ import {
   AuthorizeCredential,
   Currency,
   IssuedCurrencyAmount,
+  MPTAmount,
   Memo,
   Signer,
   XChainBridge,
-  MPTAmount,
 } from '../common'
 import { onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
-const MAX_CREDENTIALS_LIST_LENGTH = 8
+export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
@@ -134,7 +134,9 @@ export function isIssuedCurrency(
  * @param input - The input to check the form and type of
  * @returns Whether the AuthorizeCredential is properly formed
  */
-function isAuthorizeCredential(input: unknown): input is AuthorizeCredential {
+export function isAuthorizeCredential(
+  input: unknown,
+): input is AuthorizeCredential {
   return (
     isRecord(input) &&
     isRecord(input.Credential) &&
@@ -455,13 +457,16 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param credentials An array of credential IDs to check for errors
  * @param transactionType The transaction type to include in error messages
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
+ * @param maxCredentials The maximum length of the credentials array.
+ *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-lines-per-function, max-params -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
+  maxCredentials: number,
 ): void {
   if (credentials == null) {
     return
@@ -471,9 +476,9 @@ export function validateCredentialsList(
       `${transactionType}: Credentials must be an array`,
     )
   }
-  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
+  if (credentials.length > maxCredentials) {
     throw new ValidationError(
-      `${transactionType}: Credentials length cannot exceed ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
+      `${transactionType}: Credentials length cannot exceed ${maxCredentials} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(
@@ -500,7 +505,42 @@ export function validateCredentialsList(
   }
 }
 
-function containsDuplicates(objectList: object[]): boolean {
-  const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
-  return objSet.size !== objectList.length
+// Type guard to ensure we're working with AuthorizeCredential[]
+// Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
+function isAuthorizeCredentialArray(
+  list: AuthorizeCredential[] | string[],
+): list is AuthorizeCredential[] {
+  return typeof list[0] !== 'string'
+}
+
+/**
+ * Check if an array of objects contains any duplicates.
+ *
+ * @param objectList - Array of objects to check for duplicates
+ * @returns True if duplicates exist, false otherwise
+ */
+export function containsDuplicates(
+  objectList: AuthorizeCredential[] | string[],
+): boolean {
+  // Case-1: Process a list of string-IDs
+  if (typeof objectList[0] === 'string') {
+    const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+    return objSet.size !== objectList.length
+  }
+
+  // Case-2: Process a list of nested objects
+  const seen = new Set<string>()
+
+  if (isAuthorizeCredentialArray(objectList)) {
+    for (const item of objectList) {
+      const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
+      // eslint-disable-next-line max-depth -- necessary to check for type-guards
+      if (seen.has(key)) {
+        return true
+      }
+      seen.add(key)
+    }
+  }
+
+  return false
 }
