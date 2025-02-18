@@ -53,6 +53,7 @@ describe('server_info (rippled)', function () {
               threads: 1,
             },
             load_factor: 1,
+            network_id: 63456,
             peer_disconnects: '0',
             peer_disconnects_resources: '0',
             peers: 0,
