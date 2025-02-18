@@ -280,3 +280,7 @@ We have a low-traffic mailing list for announcements of new `xrpl.js` releases. 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
 - [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
+
+## Troubleshooting steps
+
+If you encounter errors related to dependencies in the `npm run build` step, execute: `npm install`. If the error persists despite a successful execution of `npm i`, execute `npm run clean && npm install`.
