@@ -108,7 +108,7 @@ export interface NFTokenMint extends BaseTransaction {
    */
   URI?: string | null
   /**
-   * Indicates the amount for the Token.
+   * Indicates the amount expected for the Token.
    *
    * The amount can be zero. This would indicate that the account is giving
    * the token away free, either to anyone at all, or to the account identified
