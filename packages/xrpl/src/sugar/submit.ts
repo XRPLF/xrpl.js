@@ -1,5 +1,3 @@
-import { decode, encode } from 'ripple-binary-codec'
-
 import type {
   APIVersion,
   Client,
@@ -14,6 +12,7 @@ import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { BaseTransaction } from '../models/transactions/common'
+import { decode, encode } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
 const LEDGER_CLOSE_TIME = 1000
@@ -56,7 +55,7 @@ export async function submitRequest<
   failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
-    throw new ValidationError('Transaction must be signed')
+    throw new ValidationError('Transaction must be signed.')
   }
 
   const signedTxEncoded =

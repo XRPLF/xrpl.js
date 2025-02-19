@@ -39,10 +39,15 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
+  SimulateRequest,
   BaseRequest,
 } from '../models/methods'
 import { AccountTxResponseBase } from '../models/methods/accountTx'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
+import {
+  SimulateBinaryResponse,
+  SimulateJsonResponse,
+} from '../models/methods/simulate'
 import type {
   EventTypes,
   OnEventToListenerMap,
@@ -785,6 +790,41 @@ class Client<
   ): Promise<SubmitResponse> {
     const signedTx = await getSignedTx(this, transaction, opts)
     return submitRequest(this, signedTx, opts?.failHard)
+  }
+
+  /**
+   * Simulates an unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
+   * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.binary - If true, return the metadata in a binary encoding.
+   *
+   * @returns A promise that contains SimulateResponse.
+   * @throws RippledError if the simulate request fails.
+   */
+
+  public async simulate<Binary extends boolean = false>(
+    transaction: SubmittableTransaction | string,
+    opts?: {
+      // If true, return the binary-encoded representation of the results.
+      binary?: Binary
+    },
+  ): Promise<
+    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
+  > {
+    // send request
+    const binary = opts?.binary ?? false
+    const request: SimulateRequest =
+      typeof transaction === 'string'
+        ? { command: 'simulate', tx_blob: transaction, binary }
+        : { command: 'simulate', tx_json: transaction, binary }
+    return this.request(request)
   }
 
   /**
