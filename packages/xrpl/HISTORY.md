@@ -11,7 +11,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
 ### Added
-* Support for XLS-52 (NFTokenMintOffer)
+* Support for `NFTokenMintOffer` (XLS-52)
 
 ## 4.1.0 (2024-12-23)
 
