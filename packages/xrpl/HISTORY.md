@@ -5,13 +5,22 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Support for `NFTokenMintOffer` (XLS-52)
+
+## 4.2.0 (2025-2-13)
+
+### Added
+* Support for the AMMClawback amendment (XLS-73)
 * Adds utility function `convertTxFlagsToNumber`
+* Support for the Permissioned Domains amendment (XLS-80).
+* Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
+* Support for XLS-77d Deep-Freeze amendment
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
 
-### Added
-* Support for `NFTokenMintOffer` (XLS-52)
+### Fixed
+* Include `network_id` field in the `server_state` response interface.
 
 ## 4.1.0 (2024-12-23)
 

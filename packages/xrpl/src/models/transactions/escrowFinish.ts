@@ -7,6 +7,7 @@ import {
   validateBaseTransaction,
   validateCredentialsList,
   validateRequiredField,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -55,6 +56,7 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
     tx.TransactionType as string,
     true,
+    MAX_AUTHORIZED_CREDENTIALS,
   )
 
   if (tx.OfferSequence == null) {
