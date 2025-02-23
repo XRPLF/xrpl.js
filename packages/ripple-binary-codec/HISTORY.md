@@ -2,10 +2,22 @@
 
 ## Unreleased
 
+## 2.3.0 (2025-2-13)
+
+### Added
+* Support for the AMMClawback amendment (XLS-73)
+* Support for the Permissioned Domains amendment (XLS-80).
+
+## 2.2.0 (2024-12-23)
+
+### Added
+* Support for the Multi-Purpose Token amendment (XLS-33)
+
 ## 2.1.0 (2024-06-03)
 
 ### Added
 * Support for the Price Oracles amendment (XLS-47).
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * Better error handling/error messages for serialization/deserialization errors.

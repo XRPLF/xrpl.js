@@ -1,5 +1,11 @@
 import { Client, Payment } from '../../src'
 
+// Prerequisites for this snippet. Please verify these conditions after a reset of the
+// test network:
+// - destination_account must have a trust line with the destination_amount.issuer
+// - There must be appropriate DEX Offers or XRP/TST AMM for the cross-currency exchange
+
+// PathFind RPC requires the use of a Websocket client only
 const client = new Client('wss://s.altnet.rippletest.net:51233')
 
 async function createTxWithPaths(): Promise<void> {
@@ -8,22 +14,17 @@ async function createTxWithPaths(): Promise<void> {
   const { wallet } = await client.fundWallet(null, {
     usageContext: 'code snippets',
   })
-  const destination_account = 'rKT4JX4cCof6LcDYRz8o3rGRu7qxzZ2Zwj'
+  const destination_account = 'rJPeZVPty1bXXbDR9oKscg2irqABr7sP3t'
   const destination_amount = {
     value: '0.001',
-    currency: 'USD',
-    issuer: 'rVnYNK9yuxBz4uP8zC8LEFokM2nqH3poc',
+    currency: 'TST',
+    issuer: 'rP9jPyP5kyvFRb6ZiRghAGw5u8SGAmU4bd',
   }
 
   const resp = await client.request({
-    // TOOD: Replace with path_find - https://github.com/XRPLF/xrpl.js/issues/2385
-    command: 'ripple_path_find',
+    command: 'path_find',
+    subcommand: 'create',
     source_account: wallet.classicAddress,
-    source_currencies: [
-      {
-        currency: 'XRP',
-      },
-    ],
     destination_account,
     destination_amount,
   })

@@ -77,4 +77,8 @@ export enum RippleStateFlags {
   lsfHighFreeze = 0x00800000,
   // True, trust line to AMM. Used by client apps to identify payments via AMM.
   lsfAMMNode = 0x01000000,
+  // True, low side has set deep freeze flag
+  lsfLowDeepFreeze = 0x02000000,
+  // True, high side has set deep freeze flag
+  lsfHighDeepFreeze = 0x04000000,
 }

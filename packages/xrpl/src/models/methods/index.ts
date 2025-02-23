@@ -148,6 +148,14 @@ import {
   StateAccountingFinal,
 } from './serverInfo'
 import { ServerStateRequest, ServerStateResponse } from './serverState'
+import {
+  SimulateBinaryRequest,
+  SimulateBinaryResponse,
+  SimulateJsonRequest,
+  SimulateJsonResponse,
+  SimulateRequest,
+  SimulateResponse,
+} from './simulate'
 import { SubmitRequest, SubmitResponse } from './submit'
 import {
   SubmitMultisignedRequest,
@@ -168,6 +176,7 @@ import {
   SubscribeRequest,
   SubscribeResponse,
   TransactionStream,
+  TransactionV1Stream,
   ValidationStream,
 } from './subscribe'
 import {
@@ -202,6 +211,7 @@ type Request =
   | LedgerDataRequest
   | LedgerEntryRequest
   // transaction methods
+  | SimulateRequest
   | SubmitRequest
   | SubmitMultisignedRequest
   | TransactionEntryRequest
@@ -260,6 +270,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | LedgerDataResponse
   | LedgerEntryResponse
   // transaction methods
+  | SimulateResponse
   | SubmitResponse
   | SubmitMultisignedVersionResponseMap<Version>
   | TransactionEntryResponse
@@ -397,6 +408,12 @@ export type RequestResponseMap<
   ? LedgerDataResponse
   : T extends LedgerEntryRequest
   ? LedgerEntryResponse
+  : T extends SimulateBinaryRequest
+  ? SimulateBinaryResponse
+  : T extends SimulateJsonRequest
+  ? SimulateJsonResponse
+  : T extends SimulateRequest
+  ? SimulateJsonResponse
   : T extends SubmitRequest
   ? SubmitResponse
   : T extends SubmitMultisignedRequest
@@ -543,6 +560,8 @@ export {
   LedgerEntryRequest,
   LedgerEntryResponse,
   // transaction methods with types
+  SimulateRequest,
+  SimulateResponse,
   SubmitRequest,
   SubmitResponse,
   SubmitMultisignedRequest,
@@ -583,6 +602,7 @@ export {
   LedgerStreamResponse,
   ValidationStream,
   TransactionStream,
+  TransactionV1Stream,
   PathFindStream,
   PeerStatusStream,
   OrderBookStream,
