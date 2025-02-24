@@ -29,7 +29,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.0",
+    "@xrplf/isomorphic": "^1.0.1",
     "ripple-keypairs": "^2.0.0"
   },
   "prettier": "@xrplf/prettier-config",

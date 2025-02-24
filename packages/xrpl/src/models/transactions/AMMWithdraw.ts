@@ -3,7 +3,7 @@ import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
   isCurrency,
   isIssuedCurrency,
@@ -25,7 +25,7 @@ export enum AMMWithdrawFlags {
   tfLimitLPToken = 0x00400000,
 }
 
-export interface AMMWithdrawFlagsInterface extends GlobalFlags {
+export interface AMMWithdrawFlagsInterface extends GlobalFlagsInterface {
   tfLPToken?: boolean
   tfWithdrawAll?: boolean
   tfOneAssetWithdrawAll?: boolean

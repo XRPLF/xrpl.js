@@ -1,10 +1,12 @@
+/* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { Transaction } from '../models/transactions'
+import { Batch, Payment, Transaction } from '../models/transactions'
+import { GlobalFlags } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -207,6 +209,20 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
   }
 }
 
+// Helper function to get the next valid sequence number for an account.
+async function getNextValidSequenceNumber(
+  client: Client,
+  account: string,
+): Promise<number> {
+  const request: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+    ledger_index: 'current',
+  }
+  const data = await client.request(request)
+  return data.result.account_data.Sequence
+}
+
 /**
  * Sets the next valid sequence number for a transaction.
  *
@@ -219,14 +235,8 @@ export async function setNextValidSequenceNumber(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account: tx.Account,
-    ledger_index: 'current',
-  }
-  const data = await client.request(request)
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
-  tx.Sequence = data.result.account_data.Sequence
+  tx.Sequence = await getNextValidSequenceNumber(client, tx.Account)
 }
 
 /**
@@ -274,13 +284,16 @@ export async function calculateFeePerTransactionType(
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
-  }
-
-  if (
+  } else if (
     tx.TransactionType === 'AccountDelete' ||
     tx.TransactionType === 'AMMCreate'
   ) {
     baseFee = await fetchAccountDeleteFee(client)
+  } else if (tx.TransactionType === 'Batch') {
+    baseFee = BigNumber.sum(
+      baseFee.times(2),
+      baseFee.times(tx.RawTransactions.length + (tx.BatchSigners?.length ?? 0)),
+    )
   }
 
   /*
@@ -358,4 +371,120 @@ export async function checkAccountDeleteBlockers(
     }
     resolve()
   })
+}
+/**
+ * Replaces Amount with DeliverMax if needed.
+ *
+ * @param tx - The transaction object.
+ * @throws ValidationError if Amount and DeliverMax are both provided but do not match.
+ */
+export function handleDeliverMax(tx: Payment): void {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+  // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+  if (tx.DeliverMax != null) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount == null) {
+      // If only DeliverMax is provided, use it to populate the Amount field
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-param-reassign -- known RPC-level property
+      tx.Amount = tx.DeliverMax
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+      throw new ValidationError(
+        'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
+    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    // eslint-disable-next-line no-param-reassign -- needed here
+    delete tx.DeliverMax
+  }
+}
+
+/**
+ * Autofills all the relevant `x` fields.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
+ */
+// eslint-disable-next-line complexity, max-lines-per-function, max-statements -- needed here, lots to check
+export async function autofillBatchTxn(
+  client: Client,
+  tx: Batch,
+): Promise<void> {
+  const accountSequences: Record<string, number> = {}
+
+  for await (const rawTxn of tx.RawTransactions) {
+    const txn = rawTxn.RawTransaction
+
+    // Flag processing
+    /* eslint-disable no-bitwise -- needed here for flag parsing */
+    if (txn.Flags == null) {
+      txn.Flags = GlobalFlags.tfInnerBatchTxn
+    } else if (typeof txn.Flags === 'number') {
+      if (!((txn.Flags & GlobalFlags.tfInnerBatchTxn) === 0)) {
+        txn.Flags |= GlobalFlags.tfInnerBatchTxn
+      }
+    } else if (!txn.Flags.tfInnerBatchTxn) {
+      txn.Flags.tfInnerBatchTxn = true
+    }
+    /* eslint-enable no-bitwise */
+
+    // Sequence processing
+    if (txn.Sequence == null && txn.TicketSequence == null) {
+      if (txn.Account in accountSequences) {
+        txn.Sequence = accountSequences[txn.Account]
+        accountSequences[txn.Account] += 1
+      } else {
+        const nextSequence = await getNextValidSequenceNumber(
+          client,
+          txn.Account,
+        )
+        const sequence =
+          txn.Account === tx.Account ? nextSequence + 1 : nextSequence
+        accountSequences[txn.Account] = sequence + 1
+        txn.Sequence = sequence
+      }
+    }
+
+    if (txn.Fee == null) {
+      txn.Fee = '0'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+    } else if (txn.Fee !== '0') {
+      throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
+    }
+
+    if (txn.SigningPubKey == null) {
+      txn.SigningPubKey = ''
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+    } else if (txn.SigningPubKey !== '') {
+      throw new XrplError(
+        'Must have `SigningPubKey` of "" in inner Batch transaction.',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+    if (txn.TxnSignature != null) {
+      throw new XrplError(
+        'Must not have `TxnSignature` in inner Batch transaction.',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
+    if (txn.Signers != null) {
+      throw new XrplError('Must not have `Signers` in inner Batch transaction.')
+    }
+
+    if (txn.NetworkID == null) {
+      txn.NetworkID = txNeedsNetworkID(client) ? client.networkID : undefined
+    }
+  }
 }
