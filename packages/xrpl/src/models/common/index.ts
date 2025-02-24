@@ -201,7 +201,7 @@ export interface PriceData {
      * The asset price after applying the Scale precision level. It's not included if the last update transaction didn't include
      * the BaseAsset/QuoteAsset pair.
      */
-    AssetPrice?: number | string
+    AssetPrice?: bigint | number | string
 
     /**
      * The scaling factor to apply to an asset price. For example, if Scale is 6 and original price is 0.155, then the scaled
