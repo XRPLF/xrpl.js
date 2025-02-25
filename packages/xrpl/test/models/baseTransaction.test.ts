@@ -10,7 +10,7 @@ import { validateBaseTransaction } from '../../src/models/transactions/common'
  */
 describe('BaseTransaction', function () {
   it(`Verifies all optional BaseTransaction`, function () {
-    const txJson = {
+    const txJson: any = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
       Fee: '12',
@@ -59,6 +59,15 @@ describe('BaseTransaction', function () {
     assert.doesNotThrow(() => validateBaseTransaction(txJson))
   })
 
+  it('Verifies flag map', function () {
+    const txJson = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: { tfSellToken: true },
+    }
+    assert.doesNotThrow(() => validateBaseTransaction(txJson))
+  })
+
   it(`Verifies only required BaseTransaction`, function () {
     const txJson = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
@@ -86,7 +95,7 @@ describe('BaseTransaction', function () {
     const invalidSeq = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      Sequence: '145',
+      Sequence: 'abcd',
     } as any
 
     assert.throws(
@@ -114,7 +123,7 @@ describe('BaseTransaction', function () {
     const invalidLastLedgerSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      LastLedgerSequence: '1000',
+      LastLedgerSequence: 'abcd',
     } as any
 
     assert.throws(
@@ -138,6 +147,20 @@ describe('BaseTransaction', function () {
     )
   })
 
+  it(`Handles invalid Flags`, function () {
+    const invalidFlags = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: 'abcd',
+    } as any
+
+    assert.throws(
+      () => validateBaseTransaction(invalidFlags),
+      ValidationError,
+      'Payment: invalid field Flags',
+    )
+  })
+
   it(`Handles invalid SigningPubKey`, function () {
     const invalidSigningPubKey = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
@@ -156,7 +179,7 @@ describe('BaseTransaction', function () {
     const invalidTicketSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      TicketSequence: '1000',
+      TicketSequence: 'abcd',
     } as any
 
     assert.throws(
@@ -190,7 +213,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSigners),
       ValidationError,
-      'BaseTransaction: invalid Signers',
+      'BaseTransaction: invalid field Signers',
     )
 
     const invalidSigners2 = {
@@ -208,7 +231,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidSigners2),
       ValidationError,
-      'BaseTransaction: invalid Signers',
+      'BaseTransaction: invalid field Signers',
     )
   })
 
@@ -229,7 +252,7 @@ describe('BaseTransaction', function () {
     assert.throws(
       () => validateBaseTransaction(invalidMemo),
       ValidationError,
-      'BaseTransaction: invalid Memos',
+      'BaseTransaction: invalid field Memos',
     )
   })
 
@@ -237,7 +260,7 @@ describe('BaseTransaction', function () {
     const invalidNetworkID = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      NetworkID: '1024',
+      NetworkID: 'abcd',
     }
     assert.throws(
       () => validateBaseTransaction(invalidNetworkID),

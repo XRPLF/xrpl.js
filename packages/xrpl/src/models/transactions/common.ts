@@ -68,8 +68,13 @@ const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
-
-function isRecord(value: unknown): value is Record<string, unknown> {
+/**
+ * Verify the form and type of an object/record at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
 
@@ -84,13 +89,36 @@ export function isString(str: unknown): str is string {
 }
 
 /**
- * Verify the form and type of a number at runtime.
+ * Verify the form and type of a number at runtime. Includes
+ * numbers in the form of strings (e.g. `"7"`).
  *
  * @param num - The object to check the form and type of.
  * @returns Whether the number is properly formed.
  */
 export function isNumber(num: unknown): num is number {
-  return typeof num === 'number'
+  return (
+    (typeof num === 'number' || !Number.isNaN(Number(num))) &&
+    Number.isInteger(Number(num))
+  )
+}
+
+/**
+ * Verify the form and type of a number at runtime, and ensures that the
+ * number is within the provided bounds. Includes numbers in the form of
+ * strings (e.g. `"7"`).
+ *
+ * @param lower The lower bound (inclusive).
+ * @param upper The upper bound (inclusive).
+ * @returns Whether the number is properly formed and within the bounds.
+ */
+export function isNumberWithBounds(
+  lower: number,
+  upper: number,
+): (num: unknown) => num is number {
+  // eslint-disable-next-line func-style -- returning a function
+  const func = (num: unknown): num is number =>
+    isNumber(num) && Number(num) >= lower && Number(num) <= upper
+  return func
 }
 
 /**
@@ -348,15 +376,10 @@ export interface BaseTransaction {
  * @throws When the common param is malformed.
  */
 export function validateBaseTransaction(common: Record<string, unknown>): void {
-  if (common.TransactionType === undefined) {
-    throw new ValidationError('BaseTransaction: missing field TransactionType')
-  }
+  validateRequiredField(common, 'TransactionType', isString)
 
-  if (typeof common.TransactionType !== 'string') {
-    throw new ValidationError('BaseTransaction: TransactionType not string')
-  }
-
-  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Checked above
+  if (!TRANSACTION_TYPES.includes(common.TransactionType as string)) {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
@@ -370,10 +393,16 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
 
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
+  validateOptionalField(
+    common,
+    'Flags',
+    (inp) => isNumber(inp) || isRecord(inp),
+  )
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
   if (memos !== undefined && !memos.every(isMemo)) {
-    throw new ValidationError('BaseTransaction: invalid Memos')
+    throw new ValidationError('BaseTransaction: invalid field Memos')
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
@@ -383,7 +412,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     signers !== undefined &&
     (signers.length === 0 || !signers.every(isSigner))
   ) {
-    throw new ValidationError('BaseTransaction: invalid Signers')
+    throw new ValidationError('BaseTransaction: invalid field Signers')
   }
 
   validateOptionalField(common, 'SourceTag', isNumber)
@@ -461,7 +490,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function, max-params -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-params -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
@@ -472,9 +501,7 @@ export function validateCredentialsList(
     return
   }
   if (!Array.isArray(credentials)) {
-    throw new ValidationError(
-      `${transactionType}: Credentials must be an array`,
-    )
+    throw new ValidationError(`${transactionType}: invalid field Credentials`)
   }
   if (credentials.length > maxCredentials) {
     throw new ValidationError(

@@ -1,15 +1,15 @@
-import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrency,
   isAccount,
   validateRequiredField,
   validateOptionalField,
   isNumber,
   Account,
+  isAmount,
+  isString,
 } from './common'
 
 /**
@@ -57,26 +57,9 @@ export interface CheckCreate extends BaseTransaction {
 export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SendMax === undefined) {
-    throw new ValidationError('CheckCreate: missing field SendMax')
-  }
-
+  validateRequiredField(tx, 'SendMax', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
-  if (
-    typeof tx.SendMax !== 'string' &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
-  ) {
-    throw new ValidationError('CheckCreate: invalid SendMax')
-  }
-
-  if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
-    throw new ValidationError('CheckCreate: invalid Expiration')
-  }
-
-  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
-    throw new ValidationError('CheckCreate: invalid InvoiceID')
-  }
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'InvoiceID', isString)
 }
