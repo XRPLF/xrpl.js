@@ -1,8 +1,9 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
+
 import {
   multisign,
   Client,
   AccountSet,
-  convertStringToHex,
   SignerListSet,
   Wallet,
 } from '../../src'
@@ -50,7 +51,7 @@ async function multisigning(): Promise<void> {
   const accountSet: AccountSet = {
     TransactionType: 'AccountSet',
     Account: walletMaster.classicAddress,
-    Domain: convertStringToHex('example.com'),
+    Domain: stringToHex('example.com'),
   }
   const accountSetTx = await client.autofill(accountSet, 2)
   console.log('AccountSet transaction is ready to be multisigned:')
