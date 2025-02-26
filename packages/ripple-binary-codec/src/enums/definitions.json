@@ -2561,15 +2561,6 @@
       }
     ],
     [
-      "AcceptedCredentials", {
-        "nth": 28,
-        "isVLEncoded": false,
-        "isSerialized": true,
-        "isSigningField": true,
-        "type": "STArray"
-      }
-    ],
-    [
       "CloseResolution",
       {
         "isSerialized": true,
