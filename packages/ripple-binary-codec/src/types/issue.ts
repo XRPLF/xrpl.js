@@ -4,6 +4,8 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
+import { Hash192 } from 'ripple-binary-codec/dist/types'
+import { isMPTAmount } from 'xrpl'
 
 /**
  * Interface for JSON objects that represent amounts
@@ -11,6 +13,8 @@ import { JsonObject, SerializedType } from './serialized-type'
 interface IssueObject extends JsonObject {
   currency: string
   issuer?: string
+  value?: string
+  mpt_issuance_id?: string
 }
 
 /**
@@ -18,10 +22,15 @@ interface IssueObject extends JsonObject {
  */
 function isIssueObject(arg): arg is IssueObject {
   const keys = Object.keys(arg).sort()
+
+  // Check if is XRP
   if (keys.length === 1) {
     return keys[0] === 'currency'
   }
-  return keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
+  const isIOU = keys.length === 2 && (keys[0] === 'currency' && keys[1] === 'issuer')
+  const isMPT = keys.length === 2 && (keys[0] === 'value' && keys[1] === 'mpt_issuance_id')
+
+  return isIOU || isMPT
 }
 
 /**
@@ -51,6 +60,12 @@ class Issue extends SerializedType {
       if (value.issuer == null) {
         return new Issue(currency)
       }
+
+      if (isMPTAmount(value)) {
+        const mptIssuanceIdBytes = Hash192.from(value.mpt_issuance_id).toBytes()
+        return new Issue(mptIssuanceIdBytes)
+      }
+
       const issuer = AccountID.from(value.issuer).toBytes()
       return new Issue(concat([currency, issuer]))
     }
@@ -80,6 +95,12 @@ class Issue extends SerializedType {
    */
   toJSON(): IssueObject {
     const parser = new BinaryParser(this.toString())
+
+    if len(self.buffer) == Hash192:
+    return {"mpt_issuance_id": self.to_hex().upper()}
+
+parser = BinaryParser(self.to_hex())
+
     const currency = Currency.fromParser(parser) as Currency
     if (currency.toJSON() === 'XRP') {
       return { currency: currency.toJSON() }
