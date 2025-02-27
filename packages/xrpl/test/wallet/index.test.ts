@@ -810,6 +810,22 @@ describe('Wallet', function () {
       }, /^1.1234567 is an illegal amount/u)
     })
 
+    it('sign throws when an illegal amount is provided', async function () {
+      const payment: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '1.0',
+        Flags: 2147483648,
+        Sequence: 23,
+        LastLedgerSequence: 8819954,
+        Fee: '12',
+      }
+      assert.throws(() => {
+        wallet.sign(payment)
+      }, /^1.0 is an illegal amount/u)
+    })
+
     const issuedCurrencyPayment: Transaction = {
       TransactionType: 'Payment',
       Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
