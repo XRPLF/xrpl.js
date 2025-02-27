@@ -7,9 +7,9 @@ import {
   validateOptionalField,
 } from './common'
 
-// TODO: add docs
-
 /**
+ * Creates a new DID ledger entry or updates the fields of an existing one.
+ *
  * @category Transaction Models
  */
 export interface DIDSet extends BaseTransaction {
