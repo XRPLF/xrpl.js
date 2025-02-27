@@ -1,3 +1,5 @@
+import { HEX_REGEX } from 'ripple-binary-codec/dist/types/uint-64'
+
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
 
@@ -9,8 +11,6 @@ import {
   validateOptionalField,
   validateRequiredField,
 } from './common'
-
-import {HEX_REGEX} from 'ripple-binary-codec/dist/types/uint-64'
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
 const SCALE_MAX = 10
@@ -144,14 +144,18 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate the priceData.PriceData.AssetPrice value */
       if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
         'AssetPrice' in priceData.PriceData &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        !(isNumber(priceData.PriceData.AssetPrice) || (typeof priceData.PriceData.AssetPrice === 'string' && HEX_REGEX.test(priceData.PriceData.AssetPrice)))
+        !(
+          isNumber(priceData.PriceData.AssetPrice) ||
+          (typeof priceData.PriceData.AssetPrice === 'string' &&
+            HEX_REGEX.test(priceData.PriceData.AssetPrice))
+        )
       ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
       }
+      /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
