@@ -5,6 +5,7 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
   isString,
   isXChainBridge,
@@ -97,9 +98,9 @@ export function validateXChainAddClaimAttestation(
 
   validateRequiredField(tx, 'OtherChainSource', isAccount)
 
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
 
-  validateRequiredField(tx, 'Signature', isString)
+  validateRequiredField(tx, 'Signature', isHexString)
 
   validateRequiredField(
     tx,

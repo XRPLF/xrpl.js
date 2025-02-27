@@ -3,12 +3,12 @@ import {
   BaseTransaction,
   isAccount,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateCredentialsList,
   validateOptionalField,
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 
 /**
@@ -61,6 +61,6 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
   )
 
   validateRequiredField(tx, 'OfferSequence', isNumber)
-  validateOptionalField(tx, 'Condition', isString)
-  validateOptionalField(tx, 'Fulfillment', isString)
+  validateOptionalField(tx, 'Condition', isHexString)
+  validateOptionalField(tx, 'Fulfillment', isHexString)
 }

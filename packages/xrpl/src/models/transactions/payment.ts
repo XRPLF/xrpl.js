@@ -177,7 +177,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-  validateOptionalField(tx, 'InvoiceID', isString)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
 
   if (
     tx.Paths !== undefined &&

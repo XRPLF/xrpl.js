@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -126,7 +127,7 @@ export function validateMPTokenIssuanceCreate(
 ): void {
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'MaximumAmount', isString)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 

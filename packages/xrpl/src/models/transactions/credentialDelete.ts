@@ -2,7 +2,7 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
-  isString,
+  isAccount,
   validateBaseTransaction,
   validateCredentialType,
   validateOptionalField,
@@ -45,11 +45,11 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isAccount)
 
   validateCredentialType(tx)
 
-  validateOptionalField(tx, 'Subject', isString)
+  validateOptionalField(tx, 'Subject', isAccount)
 
-  validateOptionalField(tx, 'Issuer', isString)
+  validateOptionalField(tx, 'Issuer', isAccount)
 }

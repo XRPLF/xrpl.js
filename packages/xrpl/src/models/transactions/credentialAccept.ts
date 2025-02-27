@@ -36,9 +36,9 @@ export interface CredentialAccept extends BaseTransaction {
 export function validateCredentialAccept(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isAccount)
 
-  validateRequiredField(tx, 'Issuer', isString)
+  validateRequiredField(tx, 'Issuer', isAccount)
 
   validateCredentialType(tx)
 }

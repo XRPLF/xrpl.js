@@ -70,6 +70,6 @@ export function validatePaymentChannelCreate(
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateRequiredField(tx, 'SettleDelay', isNumber)
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
   validateOptionalField(tx, 'CancelAfter', isNumber)
 }

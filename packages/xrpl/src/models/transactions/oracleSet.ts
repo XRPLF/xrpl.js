@@ -76,11 +76,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
-  validateOptionalField(tx, 'Provider', isString)
+  validateOptionalField(tx, 'Provider', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
-  validateOptionalField(tx, 'AssetClass', isString)
+  validateOptionalField(tx, 'AssetClass', isHexString)
 
   // eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
   validateRequiredField(tx, 'PriceDataSeries', (value) => {

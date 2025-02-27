@@ -1,12 +1,12 @@
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlags,
+  isHexString,
 } from './common'
 
 /**
@@ -62,6 +62,6 @@ export interface MPTokenAuthorize extends BaseTransaction {
  */
 export function validateMPTokenAuthorize(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
 }

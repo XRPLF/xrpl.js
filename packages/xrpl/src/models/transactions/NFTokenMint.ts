@@ -7,7 +7,7 @@ import {
   GlobalFlags,
   isAccount,
   isNumber,
-  isString,
+  isHexString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -127,7 +127,7 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'NFTokenTaxon', isNumber)
   validateOptionalField(tx, 'Issuer', isAccount)
   validateOptionalField(tx, 'TransferFee', isNumber)
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
   if (tx.Account === tx.Issuer) {
     throw new ValidationError(

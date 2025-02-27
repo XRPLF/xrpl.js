@@ -35,7 +35,7 @@ export function validatePermissionedDomainSet(
 ): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
   validateRequiredField(
     tx,
     'AcceptedCredentials',

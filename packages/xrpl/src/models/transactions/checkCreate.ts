@@ -61,5 +61,5 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateOptionalField(tx, 'Expiration', isNumber)
-  validateOptionalField(tx, 'InvoiceID', isString)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
 }

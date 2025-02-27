@@ -4,8 +4,8 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
+  isAccount,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateCredentialType,
   validateOptionalField,
@@ -47,9 +47,9 @@ export interface CredentialCreate extends BaseTransaction {
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isAccount)
 
-  validateRequiredField(tx, 'Subject', isString)
+  validateRequiredField(tx, 'Subject', isAccount)
 
   validateCredentialType(tx)
 

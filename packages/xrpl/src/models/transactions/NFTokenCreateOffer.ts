@@ -12,9 +12,9 @@ import {
   validateOptionalField,
   Account,
   validateRequiredField,
-  isString,
   isNumber,
   isRecord,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -139,7 +139,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Owner', isAccount)
   validateOptionalField(tx, 'Expiration', isNumber)

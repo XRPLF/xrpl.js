@@ -24,5 +24,5 @@ export function validatePermissionedDomainDelete(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'DomainID', isString)
+  validateRequiredField(tx, 'DomainID', isHexString)
 }

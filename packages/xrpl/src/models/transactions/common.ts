@@ -14,7 +14,7 @@ import {
   Signer,
   XChainBridge,
 } from '../common'
-import { onlyHasFields } from '../utils'
+import { isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
@@ -68,6 +68,7 @@ const ISSUED_CURRENCY_SIZE = 3
 const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
+
 /**
  * Verify the form and type of an object/record at runtime.
  *
@@ -86,6 +87,16 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
  */
 export function isString(str: unknown): str is string {
   return typeof str === 'string'
+}
+
+/**
+ * Verify the form and type of a hex string at runtime.
+ *
+ * @param str - The object to check the form and type of.
+ * @returns Whether the hex string is properly formed.
+ */
+export function isHexString(str: unknown): str is string {
+  return typeof str === 'string' && isHex(str)
 }
 
 /**
@@ -116,9 +127,9 @@ export function isNumberWithBounds(
   upper: number,
 ): (num: unknown) => num is number {
   // eslint-disable-next-line func-style -- returning a function
-  const func = (num: unknown): num is number =>
+  const isNumberWithBoundsInternal = (num: unknown): num is number =>
     isNumber(num) && Number(num) >= lower && Number(num) <= upper
-  return func
+  return isNumberWithBoundsInternal
 }
 
 /**
@@ -238,6 +249,22 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
+const invalidMessagesMap: Record<string, string> = {
+  isAccount: 'expected a valid account address',
+  isAmount: 'expected a valid Amount',
+  isCurrency: 'expected a valid Currency',
+  isIssuedCurrency: 'expected a valid IssuedCurrencyAmount',
+  isMPTAmount: 'expected a valid MPTAmount',
+  isXChainBridge: 'expected a valid XChainBridge',
+  isMemo: 'expected a valid Memo',
+  isSigner: 'expected a valid Signer',
+  isRecord: 'expected a valid Record',
+  isString: 'expected a valid string',
+  isHexString: 'expected a valid hex string',
+  isNumber: 'expected a valid number',
+  isNumberWithBoundsInternal: 'expected a valid number',
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -260,9 +287,13 @@ export function validateRequiredField(
   }
 
   if (!checkValidity(tx[paramName])) {
-    throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
-    )
+    let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
+    const invalidMessage = invalidMessagesMap[checkValidity.name]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- okay
+    if (invalidMessage != null) {
+      errorMessage += `, ${invalidMessage}`
+    }
+    throw new ValidationError(errorMessage)
   }
 }
 
@@ -280,9 +311,12 @@ export function validateOptionalField(
   checkValidity: (inp: unknown) => boolean,
 ): void {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
-    throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
-    )
+    let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
+    const invalidMessage = invalidMessagesMap[checkValidity.name]
+    if (invalidMessage) {
+      errorMessage += `, ${invalidMessage}`
+    }
+    throw new ValidationError(errorMessage)
   }
 }
 
@@ -383,13 +417,13 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
-  validateRequiredField(common, 'Account', isString)
+  validateRequiredField(common, 'Account', isAccount)
 
   validateOptionalField(common, 'Fee', isString)
 
   validateOptionalField(common, 'Sequence', isNumber)
 
-  validateOptionalField(common, 'AccountTxnID', isString)
+  validateOptionalField(common, 'AccountTxnID', isHexString)
 
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
@@ -417,11 +451,11 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
 
   validateOptionalField(common, 'SourceTag', isNumber)
 
-  validateOptionalField(common, 'SigningPubKey', isString)
+  validateOptionalField(common, 'SigningPubKey', isHexString)
 
   validateOptionalField(common, 'TicketSequence', isNumber)
 
-  validateOptionalField(common, 'TxnSignature', isString)
+  validateOptionalField(common, 'TxnSignature', isHexString)
 
   validateOptionalField(common, 'NetworkID', isNumber)
 }

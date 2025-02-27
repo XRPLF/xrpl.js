@@ -31,5 +31,5 @@ export interface CheckCancel extends BaseTransaction {
 export function validateCheckCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'CheckID', isString)
+  validateRequiredField(tx, 'CheckID', isHexString)
 }

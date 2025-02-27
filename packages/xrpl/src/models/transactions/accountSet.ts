@@ -4,9 +4,9 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isHexString,
   isNumber,
   isNumberWithBounds,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -181,23 +181,27 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid field ClearFlag')
+      throw new ValidationError(
+        'AccountSet: invalid field ClearFlag, expected a valid number',
+      )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: invalid field ClearFlag')
+      throw new ValidationError('AccountSet: not a valid ClearFlag value')
     }
   }
 
-  validateOptionalField(tx, 'Domain', isString)
-  validateOptionalField(tx, 'EmailHash', isString)
-  validateOptionalField(tx, 'MessageKey', isString)
+  validateOptionalField(tx, 'Domain', isHexString)
+  validateOptionalField(tx, 'EmailHash', isHexString)
+  validateOptionalField(tx, 'MessageKey', isHexString)
 
   if (tx.SetFlag !== undefined) {
     if (typeof tx.SetFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid field SetFlag')
+      throw new ValidationError(
+        'AccountSet: invalid field SetFlag, expected a valid number',
+      )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: invalid field SetFlag')
+      throw new ValidationError('AccountSet: not a valid SetFlag value')
     }
   }
 

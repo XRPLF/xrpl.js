@@ -3,13 +3,13 @@ import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlags,
+  isHexString,
 } from './common'
 
 /**
@@ -65,7 +65,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary

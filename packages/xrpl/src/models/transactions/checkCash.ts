@@ -47,7 +47,7 @@ export interface CheckCash extends BaseTransaction {
 export function validateCheckCash(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'CheckID', isString)
+  validateRequiredField(tx, 'CheckID', isHexString)
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'DeliverMin', isAmount)
 
