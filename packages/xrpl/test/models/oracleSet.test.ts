@@ -173,6 +173,11 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
+  it(`throws w/ valid AssetPrice of PriceDataSeries`, function () {
+    tx.PriceDataSeries[0].PriceData.AssetPrice = 'ab15' // valid string which can be parsed as hexadecimal number
+    assert.doesNotThrow(() => validate(tx))
+  })
+
   it(`throws w/ invalid AssetPrice type in PriceDataSeries`, function () {
     tx.PriceDataSeries[0].PriceData.AssetPrice = ['sample', 'invalid', 'type']
     const errorMessage = 'OracleSet: invalid field AssetPrice'
