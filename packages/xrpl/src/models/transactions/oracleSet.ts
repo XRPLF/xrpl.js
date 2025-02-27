@@ -3,8 +3,8 @@ import { PriceData } from '../common'
 
 import {
   BaseTransaction,
+  isHexString,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,

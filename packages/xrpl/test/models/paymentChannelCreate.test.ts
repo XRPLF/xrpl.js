@@ -68,36 +68,54 @@ describe('PaymentChannelCreate', function () {
   it(`invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field Amount')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field Amount, expected a valid XRP Amount',
+    )
   })
 
   it(`invalid Destination`, function () {
     channel.Destination = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field Destination')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`invalid SettleDelay`, function () {
     channel.SettleDelay = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field SettleDelay')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field SettleDelay, expected a valid number',
+    )
   })
 
   it(`invalid PublicKey`, function () {
     channel.PublicKey = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field PublicKey')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field PublicKey, expected a valid hex string',
+    )
   })
 
   it(`invalid DestinationTag`, function () {
     channel.DestinationTag = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field DestinationTag')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field DestinationTag, expected a valid number',
+    )
   })
 
   it(`invalid CancelAfter`, function () {
     channel.CancelAfter = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field CancelAfter')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field CancelAfter, expected a valid number',
+    )
   })
 })

@@ -1184,7 +1184,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /URI must be in hex format/u)
+      }, /^NFTokenMint: invalid field URI, expected a valid hex string$/u)
     })
   })
 

@@ -40,7 +40,8 @@ describe('AMMCreate', function () {
 
   it(`throws w/ Amount must be an Amount`, function () {
     ammCreate.Amount = 1000
-    const errorMessage = 'AMMCreate: invalid field Amount'
+    const errorMessage =
+      'AMMCreate: invalid field Amount, expected a valid Amount'
     assertInvalid(ammCreate, errorMessage)
   })
 
@@ -52,7 +53,8 @@ describe('AMMCreate', function () {
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     ammCreate.Amount2 = 1000
-    const errorMessage = 'AMMCreate: invalid field Amount2'
+    const errorMessage =
+      'AMMCreate: invalid field Amount2, expected a valid Amount'
     assertInvalid(ammCreate, errorMessage)
   })
 
@@ -64,19 +66,22 @@ describe('AMMCreate', function () {
 
   it(`throws w/ TradingFee must be a number`, function () {
     ammCreate.TradingFee = 'abcd'
-    const errorMessage = 'AMMCreate: invalid field TradingFee'
+    const errorMessage =
+      'AMMCreate: invalid field TradingFee, expected a valid number'
     assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws when TradingFee is greater than 1000`, function () {
     ammCreate.TradingFee = 1001
-    const errorMessage = 'AMMCreate: invalid field TradingFee'
+    const errorMessage =
+      'AMMCreate: invalid field TradingFee, expected a valid number'
     assertInvalid(ammCreate, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     ammCreate.TradingFee = -1
-    const errorMessage = 'AMMCreate: invalid field TradingFee'
+    const errorMessage =
+      'AMMCreate: invalid field TradingFee, expected a valid number'
     assertInvalid(ammCreate, errorMessage)
   })
 })

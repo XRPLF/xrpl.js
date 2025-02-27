@@ -88,24 +88,36 @@ describe('OfferCreate', function () {
   it(`throws w/ invalid Expiration`, function () {
     offer.Expiration = 'abcd'
 
-    assertInvalid(offer, 'OfferCreate: invalid field Expiration')
+    assertInvalid(
+      offer,
+      'OfferCreate: invalid field Expiration, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
     offer.OfferSequence = 'abcd'
 
-    assertInvalid(offer, 'OfferCreate: invalid field OfferSequence')
+    assertInvalid(
+      offer,
+      'OfferCreate: invalid field OfferSequence, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid TakerPays`, function () {
     offer.TakerPays = 10
 
-    assertInvalid(offer, 'OfferCreate: invalid field TakerPays')
+    assertInvalid(
+      offer,
+      'OfferCreate: invalid field TakerPays, expected a valid Amount',
+    )
   })
 
   it(`throws w/ invalid TakerGets`, function () {
     offer.TakerGets = 11
 
-    assertInvalid(offer, 'OfferCreate: invalid field TakerGets')
+    assertInvalid(
+      offer,
+      'OfferCreate: invalid field TakerGets, expected a valid Amount',
+    )
   })
 })

@@ -6,8 +6,8 @@ import {
   validateBaseTransaction,
   isAmount,
   validateRequiredField,
-  isString,
   validateOptionalField,
+  isHexString,
 } from './common'
 
 /**

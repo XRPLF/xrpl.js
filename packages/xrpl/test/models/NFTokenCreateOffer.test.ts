@@ -131,7 +131,10 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assertInvalid(invalid, 'NFTokenCreateOffer: invalid field Amount')
+    assertInvalid(
+      invalid,
+      'NFTokenCreateOffer: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it(`throws w/ missing Amount`, function () {

@@ -40,19 +40,22 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ Account not string`, function () {
     credentialDelete.Account = 123
-    const errorMessage = 'CredentialDelete: invalid field Account'
+    const errorMessage =
+      'CredentialDelete: invalid field Account, expected a valid account address'
     assertInvalid(credentialDelete, errorMessage)
   })
 
   it(`throws w/ Subject not string`, function () {
     credentialDelete.Subject = 123
-    const errorMessage = 'CredentialDelete: invalid field Subject'
+    const errorMessage =
+      'CredentialDelete: invalid field Subject, expected a valid account address'
     assertInvalid(credentialDelete, errorMessage)
   })
 
   it(`throws w/ Issuer not string`, function () {
     credentialDelete.Issuer = 123
-    const errorMessage = 'CredentialDelete: invalid field Issuer'
+    const errorMessage =
+      'CredentialDelete: invalid field Issuer, expected a valid account address'
     assertInvalid(credentialDelete, errorMessage)
   })
 
@@ -86,8 +89,7 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field not hex`, function () {
     credentialDelete.CredentialType = 'this is not hex'
-    const errorMessage =
-      'CredentialDelete: CredentialType must be encoded in hex'
+    const errorMessage = 'CredentialDelete: CredentialType must be a hex string'
     assertInvalid(credentialDelete, errorMessage)
   })
 })

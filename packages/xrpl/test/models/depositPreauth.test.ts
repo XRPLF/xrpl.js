@@ -109,14 +109,16 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when AuthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: invalid field Credentials'
+    const errorMessage =
+      'DepositPreauth: invalid field Credentials, expected a valid array'
     depositPreauth.AuthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)
   })
 
   it('throws when UnauthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: invalid field Credentials'
+    const errorMessage =
+      'DepositPreauth: invalid field Credentials, expected a valid array'
     depositPreauth.UnauthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)

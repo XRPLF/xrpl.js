@@ -59,7 +59,8 @@ describe('AMMClawback', function () {
 
   it(`throws w/ invalid field Holder`, function () {
     ammClawback.Holder = 1234
-    const errorMessage = 'AMMClawback: invalid field Holder'
+    const errorMessage =
+      'AMMClawback: invalid field Holder, expected a valid account address'
     assertInvalid(ammClawback, errorMessage)
   })
 
@@ -77,7 +78,8 @@ describe('AMMClawback', function () {
 
   it(`throws w/ invalid field Asset`, function () {
     ammClawback.Asset = '1000'
-    const errorMessage = 'AMMClawback: invalid field Asset'
+    const errorMessage =
+      'AMMClawback: invalid field Asset, expected a valid Currency'
     assertInvalid(ammClawback, errorMessage)
   })
 
@@ -95,13 +97,15 @@ describe('AMMClawback', function () {
 
   it(`throws w/ invalid field Asset2`, function () {
     ammClawback.Asset2 = '1000'
-    const errorMessage = 'AMMClawback: invalid field Asset2'
+    const errorMessage =
+      'AMMClawback: invalid field Asset2, expected a valid Currency'
     assertInvalid(ammClawback, errorMessage)
   })
 
   it(`throws w/ invalid field Amount`, function () {
     ammClawback.Amount = 1000
-    const errorMessage = 'AMMClawback: invalid field Amount'
+    const errorMessage =
+      'AMMClawback: invalid field Amount, expected a valid Amount'
     assertInvalid(ammClawback, errorMessage)
   })
 

@@ -54,7 +54,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+      'MPTokenIssuanceCreate: invalid field MPTokenMetadata, expected a valid hex string',
     )
   })
 

@@ -40,7 +40,8 @@ describe('PermissionedDomainSet', function () {
   it(`throws with invalid field DomainID`, function () {
     // DomainID is expected to be a string
     tx.DomainID = 1234
-    const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
+    const errorMessage =
+      'PermissionedDomainSet: invalid field DomainID, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 

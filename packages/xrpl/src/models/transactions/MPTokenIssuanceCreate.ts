@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -107,7 +107,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   /**
    * Arbitrary metadata about this issuance, in hex format.
    */
-  MPTokenMetadata?: string | null
+  MPTokenMetadata?: string
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
 
@@ -131,15 +131,9 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 
-  if (isString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
+  if (isHexString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
     throw new ValidationError(
       'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
-    )
-  }
-
-  if (isString(tx.MPTokenMetadata) && !isHex(tx.MPTokenMetadata)) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
     )
   }
 

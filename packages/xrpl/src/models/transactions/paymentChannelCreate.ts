@@ -2,8 +2,9 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isHexString,
   isNumber,
-  isString,
+  isXRPAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -66,7 +67,7 @@ export function validatePaymentChannelCreate(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isString)
+  validateRequiredField(tx, 'Amount', isXRPAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateRequiredField(tx, 'SettleDelay', isNumber)

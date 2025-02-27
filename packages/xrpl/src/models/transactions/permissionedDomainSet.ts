@@ -2,11 +2,11 @@ import { AuthorizeCredential } from '../common'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
   validateCredentialsList,
+  isHexString,
 } from './common'
 
 const MAX_ACCEPTED_CREDENTIALS = 10

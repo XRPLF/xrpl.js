@@ -1,5 +1,4 @@
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
 
 import {
   BaseTransaction,
@@ -59,9 +58,6 @@ export function validateNFTokenModify(tx: Record<string, unknown>): void {
   if (tx.URI !== undefined && typeof tx.URI === 'string') {
     if (tx.URI === '') {
       throw new ValidationError('NFTokenModify: URI must not be empty string')
-    }
-    if (!isHex(tx.URI)) {
-      throw new ValidationError('NFTokenModify: URI must be in hex format')
     }
   }
 }

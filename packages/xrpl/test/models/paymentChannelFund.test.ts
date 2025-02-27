@@ -50,18 +50,27 @@ describe('PaymentChannelFund', function () {
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 100
 
-    assertInvalid(channel, 'PaymentChannelFund: invalid field Amount')
+    assertInvalid(
+      channel,
+      'PaymentChannelFund: invalid field Amount, expected a valid XRP Amount',
+    )
   })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 1000
 
-    assertInvalid(channel, 'PaymentChannelFund: invalid field Channel')
+    assertInvalid(
+      channel,
+      'PaymentChannelFund: invalid field Channel, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid Expiration`, function () {
     channel.Expiration = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelFund: invalid field Expiration')
+    assertInvalid(
+      channel,
+      'PaymentChannelFund: invalid field Expiration, expected a valid number',
+    )
   })
 })

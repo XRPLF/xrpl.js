@@ -43,16 +43,25 @@ describe('TrustSet', function () {
 
   it('throws when LimitAmount is invalid', function () {
     trustSet.LimitAmount = 1234
-    assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
+    assertInvalid(
+      trustSet,
+      'TrustSet: invalid field LimitAmount, expected a valid IssuedCurrencyAmount object',
+    )
   })
 
   it('throws when QualityIn is not a number', function () {
     trustSet.QualityIn = 'abcd'
-    assertInvalid(trustSet, 'TrustSet: invalid field QualityIn')
+    assertInvalid(
+      trustSet,
+      'TrustSet: invalid field QualityIn, expected a valid number',
+    )
   })
 
   it('throws when QualityOut is not a number', function () {
     trustSet.QualityOut = 'dcba'
-    assertInvalid(trustSet, 'TrustSet: invalid field QualityOut')
+    assertInvalid(
+      trustSet,
+      'TrustSet: invalid field QualityOut, expected a valid number',
+    )
   })
 })

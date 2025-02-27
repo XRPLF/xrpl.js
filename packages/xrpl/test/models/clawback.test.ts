@@ -41,7 +41,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAmount, 'Clawback: invalid field Amount')
+    assertInvalid(
+      invalidAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
+    )
 
     const invalidStrAmount = {
       TransactionType: 'Clawback',
@@ -49,7 +52,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidStrAmount, 'Clawback: invalid field Amount')
+    assertInvalid(
+      invalidStrAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
+    )
   })
 
   it(`throws w/ invalid holder Account`, function () {

@@ -1,10 +1,9 @@
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-
 import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
   isAccount,
+  isHexString,
   isNumber,
   validateBaseTransaction,
   validateCredentialType,
@@ -55,27 +54,19 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'Expiration', isNumber)
 
-  validateURI(tx.URI)
-}
-
-function validateURI(URI: unknown): void {
-  if (URI === undefined) {
-    return
-  }
-
-  if (typeof URI !== 'string') {
-    throw new ValidationError('CredentialCreate: invalid field URI')
-  }
-
-  if (URI.length === 0) {
-    throw new ValidationError('CredentialCreate: URI cannot be an empty string')
-  } else if (URI.length > MAX_URI_LENGTH) {
-    throw new ValidationError(
-      `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
-    )
-  }
-
-  if (!HEX_REGEX.test(URI)) {
-    throw new ValidationError('CredentialCreate: URI must be encoded in hex')
+  validateOptionalField(tx, 'URI', isHexString)
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  const uriLength = (tx.URI as string | undefined)?.length
+  if (uriLength !== undefined) {
+    if (uriLength === 0) {
+      throw new ValidationError(
+        'CredentialCreate: URI cannot be an empty string',
+      )
+    }
+    if (uriLength > MAX_URI_LENGTH) {
+      throw new ValidationError(
+        `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
+      )
+    }
   }
 }

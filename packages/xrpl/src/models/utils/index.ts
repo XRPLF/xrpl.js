@@ -1,4 +1,4 @@
-const HEX_REGEX = /^[0-9A-Fa-f]+$/u
+const HEX_REGEX = /^[0-9A-Fa-f]*$/u
 export const INTEGER_SANITY_CHECK = /^[0-9]+$/u
 
 /**

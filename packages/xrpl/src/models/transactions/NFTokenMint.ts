@@ -1,5 +1,4 @@
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
 
 import {
   Account,
@@ -137,9 +136,5 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
 
   if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')
-  }
-
-  if (typeof tx.URI === 'string' && !isHex(tx.URI)) {
-    throw new ValidationError('NFTokenMint: URI must be in hex format')
   }
 }

@@ -1,7 +1,8 @@
 import {
   BaseTransaction,
+  isHexString,
   isNumber,
-  isString,
+  isXRPAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -49,6 +50,6 @@ export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Channel', isHexString)
-  validateRequiredField(tx, 'Amount', isString)
+  validateRequiredField(tx, 'Amount', isXRPAmount)
   validateOptionalField(tx, 'Expiration', isNumber)
 }

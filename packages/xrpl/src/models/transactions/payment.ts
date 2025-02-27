@@ -13,8 +13,8 @@ import {
   isNumber,
   Account,
   validateCredentialsList,
-  isString,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -223,7 +223,9 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     }
 
     if (!isAmount(tx.DeliverMin)) {
-      throw new ValidationError('Payment: invalid field DeliverMin')
+      throw new ValidationError(
+        'Payment: invalid field DeliverMin, expected a valid Amount',
+      )
     }
   }
 }

@@ -9,7 +9,7 @@ import {
   isNumber,
   Account,
   isAmount,
-  isString,
+  isHexString,
 } from './common'
 
 /**

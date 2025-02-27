@@ -92,6 +92,9 @@ describe('NFTokenMint', function () {
       URI: 'http://xrpl.org',
     } as any
 
-    assertInvalid(invalid, 'NFTokenMint: URI must be in hex format')
+    assertInvalid(
+      invalid,
+      'NFTokenMint: invalid field URI, expected a valid hex string',
+    )
   })
 })

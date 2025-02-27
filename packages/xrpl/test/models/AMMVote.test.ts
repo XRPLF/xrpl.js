@@ -41,7 +41,8 @@ describe('AMMVote', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     vote.Asset = 1234
-    const errorMessage = 'AMMVote: invalid field Asset'
+    const errorMessage =
+      'AMMVote: invalid field Asset, expected a valid Currency'
     assertInvalid(vote, errorMessage)
   })
 
@@ -53,7 +54,8 @@ describe('AMMVote', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     vote.Asset2 = 1234
-    const errorMessage = 'AMMVote: invalid field Asset2'
+    const errorMessage =
+      'AMMVote: invalid field Asset2, expected a valid Currency'
     assertInvalid(vote, errorMessage)
   })
 
@@ -65,19 +67,22 @@ describe('AMMVote', function () {
 
   it(`throws w/ TradingFee must be a number`, function () {
     vote.TradingFee = 'abcd'
-    const errorMessage = 'AMMVote: invalid field TradingFee'
+    const errorMessage =
+      'AMMVote: invalid field TradingFee, expected a valid number'
     assertInvalid(vote, errorMessage)
   })
 
   it(`throws when TradingFee is greater than AMM_MAX_TRADING_FEE`, function () {
     vote.TradingFee = 1001
-    const errorMessage = 'AMMVote: invalid field TradingFee'
+    const errorMessage =
+      'AMMVote: invalid field TradingFee, expected a valid number'
     assertInvalid(vote, errorMessage)
   })
 
   it(`throws when TradingFee is a negative number`, function () {
     vote.TradingFee = -1
-    const errorMessage = 'AMMVote: invalid field TradingFee'
+    const errorMessage =
+      'AMMVote: invalid field TradingFee, expected a valid number'
     assertInvalid(vote, errorMessage)
   })
 })

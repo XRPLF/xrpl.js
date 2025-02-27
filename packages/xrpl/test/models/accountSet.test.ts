@@ -32,7 +32,7 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid SetFlag (out of range)`, function () {
     tx.SetFlag = 20
-    assertInvalid(tx, 'AccountSet: not a valid SetFlag')
+    assertInvalid(tx, 'AccountSet: not a valid SetFlag value')
   })
 
   it(`throws w/ invalid SetFlag (incorrect type)`, function () {
@@ -45,19 +45,22 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid ClearFlag`, function () {
     tx.ClearFlag = 20
-    assertInvalid(tx, 'AccountSet: not a valid ClearFlag')
+    assertInvalid(tx, 'AccountSet: not a valid ClearFlag value')
   })
 
   it(`throws w/ invalid Domain`, function () {
     tx.Domain = 6578616
-    assertInvalid(tx, 'AccountSet: invalid field Domain, expected a hex string')
+    assertInvalid(
+      tx,
+      'AccountSet: invalid field Domain, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid EmailHash`, function () {
     tx.EmailHash = 6578656789876543
     assertInvalid(
       tx,
-      'AccountSet: invalid field EmailHash, expected a hex string',
+      'AccountSet: invalid field EmailHash, expected a valid hex string',
     )
   })
 
@@ -65,7 +68,7 @@ describe('AccountSet', function () {
     tx.MessageKey = 6578656789876543
     assertInvalid(
       tx,
-      'AccountSet: invalid field MessageKey, expected a hex string',
+      'AccountSet: invalid field MessageKey, expected a valid hex string',
     )
   })
 
@@ -81,7 +84,7 @@ describe('AccountSet', function () {
     tx.TickSize = 20
     assertInvalid(
       tx,
-      'AccountSet: invalid field TickSize, expected a valid number between bounds',
+      'AccountSet: invalid field TickSize, expected a valid number',
     )
   })
 

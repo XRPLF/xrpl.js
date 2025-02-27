@@ -1,6 +1,6 @@
 import {
   BaseTransaction,
-  isString,
+  isAccount,
   validateBaseTransaction,
   validateCredentialType,
   validateRequiredField,

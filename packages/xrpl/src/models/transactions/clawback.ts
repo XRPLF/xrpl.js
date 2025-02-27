@@ -48,6 +48,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
     tx,
     'Amount',
     (inp) => isIssuedCurrency(inp) || isMPTAmount(inp),
+    'expected a valid non-XRP Amount',
   )
 
   if (isIssuedCurrency(tx.Amount)) {

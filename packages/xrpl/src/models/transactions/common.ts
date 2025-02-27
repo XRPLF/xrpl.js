@@ -1,5 +1,4 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -13,6 +12,7 @@ import {
   Memo,
   Signer,
   XChainBridge,
+  XRPAmount,
 } from '../common'
 import { isHex, onlyHasFields } from '../utils'
 
@@ -155,6 +155,20 @@ export function isCurrency(input: unknown): input is Currency {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
+export function isXRPAmount(input: unknown): input is XRPAmount {
+  return (
+    isString(input) &&
+    !Number.isNaN(Number(input)) &&
+    Number.isInteger(Number(input))
+  )
+}
+
+/**
+ * Verify the form and type of an IssuedCurrencyAmount at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the IssuedCurrencyAmount is properly formed.
+ */
 export function isIssuedCurrency(
   input: unknown,
 ): input is IssuedCurrencyAmount {
@@ -253,9 +267,10 @@ const invalidMessagesMap: Record<string, string> = {
   isAccount: 'expected a valid account address',
   isAmount: 'expected a valid Amount',
   isCurrency: 'expected a valid Currency',
-  isIssuedCurrency: 'expected a valid IssuedCurrencyAmount',
-  isMPTAmount: 'expected a valid MPTAmount',
-  isXChainBridge: 'expected a valid XChainBridge',
+  isXRPAmount: 'expected a valid XRP Amount',
+  isIssuedCurrency: 'expected a valid IssuedCurrencyAmount object',
+  isMPTAmount: 'expected a valid MPTAmount object',
+  isXChainBridge: 'expected a valid XChainBridge object',
   isMemo: 'expected a valid Memo',
   isSigner: 'expected a valid Signer',
   isRecord: 'expected a valid Record',
@@ -273,12 +288,15 @@ const invalidMessagesMap: Record<string, string> = {
  * @param tx - The transaction input to check the form and type of.
  * @param paramName - The name of the transaction parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param invalidMessage -- optional error message.
+ * @throws ValidationError if the field is missing or invalid.
  */
+// eslint-disable-next-line max-params -- okay for a helper function
 export function validateRequiredField(
   tx: Record<string, unknown>,
   paramName: string,
   checkValidity: (inp: unknown) => boolean,
+  invalidMessage?: string,
 ): void {
   if (tx[paramName] == null) {
     throw new ValidationError(
@@ -288,9 +306,13 @@ export function validateRequiredField(
 
   if (!checkValidity(tx[paramName])) {
     let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
-    const invalidMessage = invalidMessagesMap[checkValidity.name]
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- okay
-    if (invalidMessage != null) {
+    if (invalidMessage == null) {
+      const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
+      if (invalidMessageFromMap != null) {
+        errorMessage += `, ${invalidMessageFromMap}`
+      }
+    } else {
       errorMessage += `, ${invalidMessage}`
     }
     throw new ValidationError(errorMessage)
@@ -303,17 +325,25 @@ export function validateRequiredField(
  * @param tx - The transaction input to check the form and type of.
  * @param paramName - The name of the transaction parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param invalidMessage - optional error message.
+ * @throws ValidationError if the field is invalid.
  */
+// eslint-disable-next-line max-params -- okay for a helper function
 export function validateOptionalField(
   tx: Record<string, unknown>,
   paramName: string,
   checkValidity: (inp: unknown) => boolean,
+  invalidMessage?: string,
 ): void {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
     let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
-    const invalidMessage = invalidMessagesMap[checkValidity.name]
-    if (invalidMessage) {
+    if (invalidMessage == null) {
+      const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
+      if (invalidMessageFromMap != null) {
+        errorMessage += `, ${invalidMessageFromMap}`
+      }
+    } else {
       errorMessage += `, ${invalidMessage}`
     }
     throw new ValidationError(errorMessage)
@@ -492,9 +522,9 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
     )
   }
 
-  if (!isString(tx.CredentialType)) {
+  if (!isHexString(tx.CredentialType)) {
     throw new ValidationError(
-      `${tx.TransactionType}: CredentialType must be a string`,
+      `${tx.TransactionType}: CredentialType must be a hex string`,
     )
   }
   if (tx.CredentialType.length === 0) {
@@ -504,12 +534,6 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
   } else if (tx.CredentialType.length > MAX_CREDENTIAL_TYPE_LENGTH) {
     throw new ValidationError(
       `${tx.TransactionType}: CredentialType length cannot be > ${MAX_CREDENTIAL_TYPE_LENGTH}`,
-    )
-  }
-
-  if (!HEX_REGEX.test(tx.CredentialType)) {
-    throw new ValidationError(
-      `${tx.TransactionType}: CredentialType must be encoded in hex`,
     )
   }
 }
@@ -524,7 +548,7 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-params -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-params, max-lines-per-function -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
@@ -535,7 +559,9 @@ export function validateCredentialsList(
     return
   }
   if (!Array.isArray(credentials)) {
-    throw new ValidationError(`${transactionType}: invalid field Credentials`)
+    throw new ValidationError(
+      `${transactionType}: invalid field Credentials, expected a valid array`,
+    )
   }
   if (credentials.length > maxCredentials) {
     throw new ValidationError(

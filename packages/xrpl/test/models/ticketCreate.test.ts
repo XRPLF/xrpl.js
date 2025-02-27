@@ -32,21 +32,33 @@ describe('TicketCreate', function () {
 
   it('throws when TicketCount is not a number', function () {
     ticketCreate.TicketCount = 'abcd'
-    assertInvalid(ticketCreate, 'TicketCreate: invalid field TicketCount')
+    assertInvalid(
+      ticketCreate,
+      'TicketCreate: invalid field TicketCount, expected a valid number',
+    )
   })
 
   it('throws when TicketCount is not an integer', function () {
     ticketCreate.TicketCount = 12.5
-    assertInvalid(ticketCreate, 'TicketCreate: invalid field TicketCount')
+    assertInvalid(
+      ticketCreate,
+      'TicketCreate: invalid field TicketCount, expected a valid number',
+    )
   })
 
   it('throws when TicketCount is < 1', function () {
     ticketCreate.TicketCount = 0
-    assertInvalid(ticketCreate, 'TicketCreate: invalid field TicketCount')
+    assertInvalid(
+      ticketCreate,
+      'TicketCreate: invalid field TicketCount, expected a valid number',
+    )
   })
 
   it('throws when TicketCount is > 250', function () {
     ticketCreate.TicketCount = 251
-    assertInvalid(ticketCreate, 'TicketCreate: invalid field TicketCount')
+    assertInvalid(
+      ticketCreate,
+      'TicketCreate: invalid field TicketCount, expected a valid number',
+    )
   })
 })

@@ -7,7 +7,6 @@ import {
   isAmount,
   isHexString,
   isNumber,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateRequiredField,
@@ -117,7 +116,7 @@ export function validateXChainAddAccountCreateAttestation(
   validateRequiredField(
     tx,
     'XChainAccountCreateCount',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isNumber(inp) || isHexString(inp),
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)

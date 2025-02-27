@@ -47,12 +47,18 @@ describe('EscrowCancel', function () {
   it(`Invalid Owner`, function () {
     cancel.Owner = 10
 
-    assertInvalid(cancel, 'EscrowCancel: invalid field Owner')
+    assertInvalid(
+      cancel,
+      'EscrowCancel: invalid field Owner, expected a valid account address',
+    )
   })
 
   it(`Invalid OfferSequence`, function () {
     cancel.OfferSequence = 'random'
 
-    assertInvalid(cancel, 'EscrowCancel: invalid field OfferSequence')
+    assertInvalid(
+      cancel,
+      'EscrowCancel: invalid field OfferSequence, expected a valid number',
+    )
   })
 })

@@ -76,8 +76,9 @@ export interface NFTokenAcceptOfferMetadata extends TransactionMetadataBase {
 function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
   const value = parseAmountValue(tx.NFTokenBrokerFee)
   if (Number.isNaN(value)) {
+    // already checked, additional sanity check
     throw new ValidationError(
-      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee',
+      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee, expected a valid Amount',
     )
   }
 

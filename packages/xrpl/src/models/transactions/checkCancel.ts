@@ -1,6 +1,6 @@
 import {
   BaseTransaction,
-  isString,
+  isHexString,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
