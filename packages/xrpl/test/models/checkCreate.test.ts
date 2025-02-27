@@ -40,7 +40,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidDestination, 'CheckCreate: invalid field Destination')
+    assertInvalid(
+      invalidDestination,
+      'CheckCreate: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`throws w/ invalid SendMax`, function () {
@@ -56,7 +59,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidSendMax, 'CheckCreate: invalid field SendMax')
+    assertInvalid(
+      invalidSendMax,
+      'CheckCreate: invalid field SendMax, expected a valid Amount',
+    )
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
@@ -74,7 +80,7 @@ describe('CheckCreate', function () {
 
     assertInvalid(
       invalidDestinationTag,
-      'CheckCreate: invalid field DestinationTag',
+      'CheckCreate: invalid field DestinationTag, expected a valid number',
     )
   })
 
@@ -91,7 +97,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidExpiration, 'CheckCreate: invalid field Expiration')
+    assertInvalid(
+      invalidExpiration,
+      'CheckCreate: invalid field Expiration, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid InvoiceID`, function () {
@@ -106,6 +115,9 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid field InvoiceID')
+    assertInvalid(
+      invalidInvoiceID,
+      'CheckCreate: invalid field InvoiceID, expected a valid hex string',
+    )
   })
 })

@@ -40,13 +40,15 @@ describe('AccountDelete', function () {
 
   it(`throws w/ invalid Destination`, function () {
     validAccountDelete.Destination = 65478965
-    const errorMessage = 'AccountDelete: invalid field Destination'
+    const errorMessage =
+      'AccountDelete: invalid field Destination, expected a valid account address'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
     validAccountDelete.DestinationTag = 'gvftyujnbv'
-    const errorMessage = 'AccountDelete: invalid field DestinationTag'
+    const errorMessage =
+      'AccountDelete: invalid field DestinationTag, expected a valid number'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
@@ -54,7 +56,8 @@ describe('AccountDelete', function () {
     validAccountDelete.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'AccountDelete: invalid field Credentials'
+    const errorMessage =
+      'AccountDelete: invalid field Credentials, expected a valid array'
     assertInvalid(validAccountDelete, errorMessage)
   })
 

@@ -80,8 +80,18 @@ export function assertTxValidationError(
   validateTx: (tx: any) => void,
   errorMessage: string,
 ): void {
-  assert.throws(() => validateTx(tx), ValidationError, errorMessage)
-  assert.throws(() => validate(tx), ValidationError, errorMessage)
+  assert.throws(
+    () => validateTx(tx),
+    ValidationError,
+    // eslint-disable-next-line require-unicode-regexp -- TS complains if it's included
+    new RegExp(`^${errorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'u'),
+  )
+  assert.throws(
+    () => validate(tx),
+    ValidationError,
+    // eslint-disable-next-line require-unicode-regexp -- TS complains if it's included
+    new RegExp(`^${errorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'u'),
+  )
 }
 
 /**
