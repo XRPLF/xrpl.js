@@ -102,10 +102,6 @@ describe('DepositPreauth', function () {
       depositPreauth,
       "DepositPreauth: Account can't unauthorize its own address",
     )
-    assertInvalid(
-      depositPreauth,
-      "DepositPreauth: Account can't unauthorize its own address",
-    )
   })
 
   it('throws when AuthorizeCredentials is not an array', function () {
