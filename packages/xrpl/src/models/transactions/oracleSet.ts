@@ -144,7 +144,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
-      /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate the priceData.PriceData.AssetPrice value */
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate priceData.PriceData.AssetPrice value */
       if (
         'AssetPrice' in priceData.PriceData &&
         !(
