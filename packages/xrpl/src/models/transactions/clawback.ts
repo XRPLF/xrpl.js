@@ -53,7 +53,9 @@ export function validateClawback(tx: Record<string, unknown>): void {
 
   if (isIssuedCurrency(tx.Amount)) {
     if (tx.Account === tx.Amount.issuer) {
-      throw new ValidationError('Clawback: invalid holder Account')
+      throw new ValidationError(
+        'Clawback: Amount.issuer and Account cannot be the same',
+      )
     }
 
     if (tx.Holder) {
@@ -61,7 +63,9 @@ export function validateClawback(tx: Record<string, unknown>): void {
     }
   } else if (isMPTAmount(tx.Amount)) {
     if (tx.Account === tx.Holder) {
-      throw new ValidationError('Clawback: invalid holder Account')
+      throw new ValidationError(
+        'Clawback: Account and Holder cannot be the same',
+      )
     }
 
     if (!tx.Holder) {

@@ -146,6 +146,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Destination', isAccount)
 
   let isSellOffer = false
+  // TODO: refactor some of this flag logic
   if (isNumber(tx.Flags)) {
     isSellOffer = isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
   } else if (isRecord(tx.Flags)) {

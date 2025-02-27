@@ -178,14 +178,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateOptionalField(tx, 'InvoiceID', isHexString)
-
-  if (
-    tx.Paths !== undefined &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
-  ) {
-    throw new ValidationError('Payment: invalid field Paths')
-  }
+  validateOptionalField(tx, 'Paths', isPaths, 'expected a valid Paths array')
 
   validateOptionalField(tx, 'SendMax', isAmount)
   validateOptionalField(tx, 'DeliverMin', isAmount)
@@ -265,7 +258,7 @@ function isPath(path: Array<Record<string, unknown>>): boolean {
   return true
 }
 
-function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
+function isPaths(paths: unknown): boolean {
   if (!Array.isArray(paths) || paths.length === 0) {
     return false
   }

@@ -69,7 +69,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAccount, 'Clawback: invalid holder Account')
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Amount.issuer and Account cannot be the same',
+    )
   })
 
   it(`verifies valid MPT Clawback`, function () {
@@ -97,7 +100,10 @@ describe('Clawback', function () {
       Holder: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAccount, 'Clawback: invalid holder Account')
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Account and Holder cannot be the same',
+    )
   })
 
   it(`throws w/ invalid Holder`, function () {

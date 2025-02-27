@@ -134,7 +134,10 @@ describe('Payment', function () {
 
   it(`throws when Paths is invalid`, function () {
     payment.Paths = [[{ account: 123 }]]
-    assertInvalid(payment, 'Payment: invalid field Paths')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Paths, expected a valid Paths array',
+    )
   })
 
   it(`throws when SendMax is invalid`, function () {

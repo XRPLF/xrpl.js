@@ -10,8 +10,11 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isNumberWithBounds,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
+
+const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -125,7 +128,11 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'NFTokenTaxon', isNumber)
   validateOptionalField(tx, 'Issuer', isAccount)
-  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(
+    tx,
+    'TransferFee',
+    isNumberWithBounds(0, MAX_TRANSFER_FEE),
+  )
   validateOptionalField(tx, 'URI', isHexString)
 
   if (tx.Account === tx.Issuer) {
