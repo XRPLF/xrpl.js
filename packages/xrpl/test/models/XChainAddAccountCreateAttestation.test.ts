@@ -210,7 +210,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend',
+      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend, expected 0 or 1',
     )
   })
 
@@ -228,7 +228,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
+      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount, expected a valid number or hex string',
     )
   })
 

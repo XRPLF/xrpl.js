@@ -80,7 +80,10 @@ describe('DepositPreauth', function () {
 
   it('throws when Authorize is not a string', function () {
     depositPreauth.Authorize = 1234
-    assertInvalid(depositPreauth, 'DepositPreauth: invalid field Authorize')
+    assertInvalid(
+      depositPreauth,
+      'DepositPreauth: invalid field Authorize, expected a valid account address',
+    )
   })
 
   it('throws when an Account attempts to preauthorize its own address', function () {
@@ -93,7 +96,10 @@ describe('DepositPreauth', function () {
 
   it('throws when Unauthorize is not a string', function () {
     depositPreauth.Unauthorize = 1234
-    assertInvalid(depositPreauth, 'DepositPreauth: invalid field Unauthorize')
+    assertInvalid(
+      depositPreauth,
+      'DepositPreauth: invalid field Unauthorize, expected a valid account address',
+    )
   })
 
   it('throws when an Account attempts to unauthorize its own address', function () {

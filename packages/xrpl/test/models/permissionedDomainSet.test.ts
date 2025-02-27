@@ -73,7 +73,7 @@ describe('PermissionedDomainSet', function () {
     tx.AcceptedCredentials = 'AcceptedCredentials is not an array'
     assertInvalid(
       tx,
-      'PermissionedDomainSet: invalid field AcceptedCredentials',
+      'PermissionedDomainSet: invalid field AcceptedCredentials, expected a valid array',
     )
   })
 

@@ -159,13 +159,15 @@ describe('OracleSet', function () {
 
   it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {
     tx.PriceDataSeries[0].PriceData.AssetPrice = 'abcd'
-    const errorMessage = 'OracleSet: invalid field AssetPrice'
+    const errorMessage =
+      'OracleSet: invalid field AssetPrice, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ invalid Scale of PriceDataSeries`, function () {
     tx.PriceDataSeries[0].PriceData.Scale = 'abcd'
-    const errorMessage = 'OracleSet: invalid field Scale'
+    const errorMessage =
+      'OracleSet: invalid field Scale, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 

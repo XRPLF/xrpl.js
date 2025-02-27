@@ -257,7 +257,7 @@ class Amount extends SerializedType {
    * @returns void, but will throw if invalid amount
    */
   private static assertXrpIsValid(amount: string): void {
-    if (amount.indexOf('.') !== -1) {
+    if (!Number.isInteger(Number(amount))) {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
 

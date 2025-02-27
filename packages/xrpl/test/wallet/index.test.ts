@@ -711,7 +711,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /1\.2 is an illegal amount/u)
+      }, /AccountSet: invalid field Fee, expected a valid XRP Amount/u)
     })
 
     it('sign throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
@@ -729,7 +729,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /1123456\.7 is an illegal amount/u)
+      }, /AccountSet: invalid field Fee, expected a valid XRP Amount/u)
     })
 
     it('sign with a ticket transaction', async function () {

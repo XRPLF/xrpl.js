@@ -6,6 +6,8 @@ import {
   validateBaseTransaction,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  validateOptionalField,
+  isAccount,
 } from './common'
 
 /**
@@ -47,21 +49,16 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 
   validateSingleAuthorizationFieldProvided(tx)
 
-  if (tx.Authorize !== undefined) {
-    if (typeof tx.Authorize !== 'string') {
-      throw new ValidationError('DepositPreauth: invalid field Authorize')
-    }
+  validateOptionalField(tx, 'Authorize', isAccount)
+  validateOptionalField(tx, 'Unauthorize', isAccount)
 
+  if (tx.Authorize !== undefined) {
     if (tx.Account === tx.Authorize) {
       throw new ValidationError(
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
   } else if (tx.Unauthorize !== undefined) {
-    if (typeof tx.Unauthorize !== 'string') {
-      throw new ValidationError('DepositPreauth: invalid field Unauthorize')
-    }
-
     if (tx.Account === tx.Unauthorize) {
       throw new ValidationError(
         "DepositPreauth: Account can't unauthorize its own address",

@@ -123,7 +123,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: null,
     }
-    const errorMessage = 'AMMBid: invalid field AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts, expected objects in array'
     assertInvalid(bid, errorMessage)
   })
 
@@ -131,7 +132,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: undefined,
     }
-    const errorMessage = 'AMMBid: invalid field AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts, expected objects in array'
     assertInvalid(bid, errorMessage)
   })
 
@@ -139,7 +141,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: 1234,
     }
-    const errorMessage = 'AMMBid: invalid field AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts, expected objects in array'
     assertInvalid(bid, errorMessage)
   })
 

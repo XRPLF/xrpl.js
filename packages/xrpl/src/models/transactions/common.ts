@@ -28,10 +28,9 @@ function isMemo(obj: { Memo?: unknown }): boolean {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memo = obj.Memo as Record<string, unknown>
   const size = Object.keys(memo).length
-  const validData = memo.MemoData == null || typeof memo.MemoData === 'string'
-  const validFormat =
-    memo.MemoFormat == null || typeof memo.MemoFormat === 'string'
-  const validType = memo.MemoType == null || typeof memo.MemoType === 'string'
+  const validData = memo.MemoData == null || isHexString(memo.MemoData)
+  const validFormat = memo.MemoFormat == null || isHexString(memo.MemoFormat)
+  const validType = memo.MemoType == null || isHexString(memo.MemoType)
 
   return (
     size >= 1 &&
@@ -77,6 +76,16 @@ const AUTHORIZE_CREDENTIAL_SIZE = 1
  */
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
+}
+
+/**
+ * Verify the form and type of an array at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the array is properly formed.
+ */
+export function isArray(value: unknown): value is unknown[] {
+  return Array.isArray(value)
 }
 
 /**
@@ -278,6 +287,7 @@ const invalidMessagesMap: Record<string, string> = {
   isHexString: 'expected a valid hex string',
   isNumber: 'expected a valid number',
   isNumberWithBoundsInternal: 'expected a valid number',
+  isArray: 'expected a valid array',
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
@@ -439,6 +449,7 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
+// eslint-disable-next-line max-lines-per-function, max-statements -- not worth refactoring
 export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateRequiredField(common, 'TransactionType', isString)
 
@@ -448,45 +459,52 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   }
 
   validateRequiredField(common, 'Account', isAccount)
-
-  validateOptionalField(common, 'Fee', isString)
-
+  validateOptionalField(common, 'Fee', isXRPAmount)
   validateOptionalField(common, 'Sequence', isNumber)
-
   validateOptionalField(common, 'AccountTxnID', isHexString)
-
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
-
   validateOptionalField(
     common,
     'Flags',
     (inp) => isNumber(inp) || isRecord(inp),
+    'expected a valid number or Flags object',
   )
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
-  if (memos !== undefined && !memos.every(isMemo)) {
-    throw new ValidationError('BaseTransaction: invalid field Memos')
+  if (memos !== undefined) {
+    if (!isArray(memos)) {
+      throw new ValidationError(
+        'BaseTransaction: invalid field Memos, expected an array',
+      )
+    }
+    if (!memos.every(isMemo)) {
+      throw new ValidationError(
+        'BaseTransaction: invalid field Memos, expected an array of valid Memo objects',
+      )
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const signers = common.Signers as Array<Record<string, unknown>> | undefined
 
-  if (
-    signers !== undefined &&
-    (signers.length === 0 || !signers.every(isSigner))
-  ) {
-    throw new ValidationError('BaseTransaction: invalid field Signers')
+  if (signers !== undefined) {
+    if (!isArray(signers)) {
+      throw new ValidationError(
+        'BaseTransaction: invalid field Signers, expected an array',
+      )
+    }
+    if (signers.length === 0 || !signers.every(isSigner)) {
+      throw new ValidationError(
+        'BaseTransaction: invalid field Signers, expected an array of valid Signer objects',
+      )
+    }
   }
 
   validateOptionalField(common, 'SourceTag', isNumber)
-
   validateOptionalField(common, 'SigningPubKey', isHexString)
-
   validateOptionalField(common, 'TicketSequence', isNumber)
-
   validateOptionalField(common, 'TxnSignature', isHexString)
-
   validateOptionalField(common, 'NetworkID', isNumber)
 }
 
@@ -558,7 +576,7 @@ export function validateCredentialsList(
   if (credentials == null) {
     return
   }
-  if (!Array.isArray(credentials)) {
+  if (!isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: invalid field Credentials, expected a valid array`,
     )
@@ -595,7 +613,7 @@ export function validateCredentialsList(
 // Type guard to ensure we're working with AuthorizeCredential[]
 // Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
 function isAuthorizeCredentialArray(
-  list: AuthorizeCredential[] | string[],
+  list: unknown[],
 ): list is AuthorizeCredential[] {
   return typeof list[0] !== 'string'
 }
@@ -606,9 +624,7 @@ function isAuthorizeCredentialArray(
  * @param objectList - Array of objects to check for duplicates
  * @returns True if duplicates exist, false otherwise
  */
-export function containsDuplicates(
-  objectList: AuthorizeCredential[] | string[],
-): boolean {
+export function containsDuplicates(objectList: unknown[]): boolean {
   // Case-1: Process a list of string-IDs
   if (typeof objectList[0] === 'string') {
     const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))

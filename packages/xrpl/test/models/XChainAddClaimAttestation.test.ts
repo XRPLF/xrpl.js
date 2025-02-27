@@ -171,7 +171,7 @@ describe('XChainAddClaimAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddClaimAttestation: invalid field WasLockingChainSend',
+      'XChainAddClaimAttestation: invalid field WasLockingChainSend, expected 0 or 1',
     )
   })
 

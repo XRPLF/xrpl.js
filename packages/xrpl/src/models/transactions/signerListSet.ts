@@ -3,6 +3,7 @@ import { SignerEntry } from '../common'
 
 import {
   BaseTransaction,
+  isArray,
   isNumber,
   validateBaseTransaction,
   validateRequiredField,
@@ -51,7 +52,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     return
   }
 
-  validateRequiredField(tx, 'SignerEntries', Array.isArray)
+  validateRequiredField(tx, 'SignerEntries', isArray)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
   const signerEntries = tx.SignerEntries as unknown[]

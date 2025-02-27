@@ -97,7 +97,9 @@ function validateAuthAccounts(
       authAccount.AuthAccount == null ||
       typeof authAccount.AuthAccount !== 'object'
     ) {
-      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
+      throw new ValidationError(
+        `AMMBid: invalid field AuthAccounts, expected objects in array`,
+      )
     }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
     // @ts-expect-error -- used for null check
