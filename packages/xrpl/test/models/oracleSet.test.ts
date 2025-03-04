@@ -174,7 +174,7 @@ describe('OracleSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ valid AssetPrice of PriceDataSeries`, function () {
+  it(`verifies valid AssetPrice of PriceDataSeries`, function () {
     // valid string which can be parsed as hexadecimal number
     tx.PriceDataSeries[0].PriceData.AssetPrice = 'ab15'
     assert.doesNotThrow(() => validate(tx))
