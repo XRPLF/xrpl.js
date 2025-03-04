@@ -129,4 +129,4 @@ class UInt64 extends UInt {
   }
 }
 
-export { UInt64, HEX_REGEX }
+export { UInt64 }

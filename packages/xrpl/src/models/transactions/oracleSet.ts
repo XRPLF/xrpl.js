@@ -1,4 +1,4 @@
-import { HEX_REGEX } from 'ripple-binary-codec/dist/types/uint-64'
+import { isHex } from '../utils'
 
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
@@ -150,7 +150,9 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         !(
           isNumber(priceData.PriceData.AssetPrice) ||
           (typeof priceData.PriceData.AssetPrice === 'string' &&
-            HEX_REGEX.test(priceData.PriceData.AssetPrice))
+            isHex(priceData.PriceData.AssetPrice) &&
+            priceData.PriceData.AssetPrice.length <= 16 &&
+            priceData.PriceData.AssetPrice.length >= 1)
         )
       ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
