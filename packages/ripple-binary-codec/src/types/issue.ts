@@ -4,16 +4,14 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
-import { Hash192 } from 'ripple-binary-codec/dist/types'
-import { isMPTAmount } from 'xrpl'
+import { Hash192 } from './hash-192'
 
 /**
  * Interface for JSON objects that represent amounts
  */
 interface IssueObject extends JsonObject {
-  currency: string
+  currency?: string
   issuer?: string
-  value?: string
   mpt_issuance_id?: string
 }
 
@@ -22,15 +20,12 @@ interface IssueObject extends JsonObject {
  */
 function isIssueObject(arg): arg is IssueObject {
   const keys = Object.keys(arg).sort()
+  const isXRP = keys.length === 1 && keys[0] === 'currency'
+  const isIOU =
+    keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
+  const isMPT = keys.length === 1 && keys[0] === 'mpt_issuance_id'
 
-  // Check if is XRP
-  if (keys.length === 1) {
-    return keys[0] === 'currency'
-  }
-  const isIOU = keys.length === 2 && (keys[0] === 'currency' && keys[1] === 'issuer')
-  const isMPT = keys.length === 2 && (keys[0] === 'value' && keys[1] === 'mpt_issuance_id')
-
-  return isIOU || isMPT
+  return isXRP || isIOU || isMPT
 }
 
 /**
@@ -56,18 +51,24 @@ class Issue extends SerializedType {
     }
 
     if (isIssueObject(value)) {
-      const currency = Currency.from(value.currency).toBytes()
-      if (value.issuer == null) {
+      if (value.currency) {
+        const currency = Currency.from(value.currency).toBytes()
+
+        //IOU case
+        if (value.issuer) {
+          const issuer = AccountID.from(value.issuer).toBytes()
+          return new Issue(concat([currency, issuer]))
+        }
+
+        //XRP case
         return new Issue(currency)
       }
 
-      if (isMPTAmount(value)) {
+      // MPT case
+      if (value.mpt_issuance_id) {
         const mptIssuanceIdBytes = Hash192.from(value.mpt_issuance_id).toBytes()
         return new Issue(mptIssuanceIdBytes)
       }
-
-      const issuer = AccountID.from(value.issuer).toBytes()
-      return new Issue(concat([currency, issuer]))
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -94,12 +95,14 @@ class Issue extends SerializedType {
    * @returns the JSON interpretation of this.bytes
    */
   toJSON(): IssueObject {
+    // If the buffer is exactly 24 bytes, treat it as an MPT amount.
+    if (this.toBytes.length === Hash192.width) {
+      return {
+        mpt_issuance_id: this.toHex().toUpperCase(),
+      }
+    }
+
     const parser = new BinaryParser(this.toString())
-
-    if len(self.buffer) == Hash192:
-    return {"mpt_issuance_id": self.to_hex().upper()}
-
-parser = BinaryParser(self.to_hex())
 
     const currency = Currency.fromParser(parser) as Currency
     if (currency.toJSON() === 'XRP') {
