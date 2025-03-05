@@ -151,7 +151,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         'AssetPrice' in priceData.PriceData &&
         !(
           isNumber(priceData.PriceData.AssetPrice) ||
-          (typeof priceData.PriceData.AssetPrice === 'string' &&
+          (isString(priceData.PriceData.AssetPrice) &&
             isHex(priceData.PriceData.AssetPrice) &&
             priceData.PriceData.AssetPrice.length <=
               _MAXIMUM_ASSET_PRICE_LENGTH &&
