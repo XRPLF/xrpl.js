@@ -4,10 +4,10 @@
     "jsx": "react",
     "jsxFactory": "JSX.createElement",
     "jsxFragmentFactory": "JSX.Fragment",
-    "lib": ["es2015", "dom"],
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "ES2015"
+    "lib": ["es2021"],
+    "module": "Node16",
+    "target": "ES2021",
+    "skipLibCheck": true
   },
-  "include": ["./typedoc.tsx"]
+  "include": ["./typedoc.mts"]
 }
