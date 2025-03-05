@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Adds `apiVersion` option on `Client` constructor
+
 ## 4.2.0 (2025-2-13)
 
 ### Added

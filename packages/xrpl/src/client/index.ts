@@ -28,7 +28,6 @@ import {
   AccountOffersRequest,
   AccountOffersResponse,
   AccountTxRequest,
-  AccountTxResponse,
   // ledger methods
   LedgerDataRequest,
   LedgerDataResponse,
@@ -41,7 +40,9 @@ import type {
   MarkerResponse,
   SubmitResponse,
   SimulateRequest,
+  BaseRequest,
 } from '../models/methods'
+import { AccountTxResponseBase } from '../models/methods/accountTx'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
 import {
   SimulateBinaryResponse,
@@ -97,7 +98,9 @@ import {
   handleStreamPartialPayment,
 } from './partialPayment'
 
-export interface ClientOptions extends ConnectionUserOptions {
+export interface ClientOptions<
+  ClientAPIVersion extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends ConnectionUserOptions {
   /**
    * Multiplication factor to multiply estimated fee by to provide a cushion in case the
    * required fee rises during submission of a transaction. Defaults to 1.2.
@@ -116,6 +119,12 @@ export interface ClientOptions extends ConnectionUserOptions {
    * Duration to wait for a request to timeout.
    */
   timeout?: number
+  /**
+   * API Version to use for requests.
+   *
+   * @default DEFAULT_API_VERSION
+   */
+  apiVersion?: ClientAPIVersion
 }
 
 // Make sure to update both this and `RequestNextPageReturnMap` at the same time
@@ -127,7 +136,10 @@ type RequestNextPageType =
   | AccountTxRequest
   | LedgerDataRequest
 
-type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
+type RequestNextPageReturnMap<
+  T extends BaseRequest,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
   ? AccountLinesResponse
@@ -136,7 +148,7 @@ type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   : T extends AccountOffersRequest
   ? AccountOffersResponse
   : T extends AccountTxRequest
-  ? AccountTxResponse
+  ? AccountTxResponseBase<V>
   : T extends LedgerDataRequest
   ? LedgerDataResponse
   : never
@@ -189,7 +201,9 @@ const NORMAL_DISCONNECT_CODE = 1000
  *
  * @category Clients
  */
-class Client extends EventEmitter<EventTypes> {
+class Client<
+  ClientAPIVersion extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends EventEmitter<EventTypes> {
   /*
    * Underlying connection to rippled.
    */
@@ -227,7 +241,7 @@ class Client extends EventEmitter<EventTypes> {
    * API Version used by the server this client is connected to
    *
    */
-  public apiVersion: APIVersion = DEFAULT_API_VERSION
+  public apiVersion: APIVersion
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.
@@ -243,7 +257,10 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   /* eslint-disable max-lines-per-function -- the constructor requires more lines to implement the logic */
-  public constructor(server: string, options: ClientOptions = {}) {
+  public constructor(
+    server: string,
+    options: ClientOptions<ClientAPIVersion> = {},
+  ) {
     super()
     if (typeof server !== 'string' || !/wss?(?:\+unix)?:\/\//u.exec(server)) {
       throw new ValidationError(
@@ -253,6 +270,8 @@ class Client extends EventEmitter<EventTypes> {
 
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
+
+    this.apiVersion = options.apiVersion ?? DEFAULT_API_VERSION
 
     this.connection = new Connection(server, options)
 
@@ -337,7 +356,7 @@ class Client extends EventEmitter<EventTypes> {
    */
   public async request<
     R extends Request,
-    V extends APIVersion = typeof DEFAULT_API_VERSION,
+    V extends APIVersion = ClientAPIVersion,
     T = RequestResponseMap<R, V>,
   >(req: R): Promise<T> {
     const request = {
@@ -382,8 +401,8 @@ class Client extends EventEmitter<EventTypes> {
    */
   public async requestNextPage<
     T extends RequestNextPageType,
-    U extends RequestNextPageReturnMap<T>,
-  >(req: T, resp: U): Promise<RequestNextPageReturnMap<T>> {
+    U extends RequestNextPageReturnMap<T, ClientAPIVersion>,
+  >(req: T, resp: U): Promise<U> {
     if (!resp.result.marker) {
       return Promise.reject(
         new NotFoundError('response does not have a next page'),
@@ -422,7 +441,10 @@ class Client extends EventEmitter<EventTypes> {
   public on<
     T extends EventTypes,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-    U extends (...args: any[]) => void = OnEventToListenerMap<T>,
+    U extends (...args: any[]) => void = OnEventToListenerMap<
+      T,
+      ClientAPIVersion
+    >,
   >(eventName: T, listener: U): this {
     return super.on(eventName, listener)
   }
@@ -460,7 +482,7 @@ class Client extends EventEmitter<EventTypes> {
 
   public async requestAll<
     T extends MarkerRequest,
-    U = RequestAllResponseMap<T, APIVersion>,
+    U = RequestAllResponseMap<T, ClientAPIVersion>,
   >(request: T, collect?: string): Promise<U[]> {
     /*
      * The data under collection is keyed based on the command. Fail if command
@@ -488,7 +510,8 @@ class Client extends EventEmitter<EventTypes> {
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
       const singleResponse = await this.connection.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      const singleResult = (singleResponse as MarkerResponse<APIVersion>).result
+      const singleResult = (singleResponse as MarkerResponse<ClientAPIVersion>)
+        .result
       if (!(collectKey in singleResult)) {
         throw new XrplError(`${collectKey} not in result`)
       }
@@ -873,7 +896,7 @@ class Client extends EventEmitter<EventTypes> {
       // A wallet to sign a transaction. It must be provided when submitting an unsigned transaction.
       wallet?: Wallet
     },
-  ): Promise<TxResponse<T>> {
+  ): Promise<TxResponse<T, ClientAPIVersion>> {
     const signedTx = await getSignedTx(this, transaction, opts)
 
     const lastLedger = getLastLedgerSequence(signedTx)
