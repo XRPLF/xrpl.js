@@ -6,14 +6,21 @@ import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
 import { Hash192 } from './hash-192'
 
+interface XRPIssue extends JsonObject {
+  currency: string
+}
+
+interface IOUIssue extends JsonObject {
+  currency: string
+  issuer: string
+}
+interface MPTIssue extends JsonObject {
+  mpt_issuance_id: string
+}
 /**
  * Interface for JSON objects that represent amounts
  */
-interface IssueObject extends JsonObject {
-  currency?: string
-  issuer?: string
-  mpt_issuance_id?: string
-}
+type IssueObject = XRPIssue | IOUIssue | MPTIssue
 
 /**
  * Type guard for AmountObject
@@ -52,11 +59,11 @@ class Issue extends SerializedType {
 
     if (isIssueObject(value)) {
       if (value.currency) {
-        const currency = Currency.from(value.currency).toBytes()
+        const currency = Currency.from(value.currency.toString()).toBytes()
 
         //IOU case
         if (value.issuer) {
-          const issuer = AccountID.from(value.issuer).toBytes()
+          const issuer = AccountID.from(value.issuer.toString()).toBytes()
           return new Issue(concat([currency, issuer]))
         }
 
@@ -66,7 +73,9 @@ class Issue extends SerializedType {
 
       // MPT case
       if (value.mpt_issuance_id) {
-        const mptIssuanceIdBytes = Hash192.from(value.mpt_issuance_id).toBytes()
+        const mptIssuanceIdBytes = Hash192.from(
+          value.mpt_issuance_id.toString(),
+        ).toBytes()
         return new Issue(mptIssuanceIdBytes)
       }
     }
