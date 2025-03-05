@@ -1,11 +1,13 @@
-import { ValidationError } from '../../errors'
-
 import {
   BaseTransaction,
   GlobalFlags,
   validateBaseTransaction,
   validateCredentialsList,
+  validateOptionalField,
+  validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
+  isXRPAmount,
 } from './common'
 
 /**
@@ -149,6 +151,12 @@ export interface PaymentChannelClaim extends BaseTransaction {
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'Channel', isHexString)
+  validateOptionalField(tx, 'Balance', isXRPAmount)
+  validateOptionalField(tx, 'Amount', isXRPAmount)
+  validateOptionalField(tx, 'Signature', isHexString)
+  validateOptionalField(tx, 'PublicKey', isHexString)
+
   validateCredentialsList(
     tx.CredentialIDs,
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
@@ -156,28 +164,4 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
-
-  if (tx.Channel === undefined) {
-    throw new ValidationError('PaymentChannelClaim: missing Channel')
-  }
-
-  if (typeof tx.Channel !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Channel must be a string')
-  }
-
-  if (tx.Balance !== undefined && typeof tx.Balance !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Balance must be a string')
-  }
-
-  if (tx.Amount !== undefined && typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Amount must be a string')
-  }
-
-  if (tx.Signature !== undefined && typeof tx.Signature !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: Signature must be a string')
-  }
-
-  if (tx.PublicKey !== undefined && typeof tx.PublicKey !== 'string') {
-    throw new ValidationError('PaymentChannelClaim: PublicKey must be a string')
-  }
 }

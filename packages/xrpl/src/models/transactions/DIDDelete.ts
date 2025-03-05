@@ -1,8 +1,8 @@
 import { BaseTransaction, validateBaseTransaction } from './common'
 
-// TODO: add docs
-
 /**
+ * Delete the DID ledger entry associated with the specified Account field.
+ *
  * @category Transaction Models
  */
 export interface DIDDelete extends BaseTransaction {
