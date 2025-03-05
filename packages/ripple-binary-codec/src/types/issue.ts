@@ -50,7 +50,7 @@ class Issue extends SerializedType {
    *
    * @param value An Amount, object representing an IOU, or a string
    *     representing an integer amount
-   * @returns An Amount object
+   * @returns An Issue object
    */
   static from<T extends Issue | IssueObject>(value: T): Issue {
     if (value instanceof Issue) {
@@ -87,9 +87,16 @@ class Issue extends SerializedType {
    * Read an amount from a BinaryParser
    *
    * @param parser BinaryParser to read the Amount from
-   * @returns An Amount object
+   * @param hint The number of bytes to consume from the parser.
+   * For an MPT amount, pass 24 (the fixed length for Hash192).
+   *
+   * @returns An Issue object
    */
-  static fromParser(parser: BinaryParser): Issue {
+  static fromParser(parser: BinaryParser, hint?: number): Issue {
+    if (hint === Hash192.width) {
+      const mptBytes = parser.read(Hash192.width)
+      return new Issue(mptBytes)
+    }
     const currency = parser.read(20)
     if (new Currency(currency).toJSON() === 'XRP') {
       return new Issue(currency)
@@ -105,7 +112,7 @@ class Issue extends SerializedType {
    */
   toJSON(): IssueObject {
     // If the buffer is exactly 24 bytes, treat it as an MPT amount.
-    if (this.toBytes.length === Hash192.width) {
+    if (this.toBytes().length === Hash192.width) {
       return {
         mpt_issuance_id: this.toHex().toUpperCase(),
       }
