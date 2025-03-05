@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@noble/curves": "^1.0.0",
-    "@xrplf/isomorphic": "^1.0.0",
+    "@xrplf/isomorphic": "^1.0.1",
     "ripple-address-codec": "^5.0.0"
   },
   "keywords": [
