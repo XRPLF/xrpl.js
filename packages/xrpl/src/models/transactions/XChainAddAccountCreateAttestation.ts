@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateRequiredField,
@@ -101,9 +101,9 @@ export function validateXChainAddAccountCreateAttestation(
 
   validateRequiredField(tx, 'OtherChainSource', isAccount)
 
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
 
-  validateRequiredField(tx, 'Signature', isString)
+  validateRequiredField(tx, 'Signature', isHexString)
 
   validateRequiredField(tx, 'SignatureReward', isAmount)
 
@@ -111,12 +111,14 @@ export function validateXChainAddAccountCreateAttestation(
     tx,
     'WasLockingChainSend',
     (inp) => inp === 0 || inp === 1,
+    'expected 0 or 1',
   )
 
   validateRequiredField(
     tx,
     'XChainAccountCreateCount',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isNumber(inp) || isHexString(inp),
+    'expected a valid number or hex string',
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)

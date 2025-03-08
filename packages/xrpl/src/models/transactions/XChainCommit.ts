@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateOptionalField,
@@ -67,7 +67,8 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp) => isNumber(inp) || isHexString(inp),
+    'expected a number or hex string',
   )
 
   validateOptionalField(tx, 'OtherChainDestination', isAccount)
