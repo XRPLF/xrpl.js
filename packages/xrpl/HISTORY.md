@@ -12,6 +12,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Support for the Permissioned Domains amendment (XLS-80).
 * Support for the `simulate` RPC ([XLS-69](https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0069-simulate))
 * Support for XLS-77d Deep-Freeze amendment
+* Add support for `Batch` amendment (XLS-56)
 
 ### Changed
 * Deprecated `setTransactionFlagsToNumber`. Start using convertTxFlagsToNumber instead
