@@ -1,5 +1,6 @@
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
+import { isHex } from '../utils'
 
 import {
   BaseTransaction,
@@ -82,7 +83,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'AssetClass', isString)
 
-  // eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
+  /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(tx, 'PriceDataSeries', (value) => {
     if (!Array.isArray(value)) {
       throw new ValidationError('OracleSet: PriceDataSeries must be an array')
@@ -142,14 +143,25 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
+      const _MINIMUM_ASSET_PRICE_LENGTH = 1
+      const _MAXIMUM_ASSET_PRICE_LENGTH = 16
+
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate priceData.PriceData.AssetPrice value */
       if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
         'AssetPrice' in priceData.PriceData &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        !isNumber(priceData.PriceData.AssetPrice)
+        !(
+          isNumber(priceData.PriceData.AssetPrice) ||
+          (isString(priceData.PriceData.AssetPrice) &&
+            isHex(priceData.PriceData.AssetPrice) &&
+            priceData.PriceData.AssetPrice.length <=
+              _MAXIMUM_ASSET_PRICE_LENGTH &&
+            priceData.PriceData.AssetPrice.length >=
+              _MINIMUM_ASSET_PRICE_LENGTH)
+        )
       ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
       }
+      /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
@@ -173,4 +185,5 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
     }
     return true
   })
+  /* eslint-enable max-statements, max-lines-per-function */
 }
