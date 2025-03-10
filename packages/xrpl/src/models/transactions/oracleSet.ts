@@ -146,22 +146,6 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       const _MINIMUM_ASSET_PRICE_LENGTH = 1
       const _MAXIMUM_ASSET_PRICE_LENGTH = 16
 
-<<<<<<< HEAD
-      /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate priceData.PriceData.AssetPrice value */
-      if (
-        'AssetPrice' in priceData.PriceData &&
-        !(
-          isNumber(priceData.PriceData.AssetPrice) ||
-          (isString(priceData.PriceData.AssetPrice) &&
-            isHex(priceData.PriceData.AssetPrice) &&
-            priceData.PriceData.AssetPrice.length <=
-              _MAXIMUM_ASSET_PRICE_LENGTH &&
-            priceData.PriceData.AssetPrice.length >=
-              _MINIMUM_ASSET_PRICE_LENGTH)
-        )
-      ) {
-        throw new ValidationError('OracleSet: invalid field AssetPrice')
-=======
       /* eslint-disable @typescript-eslint/no-unsafe-member-access, max-depth --
       we need to validate priceData.PriceData.AssetPrice value */
       if ('AssetPrice' in priceData.PriceData) {
@@ -186,7 +170,6 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
             )
           }
         }
->>>>>>> 64fdd0ae (re-organize the if-condition)
       }
       /* eslint-enable @typescript-eslint/no-unsafe-member-access, max-depth */
 
