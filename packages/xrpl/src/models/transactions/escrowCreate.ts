@@ -47,6 +47,10 @@ export interface EscrowCreate extends BaseTransaction {
    * payment, such as a hosted recipient at the destination address.
    */
   DestinationTag?: number
+
+  FinishFunction?: string
+
+  Data?: string
 }
 
 /**
