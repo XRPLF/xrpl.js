@@ -146,6 +146,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       const _MINIMUM_ASSET_PRICE_LENGTH = 1
       const _MAXIMUM_ASSET_PRICE_LENGTH = 16
 
+<<<<<<< HEAD
       /* eslint-disable @typescript-eslint/no-unsafe-member-access -- we need to validate priceData.PriceData.AssetPrice value */
       if (
         'AssetPrice' in priceData.PriceData &&
@@ -160,8 +161,34 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       ) {
         throw new ValidationError('OracleSet: invalid field AssetPrice')
+=======
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access, max-depth --
+      we need to validate priceData.PriceData.AssetPrice value */
+      if ('AssetPrice' in priceData.PriceData) {
+        if (!isNumber(priceData.PriceData.AssetPrice)) {
+          if (typeof priceData.PriceData.AssetPrice !== 'string') {
+            throw new ValidationError(
+              'OracleSet: Field AssetPrice must be a string or a number',
+            )
+          }
+          if (!isHex(priceData.PriceData.AssetPrice)) {
+            throw new ValidationError(
+              'OracleSet: Field AssetPrice must be a valid hex string',
+            )
+          }
+          if (
+            priceData.PriceData.AssetPrice.length <
+              _MINIMUM_ASSET_PRICE_LENGTH ||
+            priceData.PriceData.AssetPrice.length > _MAXIMUM_ASSET_PRICE_LENGTH
+          ) {
+            throw new ValidationError(
+              `OracleSet: Length of AssetPrice field must be between ${_MINIMUM_ASSET_PRICE_LENGTH} and ${_MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
+            )
+          }
+        }
+>>>>>>> 64fdd0ae (re-organize the if-condition)
       }
-      /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+      /* eslint-enable @typescript-eslint/no-unsafe-member-access, max-depth */
 
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
