@@ -61,4 +61,8 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
+
+  FinishFunction?: string
+
+  Data?: string
 }
