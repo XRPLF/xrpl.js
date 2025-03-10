@@ -33,7 +33,7 @@
     "@xrplf/prettier-config": "^1.9.1",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.18.0",
+    "eslint": "^9.22.0",
     "eslint-plugin-array-func": "^3.1.7",
     "eslint-plugin-consistent-default-export-name": "^0.0.15",
     "eslint-plugin-eslint-comments": "^3.2.0",
