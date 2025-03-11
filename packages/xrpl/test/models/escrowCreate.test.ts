@@ -169,12 +169,12 @@ describe('EscrowCreate', function () {
     assert.throws(
       () => validateEscrowCreate(escrow),
       ValidationError,
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
+      'EscrowCreate: Either FinishAfter, Condition, or FinishFunction must be specified',
     )
     assert.throws(
       () => validate(escrow),
       ValidationError,
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
+      'EscrowCreate: Either FinishAfter, Condition, or FinishFunction must be specified',
     )
   })
 })
