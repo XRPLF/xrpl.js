@@ -14,7 +14,7 @@ import { OfferCreate, Transaction } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
-import { ManifestRequest } from './manifest'
+import type { ManifestRequest } from './manifest'
 
 export interface SubscribeBook {
   /**
@@ -455,8 +455,20 @@ export interface PathFindStream extends BaseStream {
 }
 
 /**
+ * The manifest method searches for a path along which a transaction can
+ * possibly be made, and periodically sends updates when the path changes over
+ * time.
+ *
  * @category Streams
  */
+export interface ManifestStream extends BaseStream, ManifestRequest {
+  type: 'manifestReceived'
+}
+
+/**
+ * @category Streams
+ */
+// TODO: Add stream type for manifestReceived
 export type Stream =
   | LedgerStream
   | ValidationStream
@@ -465,6 +477,7 @@ export type Stream =
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream
+  | ManifestStream
 
 export type EventTypes =
   | 'connected'
@@ -493,7 +506,7 @@ export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   : T extends 'consensusPhase'
   ? (consensus: ConsensusStream) => void
   : T extends 'manifestReceived'
-  ? (manifest: ManifestRequest) => void
+  ? (manifest: ManifestStream) => void
   : T extends 'path_find'
   ? (path: PathFindStream) => void
   : T extends 'error'

@@ -137,7 +137,8 @@ describe('Client subscription', function () {
     await new Promise<void>((resolve) => {
       // @es-expect-error Seems like a valid method
       testContext.client.on('manifestReceived', (path) => {
-        assert('type' in path && path.type === 'manifestReceived')
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- TODO: Refactor as this seems pointless
+        assert(path.type === 'manifestReceived')
         resolve()
       })
 
