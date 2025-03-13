@@ -137,7 +137,7 @@ describe('Client subscription', function () {
     await new Promise<void>((resolve) => {
       // @es-expect-error Seems like a valid method
       testContext.client.on('manifestReceived', (path) => {
-        assert(path.type === 'manifestReceived')
+        assert('type' in path && path.type === 'manifestReceived')
         resolve()
       })
 
