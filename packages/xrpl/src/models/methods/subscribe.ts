@@ -455,9 +455,8 @@ export interface PathFindStream extends BaseStream {
 }
 
 /**
- * The manifest method searches for a path along which a transaction can
- * possibly be made, and periodically sends updates when the path changes over
- * time.
+ * The manifest stream sends messages when a new manifest has been processed or updated.
+ * The message contains the public key, either the master public key or ephemeral public key.
  *
  * @category Streams
  */
