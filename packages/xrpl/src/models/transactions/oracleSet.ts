@@ -13,6 +13,8 @@ import {
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
 const SCALE_MAX = 10
+const MINIMUM_ASSET_PRICE_LENGTH = 1
+const MAXIMUM_ASSET_PRICE_LENGTH = 16
 
 /**
  * Creates a new Oracle ledger entry or updates the fields of an existing one, using the Oracle ID.
@@ -143,9 +145,6 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
-      const _MINIMUM_ASSET_PRICE_LENGTH = 1
-      const _MAXIMUM_ASSET_PRICE_LENGTH = 16
-
       /* eslint-disable @typescript-eslint/no-unsafe-member-access, max-depth --
       we need to validate priceData.PriceData.AssetPrice value */
       if ('AssetPrice' in priceData.PriceData) {
@@ -162,11 +161,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
           }
           if (
             priceData.PriceData.AssetPrice.length <
-              _MINIMUM_ASSET_PRICE_LENGTH ||
-            priceData.PriceData.AssetPrice.length > _MAXIMUM_ASSET_PRICE_LENGTH
+              MINIMUM_ASSET_PRICE_LENGTH ||
+            priceData.PriceData.AssetPrice.length > MAXIMUM_ASSET_PRICE_LENGTH
           ) {
             throw new ValidationError(
-              `OracleSet: Length of AssetPrice field must be between ${_MINIMUM_ASSET_PRICE_LENGTH} and ${_MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
+              `OracleSet: Length of AssetPrice field must be between ${MINIMUM_ASSET_PRICE_LENGTH} and ${MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
             )
           }
         }
