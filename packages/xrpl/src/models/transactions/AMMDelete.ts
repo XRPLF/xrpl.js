@@ -1,7 +1,11 @@
-import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
-import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isCurrency,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * Delete an empty Automated Market Maker (AMM) instance that could not be fully deleted automatically.
@@ -37,19 +41,6 @@ export interface AMMDelete extends BaseTransaction {
 export function validateAMMDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMDelete: missing field Asset')
-  }
-
-  if (!isCurrency(tx.Asset)) {
-    throw new ValidationError('AMMDelete: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMDelete: missing field Asset2')
-  }
-
-  if (!isCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMDelete: Asset2 must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
 }

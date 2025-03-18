@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateCheckCash } from '../../src/models/transactions/checkCash'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateCheckCash)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateCheckCash, message)
 
 /**
  * CheckCash Transaction Verification Testing.
@@ -19,8 +21,7 @@ describe('CheckCash', function () {
       Fee: '12',
     } as any
 
-    assert.doesNotThrow(() => validateCheckCash(validCheckCash))
-    assert.doesNotThrow(() => validate(validCheckCash))
+    assertValid(validCheckCash)
   })
 
   it(`throws w/ invalid CheckID`, function () {
@@ -31,15 +32,9 @@ describe('CheckCash', function () {
       CheckID: 83876645678567890,
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidCheckID),
-      ValidationError,
-      'CheckCash: invalid CheckID',
-    )
-    assert.throws(
-      () => validate(invalidCheckID),
-      ValidationError,
-      'CheckCash: invalid CheckID',
+    assertInvalid(
+      invalidCheckID,
+      'CheckCash: invalid field CheckID, expected a valid hex string',
     )
   })
 
@@ -52,15 +47,9 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidAmount),
-      ValidationError,
-      'CheckCash: invalid Amount',
-    )
-    assert.throws(
-      () => validate(invalidAmount),
-      ValidationError,
-      'CheckCash: invalid Amount',
+    assertInvalid(
+      invalidAmount,
+      'CheckCash: invalid field Amount, expected a valid Amount',
     )
   })
 
@@ -69,19 +58,13 @@ describe('CheckCash', function () {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
       Amount: '100000000',
-      DeliverMin: 852156963,
+      DeliverMin: '852156963',
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: cannot have both Amount and DeliverMin',
-    )
-    assert.throws(
-      () => validate(invalidDeliverMin),
-      ValidationError,
+    assertInvalid(
+      invalidDeliverMin,
       'CheckCash: cannot have both Amount and DeliverMin',
     )
   })
@@ -95,15 +78,9 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assert.throws(
-      () => validateCheckCash(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: invalid DeliverMin',
-    )
-    assert.throws(
-      () => validate(invalidDeliverMin),
-      ValidationError,
-      'CheckCash: invalid DeliverMin',
+    assertInvalid(
+      invalidDeliverMin,
+      'CheckCash: invalid field DeliverMin, expected a valid Amount',
     )
   })
 })

@@ -128,16 +128,7 @@ function processModel(model, txName) {
       output += `  it("throws w/ missing ${param}", function () {
     delete tx.${param}
 
-    assert.throws(
-      () => validate${txName}(tx),
-      ValidationError,
-      '${txName}: missing field ${param}',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      '${txName}: missing field ${param}',
-    )
+    assertInvalid(tx, '${txName}: missing field ${param}')
   })
 
 `
@@ -147,16 +138,7 @@ function processModel(model, txName) {
     output += `  it('throws w/ invalid ${param}', function () {
     tx.${param} = ${fakeValue}
 
-    assert.throws(
-      () => validate${txName}(tx),
-      ValidationError,
-      '${txName}: invalid field ${param}',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      '${txName}: invalid field ${param}',
-    )
+    assertInvalid(tx, '${txName}: invalid field ${param}')
   })
 
 `
@@ -165,10 +147,12 @@ function processModel(model, txName) {
   output = output.substring(0, output.length - 2)
   output += '\n})\n'
   output =
-    `import { assert } from 'chai'
+    `import { validate${txName} } from '../../src/models/transactions/${txName}'
 
-import { validate, ValidationError } from '../../src'
-import { validate${txName} } from '../../src/models/transactions/${txName}'
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validate${txName})
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validate${txName}, message)
 
 /**
  * ${txName} Transaction Verification Testing.
@@ -183,8 +167,7 @@ describe('${txName}', function () {
   })
 
   it('verifies valid ${txName}', function () {
-    assert.doesNotThrow(() => validate${txName}(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
 ` + output
