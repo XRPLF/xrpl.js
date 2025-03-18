@@ -4,7 +4,7 @@ import { Currency, IssuedCurrency, IssuedCurrencyAmount } from '../common'
 import {
   Account,
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAccount,
   isAmount,
   isCurrency,
@@ -28,7 +28,7 @@ export enum AMMClawbackFlags {
  *
  * @category Transaction Flags
  */
-export interface AMMClawbackFlagsInterface extends GlobalFlags {
+export interface AMMClawbackFlagsInterface extends GlobalFlagsInterface {
   tfClawTwoAssets?: boolean
 }
 
