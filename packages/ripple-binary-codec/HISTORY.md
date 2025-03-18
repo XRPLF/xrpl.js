@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Throw an error if a field is unknown, rather than silently throwing it away.
+
 ## 2.3.0 (2025-2-13)
 
 ### Added
