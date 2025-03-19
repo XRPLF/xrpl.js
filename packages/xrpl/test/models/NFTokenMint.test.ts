@@ -1,7 +1,7 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
-  convertStringToHex,
   validate,
   ValidationError,
   NFTokenMintFlags,
@@ -25,7 +25,7 @@ describe('NFTokenMint', function () {
       NFTokenTaxon: 0,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
     assert.doesNotThrow(() => validate(validNFTokenMint))
@@ -40,7 +40,7 @@ describe('NFTokenMint', function () {
       Flags: NFTokenMintFlags.tfTransferable,
       Issuer: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
       TransferFee: 1,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
     assert.throws(
@@ -60,7 +60,7 @@ describe('NFTokenMint', function () {
       Issuer: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       TransferFee: 1,
       NFTokenTaxon: 0,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
     assert.throws(
