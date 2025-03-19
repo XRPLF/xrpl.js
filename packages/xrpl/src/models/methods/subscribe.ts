@@ -283,6 +283,10 @@ interface TransactionStreamBase<
   /** Human-readable explanation for the transaction response. */
   engine_result_message: string
   /**
+   * The unique hash identifier of the transaction.
+   */
+  hash?: Version extends typeof RIPPLED_API_V2 ? string : never
+  /**
    * The ledger index of the current in-progress ledger version for which this
    * transaction is currently proposed.
    */
