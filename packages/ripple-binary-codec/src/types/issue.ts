@@ -30,7 +30,8 @@ function isIssueObject(arg): arg is IssueObject {
   const isXRP = keys.length === 1 && keys[0] === 'currency'
   const isIOU =
     keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
-  const isMPT = keys.length === 2 && keys[0] === 'mpt_issuance_id' && keys[1] === 'value'
+  const isMPT =
+    keys.length === 2 && keys[0] === 'mpt_issuance_id' && keys[1] === 'value'
 
   return isXRP || isIOU || isMPT
 }
@@ -53,8 +54,6 @@ class Issue extends SerializedType {
    * @returns An Issue object
    */
   static from<T extends Issue | IssueObject>(value: T): Issue {
-
-    console.log('ISSUE: ', JSON.stringify(value))
     if (value instanceof Issue) {
       return value
     }

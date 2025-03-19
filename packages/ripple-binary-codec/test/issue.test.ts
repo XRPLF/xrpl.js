@@ -28,7 +28,6 @@ describe('Issue type conversion functions', () => {
 
   it(`test from value mpt`, () => {
     const mptJson = {
-      // value: '100', // MPT amounts must be an integer string (no decimal point)
       mpt_issuance_id: 'BAADF00DBAADF00DBAADF00DBAADF00DBAADF00DBAADF00D',
     }
     const mptIssue = Issue.from(mptJson)
@@ -67,7 +66,6 @@ describe('Issue type conversion functions', () => {
 
   it(`test from parser mpt`, () => {
     const mptJson = {
-      // value: '100', // MPT amounts must be an integer string (no decimal point)
       mpt_issuance_id: 'BAADF00DBAADF00DBAADF00DBAADF00DBAADF00DBAADF00D',
     }
     const mptIssue = Issue.from(mptJson)
