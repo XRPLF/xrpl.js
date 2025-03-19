@@ -275,7 +275,7 @@ interface TransactionStreamBase<
    * The approximate time this ledger was closed, in date time string format.
    * Always uses the UTC time zone.
    */
-  close_time_iso: string
+  close_time_iso: Version extends typeof RIPPLED_API_V2 ? string : never
   /** String Transaction result code. */
   engine_result: string
   /** Numeric transaction response code, if applicable. */
