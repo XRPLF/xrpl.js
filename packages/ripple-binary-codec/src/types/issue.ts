@@ -53,7 +53,6 @@ class Issue extends SerializedType {
    * @returns An Issue object
    */
   static from<T extends Issue | IssueObject>(value: T): Issue {
-    console.log('ISSUE: ', value)
     if (value instanceof Issue) {
       return value
     }
