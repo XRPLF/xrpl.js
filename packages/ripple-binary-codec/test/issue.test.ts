@@ -17,7 +17,7 @@ describe('Issue type conversion functions', () => {
     expect(iouIssue.toJSON()).toMatchObject(iouJson)
   })
 
-  it(`test from value nonstandard currency`, () => {
+  it(`test from value non-standard currency`, () => {
     const iouJson = {
       currency: '0123456789ABCDEF0123456789ABCDEF01234567',
       issuer: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
@@ -54,7 +54,7 @@ describe('Issue type conversion functions', () => {
     expect(parserIssue.toJSON()).toMatchObject(iouJson)
   })
 
-  it(`test from parser nonstandard currency`, () => {
+  it(`test from parser non-standard currency`, () => {
     const iouJson = {
       currency: '0123456789ABCDEF0123456789ABCDEF01234567',
       issuer: 'rLUEXYuLiQptky37CqLcm9USQpPiz5rkpD',

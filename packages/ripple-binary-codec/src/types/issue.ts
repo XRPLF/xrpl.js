@@ -18,19 +18,19 @@ interface MPTIssue extends JsonObject {
   mpt_issuance_id: string
 }
 /**
- * Interface for JSON objects that represent amounts
+ * Interface for JSON objects that represent issues
  */
 type IssueObject = XRPIssue | IOUIssue | MPTIssue
 
 /**
- * Type guard for AmountObject
+ * Type guard for Issue Object
  */
 function isIssueObject(arg): arg is IssueObject {
   const keys = Object.keys(arg).sort()
   const isXRP = keys.length === 1 && keys[0] === 'currency'
   const isIOU =
     keys.length === 2 && keys[0] === 'currency' && keys[1] === 'issuer'
-  const isMPT = keys.length === 1 && keys[0] === 'mpt_issuance_id'
+  const isMPT = keys.length === 2 && keys[0] === 'mpt_issuance_id' && keys[1] === 'value'
 
   return isXRP || isIOU || isMPT
 }
@@ -48,11 +48,13 @@ class Issue extends SerializedType {
   /**
    * Construct an amount from an IOU or string amount
    *
-   * @param value An Amount, object representing an IOU, or a string
+   * @param value An Amount, object representing an IOU, MPTAmount, or a string
    *     representing an integer amount
    * @returns An Issue object
    */
   static from<T extends Issue | IssueObject>(value: T): Issue {
+
+    console.log('ISSUE: ', JSON.stringify(value))
     if (value instanceof Issue) {
       return value
     }
