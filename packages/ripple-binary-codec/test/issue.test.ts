@@ -5,7 +5,7 @@ describe('Issue type conversion functions', () => {
   it(`test from value xrp`, () => {
     const xrpJson = { currency: 'XRP' }
     const xrpIssue = Issue.from(xrpJson)
-    expect(xrpIssue.toJSON()).toMatchObject(xrpJson)
+    expect(xrpIssue.toJSON()).toEqual(xrpJson)
   })
 
   it(`test from value issued currency`, () => {
@@ -14,7 +14,7 @@ describe('Issue type conversion functions', () => {
       issuer: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
     }
     const iouIssue = Issue.from(iouJson)
-    expect(iouIssue.toJSON()).toMatchObject(iouJson)
+    expect(iouIssue.toJSON()).toEqual(iouJson)
   })
 
   it(`test from value non-standard currency`, () => {
@@ -23,7 +23,7 @@ describe('Issue type conversion functions', () => {
       issuer: 'rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn',
     }
     const iouIssue = Issue.from(iouJson)
-    expect(iouIssue.toJSON()).toMatchObject(iouJson)
+    expect(iouIssue.toJSON()).toEqual(iouJson)
   })
 
   it(`test from value mpt`, () => {
@@ -31,7 +31,7 @@ describe('Issue type conversion functions', () => {
       mpt_issuance_id: 'BAADF00DBAADF00DBAADF00DBAADF00DBAADF00DBAADF00D',
     }
     const mptIssue = Issue.from(mptJson)
-    expect(mptIssue.toJSON()).toMatchObject(mptJson)
+    expect(mptIssue.toJSON()).toEqual(mptJson)
   })
 
   it(`test from parser xrp`, () => {
@@ -39,7 +39,7 @@ describe('Issue type conversion functions', () => {
     const xrpIssue = Issue.from(xrpJson)
     const parser = new BinaryParser(xrpIssue.toHex())
     const parserIssue = Issue.fromParser(parser)
-    expect(parserIssue.toJSON()).toMatchObject(xrpJson)
+    expect(parserIssue.toJSON()).toEqual(xrpJson)
   })
 
   it(`test from parser issued currency`, () => {
@@ -50,7 +50,7 @@ describe('Issue type conversion functions', () => {
     const iouIssue = Issue.from(iouJson)
     const parser = new BinaryParser(iouIssue.toHex())
     const parserIssue = Issue.fromParser(parser)
-    expect(parserIssue.toJSON()).toMatchObject(iouJson)
+    expect(parserIssue.toJSON()).toEqual(iouJson)
   })
 
   it(`test from parser non-standard currency`, () => {
@@ -61,7 +61,7 @@ describe('Issue type conversion functions', () => {
     const iouIssue = Issue.from(iouJson)
     const parser = new BinaryParser(iouIssue.toHex())
     const parserIssue = Issue.fromParser(parser)
-    expect(parserIssue.toJSON()).toMatchObject(iouJson)
+    expect(parserIssue.toJSON()).toEqual(iouJson)
   })
 
   it(`test from parser mpt`, () => {
@@ -71,7 +71,7 @@ describe('Issue type conversion functions', () => {
     const mptIssue = Issue.from(mptJson)
     const parser = new BinaryParser(mptIssue.toHex())
     const parserIssue = Issue.fromParser(parser, 24)
-    expect(parserIssue.toJSON()).toMatchObject(mptJson)
+    expect(parserIssue.toJSON()).toEqual(mptJson)
   })
 
   it(`throws with invalid input`, () => {
