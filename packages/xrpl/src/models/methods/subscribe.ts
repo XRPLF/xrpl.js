@@ -467,7 +467,6 @@ export interface ManifestStream extends BaseStream, ManifestRequest {
 /**
  * @category Streams
  */
-// TODO: Add stream type for manifestReceived
 export type Stream =
   | LedgerStream
   | ValidationStream
