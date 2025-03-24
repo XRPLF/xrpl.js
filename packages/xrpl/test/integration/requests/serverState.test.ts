@@ -135,10 +135,12 @@ describe('server_state', function () {
         key,
       ) {
         assert.equal(
+          // @ts-expect-error -- non-iterative type
           typeof response.result.state.state_accounting[key].duration_us,
           'string',
         )
         assert.equal(
+          // @ts-expect-error -- non-iterative type
           typeof response.result.state.state_accounting[key].transitions,
           'string',
         )
@@ -153,6 +155,7 @@ describe('server_state', function () {
         omit(response.result.state.validated_ledger, 'hash'),
       )) {
         assert.equal(
+          // @ts-expect-error -- non-iterative type
           typeof response.result.state.validated_ledger?.[key],
           'number',
         )

@@ -26,7 +26,6 @@ describe('ripple_path_find', function () {
       const wallet2 = await generateFundedWallet(testContext.client)
       const ripplePathFind: RipplePathFindRequest = {
         command: 'ripple_path_find',
-        subcommand: 'create',
         source_account: testContext.wallet.classicAddress,
         destination_account: wallet2.classicAddress,
         destination_amount: '100',

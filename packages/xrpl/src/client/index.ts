@@ -347,6 +347,7 @@ class Client extends EventEmitter<EventTypes> {
           ? ensureClassicAddress(req.account)
           : undefined,
       api_version: req.api_version ?? this.apiVersion,
+      strict: req.strict ?? false,
     }
     const response = await this.connection.request<R, T>(request)
 

@@ -55,6 +55,8 @@ describe('ledger', function () {
       assert.typeOf(ledgerResponse.result.ledger_index, 'number')
 
       const ledger = ledgerResponse.result.ledger as Ledger & {
+        // Add index signature to request for interative through keys and asset types
+        [index: string]: unknown
         accepted: boolean
         hash: string
         seqNum: string
@@ -118,6 +120,8 @@ describe('ledger', function () {
       assert.typeOf(ledgerResponse.result.ledger_index, 'number')
 
       const ledger = ledgerResponse.result.ledger as LedgerV1 & {
+        // Add index signature to request for interative through keys and asset types
+        [index: string]: unknown
         accepted: boolean
         hash: string
         seqNum: string

@@ -2,9 +2,14 @@ import { Amount, Path } from '../common'
 
 import { BaseRequest, BaseResponse } from './baseMethod'
 
+export type Subcommand = 'create' | 'status' | 'close'
+
 interface BasePathFindRequest extends BaseRequest {
   command: 'path_find'
-  subcommand: string
+  /**
+   * Type of pathfinding request
+   */
+  subcommand: Subcommand
 }
 
 /** Start sending pathfinding information. */

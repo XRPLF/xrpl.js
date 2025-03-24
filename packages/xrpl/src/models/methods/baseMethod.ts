@@ -11,6 +11,8 @@ export interface BaseRequest {
   id?: number | string
   /** The name of the API method. */
   command: string
+  /** Enable strict-mode. If omitted, use false. */
+  strict?: boolean
   /** The API version to use. If omitted, use version 1. */
   api_version?: number
 }
