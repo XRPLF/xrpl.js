@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
+
 ## 4.2.0 (2025-2-13)
 
 ### Added
