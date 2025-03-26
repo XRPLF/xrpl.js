@@ -158,9 +158,23 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {
-    tx.PriceDataSeries[0].PriceData.AssetPrice = 'abcd'
+    // value cannot be parsed as hexadecimal number
+    tx.PriceDataSeries[0].PriceData.AssetPrice = 'ghij'
     const errorMessage =
-      'OracleSet: invalid field AssetPrice, expected a valid number'
+      'OracleSet: Field AssetPrice must be a valid hex string'
+    assertInvalid(tx, errorMessage)
+  })
+
+  it(`verifies valid AssetPrice of PriceDataSeries`, function () {
+    // valid string which can be parsed as hexadecimal number
+    tx.PriceDataSeries[0].PriceData.AssetPrice = 'ab15'
+    assertValid(tx)
+  })
+
+  it(`throws w/ invalid AssetPrice type in PriceDataSeries`, function () {
+    tx.PriceDataSeries[0].PriceData.AssetPrice = ['sample', 'invalid', 'type']
+    const errorMessage =
+      'OracleSet: Field AssetPrice must be a string or a number'
     assertInvalid(tx, errorMessage)
   })
 
