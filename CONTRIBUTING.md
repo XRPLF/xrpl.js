@@ -156,7 +156,7 @@ This should almost always be done using [this script](./packages/ripple-binary-c
 
 1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
 2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
-5. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
+3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
 
 ## Adding and removing packages
 
