@@ -35,6 +35,8 @@ const HashPrefix: Record<string, Uint8Array> = {
   proposal: bytes(0x50525000),
   // payment channel claim
   paymentChannelClaim: bytes(0x434c4d00),
+  // batch
+  batch: bytes(0x42434800),
 }
 
 export { HashPrefix }
