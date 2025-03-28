@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
+* Better faucet support
 
 ## 4.2.0 (2025-2-13)
 
