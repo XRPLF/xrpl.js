@@ -38,8 +38,9 @@ class XrplDefinitionsBase {
 
   /**
    * Present rippled types in a typed and updatable format.
-   * For an example of the input format see `definitions.json`
-   * To generate a new definitions file from rippled source code, use this tool: https://github.com/RichardAH/xrpl-codec-gen
+   * For an example of the input format see `definitions.json`.
+   * To generate a new definitions file from rippled source code, use the tool at
+   * `packages/ripple-binary-codec/tools/generateDefinitions.js`.
    *
    * See the definitions.test.js file for examples of how to create your own updated definitions.json.
    *

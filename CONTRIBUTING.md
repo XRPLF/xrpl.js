@@ -150,9 +150,13 @@ npm run docgen
 
 This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
-## Update `definitions.json`
+## Updating `definitions.json`
 
-Use [this repo](https://github.com/RichardAH/xrpl-codec-gen) to generate a new `definitions.json` file from the rippled source code. Instructions are available in that README.
+This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js) - if the output needs manual intervention afterwards, consider updating the script instead.
+
+1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
+2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
+3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
 
 ## Adding and removing packages
 
@@ -200,16 +204,6 @@ In order to update the list, follow these steps from the top level of the librar
 4. Push your changes
 
 Note: The same updated config can be used to update xrpl-py's CI as well.
-
-## Updating `definitions.json`
-
-This should almost always be done using the [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen) script - if the output needs manual intervention afterwards, consider updating the script instead.
-
-1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
-2. Clone / pull the latest changes from [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen)
-3. From the `xrpl-codec-gen` tool, follow the steps in the `README.md` to generate a new `definitions.json` file.
-4. Replace the `definitions.json` file in the `ripple-binary-codec` with the newly generated file.
-5. Verify that the changes make sense by inspection before submitting, as there may be updates required for the `xrpl-codec-gen` tool depending on the latest amendments we're updating to match.
 
 
 ## Release process + checklist
