@@ -5,7 +5,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
-* Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
+* `OracleSet` transaction accepts hexadecimal string values for `AssetPrice` field
+* `TransactionStream` model includes `hash` field in APIv2
+* `TransactionStream` model includes `close_time_iso` field only for APIv2
 
 ## 4.2.0 (2025-2-13)
 
