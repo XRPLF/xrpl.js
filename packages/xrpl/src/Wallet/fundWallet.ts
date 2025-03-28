@@ -3,11 +3,7 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 import type { Client } from '../client'
 import { XRPLFaucetError } from '../errors'
 
-import {
-  FaucetWallet,
-  getFaucetHost,
-  getDefaultFaucetPath,
-} from './defaultFaucets'
+import { FaucetWallet, getFaucetHost, getFaucetPath } from './defaultFaucets'
 
 import { Wallet } from '.'
 
@@ -148,7 +144,7 @@ export async function requestFunding(
   if (!hostname) {
     throw new XRPLFaucetError('No faucet hostname could be derived')
   }
-  const pathname = options.faucetPath ?? getDefaultFaucetPath(hostname)
+  const pathname = options.faucetPath ?? getFaucetPath(hostname)
   const response = await fetch(`https://${hostname}${pathname}`, {
     method: 'POST',
     headers: {

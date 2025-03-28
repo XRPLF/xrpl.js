@@ -56,7 +56,7 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
  * @returns A String with the correct path for the input hostname.
  * If hostname undefined or cannot find (key, value) pair in {@link FaucetNetworkPaths}, defaults to '/accounts'
  */
-export function getDefaultFaucetPath(hostname: string | undefined): string {
+export function getFaucetPath(hostname: string | undefined): string {
   if (hostname === undefined) {
     return '/accounts'
   }
