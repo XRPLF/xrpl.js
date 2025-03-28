@@ -275,6 +275,10 @@ export async function calculateFeePerTransactionType(
     )
     baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
+  // EscrowCreate transaction with FinishFunction
+  if (tx.TransactionType === 'EscrowCreate' && tx.FinishFunction != null) {
+    baseFee = BigNumber.sum(baseFee, 1000)
+  }
 
   if (
     tx.TransactionType === 'AccountDelete' ||
