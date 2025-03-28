@@ -14,11 +14,13 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
+  WasmDevnet = 'wasm.faucet.devnet.rippletest.net',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
+  [FaucetNetwork.WasmDevnet]: '/accounts',
 }
 
 /**
@@ -44,6 +46,10 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
 
   if (connectionUrl.includes('devnet')) {
     return FaucetNetwork.Devnet
+  }
+
+  if (connectionUrl.includes('wasm')) {
+    return FaucetNetwork.WasmDevnet
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')

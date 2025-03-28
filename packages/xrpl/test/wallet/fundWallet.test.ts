@@ -47,7 +47,18 @@ describe('Get Faucet host ', function () {
   it('returns the correct faucetPath for Devnet host', function () {
     const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
     // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Devnet
+    testContext.client.connection.url = 's.devnet.rippletest.net'
+
+    assert.strictEqual(
+      getDefaultFaucetPath(getFaucetHost(testContext.client)),
+      expectedFaucetPath,
+    )
+  })
+
+  it('returns the correct faucetPath for WASM Devnet host', function () {
+    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.WasmDevnet]
+    // @ts-expect-error Intentionally modifying private data for test
+    testContext.client.connection.url = 'wasm.devnet.rippletest.net'
 
     assert.strictEqual(
       getDefaultFaucetPath(getFaucetHost(testContext.client)),

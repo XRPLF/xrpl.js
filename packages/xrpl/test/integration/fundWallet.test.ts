@@ -55,7 +55,7 @@ const TIMEOUT = 60000
 // This test is reliant on external networks, and as such may be flaky.
 describe('fundWallet', function () {
   it(
-    'submit generates a testnet wallet',
+    'generates a testnet wallet',
     async function () {
       await generate_faucet_wallet_and_fund_again(
         'wss://s.altnet.rippletest.net:51233',
@@ -65,10 +65,20 @@ describe('fundWallet', function () {
   )
 
   it(
-    'submit generates a devnet wallet',
+    'generates a devnet wallet',
     async function () {
       await generate_faucet_wallet_and_fund_again(
         'wss://s.devnet.rippletest.net:51233',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'generates a devnet wallet',
+    async function () {
+      await generate_faucet_wallet_and_fund_again(
+        'wss://wasm.devnet.rippletest.net:51233',
       )
     },
     TIMEOUT,
