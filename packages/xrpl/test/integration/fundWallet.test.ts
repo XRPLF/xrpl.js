@@ -75,7 +75,7 @@ describe('fundWallet', function () {
   )
 
   it(
-    'generates a devnet wallet',
+    'generates a WASM devnet wallet',
     async function () {
       await generate_faucet_wallet_and_fund_again(
         'wss://wasm.devnet.rippletest.net:51233',

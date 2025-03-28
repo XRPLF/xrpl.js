@@ -163,6 +163,7 @@ export async function requestFunding(
     response.ok &&
     response.headers.get('Content-Type')?.startsWith('application/json')
   ) {
+    console.log(body)
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
     const classicAddress = (body as FaucetWallet).account.classicAddress
     return processSuccessfulResponse(
