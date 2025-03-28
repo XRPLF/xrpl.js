@@ -22,32 +22,21 @@ describe('Get Faucet host ', function () {
 
   it('returns the Devnet host', function () {
     const expectedFaucet = FaucetNetwork.Devnet
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Devnet
+    testContext.client.networkID = 2
 
     assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
   })
 
   it('returns the Testnet host', function () {
     const expectedFaucet = FaucetNetwork.Testnet
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Testnet
-
-    assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
-  })
-
-  it('returns the Testnet host with the XRPL Labs server', function () {
-    const expectedFaucet = FaucetNetwork.Testnet
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = 'wss://testnet.xrpl-labs.com'
+    testContext.client.networkID = 1
 
     assert.strictEqual(getFaucetHost(testContext.client), expectedFaucet)
   })
 
   it('returns the correct faucetPath for Devnet host', function () {
     const expectedFaucetPath = faucetNetworkPaths[FaucetNetwork.Devnet]
-    // @ts-expect-error Intentionally modifying private data for test
-    testContext.client.connection.url = FaucetNetwork.Devnet
+    testContext.client.networkID = 2
 
     assert.strictEqual(
       getFaucetPath(getFaucetHost(testContext.client)),
@@ -61,8 +50,13 @@ describe('Get Faucet host ', function () {
     assert.strictEqual(getFaucetPath(undefined), expectedFaucetPath)
   })
 
+  it('throws if connected to mainnet', function () {
+    testContext.client.networkID = 0
+    assert.throws(() => getFaucetHost(testContext.client))
+  })
+
   it('throws if not connected to a known faucet host', function () {
-    // Info: setupClient.setup creates a connection to 'localhost'
+    testContext.client.networkID = 300
     assert.throws(() => getFaucetHost(testContext.client))
   })
 })

@@ -34,8 +34,7 @@ export const faucetNetworkIDs: Map<number, FaucetNetwork> = new Map([
  * @throws When the client url is not on altnet or devnet.
  */
 export function getFaucetHost(client: Client): FaucetNetwork | undefined {
-  const connectionUrl = client.url
-
+  console.log(client.networkID)
   if (client.networkID == null) {
     throw new XRPLFaucetError(
       'Cannot create faucet URL without networkID or the faucet_host information',
@@ -46,9 +45,9 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
     return faucetNetworkIDs.get(client.networkID)
   }
 
-  // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
-  if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
-    return FaucetNetwork.Testnet
+  if (client.networkID === 0) {
+    // mainnet does not have a faucet
+    throw new XRPLFaucetError('Faucet is not available for mainnet.')
   }
 
   throw new XRPLFaucetError('Faucet URL is not defined or inferrable.')
