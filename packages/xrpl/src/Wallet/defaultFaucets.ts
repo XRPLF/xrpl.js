@@ -34,7 +34,6 @@ export const faucetNetworkIDs: Map<number, FaucetNetwork> = new Map([
  * @throws When the client url is not on altnet or devnet.
  */
 export function getFaucetHost(client: Client): FaucetNetwork | undefined {
-  console.log(client.networkID)
   if (client.networkID == null) {
     throw new XRPLFaucetError(
       'Cannot create faucet URL without networkID or the faucet_host information',
