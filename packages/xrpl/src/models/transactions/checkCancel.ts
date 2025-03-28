@@ -1,6 +1,9 @@
-import { ValidationError } from '../../errors'
-
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isHexString,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * Cancels an unredeemed Check, removing it from the ledger without sending any
@@ -28,7 +31,5 @@ export interface CheckCancel extends BaseTransaction {
 export function validateCheckCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string') {
-    throw new ValidationError('CheckCancel: invalid CheckID')
-  }
+  validateRequiredField(tx, 'CheckID', isHexString)
 }

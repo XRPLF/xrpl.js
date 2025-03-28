@@ -4,8 +4,8 @@ import { isHex } from '../utils'
 
 import {
   BaseTransaction,
+  isHexString,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -79,11 +79,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
-  validateOptionalField(tx, 'Provider', isString)
+  validateOptionalField(tx, 'Provider', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
-  validateOptionalField(tx, 'AssetClass', isString)
+  validateOptionalField(tx, 'AssetClass', isHexString)
 
   /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(tx, 'PriceDataSeries', (value) => {
@@ -178,7 +178,9 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
         !isNumber(priceData.PriceData.Scale)
       ) {
-        throw new ValidationError('OracleSet: invalid field Scale')
+        throw new ValidationError(
+          'OracleSet: invalid field Scale, expected a valid number',
+        )
       }
 
       if (
