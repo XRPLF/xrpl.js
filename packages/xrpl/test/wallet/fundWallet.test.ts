@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import {
   FaucetNetwork,
-  FaucetNetworkPaths,
+  faucetNetworkPaths,
   getFaucetHost,
   getFaucetPath,
 } from '../../src/Wallet/defaultFaucets'
@@ -45,7 +45,7 @@ describe('Get Faucet host ', function () {
   })
 
   it('returns the correct faucetPath for Devnet host', function () {
-    const expectedFaucetPath = FaucetNetworkPaths[FaucetNetwork.Devnet]
+    const expectedFaucetPath = faucetNetworkPaths[FaucetNetwork.Devnet]
     // @ts-expect-error Intentionally modifying private data for test
     testContext.client.connection.url = FaucetNetwork.Devnet
 
