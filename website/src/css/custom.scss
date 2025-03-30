@@ -1,0 +1,199 @@
+@import "_font-face.scss";
+
+// Variables
+$color-primary: #7919ff;
+$color-primary-dark: #6a16e6;
+$color-primary-darker: #5e13d4;
+$color-primary-darkest: #4f10b8;
+$color-primary-light: #8a1dff;
+$color-primary-lighter: #9422ff;
+$color-primary-lightest: #a02aff;
+$code-font-size: 95%;
+$highlighted-line-bg: rgba(0, 0, 0, 0.1);
+$code-background: #0a2e1b;
+$font-family-work-sans: "Work Sans", sans-serif;
+$font-family-space-mono: "Space Mono", monospace;
+
+// Global Styles
+:root {
+  --ifm-color-primary: $color-primary;
+  --ifm-color-primary-dark: $color-primary-dark;
+  --ifm-color-primary-darker: $color-primary-darker;
+  --ifm-color-primary-darkest: $color-primary-darkest;
+  --ifm-color-primary-light: $color-primary-light;
+  --ifm-color-primary-lighter: $color-primary-lighter;
+  --ifm-color-primary-lightest: $color-primary-lightest;
+  --ifm-code-font-size: $code-font-size;
+  --docusaurus-highlighted-code-line-bg: $highlighted-line-bg;
+  --ifm-code-background: $code-background;
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #9a52ff;
+  --ifm-color-primary-dark: #883ff5;
+  --ifm-color-primary-darker: #7732e2;
+  --ifm-color-primary-darkest: #6625cf;
+  --ifm-color-primary-light: #a565ff;
+  --ifm-color-primary-lighter: #b078ff;
+  --ifm-color-primary-lightest: #bb8bff;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+// Global code style
+code {
+  font-family: $font-family-space-mono !important;
+  font-size: 1rem;
+  --ifm-code-background: $code-background;
+  color: #5beb9d;
+}
+
+// Button margin adjustment
+.button {
+  margin-left: 10px;
+}
+
+// Font family adjustments for various elements
+h3,
+li,
+strong,
+.hero__subtitle,
+p,
+a {
+  font-family: $font-family-work-sans;
+}
+
+// Hero primary background color
+.hero--primary {
+  --ifm-hero-background-color: #232325;
+}
+
+// Hero title styles
+.hero__title {
+  color: #ffffff;
+  font-size: 3.5rem;
+  font-family: $font-family-work-sans;
+}
+
+// Hero subtitle styles
+.hero__subtitle {
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 1.125rem;
+  gap: 2rem;
+  width: 54rem;
+}
+
+// Secondary button styles
+.button.button--secondary {
+  color: #ffffff;
+  background: $color-primary;
+  border: none;
+  font-family: $font-family-work-sans;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+}
+
+// Large button size multiplier
+.button--lg {
+  --ifm-button-size-multiplier: 1;
+}
+
+// SVG icons in features component
+.featureSvg_src-components-HomepageFeatures-styles-module {
+  height: 2.5rem !important;
+  width: 2.5rem !important;
+}
+
+// Adjusting code background and color globally
+code {
+  --ifm-code-background: #0a2e1b;
+  color: #5beb9d;
+}
+
+// H3 font size and weight
+h3 {
+  --ifm-h3-font-size: 1.3rem;
+  font-weight: 700;
+}
+
+// Paragraph font size
+p {
+  font-size: 1rem;
+}
+
+// Features component background color
+.features_src-components-HomepageFeatures-styles-module {
+  padding: 10rem 0 !important;
+  background: #111112;
+}
+
+// Dark mode footer background color
+.footer--dark {
+  --ifm-footer-background-color: #232325;
+}
+
+// Light theme adjustments
+[data-theme="light"] {
+  .features_src-components-HomepageFeatures-styles-module {
+    background: #ffffff;
+  }
+
+  .hero--primary {
+    background: #f5f5f7;
+  }
+
+  .hero__title,
+  .hero__subtitle,
+  .footer--dark,
+  .footer__link-item,
+  .footer__copyright,
+  .footer__title {
+    color: #111112;
+  }
+
+  code {
+    --ifm-code-background: #e0e0e1;
+    color: #111112;
+  }
+
+  .footer--dark {
+    background: #f5f5f7;
+  }
+
+  .transaction_submission {
+    content: url("/img/transaction_submission_light.svg");
+  }
+
+  .keys_and_testing {
+    content: url("/img/keys_and_testing_light.svg");
+  }
+
+  .subscription_to_ledger {
+    content: url("/img/subscription_to_ledger_light.svg");
+  }
+}
+
+// Define a mixin for shared styles
+@mixin arrow-icon-after {
+  content: "";
+  background: url("/img/arrow-up-right.svg") no-repeat center center;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-block;
+  vertical-align: sub;
+}
+
+.footer__link-item:has(svg)::after {
+  @include arrow-icon-after;
+  right: 0;
+}
+
+.navbar__link:has(svg)::after {
+  @include arrow-icon-after;
+}
+
+.navbar__link svg,
+.footer__link-item svg {
+  display: none;
+}
