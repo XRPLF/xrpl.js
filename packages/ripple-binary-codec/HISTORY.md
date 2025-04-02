@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+- add `MPTAmount` support in `Issue` (rippled internal type)
+
 ## 2.3.0 (2025-2-13)
 
 ### Added
