@@ -1,5 +1,6 @@
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
+import { isHex } from '../utils'
 
 import {
   BaseTransaction,
@@ -12,6 +13,8 @@ import {
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
 const SCALE_MAX = 10
+const MINIMUM_ASSET_PRICE_LENGTH = 1
+const MAXIMUM_ASSET_PRICE_LENGTH = 16
 
 /**
  * Creates a new Oracle ledger entry or updates the fields of an existing one, using the Oracle ID.
@@ -82,7 +85,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'AssetClass', isString)
 
-  // eslint-disable-next-line max-lines-per-function -- necessary to validate many fields
+  /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(tx, 'PriceDataSeries', (value) => {
     if (!Array.isArray(value)) {
       throw new ValidationError('OracleSet: PriceDataSeries must be an array')
@@ -142,14 +145,32 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         )
       }
 
-      if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        'AssetPrice' in priceData.PriceData &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        !isNumber(priceData.PriceData.AssetPrice)
-      ) {
-        throw new ValidationError('OracleSet: invalid field AssetPrice')
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access, max-depth --
+      we need to validate priceData.PriceData.AssetPrice value */
+      if ('AssetPrice' in priceData.PriceData) {
+        if (!isNumber(priceData.PriceData.AssetPrice)) {
+          if (typeof priceData.PriceData.AssetPrice !== 'string') {
+            throw new ValidationError(
+              'OracleSet: Field AssetPrice must be a string or a number',
+            )
+          }
+          if (!isHex(priceData.PriceData.AssetPrice)) {
+            throw new ValidationError(
+              'OracleSet: Field AssetPrice must be a valid hex string',
+            )
+          }
+          if (
+            priceData.PriceData.AssetPrice.length <
+              MINIMUM_ASSET_PRICE_LENGTH ||
+            priceData.PriceData.AssetPrice.length > MAXIMUM_ASSET_PRICE_LENGTH
+          ) {
+            throw new ValidationError(
+              `OracleSet: Length of AssetPrice field must be between ${MINIMUM_ASSET_PRICE_LENGTH} and ${MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
+            )
+          }
+        }
       }
+      /* eslint-enable @typescript-eslint/no-unsafe-member-access, max-depth */
 
       if (
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
@@ -173,4 +194,5 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
     }
     return true
   })
+  /* eslint-enable max-statements, max-lines-per-function */
 }
