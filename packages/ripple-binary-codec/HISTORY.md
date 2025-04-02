@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Support for the `Batch` amendment (XLS-56).
+
 ### Fixed
 - add `MPTAmount` support in `Issue` (rippled internal type)
 
@@ -14,7 +17,7 @@
 ## 2.2.0 (2024-12-23)
 
 ### Added
-* Support for the Multi-Purpose Token amendment (XLS-33)
+* Support for the Multi-Purpose Token amendment (XLS-33).
 
 ## 2.1.0 (2024-06-03)
 
