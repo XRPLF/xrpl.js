@@ -3,7 +3,8 @@
 ## Unreleased
 
 ### Fixed
-- add `MPTAmount` support in `Issue` (rippled internal type)
+* add `MPTAmount` support in `Issue` (rippled internal type)
+* Throw an error if a field is unknown, rather than silently throwing it away.
 
 ## 2.3.0 (2025-2-13)
 
