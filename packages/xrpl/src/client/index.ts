@@ -343,10 +343,11 @@ class Client extends EventEmitter<EventTypes> {
     const request = {
       ...req,
       account:
-        typeof req.account === 'string'
+        'account' in req && typeof req.account === 'string'
           ? ensureClassicAddress(req.account)
           : undefined,
       api_version: req.api_version ?? this.apiVersion,
+      strict: req.strict ?? false,
     }
     const response = await this.connection.request<R, T>(request)
 

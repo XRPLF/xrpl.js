@@ -14,7 +14,7 @@ import { OfferCreate, Transaction } from '../transactions'
 import { TransactionMetadata } from '../transactions/metadata'
 
 import type { BaseRequest, BaseResponse } from './baseMethod'
-import { ManifestRequest } from './manifest'
+import type { ManifestRequest } from './manifest'
 
 export interface SubscribeBook {
   /**
@@ -459,6 +459,16 @@ export interface PathFindStream extends BaseStream {
 }
 
 /**
+ * The manifest stream sends messages when a new manifest has been processed or updated.
+ * The message contains the public key, either the master public key or ephemeral public key.
+ *
+ * @category Streams
+ */
+export interface ManifestStream extends BaseStream, ManifestRequest {
+  type: 'manifestReceived'
+}
+
+/**
  * @category Streams
  */
 export type Stream =
@@ -469,6 +479,7 @@ export type Stream =
   | PeerStatusStream
   | OrderBookStream
   | ConsensusStream
+  | ManifestStream
 
 export type EventTypes =
   | 'connected'
@@ -497,7 +508,7 @@ export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   : T extends 'consensusPhase'
   ? (consensus: ConsensusStream) => void
   : T extends 'manifestReceived'
-  ? (manifest: ManifestRequest) => void
+  ? (manifest: ManifestStream) => void
   : T extends 'path_find'
   ? (path: PathFindStream) => void
   : T extends 'error'
