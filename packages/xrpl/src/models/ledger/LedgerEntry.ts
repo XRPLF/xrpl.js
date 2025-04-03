@@ -17,6 +17,7 @@ import PermissionedDomain from './PermissionedDomain'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Ticket from './Ticket'
+import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -40,6 +41,7 @@ type LedgerEntry =
   | RippleState
   | SignerList
   | Ticket
+  | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
 
@@ -67,6 +69,7 @@ type LedgerEntryFilter =
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'vault'
   | 'xchain_owned_create_account_claim_id'
   | 'xchain_owned_claim_id'
 
