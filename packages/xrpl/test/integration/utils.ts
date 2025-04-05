@@ -314,52 +314,6 @@ export async function getLedgerCloseTime(client: Client): Promise<number> {
   return CLOSE_TIME
 }
 
-/**
- * Waits for the ledger time to reach a specific value and forces ledger progress if necessary.
- *
- * @param client - The client object.
- * @param ledgerTime - The target ledger time.
- * @param [retries=20] - The number of retries before throwing an error.
- * @returns - A promise that resolves when the ledger time reaches the target value.
- *
- * @example
- * try {
- *   await waitForAndForceProgressLedgerTime(client, 1626424978, 10);
- *   console.log('Ledger time reached.'); // Output: Ledger time reached.
- * } catch (error) {
- *   console.error(error);
- * }
- */
-export async function waitForAndForceProgressLedgerTime(
-  client: Client,
-  ledgerTime: number,
-  retries = 20,
-): Promise<void> {
-  async function getCloseTime(): Promise<boolean> {
-    const CLOSE_TIME: number = await getLedgerCloseTime(client)
-    if (CLOSE_TIME >= ledgerTime) {
-      return true
-    }
-
-    return false
-  }
-
-  let retryCounter = retries || 0
-
-  while (retryCounter > 0) {
-    // eslint-disable-next-line no-await-in-loop -- Necessary for retries
-    if (await getCloseTime()) {
-      return
-    }
-
-    // eslint-disable-next-line no-await-in-loop -- Necessary for retries
-    await ledgerAccept(client)
-    retryCounter -= 1
-  }
-
-  throw new Error(`Ledger time not reached after ${retries} retries.`)
-}
-
 export async function getIOUBalance(
   client: Client,
   wallet: Wallet,
