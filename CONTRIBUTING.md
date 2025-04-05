@@ -255,6 +255,8 @@ This should almost always be done using the [`xrpl-codec-gen`](https://github.co
    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
 1. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
+
+   For experimental releases, the git tagname should include its own version number along with feature name. Here's an example for [MPT beta release](https://github.com/XRPLF/xrpl.js/releases/tag/xrpl%401.0.1-mpt-beta).
 1. Run `git push --follow-tags`, to push the tags to Github.
 1. On GitHub, click the "Releases" link on the right-hand side of the page.
 
