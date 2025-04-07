@@ -887,7 +887,7 @@ class Client extends EventEmitter<EventTypes> {
 
     if (response.result.engine_result.startsWith('tem')) {
       throw new XrplError(
-        `${response.result.engine_result}: ${response.result.engine_result_message}`,
+        `Transaction failed, ${response.result.engine_result}: ${response.result.engine_result_message}`,
       )
     }
 
