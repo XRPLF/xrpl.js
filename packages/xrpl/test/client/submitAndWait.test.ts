@@ -38,7 +38,7 @@ describe('client.submitAndWait', function () {
     await assertRejects(
       testContext.client.submitAndWait(signedTx),
       XrplError,
-      'temMALFORMED: Malformed transaction.',
+      'Transaction failed, temMALFORMED: Malformed transaction.',
     )
   })
 })
