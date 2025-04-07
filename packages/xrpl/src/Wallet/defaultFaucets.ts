@@ -31,7 +31,7 @@ export const faucetNetworkIDs: Map<number, FaucetNetwork> = new Map([
  *
  * @param client - Client.
  * @returns A {@link FaucetNetwork}.
- * @throws When the client url is not on altnet or devnet.
+ * @throws When there is no known faucet for the client's network ID.
  */
 export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   if (client.networkID == null) {
