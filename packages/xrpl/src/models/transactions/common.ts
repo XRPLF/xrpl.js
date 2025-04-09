@@ -210,20 +210,20 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
-/* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
-
 /**
  * Verify the form and type of a required type for a transaction at runtime.
  *
  * @param tx - The transaction input to check the form and type of.
  * @param paramName - The name of the transaction parameter.
  * @param checkValidity - The function to use to check the type.
+ * @param expectedType - Optional. The expected type for more specific error messages.
  * @throws
  */
 export function validateRequiredField(
   tx: Record<string, unknown>,
   paramName: string,
   checkValidity: (inp: unknown) => boolean,
+  expectedType?: string,
 ): void {
   if (tx[paramName] == null) {
     throw new ValidationError(
@@ -232,8 +232,9 @@ export function validateRequiredField(
   }
 
   if (!checkValidity(tx[paramName])) {
+    const actualType = tx[paramName] === null ? 'null' : typeof tx[paramName]
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${paramName}${expectedType ? `: expected ${expectedType}, received ${actualType}` : ''}`,
     )
   }
 }
@@ -244,21 +245,22 @@ export function validateRequiredField(
  * @param tx - The transaction input to check the form and type of.
  * @param paramName - The name of the transaction parameter.
  * @param checkValidity - The function to use to check the type.
+ * @param expectedType - Optional. The expected type for more specific error messages.
  * @throws
  */
 export function validateOptionalField(
   tx: Record<string, unknown>,
   paramName: string,
   checkValidity: (inp: unknown) => boolean,
+  expectedType?: string,
 ): void {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+    const actualType = tx[paramName] === null ? 'null' : typeof tx[paramName]
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${paramName}${expectedType ? `: expected ${expectedType}, received ${actualType}` : ''}`,
     )
   }
 }
-
-/* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
 export interface GlobalFlags {}
@@ -360,15 +362,15 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
-  validateRequiredField(common, 'Account', isString)
+  validateRequiredField(common, 'Account', isString, 'string')
 
-  validateOptionalField(common, 'Fee', isString)
+  validateOptionalField(common, 'Fee', isString, 'string')
 
-  validateOptionalField(common, 'Sequence', isNumber)
+  validateOptionalField(common, 'Sequence', isNumber, 'number')
 
-  validateOptionalField(common, 'AccountTxnID', isString)
+  validateOptionalField(common, 'AccountTxnID', isString, 'string')
 
-  validateOptionalField(common, 'LastLedgerSequence', isNumber)
+  validateOptionalField(common, 'LastLedgerSequence', isNumber, 'number')
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
   const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
@@ -386,15 +388,15 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
 
-  validateOptionalField(common, 'SourceTag', isNumber)
+  validateOptionalField(common, 'SourceTag', isNumber, 'number')
 
-  validateOptionalField(common, 'SigningPubKey', isString)
+  validateOptionalField(common, 'SigningPubKey', isString, 'string')
 
-  validateOptionalField(common, 'TicketSequence', isNumber)
+  validateOptionalField(common, 'TicketSequence', isNumber, 'number')
 
-  validateOptionalField(common, 'TxnSignature', isString)
+  validateOptionalField(common, 'TxnSignature', isString, 'string')
 
-  validateOptionalField(common, 'NetworkID', isNumber)
+  validateOptionalField(common, 'NetworkID', isNumber, 'number')
 }
 
 /**
