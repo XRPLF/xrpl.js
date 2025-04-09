@@ -1,5 +1,8 @@
-import { validateRequiredField, validateOptionalField } from '../../../src/models/transactions/common'
 import { ValidationError } from '../../../src/errors'
+import {
+  validateRequiredField,
+  validateOptionalField,
+} from '../../../src/models/transactions/common'
 
 describe('validateRequiredField', () => {
   const txMock = {
@@ -10,25 +13,43 @@ describe('validateRequiredField', () => {
 
   it('throws an error with expected and actual types', () => {
     expect(() =>
-      validateRequiredField(txMock, 'amount', (val) => typeof val === 'string', 'string')
-    ).toThrow(new ValidationError('Payment: invalid field amount: expected string, received number'))
+      validateRequiredField(
+        txMock,
+        'amount',
+        (val) => typeof val === 'string',
+        'string',
+      ),
+    ).toThrow(
+      new ValidationError(
+        'Payment: invalid field amount: expected string, received number',
+      ),
+    )
   })
 
   it('does not throw if value is valid', () => {
     expect(() =>
-      validateRequiredField(txMock, 'account', (val) => typeof val === 'string', 'string')
+      validateRequiredField(
+        txMock,
+        'account',
+        (val) => typeof val === 'string',
+        'string',
+      ),
     ).not.toThrow()
   })
 
   it('throws without expectedType if not passed', () => {
     expect(() =>
-      validateRequiredField(txMock, 'amount', (val) => typeof val === 'string')
+      validateRequiredField(txMock, 'amount', (val) => typeof val === 'string'),
     ).toThrow(new ValidationError('Payment: invalid field amount'))
   })
 
   it('throws when field is missing', () => {
     expect(() =>
-      validateRequiredField(txMock, 'nonExistentField', (val) => typeof val === 'string')
+      validateRequiredField(
+        txMock,
+        'nonExistentField',
+        (val) => typeof val === 'string',
+      ),
     ).toThrow(new ValidationError('Payment: missing field nonExistentField'))
   })
 })
@@ -45,13 +66,27 @@ describe('validateOptionalField', () => {
 
   it('skips validation if value is undefined', () => {
     expect(() =>
-      validateOptionalField(txNoMemo, 'memo', (val) => typeof val === 'string', 'string')
+      validateOptionalField(
+        txNoMemo,
+        'memo',
+        (val) => typeof val === 'string',
+        'string',
+      ),
     ).not.toThrow()
   })
 
   it('delegates to validation if value is defined', () => {
     expect(() =>
-      validateOptionalField(txMock, 'memo', (val) => typeof val === 'string', 'string')
-    ).toThrow(new ValidationError('Payment: invalid field memo: expected string, received number'))
+      validateOptionalField(
+        txMock,
+        'memo',
+        (val) => typeof val === 'string',
+        'string',
+      ),
+    ).toThrow(
+      new ValidationError(
+        'Payment: invalid field memo: expected string, received number',
+      ),
+    )
   })
-})
+})

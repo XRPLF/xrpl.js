@@ -219,6 +219,18 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  * @param expectedType - Optional. The expected type for more specific error messages.
  * @throws
  */
+
+/* eslint-disable max-params -- Allowing 4 params for better error messages */
+/* eslint-disable @typescript-eslint/restrict-template-expressions -- Using template expressions with checked values */
+/**
+ * Verify the form and type of a required type for a transaction at runtime.
+ *
+ * @param tx - The transaction input to check the form and type of.
+ * @param paramName - The name of the transaction parameter.
+ * @param checkValidity - The function to use to check the type.
+ * @param expectedType - Optional. The expected type for more specific error messages.
+ * @throws When the field is missing or invalid.
+ */
 export function validateRequiredField(
   tx: Record<string, unknown>,
   paramName: string,
@@ -234,7 +246,9 @@ export function validateRequiredField(
   if (!checkValidity(tx[paramName])) {
     const actualType = tx[paramName] === null ? 'null' : typeof tx[paramName]
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}${expectedType ? `: expected ${expectedType}, received ${actualType}` : ''}`,
+      `${tx.TransactionType}: invalid field ${paramName}${
+        expectedType ? `: expected ${expectedType}, received ${actualType}` : ''
+      }`,
     )
   }
 }
@@ -246,7 +260,7 @@ export function validateRequiredField(
  * @param paramName - The name of the transaction parameter.
  * @param checkValidity - The function to use to check the type.
  * @param expectedType - Optional. The expected type for more specific error messages.
- * @throws
+ * @throws When the field is invalid.
  */
 export function validateOptionalField(
   tx: Record<string, unknown>,
@@ -257,10 +271,14 @@ export function validateOptionalField(
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
     const actualType = tx[paramName] === null ? 'null' : typeof tx[paramName]
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}${expectedType ? `: expected ${expectedType}, received ${actualType}` : ''}`,
+      `${tx.TransactionType}: invalid field ${paramName}${
+        expectedType ? `: expected ${expectedType}, received ${actualType}` : ''
+      }`,
     )
   }
 }
+/* eslint-enable max-params */
+/* eslint-enable @typescript-eslint/restrict-template-expressions */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
 export interface GlobalFlags {}
