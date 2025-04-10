@@ -3,6 +3,7 @@ import { Signer } from '../common'
 
 import {
   BaseTransaction,
+  GlobalFlags,
   GlobalFlagsInterface,
   isArray,
   isObject,
@@ -108,8 +109,27 @@ export function validateBatch(tx: Record<string, unknown>): void {
         `Batch: RawTransactions[${index}] is a Batch transaction. Cannot nest Batch transactions.`,
       )
     }
+
+    // Automatically add the `tfInnerBatchTxn` flag to the inner transactions
+    /* eslint-disable no-bitwise -- needed here for flag parsing */
+    if (rawTx.Flags == null) {
+      rawTx.Flags = GlobalFlags.tfInnerBatchTxn
+    } else if (typeof rawTx.Flags === 'number') {
+      if (!((rawTx.Flags & GlobalFlags.tfInnerBatchTxn) === 0)) {
+        rawTx.Flags |= GlobalFlags.tfInnerBatchTxn
+      }
+    } else if (typeof rawTx.Flags === 'object') {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+      const flags = rawTx.Flags as Record<string, boolean>
+      if (!flags.tfInnerBatchTxn) {
+        // txInnerBatchTxn is either false or null
+        flags.tfInnerBatchTxn = true
+      }
+    }
+    /* eslint-enable no-bitwise */
+
+    // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
   })
-  // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
 
   validateOptionalField(tx, 'BatchSigners', isArray)
 

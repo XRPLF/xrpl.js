@@ -6,7 +6,6 @@ import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
-import { GlobalFlags } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -415,7 +414,7 @@ export function handleDeliverMax(tx: Payment): void {
  * @param tx - The transaction object.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
-// eslint-disable-next-line complexity, max-lines-per-function, max-statements -- needed here, lots to check
+// eslint-disable-next-line complexity, max-lines-per-function -- needed here, lots to check
 export async function autofillBatchTxn(
   client: Client,
   tx: Batch,
@@ -424,19 +423,6 @@ export async function autofillBatchTxn(
 
   for await (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
-
-    // Flag processing
-    /* eslint-disable no-bitwise -- needed here for flag parsing */
-    if (txn.Flags == null) {
-      txn.Flags = GlobalFlags.tfInnerBatchTxn
-    } else if (typeof txn.Flags === 'number') {
-      if (!((txn.Flags & GlobalFlags.tfInnerBatchTxn) === 0)) {
-        txn.Flags |= GlobalFlags.tfInnerBatchTxn
-      }
-    } else if (!txn.Flags.tfInnerBatchTxn) {
-      txn.Flags.tfInnerBatchTxn = true
-    }
-    /* eslint-enable no-bitwise */
 
     // Sequence processing
     if (txn.Sequence == null && txn.TicketSequence == null) {
@@ -457,14 +443,14 @@ export async function autofillBatchTxn(
 
     if (txn.Fee == null) {
       txn.Fee = '0'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
     } else if (txn.Fee !== '0') {
       throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- JS check
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
     } else if (txn.SigningPubKey !== '') {
       throw new XrplError(
         'Must have `SigningPubKey` of "" in inner Batch transaction.',
