@@ -1,6 +1,6 @@
 import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
-import { ClaimObject } from './binary'
+import { ClaimObject, BatchObject } from './binary'
 import { JsonObject } from './types/serialized-type'
 import {
   XrplDefinitionsBase,
@@ -15,6 +15,7 @@ const {
   signingData,
   signingClaimData,
   multiSigningData,
+  signingBatchData,
   binaryToJSON,
   serializeObject,
 } = binary
@@ -110,6 +111,13 @@ function encodeForMultisigning(
   )
 }
 
+function encodeForSigningBatch(json: object): string {
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  return bytesToHex(signingBatchData(json as BatchObject))
+}
+
 /**
  * Encode a quality value
  *
@@ -142,6 +150,7 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningBatch,
   encodeQuality,
   decodeQuality,
   decodeLedgerData,
