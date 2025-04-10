@@ -210,16 +210,6 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
-/**
- * Verify the form and type of a required type for a transaction at runtime.
- *
- * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
- * @param checkValidity - The function to use to check the type.
- * @param expectedType - Optional. The expected type for more specific error messages.
- * @throws
- */
-
 /* eslint-disable max-params -- Allowing 4 params for better error messages */
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- Using template expressions with checked values */
 /**
