@@ -273,21 +273,21 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
 }
 
 const invalidMessagesMap: Record<string, string> = {
-  isAccount: 'expected a valid account address',
-  isAmount: 'expected a valid Amount',
-  isCurrency: 'expected a valid Currency',
-  isXRPAmount: 'expected a valid XRP Amount',
-  isIssuedCurrency: 'expected a valid IssuedCurrencyAmount object',
-  isMPTAmount: 'expected a valid MPTAmount object',
-  isXChainBridge: 'expected a valid XChainBridge object',
-  isMemo: 'expected a valid Memo',
-  isSigner: 'expected a valid Signer',
-  isRecord: 'expected a valid Record',
-  isString: 'expected a valid string',
-  isHexString: 'expected a valid hex string',
-  isNumber: 'expected a valid number',
-  isNumberWithBoundsInternal: 'expected a valid number',
-  isArray: 'expected a valid array',
+  isAccount: 'account address',
+  isAmount: 'Amount',
+  isCurrency: 'Currency',
+  isXRPAmount: 'XRP Amount',
+  isIssuedCurrency: 'IssuedCurrencyAmount object',
+  isMPTAmount: 'MPTAmount object',
+  isXChainBridge: 'XChainBridge object',
+  isMemo: 'Memo',
+  isSigner: 'Signer',
+  isRecord: 'Record',
+  isString: 'string',
+  isHexString: 'hex string',
+  isNumber: 'number',
+  isNumberWithBoundsInternal: 'number',
+  isArray: 'array',
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
@@ -320,10 +320,10 @@ export function validateRequiredField(
       const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
       if (invalidMessageFromMap != null) {
-        errorMessage += `, ${invalidMessageFromMap}`
+        errorMessage += `, expected a valid ${invalidMessageFromMap}`
       }
     } else {
-      errorMessage += `, ${invalidMessage}`
+      errorMessage += `, expected a valid ${invalidMessage}`
     }
     throw new ValidationError(errorMessage)
   }
