@@ -323,7 +323,7 @@ export function validateRequiredField(
         errorMessage += `, expected a valid ${invalidMessageFromMap}`
       }
     } else {
-      errorMessage += `, expected a valid ${invalidMessage}`
+      errorMessage += `, ${invalidMessage}`
     }
     throw new ValidationError(errorMessage)
   }
@@ -351,7 +351,7 @@ export function validateOptionalField(
       const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
       if (invalidMessageFromMap != null) {
-        errorMessage += `, ${invalidMessageFromMap}`
+        errorMessage += `, expected a valid ${invalidMessageFromMap}`
       }
     } else {
       errorMessage += `, ${invalidMessage}`
