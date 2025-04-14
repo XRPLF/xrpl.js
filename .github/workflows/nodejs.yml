@@ -198,6 +198,11 @@ jobs:
   generate-documentation:
     runs-on: ubuntu-latest
 
+    # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+
     strategy:
       matrix:
         node-version: [18.x]
@@ -236,6 +241,13 @@ jobs:
 
       - name: Generate Documentation
         run: npm run docgen
+
+      - name: Upload static files as artifact
+        id: docs-artifact
+        uses: actions/upload-pages-artifact@v3 # or specific "vX.X.X" version tag for this action
+        with:
+          path: docs/
+          retention-days: 10
 
   snippets:
     runs-on: ubuntu-latest
