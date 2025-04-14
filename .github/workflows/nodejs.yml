@@ -250,8 +250,6 @@ jobs:
       url: ${{ steps.docs-artifact.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: generate-documentation
-    # Deploy docs only pushes into the main branch
-    if: success() && github.ref == 'refs/heads/main'
     steps:
       - name: Deploy to Documentation to GitHub Pages
         id: docs-artifact
