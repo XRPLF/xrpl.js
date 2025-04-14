@@ -244,7 +244,7 @@ jobs:
           path: docs/
           retention-days: 10
 
-  deploy:
+  deploy-docs-pages:
     environment:
       name: github-pages
       url: ${{ steps.docs-artifact.outputs.page_url }}
