@@ -245,6 +245,9 @@ jobs:
           retention-days: 10
 
   deploy-docs-pages:
+    permissions:
+      id-token: write  # Needed for OIDC authentication
+      pages: write # this permission is needed for deploying into Github Pages
     environment:
       name: github-pages
       url: ${{ steps.docs-artifact.outputs.page_url }}
