@@ -36,7 +36,7 @@ export const faucetNetworkIDs: Map<number, FaucetNetwork> = new Map([
 export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   if (client.networkID == null) {
     throw new XRPLFaucetError(
-      'Cannot create faucet URL without networkID or the faucet_host information',
+      'Cannot create faucet URL without networkID or the faucetHost information',
     )
   }
 
