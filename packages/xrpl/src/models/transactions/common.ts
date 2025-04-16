@@ -290,7 +290,7 @@ export interface GlobalFlags {}
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction {
+export interface BaseTransaction extends Record<string, unknown> {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -371,7 +371,9 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-export function validateBaseTransaction(common: Record<string, unknown>): void {
+export function validateBaseTransaction(
+  common: Record<string, unknown>,
+): asserts common is BaseTransaction {
   if (common.TransactionType === undefined) {
     throw new ValidationError('BaseTransaction: missing field TransactionType')
   }
