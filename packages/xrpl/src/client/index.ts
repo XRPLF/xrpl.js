@@ -689,20 +689,16 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
     if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
       if (tx.Amount == null) {
         // If only DeliverMax is provided, use it to populate the Amount field
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
         // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
+
         tx.Amount = tx.DeliverMax
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
       if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
         return Promise.reject(
@@ -712,8 +708,6 @@ class Client extends EventEmitter<EventTypes> {
         )
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       delete tx.DeliverMax
     }
 

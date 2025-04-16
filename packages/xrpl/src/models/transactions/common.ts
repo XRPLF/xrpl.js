@@ -380,7 +380,7 @@ export interface GlobalFlags {}
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction {
+export interface BaseTransaction extends Record<string, unknown> {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -462,7 +462,9 @@ export interface BaseTransaction {
  * @throws When the common param is malformed.
  */
 // eslint-disable-next-line max-lines-per-function, max-statements -- not worth refactoring
-export function validateBaseTransaction(common: Record<string, unknown>): void {
+export function validateBaseTransaction(
+  common: Record<string, unknown>,
+): asserts common is BaseTransaction {
   validateRequiredField(common, 'TransactionType', isString)
 
   if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
@@ -477,7 +479,7 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateOptionalField(
     common,
     'Flags',
-    (inp) => isNumber(inp) || isRecord(inp),
+    (inp): inp is number | object => isNumber(inp) || isRecord(inp),
     'expected a valid number or Flags object',
   )
 

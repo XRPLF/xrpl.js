@@ -47,7 +47,8 @@ export function validateClawback(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'Amount',
-    (inp) => isIssuedCurrency(inp) || isMPTAmount(inp),
+    (inp): inp is IssuedCurrencyAmount | MPTAmount =>
+      isIssuedCurrency(inp) || isMPTAmount(inp),
     'expected a valid non-XRP Amount',
   )
 

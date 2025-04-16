@@ -67,7 +67,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isHexString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isHexString(inp),
     'expected a number or hex string',
   )
 

@@ -55,8 +55,8 @@ export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Expiration', isNumber)
 
   validateOptionalField(tx, 'URI', isHexString)
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const uriLength = (tx.URI as string | undefined)?.length
+
+  const uriLength = tx.URI?.length
   if (uriLength !== undefined) {
     if (uriLength === 0) {
       throw new ValidationError(

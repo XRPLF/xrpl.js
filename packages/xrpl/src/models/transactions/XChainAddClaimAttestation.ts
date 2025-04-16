@@ -104,7 +104,7 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'WasLockingChainSend',
-    (inp) => inp === 0 || inp === 1,
+    (inp: unknown): inp is 0 | 1 => inp === 0 || inp === 1,
     'expected 0 or 1',
   )
 
@@ -113,7 +113,7 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isHexString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isHexString(inp),
     'expected a number or hex string',
   )
 }

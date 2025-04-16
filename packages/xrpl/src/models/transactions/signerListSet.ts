@@ -54,21 +54,19 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'SignerEntries', isArray)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const signerEntries = tx.SignerEntries as unknown[]
-  if (signerEntries.length === 0) {
+  if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',
     )
   }
 
-  if (signerEntries.length > MAX_SIGNERS) {
+  if (tx.SignerEntries.length > MAX_SIGNERS) {
     throw new ValidationError(
       `SignerListSet: maximum of ${MAX_SIGNERS} members allowed in SignerEntries`,
     )
   }
 
-  for (const entry of signerEntries) {
+  for (const entry of tx.SignerEntries) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
     const signerEntry = entry as SignerEntry
     const { WalletLocator } = signerEntry.SignerEntry
