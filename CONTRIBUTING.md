@@ -64,18 +64,20 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.2.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
 npm run build
 npm run test:integration
 ```
 
 Breaking down the command:
 * `docker run -p 6006:6006` starts a Docker container with an open port for admin WebSocket requests.
-* `--interactive` allows you to interact with the container.
-* `-t` starts a terminal in the container for you to send commands to.
-* `--volume $PWD/.ci-config:/config/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
+ `--rm` tells docker to close the container after processes are done running.
+* `-it` allows you to interact with the container.
+   `--name rippled_standalone` is an instance name for clarity
+* `--volume $PWD/.ci-config:/etc/opt/ripple/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
 * `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
-* `/opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg` starts `rippled` in standalone mode
+* `--entrypoint bash rippleci/rippled:develop` manually overrides the entrypoint (for the latest version of rippled on the `develop` branch)
+*  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
 
 ### Browser Tests
 
@@ -90,7 +92,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run -p 6006:6006 --interactive -t --volume $PWD/.ci-config:/opt/ripple/etc/ --platform linux/amd64 rippleci/rippled:2.2.0-b3 /opt/ripple/bin/rippled -a --conf /opt/ripple/etc/rippled.cfg
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
 npm run test:browser
 ```
 
@@ -130,13 +132,13 @@ For every file in `src`, we try to have a corresponding file in `test` with unit
 
 The goal is to maintain above 80% code coverage, and generally any new feature or bug fix should be accompanied by unit tests, and integration tests if applicable.
 
-For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.ts).
+For an example of a unit test, check out the [autofill tests here](./packages/xrpl/test/client/autofill.test.ts).
 
 If your code connects to the ledger (ex. Adding a new transaction type) it's handy to write integration tests to ensure that you can successfully interact with the ledger. Integration tests are generally run against a docker instance of rippled which contains the latest updates. Since standalone mode allows us to manually close ledgers, this allows us to run integration tests at a much faster rate than if we had to wait 4-5 seconds per transaction for the ledger to validate the transaction. [See above](#running-tests) for how to start up the docker container to run integration tests.
 
 All integration tests should be written in the `test/integration` folder, with new `Requests` and `Transactions` tests being in their respective folders.
 
-For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.ts).
+For an example of how to write an integration test for `xrpl.js`, you can look at the [Payment integration test](./packages/xrpl/test/integration/transactions/payment.test.ts).
 
 ## Generate reference docs
 
@@ -148,9 +150,13 @@ npm run docgen
 
 This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
-## Update `definitions.json`
+## Updating `definitions.json`
 
-Use [this repo](https://github.com/RichardAH/xrpl-codec-gen) to generate a new `definitions.json` file from the rippled source code. Instructions are available in that README.
+This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js) - if the output needs manual intervention afterwards, consider updating the script instead.
+
+1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
+2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
+3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
 
 ## Adding and removing packages
 
@@ -198,16 +204,6 @@ In order to update the list, follow these steps from the top level of the librar
 4. Push your changes
 
 Note: The same updated config can be used to update xrpl-py's CI as well.
-
-## Updating `definitions.json`
-
-This should almost always be done using the [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen) script - if the output needs manual intervention afterwards, consider updating the script instead.
-
-1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
-2. Clone / pull the latest changes from [`xrpl-codec-gen`](https://github.com/RichardAH/xrpl-codec-gen)
-3. From the `xrpl-codec-gen` tool, follow the steps in the `README.md` to generate a new `definitions.json` file.
-4. Replace the `definitions.json` file in the `ripple-binary-codec` with the newly generated file.
-5. Verify that the changes make sense by inspection before submitting, as there may be updates required for the `xrpl-codec-gen` tool depending on the latest amendments we're updating to match.
 
 
 ## Release process + checklist

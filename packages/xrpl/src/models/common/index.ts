@@ -20,6 +20,11 @@ export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
 }
 
+export interface MPTAmount {
+  mpt_issuance_id: string
+  value: string
+}
+
 export type Amount = IssuedCurrencyAmount | string
 
 export interface Balance {
@@ -154,6 +159,16 @@ export interface NFToken {
 export interface AuthAccount {
   AuthAccount: {
     Account: string
+  }
+}
+
+export interface AuthorizeCredential {
+  Credential: {
+    /** The issuer of the credential. */
+    Issuer: string
+
+    /** A hex-encoded value to identify the type of credential from the issuer. */
+    CredentialType: string
   }
 }
 

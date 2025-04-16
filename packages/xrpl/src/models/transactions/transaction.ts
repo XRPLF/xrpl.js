@@ -4,11 +4,12 @@
 import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
-import { setTransactionFlagsToNumber } from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMClawback, validateAMMClawback } from './AMMClawback'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
 import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
@@ -19,6 +20,9 @@ import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import { BaseTransaction, isIssuedCurrency } from './common'
+import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -27,6 +31,19 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -41,6 +58,7 @@ import {
   validateNFTokenCreateOffer,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
+import { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
@@ -58,6 +76,14 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import {
+  PermissionedDomainDelete,
+  validatePermissionedDomainDelete,
+} from './permissionedDomainDelete'
+import {
+  PermissionedDomainSet,
+  validatePermissionedDomainSet,
+} from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -98,6 +124,7 @@ import {
  */
 export type SubmittableTransaction =
   | AMMBid
+  | AMMClawback
   | AMMCreate
   | AMMDelete
   | AMMDeposit
@@ -109,17 +136,25 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | CredentialAccept
+  | CredentialCreate
+  | CredentialDelete
   | DIDDelete
   | DIDSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | MPTokenAuthorize
+  | MPTokenIssuanceCreate
+  | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
   | NFTokenCreateOffer
   | NFTokenMint
+  | NFTokenModify
   | OfferCancel
   | OfferCreate
   | OracleDelete
@@ -128,6 +163,8 @@ export type SubmittableTransaction =
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
+  | PermissionedDomainSet
+  | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
   | TicketCreate
@@ -232,10 +269,14 @@ export function validate(transaction: Record<string, unknown>): void {
   })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-  setTransactionFlagsToNumber(tx as unknown as Transaction)
+  tx.Flags = convertTxFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMClawback':
+      validateAMMClawback(tx)
       break
 
     case 'AMMCreate':
@@ -282,6 +323,18 @@ export function validate(transaction: Record<string, unknown>): void {
       validateClawback(tx)
       break
 
+    case 'CredentialAccept':
+      validateCredentialAccept(tx)
+      break
+
+    case 'CredentialCreate':
+      validateCredentialCreate(tx)
+      break
+
+    case 'CredentialDelete':
+      validateCredentialDelete(tx)
+      break
+
     case 'DIDDelete':
       validateDIDDelete(tx)
       break
@@ -306,6 +359,22 @@ export function validate(transaction: Record<string, unknown>): void {
       validateEscrowFinish(tx)
       break
 
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
+      break
+
+    case 'MPTokenIssuanceCreate':
+      validateMPTokenIssuanceCreate(tx)
+      break
+
+    case 'MPTokenIssuanceDestroy':
+      validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
+      break
+
     case 'NFTokenAcceptOffer':
       validateNFTokenAcceptOffer(tx)
       break
@@ -324,6 +393,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'NFTokenMint':
       validateNFTokenMint(tx)
+      break
+
+    case 'NFTokenModify':
+      validateNFTokenModify(tx)
       break
 
     case 'OfferCancel':
@@ -356,6 +429,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PaymentChannelFund':
       validatePaymentChannelFund(tx)
+      break
+
+    case 'PermissionedDomainSet':
+      validatePermissionedDomainSet(tx)
+      break
+
+    case 'PermissionedDomainDelete':
+      validatePermissionedDomainDelete(tx)
       break
 
     case 'SetRegularKey':
