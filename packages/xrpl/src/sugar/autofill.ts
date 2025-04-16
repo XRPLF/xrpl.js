@@ -266,13 +266,14 @@ async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
- * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
+ * @returns A promise that returns the fee.
  */
-export async function calculateFeePerTransactionType(
+
+async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
-): Promise<void> {
+): Promise<BigNumber> {
   // netFee is usually 0.00001 XRP (10 drops)
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
@@ -293,10 +294,15 @@ export async function calculateFeePerTransactionType(
   ) {
     baseFee = await fetchAccountDeleteFee(client)
   } else if (tx.TransactionType === 'Batch') {
-    baseFee = BigNumber.sum(
-      baseFee.times(2),
-      baseFee.times(tx.RawTransactions.length + (tx.BatchSigners?.length ?? 0)),
-    )
+    const rawTxFees = await tx.RawTransactions.reduce(async (acc, rawTxn) => {
+      const resolvedAcc = await acc
+      const fee = await calculateFeePerTransactionType(
+        client,
+        rawTxn.RawTransaction,
+      )
+      return BigNumber.sum(resolvedAcc, fee)
+    }, Promise.resolve(new BigNumber(0)))
+    baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
   }
 
   /*
@@ -314,8 +320,26 @@ export async function calculateFeePerTransactionType(
       : BigNumber.min(baseFee, maxFeeDrops)
 
   // Round up baseFee and return it as a string
-  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers -- param reassign is safe, base 10 magic num
-  tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
+
+  return totalFee.dp(0, BigNumber.ROUND_CEIL)
+}
+
+/**
+ * Calculates the fee per transaction type and sets it in the transaction.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
+ */
+export async function getTransactionFee(
+  client: Client,
+  tx: Transaction,
+  signersCount = 0,
+): Promise<void> {
+  const fee = await calculateFeePerTransactionType(client, tx, signersCount)
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
+  tx.Fee = fee.toString(10)
 }
 
 /**
@@ -390,7 +414,7 @@ export function handleDeliverMax(tx: Payment): void {
       // If only DeliverMax is provided, use it to populate the Amount field
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
       // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, no-param-reassign -- known RPC-level property
+      // eslint-disable-next-line no-param-reassign -- known RPC-level property
       tx.Amount = tx.DeliverMax
     }
 
