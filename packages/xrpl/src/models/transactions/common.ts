@@ -543,21 +543,9 @@ export function parseAmountValue(amount: unknown): number {
  * @param tx A CredentialType Transaction.
  * @throws when the CredentialType is malformed.
  */
-export function validateCredentialType(tx: Record<string, unknown>): void {
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError('Invalid TransactionType')
-  }
-  if (tx.CredentialType === undefined) {
-    throw new ValidationError(
-      `${tx.TransactionType}: missing field CredentialType`,
-    )
-  }
+export function validateCredentialType<T extends BaseTransaction>(tx: T): void {
+  validateRequiredField(tx, 'CredentialType', isHexString)
 
-  if (!isHexString(tx.CredentialType)) {
-    throw new ValidationError(
-      `${tx.TransactionType}: CredentialType must be a hex string`,
-    )
-  }
   if (tx.CredentialType.length === 0) {
     throw new ValidationError(
       `${tx.TransactionType}: CredentialType cannot be an empty string`,

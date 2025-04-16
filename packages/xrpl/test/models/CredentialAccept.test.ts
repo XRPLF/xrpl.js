@@ -79,7 +79,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ credentialType field not hex`, function () {
     credentialAccept.CredentialType = 'this is not hex'
-    const errorMessage = 'CredentialAccept: CredentialType must be a hex string'
+    const errorMessage =
+      'CredentialAccept: invalid field CredentialType, expected a valid hex string'
     assertInvalid(credentialAccept, errorMessage)
   })
 })

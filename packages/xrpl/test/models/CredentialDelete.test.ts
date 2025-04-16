@@ -89,7 +89,8 @@ describe('CredentialDelete', function () {
 
   it(`throws w/ credentialType field not hex`, function () {
     credentialDelete.CredentialType = 'this is not hex'
-    const errorMessage = 'CredentialDelete: CredentialType must be a hex string'
+    const errorMessage =
+      'CredentialDelete: invalid field CredentialType, expected a valid hex string'
     assertInvalid(credentialDelete, errorMessage)
   })
 })
