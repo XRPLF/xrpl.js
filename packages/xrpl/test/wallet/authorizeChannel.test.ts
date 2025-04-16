@@ -4,7 +4,7 @@ import { ECDSA, Wallet } from '../../src'
 import { authorizeChannel } from '../../src/Wallet/authorizeChannel'
 
 describe('authorizeChannel', function () {
-  it('authorizeChannel succeeds with secp256k1 seed', function () {
+  it('succeeds with secp256k1 seed', function () {
     const secpWallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd', {
       algorithm: ECDSA.secp256k1,
     })
@@ -18,7 +18,7 @@ describe('authorizeChannel', function () {
     )
   })
 
-  it('authorizeChannel succeeds with ed25519 seed', function () {
+  it('succeeds with ed25519 seed', function () {
     const edWallet = Wallet.fromSeed('sEdSuqBPSQaood2DmNYVkwWTn1oQTj2')
     const channelId =
       '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
@@ -27,5 +27,25 @@ describe('authorizeChannel', function () {
       authorizeChannel(edWallet, channelId, amount),
       '7E1C217A3E4B3C107B7A356E665088B4FBA6464C48C58267BEF64975E3375EA338AE22E6714E3F5E734AE33E6B97AAD59058E1E196C1F92346FC1498D0674404',
     )
+  })
+
+  it('throws on invalid channel ID format', function () {
+    const wallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd', {
+      algorithm: ECDSA.secp256k1,
+    })
+    assert.throws(() => {
+      authorizeChannel(wallet, 'invalid-id', '1000000')
+    })
+  })
+
+  it('throws on invalid amount format', function () {
+    const wallet = Wallet.fromSeed('snGHNrPbHrdUcszeuDEigMdC1Lyyd', {
+      algorithm: ECDSA.secp256k1,
+    })
+    const channelId =
+      '5DB01B7FFED6B67E6B0414DED11E051D2EE2B7619CE0EAA6286D67A3A4D5BDB3'
+    assert.throws(() => {
+      authorizeChannel(wallet, channelId, 'invalid-amount')
+    })
   })
 })

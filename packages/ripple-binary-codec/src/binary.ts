@@ -179,6 +179,8 @@ function multiSigningData(
 
 /**
  * Interface describing fields required for a Batch signer
+ * @property flags - Flags indicating Batch transaction properties
+ * @property txIDs - Array of transaction IDs included in the Batch
  */
 interface BatchObject extends JsonObject {
   flags: number
@@ -188,8 +190,7 @@ interface BatchObject extends JsonObject {
 /**
  * Serialize a signingClaim
  *
- * @param batch A Batch object to serialize
- * @param opts.definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @param batch A Batch object to serialize.
  * @returns the serialized object with appropriate prefix
  */
 function signingBatchData(batch: BatchObject): Uint8Array {
@@ -209,6 +210,9 @@ function signingBatchData(batch: BatchObject): Uint8Array {
   bytesList.put(flags)
   bytesList.put(txIDsLength)
   batch.txIDs.forEach((txID: string) => {
+    if (!/^[A-F0-9]{64}$/i.test(txID)) {
+      throw new Error(`Invalid transaction ID format: ${txID}`)
+    }
     bytesList.put(coreTypes.Hash256.from(txID).toBytes())
   })
 

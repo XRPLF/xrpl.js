@@ -74,10 +74,8 @@ function encodeForSigning(
 /**
  * Encode a payment channel claim for signing.
  *
- * @param json JSON object representing the transaction
- * @param signer string representing the account to sign the transaction with
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns a hex string of the encoded transaction
+ * @param json JSON object representing the claim.
+ * @returns a hex string of the encoded claim.
  */
 function encodeForSigningClaim(json: object): string {
   if (typeof json !== 'object') {
@@ -87,12 +85,12 @@ function encodeForSigningClaim(json: object): string {
 }
 
 /**
- * Encode a transaction and prepare for multi-signing
+ * Encode a transaction and prepare for multi-signing.
  *
- * @param json JSON object representing the transaction
- * @param signer string representing the account to sign the transaction with
+ * @param json JSON object representing the transaction.
+ * @param signer string representing the account to sign the transaction with.
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns a hex string of the encoded transaction
+ * @returns a hex string of the encoded transaction.
  */
 function encodeForMultisigning(
   json: object,
@@ -114,10 +112,8 @@ function encodeForMultisigning(
 /**
  * Encode a Batch transaction for signing.
  *
- * @param json JSON object representing the transaction
- * @param signer string representing the account to sign the transaction with
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns a hex string of the encoded transaction
+ * @param json JSON object representing the transaction.
+ * @returns a hex string of the encoded transaction.
  */
 function encodeForSigningBatch(json: object): string {
   if (typeof json !== 'object') {

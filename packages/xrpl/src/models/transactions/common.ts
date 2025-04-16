@@ -217,7 +217,7 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  * @returns Whether the Object is properly formed.
  */
 export function isObject(input: unknown): input is object {
-  return typeof input === 'object'
+  return input !== null && typeof input === 'object'
 }
 
 /**
@@ -226,7 +226,7 @@ export function isObject(input: unknown): input is object {
  * @param input - The object to check the form and type of.
  * @returns Whether the Array is properly formed.
  */
-export function isArray(input: unknown): boolean {
+export function isArray<T = unknown>(input: unknown): input is T[] {
   return Array.isArray(input)
 }
 
