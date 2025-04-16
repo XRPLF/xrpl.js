@@ -7,6 +7,7 @@ import {
   validateOptionalField,
   validateRequiredField,
   validateCredentialsList,
+  isArray,
 } from './common'
 
 const MAX_ACCEPTED_CREDENTIALS = 10
@@ -36,11 +37,7 @@ export function validatePermissionedDomainSet(
   validateBaseTransaction(tx)
 
   validateOptionalField(tx, 'DomainID', isString)
-  validateRequiredField(
-    tx,
-    'AcceptedCredentials',
-    () => tx.AcceptedCredentials instanceof Array,
-  )
+  validateRequiredField(tx, 'AcceptedCredentials', isArray)
 
   validateCredentialsList(
     tx.AcceptedCredentials,
