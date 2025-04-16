@@ -140,41 +140,46 @@ export function setValidAddresses(tx: Transaction): void {
  * @param tagField - The field name for the tag in the transaction object.
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
-function validateAccountAddress(
-  tx: Transaction,
-  accountField: string,
-  tagField: string,
-): void {
+function validateAccountAddress<
+  T extends Transaction,
+  K extends keyof T & string,
+  K2 extends keyof T & string,
+>(tx: T, accountField: K, tagField: K2): void {
+  const val = tx[accountField]
+
+  if (typeof val !== 'string') {
+    throw new Error(`${accountField} must be a string`)
+  }
   // if X-address is given, convert it to classic address
-  const { classicAccount, tag } = getClassicAccountAndTag(tx[accountField])
-  // eslint-disable-next-line no-param-reassign -- param reassign is safe
-  tx[accountField] = classicAccount
+  const { classicAccount, tag } = getClassicAccountAndTag(val)
+  // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- param reassign is safe
+  ;(tx as Record<K, string>)[accountField] = classicAccount
 
   if (tag != null && tag !== false) {
-    if (tx[tagField] && tx[tagField] !== tag) {
+    if (tagField in tx && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
       )
     }
-    // eslint-disable-next-line no-param-reassign -- param reassign is safe
-    tx[tagField] = tag
+    // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- param reassign is safe
+    ;(tx as Record<K2, number | false>)[tagField] = tag
   }
 }
 
 /**
  * Retrieves the classic account and tag from an account address.
  *
- * @param Account - The account address.
+ * @param account - The account address.
  * @param [expectedTag] - The expected tag for the account address.
  * @returns The classic account and tag.
  * @throws {ValidationError} If the address includes a tag that does not match the tag specified in the transaction.
  */
 function getClassicAccountAndTag(
-  Account: string,
+  account: string,
   expectedTag?: number,
 ): ClassicAccountAndTag {
-  if (isValidXAddress(Account)) {
-    const classic = xAddressToClassicAddress(Account)
+  if (isValidXAddress(account)) {
+    const classic = xAddressToClassicAddress(account)
     if (expectedTag != null && classic.tag !== expectedTag) {
       throw new ValidationError(
         'address includes a tag that does not match the tag specified in the transaction',
@@ -186,7 +191,7 @@ function getClassicAccountAndTag(
     }
   }
   return {
-    classicAccount: Account,
+    classicAccount: account,
     tag: expectedTag,
   }
 }
@@ -198,7 +203,6 @@ function getClassicAccountAndTag(
  * @param fieldName - The name of the field to convert.export
  */
 function convertToClassicAddress(tx: Transaction, fieldName: string): void {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- assignment is safe
   const account = tx[fieldName]
   if (typeof account === 'string') {
     const { classicAccount } = getClassicAccountAndTag(account)
