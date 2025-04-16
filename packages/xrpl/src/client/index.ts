@@ -695,7 +695,6 @@ class Client extends EventEmitter<EventTypes> {
         // If only DeliverMax is provided, use it to populate the Amount field
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
         // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-
         tx.Amount = tx.DeliverMax
       }
 

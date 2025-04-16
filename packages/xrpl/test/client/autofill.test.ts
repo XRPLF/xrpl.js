@@ -79,7 +79,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: Specify Only DeliverMax field', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     delete paymentTx.Amount
@@ -89,7 +88,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
 
     const txResult = await testContext.client.autofill(paymentTx)
@@ -99,7 +97,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = '6789'
     paymentTx.Amount = '1234'
 
