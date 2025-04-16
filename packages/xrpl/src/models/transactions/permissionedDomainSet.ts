@@ -41,8 +41,7 @@ export function validatePermissionedDomainSet(
 
   validateCredentialsList(
     tx.AcceptedCredentials,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
+    tx.TransactionType,
     // PermissionedDomainSet uses AuthorizeCredential nested objects only, strings are not allowed
     false,
     // PermissionedDomainSet uses at most 10 accepted credentials. This is different from Credential-feature transactions.

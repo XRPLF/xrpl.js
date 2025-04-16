@@ -152,8 +152,7 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
 
   validateCredentialsList(
     tx.CredentialIDs,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
+    tx.TransactionType,
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )

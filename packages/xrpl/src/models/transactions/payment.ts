@@ -186,8 +186,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   validateCredentialsList(
     tx.CredentialIDs,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
+    tx.TransactionType,
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
@@ -264,7 +263,10 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
   return false
 }
 
-function isPath(path: Array<Record<string, unknown>>): boolean {
+function isPath(path: unknown): path is Path {
+  if (!Array.isArray(path) || path.length === 0) {
+    return false
+  }
   for (const pathStep of path) {
     if (!isPathStep(pathStep)) {
       return false
@@ -273,7 +275,7 @@ function isPath(path: Array<Record<string, unknown>>): boolean {
   return true
 }
 
-function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
+function isPaths(paths: unknown): paths is Path[] {
   if (!Array.isArray(paths) || paths.length === 0) {
     return false
   }
