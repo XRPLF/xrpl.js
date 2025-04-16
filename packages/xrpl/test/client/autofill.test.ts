@@ -438,15 +438,16 @@ describe('client.autofill', function () {
   })
 
   it('should autofill Batch transaction with single account', async function () {
+    const sender = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
     const tx: Batch = {
       TransactionType: 'Batch',
-      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Account: sender,
       RawTransactions: [
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
             Flags: 0x40000000,
-            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Account: sender,
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
         },
@@ -454,7 +455,7 @@ describe('client.autofill', function () {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
             Flags: 0x40000000,
-            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Account: sender,
             Authorize: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
           },
         },
@@ -479,16 +480,18 @@ describe('client.autofill', function () {
     })
   })
 
-  it('should autofill Batch transaction with single account', async function () {
+  it('should autofill Batch transaction with multiple accounts', async function () {
+    const sender1 = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+    const sender2 = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn'
     const tx: Transaction = {
       TransactionType: 'Batch',
-      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Account: sender1,
       RawTransactions: [
         {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
             Flags: 0x40000000,
-            Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+            Account: sender1,
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
         },
@@ -496,7 +499,7 @@ describe('client.autofill', function () {
           RawTransaction: {
             TransactionType: 'DepositPreauth',
             Flags: 0x40000000,
-            Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+            Account: sender2,
             Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
           },
         },

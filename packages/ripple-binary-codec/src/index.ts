@@ -72,7 +72,7 @@ function encodeForSigning(
 }
 
 /**
- * Encode a transaction and prepare for signing with a claim
+ * Encode a payment channel claim for signing.
  *
  * @param json JSON object representing the transaction
  * @param signer string representing the account to sign the transaction with
@@ -111,9 +111,17 @@ function encodeForMultisigning(
   )
 }
 
+/**
+ * Encode a Batch transaction for signing.
+ *
+ * @param json JSON object representing the transaction
+ * @param signer string representing the account to sign the transaction with
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns a hex string of the encoded transaction
+ */
 function encodeForSigningBatch(json: object): string {
   if (typeof json !== 'object') {
-    throw new Error()
+    throw new Error('Need an object to encode a Batch transaction')
   }
   return bytesToHex(signingBatchData(json as BatchObject))
 }
