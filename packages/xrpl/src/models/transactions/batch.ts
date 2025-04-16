@@ -6,7 +6,7 @@ import {
   GlobalFlags,
   GlobalFlagsInterface,
   isArray,
-  isObject,
+  isRecord,
   isString,
   validateBaseTransaction,
   validateOptionalField,
@@ -87,23 +87,19 @@ export function validateBatch(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'RawTransactions', isArray)
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const rawTransactions = tx.RawTransactions as unknown[]
-  rawTransactions.forEach((rawTxObj, index) => {
-    if (!isObject(rawTxObj)) {
+
+  tx.RawTransactions.forEach((rawTxObj, index) => {
+    if (!isRecord(rawTxObj)) {
       throw new ValidationError(
         `Batch: RawTransactions[${index}] is not object.`,
       )
     }
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-    const rawTxRecord = rawTxObj as Record<string, unknown>
-    validateRequiredField(rawTxRecord, 'RawTransaction', isObject, {
+    validateRequiredField(rawTxObj, 'RawTransaction', isRecord, {
       paramName: `RawTransactions[${index}].RawTransaction`,
       txType: 'Batch',
     })
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-    const rawTx = rawTxRecord.RawTransaction as Record<string, unknown>
+    const rawTx = rawTxObj.RawTransaction
     if (rawTx.TransactionType === 'Batch') {
       throw new ValidationError(
         `Batch: RawTransactions[${index}] is a Batch transaction. Cannot nest Batch transactions.`,
@@ -133,20 +129,18 @@ export function validateBatch(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'BatchSigners', isArray)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-  const batchSigners = tx.BatchSigners as unknown[] | undefined
-  batchSigners?.forEach((signerObj, index) => {
-    if (!isObject(signerObj)) {
+  tx.BatchSigners?.forEach((signerObj, index) => {
+    if (!isRecord(signerObj)) {
       throw new ValidationError(`Batch: BatchSigners[${index}] is not object.`)
     }
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-    const signerRecord = signerObj as Record<string, unknown>
-    validateRequiredField(signerRecord, 'BatchSigner', isObject, {
+
+    const signerRecord = signerObj
+    validateRequiredField(signerRecord, 'BatchSigner', isRecord, {
       paramName: `BatchSigners[${index}].BatchSigner`,
       txType: 'Batch',
     })
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
-    const signer = signerRecord.BatchSigner as Record<string, unknown>
+
+    const signer = signerRecord.BatchSigner
     validateRequiredField(signer, 'Account', isString, {
       paramName: `BatchSigners[${index}].Account`,
       txType: 'Batch',

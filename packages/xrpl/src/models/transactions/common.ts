@@ -69,7 +69,13 @@ const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+/**
+ * Verify the form and type of a Record/Object at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the Record/Object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
 
@@ -211,16 +217,6 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
 }
 
 /**
- * Verify the form and type of an Object at runtime.
- *
- * @param input - The object to check the form and type of.
- * @returns Whether the Object is properly formed.
- */
-export function isObject(input: unknown): input is object {
-  return input !== null && typeof input === 'object'
-}
-
-/**
  * Verify the form and type of an Array at runtime.
  *
  * @param input - The object to check the form and type of.
@@ -241,26 +237,34 @@ export function isArray<T = unknown>(input: unknown): input is T[] {
  * @param errorOpts - Extra values to make the error message easier to understand.
  * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
- * @throws
+ * @throws ValidationError if the parameter is missing or invalid.
  */
 // eslint-disable-next-line max-params -- helper function
-export function validateRequiredField(
-  tx: Record<string, unknown>,
-  param: string,
-  checkValidity: (inp: unknown) => boolean,
+export function validateRequiredField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
   errorOpts: {
     txType?: string
     paramName?: string
   } = {},
-): void {
+): asserts tx is T & { [P in K]: V } {
   const paramNameStr = errorOpts.paramName ?? param
   const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] == null) {
-    throw new ValidationError(`${txType}: missing field ${paramNameStr}`)
+    throw new ValidationError(
+      `${txType}: missing field ${String(paramNameStr)}`,
+    )
   }
 
   if (!checkValidity(tx[param])) {
-    throw new ValidationError(`${txType}: invalid field ${paramNameStr}`)
+    throw new ValidationError(
+      `${txType}: invalid field ${String(paramNameStr)}`,
+    )
   }
 }
 
@@ -273,22 +277,28 @@ export function validateRequiredField(
  * @param errorOpts - Extra values to make the error message easier to understand.
  * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
- * @throws
+ * @throws ValidationError if the parameter is invalid.
  */
 // eslint-disable-next-line max-params -- helper function
-export function validateOptionalField(
-  tx: Record<string, unknown>,
-  param: string,
-  checkValidity: (inp: unknown) => boolean,
+export function validateOptionalField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
   errorOpts: {
     txType?: string
     paramName?: string
   } = {},
-): void {
+): asserts tx is T & { [P in K]: V | undefined } {
   const paramNameStr = errorOpts.paramName ?? param
   const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] !== undefined && !checkValidity(tx[param])) {
-    throw new ValidationError(`${txType}: invalid field ${paramNameStr}`)
+    throw new ValidationError(
+      `${txType}: invalid field ${String(paramNameStr)}`,
+    )
   }
 }
 
