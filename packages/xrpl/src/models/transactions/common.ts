@@ -79,13 +79,13 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * Verify the form and type of an array at runtime.
+ * Verify the form and type of an Array at runtime.
  *
- * @param value - The object to check the form and type of.
- * @returns Whether the array is properly formed.
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Array is properly formed.
  */
-export function isArray(value: unknown): value is unknown[] {
-  return Array.isArray(value)
+export function isArray<T = unknown>(input: unknown): input is T[] {
+  return Array.isArray(input)
 }
 
 /**
@@ -302,20 +302,26 @@ const invalidMessagesMap: Record<string, string> = {
  * @throws ValidationError if the field is missing or invalid.
  */
 // eslint-disable-next-line max-params -- okay for a helper function
-export function validateRequiredField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
+export function validateRequiredField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  paramName: K,
+  checkValidity: (inp: unknown) => inp is V,
   invalidMessage?: string,
-): void {
+): asserts tx is T & { [P in K]: V } {
   if (tx[paramName] == null) {
     throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramName}`,
+      `${tx.TransactionType}: missing field ${String(paramName)}`,
     )
   }
 
   if (!checkValidity(tx[paramName])) {
-    let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
+    let errorMessage = `${tx.TransactionType}: invalid field ${String(
+      paramName,
+    )}`
     if (invalidMessage == null) {
       const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
@@ -339,14 +345,20 @@ export function validateRequiredField(
  * @throws ValidationError if the field is invalid.
  */
 // eslint-disable-next-line max-params -- okay for a helper function
-export function validateOptionalField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
+export function validateOptionalField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  paramName: K,
+  checkValidity: (inp: unknown) => inp is V,
   invalidMessage?: string,
-): void {
+): asserts tx is T & { [P in K]: V | undefined } {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
-    let errorMessage = `${tx.TransactionType}: invalid field ${paramName}`
+    let errorMessage = `${tx.TransactionType}: invalid field ${String(
+      paramName,
+    )}`
     if (invalidMessage == null) {
       const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
@@ -453,8 +465,7 @@ export interface BaseTransaction {
 export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateRequiredField(common, 'TransactionType', isString)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Checked above
-  if (!TRANSACTION_TYPES.includes(common.TransactionType as string)) {
+  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
     throw new ValidationError('BaseTransaction: Unknown TransactionType')
   }
 
