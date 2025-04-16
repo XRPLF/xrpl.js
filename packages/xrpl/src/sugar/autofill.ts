@@ -406,8 +406,6 @@ export async function checkAccountDeleteBlockers(
  * @throws ValidationError if Amount and DeliverMax are both provided but do not match.
  */
 export function handleDeliverMax(tx: Payment): void {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-  // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
   if (tx.DeliverMax != null) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount == null) {
@@ -418,9 +416,6 @@ export function handleDeliverMax(tx: Payment): void {
       tx.Amount = tx.DeliverMax
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
       throw new ValidationError(
@@ -428,8 +423,6 @@ export function handleDeliverMax(tx: Payment): void {
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
     // eslint-disable-next-line no-param-reassign -- needed here
     delete tx.DeliverMax
   }
