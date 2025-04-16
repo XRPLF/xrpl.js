@@ -14,6 +14,7 @@ import {
   Account,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  isArray,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -274,12 +275,12 @@ function isPath(path: Array<Record<string, unknown>>): boolean {
 }
 
 function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
-  if (!Array.isArray(paths) || paths.length === 0) {
+  if (!isArray(paths) || paths.length === 0) {
     return false
   }
 
   for (const path of paths) {
-    if (!Array.isArray(path) || path.length === 0) {
+    if (!isArray(path) || path.length === 0) {
       return false
     }
 

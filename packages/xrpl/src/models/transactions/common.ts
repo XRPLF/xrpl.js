@@ -69,7 +69,13 @@ const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+/**
+ * Verify the form and type of a Record/Object at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the Record/Object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
 
@@ -210,6 +216,16 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
+/**
+ * Verify the form and type of an Array at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Array is properly formed.
+ */
+export function isArray<T = unknown>(input: unknown): input is T[] {
+  return Array.isArray(input)
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -220,20 +236,24 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  * @param checkValidity - The function to use to check the type.
  * @throws
  */
-export function validateRequiredField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
+export function validateRequiredField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  paramName: K,
+  checkValidity: (inp: unknown) => inp is V,
+): asserts tx is T & { [P in K]: V } {
   if (tx[paramName] == null) {
     throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramName}`,
+      `${tx.TransactionType}: missing field ${String(paramName)}`,
     )
   }
 
   if (!checkValidity(tx[paramName])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${String(paramName)}`,
     )
   }
 }
@@ -246,14 +266,18 @@ export function validateRequiredField(
  * @param checkValidity - The function to use to check the type.
  * @throws
  */
-export function validateOptionalField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
+export function validateOptionalField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  paramName: K,
+  checkValidity: (inp: unknown) => inp is V,
+): asserts tx is T & { [P in K]: V | undefined } {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${tx.TransactionType}: invalid field ${String(paramName)}`,
     )
   }
 }
@@ -471,7 +495,7 @@ export function validateCredentialsList(
   if (credentials == null) {
     return
   }
-  if (!Array.isArray(credentials)) {
+  if (!isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials must be an array`,
     )

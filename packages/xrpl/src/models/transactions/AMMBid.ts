@@ -4,6 +4,7 @@ import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 import {
   BaseTransaction,
   isAmount,
+  isArray,
   isCurrency,
   validateBaseTransaction,
 } from './common'
@@ -86,7 +87,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
   }
 
   if (tx.AuthAccounts != null) {
-    if (!Array.isArray(tx.AuthAccounts)) {
+    if (!isArray(tx.AuthAccounts)) {
       throw new ValidationError(
         `AMMBid: AuthAccounts must be an AuthAccount array`,
       )
