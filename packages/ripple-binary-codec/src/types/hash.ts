@@ -27,6 +27,9 @@ class Hash extends Comparable<Hash | string> {
     }
 
     if (typeof value === 'string') {
+      if (!/^[A-F0-9]*$/i.test(value)) {
+        throw new Error(`Invalid hash string ${value}`)
+      }
       return new this(hexToBytes(value))
     }
 

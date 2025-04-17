@@ -100,34 +100,35 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
  * @returns A numerical representation of a Transaction's Flags
  */
 export function convertTxFlagsToNumber(tx: Transaction): number {
-  if (!tx.Flags) {
+  const txFlags = tx.Flags
+  if (txFlags == null) {
     return 0
   }
-  if (typeof tx.Flags === 'number') {
-    return tx.Flags
+  if (typeof txFlags === 'number') {
+    return txFlags
   }
 
   if (isTxToFlagKey(tx.TransactionType)) {
     const flagEnum = txToFlag[tx.TransactionType]
-    return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
-      if (flagEnum[flag] == null) {
-        throw new ValidationError(
-          `Invalid flag ${flag}. Valid flags are ${JSON.stringify(flagEnum)}`,
-        )
+    return Object.keys(txFlags).reduce((resultFlags, flag) => {
+      if (flagEnum[flag] == null && GlobalFlags[flag] == null) {
+        throw new ValidationError(`Invalid flag ${flag}.`)
       }
 
-      return tx.Flags?.[flag] ? resultFlags | flagEnum[flag] : resultFlags
+      return txFlags[flag]
+        ? resultFlags | (flagEnum[flag] || GlobalFlags[flag])
+        : resultFlags
     }, 0)
   }
 
-  return Object.keys(tx.Flags).reduce((resultFlags, flag) => {
+  return Object.keys(txFlags).reduce((resultFlags, flag) => {
     if (GlobalFlags[flag] == null) {
       throw new ValidationError(
         `Invalid flag ${flag}. Valid flags are ${JSON.stringify(GlobalFlags)}`,
       )
     }
 
-    return tx.Flags?.[flag] ? resultFlags | GlobalFlags[flag] : resultFlags
+    return txFlags[flag] ? resultFlags | GlobalFlags[flag] : resultFlags
   }, 0)
 }
 

@@ -36,7 +36,6 @@ export function signMultiBatch(
     multisignAddress = wallet.classicAddress
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS
   if (transaction.TransactionType !== 'Batch') {
     throw new ValidationError('Must be a Batch transaction.')
   }
@@ -188,8 +187,6 @@ function getTransactionWithAllBatchSigners(transactions: Batch[]): Batch {
 /**
  * If presented in binary form, the BatchSigners array must be sorted based on
  * the numeric value of the signer addresses, with the lowest value first.
- * (If submitted as JSON, the submit_multisigned method handles this automatically.)
- * https://xrpl.org/multi-signing.html.
  *
  * @param left - A BatchSigner to compare with.
  * @param right - A second BatchSigner to compare with.

@@ -210,9 +210,6 @@ function signingBatchData(batch: BatchObject): Uint8Array {
   bytesList.put(flags)
   bytesList.put(txIDsLength)
   batch.txIDs.forEach((txID: string) => {
-    if (!/^[A-F0-9]{64}$/i.test(txID)) {
-      throw new Error(`Invalid transaction ID format: ${txID}`)
-    }
     bytesList.put(coreTypes.Hash256.from(txID).toBytes())
   })
 
