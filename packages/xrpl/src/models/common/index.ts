@@ -14,7 +14,11 @@ export interface IssuedCurrency {
   issuer: string
 }
 
-export type Currency = IssuedCurrency | XRP
+export interface MPTCurrency {
+  mpt_issuance_id: string
+}
+
+export type Currency = IssuedCurrency | MPTCurrency | XRP
 
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
