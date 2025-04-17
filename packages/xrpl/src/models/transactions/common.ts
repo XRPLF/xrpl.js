@@ -524,7 +524,8 @@ export function validateCredentialsList(
       )
     }
   })
-  if (containsDuplicates(credentials)) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  if (containsDuplicates(credentials as string[] | AuthorizeCredential[])) {
     throw new ValidationError(
       `${transactionType}: Credentials cannot contain duplicate elements`,
     )
