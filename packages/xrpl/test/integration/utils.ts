@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 import throttle from 'lodash/throttle'
@@ -456,4 +457,17 @@ export async function createAMMPool(
     asset,
     asset2,
   }
+}
+
+export async function fetchAccountReserveFee(
+  client: Client,
+): Promise<string | null> {
+  const response = await client.request({ command: 'server_state' })
+  const fee = response.result.state.validated_ledger?.reserve_base
+
+  if (fee == null) {
+    return null
+  }
+
+  return new BigNumber(fee).dp(0, BigNumber.ROUND_CEIL).toString(10)
 }
