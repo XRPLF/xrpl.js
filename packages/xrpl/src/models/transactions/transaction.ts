@@ -19,7 +19,13 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { BaseTransaction, isIssuedCurrency } from './common'
+import {
+  BaseTransaction,
+  isArray,
+  isIssuedCurrencyAmount,
+  isRecord,
+  isString,
+} from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -222,29 +228,31 @@ export function validate(transaction: Record<string, unknown>): void {
   /*
    * - Memos have exclusively hex data.
    */
-  if (tx.Memos != null && typeof tx.Memos !== 'object') {
-    throw new ValidationError('Memo must be array')
-  }
-  if (tx.Memos != null) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
-      if (memo?.Memo == null) {
+  if (tx.Memos != null && !isArray(tx.Memos)) {
+    if (!isArray(tx.Memos)) {
+      throw new ValidationError('Memo must be array')
+    }
+    tx.Memos.forEach((memo) => {
+      if (!isRecord(memo)) {
+        throw new ValidationError('Memo must be an object')
+      }
+      if (!isRecord(memo.Memo)) {
         throw new ValidationError('Memo data must be in a `Memo` field')
       }
       if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
+        if (!isString(memo.Memo.MemoData) || !isHex(memo.Memo.MemoData)) {
           throw new ValidationError('MemoData field must be a hex value')
         }
       }
 
       if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
+        if (!isString(memo.Memo.MemoType) || !isHex(memo.Memo.MemoType)) {
           throw new ValidationError('MemoType field must be a hex value')
         }
       }
 
       if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
+        if (!isString(memo.Memo.MemoFormat) || !isHex(memo.Memo.MemoFormat)) {
           throw new ValidationError('MemoFormat field must be a hex value')
         }
       }
@@ -253,9 +261,9 @@ export function validate(transaction: Record<string, unknown>): void {
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
-    if (tx[key] && isIssuedCurrency(tx[key])) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+    const value = tx[key]
+    if (value && isIssuedCurrencyAmount(value)) {
+      const txCurrency = value.currency
 
       if (
         txCurrency.length === standard_currency_code_len &&

@@ -196,11 +196,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
   }
 
-  if (
-    tx.Paths !== undefined &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
-  ) {
+  if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
     throw new ValidationError('PaymentTransaction: invalid Paths')
   }
 

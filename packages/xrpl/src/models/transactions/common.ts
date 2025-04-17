@@ -8,6 +8,7 @@ import {
   Amount,
   AuthorizeCredential,
   Currency,
+  IssuedCurrency,
   IssuedCurrencyAmount,
   MPTAmount,
   Memo,
@@ -21,17 +22,19 @@ export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
-function isMemo(obj: { Memo?: unknown }): boolean {
-  if (obj.Memo == null) {
+function isMemo(obj: unknown): obj is Memo {
+  if (!isRecord(obj)) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memo = obj.Memo as Record<string, unknown>
+
+  const memo = obj.Memo
+  if (!isRecord(memo)) {
+    return false
+  }
   const size = Object.keys(memo).length
-  const validData = memo.MemoData == null || typeof memo.MemoData === 'string'
-  const validFormat =
-    memo.MemoFormat == null || typeof memo.MemoFormat === 'string'
-  const validType = memo.MemoType == null || typeof memo.MemoType === 'string'
+  const validData = memo.MemoData == null || isString(memo.MemoData)
+  const validFormat = memo.MemoFormat == null || isString(memo.MemoFormat)
+  const validType = memo.MemoType == null || isString(memo.MemoType)
 
   return (
     size >= 1 &&
@@ -45,20 +48,21 @@ function isMemo(obj: { Memo?: unknown }): boolean {
 
 const SIGNER_SIZE = 3
 
-function isSigner(obj: unknown): boolean {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const signerWrapper = obj as Record<string, unknown>
-
-  if (signerWrapper.Signer == null) {
+function isSigner(obj: unknown): obj is Signer {
+  if (!isRecord(obj)) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS and Signer is previously unknown
-  const signer = signerWrapper.Signer as Record<string, unknown>
+
+  const signer = obj.Signer
+  if (!isRecord(signer)) {
+    return false
+  }
+
   return (
     Object.keys(signer).length === SIGNER_SIZE &&
-    typeof signer.Account === 'string' &&
-    typeof signer.TxnSignature === 'string' &&
-    typeof signer.SigningPubKey === 'string'
+    isString(signer.Account) &&
+    isString(signer.TxnSignature) &&
+    isString(signer.SigningPubKey)
   )
 }
 
@@ -105,12 +109,12 @@ export function isNumber(num: unknown): num is number {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrency is properly formed.
  */
-export function isCurrency(input: unknown): input is Currency {
+export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
   return (
     isRecord(input) &&
     ((Object.keys(input).length === ISSUE_SIZE &&
-      typeof input.issuer === 'string' &&
-      typeof input.currency === 'string') ||
+      isString(input.issuer) &&
+      isString(input.currency)) ||
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
         input.currency === 'XRP'))
   )
@@ -122,15 +126,15 @@ export function isCurrency(input: unknown): input is Currency {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
-export function isIssuedCurrency(
+export function isIssuedCurrencyAmount(
   input: unknown,
 ): input is IssuedCurrencyAmount {
   return (
     isRecord(input) &&
     Object.keys(input).length === ISSUED_CURRENCY_SIZE &&
-    typeof input.value === 'string' &&
-    typeof input.issuer === 'string' &&
-    typeof input.currency === 'string'
+    isString(input.value) &&
+    isString(input.issuer) &&
+    isString(input.currency)
   )
 }
 
@@ -194,7 +198,7 @@ export function isAccount(account: unknown): account is Account {
 export function isAmount(amount: unknown): amount is Amount {
   return (
     typeof amount === 'string' ||
-    isIssuedCurrency(amount) ||
+    isIssuedCurrencyAmount(amount) ||
     isMPTAmount(amount)
   )
 }
@@ -210,9 +214,9 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
     typeof input.LockingChainDoor === 'string' &&
-    isCurrency(input.LockingChainIssue) &&
+    isIssuedCurrency(input.LockingChainIssue) &&
     typeof input.IssuingChainDoor === 'string' &&
-    isCurrency(input.IssuingChainIssue)
+    isIssuedCurrency(input.IssuingChainIssue)
   )
 }
 
@@ -223,7 +227,7 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  * @returns Whether the Array is properly formed.
  */
 export function isArray<T = unknown>(input: unknown): input is T[] {
-  return Array.isArray(input)
+  return input != null && Array.isArray(input)
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
@@ -396,19 +400,14 @@ export function validateBaseTransaction(
 
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
-  if (memos !== undefined && !memos.every(isMemo)) {
+  const memos = common.Memos
+  if (!isArray(memos) || !memos.every(isMemo)) {
     throw new ValidationError('BaseTransaction: invalid Memos')
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const signers = common.Signers as Array<Record<string, unknown>> | undefined
+  const signers = common.Signers
 
-  if (
-    signers !== undefined &&
-    (signers.length === 0 || !signers.every(isSigner))
-  ) {
+  if (!isArray(signers) || signers.length === 0 || !signers.every(isSigner)) {
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
 

@@ -1,7 +1,14 @@
 import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, isArray, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isArray,
+  isRecord,
+  isString,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * The SignerListSet transaction creates, replaces, or removes a list of
@@ -52,13 +59,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     return
   }
 
-  if (tx.SignerEntries === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerEntries')
-  }
-
-  if (!isArray(tx.SignerEntries)) {
-    throw new ValidationError('SignerListSet: invalid SignerEntries')
-  }
+  validateRequiredField(tx, 'SignerEntries', isArray)
 
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
@@ -73,11 +74,15 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   }
 
   for (const entry of tx.SignerEntries) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
-    const signerEntry = entry as SignerEntry
-    const { WalletLocator } = signerEntry.SignerEntry
+    if (!isRecord(entry) || !isRecord(entry.SignerEntry)) {
+      throw new ValidationError(
+        'SignerListSet: SignerEntries must be an array of SignerEntry objects',
+      )
+    }
+    const signerEntry = entry.SignerEntry
+    const { WalletLocator } = signerEntry
     if (
-      WalletLocator !== undefined &&
+      WalletLocator != null && isString(WalletLocator)
       !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
     ) {
       throw new ValidationError(
