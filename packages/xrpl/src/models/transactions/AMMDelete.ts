@@ -3,7 +3,7 @@ import { Currency } from '../common'
 
 import {
   BaseTransaction,
-  isIssuedCurrencyAmount,
+  isIssuedCurrency,
   validateBaseTransaction,
 } from './common'
 
@@ -45,7 +45,7 @@ export function validateAMMDelete(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDelete: missing field Asset')
   }
 
-  if (!isIssuedCurrencyAmount(tx.Asset)) {
+  if (!isIssuedCurrency(tx.Asset)) {
     throw new ValidationError('AMMDelete: Asset must be a Currency')
   }
 
@@ -53,7 +53,7 @@ export function validateAMMDelete(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDelete: missing field Asset2')
   }
 
-  if (!isIssuedCurrencyAmount(tx.Asset2)) {
+  if (!isIssuedCurrency(tx.Asset2)) {
     throw new ValidationError('AMMDelete: Asset2 must be a Currency')
   }
 }

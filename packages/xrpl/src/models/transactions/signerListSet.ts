@@ -4,6 +4,7 @@ import { SignerEntry } from '../common'
 import {
   BaseTransaction,
   isArray,
+  isNumber,
   isRecord,
   isString,
   validateBaseTransaction,
@@ -46,13 +47,7 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SignerQuorum === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerQuorum')
-  }
-
-  if (typeof tx.SignerQuorum !== 'number') {
-    throw new ValidationError('SignerListSet: invalid SignerQuorum')
-  }
+  validateRequiredField(tx, 'SignerQuorum', isNumber)
 
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
@@ -60,7 +55,6 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   }
 
   validateRequiredField(tx, 'SignerEntries', isArray)
-
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',
@@ -82,8 +76,9 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     const signerEntry = entry.SignerEntry
     const { WalletLocator } = signerEntry
     if (
-      WalletLocator != null && isString(WalletLocator)
-      !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
+      WalletLocator != null &&
+      (!isString(WalletLocator) ||
+        !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator))
     ) {
       throw new ValidationError(
         `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,

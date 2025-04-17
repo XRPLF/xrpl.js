@@ -2,7 +2,6 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, Memo } from '../common'
 import { isHex } from '../utils'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
@@ -228,7 +227,7 @@ export function validate(transaction: Record<string, unknown>): void {
   /*
    * - Memos have exclusively hex data.
    */
-  if (tx.Memos != null && !isArray(tx.Memos)) {
+  if (tx.Memos != null) {
     if (!isArray(tx.Memos)) {
       throw new ValidationError('Memo must be array')
     }

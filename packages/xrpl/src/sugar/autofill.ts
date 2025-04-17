@@ -162,7 +162,7 @@ function validateAccountAddress<
   ;(tx as Record<K, string>)[accountField] = classicAccount
 
   if (tag != null && tag !== false) {
-    if (tagField in tx && tx[tagField] !== tag) {
+    if (tx[tagField] != null && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
       )

@@ -104,6 +104,16 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
+ * Verify the form and type of a Currency at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the Currency is properly formed.
+ */
+export function isCurrency(input: unknown): input is Currency {
+  return isString(input) || isIssuedCurrency(input)
+}
+
+/**
  * Verify the form and type of an IssuedCurrency at runtime.
  *
  * @param input - The input to check the form and type of.
@@ -401,13 +411,16 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
   const memos = common.Memos
-  if (!isArray(memos) || !memos.every(isMemo)) {
+  if (memos != null && (!isArray(memos) || !memos.every(isMemo))) {
     throw new ValidationError('BaseTransaction: invalid Memos')
   }
 
   const signers = common.Signers
 
-  if (!isArray(signers) || signers.length === 0 || !signers.every(isSigner)) {
+  if (
+    signers != null &&
+    (!isArray(signers) || signers.length === 0 || !signers.every(isSigner))
+  ) {
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
 
