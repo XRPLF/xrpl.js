@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Support for `NFTokenMintOffer` (XLS-52)
+* Add support for `Batch` amendment (XLS-56)
 
 ### Fixed
 * `OracleSet` transaction accepts hexadecimal string values for `AssetPrice` field
