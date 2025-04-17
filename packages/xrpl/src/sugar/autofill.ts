@@ -273,6 +273,10 @@ export async function calculateFeePerTransactionType(
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
   }
+  // EscrowCreate transaction with FinishFunction
+  if (tx.TransactionType === 'EscrowCreate' && tx.FinishFunction != null) {
+    baseFee = BigNumber.sum(baseFee, 1000)
+  }
 
   const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
     tx.TransactionType,
