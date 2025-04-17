@@ -290,6 +290,26 @@ const invalidMessagesMap: Record<string, string> = {
   isArray: 'array',
 }
 
+// eslint-disable-next-line max-params -- okay for a helper function
+function getErrorMessage(
+  txType: string,
+  paramName: string,
+  functionName: string,
+  invalidMessage?: string,
+): string {
+  let errorMessage = `${txType}: invalid field ${paramName}`
+  if (invalidMessage == null) {
+    const invalidMessageFromMap = invalidMessagesMap[functionName]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- okay
+    if (invalidMessageFromMap != null) {
+      errorMessage += `, expected a valid ${invalidMessageFromMap}`
+    }
+  } else {
+    errorMessage += `, ${invalidMessage}`
+  }
+  return errorMessage
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -319,19 +339,14 @@ export function validateRequiredField<
   }
 
   if (!checkValidity(tx[paramName])) {
-    let errorMessage = `${tx.TransactionType}: invalid field ${String(
-      paramName,
-    )}`
-    if (invalidMessage == null) {
-      const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
-      if (invalidMessageFromMap != null) {
-        errorMessage += `, expected a valid ${invalidMessageFromMap}`
-      }
-    } else {
-      errorMessage += `, ${invalidMessage}`
-    }
-    throw new ValidationError(errorMessage)
+    throw new ValidationError(
+      getErrorMessage(
+        String(tx.TransactionType),
+        String(paramName),
+        checkValidity.name,
+        invalidMessage,
+      ),
+    )
   }
 }
 
@@ -356,19 +371,14 @@ export function validateOptionalField<
   invalidMessage?: string,
 ): asserts tx is T & { [P in K]: V | undefined } {
   if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
-    let errorMessage = `${tx.TransactionType}: invalid field ${String(
-      paramName,
-    )}`
-    if (invalidMessage == null) {
-      const invalidMessageFromMap = invalidMessagesMap[checkValidity.name]
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, max-depth -- okay
-      if (invalidMessageFromMap != null) {
-        errorMessage += `, expected a valid ${invalidMessageFromMap}`
-      }
-    } else {
-      errorMessage += `, ${invalidMessage}`
-    }
-    throw new ValidationError(errorMessage)
+    throw new ValidationError(
+      getErrorMessage(
+        String(tx.TransactionType),
+        String(paramName),
+        checkValidity.name,
+        invalidMessage,
+      ),
+    )
   }
 }
 
