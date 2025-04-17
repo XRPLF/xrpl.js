@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validatePaymentChannelCreate } from '../../src/models/transactions/paymentChannelCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validatePaymentChannelCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePaymentChannelCreate, message)
 
 /**
  * PaymentChannelCreate Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validatePaymentChannelCreate } from '../../src/models/transactions/paym
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('PaymentChannelCreate', function () {
-  let channel
+  let channel: any
 
   beforeEach(function () {
     channel = {
@@ -27,8 +30,7 @@ describe('PaymentChannelCreate', function () {
   })
 
   it(`verifies valid PaymentChannelCreate`, function () {
-    assert.doesNotThrow(() => validatePaymentChannelCreate(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`verifies valid PaymentChannelCreate w/o optional`, function () {
@@ -36,157 +38,66 @@ describe('PaymentChannelCreate', function () {
     delete channel.DestinationTag
     delete channel.SourceTag
 
-    assert.doesNotThrow(() => validatePaymentChannelCreate(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`missing Amount`, function () {
     delete channel.Amount
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing Amount',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing Amount',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: missing Amount')
   })
 
   it(`missing Destination`, function () {
     delete channel.Destination
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing field Destination',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing field Destination',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: missing field Destination')
   })
 
   it(`missing SettleDelay`, function () {
     delete channel.SettleDelay
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing SettleDelay',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing SettleDelay',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: missing SettleDelay')
   })
 
   it(`missing PublicKey`, function () {
     delete channel.PublicKey
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing PublicKey',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: missing PublicKey',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: missing PublicKey')
   })
 
   it(`invalid Amount`, function () {
     channel.Amount = 1000
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: Amount must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: Amount must be a string')
   })
 
   it(`invalid Destination`, function () {
     channel.Destination = 10
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: invalid field Destination',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field Destination')
   })
 
   it(`invalid SettleDelay`, function () {
     channel.SettleDelay = '10'
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: SettleDelay must be a number',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: SettleDelay must be a number',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: SettleDelay must be a number')
   })
 
   it(`invalid PublicKey`, function () {
     channel.PublicKey = 10
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: PublicKey must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: PublicKey must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: PublicKey must be a string')
   })
 
   it(`invalid DestinationTag`, function () {
     channel.DestinationTag = '10'
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: invalid field DestinationTag',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: invalid field DestinationTag',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field DestinationTag')
   })
 
   it(`invalid CancelAfter`, function () {
     channel.CancelAfter = '100'
 
-    assert.throws(
-      () => validatePaymentChannelCreate(channel),
-      ValidationError,
-      'PaymentChannelCreate: CancelAfter must be a number',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelCreate: CancelAfter must be a number',
-    )
+    assertInvalid(channel, 'PaymentChannelCreate: CancelAfter must be a number')
   })
 })
