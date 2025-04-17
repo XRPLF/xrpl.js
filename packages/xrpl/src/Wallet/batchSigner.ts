@@ -36,6 +36,7 @@ export function signMultiBatch(
     multisignAddress = wallet.classicAddress
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
   if (transaction.TransactionType !== 'Batch') {
     throw new ValidationError('Must be a Batch transaction.')
   }
