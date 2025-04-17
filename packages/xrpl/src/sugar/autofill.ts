@@ -3,8 +3,14 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { Transaction } from '../models/transactions'
+import {
+  AccountInfoRequest,
+  AccountObjectsRequest,
+  Amount,
+  MPTAmount,
+  Payment,
+  Transaction,
+} from '../models'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -362,4 +368,31 @@ export async function checkAccountDeleteBlockers(
     }
     resolve()
   })
+}
+
+/**
+ * Replaces Amount with DeliverMax if needed.
+ *
+ * @param tx - The transaction object.
+ * @throws ValidationError if Amount and DeliverMax are both provided but do not match.
+ */
+export function handleDeliverMax(tx: Payment): void {
+  if (tx.DeliverMax != null) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount == null) {
+      // If only DeliverMax is provided, use it to populate the Amount field
+      // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- known RPC-level property
+      tx.Amount = tx.DeliverMax as Amount | MPTAmount
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+      throw new ValidationError(
+        'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+      )
+    }
+
+    // eslint-disable-next-line no-param-reassign -- needed here
+    delete tx.DeliverMax
+  }
 }
