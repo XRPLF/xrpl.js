@@ -80,7 +80,7 @@ const AUTHORIZE_CREDENTIAL_SIZE = 1
  * @returns Whether the Record/Object is properly formed.
  */
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object'
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 /**
