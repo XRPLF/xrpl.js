@@ -1,6 +1,9 @@
-import { assert } from 'chai'
+import { validateClawback } from '../../src/models/transactions/clawback'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
-import { validate, ValidationError } from '../../src'
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateClawback)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateClawback, message)
 
 /**
  * Clawback Transaction Verification Testing.
@@ -19,7 +22,7 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.doesNotThrow(() => validate(validClawback))
+    assertValid(validClawback)
   })
 
   it(`throws w/ missing Amount`, function () {
@@ -28,11 +31,7 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(missingAmount),
-      ValidationError,
-      'Clawback: missing field Amount',
-    )
+    assertInvalid(missingAmount, 'Clawback: missing field Amount')
   })
 
   it(`throws w/ invalid Amount`, function () {
@@ -42,10 +41,9 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalidAmount),
-      ValidationError,
-      'Clawback: invalid Amount',
+    assertInvalid(
+      invalidAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
     )
 
     const invalidStrAmount = {
@@ -54,10 +52,9 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalidStrAmount),
-      ValidationError,
-      'Clawback: invalid Amount',
+    assertInvalid(
+      invalidStrAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
     )
   })
 
@@ -72,10 +69,9 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalidAccount),
-      ValidationError,
-      'Clawback: invalid holder Account',
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Amount.issuer and Account cannot be the same',
     )
   })
 
@@ -90,7 +86,7 @@ describe('Clawback', function () {
       Holder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
 
-    assert.doesNotThrow(() => validate(validClawback))
+    assertValid(validClawback)
   })
 
   it(`throws w/ invalid Holder Account`, function () {
@@ -104,10 +100,9 @@ describe('Clawback', function () {
       Holder: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalidAccount),
-      ValidationError,
-      'Clawback: invalid holder Account',
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Account and Holder cannot be the same',
     )
   })
 
@@ -121,11 +116,7 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalidAccount),
-      ValidationError,
-      'Clawback: missing Holder',
-    )
+    assertInvalid(invalidAccount, 'Clawback: missing field Holder')
   })
 
   it(`throws w/ invalid currency Holder`, function () {
@@ -140,10 +131,6 @@ describe('Clawback', function () {
       Holder: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     } as any
 
-    assert.throws(
-      () => validate(invalidAccount),
-      ValidationError,
-      'Clawback: cannot have Holder for currency',
-    )
+    assertInvalid(invalidAccount, 'Clawback: cannot have Holder for currency')
   })
 })

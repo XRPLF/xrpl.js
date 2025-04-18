@@ -16,6 +16,8 @@ export interface IssuedCurrency {
 
 export type Currency = IssuedCurrency | XRP
 
+export type XRPAmount = string
+
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
 }
@@ -25,7 +27,7 @@ export interface MPTAmount {
   value: string
 }
 
-export type Amount = IssuedCurrencyAmount | string
+export type Amount = IssuedCurrencyAmount | XRPAmount
 
 export interface Balance {
   currency: string
