@@ -145,15 +145,14 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Expiration', isNumber)
   validateOptionalField(tx, 'Destination', isAccount)
 
-  let isSellOffer = false
-  // TODO: refactor some of this flag logic
-  if (isNumber(tx.Flags)) {
-    isSellOffer = isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
-  } else if (isRecord(tx.Flags)) {
-    isSellOffer = tx.Flags.tfSellNFToken === true
-  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
+  const flags = (tx.Flags ?? 0) as number | NFTokenCreateOfferFlagsInterface
+  const isTfSellNFToken =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)
+      : flags.tfSellNFToken ?? false
 
-  if (isSellOffer) {
+  if (isTfSellNFToken) {
     validateNFTokenSellOfferCases(tx)
   } else {
     validateNFTokenBuyOfferCases(tx)

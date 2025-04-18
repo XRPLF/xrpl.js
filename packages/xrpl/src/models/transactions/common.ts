@@ -117,8 +117,11 @@ export function isHexString(str: unknown): str is string {
  */
 export function isNumber(num: unknown): num is number {
   return (
-    (typeof num === 'number' || !Number.isNaN(Number(num))) &&
-    Number.isInteger(Number(num))
+    (typeof num === 'number' && Number.isInteger(num)) ||
+    (typeof num === 'string' &&
+      num.trim() !== '' &&
+      !Number.isNaN(Number(num)) &&
+      Number.isInteger(Number(num)))
   )
 }
 
@@ -167,6 +170,7 @@ export function isCurrency(input: unknown): input is Currency {
 export function isXRPAmount(input: unknown): input is XRPAmount {
   return (
     isString(input) &&
+    input.trim() !== '' &&
     !Number.isNaN(Number(input)) &&
     Number.isInteger(Number(input))
   )

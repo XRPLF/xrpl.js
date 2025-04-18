@@ -107,7 +107,6 @@ module.exports = {
         '@typescript-eslint/no-unsafe-assignment': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/consistent-type-assertions': 'off',
-        '@typescript-eslint/no-unsafe-return': 'off',
 
         // We need to mess with internal things to generate certain testing situations
         '@typescript-eslint/no-unsafe-member-access': 'off',
