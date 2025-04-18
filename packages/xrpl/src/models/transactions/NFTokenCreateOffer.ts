@@ -13,7 +13,6 @@ import {
   Account,
   validateRequiredField,
   isNumber,
-  isRecord,
   isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
