@@ -13,7 +13,11 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  fetchAccountReserveFee,
+  generateFundedWallet,
+  testTransaction,
+} from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -21,7 +25,8 @@ const TIMEOUT = 20000
 describe('Payment', function () {
   let testContext: XrplIntegrationTestContext
   let paymentTx: Payment
-  const AMOUNT = '10000000'
+  let amount: string
+  const DEFAULT_AMOUNT = '10000000'
   // This wallet is used for DeliverMax related tests
   let senderWallet: Wallet
 
@@ -31,7 +36,7 @@ describe('Payment', function () {
     paymentTx = {
       TransactionType: 'Payment',
       Account: senderWallet.classicAddress,
-      Amount: AMOUNT,
+      Amount: amount,
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
     }
   })
@@ -39,6 +44,9 @@ describe('Payment', function () {
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
     senderWallet = await generateFundedWallet(testContext.client)
+    // Make sure the amount sent satisfies minimum reserve requirement to fund an account.
+    amount =
+      (await fetchAccountReserveFee(testContext.client)) ?? DEFAULT_AMOUNT
   })
   afterAll(async () => teardownClient(testContext))
 
@@ -66,7 +74,7 @@ describe('Payment', function () {
       )
 
       assert.equal(result.result.engine_result_code, 0)
-      assert.equal((result.result.tx_json as Payment).Amount, AMOUNT)
+      assert.equal((result.result.tx_json as Payment).Amount, amount)
     },
     TIMEOUT,
   )
@@ -86,7 +94,7 @@ describe('Payment', function () {
       )
 
       assert.equal(result.result.engine_result_code, 0)
-      assert.equal((result.result.tx_json as Payment).Amount, AMOUNT)
+      assert.equal((result.result.tx_json as Payment).Amount, amount)
     },
     TIMEOUT,
   )
@@ -104,7 +112,7 @@ describe('Payment', function () {
       )
 
       assert.equal(result.result.engine_result_code, 0)
-      assert.equal((result.result.tx_json as Payment).Amount, AMOUNT)
+      assert.equal((result.result.tx_json as Payment).Amount, amount)
     },
     TIMEOUT,
   )
