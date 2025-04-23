@@ -18,6 +18,12 @@ For a good example unit test file, look at [test/hash.test.ts](test/hash.test.ts
 
 If you add a new serializable type, please add a new file with tests that ensure it can be encoded / decoded, and that it throws any relevant errors.
 
+# Updating `definitions.json`
+
+The `definitions.json` file contains all the fields within rippled and all the relevant values needed to decode/encode it from the [rippled binary format](https://xrpl.org/es-es/docs/references/protocol/binary-format).
+
+To update it, use the script [here](./tools/generateDefinitions.js). You can run the script with `node path/to/generateDefinitions.js`.
+
 # Adding new serializable types
 To add a new serializable type, first read through `enum`'s [README.md](src/enums/README.md) as it explains how to update `definitions.json` which ties `TransactionType`s and `Field`s to specific ids rippled understands.
 
