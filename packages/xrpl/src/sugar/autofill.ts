@@ -230,13 +230,13 @@ export async function setNextValidSequenceNumber(
 }
 
 /**
- * Fetches the account deletion fee from the server state using the provided client.
+ * Fetches the owner reserve fee from the server state using the provided client.
  *
  * @param client - The client object used to make the request.
- * @returns A Promise that resolves to the account deletion fee as a BigNumber.
- * @throws {Error} Throws an error if the account deletion fee cannot be fetched.
+ * @returns A Promise that resolves to the owner reserve fee as a BigNumber.
+ * @throws {Error} Throws an error if the owner reserve fee cannot be fetched.
  */
-async function fetchAccountDeleteFee(client: Client): Promise<BigNumber> {
+async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
@@ -260,7 +260,6 @@ export async function calculateFeePerTransactionType(
   tx: Transaction,
   signersCount = 0,
 ): Promise<void> {
-  // netFee is usually 0.00001 XRP (10 drops)
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
@@ -268,37 +267,36 @@ export async function calculateFeePerTransactionType(
   // EscrowFinish Transaction with Fulfillment
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
     const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
-    // 10 drops × (33 + (Fulfillment size in bytes / 16))
-    const product = new BigNumber(
+    // BaseFee × (33 + (Fulfillment size in bytes / 16))
+    baseFee = new BigNumber(
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
-    baseFee = product.dp(0, BigNumber.ROUND_CEIL)
   }
 
-  if (
-    tx.TransactionType === 'AccountDelete' ||
-    tx.TransactionType === 'AMMCreate'
-  ) {
-    baseFee = await fetchAccountDeleteFee(client)
+  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
+    tx.TransactionType,
+  )
+
+  if (isSpecialTxCost) {
+    baseFee = await fetchOwnerReserveFee(client)
   }
 
   /*
    * Multi-signed Transaction
-   * 10 drops × (1 + Number of Signatures Provided)
+   * BaseFee × (1 + Number of Signatures Provided)
    */
   if (signersCount > 0) {
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
-  const totalFee =
-    tx.TransactionType === 'AccountDelete'
-      ? baseFee
-      : BigNumber.min(baseFee, maxFeeDrops)
+  const totalFee = isSpecialTxCost
+    ? baseFee
+    : BigNumber.min(baseFee, maxFeeDrops)
 
   // Round up baseFee and return it as a string
-  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers -- param reassign is safe, base 10 magic num
+  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers, require-atomic-updates -- safe reassignment.
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
 }
 
