@@ -1,6 +1,12 @@
-import { assert } from 'chai'
+import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import { convertStringToHex, validate, ValidationError } from '../../src'
+import { validateNFTokenModify } from '../../src/models/transactions/NFTokenModify'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateNFTokenModify)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenModify, message)
 
 const TOKEN_ID =
   '00090032B5F762798A53D543A014CAF8B297CFF8F2F937E844B17C9E00000003'
@@ -18,10 +24,10 @@ describe('NFTokenModify', function () {
       NFTokenID: TOKEN_ID,
       Fee: '5000000',
       Sequence: 2470665,
-      URI: convertStringToHex('http://xrpl.org'),
+      URI: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenModify))
+    assertValid(validNFTokenModify)
   })
 
   it(`throws w/ missing NFTokenID`, function () {
@@ -32,11 +38,7 @@ describe('NFTokenModify', function () {
       Sequence: 2470665,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenModify: missing field NFTokenID',
-    )
+    assertInvalid(invalid, 'NFTokenModify: missing field NFTokenID')
   })
 
   it(`throws w/ URI being an empty string`, function () {
@@ -49,11 +51,7 @@ describe('NFTokenModify', function () {
       URI: '',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenModify: URI must not be empty string',
-    )
+    assertInvalid(invalid, 'NFTokenModify: URI must not be empty string')
   })
 
   it(`throws w/ URI not in hex format`, function () {
@@ -66,10 +64,6 @@ describe('NFTokenModify', function () {
       URI: '--',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenModify: URI must be in hex format',
-    )
+    assertInvalid(invalid, 'NFTokenModify: URI must be in hex format')
   })
 })
