@@ -14,7 +14,7 @@ import {
   ECDSA,
   AccountLinesRequest,
   IssuedCurrency,
-  Currency,
+  XRP,
 } from '../../src'
 import {
   AMMCreate,
@@ -380,8 +380,8 @@ export async function createAMMPool(
 ): Promise<{
   issuerWallet: Wallet
   lpWallet: Wallet
-  asset: Currency
-  asset2: Currency
+  asset: XRP
+  asset2: IssuedCurrency
 }> {
   const lpWallet = await generateFundedWallet(client)
   const issuerWallet = await generateFundedWallet(client)
@@ -445,8 +445,8 @@ export async function createAMMPool(
 
   await testTransaction(client, ammCreateTx, lpWallet)
 
-  const asset: Currency = { currency: 'XRP' }
-  const asset2: Currency = {
+  const asset: XRP = { currency: 'XRP' }
+  const asset2: IssuedCurrency = {
     currency: currencyCode,
     issuer: issuerWallet.classicAddress,
   }
