@@ -1,5 +1,4 @@
 import { assert } from 'chai'
-
 import { convertHexToString, convertStringToHex } from '../../src/utils'
 
 describe('convertHexToString and convertStringToHex', function () {
