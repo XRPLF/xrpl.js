@@ -18,6 +18,8 @@ const LEDGER_OFFSET = 20
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
 
+const MICRO_DROPS_PER_DROP = 1_000_000
+
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
  * Example usage: isNotLaterRippledVersion('1.10.0', '1.11.0') returns true.
@@ -247,6 +249,17 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   return new BigNumber(fee)
 }
 
+async function fetchGasPrice(client: Client): Promise<BigNumber> {
+  const response = await client.request({ command: 'server_state' })
+  const gasPrice = response.result.state.validated_ledger?.gas_price
+
+  if (gasPrice == null) {
+    return Promise.reject(new Error('Could not fetch Owner Reserve.'))
+  }
+
+  return new BigNumber(gasPrice)
+}
+
 /**
  * Calculates the fee per transaction type.
  *
@@ -255,27 +268,37 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
+// eslint-disable-next-line max-lines-per-function -- okay here
 export async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
 ): Promise<void> {
   const netFeeXRP = await getFeeXrp(client)
-  const netFeeDrops = xrpToDrops(netFeeXRP)
-  let baseFee = new BigNumber(netFeeDrops)
+  const netFeeDrops = new BigNumber(xrpToDrops(netFeeXRP))
+  let baseFee = netFeeDrops
 
-  // EscrowFinish Transaction with Fulfillment
-  if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
-    const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
-    // BaseFee × (33 + (Fulfillment size in bytes / 16))
-    baseFee = new BigNumber(
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
-      scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
-    )
+  // EscrowFinish Transaction with Fulfillment/ComputationAllowance
+  if (tx.TransactionType === 'EscrowFinish') {
+    if (tx.Fulfillment != null) {
+      const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
+      // BaseFee × (33 + (Fulfillment size in bytes / 16))
+      baseFee = netFeeDrops.multipliedBy(
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
+        33 + fulfillmentBytesSize / 16,
+      )
+    }
+    if (tx.ComputationAllowance != null) {
+      const gasPrice = await fetchGasPrice(client)
+      const extraFee: BigNumber = gasPrice
+        .multipliedBy(tx.ComputationAllowance)
+        .dividedBy(MICRO_DROPS_PER_DROP)
+      baseFee = baseFee.plus(extraFee)
+    }
   }
   // EscrowCreate transaction with FinishFunction
   if (tx.TransactionType === 'EscrowCreate' && tx.FinishFunction != null) {
-    baseFee = BigNumber.sum(baseFee, 1000)
+    baseFee = baseFee.plus(1000)
   }
 
   const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
@@ -291,7 +314,7 @@ export async function calculateFeePerTransactionType(
    * BaseFee × (1 + Number of Signatures Provided)
    */
   if (signersCount > 0) {
-    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
+    baseFee = BigNumber.sum(baseFee, netFeeDrops.multipliedBy(1 + signersCount))
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
@@ -302,17 +325,6 @@ export async function calculateFeePerTransactionType(
   // Round up baseFee and return it as a string
   // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers, require-atomic-updates -- safe reassignment.
   tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
-}
-
-/**
- * Scales the given value by multiplying it with the provided multiplier.
- *
- * @param value - The value to be scaled.
- * @param multiplier - The multiplier to scale the value.
- * @returns The scaled value as a string.
- */
-function scaleValue(value, multiplier): string {
-  return new BigNumber(value).times(multiplier).toString()
 }
 
 /**
