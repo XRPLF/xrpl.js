@@ -14,11 +14,13 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
+  WasmDevnet = 'wasmfaucet.devnet.rippletest.net',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
+  [FaucetNetwork.WasmDevnet]: '/accounts',
 }
 
 /**
@@ -40,6 +42,10 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
     throw new XRPLFaucetError(
       'Cannot fund an account on an issuing chain. Accounts must be created via the bridge.',
     )
+  }
+
+  if (connectionUrl.includes('wasm')) {
+    return FaucetNetwork.WasmDevnet
   }
 
   if (connectionUrl.includes('devnet')) {
