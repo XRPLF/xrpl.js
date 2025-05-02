@@ -691,6 +691,26 @@
       }
     ],
     [
+      "GasPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 54,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ComputationAllowance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 55,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -3031,8 +3051,10 @@
     "tefNOT_MULTI_SIGNING": -184,
     "tefNO_AUTH_REQUIRED": -191,
     "tefNO_TICKET": -180,
+    "tefNO_WASM": -177,
     "tefPAST_SEQ": -190,
     "tefTOO_BIG": -181,
+    "tefWASM_FIELD_NOT_INCLUDED": -176,
     "tefWRONG_PRIOR": -189,
 
     "telBAD_DOMAIN": -398,
