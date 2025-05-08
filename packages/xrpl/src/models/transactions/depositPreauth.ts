@@ -6,6 +6,8 @@ import {
   validateBaseTransaction,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  validateOptionalField,
+  isAccount,
 } from './common'
 
 /**
@@ -47,21 +49,16 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
 
   validateSingleAuthorizationFieldProvided(tx)
 
-  if (tx.Authorize !== undefined) {
-    if (typeof tx.Authorize !== 'string') {
-      throw new ValidationError('DepositPreauth: Authorize must be a string')
-    }
+  validateOptionalField(tx, 'Authorize', isAccount)
+  validateOptionalField(tx, 'Unauthorize', isAccount)
 
+  if (tx.Authorize !== undefined) {
     if (tx.Account === tx.Authorize) {
       throw new ValidationError(
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
   } else if (tx.Unauthorize !== undefined) {
-    if (typeof tx.Unauthorize !== 'string') {
-      throw new ValidationError('DepositPreauth: Unauthorize must be a string')
-    }
-
     if (tx.Account === tx.Unauthorize) {
       throw new ValidationError(
         "DepositPreauth: Account can't unauthorize its own address",
@@ -70,16 +67,14 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
   } else if (tx.AuthorizeCredentials !== undefined) {
     validateCredentialsList(
       tx.AuthorizeCredentials,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
-      tx.TransactionType as string,
+      tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
     )
   } else if (tx.UnauthorizeCredentials !== undefined) {
     validateCredentialsList(
       tx.UnauthorizeCredentials,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- confirmed in base transaction check
-      tx.TransactionType as string,
+      tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
     )

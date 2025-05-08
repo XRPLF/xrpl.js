@@ -96,10 +96,9 @@ function isPartialPayment(
   }
 
   const delivered = meta.delivered_amount
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- DeliverMax is a valid field on Payment response
-  // @ts-expect-error -- DeliverMax is a valid field on Payment response
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a valid field on Payment response
-  const amount = tx.DeliverMax
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
+  const amount = tx.DeliverMax as Amount | MPTAmount
 
   if (delivered === undefined) {
     return false

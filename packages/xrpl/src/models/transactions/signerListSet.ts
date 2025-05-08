@@ -1,7 +1,13 @@
 import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isArray,
+  isNumber,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * The SignerListSet transaction creates, replaces, or removes a list of
@@ -39,26 +45,14 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SignerQuorum === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerQuorum')
-  }
-
-  if (typeof tx.SignerQuorum !== 'number') {
-    throw new ValidationError('SignerListSet: invalid SignerQuorum')
-  }
+  validateRequiredField(tx, 'SignerQuorum', isNumber)
 
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
   }
 
-  if (tx.SignerEntries === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerEntries')
-  }
-
-  if (!Array.isArray(tx.SignerEntries)) {
-    throw new ValidationError('SignerListSet: invalid SignerEntries')
-  }
+  validateRequiredField(tx, 'SignerEntries', isArray)
 
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
