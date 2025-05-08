@@ -6,8 +6,6 @@ import { ValidationError, XrplError } from '../errors'
 import {
   AccountInfoRequest,
   AccountObjectsRequest,
-  Amount,
-  MPTAmount,
   Payment,
   Transaction,
 } from '../models'
@@ -379,8 +377,8 @@ export function handleDeliverMax(tx: Payment): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount == null) {
       // If only DeliverMax is provided, use it to populate the Amount field
-      // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- known RPC-level property
-      tx.Amount = tx.DeliverMax as Amount | MPTAmount
+      // eslint-disable-next-line no-param-reassign -- known RPC-level property
+      tx.Amount = tx.DeliverMax
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
