@@ -168,12 +168,7 @@ export function isCurrency(input: unknown): input is Currency {
  * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
 export function isXRPAmount(input: unknown): input is XRPAmount {
-  return (
-    isString(input) &&
-    input.trim() !== '' &&
-    !Number.isNaN(Number(input)) &&
-    Number.isInteger(Number(input))
-  )
+  return isString(input) && isNumber(input)
 }
 
 /**
