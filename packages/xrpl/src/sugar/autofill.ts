@@ -141,10 +141,9 @@ export function setValidAddresses(tx: Transaction): void {
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
 function validateAccountAddress<
-  T extends Transaction,
-  K extends keyof T & string,
-  K2 extends keyof T & string,
->(tx: T, accountField: K, tagField: K2): void {
+  K extends keyof Transaction & string,
+  K2 extends keyof Transaction & string,
+>(tx: Transaction, accountField: K, tagField: K2): void {
   const val = tx[accountField]
 
   if (typeof val !== 'string') {
