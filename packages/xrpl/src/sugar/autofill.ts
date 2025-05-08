@@ -201,7 +201,10 @@ function getClassicAccountAndTag(
  * @param tx - The transaction object.
  * @param fieldName - The name of the field to convert.export
  */
-function convertToClassicAddress(tx: Transaction, fieldName: string): void {
+function convertToClassicAddress<K extends keyof Transaction & string>(
+  tx: Transaction,
+  fieldName: K,
+): void {
   const account = tx[fieldName]
   if (typeof account === 'string') {
     const { classicAccount } = getClassicAccountAndTag(account)
