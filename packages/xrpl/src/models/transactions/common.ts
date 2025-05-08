@@ -304,7 +304,7 @@ export interface GlobalFlags {}
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction extends Record<string, unknown> {
+export interface BaseTransaction {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -386,8 +386,14 @@ export interface BaseTransaction extends Record<string, unknown> {
  * @throws When the common param is malformed.
  */
 export function validateBaseTransaction(
-  common: Record<string, unknown>,
+  common: unknown,
 ): asserts common is BaseTransaction {
+  if (!isRecord(common)) {
+    throw new ValidationError(
+      'BaseTransaction: invalid, expected a valid object',
+    )
+  }
+
   if (common.TransactionType === undefined) {
     throw new ValidationError('BaseTransaction: missing field TransactionType')
   }
@@ -457,7 +463,9 @@ export function parseAmountValue(amount: unknown): number {
  * @param tx A CredentialType Transaction.
  * @throws when the CredentialType is malformed.
  */
-export function validateCredentialType(tx: Record<string, unknown>): void {
+export function validateCredentialType<
+  T extends BaseTransaction & Record<string, unknown>,
+>(tx: T): void {
   if (typeof tx.TransactionType !== 'string') {
     throw new ValidationError('Invalid TransactionType')
   }
