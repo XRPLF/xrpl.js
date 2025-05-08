@@ -394,7 +394,7 @@ export interface GlobalFlags {}
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction extends Record<string, unknown> {
+export interface BaseTransaction {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -477,8 +477,13 @@ export interface BaseTransaction extends Record<string, unknown> {
  */
 // eslint-disable-next-line max-lines-per-function, max-statements -- not worth refactoring
 export function validateBaseTransaction(
-  common: Record<string, unknown>,
+  common: unknown,
 ): asserts common is BaseTransaction {
+  if (!isRecord(common)) {
+    throw new ValidationError(
+      'BaseTransaction: invalid, expected a valid object',
+    )
+  }
   validateRequiredField(common, 'TransactionType', isString)
 
   if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
@@ -557,7 +562,9 @@ export function parseAmountValue(amount: unknown): number {
  * @param tx A CredentialType Transaction.
  * @throws when the CredentialType is malformed.
  */
-export function validateCredentialType<T extends BaseTransaction>(tx: T): void {
+export function validateCredentialType<
+  T extends BaseTransaction & Record<string, unknown>,
+>(tx: T): void {
   validateRequiredField(tx, 'CredentialType', isHexString)
 
   if (tx.CredentialType.length === 0) {
