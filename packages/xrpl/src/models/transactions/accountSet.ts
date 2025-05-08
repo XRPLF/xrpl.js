@@ -186,7 +186,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
       )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: not a valid ClearFlag value')
+      throw new ValidationError('AccountSet: invalid ClearFlag value')
     }
   }
 
@@ -201,7 +201,7 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
       )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: not a valid SetFlag value')
+      throw new ValidationError('AccountSet: invalid SetFlag value')
     }
   }
 
