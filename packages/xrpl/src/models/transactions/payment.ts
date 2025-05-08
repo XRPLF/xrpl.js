@@ -120,6 +120,9 @@ export interface Payment extends BaseTransaction {
    * to this amount instead.
    */
   Amount: Amount | MPTAmount
+
+  DeliverMax?: Amount | MPTAmount
+
   /** The unique address of the account receiving the payment. */
   Destination: Account
   /**
@@ -191,6 +194,12 @@ export function validatePayment(tx: Record<string, unknown>): void {
   )
 
   checkPartialPayment(tx)
+
+  if (tx.DeliverMax != null) {
+    throw new ValidationError(
+      'Payment: DeliverMax is not allowed when submitting a transaction',
+    )
+  }
 }
 
 function checkPartialPayment(tx: Record<string, unknown>): void {
