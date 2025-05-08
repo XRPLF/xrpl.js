@@ -97,8 +97,6 @@ function isPartialPayment(
 
   const delivered = meta.delivered_amount
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- needed here
-  // @ts-expect-error -- this line is intended to correct the type properly
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
   const amount = tx.DeliverMax as Amount | MPTAmount
 
