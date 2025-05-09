@@ -1,3 +1,6 @@
+/* eslint-disable no-console */
+import { AssertionError } from 'assert'
+
 import { assert } from 'chai'
 
 import { Payment, Wallet, xrpToDrops } from '../../../src'
@@ -38,9 +41,12 @@ describe('DelegateSet', function () {
       }
       try {
         await testTransaction(testContext.client, tx, bob)
-      } catch (e) {
-        console.log(e)
-        assert.equal(e, 'tecNO_PERMISSION')
+      } catch (err) {
+        console.log('yo toString')
+        console.log(err.toString())
+        console.log('yo message')
+        console.log(err.message)
+        assert.equal(err.message, 'tecNO_PERMISSION')
       }
     },
     TIMEOUT,
