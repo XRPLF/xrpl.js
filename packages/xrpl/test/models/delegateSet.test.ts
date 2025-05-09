@@ -16,6 +16,7 @@ describe('DelegateSet', function () {
       TransactionType: 'DelegateSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       Authorize: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+      // eslint-disable-next-line no-inline-comments -- helpful comment
       Permissions: [65537, 0], // TrustlineAuthorize, Payment
     } as any
   })
