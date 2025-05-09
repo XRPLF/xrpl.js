@@ -1,8 +1,6 @@
-import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { OracleSet, Payment, Wallet, xrpToDrops } from '../../../src'
-import { Oracle } from '../../../src/models/ledger'
+import { Payment, Wallet, xrpToDrops } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -22,8 +20,6 @@ describe('DelegateSet', function () {
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
-
-    // Note: Using WALLET, DESTINATION accounts could pollute the test results
     alice = await generateFundedWallet(testContext.client)
     bob = await generateFundedWallet(testContext.client)
     carol = await generateFundedWallet(testContext.client)
