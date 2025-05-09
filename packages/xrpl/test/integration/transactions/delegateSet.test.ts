@@ -1,6 +1,4 @@
 /* eslint-disable no-console */
-import { AssertionError } from 'assert'
-
 import { assert } from 'chai'
 
 import { Payment, Wallet, xrpToDrops } from '../../../src'
@@ -41,7 +39,8 @@ describe('DelegateSet', function () {
       }
       try {
         await testTransaction(testContext.client, tx, bob)
-      } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- AssertionError type
+      } catch (err: any) {
         console.log('yo toString')
         console.log(err.toString())
         console.log('yo message')
