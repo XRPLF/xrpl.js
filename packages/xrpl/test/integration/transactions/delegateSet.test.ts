@@ -1,4 +1,5 @@
-/* eslint-disable no-console -- to debug */
+import { AssertionError } from 'assert'
+
 import { assert } from 'chai'
 
 import { Payment, Wallet, xrpToDrops } from '../../../src'
@@ -39,14 +40,10 @@ describe('DelegateSet', function () {
       }
       try {
         await testTransaction(testContext.client, tx, bob)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- AssertionError type
-      } catch (err: any) {
-        console.log('yo toString')
-        console.log(err.toString())
-        console.log('yo message')
-        console.log(err.message)
+      } catch (err: unknown) {
+        const assertErr = err as AssertionError
         assert.equal(
-          err.message,
+          assertErr.message,
           "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
         )
       }
