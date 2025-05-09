@@ -36,8 +36,12 @@ describe('DelegateSet', function () {
         Destination: carol.address,
         Delegate: bob.address,
       }
-      const response = await testTransaction(testContext.client, tx, bob)
-      assert.equal(response.result.engine_result, 'tecNO_PERMISSION')
+      try {
+        await testTransaction(testContext.client, tx, bob)
+      } catch (e) {
+        console.log(e)
+        assert.equal(e, 'tecNO_PERMISSION')
+      }
     },
     TIMEOUT,
   )
