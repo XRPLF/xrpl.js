@@ -2,7 +2,7 @@ import { AssertionError } from 'assert'
 
 import { assert } from 'chai'
 
-import { Payment, Wallet, xrpToDrops } from '../../../src'
+import { DelegateSet, Payment, Wallet, xrpToDrops } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -47,6 +47,37 @@ describe('DelegateSet', function () {
           "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
         )
       }
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'base',
+    async () => {
+      // Authorize Bob account to execute Payment transactions and
+      // modify the domain of an account behalf of Alice's account.
+      const delegateTx: DelegateSet = {
+        TransactionType: 'DelegateSet',
+        Account: alice.address,
+        Authorize: bob.address,
+        Permissions: [0, 65540],
+      }
+      await testTransaction(testContext.client, delegateTx, alice)
+
+      // Use Bob's account to execute a transaction on behalf of Alice
+      const paymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: alice.address,
+        Amount: xrpToDrops(1),
+        Destination: carol.address,
+        Delegate: bob.address,
+      }
+      const response = await testTransaction(testContext.client, paymentTx, bob)
+
+      // Validate that the transaction was signed by Bob
+      assert.equal(response.result.tx_json.Account, alice.address)
+      assert.equal(response.result.tx_json.Delegate, bob.address)
+      assert.equal(response.result.tx_json.SigningPubKey, bob.publicKey)
     },
     TIMEOUT,
   )
