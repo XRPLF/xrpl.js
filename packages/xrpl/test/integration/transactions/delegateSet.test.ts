@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+/* eslint-disable no-console -- to debug */
 import { assert } from 'chai'
 
 import { Payment, Wallet, xrpToDrops } from '../../../src'
