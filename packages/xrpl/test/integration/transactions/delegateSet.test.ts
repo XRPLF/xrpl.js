@@ -2,7 +2,13 @@ import { AssertionError } from 'assert'
 
 import { assert } from 'chai'
 
-import { DelegateSet, Payment, Wallet, xrpToDrops } from '../../../src'
+import {
+  AccountSet,
+  DelegateSet,
+  Payment,
+  Wallet,
+  xrpToDrops,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -78,6 +84,24 @@ describe('DelegateSet', function () {
       assert.equal(response.result.tx_json.Account, alice.address)
       assert.equal(response.result.tx_json.Delegate, bob.address)
       assert.equal(response.result.tx_json.SigningPubKey, bob.publicKey)
+
+      // Use Bob's account to execute a transaction on behalf of Alice
+      const accountSetTx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: alice.address,
+        Delegate: bob.address,
+        EmailHash: '10000000002000000000300000000012',
+      }
+
+      try {
+        await testTransaction(testContext.client, accountSetTx, bob)
+      } catch (err: unknown) {
+        const assertErr = err as AssertionError
+        assert.equal(
+          assertErr.message,
+          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
+        )
+      }
     },
     TIMEOUT,
   )
