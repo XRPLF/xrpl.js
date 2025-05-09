@@ -45,7 +45,10 @@ describe('DelegateSet', function () {
         console.log(err.toString())
         console.log('yo message')
         console.log(err.message)
-        assert.equal(err.message, 'tecNO_PERMISSION')
+        assert.equal(
+          err.message,
+          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
+        )
       }
     },
     TIMEOUT,
