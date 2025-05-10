@@ -19,6 +19,7 @@ const DESTINATION = 'Destination'
 const ACCOUNT = 'Account'
 const SOURCE_TAG = 'SourceTag'
 const DEST_TAG = 'DestinationTag'
+const PERMISSION_VALUE = 'PermissionValue'
 
 /**
  * Break down an X-Address into an account and a tag
@@ -192,6 +193,11 @@ class STObject extends SerializedType {
       const field = objectParser.readField()
       if (field.name === OBJECT_END_MARKER) {
         break
+      }
+
+      if (field.name === PERMISSION_VALUE) {
+        console.log('inside field.name === PERMISSION_Value')
+        console.log('field.name:', field.name)
       }
 
       accumulator[field.name] = objectParser
