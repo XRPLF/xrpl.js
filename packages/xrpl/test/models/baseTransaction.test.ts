@@ -245,4 +245,31 @@ describe('BaseTransaction', function () {
       'Payment: invalid field NetworkID',
     )
   })
+
+  it(`Handles invalid Delegate`, function () {
+    const invalidDelegate = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Delegate: 1234,
+    }
+    assert.throws(
+      () => validateBaseTransaction(invalidDelegate),
+      ValidationError,
+      'Payment: invalid field Delegate',
+    )
+  })
+
+  it(`Handles Account and Delegate being the same error`, function () {
+    const account = 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe'
+    const invalidDelegate = {
+      Account: account,
+      TransactionType: 'Payment',
+      Delegate: account,
+    }
+    assert.throws(
+      () => validateBaseTransaction(invalidDelegate),
+      ValidationError,
+      'BaseTransaction: Account and Delegate addresses cannot be the same',
+    )
+  })
 })

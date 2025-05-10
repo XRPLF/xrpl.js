@@ -32,6 +32,8 @@ class UInt32 extends UInt {
     const buf = new Uint8Array(UInt32.width)
 
     if (typeof val === 'string') {
+      console.log('inside UInt32')
+      console.log('val:', val)
       const num = Number.parseInt(val)
       writeUInt32BE(buf, num, 0)
       return new UInt32(buf)
