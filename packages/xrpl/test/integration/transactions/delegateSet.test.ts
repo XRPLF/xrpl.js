@@ -66,7 +66,10 @@ describe('DelegateSet', function () {
         TransactionType: 'DelegateSet',
         Account: alice.address,
         Authorize: bob.address,
-        Permissions: [0, 65540],
+        Permissions: [
+          { Permission: { PermissionValue: 'Payment' } },
+          { Permission: { PermissionValue: 'AccountDomainSet' } },
+        ],
       }
       await testTransaction(testContext.client, delegateTx, alice)
 

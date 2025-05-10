@@ -10,6 +10,12 @@ import {
 
 const PERMISSIONS_MAX_LENGTH = 10
 
+interface Permission {
+  Permission: {
+    PermissionValue: string
+  }
+}
+
 /**
  * DelegateSet allows an account to delegate a set of permissions to another account.
  *
@@ -26,7 +32,7 @@ export interface DelegateSet extends BaseTransaction {
   /**
    * The transaction permissions (represented by integers) that the account has been granted.
    */
-  Permissions: number[]
+  Permissions: Permission[]
 }
 
 /**
@@ -35,6 +41,7 @@ export interface DelegateSet extends BaseTransaction {
  * @param tx - An DelegateSet Transaction.
  * @throws When the DelegateSet is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary for validation
 export function validateDelegateSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -61,14 +68,32 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
       `DelegateSet: Permissions array length cannot be greater than ${PERMISSIONS_MAX_LENGTH}.`,
     )
   }
-  permissions.forEach((permission) => {
-    if (typeof permission !== 'number') {
+  permissions.forEach((permission: Permission) => {
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
+      permission == null ||
+      Object.keys(permission).length !== 1 ||
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
+      permission.Permission == null ||
+      Object.keys(permission.Permission).length !== 1
+    ) {
       throw new ValidationError(
-        `DelegateSet: Permissions array must only contain integer values`,
+        'DelegateSet: Permissions array element is malformed',
       )
     }
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
+    if (permission.Permission.PermissionValue == null) {
+      throw new ValidationError('DelegateSet: PermissionValue must be defined')
+    }
+    if (typeof permission.Permission.PermissionValue !== 'string') {
+      throw new ValidationError(`DelegateSet: PermissionValue must be a string`)
+    }
   })
-  const permissionsSet = new Set(permissions)
+  const permissionsSet = new Set(
+    permissions.map(
+      (permission: Permission) => permission.Permission.PermissionValue,
+    ),
+  )
   if (permissions.length !== permissionsSet.size) {
     throw new ValidationError(
       `DelegateSet: Permissions array cannot contain duplicate values`,

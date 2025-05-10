@@ -16,8 +16,10 @@ describe('DelegateSet', function () {
       TransactionType: 'DelegateSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       Authorize: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
-      // eslint-disable-next-line no-inline-comments -- helpful comment
-      Permissions: [65537, 0], // TrustlineAuthorize, Payment
+      Permissions: [
+        { Permission: { PermissionValue: 'TrustlineAuthorize' } },
+        { Permission: { PermissionValue: 'Payment' } },
+      ],
     } as any
   })
 
@@ -48,7 +50,7 @@ describe('DelegateSet', function () {
   })
 
   it(`throws w/ Permissions must be an array`, function () {
-    tx.Permissions = 65537
+    tx.Permissions = 'TrustlineAuthorize'
     const errorMessage = 'DelegateSet: Permissions must be an array'
     assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
@@ -63,7 +65,17 @@ describe('DelegateSet', function () {
 
   it(`throws w/ Permissions array length cannot be greater than max`, function () {
     tx.Permissions = [
-      65537, 65538, 65539, 65540, 65541, 65542, 65543, 65544, 65545, 65546, 0,
+      { Permission: { PermissionValue: 'Payment' } },
+      { Permission: { PermissionValue: 'TrustSet' } },
+      { Permission: { PermissionValue: 'TrustlineFreeze' } },
+      { Permission: { PermissionValue: 'TrustlineUnfreeze' } },
+      { Permission: { PermissionValue: 'TrustlineAuthorize' } },
+      { Permission: { PermissionValue: 'AccountDomainSet' } },
+      { Permission: { PermissionValue: 'AccountEmailHashSet' } },
+      { Permission: { PermissionValue: 'AccountMessageKeySet' } },
+      { Permission: { PermissionValue: 'AccountTransferRateSet' } },
+      { Permission: { PermissionValue: 'AccountTickSizeSet' } },
+      { Permission: { PermissionValue: 'PaymentMint' } },
     ]
     const errorMessage =
       'DelegateSet: Permissions array length cannot be greater than 10.'
@@ -71,16 +83,33 @@ describe('DelegateSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Permissions array must only contain integer values`, function () {
-    tx.Permissions = ['65537', 0]
-    const errorMessage =
-      'DelegateSet: Permissions array must only contain integer values'
+  it(`throws w/ Permissions array element is malformed`, function () {
+    tx.Permissions = ['Payment']
+    const errorMessage = 'DelegateSet: Permissions array element is malformed'
+    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ PermissionValue must be defined`, function () {
+    tx.Permissions = [{ Permission: { PermissionValue: null } }]
+    const errorMessage = 'DelegateSet: PermissionValue must be defined'
+    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
+  it(`throws w/ PermissionValue must be a string`, function () {
+    tx.Permissions = [{ Permission: { PermissionValue: 123 } }]
+    const errorMessage = 'DelegateSet: PermissionValue must be a string'
     assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
   it(`throws w/ Permissions array cannot contain duplicate values`, function () {
-    tx.Permissions = [65537, 0, 65537]
+    tx.Permissions = [
+      { Permission: { PermissionValue: 'Payment' } },
+      { Permission: { PermissionValue: 'TrustSet' } },
+      { Permission: { PermissionValue: 'Payment' } },
+    ]
     const errorMessage =
       'DelegateSet: Permissions array cannot contain duplicate values'
     assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
