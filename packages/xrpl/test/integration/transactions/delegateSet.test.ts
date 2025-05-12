@@ -5,6 +5,7 @@ import { assert } from 'chai'
 import {
   AccountSet,
   DelegateSet,
+  LedgerEntryResponse,
   Payment,
   Wallet,
   xrpToDrops,
@@ -75,11 +76,14 @@ describe('DelegateSet', function () {
       await testTransaction(testContext.client, delegateTx, alice)
 
       // Fetch Delegate ledger entry
-      const ledgerEntryRes = await testContext.client.request({
-        command: 'ledger_entry',
-        account: alice.address,
-        authorize: bob.address,
-      })
+      const ledgerEntryRes: LedgerEntryResponse =
+        await testContext.client.request({
+          command: 'ledger_entry',
+          delegate: {
+            account: alice.address,
+            authorize: bob.address,
+          },
+        })
       const delegateLedgerEntry = ledgerEntryRes.result.node as Delegate
       assert.equal(delegateLedgerEntry.LedgerEntryType, 'Delegate')
       assert.equal(delegateLedgerEntry.Account, alice.address)
