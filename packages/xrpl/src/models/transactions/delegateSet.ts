@@ -60,9 +60,6 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
   if (!Array.isArray(permissions)) {
     throw new ValidationError('DelegateSet: Permissions must be an array')
   }
-  if (permissions.length === 0) {
-    throw new ValidationError(`DelegateSet: Permissions array cannot be empty`)
-  }
   if (permissions.length > PERMISSIONS_MAX_LENGTH) {
     throw new ValidationError(
       `DelegateSet: Permissions array length cannot be greater than ${PERMISSIONS_MAX_LENGTH}.`,

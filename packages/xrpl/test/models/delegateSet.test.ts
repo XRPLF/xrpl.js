@@ -56,13 +56,6 @@ describe('DelegateSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Permissions array cannot be empty`, function () {
-    tx.Permissions = []
-    const errorMessage = 'DelegateSet: Permissions array cannot be empty'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
-  })
-
   it(`throws w/ Permissions array length cannot be greater than max`, function () {
     tx.Permissions = [
       { Permission: { PermissionValue: 'Payment' } },
