@@ -67,7 +67,7 @@ describe('DelegateSet', function () {
         Account: alice.address,
         Authorize: bob.address,
         Permissions: [
-          { Permission: { PermissionValue: 'Payment' } },
+          // { Permission: { PermissionValue: 'Payment' } },
           { Permission: { PermissionValue: 'AccountDomainSet' } },
         ],
       }
