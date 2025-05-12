@@ -226,7 +226,7 @@ class STObject extends SerializedType {
           'objectParser.readFieldValue(field).toString():',
           value.toString(),
         )
-        const txOrdinal = parseInt(value.toString())
+        const txOrdinal = parseInt(value.toString(), 16)
         console.log(
           'parseInt(objectParser.readFieldValue(field).toString()):',
           txOrdinal,
