@@ -115,16 +115,12 @@ class STObject extends SerializedType {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
       } else if (key === 'PermissionValue') {
-        console.log("inside xAddressDecoded key === 'PermissionValue'")
-        console.log('key:', key)
-        console.log('val:', val)
         if ((val as string) in definitions.granularPermissions) {
           updatedVal = definitions.granularPermissions[val as string] + 1
         } else {
           updatedVal =
             definitions.transactionType.from(val as string).ordinal + 1
         }
-        console.log('updatedVal:', updatedVal)
       }
       return Object.assign(acc, handled ?? { [key]: updatedVal })
     }, {})
@@ -157,8 +153,6 @@ class STObject extends SerializedType {
     }
 
     sorted.forEach((field) => {
-      // console.log('inside sorted.forEach(field)')
-      // console.log('field.name:', field.name)
       const associatedValue =
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
@@ -167,14 +161,6 @@ class STObject extends SerializedType {
           : field.type.name === 'UInt64'
           ? UInt64.from(xAddressDecoded[field.name], field.name)
           : field.associatedType.from(xAddressDecoded[field.name])
-
-      if (field.name === 'PermissionValue') {
-        console.log("inside sorted if field.name === 'PermissionValue")
-        console.log('field:')
-        console.log(field)
-        console.log('associatedValue:')
-        console.log(associatedValue)
-      }
 
       if (associatedValue == undefined) {
         throw new TypeError(
@@ -219,19 +205,8 @@ class STObject extends SerializedType {
 
       let jsonValue
       if (field.name === PERMISSION_VALUE) {
-        console.log('inside field.name === PERMISSION_VALUE')
-        console.log('field.name:', field.name)
         const value = objectParser.readFieldValue(field)
-        console.log(
-          'objectParser.readFieldValue(field).toString():',
-          value.toString(),
-        )
         const txOrdinal = parseInt(value.toString(), 16)
-        console.log(
-          'parseInt(objectParser.readFieldValue(field).toString()):',
-          txOrdinal,
-        )
-        console.log('deserialize txOrdinal to txName')
         let permissionName
         if (definitions?.granularPermissionsReverse[txOrdinal]) {
           permissionName = definitions?.granularPermissionsReverse[txOrdinal]
@@ -240,9 +215,7 @@ class STObject extends SerializedType {
             txOrdinal.toString(),
           ).name
         }
-        console.log('permissionName:', permissionName)
         jsonValue = permissionName
-        console.log('updated jsonValue:', jsonValue)
       } else {
         jsonValue = objectParser
           .readFieldValue(field)
