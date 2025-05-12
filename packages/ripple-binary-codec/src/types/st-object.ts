@@ -116,7 +116,7 @@ class STObject extends SerializedType {
         checkForDuplicateTags(handled, value)
       } else if (key === PERMISSION_VALUE) {
         if ((val as string) in definitions.granularPermissions) {
-          updatedVal = definitions.granularPermissions[val as string] + 1
+          updatedVal = definitions.granularPermissions[val as string]
         } else {
           updatedVal =
             definitions.transactionType.from(val as string).ordinal + 1
@@ -208,13 +208,13 @@ class STObject extends SerializedType {
         const value = objectParser
           .readFieldValue(field)
           .toJSON(definitions, field.name) as number
-        const txOrdinal = value - 1
+        const txOrdinal = value
         let permissionName
         if (definitions?.granularPermissionsReverse[txOrdinal]) {
           permissionName = definitions?.granularPermissionsReverse[txOrdinal]
         } else {
           permissionName = definitions?.transactionType.from(
-            txOrdinal.toString(),
+            (txOrdinal - 1).toString(),
           ).name
         }
         jsonValue = permissionName
