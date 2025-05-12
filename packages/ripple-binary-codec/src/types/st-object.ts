@@ -205,14 +205,10 @@ class STObject extends SerializedType {
 
       let jsonValue
       if (field.name === PERMISSION_VALUE) {
-        const value = objectParser.readFieldValue(field)
-        console.log('inside field.name === PERMISSION_VALUE')
-        console.log('value:', value)
-        console.log(
-          'value.toJSON(definitions, field.name):',
-          value.toJSON(definitions, field.name),
-        )
-        const txOrdinal = parseInt(value.toString(), 16) - 1
+        const value = objectParser
+          .readFieldValue(field)
+          .toJSON(definitions, field.name) as number
+        const txOrdinal = value - 1
         let permissionName
         if (definitions?.granularPermissionsReverse[txOrdinal]) {
           permissionName = definitions?.granularPermissionsReverse[txOrdinal]
