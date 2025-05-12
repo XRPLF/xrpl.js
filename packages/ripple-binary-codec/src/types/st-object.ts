@@ -154,6 +154,14 @@ class STObject extends SerializedType {
           ? UInt64.from(xAddressDecoded[field.name], field.name)
           : field.associatedType.from(xAddressDecoded[field.name])
 
+      if (field['PermissionValue']) {
+        console.log("inside if field['PermissionValue']")
+        console.log("field['PermissionValue']:")
+        console.log(field['PermissionValue'])
+        console.log('associatedValue:')
+        console.log(associatedValue)
+      }
+
       if (associatedValue == undefined) {
         throw new TypeError(
           `Unable to interpret "${field.name}: ${
@@ -198,6 +206,11 @@ class STObject extends SerializedType {
       if (field.name === PERMISSION_VALUE) {
         console.log('inside field.name === PERMISSION_Value')
         console.log('field.name:', field.name)
+        const value = objectParser.readFieldValue(field)
+        console.log(
+          'objectParser.readFieldValue(field).toString():',
+          value.toString(),
+        )
       }
 
       accumulator[field.name] = objectParser
