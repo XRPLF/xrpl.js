@@ -213,6 +213,7 @@ class STObject extends SerializedType {
         break
       }
 
+      let jsonValue
       if (field.name === PERMISSION_VALUE) {
         console.log('inside field.name === PERMISSION_VALUE')
         console.log('field.name:', field.name)
@@ -221,11 +222,25 @@ class STObject extends SerializedType {
           'objectParser.readFieldValue(field).toString():',
           value.toString(),
         )
+        const txOrdinal = parseInt(value.toString())
+        console.log(
+          'parseInt(objectParser.readFieldValue(field).toString()):',
+          txOrdinal,
+        )
+        console.log('deserialize txOrdinal to txName')
+        const txName = definitions?.transactionType.from(
+          txOrdinal.toString(),
+        ).name
+        console.log('txName:', txName)
+        jsonValue = txName
+        console.log('updated jsonValue:', jsonValue)
+      } else {
+        jsonValue = objectParser
+          .readFieldValue(field)
+          .toJSON(definitions, field.name)
       }
 
-      accumulator[field.name] = objectParser
-        .readFieldValue(field)
-        .toJSON(definitions, field.name)
+      accumulator[field.name] = jsonValue
     }
 
     return accumulator
