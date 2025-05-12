@@ -235,10 +235,11 @@ class STObject extends SerializedType {
         let permissionName
         if (definitions?.granularPermissionsReverse[txOrdinal]) {
           permissionName = definitions?.granularPermissionsReverse[txOrdinal]
+        } else {
+          permissionName = definitions?.transactionType.from(
+            txOrdinal.toString(),
+          ).name
         }
-        permissionName = definitions?.transactionType.from(
-          txOrdinal.toString(),
-        ).name
         console.log('permissionName:', permissionName)
         jsonValue = permissionName
         console.log('updated jsonValue:', jsonValue)
