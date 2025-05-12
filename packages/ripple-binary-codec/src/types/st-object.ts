@@ -113,6 +113,10 @@ class STObject extends SerializedType {
       if (val && isValidXAddress(val.toString())) {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
+      } else if (key === 'PermissionValue') {
+        console.log("inside xAddressDecoded key === 'PermissionValue'")
+        console.log('key:', key)
+        console.log('val:', val)
       }
       return Object.assign(acc, handled ?? { [key]: val })
     }, {})
