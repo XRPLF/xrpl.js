@@ -120,8 +120,10 @@ class STObject extends SerializedType {
         console.log('val:', val)
         if ((val as string) in definitions.granularPermissions) {
           updatedVal = definitions.granularPermissions[val as string] + 1
+        } else {
+          updatedVal =
+            definitions.transactionType.from(val as string).ordinal + 1
         }
-        updatedVal = definitions.transactionType.from(val as string).ordinal + 1
         console.log('updatedVal:', updatedVal)
       }
       return Object.assign(acc, handled ?? { [key]: updatedVal })
