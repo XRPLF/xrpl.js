@@ -118,7 +118,9 @@ class STObject extends SerializedType {
         console.log("inside xAddressDecoded key === 'PermissionValue'")
         console.log('key:', key)
         console.log('val:', val)
-        // TODO: add support for Granular Permissions
+        if ((val as string) in definitions.granularPermissions) {
+          updatedVal = definitions.granularPermissions[val as string] + 1
+        }
         updatedVal = definitions.transactionType.from(val as string).ordinal + 1
         console.log('updatedVal:', updatedVal)
       }
@@ -228,11 +230,15 @@ class STObject extends SerializedType {
           txOrdinal,
         )
         console.log('deserialize txOrdinal to txName')
-        const txName = definitions?.transactionType.from(
+        let permissionName
+        if (definitions?.granularPermissionsReverse[txOrdinal]) {
+          permissionName = definitions?.granularPermissionsReverse[txOrdinal]
+        }
+        permissionName = definitions?.transactionType.from(
           txOrdinal.toString(),
         ).name
-        console.log('txName:', txName)
-        jsonValue = txName
+        console.log('permissionName:', permissionName)
+        jsonValue = permissionName
         console.log('updated jsonValue:', jsonValue)
       } else {
         jsonValue = objectParser
