@@ -145,8 +145,8 @@ class STObject extends SerializedType {
     }
 
     sorted.forEach((field) => {
-      console.log('inside sorted.forEach(field)')
-      console.log('field:', field)
+      // console.log('inside sorted.forEach(field)')
+      // console.log('field.name:', field.name)
       const associatedValue =
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
@@ -156,10 +156,10 @@ class STObject extends SerializedType {
           ? UInt64.from(xAddressDecoded[field.name], field.name)
           : field.associatedType.from(xAddressDecoded[field.name])
 
-      if (field['PermissionValue']) {
-        console.log("inside if field['PermissionValue']")
-        console.log("field['PermissionValue']:")
-        console.log(field['PermissionValue'])
+      if (field.name['PermissionValue']) {
+        console.log("inside if field.name['PermissionValue']")
+        console.log("field.name['PermissionValue']:")
+        console.log(field.name['PermissionValue'])
         console.log('associatedValue:')
         console.log(associatedValue)
       }
