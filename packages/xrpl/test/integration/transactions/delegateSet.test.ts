@@ -9,6 +9,7 @@ import {
   Wallet,
   xrpToDrops,
 } from '../../../src'
+import { Delegate } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -72,6 +73,18 @@ describe('DelegateSet', function () {
         ],
       }
       await testTransaction(testContext.client, delegateTx, alice)
+
+      // Fetch Delegate ledger entry
+      const ledgerEntryRes = await testContext.client.request({
+        command: 'ledger_entry',
+        account: alice.address,
+        authorize: bob.address,
+      })
+      const delegateLedgerEntry = ledgerEntryRes.result.node as Delegate
+      assert.equal(delegateLedgerEntry.LedgerEntryType, 'Delegate')
+      assert.equal(delegateLedgerEntry.Account, alice.address)
+      assert.equal(delegateLedgerEntry.Authorize, bob.address)
+      assert.equal(delegateLedgerEntry.Permissions.length, 2)
 
       // Use Bob's account to execute a transaction on behalf of Alice
       const paymentTx: Payment = {
