@@ -4,7 +4,7 @@ import {
   Bytes,
   XrplDefinitionsBase,
 } from '../enums'
-import { SerializedType, JsonObject } from './serialized-type'
+import { SerializedType, JsonObject, JSON } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
 import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
@@ -110,6 +110,7 @@ class STObject extends SerializedType {
 
     const xAddressDecoded = Object.entries(value).reduce((acc, [key, val]) => {
       let handled: JsonObject | undefined = undefined
+      let updatedVal: JSON = val
       if (val && isValidXAddress(val.toString())) {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
@@ -117,8 +118,11 @@ class STObject extends SerializedType {
         console.log("inside xAddressDecoded key === 'PermissionValue'")
         console.log('key:', key)
         console.log('val:', val)
+        // TODO: add support for Granular Permissions
+        updatedVal = definitions.transactionType.from(val as string).ordinal + 1
+        console.log('updatedVal:', updatedVal)
       }
-      return Object.assign(acc, handled ?? { [key]: val })
+      return Object.assign(acc, handled ?? { [key]: updatedVal })
     }, {})
 
     function isValidFieldInstance(
