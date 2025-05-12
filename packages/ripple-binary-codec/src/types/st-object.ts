@@ -156,10 +156,10 @@ class STObject extends SerializedType {
           ? UInt64.from(xAddressDecoded[field.name], field.name)
           : field.associatedType.from(xAddressDecoded[field.name])
 
-      if (field.name['PermissionValue']) {
-        console.log("inside if field.name['PermissionValue']")
-        console.log("field.name['PermissionValue']:")
-        console.log(field.name['PermissionValue'])
+      if (field.name === 'PermissionValue') {
+        console.log("inside sorted if field.name === 'PermissionValue")
+        console.log('field:')
+        console.log(field)
         console.log('associatedValue:')
         console.log(associatedValue)
       }
