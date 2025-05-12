@@ -145,6 +145,8 @@ class STObject extends SerializedType {
     }
 
     sorted.forEach((field) => {
+      console.log('inside sorted.forEach(field)')
+      console.log('field:', field)
       const associatedValue =
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
@@ -204,7 +206,7 @@ class STObject extends SerializedType {
       }
 
       if (field.name === PERMISSION_VALUE) {
-        console.log('inside field.name === PERMISSION_Value')
+        console.log('inside field.name === PERMISSION_VALUE')
         console.log('field.name:', field.name)
         const value = objectParser.readFieldValue(field)
         console.log(
