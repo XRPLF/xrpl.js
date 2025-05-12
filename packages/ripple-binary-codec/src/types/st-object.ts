@@ -114,7 +114,7 @@ class STObject extends SerializedType {
       if (val && isValidXAddress(val.toString())) {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
-      } else if (key === 'PermissionValue') {
+      } else if (key === PERMISSION_VALUE) {
         if ((val as string) in definitions.granularPermissions) {
           updatedVal = definitions.granularPermissions[val as string] + 1
         } else {
@@ -206,7 +206,7 @@ class STObject extends SerializedType {
       let jsonValue
       if (field.name === PERMISSION_VALUE) {
         const value = objectParser.readFieldValue(field)
-        const txOrdinal = parseInt(value.toString(), 16)
+        const txOrdinal = parseInt(value.toString(), 16) - 1
         let permissionName
         if (definitions?.granularPermissionsReverse[txOrdinal]) {
           permissionName = definitions?.granularPermissionsReverse[txOrdinal]
