@@ -30,7 +30,7 @@ describe('DelegateSet', function () {
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
-    alice = await generateFundedWallet(testContext.client)
+    alice = testContext.wallet
     bob = await generateFundedWallet(testContext.client)
     carol = await generateFundedWallet(testContext.client)
   })
