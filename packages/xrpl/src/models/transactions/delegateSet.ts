@@ -17,7 +17,7 @@ const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'AccountDelete',
 ])
 
-interface Permission {
+export interface Permission {
   Permission: {
     PermissionValue: string
   }

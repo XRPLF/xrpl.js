@@ -1,3 +1,5 @@
+import { Permission } from '../transactions'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
@@ -21,7 +23,7 @@ export default interface Delegate extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The transaction permissions that the account has access to.
    */
-  Permissions: number[]
+  Permissions: Permission[]
 
   /**
    * A hint indicating which page of the sender's owner directory links to this object,
