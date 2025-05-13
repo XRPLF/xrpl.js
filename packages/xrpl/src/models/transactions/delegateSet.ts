@@ -73,7 +73,7 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     )
   }
 
-  const permissionsSet = new Set()
+  const permissionValueSet = new Set()
   permissions.forEach((permission: Permission) => {
     if (
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
@@ -100,9 +100,9 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
         'DelegateSet: PermissionValue contains a non-delegatable transaction',
       )
     }
-    permissionsSet.add(permissionValue)
+    permissionValueSet.add(permissionValue)
   })
-  if (permissions.length !== permissionsSet.size) {
+  if (permissions.length !== permissionValueSet.size) {
     throw new ValidationError(
       'DelegateSet: Permissions array cannot contain duplicate values',
     )
