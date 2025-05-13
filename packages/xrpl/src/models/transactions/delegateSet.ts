@@ -73,6 +73,8 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
       `DelegateSet: Permissions array length cannot be greater than ${PERMISSIONS_MAX_LENGTH}.`,
     )
   }
+
+  const permissionsSet = new Set()
   permissions.forEach((permission: Permission) => {
     if (
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
@@ -99,12 +101,8 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
         'DelegateSet: PermissionValue contains a non-delegatable transaction',
       )
     }
+    permissionsSet.add(permissionValue)
   })
-  const permissionsSet = new Set(
-    permissions.map(
-      (permission: Permission) => permission.Permission.PermissionValue,
-    ),
-  )
   if (permissions.length !== permissionsSet.size) {
     throw new ValidationError(
       'DelegateSet: Permissions array cannot contain duplicate values',
