@@ -210,16 +210,13 @@ class STObject extends SerializedType {
         .toJSON(definitions, field.name)
       if (field.name === PERMISSION_VALUE) {
         const txOrdinal = jsonValue as number
-        let permissionName
         if (definitions?.granularPermissionsOrdinalToName[txOrdinal]) {
-          permissionName =
-            definitions?.granularPermissionsOrdinalToName[txOrdinal]
+          jsonValue = definitions?.granularPermissionsOrdinalToName[txOrdinal]
         } else {
-          permissionName = definitions?.transactionType.from(
+          jsonValue = definitions?.transactionType.from(
             (txOrdinal - 1).toString(),
           ).name
         }
-        jsonValue = permissionName
       }
 
       accumulator[field.name] = jsonValue
