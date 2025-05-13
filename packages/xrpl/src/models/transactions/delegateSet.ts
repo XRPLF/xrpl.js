@@ -9,13 +9,6 @@ import {
 } from './common'
 
 const PERMISSIONS_MAX_LENGTH = 10
-
-interface Permission {
-  Permission: {
-    PermissionValue: string
-  }
-}
-
 const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'AccountSet',
   'SetRegularKey',
@@ -23,6 +16,12 @@ const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'DelegateSet',
   'AccountDelete',
 ])
+
+interface Permission {
+  Permission: {
+    PermissionValue: string
+  }
+}
 
 /**
  * DelegateSet allows an account to delegate a set of permissions to another account.
