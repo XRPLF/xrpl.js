@@ -115,11 +115,13 @@ class STObject extends SerializedType {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
       } else if (key === PERMISSION_VALUE) {
-        if ((val as string) in definitions.granularPermissions) {
-          updatedVal = definitions.granularPermissions[val as string]
+        const permissionName = val as string
+        if (permissionName in definitions.granularPermissionsNameToOrdinal) {
+          updatedVal =
+            definitions.granularPermissionsNameToOrdinal[permissionName]
         } else {
           updatedVal =
-            definitions.transactionType.from(val as string).ordinal + 1
+            definitions.transactionType.from(permissionName).ordinal + 1
         }
       }
       return Object.assign(acc, handled ?? { [key]: updatedVal })
@@ -203,25 +205,21 @@ class STObject extends SerializedType {
         break
       }
 
-      let jsonValue
+      let jsonValue = objectParser
+        .readFieldValue(field)
+        .toJSON(definitions, field.name)
       if (field.name === PERMISSION_VALUE) {
-        const value = objectParser
-          .readFieldValue(field)
-          .toJSON(definitions, field.name) as number
-        const txOrdinal = value
+        const txOrdinal = jsonValue as number
         let permissionName
-        if (definitions?.granularPermissionsReverse[txOrdinal]) {
-          permissionName = definitions?.granularPermissionsReverse[txOrdinal]
+        if (definitions?.granularPermissionsOrdinalToName[txOrdinal]) {
+          permissionName =
+            definitions?.granularPermissionsOrdinalToName[txOrdinal]
         } else {
           permissionName = definitions?.transactionType.from(
             (txOrdinal - 1).toString(),
           ).name
         }
         jsonValue = permissionName
-      } else {
-        jsonValue = objectParser
-          .readFieldValue(field)
-          .toJSON(definitions, field.name)
       }
 
       accumulator[field.name] = jsonValue

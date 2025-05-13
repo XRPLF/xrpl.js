@@ -36,9 +36,9 @@ class XrplDefinitionsBase {
   // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
   // Maps granular permissions names to their corresponding integer ids
-  granularPermissions: Record<string, number>
+  granularPermissionsNameToOrdinal: Record<string, number>
   // Reverse mapping of granularPermssions: maps integer ids to their corresponding names
-  granularPermissionsReverse: Record<number, string>
+  granularPermissionsOrdinalToName: Record<number, string>
 
   /**
    * Present rippled types in a typed and updatable format.
@@ -80,7 +80,7 @@ class XrplDefinitionsBase {
     this.dataTypes = {} // Filled in via associateTypes
     this.associateTypes(types)
 
-    this.granularPermissions = {
+    this.granularPermissionsNameToOrdinal = {
       TrustlineAuthorize: 65537,
       TrustlineFreeze: 65538,
       TrustlineUnfreeze: 65539,
@@ -95,10 +95,12 @@ class XrplDefinitionsBase {
       MPTokenIssuanceUnlock: 65548,
     }
     // Initialize reverse mapping
-    this.granularPermissionsReverse = {}
-    Object.entries(this.granularPermissions).forEach(([key, value]) => {
-      this.granularPermissionsReverse[value] = key
-    })
+    this.granularPermissionsOrdinalToName = {}
+    Object.entries(this.granularPermissionsNameToOrdinal).forEach(
+      ([key, value]) => {
+        this.granularPermissionsOrdinalToName[value] = key
+      },
+    )
   }
 
   /**
