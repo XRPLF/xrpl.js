@@ -16,6 +16,14 @@ interface Permission {
   }
 }
 
+const NON_DELEGATABLE_TRANSACTIONS = new Set([
+  'AccountSet',
+  'SetRegularKey',
+  'SignerListSet',
+  'DelegateSet',
+  'AccountDelete',
+])
+
 /**
  * DelegateSet allows an account to delegate a set of permissions to another account.
  *
@@ -78,12 +86,18 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
         'DelegateSet: Permissions array element is malformed',
       )
     }
+    const permissionValue = permission.Permission.PermissionValue
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
-    if (permission.Permission.PermissionValue == null) {
+    if (permissionValue == null) {
       throw new ValidationError('DelegateSet: PermissionValue must be defined')
     }
-    if (typeof permission.Permission.PermissionValue !== 'string') {
-      throw new ValidationError(`DelegateSet: PermissionValue must be a string`)
+    if (typeof permissionValue !== 'string') {
+      throw new ValidationError('DelegateSet: PermissionValue must be a string')
+    }
+    if (NON_DELEGATABLE_TRANSACTIONS.has(permissionValue)) {
+      throw new ValidationError(
+        'DelegateSet: PermissionValue contains a non-delegatable transaction',
+      )
     }
   })
   const permissionsSet = new Set(
@@ -93,7 +107,7 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
   )
   if (permissions.length !== permissionsSet.size) {
     throw new ValidationError(
-      `DelegateSet: Permissions array cannot contain duplicate values`,
+      'DelegateSet: Permissions array cannot contain duplicate values',
     )
   }
 }
