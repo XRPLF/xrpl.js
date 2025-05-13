@@ -100,7 +100,7 @@ describe('DelegateSet', function () {
   it(`throws w/ PermissionValue contains a non-delegatable transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'AccountSet' } }]
     const errorMessage =
-      'DelegateSet: PermissionValue contains a non-delegatable transaction'
+      'DelegateSet: PermissionValue contains a non-delegatable transaction AccountSet'
     assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })

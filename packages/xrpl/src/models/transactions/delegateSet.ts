@@ -94,7 +94,7 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     }
     if (NON_DELEGATABLE_TRANSACTIONS.has(permissionValue)) {
       throw new ValidationError(
-        'DelegateSet: PermissionValue contains a non-delegatable transaction',
+        `DelegateSet: PermissionValue contains a non-delegatable transaction ${permissionValue}`,
       )
     }
     permissionValueSet.add(permissionValue)
