@@ -185,7 +185,7 @@ describe('xahau related tests', function () {
   })
   test('definition hash if present', function () {
     expect(xahauDefs.getHash()).toEqual(
-      'FCD4DAD1C6374068BF2E128D23A4AAD212CE8864EEC2BBD1A15529F51EAD7896',
+      'E08D4476B0A8BC4A98F1CB9305406C6E020BB039D4563B1A6589B345284B546F',
     )
   })
   test('definition hash if not present', function () {
