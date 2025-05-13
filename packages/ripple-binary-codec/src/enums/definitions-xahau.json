@@ -851,6 +851,16 @@
       }
     ],
     [
+      "TouchCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 97,
+        "type": "UInt64"
+      }
+    ],
+    [
       "AccountIndex",
       {
         "isSerialized": true,
@@ -1017,6 +1027,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 13,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ObjectID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 14,
         "type": "Hash256"
       }
     ],
@@ -1227,6 +1247,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 36,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "HookCanEmit",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 96,
         "type": "Hash256"
       }
     ],
@@ -1721,6 +1751,26 @@
       }
     ],
     [
+      "RemarkValue",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 98,
+        "type": "Blob"
+      }
+    ],
+    [
+      "RemarkName",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 99,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "isSerialized": true,
@@ -2101,6 +2151,16 @@
       }
     ],
     [
+      "Remark",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 97,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -2287,6 +2347,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 96,
+        "type": "STArray"
+      }
+    ],
+    [
+      "Remarks",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 97,
         "type": "STArray"
       }
     ],
@@ -2506,7 +2576,6 @@
     "Amendments": 102,
     "Any": 0,
     "Check": 67,
-    "Child": 7378,
     "Contract": 99,
     "DepositPreauth": 112,
     "DirectoryNode": 100,
@@ -2628,6 +2697,7 @@
     "tecFROZEN": 137,
     "tecHAS_OBLIGATIONS": 151,
     "tecHOOK_REJECTED": 153,
+    "tecIMMUTABLE": 188,
     "tecINSUFFICIENT_FUNDS": 159,
     "tecINSUFFICIENT_PAYMENT": 161,
     "tecINSUFFICIENT_RESERVE": 141,
@@ -2663,6 +2733,7 @@
     "tecPATH_PARTIAL": 101,
     "tecPRECISION_LOSS": 170,
     "tecREQUIRES_FLAG": 169,
+    "tecTOO_MANY_REMARKS": 189,
     "tecTOO_SOON": 152,
     "tecUNFUNDED": 129,
     "tecUNFUNDED_ADD": 102,
@@ -2693,6 +2764,7 @@
     "tefCREATED": -194,
     "tefEXCEPTION": -193,
     "tefFAILURE": -199,
+    "tefIMPORT_BLACKHOLED": -175,
     "tefINTERNAL": -192,
     "tefINVARIANT_FAILED": -182,
     "tefMASTER_DISABLED": -188,
@@ -2824,6 +2896,7 @@
     "Remit": 95,
     "SetHook": 22,
     "SetRegularKey": 5,
+    "SetRemarks": 94,
     "SignerListSet": 12,
     "SpinalTap": 11,
     "TicketCreate": 10,
@@ -3033,6 +3106,11 @@
       "name": "fix1623",
       "supported": true
     },
+    "5B8E5D8F3D8687D3CE567FB5BDAED152204D195ED2EAEC346E3AA0607D51752A": {
+      "enabled": true,
+      "name": "fixRewardClaimFlags",
+      "supported": true
+    },
     "5D08145F0A4983F23AFFFF514E83FAD355C5ABFBB6CAB76FB5BC8519FF5F33BE": {
       "enabled": true,
       "name": "fix1515",
@@ -3068,6 +3146,11 @@
     "7117E2EC2DBF119CA55181D69819F1999ECEE1A0225A7FD2B9ED47940968479C": {
       "enabled": true,
       "name": "fix1571",
+      "supported": true
+    },
+    "717F060C0C237F122F8065781528B1CA047D82B4E787022984F26D7B997E3D9C": {
+      "enabled": true,
+      "name": "fix20250131",
       "supported": true
     },
     "73761231F7F3D94EC3D8C63D91BDD0D89045C6F71B917D1925C01253515A6669": {
@@ -3107,6 +3190,11 @@
       "name": "fix240911",
       "supported": true
     },
+    "88FEC10C8272D690124E923FBB47A95013C6AA20D9B27B871A99790D05055421": {
+      "enabled": true,
+      "name": "fixXahauV3",
+      "supported": true
+    },
     "89308AF3B8B10B7192C4E613E1D2E4D9BA64B2EE2D5232402AE82A6A7220D953": {
       "enabled": true,
       "name": "fixQualityUpperBound",
@@ -3117,6 +3205,12 @@
       "name": "fixCheckThreading",
       "supported": true
     },
+    "9000B5F96F9E129D1CB42F2B07AF4CEFEFBFDF49CFCD8B6FF46E719A3F19B436": {
+      "enabled": false,
+      "name": "HookCanEmit",
+      "supported": true,
+      "vetoed": true
+    },
     "919857E4B902A20216E4819B9BD9FD1FD19A66ECF63151C18A4C48C873DB9578": {
       "enabled": true,
       "name": "PaychanAndEscrowForTokens",
@@ -3126,6 +3220,12 @@
       "enabled": true,
       "name": "XRPFees",
       "supported": true
+    },
+    "94312150FFBA0E21B46244D7C4C6D66219C53C5F82FB7949F0832A6B56FB9631": {
+      "enabled": false,
+      "name": "Touch",
+      "supported": true,
+      "vetoed": true
     },
     "955DF3FA5891195A9DAEFA1DDC6BB244B545DDE1BAA84CBB25D5F12A8DA68A0C": {
       "enabled": true,
@@ -3183,6 +3283,11 @@
     "C4483A1896170C66C098DEA5B0E024309C60DC960DE5F01CD7AF986AA3D9AD37": {
       "enabled": true,
       "name": "fixMasterKeyAsRegularKey",
+      "supported": true
+    },
+    "C962119A75111083D118901B0D331959C620157FDEABA044398B992B829938C5": {
+      "enabled": true,
+      "name": "fixReduceImport",
       "supported": true
     },
     "CA7C02118BA27599528543DFE77BA6838D1B0F43B447D4D7F53523CE6A0E9AC2": {
@@ -3244,13 +3349,19 @@
       "name": "DepositAuth",
       "supported": true
     },
+    "FA4E4881FDB038DCD8D7DFD850A304546E0B2844CACC3AB97CA41136A03E49F5": {
+      "enabled": false,
+      "name": "Remarks",
+      "supported": true,
+      "vetoed": true
+    },
     "FBD513F1B893AC765B78F250E6FFA6A11B573209D1842ADC787C850696741288": {
       "enabled": true,
       "name": "fix1578",
       "supported": true
     }
   },
-  "hash": "FCD4DAD1C6374068BF2E128D23A4AAD212CE8864EEC2BBD1A15529F51EAD7896",
+  "hash": "E08D4476B0A8BC4A98F1CB9305406C6E020BB039D4563B1A6589B345284B546F",
   "native_currency_code": "XAH",
   "status": "success"
 }

@@ -1251,6 +1251,16 @@
       }
     ],
     [
+      "DomainID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -2541,6 +2551,16 @@
       }
     ],
     [
+      "AcceptedCredentials",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -2873,6 +2893,7 @@
     "Offer": 111,
     "Oracle": 128,
     "PayChannel": 120,
+    "PermissionedDomain": 130,
     "RippleState": 114,
     "SignerList": 83,
     "Ticket": 84,
@@ -3096,6 +3117,7 @@
     "NFTokenCancelOffer": 28,
     "NFTokenCreateOffer": 27,
     "NFTokenMint": 25,
+    "NFTokenModify": 61,
     "OfferCancel": 8,
     "OfferCreate": 7,
     "OracleDelete": 52,
@@ -3104,6 +3126,8 @@
     "PaymentChannelClaim": 15,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
+    "PermissionedDomainDelete": 63,
+    "PermissionedDomainSet": 62,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
@@ -3129,6 +3153,8 @@
     "Hash160": 17,
     "Hash192": 21,
     "Hash256": 5,
+    "Hash384": 22,
+    "Hash512": 23,
     "Issue": 24,
     "LedgerEntry": 10002,
     "Metadata": 10004,
@@ -3140,8 +3166,6 @@
     "Transaction": 10001,
     "UInt16": 1,
     "UInt32": 2,
-    "UInt384": 22,
-    "UInt512": 23,
     "UInt64": 3,
     "UInt8": 16,
     "UInt96": 20,
@@ -3152,22 +3176,28 @@
   },
   "TRANSACTION_FLAGS_INDICES": {
     "AccountSet": {
-        "asfAccountTxnID": 5,
-        "asfAuthorizedNFTokenMinter": 10,
-        "asfDefaultRipple": 8,
-        "asfDepositAuth": 9,
-        "asfDisableMaster": 4,
-        "asfDisallowIncomingCheck": 13,
-        "asfDisallowIncomingNFTokenOffer": 12,
-        "asfDisallowIncomingPayChan": 14,
-        "asfAllowTrustLineClawback": 16,
-        "asfDisallowIncomingTrustline": 15,
-        "asfDisallowXRP": 3,
-        "asfGlobalFreeze": 7,
-        "asfNoFreeze": 6,
-        "asfRequireAuth": 2,
-        "asfRequireDest": 1,
-        "asfTshCollect": 11
+      "asfAccountTxnID": 5,
+      "asfAuthorizedNFTokenMinter": 10,
+      "asfDefaultRipple": 8,
+      "asfDepositAuth": 9,
+      "asfDisableMaster": 4,
+      "asfDisallowIncomingCheck": 13,
+      "asfDisallowIncomingNFTokenOffer": 12,
+      "asfDisallowIncomingPayChan": 14,
+      "asfAllowTrustLineClawback": 16,
+      "asfDisallowIncomingTrustline": 15,
+      "asfDisallowXRP": 3,
+      "asfGlobalFreeze": 7,
+      "asfNoFreeze": 6,
+      "asfRequireAuth": 2,
+      "asfRequireDest": 1,
+      "asfTshCollect": 11
+    },
+    "MPTokenIssuanceCreate": {
+      "asfMPTRequireAuth": 1,
+      "asfMPTCanTransfer": 2,
+      "asfMPTCanLock": 3,
+      "asfMPTCanClawback": 4
     }
   },
   "TRANSACTION_FLAGS": {
@@ -3209,9 +3239,10 @@
       "tfOnlyXRP": 2,
       "tfTrustLine": 4,
       "tfTransferable": 8,
-      "tfApproveTransfers": 16,
-      "tfIssuerCanCancelOffers": 16,
-      "tfIssuerApprovalRequired": 32
+      "tfMutable": 16
+    },
+    "AMMClawback": {
+      "tfClawTwoAssets": 1
     },
     "NFTokenCreateOffer": {
       "tfSellToken": 1,
@@ -3222,7 +3253,8 @@
       "tfSingleAsset": 524288,
       "tfTwoAsset": 1048576,
       "tfOneAssetLPToken": 2097152,
-      "tfLimitLPToken": 4194304
+      "tfLimitLPToken": 4194304,
+      "tfTwoAssetIfEmpty": 8388608
     },
     "AMMWithdraw": {
       "tfLPToken": 65536,
@@ -3232,6 +3264,19 @@
       "tfTwoAsset": 1048576,
       "tfOneAssetLPToken": 2097152,
       "tfLimitLPToken": 4194304
+    },
+    "MPTokenAuthorize": {
+      "tfMPTUnauthorize": 1
+    },
+    "MPTokenIssuanceCreate": {
+      "tfMPTRequireAuth": 1,
+      "tfMPTCanTransfer": 2
+    },
+    "EscrowCreate": {
+      "tfUniversal": 1
+    },
+    "LedgerStateFix": {
+      "tfUniversal": 1
     }
   }
 }
