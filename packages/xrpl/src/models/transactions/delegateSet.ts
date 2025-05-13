@@ -60,13 +60,10 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     )
   }
 
-  const permissions = tx.Permissions
-  if (permissions == null) {
-    throw new ValidationError('DelegateSet: missing field Permissions')
-  }
-  if (!Array.isArray(permissions)) {
-    throw new ValidationError('DelegateSet: Permissions must be an array')
-  }
+  validateRequiredField(tx, 'Permissions', Array.isArray)
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required for validation
+  const permissions = tx.Permissions as DelegateSet['Permissions']
   if (permissions.length > PERMISSIONS_MAX_LENGTH) {
     throw new ValidationError(
       `DelegateSet: Permissions array length cannot be greater than ${PERMISSIONS_MAX_LENGTH}.`,

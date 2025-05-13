@@ -49,9 +49,9 @@ describe('DelegateSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it(`throws w/ Permissions must be an array`, function () {
+  it(`throws w/ invalid field Permissions`, function () {
     tx.Permissions = 'TrustlineAuthorize'
-    const errorMessage = 'DelegateSet: Permissions must be an array'
+    const errorMessage = 'DelegateSet: invalid field Permissions'
     assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
