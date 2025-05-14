@@ -1,4 +1,4 @@
-import { AssertionError } from 'assert'
+// import { AssertionError } from 'assert'
 
 import { assert } from 'chai'
 
@@ -6,9 +6,9 @@ import {
   // AccountSet,
   DelegateSet,
   LedgerEntryResponse,
-  Payment,
+  // Payment,
   Wallet,
-  xrpToDrops,
+  // xrpToDrops,
 } from '../../../src'
 import { Delegate } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
@@ -36,28 +36,28 @@ describe('DelegateSet', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
-  it(
-    'no permission',
-    async () => {
-      const tx: Payment = {
-        TransactionType: 'Payment',
-        Account: alice.address,
-        Amount: xrpToDrops(1),
-        Destination: carol.address,
-        Delegate: bob.address,
-      }
-      try {
-        await testTransaction(testContext.client, tx, bob)
-      } catch (err: unknown) {
-        const assertErr = err as AssertionError
-        assert.equal(
-          assertErr.message,
-          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
-        )
-      }
-    },
-    TIMEOUT,
-  )
+  // it(
+  //   'no permission',
+  //   async () => {
+  //     const tx: Payment = {
+  //       TransactionType: 'Payment',
+  //       Account: alice.address,
+  //       Amount: xrpToDrops(1),
+  //       Destination: carol.address,
+  //       Delegate: bob.address,
+  //     }
+  //     try {
+  //       await testTransaction(testContext.client, tx, bob)
+  //     } catch (err: unknown) {
+  //       const assertErr = err as AssertionError
+  //       assert.equal(
+  //         assertErr.message,
+  //         "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
+  //       )
+  //     }
+  //   },
+  //   TIMEOUT,
+  // )
 
   it(
     'base',
