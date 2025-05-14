@@ -4,7 +4,7 @@ import {
   Bytes,
   XrplDefinitionsBase,
 } from '../enums'
-import { SerializedType, JsonObject, JSON } from './serialized-type'
+import { SerializedType, JsonObject } from './serialized-type'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { BinaryParser } from '../serdes/binary-parser'
 import { BinarySerializer, BytesList } from '../serdes/binary-serializer'
@@ -19,7 +19,6 @@ const DESTINATION = 'Destination'
 const ACCOUNT = 'Account'
 const SOURCE_TAG = 'SourceTag'
 const DEST_TAG = 'DestinationTag'
-const PERMISSION_VALUE = 'PermissionValue'
 
 /**
  * Break down an X-Address into an account and a tag
@@ -110,21 +109,11 @@ class STObject extends SerializedType {
 
     const xAddressDecoded = Object.entries(value).reduce((acc, [key, val]) => {
       let handled: JsonObject | undefined = undefined
-      let updatedVal: JSON = val
       if (val && isValidXAddress(val.toString())) {
         handled = handleXAddress(key, val.toString())
         checkForDuplicateTags(handled, value)
-      } else if (key === PERMISSION_VALUE) {
-        const permissionName = val as string
-        if (permissionName in definitions.granularPermissionsNameToOrdinal) {
-          updatedVal =
-            definitions.granularPermissionsNameToOrdinal[permissionName]
-        } else {
-          updatedVal =
-            definitions.transactionType.from(permissionName).ordinal + 1
-        }
       }
-      return Object.assign(acc, handled ?? { [key]: updatedVal })
+      return Object.assign(acc, handled ?? { [key]: val })
     }, {})
 
     function isValidFieldInstance(
@@ -205,21 +194,9 @@ class STObject extends SerializedType {
         break
       }
 
-      let jsonValue = objectParser
+      accumulator[field.name] = objectParser
         .readFieldValue(field)
         .toJSON(definitions, field.name)
-      if (field.name === PERMISSION_VALUE) {
-        const txOrdinal = jsonValue as number
-        if (definitions?.granularPermissionsOrdinalToName[txOrdinal]) {
-          jsonValue = definitions?.granularPermissionsOrdinalToName[txOrdinal]
-        } else {
-          jsonValue = definitions?.transactionType.from(
-            (txOrdinal - 1).toString(),
-          ).name
-        }
-      }
-
-      accumulator[field.name] = jsonValue
     }
 
     return accumulator
