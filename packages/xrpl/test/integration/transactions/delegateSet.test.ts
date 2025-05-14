@@ -26,13 +26,13 @@ describe('DelegateSet', function () {
   let testContext: XrplIntegrationTestContext
   let alice: Wallet
   let bob: Wallet
-  let carol: Wallet
+  // let carol: Wallet
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
     alice = testContext.wallet
     bob = await generateFundedWallet(testContext.client)
-    carol = await generateFundedWallet(testContext.client)
+    // carol = await generateFundedWallet(testContext.client)
   })
   afterEach(async () => teardownClient(testContext))
 
