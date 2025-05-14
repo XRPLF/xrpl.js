@@ -173,6 +173,12 @@ class STObject extends SerializedType {
       if (field.type.name === ST_OBJECT) {
         bytes.put(OBJECT_END_MARKER_BYTE)
       }
+      // debug
+      if (field.name === 'PermissionValue') {
+        console.log('inside from - if PermissionValue')
+        console.log('associatedValue:')
+        console.log(associatedValue)
+      }
     })
 
     return new STObject(list.toBytes())
@@ -197,6 +203,13 @@ class STObject extends SerializedType {
       accumulator[field.name] = objectParser
         .readFieldValue(field)
         .toJSON(definitions, field.name)
+
+      // debug
+      if (field.name === 'PermissionValue') {
+        console.log('inside toJSON - if PermissionValue')
+        console.log('accumulator[field.name]:')
+        console.log(accumulator[field.name])
+      }
     }
 
     return accumulator
