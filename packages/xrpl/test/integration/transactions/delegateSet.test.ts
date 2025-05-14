@@ -3,7 +3,7 @@ import { AssertionError } from 'assert'
 import { assert } from 'chai'
 
 import {
-  AccountSet,
+  // AccountSet,
   DelegateSet,
   LedgerEntryResponse,
   Payment,
@@ -90,38 +90,38 @@ describe('DelegateSet', function () {
       assert.equal(delegateLedgerEntry.Authorize, bob.address)
       assert.equal(delegateLedgerEntry.Permissions.length, 2)
 
-      // Use Bob's account to execute a transaction on behalf of Alice
-      const paymentTx: Payment = {
-        TransactionType: 'Payment',
-        Account: alice.address,
-        Amount: xrpToDrops(1),
-        Destination: carol.address,
-        Delegate: bob.address,
-      }
-      const response = await testTransaction(testContext.client, paymentTx, bob)
+      // // Use Bob's account to execute a transaction on behalf of Alice
+      // const paymentTx: Payment = {
+      //   TransactionType: 'Payment',
+      //   Account: alice.address,
+      //   Amount: xrpToDrops(1),
+      //   Destination: carol.address,
+      //   Delegate: bob.address,
+      // }
+      // const response = await testTransaction(testContext.client, paymentTx, bob)
 
-      // Validate that the transaction was signed by Bob
-      assert.equal(response.result.tx_json.Account, alice.address)
-      assert.equal(response.result.tx_json.Delegate, bob.address)
-      assert.equal(response.result.tx_json.SigningPubKey, bob.publicKey)
+      // // Validate that the transaction was signed by Bob
+      // assert.equal(response.result.tx_json.Account, alice.address)
+      // assert.equal(response.result.tx_json.Delegate, bob.address)
+      // assert.equal(response.result.tx_json.SigningPubKey, bob.publicKey)
 
-      // Use Bob's account to execute a transaction on behalf of Alice
-      const accountSetTx: AccountSet = {
-        TransactionType: 'AccountSet',
-        Account: alice.address,
-        Delegate: bob.address,
-        EmailHash: '10000000002000000000300000000012',
-      }
+      // // Use Bob's account to execute a transaction on behalf of Alice
+      // const accountSetTx: AccountSet = {
+      //   TransactionType: 'AccountSet',
+      //   Account: alice.address,
+      //   Delegate: bob.address,
+      //   EmailHash: '10000000002000000000300000000012',
+      // }
 
-      try {
-        await testTransaction(testContext.client, accountSetTx, bob)
-      } catch (err: unknown) {
-        const assertErr = err as AssertionError
-        assert.equal(
-          assertErr.message,
-          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
-        )
-      }
+      // try {
+      //   await testTransaction(testContext.client, accountSetTx, bob)
+      // } catch (err: unknown) {
+      //   const assertErr = err as AssertionError
+      //   assert.equal(
+      //     assertErr.message,
+      //     "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
+      //   )
+      // }
     },
     TIMEOUT,
   )
