@@ -5,7 +5,9 @@ import { assert } from 'chai'
 import {
   AccountSet,
   DelegateSet,
+  LedgerDataResponse,
   LedgerEntryResponse,
+  LedgerIndex,
   Payment,
   Wallet,
   xrpToDrops,
@@ -61,6 +63,7 @@ describe('DelegateSet', function () {
 
   it(
     'base',
+    // eslint-disable-next-line max-statements -- needed for ledger data/entry checks
     async () => {
       // Authorize Bob account to execute Payment transactions and
       // modify the domain of an account behalf of Alice's account.
@@ -75,7 +78,7 @@ describe('DelegateSet', function () {
       }
       await testTransaction(testContext.client, delegateTx, alice)
 
-      // Fetch Delegate ledger entry
+      // Verify Delegate ledger entry
       const ledgerEntryRes: LedgerEntryResponse =
         await testContext.client.request({
           command: 'ledger_entry',
@@ -89,6 +92,46 @@ describe('DelegateSet', function () {
       assert.equal(delegateLedgerEntry.Account, alice.address)
       assert.equal(delegateLedgerEntry.Authorize, bob.address)
       assert.equal(delegateLedgerEntry.Permissions.length, 2)
+
+      // Verify Delegate ledger data
+      const grantedPermissions = new Set<string>()
+      let marker: unknown
+      let ledgerIndex: LedgerIndex = 'validated'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-constant-condition -- required
+      while (true) {
+        const ledgerDataRes: LedgerDataResponse =
+          // eslint-disable-next-line no-await-in-loop -- required
+          await testContext.client.request({
+            command: 'ledger_data',
+            type: 'delegate',
+            ledger_index: ledgerIndex,
+            marker,
+          })
+        for (const entry of ledgerDataRes.result.state) {
+          const delegateEntry = entry as Delegate
+          // eslint-disable-next-line max-depth -- required
+          if (
+            delegateEntry.Account === alice.address &&
+            delegateEntry.Authorize === bob.address
+          ) {
+            grantedPermissions.add(
+              delegateEntry.Permissions[0].Permission.PermissionValue,
+            )
+            grantedPermissions.add(
+              delegateEntry.Permissions[1].Permission.PermissionValue,
+            )
+          }
+        }
+
+        if (!ledgerDataRes.result.marker) {
+          break
+        }
+        marker = ledgerDataRes.result.marker
+        ledgerIndex = ledgerDataRes.result.ledger_index
+      }
+      assert.equal(grantedPermissions.size, 2)
+      assert.isTrue(grantedPermissions.has('Payment'))
+      assert.isTrue(grantedPermissions.has('AccountDomainSet'))
 
       // Use Bob's account to execute a transaction on behalf of Alice
       const paymentTx: Payment = {
