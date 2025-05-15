@@ -4,6 +4,7 @@ import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
+import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
@@ -27,6 +28,7 @@ type LedgerEntry =
   | Bridge
   | Check
   | Credential
+  | Delegate
   | DepositPreauth
   | DirectoryNode
   | Escrow
@@ -50,6 +52,7 @@ type LedgerEntryFilter =
   | 'bridge'
   | 'check'
   | 'credential'
+  | 'delegate'
   | 'deposit_preauth'
   | 'did'
   | 'directory'
