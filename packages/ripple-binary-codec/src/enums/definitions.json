@@ -671,6 +671,16 @@
       }
     ],
     [
+      "PermissionValue",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 52,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1961,6 +1971,16 @@
       }
     ],
     [
+      "Delegate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 12,
+        "type": "AccountID"
+      }
+    ],
+    [
       "HookAccount",
       {
         "isSerialized": true,
@@ -2177,6 +2197,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 14,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Permission",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 15,
         "type": "STObject"
       }
     ],
@@ -2591,7 +2621,7 @@
       }
     ],
     [
-      "RawTransactions",
+      "Permissions",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -2601,12 +2631,22 @@
       }
     ],
     [
+      "RawTransactions",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 30,
+        "type": "STArray"
+      }
+    ],
+    [
       "BatchSigners",
       {
         "isSerialized": true,
         "isSigningField": false,
         "isVLEncoded": false,
-        "nth": 30,
+        "nth": 31,
         "type": "STArray"
       }
     ],
@@ -2929,6 +2969,7 @@
     "Check": 67,
     "Credential": 129,
     "DID": 73,
+    "Delegate": 131,
     "DepositPreauth": 112,
     "DirectoryNode": 100,
     "Escrow": 117,
@@ -3149,7 +3190,7 @@
     "AMMWithdraw": 37,
     "AccountDelete": 21,
     "AccountSet": 3,
-    "Batch": 64,
+    "Batch": 65,
     "CheckCancel": 18,
     "CheckCash": 17,
     "CheckCreate": 16,
@@ -3159,6 +3200,7 @@
     "CredentialDelete": 60,
     "DIDDelete": 50,
     "DIDSet": 49,
+    "DelegateSet": 64,
     "DepositPreauth": 19,
     "EnableAmendment": 100,
     "EscrowCancel": 4,
