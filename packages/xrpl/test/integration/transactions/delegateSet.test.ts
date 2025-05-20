@@ -1,5 +1,3 @@
-import { AssertionError } from 'assert'
-
 import { assert } from 'chai'
 
 import {
@@ -46,15 +44,14 @@ describe('DelegateSet', function () {
         Destination: carol.address,
         Delegate: bob.address,
       }
-      try {
-        await testTransaction(testContext.client, tx, bob)
-      } catch (err: unknown) {
-        const assertErr = err as AssertionError
-        assert.equal(
-          assertErr.message,
-          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
-        )
-      }
+      // Expect transaction to fail with tecNO_PERMISSION error
+      await testTransaction(
+        testContext.client,
+        tx,
+        bob,
+        undefined,
+        'tecNO_PERMISSION',
+      )
     },
     TIMEOUT,
   )
