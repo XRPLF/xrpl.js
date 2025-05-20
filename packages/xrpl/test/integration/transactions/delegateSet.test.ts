@@ -61,7 +61,6 @@ describe('DelegateSet', function () {
 
   it(
     'base',
-
     async () => {
       // Authorize Bob account to execute Payment transactions and
       // modify the domain of an account behalf of Alice's account.
@@ -115,7 +114,15 @@ describe('DelegateSet', function () {
       }
 
       try {
-        await testTransaction(testContext.client, accountSetTx, bob)
+        // eslint-disable-next-line no-console -- for testing error
+        console.log('before failing testTransaction')
+        await testTransaction(
+          testContext.client,
+          accountSetTx,
+          bob,
+          undefined,
+          true,
+        )
       } catch (err: unknown) {
         const assertErr = err as AssertionError
         assert.equal(
