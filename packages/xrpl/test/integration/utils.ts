@@ -232,6 +232,8 @@ export async function verifySubmittedTransaction(
  *               the server's sequence numbers. This is a fix to retry the transaction if it fails due to tefPAST_SEQ.
  * @param retry.count - How many times the request should be retried.
  * @param retry.delayMs - How long to wait between retries.
+ * @param errCode - When this parameter is defined, it signifies the transaction should fail with the expected
+ *                  errCode (e.g. tecNO_PERMISSION).
  * @returns The response of the transaction.
  */
 // eslint-disable-next-line max-params -- Test function, many params are needed
@@ -243,6 +245,7 @@ export async function testTransaction(
     count: number
     delayMs: number
   },
+  errCode?: string,
 ): Promise<SubmitResponse> {
   // Accept any un-validated changes.
 
@@ -256,6 +259,11 @@ export async function testTransaction(
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')
+
+  if (errCode) {
+    assert.equal(errCode, response.result.engine_result)
+    return response
+  }
 
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- See output
