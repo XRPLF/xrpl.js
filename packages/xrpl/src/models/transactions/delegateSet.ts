@@ -15,6 +15,7 @@ const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'SignerListSet',
   'DelegateSet',
   'AccountDelete',
+  'Batch',
 ])
 
 export interface Permission {
