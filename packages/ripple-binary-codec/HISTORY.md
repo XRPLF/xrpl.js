@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+* Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d).
 * Support for the `Batch` amendment (XLS-56).
 
 ### Fixed
