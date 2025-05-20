@@ -5,9 +5,7 @@ import { assert } from 'chai'
 import {
   AccountSet,
   DelegateSet,
-  LedgerDataResponse,
   LedgerEntryResponse,
-  LedgerIndex,
   Payment,
   Wallet,
   xrpToDrops,
