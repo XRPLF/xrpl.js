@@ -260,7 +260,7 @@ export async function testTransaction(
   // check that the transaction was successful
   assert.equal(response.type, 'response')
 
-  if (typeof errCode === 'string') {
+  if (errCode) {
     assert.equal(errCode, response.result.engine_result)
     return response
   }
