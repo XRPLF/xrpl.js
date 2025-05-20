@@ -113,23 +113,14 @@ describe('DelegateSet', function () {
         EmailHash: '10000000002000000000300000000012',
       }
 
-      try {
-        // eslint-disable-next-line no-console -- for testing error
-        console.log('before failing testTransaction')
-        await testTransaction(
-          testContext.client,
-          accountSetTx,
-          bob,
-          undefined,
-          true,
-        )
-      } catch (err: unknown) {
-        const assertErr = err as AssertionError
-        assert.equal(
-          assertErr.message,
-          "No permission to perform requested operation.: expected 'tecNO_PERMISSION' to equal 'tesSUCCESS'",
-        )
-      }
+      // Expect transaction to fail with tecNO_PERMISSION error
+      await testTransaction(
+        testContext.client,
+        accountSetTx,
+        bob,
+        undefined,
+        'tecNO_PERMISSION',
+      )
     },
     TIMEOUT,
   )

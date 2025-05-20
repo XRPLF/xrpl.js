@@ -1,4 +1,3 @@
-/* eslint-disable no-console -- for testing */
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
@@ -170,6 +169,7 @@ export async function fundAccount(
   })
 
   if (response.result.engine_result !== 'tesSUCCESS') {
+    // eslint-disable-next-line no-console -- happens only when something goes wrong
     console.log(response)
     assert.fail(`Response not successful, ${response.result.engine_result}`)
   }
@@ -232,8 +232,8 @@ export async function verifySubmittedTransaction(
  *               the server's sequence numbers. This is a fix to retry the transaction if it fails due to tefPAST_SEQ.
  * @param retry.count - How many times the request should be retried.
  * @param retry.delayMs - How long to wait between retries.
- * @param errCode - The error code for an expected failed transaction. When this parameter is used, it signifies the
- *                  transaction should fail.
+ * @param errCode - When this parameter is defined, it signifies the transaction should fail with the expected
+ *                  errCode (e.g. tecNO_PERMISSION).
  * @returns The response of the transaction.
  */
 // eslint-disable-next-line max-params -- Test function, many params are needed
@@ -245,7 +245,7 @@ export async function testTransaction(
     count: number
     delayMs: number
   },
-  errCode?: boolean,
+  errCode?: string,
 ): Promise<SubmitResponse> {
   // Accept any un-validated changes.
 
@@ -257,28 +257,22 @@ export async function testTransaction(
     retry,
   })
 
-  if (errCode) {
-    console.log('inside testTransaction if errCode')
-    console.log('response.type:')
-    console.log(response.type)
-    console.log('response.result.engine_result:')
-    console.log(response.result.engine_result)
-    console.log('response.result.engine_result_code:')
-    console.log(response.result.engine_result_code)
-    console.log('JSON.stringify(response):')
-    console.log(JSON.stringify(response))
-  }
-
   // check that the transaction was successful
   assert.equal(response.type, 'response')
 
+  if (errCode != null) {
+    assert.equal(errCode, response.result.engine_result)
+    return response
+  }
+
   if (response.result.engine_result !== 'tesSUCCESS') {
+    // eslint-disable-next-line no-console -- See output
     console.error(
       `Transaction was not successful. Expected response.result.engine_result to be tesSUCCESS but got ${response.result.engine_result}`,
     )
-
+    // eslint-disable-next-line no-console -- See output
     console.error('The transaction was: ', transaction)
-
+    // eslint-disable-next-line no-console -- See output
     console.error('The response was: ', JSON.stringify(response))
   }
 
