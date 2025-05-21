@@ -15,7 +15,7 @@ const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'SignerListSet',
   'DelegateSet',
   'AccountDelete',
-  // Pseduo transactions below:
+  // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',
   'UNLModify',
