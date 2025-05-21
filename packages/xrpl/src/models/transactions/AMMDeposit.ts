@@ -3,7 +3,7 @@ import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
   isCurrency,
   isIssuedCurrency,
@@ -24,7 +24,7 @@ export enum AMMDepositFlags {
   tfTwoAssetIfEmpty = 0x00800000,
 }
 
-export interface AMMDepositFlagsInterface extends GlobalFlags {
+export interface AMMDepositFlagsInterface extends GlobalFlagsInterface {
   tfLPToken?: boolean
   tfSingleAsset?: boolean
   tfTwoAsset?: boolean

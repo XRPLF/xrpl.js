@@ -3,6 +3,7 @@ const {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningBatch,
 } = require('../src')
 
 const normalDefinitions = require('../src/enums/definitions.json')
@@ -241,6 +242,29 @@ describe('Signing data', function () {
         '43904CBFCDCEC530B4037871F86EE90BF799DF8D2E0EA564BC8A3F332E4F5FB1',
         // amount as a uint64
         '00000000000003E8',
+      ].join(''),
+    )
+  })
+
+  it('can create batch blob', function () {
+    const flags = 1
+    const txIDs = [
+      'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+      '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+    ]
+    const json = { flags, txIDs }
+    const actual = encodeForSigningBatch(json)
+    expect(actual).toBe(
+      [
+        // hash prefix
+        '42434800',
+        // flags
+        '00000001',
+        // txIds length
+        '00000002',
+        // txIds
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
       ].join(''),
     )
   })
