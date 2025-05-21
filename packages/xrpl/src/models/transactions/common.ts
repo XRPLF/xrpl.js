@@ -375,6 +375,10 @@ export interface BaseTransaction {
    * The network id of the transaction.
    */
   NetworkID?: number
+  /**
+   * The delegate account that is sending the transaction.
+   */
+  Delegate?: Account
 }
 
 /**
@@ -385,6 +389,7 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
+// eslint-disable-next-line max-statements -- lines required for validation
 export function validateBaseTransaction(
   common: unknown,
 ): asserts common is BaseTransaction {
@@ -439,6 +444,15 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'TxnSignature', isString)
 
   validateOptionalField(common, 'NetworkID', isNumber)
+
+  validateOptionalField(common, 'Delegate', isAccount)
+
+  const delegate = common.Delegate
+  if (delegate != null && delegate === common.Account) {
+    throw new ValidationError(
+      'BaseTransaction: Account and Delegate addresses cannot be the same',
+    )
+  }
 }
 
 /**
