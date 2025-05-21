@@ -16,6 +16,10 @@ const NON_DELEGATABLE_TRANSACTIONS = new Set([
   'DelegateSet',
   'AccountDelete',
   'Batch',
+  // Pseudo transactions below:
+  'EnableAmendment',
+  'SetFee',
+  'UNLModify',
 ])
 
 export interface Permission {
