@@ -7,13 +7,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for `NFTokenMintOffer` (XLS-52)
 * Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d)
-* Adds pseudo transactions to `NON_DELEGATABLE_TRANSACTIONS`
 
 ### Fixed
 * `OracleSet` transaction accepts hexadecimal string values for `AssetPrice` field
 * `TransactionStream` model includes `hash` field in APIv2
 * `TransactionStream` model includes `close_time_iso` field only for APIv2
 * Adds `MPTCurrency` type
+* Adds pseudo transactions to `NON_DELEGATABLE_TRANSACTIONS`
 
 ## 4.2.0 (2025-2-13)
 
