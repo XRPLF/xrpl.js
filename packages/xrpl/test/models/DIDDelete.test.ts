@@ -1,7 +1,7 @@
-import { assert } from 'chai'
-
-import { validate } from '../../src'
 import { validateDIDDelete } from '../../src/models/transactions/DIDDelete'
+import { assertTxIsValid } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateDIDDelete)
 
 /**
  * DIDDelete Transaction Verification Testing.
@@ -9,7 +9,7 @@ import { validateDIDDelete } from '../../src/models/transactions/DIDDelete'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('DIDDelete', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -22,13 +22,6 @@ describe('DIDDelete', function () {
   })
 
   it('verifies valid DIDDelete', function () {
-    assert.doesNotThrow(() => validateDIDDelete(tx))
-    assert.doesNotThrow(() => validate(tx))
-  })
-
-  it('throws on invalid DIDDelete', function () {
-    tx.FakeField = 'blah'
-    assert.doesNotThrow(() => validateDIDDelete(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 })
