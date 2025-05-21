@@ -105,6 +105,14 @@ describe('DelegateSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
+  it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {
+    tx.Permissions = [{ Permission: { PermissionValue: 'EnableAmendment' } }]
+    const errorMessage =
+      'DelegateSet: PermissionValue contains a non-delegatable transaction EnableAmendment'
+    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
+    assert.throws(() => validate(tx), ValidationError, errorMessage)
+  })
+
   it(`throws w/ Permissions array cannot contain duplicate values`, function () {
     tx.Permissions = [
       { Permission: { PermissionValue: 'Payment' } },
