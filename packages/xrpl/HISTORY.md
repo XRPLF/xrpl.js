@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for `NFTokenMintOffer` (XLS-52)
 * Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d)
+* Adds pseudo transactions to `NON_DELEGATABLE_TRANSACTIONS`
 
 ### Fixed
 * `OracleSet` transaction accepts hexadecimal string values for `AssetPrice` field
