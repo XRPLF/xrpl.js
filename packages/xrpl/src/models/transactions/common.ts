@@ -389,7 +389,7 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-// eslint-disable-next-line max-statements -- lines required for validation
+// eslint-disable-next-line max-statements, max-lines-per-function -- lines required for validation
 export function validateBaseTransaction(
   common: unknown,
 ): asserts common is BaseTransaction {
