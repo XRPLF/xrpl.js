@@ -3,7 +3,6 @@ import { LedgerIndex } from '../common'
 import type { Request } from '.'
 
 export interface BaseRequest {
-  [x: string]: unknown
   /**
    * A unique value to identify this request. The response to this request uses
    * the same id field. This way, even if responses arrive out of order, you
@@ -12,6 +11,8 @@ export interface BaseRequest {
   id?: number | string
   /** The name of the API method. */
   command: string
+  /** Enable strict-mode. If omitted, use false. */
+  strict?: boolean
   /** The API version to use. If omitted, use version 1. */
   api_version?: number
 }
