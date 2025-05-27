@@ -23,6 +23,7 @@ import { BaseTransaction, isIssuedCurrency } from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
+import { DelegateSet, validateDelegateSet } from './delegateSet'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -141,6 +142,7 @@ export type SubmittableTransaction =
   | CredentialDelete
   | DIDDelete
   | DIDSet
+  | DelegateSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
@@ -341,6 +343,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'DIDSet':
       validateDIDSet(tx)
+      break
+
+    case 'DelegateSet':
+      validateDelegateSet(tx)
       break
 
     case 'DepositPreauth':
