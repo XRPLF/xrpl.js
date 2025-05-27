@@ -206,7 +206,7 @@ describe('Wallet batch operations', function () {
       assert.throws(
         () => signMultiBatch(otherWallet, transaction),
         ValidationError,
-        'Must be signing for an address included in the Batch.',
+        'Must be signing for an address submitting a transaction included in the Batch.',
       )
     })
 
