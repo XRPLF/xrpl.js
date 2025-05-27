@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { AuthorizeCredential, validate, ValidationError } from '../../src'

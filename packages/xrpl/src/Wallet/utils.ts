@@ -1,4 +1,4 @@
-import { bytesToHex } from '@xrplf/isomorphic/dist/utils'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { decodeAccountID } from 'ripple-address-codec'
 import { decode, encode } from 'ripple-binary-codec'
