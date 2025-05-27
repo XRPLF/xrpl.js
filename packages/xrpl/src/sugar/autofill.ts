@@ -487,8 +487,8 @@ export async function autofillBatchTxn(
       throw new XrplError('Must not have `Signers` in inner Batch transaction.')
     }
 
-    if (txn.NetworkID == null) {
-      txn.NetworkID = txNeedsNetworkID(client) ? client.networkID : undefined
+    if (txn.NetworkID == null && txNeedsNetworkID(client)) {
+      txn.NetworkID = client.networkID
     }
   }
 }
