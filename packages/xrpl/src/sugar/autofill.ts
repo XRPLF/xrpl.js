@@ -141,29 +141,27 @@ export function setValidAddresses(tx: Transaction): void {
  * @param tagField - The field name for the tag in the transaction object.
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
-function validateAccountAddress<
-  T extends Transaction,
-  K extends keyof T & string,
-  K2 extends keyof T & string,
->(tx: T, accountField: K, tagField: K2): void {
-  const val = tx[accountField]
-
-  if (typeof val !== 'string') {
-    throw new Error(`${accountField} must be a string`)
-  }
+function validateAccountAddress(
+  tx: Transaction,
+  accountField: string,
+  tagField: string,
+): void {
   // if X-address is given, convert it to classic address
-  const { classicAccount, tag } = getClassicAccountAndTag(val)
-  // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- param reassign is safe
-  ;(tx as Record<K, string>)[accountField] = classicAccount
+  const { classicAccount, tag } = getClassicAccountAndTag(
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
+    tx[accountField] as string,
+  )
+  // eslint-disable-next-line no-param-reassign -- param reassign is safe
+  tx[accountField] = classicAccount
 
   if (tag != null && tag !== false) {
-    if (tagField in tx && tx[tagField] !== tag) {
+    if (tx[tagField] && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
       )
     }
-    // eslint-disable-next-line no-param-reassign, @typescript-eslint/consistent-type-assertions -- param reassign is safe
-    ;(tx as Record<K2, number | false>)[tagField] = tag
+    // eslint-disable-next-line no-param-reassign -- param reassign is safe
+    tx[tagField] = tag
   }
 }
 
