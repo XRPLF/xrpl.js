@@ -223,6 +223,11 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
         xchain_owned_create_account_claim_id: string | number
       }
     | string
+
+  delegate?: {
+    account: string
+    authorize: string
+  }
 }
 
 /**
