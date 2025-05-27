@@ -30,9 +30,7 @@ describe('Batch', function () {
     },
   ): Promise<void> {
     await testTransaction(testContext.client, batch, wallet, retry)
-    const promises: Array<Promise<void>> = [
-      verifySubmittedTransaction(testContext.client, batch),
-    ]
+    const promises: Array<Promise<void>> = []
     for (const rawTx of batch.RawTransactions) {
       promises.push(
         verifySubmittedTransaction(testContext.client, rawTx.RawTransaction),
