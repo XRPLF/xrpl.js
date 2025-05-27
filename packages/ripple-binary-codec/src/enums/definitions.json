@@ -1271,12 +1271,22 @@
       }
     ],
     [
-      "ParentBatchID",
+      "VaultID",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 35,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ParentBatchID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 36,
         "type": "Hash256"
       }
     ],
@@ -2071,6 +2081,46 @@
       }
     ],
     [
+      "AssetsAvailable",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 2,
+        "type": "Number"
+      }
+    ],
+    [
+      "AssetsMaximum",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 3,
+        "type": "Number"
+      }
+    ],
+    [
+      "AssetsTotal",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 4,
+        "type": "Number"
+      }
+    ],
+    [
+      "LossUnrealized",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 5,
+        "type": "Number"
+      }
+    ],
+    [
       "TransactionMetaData",
       {
         "isSerialized": true,
@@ -2741,6 +2791,16 @@
       }
     ],
     [
+      "WithdrawalPolicy",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 20,
+        "type": "UInt8"
+      }
+    ],
+    [
       "TakerPaysCurrency",
       {
         "isSerialized": true,
@@ -2847,6 +2907,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 1,
+        "type": "Hash192"
+      }
+    ],
+    [
+      "ShareMPTID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 2,
         "type": "Hash192"
       }
     ],
@@ -2988,6 +3058,7 @@
     "RippleState": 114,
     "SignerList": 83,
     "Ticket": 84,
+    "Vault": 132,
     "XChainOwnedClaimID": 113,
     "XChainOwnedCreateAccountClaimID": 116
   },
@@ -3024,6 +3095,7 @@
     "tecINVALID_UPDATE_TIME": 188,
     "tecINVARIANT_FAILED": 147,
     "tecKILLED": 150,
+    "tecLIMIT_EXCEEDED": 195,
     "tecLOCKED": 192,
     "tecMAX_SEQUENCE_REACHED": 154,
     "tecNEED_MASTER_KEY": 142,
@@ -3047,6 +3119,7 @@
     "tecOWNERS": 132,
     "tecPATH_DRY": 128,
     "tecPATH_PARTIAL": 101,
+    "tecPSEUDO_ACCOUNT": 196,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecTOO_SOON": 152,
     "tecUNFUNDED": 129,
@@ -3054,6 +3127,7 @@
     "tecUNFUNDED_AMM": 162,
     "tecUNFUNDED_OFFER": 103,
     "tecUNFUNDED_PAYMENT": 104,
+    "tecWRONG_ASSET": 194,
     "tecXCHAIN_ACCOUNT_CREATE_PAST": 181,
     "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 182,
     "tecXCHAIN_BAD_CLAIM_ID": 172,
@@ -3164,6 +3238,7 @@
     "temXCHAIN_BRIDGE_NONDOOR_OWNER": -257,
     "temXCHAIN_EQUAL_DOOR_ACCOUNTS": -260,
 
+    "terADDRESS_COLLISION": -86,
     "terFUNDS_SPENT": -98,
     "terINSUF_FEE_B": -97,
     "terLAST": -91,
@@ -3190,7 +3265,7 @@
     "AMMWithdraw": 37,
     "AccountDelete": 21,
     "AccountSet": 3,
-    "Batch": 65,
+    "Batch": 71,
     "CheckCancel": 18,
     "CheckCash": 17,
     "CheckCreate": 16,
@@ -3234,6 +3309,12 @@
     "TicketCreate": 10,
     "TrustSet": 20,
     "UNLModify": 102,
+    "VaultClawback": 70,
+    "VaultCreate": 65,
+    "VaultDelete": 67,
+    "VaultDeposit": 68,
+    "VaultSet": 66,
+    "VaultWithdraw": 69,
     "XChainAccountCreateCommit": 44,
     "XChainAddAccountCreateAttestation": 46,
     "XChainAddClaimAttestation": 45,
