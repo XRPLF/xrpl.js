@@ -6,6 +6,7 @@ import {
   LEDGER_ENTRY_WIDTH,
   TRANSACTION_TYPE_WIDTH,
   TRANSACTION_RESULT_WIDTH,
+  DELEGATABLE_PERMISSIONS_WIDTH,
 } from './constants'
 
 interface DefinitionsData {
@@ -35,6 +36,10 @@ class XrplDefinitionsBase {
   transactionNames: string[]
   // Maps serializable types to their TypeScript class implementation
   dataTypes: Record<string, typeof SerializedType>
+  // Maps granular permissions names to their corresponding integer ids
+  granularPermissions: Record<string, number>
+  // Defined delegatable permissions
+  delegatablePermissions: BytesLookup
 
   /**
    * Present rippled types in a typed and updatable format.
@@ -75,6 +80,36 @@ class XrplDefinitionsBase {
 
     this.dataTypes = {} // Filled in via associateTypes
     this.associateTypes(types)
+
+    this.granularPermissions = {
+      TrustlineAuthorize: 65537,
+      TrustlineFreeze: 65538,
+      TrustlineUnfreeze: 65539,
+      AccountDomainSet: 65540,
+      AccountEmailHashSet: 65541,
+      AccountMessageKeySet: 65542,
+      AccountTransferRateSet: 65543,
+      AccountTickSizeSet: 65544,
+      PaymentMint: 65545,
+      PaymentBurn: 65546,
+      MPTokenIssuanceLock: 65547,
+      MPTokenIssuanceUnlock: 65548,
+    }
+
+    const incrementedTransactionTypes = Object.fromEntries(
+      Object.entries(enums.TRANSACTION_TYPES).map(([key, value]) => [
+        key,
+        value + 1,
+      ]),
+    )
+    const combinedPermissions = {
+      ...this.granularPermissions,
+      ...incrementedTransactionTypes,
+    }
+    this.delegatablePermissions = new BytesLookup(
+      combinedPermissions,
+      DELEGATABLE_PERMISSIONS_WIDTH,
+    )
   }
 
   /**
@@ -94,6 +129,7 @@ class XrplDefinitionsBase {
     this.field['TransactionType'].associatedType = this.transactionType
     this.field['TransactionResult'].associatedType = this.transactionResult
     this.field['LedgerEntryType'].associatedType = this.ledgerEntryType
+    this.field['PermissionValue'].associatedType = this.delegatablePermissions
   }
 
   public getAssociatedTypes(): Record<string, typeof SerializedType> {
