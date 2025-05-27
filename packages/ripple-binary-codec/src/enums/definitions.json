@@ -671,6 +671,16 @@
       }
     ],
     [
+      "PermissionValue",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 52,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1951,6 +1961,16 @@
       }
     ],
     [
+      "Delegate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 12,
+        "type": "AccountID"
+      }
+    ],
+    [
       "HookAccount",
       {
         "isSerialized": true,
@@ -2167,6 +2187,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 14,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Permission",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 15,
         "type": "STObject"
       }
     ],
@@ -2561,6 +2591,16 @@
       }
     ],
     [
+      "Permissions",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 29,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -2879,6 +2919,7 @@
     "Check": 67,
     "Credential": 129,
     "DID": 73,
+    "Delegate": 131,
     "DepositPreauth": 112,
     "DirectoryNode": 100,
     "Escrow": 117,
@@ -3107,6 +3148,7 @@
     "CredentialDelete": 60,
     "DIDDelete": 50,
     "DIDSet": 49,
+    "DelegateSet": 64,
     "DepositPreauth": 19,
     "EnableAmendment": 100,
     "EscrowCancel": 4,

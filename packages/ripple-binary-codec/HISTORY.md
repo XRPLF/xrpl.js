@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d)
+
 ### Fixed
 * add `MPTCurrency` support in `Issue` (rippled internal type)
 * Throw an error during serialization if a field is unknown, rather than silently throwing it away.
