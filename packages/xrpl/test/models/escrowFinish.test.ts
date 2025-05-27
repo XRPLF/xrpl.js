@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateEscrowFinish } from '../../src/models/transactions/escrowFinish'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateEscrowFinish)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateEscrowFinish, message)
 
 /**
  * EscrowFinish Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateEscrowFinish } from '../../src/models/transactions/escrowFinish
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('EscrowFinish', function () {
-  let escrow
+  let escrow: any
 
   beforeEach(function () {
     escrow = {
@@ -26,8 +28,7 @@ describe('EscrowFinish', function () {
     }
   })
   it(`verifies valid EscrowFinish`, function () {
-    assert.doesNotThrow(() => validateEscrowFinish(escrow))
-    assert.doesNotThrow(() => validate(escrow))
+    assertValid(escrow)
   })
 
   it(`verifies valid EscrowFinish w/o optional`, function () {
@@ -35,75 +36,37 @@ describe('EscrowFinish', function () {
     escrow.Fulfillment = undefined
     escrow.CredentialIDs = undefined
 
-    assert.doesNotThrow(() => validateEscrowFinish(escrow))
-    assert.doesNotThrow(() => validate(escrow))
+    assertValid(escrow)
   })
 
   it(`verifies valid EscrowFinish w/string OfferSequence`, function () {
     escrow.OfferSequence = '7'
 
-    assert.doesNotThrow(() => validateEscrowFinish(escrow))
-    assert.doesNotThrow(() => validate(escrow))
+    assertValid(escrow)
   })
 
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      'EscrowFinish: invalid field Owner',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowFinish: invalid field Owner',
-    )
+    assertInvalid(escrow, 'EscrowFinish: invalid field Owner')
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
     escrow.OfferSequence = 'random'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      'EscrowFinish: OfferSequence must be a number',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowFinish: OfferSequence must be a number',
-    )
+    assertInvalid(escrow, 'EscrowFinish: OfferSequence must be a number')
   })
 
   it(`throws w/ invalid Condition`, function () {
     escrow.Condition = 10
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      'EscrowFinish: Condition must be a string',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowFinish: Condition must be a string',
-    )
+    assertInvalid(escrow, 'EscrowFinish: Condition must be a string')
   })
 
   it(`throws w/ invalid Fulfillment`, function () {
     escrow.Fulfillment = 0x142341
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      'EscrowFinish: Fulfillment must be a string',
-    )
-    assert.throws(
-      () => validate(escrow),
-      ValidationError,
-      'EscrowFinish: Fulfillment must be a string',
-    )
+    assertInvalid(escrow, 'EscrowFinish: Fulfillment must be a string')
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
@@ -112,12 +75,7 @@ describe('EscrowFinish', function () {
 
     const errorMessage = 'EscrowFinish: Credentials must be an array'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
+    assertInvalid(escrow, errorMessage)
   })
 
   it(`throws CredentialIDs length exceeds max length`, function () {
@@ -136,12 +94,7 @@ describe('EscrowFinish', function () {
     const errorMessage =
       'EscrowFinish: Credentials length cannot exceed 8 elements'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
+    assertInvalid(escrow, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
@@ -149,12 +102,7 @@ describe('EscrowFinish', function () {
 
     const errorMessage = 'EscrowFinish: Credentials cannot be an empty array'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
+    assertInvalid(escrow, errorMessage)
   })
 
   it(`throws w/ non-string CredentialIDs`, function () {
@@ -165,12 +113,7 @@ describe('EscrowFinish', function () {
 
     const errorMessage = 'EscrowFinish: Invalid Credentials ID list format'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
+    assertInvalid(escrow, errorMessage)
   })
 
   it(`throws w/ duplicate CredentialIDs`, function () {
@@ -182,11 +125,6 @@ describe('EscrowFinish', function () {
     const errorMessage =
       'EscrowFinish: Credentials cannot contain duplicate elements'
 
-    assert.throws(
-      () => validateEscrowFinish(escrow),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(escrow), ValidationError, errorMessage)
+    assertInvalid(escrow, errorMessage)
   })
 })
