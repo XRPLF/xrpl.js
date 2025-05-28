@@ -14,13 +14,11 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
-  Batchnet = 'batch.faucet.nerdnest.xyz',
 }
 
 export const FaucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
-  [FaucetNetwork.Batchnet]: '/accounts',
 }
 
 /**
@@ -36,10 +34,6 @@ export function getFaucetHost(client: Client): FaucetNetwork | undefined {
   // 'altnet' for Ripple Testnet server and 'testnet' for XRPL Labs Testnet server
   if (connectionUrl.includes('altnet') || connectionUrl.includes('testnet')) {
     return FaucetNetwork.Testnet
-  }
-
-  if (connectionUrl.includes('batchnet')) {
-    return FaucetNetwork.Batchnet
   }
 
   if (connectionUrl.includes('sidechain-net2')) {
