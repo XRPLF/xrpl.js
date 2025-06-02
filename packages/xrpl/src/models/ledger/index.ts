@@ -7,6 +7,7 @@ import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
+import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
 import DID from './DID'
 import DirectoryNode from './DirectoryNode'
@@ -43,6 +44,7 @@ export {
   Bridge,
   Check,
   Credential,
+  Delegate,
   DepositPreauth,
   DirectoryNode,
   DID,
