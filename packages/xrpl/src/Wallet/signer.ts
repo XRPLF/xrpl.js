@@ -137,8 +137,10 @@ function getTransactionWithAllSigners(
  * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
  */
 function compareSigners(left: Signer, right: Signer): number {
-  return addressToBigNumber(left.Signer.Account).comparedTo(
-    addressToBigNumber(right.Signer.Account),
+  return (
+    addressToBigNumber(left.Signer.Account).comparedTo(
+      addressToBigNumber(right.Signer.Account),
+    ) || 0
   )
 }
 
