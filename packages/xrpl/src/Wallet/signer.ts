@@ -140,7 +140,7 @@ function compareSigners(left: Signer, right: Signer): number {
   return (
     addressToBigNumber(left.Signer.Account).comparedTo(
       addressToBigNumber(right.Signer.Account),
-    ) || 0
+    ) ?? 0
   )
 }
 
