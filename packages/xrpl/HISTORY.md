@@ -10,10 +10,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add support for `Batch` amendment (XLS-56)
 
 ### Fixed
-* `OracleSet` transaction accepts hexadecimal string values for `AssetPrice` field
+* Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
 * `TransactionStream` model includes `hash` field in APIv2
 * `TransactionStream` model includes `close_time_iso` field only for APIv2
 * Adds `MPTCurrency` type
+* Better faucet support
 
 ## 4.2.0 (2025-2-13)
 
