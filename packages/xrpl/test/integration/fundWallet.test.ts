@@ -90,10 +90,10 @@ describe('fundWallet', function () {
 
       await api.connect()
       const { wallet, balance } = await api.fundWallet(null, {
-        amount: '1000',
+        amount: '100',
         usageContext: 'integration-test',
       })
-      assert.equal(balance, 1000)
+      assert.equal(balance, 100)
       assert.notStrictEqual(wallet, undefined)
       assert(isValidClassicAddress(wallet.classicAddress))
       assert(isValidXAddress(wallet.getXAddress()))
