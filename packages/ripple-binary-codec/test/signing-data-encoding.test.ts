@@ -1,10 +1,10 @@
 import { XrplDefinitions } from '../src/enums/xrpl-definitions'
-const {
+import {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
   encodeForSigningBatch,
-} = require('../src')
+} from '../src'
 
 const normalDefinitions = require('../src/enums/definitions.json')
 
@@ -267,5 +267,11 @@ describe('Signing data', function () {
         '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
       ].join(''),
     )
+  })
+
+  it('encodeForSigningBatch fails on non-object', function () {
+    const flags = 1
+    // @ts-expect-error - testing invalid input for JS users
+    expect(() => encodeForSigningBatch(flags)).toThrow(Error)
   })
 })

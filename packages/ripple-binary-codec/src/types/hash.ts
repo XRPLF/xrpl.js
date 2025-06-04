@@ -1,6 +1,6 @@
 import { Comparable } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
-import { hexToBytes } from '@xrplf/isomorphic/utils'
+import { HEX_REGEX, hexToBytes } from '@xrplf/isomorphic/utils'
 import { compare } from '../utils'
 
 /**
@@ -27,7 +27,7 @@ class Hash extends Comparable<Hash | string> {
     }
 
     if (typeof value === 'string') {
-      if (!/^[A-F0-9]*$/i.test(value)) {
+      if (!HEX_REGEX.test(value)) {
         throw new Error(`Invalid hash string ${value}`)
       }
       return new this(hexToBytes(value))
