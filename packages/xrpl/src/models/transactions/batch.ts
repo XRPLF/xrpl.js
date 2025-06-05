@@ -1,6 +1,6 @@
 import { ValidationError } from '../../errors'
 import { Signer } from '../common'
-import { hasFlag } from '../utils/flags'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -108,9 +108,7 @@ export function validateBatch(tx: Record<string, unknown>): void {
     }
 
     // Check for the `tfInnerBatchTxn` flag in the inner transactions
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- needed here
-    // @ts-expect-error -- hasFlag expects a Transaction, `rawTx` hasn't been fully validated for that yet
-    if (!hasFlag(rawTx, GlobalFlags.tfInnerBatchTxn)) {
+    if (!hasFlag(rawTx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
       throw new ValidationError(
         `Batch: RawTransactions[${index}] must contain the \`tfInnerBatchTxn\` flag.`,
       )

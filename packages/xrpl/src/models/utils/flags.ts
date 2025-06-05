@@ -160,21 +160,3 @@ export function parseTransactionFlags(tx: Transaction): object {
 
   return booleanFlagMap
 }
-
-/**
- * Determines whether a transaction has a certain flag enabled.
- *
- * @param tx The transaction.
- * @param flag The flag to check.
- * @returns Whether `flag` is enabled on `tx`.
- */
-export function hasFlag(tx: Transaction, flag: number): boolean {
-  if (tx.Flags == null) {
-    return false
-  }
-  if (typeof tx.Flags === 'number') {
-    return isFlagEnabled(tx.Flags, flag)
-  }
-  const txFlagNum = convertTxFlagsToNumber(tx)
-  return isFlagEnabled(txFlagNum, flag)
-}
