@@ -57,6 +57,7 @@ describe('Batch', function () {
           {
             RawTransaction: {
               TransactionType: 'Payment',
+              Flags: 0x40000000,
               Account: testContext.wallet.classicAddress,
               Destination: destination.classicAddress,
               Amount: '10000000',
@@ -65,6 +66,7 @@ describe('Batch', function () {
           {
             RawTransaction: {
               TransactionType: 'Payment',
+              Flags: 0x40000000,
               Account: testContext.wallet.classicAddress,
               Destination: destination.classicAddress,
               Amount: '10000000',
@@ -89,6 +91,7 @@ describe('Batch', function () {
           {
             RawTransaction: {
               TransactionType: 'Payment',
+              Flags: 0x40000000,
               Account: testContext.wallet.classicAddress,
               Destination: destination.classicAddress,
               Amount: '10000000',
@@ -97,6 +100,7 @@ describe('Batch', function () {
           {
             RawTransaction: {
               TransactionType: 'Payment',
+              Flags: 0x40000000,
               Account: wallet2.classicAddress,
               Destination: destination.classicAddress,
               Amount: '10000000',

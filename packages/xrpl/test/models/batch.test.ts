@@ -34,6 +34,7 @@ describe('Batch', function () {
             Amount: '5000000',
             Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
             Fee: '0',
+            Flags: 0x40000000,
             NetworkID: 21336,
             Sequence: 0,
             SigningPubKey: '',
@@ -46,6 +47,7 @@ describe('Batch', function () {
             Amount: '1000000',
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
+            Flags: 0x40000000,
             NetworkID: 21336,
             Sequence: 0,
             SigningPubKey: '',
@@ -73,6 +75,7 @@ describe('Batch', function () {
             Amount: '5000000',
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
+            Flags: 0x40000000,
             NetworkID: 21336,
             Sequence: 0,
             SigningPubKey: '',
@@ -85,6 +88,7 @@ describe('Batch', function () {
             Amount: '1000000',
             Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
             Fee: '0',
+            Flags: 0x40000000,
             NetworkID: 21336,
             Sequence: 0,
             SigningPubKey: '',
@@ -158,6 +162,15 @@ describe('Batch', function () {
       tx,
       validateBatch,
       'Batch: BatchSigners[0] is not object.',
+    )
+  })
+
+  it('throws w/ no `tfInnerBatchTxn` flag in inner transaction', function () {
+    tx.RawTransactions[0].RawTransaction.Flags = 0
+    assertTxValidationError(
+      tx,
+      validateBatch,
+      'Batch: RawTransactions[0] must contain the `tfInnerBatchTxn` flag.',
     )
   })
 })
