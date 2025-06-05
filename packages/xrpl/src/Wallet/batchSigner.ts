@@ -79,10 +79,10 @@ export function signMultiBatch(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
   validate(transaction as unknown as Record<string, unknown>)
 
-  const involvedAccounts = transaction.RawTransactions.map(
-    (raw) => raw.RawTransaction.Account,
+  const involvedAccounts = new Set(
+    transaction.RawTransactions.map((raw) => raw.RawTransaction.Account),
   )
-  if (!involvedAccounts.includes(batchAccount)) {
+  if (!involvedAccounts.has(batchAccount)) {
     throw new ValidationError(
       'Must be signing for an address submitting a transaction in the Batch.',
     )
