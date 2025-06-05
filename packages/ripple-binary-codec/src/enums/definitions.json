@@ -941,6 +941,16 @@
       }
     ],
     [
+      "LockedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 29,
+        "type": "UInt64"
+      }
+    ],
+    [
       "EmailHash",
       {
         "isSerialized": true,
@@ -2451,6 +2461,16 @@
       }
     ],
     [
+      "Book",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 36,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -2547,6 +2567,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 12,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AdditionalBooks",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 13,
         "type": "STArray"
       }
     ],
@@ -3103,6 +3133,7 @@
     "tecNFTOKEN_OFFER_TYPE_MISMATCH": 157,
     "tecNO_ALTERNATIVE_KEY": 130,
     "tecNO_AUTH": 134,
+    "tecNO_DELEGATE_PERMISSION": 198,
     "tecNO_DST": 124,
     "tecNO_DST_INSUF_XRP": 125,
     "tecNO_ENTRY": 140,
@@ -3119,6 +3150,7 @@
     "tecOWNERS": 132,
     "tecPATH_DRY": 128,
     "tecPATH_PARTIAL": 101,
+    "tecPRECISION_LOSS": 197,
     "tecPSEUDO_ACCOUNT": 196,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecTOO_SOON": 152,
