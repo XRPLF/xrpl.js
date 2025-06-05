@@ -25,7 +25,7 @@ import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
 import { GlobalFlags } from '../models/transactions/common'
-import { hasFlag } from '../models/utils/flags'
+import { hasFlag } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -410,7 +410,7 @@ export class Wallet {
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validate(tx as unknown as Record<string, unknown>)
-    if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn)) {
+    if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
       throw new ValidationError('Cannot sign a Batch inner transaction.')
     }
 

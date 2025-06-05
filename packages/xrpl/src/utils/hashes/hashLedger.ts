@@ -13,7 +13,7 @@ import { LedgerEntry } from '../../models/ledger'
 import { LedgerVersionMap } from '../../models/ledger/Ledger'
 import { Transaction, TransactionMetadata } from '../../models/transactions'
 import { GlobalFlags } from '../../models/transactions/common'
-import { hasFlag } from '../../models/utils/flags'
+import { hasFlag } from '../../models/utils'
 
 import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
@@ -87,7 +87,7 @@ export function hashSignedTx(tx: Transaction | string): string {
     txObject.TxnSignature === undefined &&
     txObject.Signers === undefined &&
     txObject.SigningPubKey === undefined &&
-    !hasFlag(txObject, GlobalFlags.tfInnerBatchTxn)
+    !hasFlag(txObject, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')
   ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }
