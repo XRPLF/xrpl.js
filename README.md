@@ -19,13 +19,13 @@ See the full reference documentation for all classes, methods, and utilities.
 4. Subscribing to changes in the ledger ([Ex. ledger, transactions, & more...](https://xrpl.org/subscribe.html))
 5. Parsing ledger data into more convenient formats ([`xrpToDrops`](https://js.xrpl.org/functions/xrpToDrops.html) and [`rippleTimeToISOTime`](https://js.xrpl.org/functions/rippleTimeToISOTime.html))
 
-All of which works in Node.js (tested for v18+) & web browsers (tested for Chrome).
+All of which works in Node.js (tested for v20+) & web browsers (tested for Chrome).
 
 # Quickstart
 
 ### Requirements
 
-+ **[Node.js v18](https://nodejs.org/)** is recommended. We also support v20 and v22. Other versions may work but are not frequently tested.
++ **[Node.js v22](https://nodejs.org/)** is recommended. We also support v20. Other versions may work but are not frequently tested.
 
 ### Installing xrpl.js
 
