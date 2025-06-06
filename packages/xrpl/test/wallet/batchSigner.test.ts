@@ -18,15 +18,22 @@ import {
   signMultiBatch,
 } from '../../src/Wallet/batchSigner'
 
+// rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK
 const secpWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
   algorithm: ECDSA.secp256k1,
 })
+
+// rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7
 const edWallet = Wallet.fromSeed('spkcsko6Ag3RbCSVXV2FJ8Pd4Zac1', {
   algorithm: ECDSA.ed25519,
 })
+
+// rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp
 const submitWallet = Wallet.fromSeed('sEd7HmQFsoyj5TAm6d98gytM9LJA1MF', {
   algorithm: ECDSA.ed25519,
 })
+
+// rwRNeznwHzdfYeKWpevYmax2NSDioyeEtT
 const regkeyWallet = Wallet.fromSeed('sEdStM1pngFcLQqVfH3RQcg2Qr6ov9e', {
   algorithm: ECDSA.ed25519,
 })
@@ -358,7 +365,7 @@ describe('Wallet batch operations', function () {
       )
     })
 
-    it('fails with different inner transactions', function () {
+    it('fails with different flags signed', function () {
       const badTx2 = { ...tx2 }
       badTx2.Flags = BatchFlags.tfIndependent
       signMultiBatch(secpWallet, tx2)
