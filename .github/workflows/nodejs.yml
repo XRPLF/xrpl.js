@@ -8,7 +8,9 @@ env:
 
 on:
   push:
-    branches: [main, 1.x]
+    branches: [main]
+    tags:
+      - '**'
   pull_request:
   workflow_dispatch:
 
@@ -194,6 +196,79 @@ jobs:
       - name: Stop docker container
         if: always()
         run: docker stop rippled-service
+
+  generate-documentation:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup npm version 10
+        run: |
+          npm i -g npm@10 --registry=https://registry.npmjs.org
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-node-modules
+        with:
+          # caching node_modules
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-deps-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-${{ matrix.node-version }}-
+
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - run: npm run build
+
+      - name: Generate Documentation
+        run: npm run docgen
+
+      - name: Upload documentation files as artifact
+        id: docs-artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+          retention-days: 10
+
+  deploy-docs-pages:
+    permissions:
+      id-token: write  # Needed for OIDC authentication
+      pages: write # this permission is needed for deploying into Github Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.docs-artifact.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: generate-documentation
+    # Deploy docs only pushes into the main branch
+    if: success() && github.ref == 'refs/heads/main'
+    steps:
+      - name: Detect (non-beta) version tag
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "published_version_tag=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to Documentation to GitHub Pages
+        id: docs-artifact
+        if: steps.check-tag.outputs.published_version_tag == 'true'
+        uses: actions/deploy-pages@v4
 
   snippets:
     if: |
