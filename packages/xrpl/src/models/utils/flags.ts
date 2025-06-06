@@ -158,5 +158,11 @@ export function parseTransactionFlags(tx: Transaction): object {
     })
   }
 
+  Object.values(GlobalFlags).forEach((flag) => {
+    if (typeof flag === 'string' && isFlagEnabled(flags, GlobalFlags[flag])) {
+      booleanFlagMap[flag] = true
+    }
+  })
+
   return booleanFlagMap
 }

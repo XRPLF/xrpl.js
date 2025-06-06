@@ -307,7 +307,7 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags all false', function () {
@@ -325,7 +325,7 @@ describe('Models Utils', function () {
       const expected = {}
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags flag is already numeric', function () {
@@ -342,7 +342,7 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags including GlobalFlag', function () {
@@ -361,10 +361,11 @@ describe('Models Utils', function () {
 
       const expected = {
         tfRenew: true,
+        tfInnerBatchTxn: true,
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags flag numeric including global flag', function () {
@@ -382,7 +383,7 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
   })
 

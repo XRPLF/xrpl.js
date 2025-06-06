@@ -108,7 +108,7 @@ describe('Batch', function () {
           },
         ],
       }
-      const autofilled = await testContext.client.autofill(tx, 2)
+      const autofilled = await testContext.client.autofill(tx, 1)
       signMultiBatch(wallet2, autofilled)
       await testBatchTransaction(autofilled, testContext.wallet)
     },
