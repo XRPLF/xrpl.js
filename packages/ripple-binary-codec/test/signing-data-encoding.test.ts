@@ -125,8 +125,8 @@ describe('Signing data', function () {
       TransactionType: 'NotAPayment',
     }
 
-    expect(() => encodeForSigning(invalidTransactionType)).toThrowError(
-      /NotAPayment/u,
+    expect(() => encodeForSigning(invalidTransactionType)).toThrow(
+      new TypeError('Unable to interpret "TransactionType: NotAPayment".'),
     )
   })
 
@@ -272,6 +272,8 @@ describe('Signing data', function () {
   it('encodeForSigningBatch fails on non-object', function () {
     const flags = 1
     // @ts-expect-error - testing invalid input for JS users
-    expect(() => encodeForSigningBatch(flags)).toThrow(Error)
+    expect(() => encodeForSigningBatch(flags)).toThrow(
+      new Error('Need an object to encode a Batch transaction'),
+    )
   })
 })
