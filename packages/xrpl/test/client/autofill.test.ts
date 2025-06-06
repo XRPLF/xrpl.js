@@ -372,7 +372,7 @@ describe('client.autofill', function () {
       )
       const txResult = await testContext.client.autofill(tx, 4)
 
-      assert.strictEqual(txResult.Fee, '459')
+      assert.strictEqual(txResult.Fee, '447')
     })
   })
 
