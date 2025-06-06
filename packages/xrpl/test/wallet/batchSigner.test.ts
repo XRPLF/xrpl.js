@@ -220,7 +220,7 @@ describe('Wallet batch operations', function () {
     it('fails with non-Batch transaction', function () {
       assert.throws(
         // @ts-expect-error - needed for JS/codecov
-        () => signMultiBatch(otherWallet, nonBatchTx),
+        () => signMultiBatch(edWallet, nonBatchTx),
         ValidationError,
         'Must be a Batch transaction.',
       )
