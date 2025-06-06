@@ -307,7 +307,7 @@ async function calculateFeePerTransactionType(
    * BaseFee × (1 + Number of Signatures Provided)
    */
   if (signersCount > 0) {
-    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
+    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, signersCount))
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)

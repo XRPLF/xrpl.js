@@ -15,6 +15,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TransactionStream` model includes `close_time_iso` field only for APIv2
 * Adds `MPTCurrency` type
 * Better faucet support
+* Improve multisign fee calculations
 
 ## 4.2.0 (2025-2-13)
 
