@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Support for `NFTokenMintOffer` (XLS-52)
 * Add Github Actions step to auto-generate documentation
 * Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d)
+* Add support for `Batch` amendment (XLS-56)
 
 ### Fixed
 * Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
@@ -15,6 +16,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TransactionStream` model includes `close_time_iso` field only for APIv2
 * Adds `MPTCurrency` type
 * Better faucet support
+* Improve multisign fee calculations
 
 ## 4.2.0 (2025-2-13)
 

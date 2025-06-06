@@ -67,7 +67,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
   )
 
   validateOptionalField(tx, 'OtherChainDestination', isAccount)

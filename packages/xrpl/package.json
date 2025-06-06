@@ -61,7 +61,7 @@
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
-    "test:watch": "jest --watch --verbose false --silent=false --runInBand ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
+    "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
     "perf": "./scripts/perf_test.sh",

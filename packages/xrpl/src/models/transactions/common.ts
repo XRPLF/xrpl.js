@@ -69,7 +69,13 @@ const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+/**
+ * Verify the form and type of a Record/Object at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the Record/Object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object'
 }
 
@@ -210,30 +216,54 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   )
 }
 
+/**
+ * Verify the form and type of an Array at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Array is properly formed.
+ */
+export function isArray<T = unknown>(input: unknown): input is T[] {
+  return Array.isArray(input)
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
  * Verify the form and type of a required type for a transaction at runtime.
  *
- * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param tx - The object input to check the form and type of.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param errorOpts.txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @throws ValidationError if the parameter is missing or invalid.
  */
-export function validateRequiredField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
-  if (tx[paramName] == null) {
+// eslint-disable-next-line max-params -- helper function
+export function validateRequiredField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
+  errorOpts: {
+    txType?: string
+    paramName?: string
+  } = {},
+): asserts tx is T & { [P in K]: V } {
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
+  if (tx[param] == null) {
     throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramName}`,
+      `${txType}: missing field ${String(paramNameStr)}`,
     )
   }
 
-  if (!checkValidity(tx[paramName])) {
+  if (!checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${txType}: invalid field ${String(paramNameStr)}`,
     )
   }
 }
@@ -242,31 +272,50 @@ export function validateRequiredField(
  * Verify the form and type of an optional type for a transaction at runtime.
  *
  * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param errorOpts.txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @throws ValidationError if the parameter is invalid.
  */
-export function validateOptionalField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
-  if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+// eslint-disable-next-line max-params -- helper function
+export function validateOptionalField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
+  errorOpts: {
+    txType?: string
+    paramName?: string
+  } = {},
+): asserts tx is T & { [P in K]: V | undefined } {
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
+  if (tx[param] !== undefined && !checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${txType}: invalid field ${String(paramNameStr)}`,
     )
   }
 }
 
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
-export interface GlobalFlags {}
+export enum GlobalFlags {
+  tfInnerBatchTxn = 0x40000000,
+}
+
+export interface GlobalFlagsInterface {
+  tfInnerBatchTxn?: boolean
+}
 
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction {
+export interface BaseTransaction extends Record<string, unknown> {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -294,7 +343,7 @@ export interface BaseTransaction {
    */
   AccountTxnID?: string
   /** Set of bit-flags for this transaction. */
-  Flags?: number | GlobalFlags
+  Flags?: number | GlobalFlagsInterface
   /**
    * Highest ledger index this transaction can appear in. Specifying this field
    * places a strict upper limit on how long the transaction can wait to be
@@ -351,8 +400,10 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-// eslint-disable-next-line max-statements -- lines required for validation
-export function validateBaseTransaction(common: Record<string, unknown>): void {
+// eslint-disable-next-line max-statements, max-lines-per-function -- lines required for validation
+export function validateBaseTransaction(
+  common: Record<string, unknown>,
+): asserts common is BaseTransaction {
   if (common.TransactionType === undefined) {
     throw new ValidationError('BaseTransaction: missing field TransactionType')
   }
@@ -362,7 +413,9 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   }
 
   if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
-    throw new ValidationError('BaseTransaction: Unknown TransactionType')
+    throw new ValidationError(
+      `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
+    )
   }
 
   validateRequiredField(common, 'Account', isString)
@@ -548,7 +601,6 @@ export function containsDuplicates(
   if (isAuthorizeCredentialArray(objectList)) {
     for (const item of objectList) {
       const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
-      // eslint-disable-next-line max-depth -- necessary to check for type-guards
       if (seen.has(key)) {
         return true
       }

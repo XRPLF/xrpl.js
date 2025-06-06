@@ -88,6 +88,8 @@ export interface TransactionMetadataBase {
   delivered_amount?: Amount | MPTAmount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
+
+  ParentBatchID?: string
 }
 
 export type TransactionMetadata<T extends BaseTransaction = Transaction> =
