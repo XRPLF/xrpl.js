@@ -88,13 +88,13 @@ describe('DelegateSet', function () {
         EmailHash: '10000000002000000000300000000012',
       }
 
-      // Expect transaction to fail with tecNO_PERMISSION error
+      // Expect transaction to fail with tecNO_DELEGATE_PERMISSION error
       await testTransaction(
         testContext.client,
         accountSetTx,
         bob,
         undefined,
-        'tecNO_PERMISSION',
+        'tecNO_DELEGATE_PERMISSION',
       )
     },
     TIMEOUT,

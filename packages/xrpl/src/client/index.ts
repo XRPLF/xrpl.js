@@ -63,11 +63,12 @@ import {
 import {
   setValidAddresses,
   setNextValidSequenceNumber,
-  calculateFeePerTransactionType,
-  handleDeliverMax,
   setLatestValidatedLedgerSequence,
   checkAccountDeleteBlockers,
   txNeedsNetworkID,
+  autofillBatchTxn,
+  handleDeliverMax,
+  getTransactionFee,
 } from '../sugar/autofill'
 import { formatBalances } from '../sugar/balances'
 import {
@@ -679,7 +680,7 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(calculateFeePerTransactionType(this, tx, signersCount))
+      promises.push(getTransactionFee(this, tx, signersCount))
     }
     if (tx.LastLedgerSequence == null) {
       promises.push(setLatestValidatedLedgerSequence(this, tx))
@@ -687,7 +688,9 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'AccountDelete') {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
-
+    if (tx.TransactionType === 'Batch') {
+      promises.push(autofillBatchTxn(this, tx))
+    }
     if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
       handleDeliverMax(tx)
     }

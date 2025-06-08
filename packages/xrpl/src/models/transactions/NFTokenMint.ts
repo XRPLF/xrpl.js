@@ -5,7 +5,7 @@ import { isHex } from '../utils'
 import {
   Account,
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAccount,
   isAmount,
   isNumber,
@@ -53,7 +53,7 @@ export enum NFTokenMintFlags {
  *
  * @category Transaction Flags
  */
-export interface NFTokenMintFlagsInterface extends GlobalFlags {
+export interface NFTokenMintFlagsInterface extends GlobalFlagsInterface {
   tfBurnable?: boolean
   tfOnlyXRP?: boolean
   tfTrustLine?: boolean

@@ -1,3 +1,5 @@
+import type { Transaction } from '../transactions'
+
 const HEX_REGEX = /^[0-9A-Fa-f]+$/u
 export const INTEGER_SANITY_CHECK = /^[0-9]+$/u
 
@@ -25,6 +27,28 @@ export function onlyHasFields(
 export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
   // eslint-disable-next-line no-bitwise -- flags need bitwise
   return (BigInt(checkFlag) & BigInt(Flags)) === BigInt(checkFlag)
+}
+
+/**
+ * Determines whether a transaction has a certain flag enabled.
+ *
+ * @param tx The transaction to check for the flag.
+ * @param flag The flag to check.
+ * @param flagName The name of the flag to check, used for object flags.
+ * @returns Whether `flag` is enabled on `tx`.
+ */
+export function hasFlag(
+  tx: Transaction | Record<string, unknown>,
+  flag: number,
+  flagName: string,
+): boolean {
+  if (tx.Flags == null) {
+    return false
+  }
+  if (typeof tx.Flags === 'number') {
+    return isFlagEnabled(tx.Flags, flag)
+  }
+  return tx.Flags[flagName] === true
 }
 
 /**
