@@ -15,7 +15,10 @@ import {
 } from '../../src'
 import { AuthorizeCredential } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
-import { containsDuplicates } from '../../src/models/transactions/common'
+import {
+  containsDuplicates,
+  GlobalFlags,
+} from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
   setTransactionFlagsToNumber,
@@ -194,7 +197,7 @@ describe('Models Utils', function () {
       assert.strictEqual(tx.Flags, expected)
     })
 
-    it('sets PaymentTransactionFlags to its numeric value', function () {
+    it('sets PaymentFlags to its numeric value', function () {
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -251,10 +254,43 @@ describe('Models Utils', function () {
       setTransactionFlagsToNumber(tx)
       assert.strictEqual(tx.Flags, 0)
     })
+
+    it('handles global flags', function () {
+      const tx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        LimitAmount: {
+          currency: 'XRP',
+          issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+          value: '4329.23',
+        },
+        QualityIn: 1234,
+        QualityOut: 4321,
+        Flags: {
+          tfSetfAuth: true,
+          tfSetNoRipple: false,
+          tfClearNoRipple: true,
+          tfSetFreeze: false,
+          tfClearFreeze: true,
+          // Global flag
+          tfInnerBatchTxn: true,
+        },
+      }
+
+      const { tfSetfAuth, tfClearNoRipple, tfClearFreeze } = TrustSetFlags
+      const expected: number =
+        tfSetfAuth |
+        tfClearNoRipple |
+        tfClearFreeze |
+        GlobalFlags.tfInnerBatchTxn
+
+      setTransactionFlagsToNumber(tx)
+      assert.strictEqual(tx.Flags, expected)
+    })
   })
 
   describe('parseTransactionFlags', function () {
-    it('parseTransactionFlags all enabled', function () {
+    it('parseTransactionFlags not all enabled', function () {
       const tx: PaymentChannelClaim = {
         Account: 'r...',
         TransactionType: 'PaymentChannelClaim',
@@ -271,7 +307,7 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags all false', function () {
@@ -289,7 +325,7 @@ describe('Models Utils', function () {
       const expected = {}
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
     })
 
     it('parseTransactionFlags flag is already numeric', function () {
@@ -306,11 +342,80 @@ describe('Models Utils', function () {
       }
 
       const flagsMap = parseTransactionFlags(tx)
-      assert.notStrictEqual(flagsMap, expected)
+      assert.deepEqual(flagsMap, expected)
+    })
+
+    it('parseTransactionFlags including GlobalFlag', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: {
+          tfRenew: true,
+          tfClose: false,
+          // Global flag
+          tfInnerBatchTxn: true,
+        },
+      }
+
+      const expected = {
+        tfRenew: true,
+        tfInnerBatchTxn: true,
+      }
+
+      const flagsMap = parseTransactionFlags(tx)
+      assert.deepEqual(flagsMap, expected)
+    })
+
+    it('parseTransactionFlags flag numeric including global flag', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: PaymentChannelClaimFlags.tfRenew + GlobalFlags.tfInnerBatchTxn,
+      }
+
+      const expected = {
+        tfRenew: true,
+        tfInnerBatchTxn: true,
+      }
+
+      const flagsMap = parseTransactionFlags(tx)
+      assert.deepEqual(flagsMap, expected)
     })
   })
 
   describe('convertTxFlagsToNumber', function () {
+    it('null case', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        // no Flags field
+      }
+
+      const result = convertTxFlagsToNumber(tx)
+      assert.strictEqual(result, 0)
+    })
+
+    it('throws error for invalid flag', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: {
+          // @ts-expect-error -- intentionally invalid flag
+          tfNonExistentFlag: true,
+        },
+      }
+
+      assert.throws(() => convertTxFlagsToNumber(tx))
+    })
+
     it('converts OfferCreateFlags to its numeric value', function () {
       const tx: OfferCreate = {
         Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
@@ -358,7 +463,7 @@ describe('Models Utils', function () {
       assert.strictEqual(result, expected)
     })
 
-    it('converts PaymentTransactionFlags to its numeric value', function () {
+    it('converts PaymentFlags to its numeric value', function () {
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -414,6 +519,55 @@ describe('Models Utils', function () {
 
       const result = convertTxFlagsToNumber(tx)
       assert.strictEqual(result, 0)
+    })
+
+    it('handles global flags', function () {
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        Amount: '1234',
+        Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+        Flags: {
+          tfNoRippleDirect: false,
+          tfPartialPayment: true,
+          tfLimitQuality: true,
+          // Global flag
+          tfInnerBatchTxn: true,
+        },
+      }
+
+      const { tfPartialPayment, tfLimitQuality } = PaymentFlags
+      const expected: number =
+        tfPartialPayment | tfLimitQuality | GlobalFlags.tfInnerBatchTxn
+
+      const result = convertTxFlagsToNumber(tx)
+      assert.strictEqual(result, expected)
+    })
+
+    it('handles only global flags', function () {
+      const tx: DepositPreauth = {
+        TransactionType: 'DepositPreauth',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        Flags: {
+          tfInnerBatchTxn: true,
+        },
+      }
+
+      const result = convertTxFlagsToNumber(tx)
+      assert.strictEqual(result, GlobalFlags.tfInnerBatchTxn)
+    })
+
+    it('throws error for bad global flag', function () {
+      const tx: DepositPreauth = {
+        TransactionType: 'DepositPreauth',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        Flags: {
+          // @ts-expect-error -- intentionally invalid flag
+          tfNonExistent: true,
+        },
+      }
+
+      assert.throws(() => convertTxFlagsToNumber(tx))
     })
   })
 })

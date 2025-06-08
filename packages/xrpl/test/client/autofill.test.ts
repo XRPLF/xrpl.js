@@ -6,6 +6,7 @@ import {
   EscrowFinish,
   Payment,
   Transaction,
+  Batch,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -79,7 +80,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: Specify Only DeliverMax field', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
     // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     delete paymentTx.Amount
@@ -89,7 +89,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = paymentTx.Amount
 
     const txResult = await testContext.client.autofill(paymentTx)
@@ -99,7 +98,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = '6789'
     paymentTx.Amount = '1234'
 
@@ -374,7 +372,7 @@ describe('client.autofill', function () {
       )
       const txResult = await testContext.client.autofill(tx, 4)
 
-      assert.strictEqual(txResult.Fee, '459')
+      assert.strictEqual(txResult.Fee, '447')
     })
   })
 
@@ -434,5 +432,90 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.Fee, '12')
     assert.strictEqual(txResult.Sequence, 23)
     assert.strictEqual(txResult.LastLedgerSequence, 9038234)
+  })
+
+  it('should autofill Batch transaction with single account', async function () {
+    const sender = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+    const tx: Batch = {
+      TransactionType: 'Batch',
+      Account: sender,
+      RawTransactions: [
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
+            Account: sender,
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
+            Account: sender,
+            Authorize: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+          },
+        },
+      ],
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    const txResult = await testContext.client.autofill(tx)
+    txResult.RawTransactions.forEach((rawTxOuter, index) => {
+      const rawTx = rawTxOuter.RawTransaction
+      assert.strictEqual(rawTx.Sequence, 23 + index + 1)
+    })
+  })
+
+  it('should autofill Batch transaction with multiple accounts', async function () {
+    const sender1 = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+    const sender2 = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn'
+    const tx: Transaction = {
+      TransactionType: 'Batch',
+      Account: sender1,
+      RawTransactions: [
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
+            Account: sender1,
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
+            Account: sender2,
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+      ],
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    const txResult = await testContext.client.autofill(tx)
+    assert.strictEqual(txResult.RawTransactions[0].RawTransaction.Sequence, 24)
+    assert.strictEqual(txResult.RawTransactions[1].RawTransaction.Sequence, 23)
   })
 })

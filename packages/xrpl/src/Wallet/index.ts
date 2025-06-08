@@ -24,6 +24,8 @@ import {
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
+import { GlobalFlags } from '../models/transactions/common'
+import { hasFlag } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -367,6 +369,7 @@ export class Wallet {
    * @param this - Wallet instance.
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
+   *                    The actual address is only needed in the case of regular key usage.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
@@ -381,7 +384,7 @@ export class Wallet {
     hash: string
   } {
     let multisignAddress: boolean | string = false
-    if (typeof multisign === 'string' && multisign.startsWith('X')) {
+    if (typeof multisign === 'string') {
       multisignAddress = multisign
     } else if (multisign) {
       multisignAddress = this.classicAddress
@@ -407,12 +410,14 @@ export class Wallet {
      */
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
     validate(tx as unknown as Record<string, unknown>)
+    if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
+      throw new ValidationError('Cannot sign a Batch inner transaction.')
+    }
 
     const txToSignAndEncode = { ...tx }
 
-    txToSignAndEncode.SigningPubKey = multisignAddress ? '' : this.publicKey
-
     if (multisignAddress) {
+      txToSignAndEncode.SigningPubKey = ''
       const signer = {
         Account: multisignAddress,
         SigningPubKey: this.publicKey,
@@ -424,6 +429,7 @@ export class Wallet {
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
     } else {
+      txToSignAndEncode.SigningPubKey = this.publicKey
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
