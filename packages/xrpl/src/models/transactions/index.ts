@@ -33,6 +33,7 @@ export {
   AMMWithdrawFlagsInterface,
   AMMWithdraw,
 } from './AMMWithdraw'
+export { Batch } from './batch'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
@@ -100,6 +101,8 @@ export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
+export { PermissionedDomainSet } from './permissionedDomainSet'
+export { PermissionedDomainDelete } from './permissionedDomainDelete'
 export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
 export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
 export { XChainClaim } from './XChainClaim'
@@ -112,6 +115,3 @@ export {
   XChainModifyBridgeFlags,
   XChainModifyBridgeFlagsInterface,
 } from './XChainModifyBridge'
-
-export { PermissionedDomainSet } from './permissionedDomainSet'
-export { PermissionedDomainDelete } from './permissionedDomainDelete'
