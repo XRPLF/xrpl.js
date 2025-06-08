@@ -47,6 +47,10 @@ export interface EscrowCreate extends BaseTransaction {
    * payment, such as a hosted recipient at the destination address.
    */
   DestinationTag?: number
+
+  FinishFunction?: string
+
+  Data?: string
 }
 
 /**
@@ -75,9 +79,13 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.FinishAfter === undefined && tx.Condition === undefined) {
+  if (
+    tx.FinishAfter === undefined &&
+    tx.Condition === undefined &&
+    tx.FinishFunction === undefined
+  ) {
     throw new ValidationError(
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
+      'EscrowCreate: Either FinishAfter, Condition, or FinishFunction must be specified',
     )
   }
 
