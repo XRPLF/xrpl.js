@@ -3,7 +3,7 @@ import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   validateOptionalField,
   isString,
@@ -58,7 +58,8 @@ export enum MPTokenIssuanceCreateFlags {
  *
  * @category Transaction Flags
  */
-export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlags {
+export interface MPTokenIssuanceCreateFlagsInterface
+  extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
   tfMPTRequireAuth?: boolean
   tfMPTCanEscrow?: boolean

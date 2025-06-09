@@ -1,7 +1,7 @@
 import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import { BaseTransaction, isArray, validateBaseTransaction } from './common'
 
 /**
  * The SignerListSet transaction creates, replaces, or removes a list of
@@ -56,7 +56,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     throw new ValidationError('SignerListSet: missing field SignerEntries')
   }
 
-  if (!Array.isArray(tx.SignerEntries)) {
+  if (!isArray(tx.SignerEntries)) {
     throw new ValidationError('SignerListSet: invalid SignerEntries')
   }
 

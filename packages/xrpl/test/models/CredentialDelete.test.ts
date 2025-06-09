@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { validateCredentialDelete } from '../../src/models/transactions/CredentialDelete'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'

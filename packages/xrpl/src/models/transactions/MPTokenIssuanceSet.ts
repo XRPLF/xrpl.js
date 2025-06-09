@@ -9,7 +9,7 @@ import {
   Account,
   validateOptionalField,
   isAccount,
-  GlobalFlags,
+  GlobalFlagsInterface,
 } from './common'
 
 /**
@@ -34,7 +34,7 @@ export enum MPTokenIssuanceSetFlags {
  *
  * @category Transaction Flags
  */
-export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlags {
+export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
 }

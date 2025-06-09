@@ -598,6 +598,17 @@ describe('Wallet', function () {
       })
     })
 
+    it('sign with regular address for multisignAddress', async function () {
+      const signature = wallet.sign(
+        REQUEST_FIXTURES.signAs as Transaction,
+        wallet.address,
+      )
+      assert.deepEqual(signature, {
+        tx_blob: RESPONSE_FIXTURES.signAs.signedTransaction,
+        hash: 'D8CF5FC93CFE5E131A34599AFB7CE186A5B8D1B9F069E35F4634AD3B27837E35',
+      })
+    })
+
     it('sign with X Address and tag for multisignAddress', async function () {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,

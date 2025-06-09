@@ -2,11 +2,13 @@
     "editor.tabSize": 2,
     "cSpell.words": [
         "altnet",
-        "Autofills",
+        "autofills",
+        "bignumber",
         "Clawback",
         "hostid",
         "keypair",
         "keypairs",
+        "MPToken",
         "multisign",
         "multisigned",
         "multisigning",
@@ -16,7 +18,8 @@
         "secp256k1",
         "Setf",
         "Sidechains",
-        "xchain"
+        "xchain",
+        "xrplf"
     ],
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
