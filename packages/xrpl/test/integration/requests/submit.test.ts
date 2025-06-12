@@ -1,3 +1,4 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
@@ -8,7 +9,6 @@ import {
   hashes,
   SubmittableTransaction,
 } from '../../../src'
-import { convertStringToHex } from '../../../src/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -35,7 +35,7 @@ describe('submit', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       const autofilledTx = await testContext.client.autofill(accountSet)
