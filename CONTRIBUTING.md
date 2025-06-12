@@ -83,15 +83,13 @@ Breaking down the command:
 
 Faucet tests are designed to ensure the functionality of account funding and other interactions that require a funded wallet, typically by interacting with a Faucet service. These tests are crucial for verifying real-world scenarios where new accounts need to be activated on the XRP Ledger.
 
-To run Faucet tests locally, you'll first need to ensure your development environment is set up and the project is built. Similar to integration tests, Faucet tests may require a running `rippled` instance.
+To run Faucet tests locally, you'll first need to ensure your development environment is set up and the project is built. Faucet tests do not require a locally running `rippled` instance to execute.
 
 From the top-level xrpl.js folder, run the following commands:
 
 ```bash
 npm install
 npm run build
-# Ensure rippled is running if needed by the tests
-# (Refer to Integration Tests or Browser Tests sections for Docker setup if required)
 npm run test:faucet # Assuming this is the command
 ```
 
