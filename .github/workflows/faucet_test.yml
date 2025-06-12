@@ -17,11 +17,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Run docker in background
-        run: |
-          docker run --detach --rm -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/ripple/" --name rippled-service --health-cmd="rippled server_info || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true --entrypoint bash ${{ env.RIPPLED_DOCKER_IMAGE || 'rippleci/rippled:develop' }} -c "rippled -a"
-
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -53,7 +48,3 @@ jobs:
 
       - name: Run Faucet Tests
         run: npm run test:faucet
-
-      - name: Stop docker container
-        if: always()
-        run: docker stop rippled-service
