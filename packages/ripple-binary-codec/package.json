@@ -1,6 +1,6 @@
 {
   "name": "xrpl-binary-codec-prerelease",
-  "version": "8.3.0",
+  "version": "8.4.0",
   "description": "XRP Ledger Protocol Binary Codec - For XRPL, Xahau and other networks (with dynamic definitions)",
   "files": [
     "dist/*",
