@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 15
 
     strategy:
+      max-parallel: 1
       matrix:
         node-version: [18.x]
 
