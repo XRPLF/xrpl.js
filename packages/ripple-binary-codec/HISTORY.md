@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Support for `Single Asset Vault` (XLS-65)
+
 ## 2.4.0 (2025-6-09)
 
 ### Added
