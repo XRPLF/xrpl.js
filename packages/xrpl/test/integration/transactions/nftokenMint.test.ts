@@ -101,6 +101,7 @@ describe('NFTokenMint', function () {
       const accountInfoRequest: AccountInfoRequest = {
         command: 'account_info',
         account: testContext.wallet.address,
+        ledger_index: 'validated',
       }
       const accountInfoResponse = await testContext.client.request(
         accountInfoRequest,
