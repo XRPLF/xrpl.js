@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import {
+  AccountInfoRequest,
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
@@ -18,7 +19,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import { AccountInfoRequest } from '../../../dist/npm'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -106,12 +106,12 @@ describe('NFTokenMint', function () {
         accountInfoRequest,
       )
       assert.equal(
-        accountInfoResponse.result.account_data?.FirstNFTokenSequence,
+        accountInfoResponse.result.account_data.FirstNFTokenSequence,
         mintTransactionSeq,
         `FirstNFTokenSequence is not same as NFTokenMint's transaction sequence.`,
       )
       assert.equal(
-        accountInfoResponse.result.account_data?.MintedNFTokens,
+        accountInfoResponse.result.account_data.MintedNFTokens,
         1,
         `MintedNFTokens is not 1.`,
       )
