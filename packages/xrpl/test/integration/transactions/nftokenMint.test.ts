@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import {
+  AccountInfoRequest,
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
@@ -48,6 +49,8 @@ describe('NFTokenMint', function () {
       )
       assert.equal(response.type, 'response')
 
+      const mintTransactionSeq = response.result.tx_json.Sequence
+
       const txRequest: TxRequest = {
         command: 'tx',
         transaction: hashSignedTx(response.result.tx_blob),
@@ -92,6 +95,26 @@ describe('NFTokenMint', function () {
         nftokenID,
         getNFTokenID(binaryTxResponse.result.meta_blob) ?? 'undefined',
         `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
+      )
+
+      // Check if AccountRoot ledger object reflects minted token
+      const accountInfoRequest: AccountInfoRequest = {
+        command: 'account_info',
+        account: testContext.wallet.address,
+        ledger_index: 'validated',
+      }
+      const accountInfoResponse = await testContext.client.request(
+        accountInfoRequest,
+      )
+      assert.equal(
+        accountInfoResponse.result.account_data.FirstNFTokenSequence,
+        mintTransactionSeq,
+        `FirstNFTokenSequence is not same as NFTokenMint's transaction sequence.`,
+      )
+      assert.equal(
+        accountInfoResponse.result.account_data.MintedNFTokens,
+        1,
+        `MintedNFTokens is not 1.`,
       )
     },
     TIMEOUT,
