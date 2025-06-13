@@ -18,6 +18,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
+import { AccountInfoRequest } from '../../../dist/npm'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -47,6 +48,8 @@ describe('NFTokenMint', function () {
         testContext.wallet,
       )
       assert.equal(response.type, 'response')
+
+      const mintTransactionSeq = response.result.tx_json.Sequence
 
       const txRequest: TxRequest = {
         command: 'tx',
@@ -92,6 +95,25 @@ describe('NFTokenMint', function () {
         nftokenID,
         getNFTokenID(binaryTxResponse.result.meta_blob) ?? 'undefined',
         `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
+      )
+
+      // Check if AccountRoot ledger object reflects minted token
+      const accountInfoRequest: AccountInfoRequest = {
+        command: 'account_info',
+        account: testContext.wallet.address,
+      }
+      const accountInfoResponse = await testContext.client.request(
+        accountInfoRequest,
+      )
+      assert.equal(
+        accountInfoResponse.result.account_data?.FirstNFTokenSequence,
+        mintTransactionSeq,
+        `FirstNFTokenSequence is not same as NFTokenMint's transaction sequence.`,
+      )
+      assert.equal(
+        accountInfoResponse.result.account_data?.MintedNFTokens,
+        1,
+        `MintedNFTokens is not 1.`,
       )
     },
     TIMEOUT,
