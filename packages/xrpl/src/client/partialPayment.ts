@@ -97,8 +97,7 @@ function isPartialPayment(
 
   const delivered = meta.delivered_amount
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-  const amount = tx.DeliverMax as Amount | MPTAmount
+  const amount = tx.DeliverMax ?? tx.Amount
 
   if (delivered === undefined) {
     return false

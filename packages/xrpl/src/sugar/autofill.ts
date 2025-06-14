@@ -4,8 +4,14 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { Batch, Payment, Transaction } from '../models/transactions'
+import {
+  AccountInfoRequest,
+  AccountObjectsRequest,
+  BaseTransaction,
+  Payment,
+  Transaction,
+  Batch,
+} from '../models'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -117,10 +123,10 @@ interface ClassicAccountAndTag {
  *
  * @param tx - The transaction object.
  */
-export function setValidAddresses(tx: Transaction): void {
+export function setValidAddresses<T extends BaseTransaction>(tx: T): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
-  // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
-  if (tx['Destination'] != null) {
+
+  if ('Destination' in tx) {
     validateAccountAddress(tx, 'Destination', 'DestinationTag')
   }
 
@@ -141,21 +147,26 @@ export function setValidAddresses(tx: Transaction): void {
  * @param tagField - The field name for the tag in the transaction object.
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
-function validateAccountAddress(
-  tx: Transaction,
+function validateAccountAddress<T extends BaseTransaction>(
+  tx: T,
   accountField: string,
   tagField: string,
 ): void {
+  if (!(accountField in tx)) {
+    throw new ValidationError(`Missing field: ${accountField}`)
+  }
+  const val: unknown = tx[accountField]
+
+  if (typeof val !== 'string') {
+    throw new ValidationError(`${accountField} must be a string`)
+  }
   // if X-address is given, convert it to classic address
-  const { classicAccount, tag } = getClassicAccountAndTag(
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-    tx[accountField] as string,
-  )
+  const { classicAccount, tag } = getClassicAccountAndTag(val)
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx[accountField] = classicAccount
 
   if (tag != null && tag !== false) {
-    if (tx[tagField] && tx[tagField] !== tag) {
+    if (tx[tagField] != null && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
       )
@@ -201,12 +212,17 @@ function getClassicAccountAndTag(
  * @param tx - The transaction object.
  * @param fieldName - The name of the field to convert.export
  */
-function convertToClassicAddress(tx: Transaction, fieldName: string): void {
-  const account = tx[fieldName]
-  if (typeof account === 'string') {
-    const { classicAccount } = getClassicAccountAndTag(account)
-    // eslint-disable-next-line no-param-reassign -- param reassign is safe
-    tx[fieldName] = classicAccount
+function convertToClassicAddress<T extends BaseTransaction>(
+  tx: T,
+  fieldName: string,
+): void {
+  if (fieldName in tx) {
+    const account: unknown = tx[fieldName]
+    if (fieldName in tx && typeof account === 'string') {
+      const { classicAccount } = getClassicAccountAndTag(account)
+      // eslint-disable-next-line no-param-reassign -- param reassign is safe
+      tx[fieldName] = classicAccount
+    }
   }
 }
 
@@ -394,6 +410,7 @@ export async function checkAccountDeleteBlockers(
     resolve()
   })
 }
+
 /**
  * Replaces Amount with DeliverMax if needed.
  *
@@ -405,8 +422,6 @@ export function handleDeliverMax(tx: Payment): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount == null) {
       // If only DeliverMax is provided, use it to populate the Amount field
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line no-param-reassign -- known RPC-level property
       tx.Amount = tx.DeliverMax
     }
@@ -459,28 +474,28 @@ export async function autofillBatchTxn(
 
     if (txn.Fee == null) {
       txn.Fee = '0'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.Fee !== '0') {
       throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.SigningPubKey !== '') {
       throw new XrplError(
         'Must have `SigningPubKey` of "" in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.TxnSignature != null) {
       throw new XrplError(
         'Must not have `TxnSignature` in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.Signers != null) {
       throw new XrplError('Must not have `Signers` in inner Batch transaction.')
     }

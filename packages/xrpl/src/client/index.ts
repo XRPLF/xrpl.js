@@ -663,7 +663,6 @@ class Client extends EventEmitter<EventTypes> {
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
-
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -692,7 +691,7 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'Batch') {
       promises.push(autofillBatchTxn(this, tx))
     }
-    if (tx.TransactionType === 'Payment') {
+    if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
       handleDeliverMax(tx)
     }
 
