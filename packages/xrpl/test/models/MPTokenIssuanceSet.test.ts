@@ -1,6 +1,11 @@
-import { assert } from 'chai'
+import { MPTokenIssuanceSetFlags } from '../../src'
+import { validateMPTokenIssuanceSet } from '../../src/models/transactions/MPTokenIssuanceSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
-import { validate, ValidationError, MPTokenIssuanceSetFlags } from '../../src'
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenIssuanceSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenIssuanceSet, message)
 
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
@@ -18,7 +23,7 @@ describe('MPTokenIssuanceSet', function () {
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
 
     validMPTokenIssuanceSet = {
       TransactionType: 'MPTokenIssuanceSet',
@@ -28,7 +33,7 @@ describe('MPTokenIssuanceSet', function () {
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
 
     // It's fine to not specify any flag, it means only tx fee is deducted
     validMPTokenIssuanceSet = {
@@ -38,7 +43,7 @@ describe('MPTokenIssuanceSet', function () {
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceSet))
+    assertValid(validMPTokenIssuanceSet)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {
@@ -47,9 +52,8 @@ describe('MPTokenIssuanceSet', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceSet: missing field MPTokenIssuanceID',
     )
   })
@@ -65,18 +69,10 @@ describe('MPTokenIssuanceSet', function () {
       // eslint-disable-next-line no-bitwise -- not needed
       MPTokenIssuanceSetFlags.tfMPTLock | MPTokenIssuanceSetFlags.tfMPTUnlock
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceSet: flag conflict',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
 
     invalid.Flags = { tfMPTLock: true, tfMPTUnlock: true }
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceSet: flag conflict',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
   })
 })

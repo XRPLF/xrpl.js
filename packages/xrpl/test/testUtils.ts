@@ -62,6 +62,17 @@ export function assertResultMatch(
  *
  * @param tx The transaction that should fail validation.
  * @param validateTx The transaction-specific validation function (e.g. `validatePayment`).
+ */
+export function assertTxIsValid(tx: any, validateTx: (tx: any) => void): void {
+  assert.doesNotThrow(() => validateTx(tx))
+  assert.doesNotThrow(() => validate(tx))
+}
+
+/**
+ * Check that a transaction error validation fails properly.
+ *
+ * @param tx The transaction that should fail validation.
+ * @param validateTx The transaction-specific validation function (e.g. `validatePayment`).
  * @param errorMessage The error message that should be included in the error.
  */
 export function assertTxValidationError(

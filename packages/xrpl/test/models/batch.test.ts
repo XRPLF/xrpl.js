@@ -1,8 +1,9 @@
-import { assert } from 'chai'
-
-import { validate } from '../../src'
 import { validateBatch } from '../../src/models/transactions/batch'
-import { assertTxValidationError } from '../testUtils'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateBatch)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateBatch, message)
 
 /**
  * Batch Transaction Verification Testing.
@@ -60,8 +61,7 @@ describe('Batch', function () {
   })
 
   it('verifies valid Batch', function () {
-    assert.doesNotThrow(() => validateBatch(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('verifies single-account Batch', function () {
@@ -98,78 +98,51 @@ describe('Batch', function () {
       ],
       TransactionType: 'Batch',
     }
-    assert.doesNotThrow(() => validateBatch(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ invalid BatchSigners', function () {
     tx.BatchSigners = 0
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: invalid field BatchSigners',
-    )
+    assertInvalid(tx, 'Batch: invalid field BatchSigners')
   })
 
   it('throws w/ missing RawTransactions', function () {
     delete tx.RawTransactions
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: missing field RawTransactions',
-    )
+    assertInvalid(tx, 'Batch: missing field RawTransactions')
   })
 
   it('throws w/ invalid RawTransactions', function () {
     tx.RawTransactions = 0
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: invalid field RawTransactions',
-    )
+    assertInvalid(tx, 'Batch: invalid field RawTransactions')
   })
 
   it('throws w/ invalid RawTransactions object', function () {
     tx.RawTransactions = [0]
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: RawTransactions[0] is not object',
-    )
+    assertInvalid(tx, 'Batch: RawTransactions[0] is not object')
   })
 
   it('throws w/ invalid RawTransactions.RawTransaction object', function () {
     tx.RawTransactions = [{ RawTransaction: 0 }]
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: invalid field RawTransactions[0].RawTransaction',
-    )
+    assertInvalid(tx, 'Batch: invalid field RawTransactions[0].RawTransaction')
   })
 
   it('throws w/ nested Batch', function () {
     tx.RawTransactions = [{ RawTransaction: tx }]
-    assertTxValidationError(
+    assertInvalid(
       tx,
-      validateBatch,
       'Batch: RawTransactions[0] is a Batch transaction. Cannot nest Batch transactions.',
     )
   })
 
   it('throws w/ non-object in BatchSigner list', function () {
     tx.BatchSigners = [1]
-    assertTxValidationError(
-      tx,
-      validateBatch,
-      'Batch: BatchSigners[0] is not object.',
-    )
+    assertInvalid(tx, 'Batch: BatchSigners[0] is not object.')
   })
 
   it('throws w/ no `tfInnerBatchTxn` flag in inner transaction', function () {
     tx.RawTransactions[0].RawTransaction.Flags = 0
-    assertTxValidationError(
+    assertInvalid(
       tx,
-      validateBatch,
       'Batch: RawTransactions[0] must contain the `tfInnerBatchTxn` flag.',
     )
   })

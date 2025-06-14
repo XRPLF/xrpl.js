@@ -19,6 +19,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Adds `MPTCurrency` type
 * Better faucet support
 * Improve multisign fee calculations
+* Fix issue with some transactions that would crash in validation
 
 ## 4.2.0 (2025-2-13)
 
