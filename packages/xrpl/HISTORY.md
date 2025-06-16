@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * Support for `Single Asset Vault` (XLS-65)
 
+### Fixed
+* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
+
 ## 4.3.0 (2025-6-09)
 
 ### Added
