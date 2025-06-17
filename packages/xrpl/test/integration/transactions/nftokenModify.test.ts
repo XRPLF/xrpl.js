@@ -1,8 +1,8 @@
 import { assert } from 'chai'
 
-import { NFTokenModify } from '../../../dist/npm'
-import { NFTokenMintFlags } from '../../../dist/npm/src'
 import {
+  NFTokenModify,
+  NFTokenMintFlags,
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,

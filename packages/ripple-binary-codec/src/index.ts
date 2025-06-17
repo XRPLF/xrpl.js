@@ -1,6 +1,6 @@
 import { quality, binary, HashPrefix } from './coretypes'
 import { decodeLedgerData } from './ledger-hashes'
-import { ClaimObject } from './binary'
+import { ClaimObject, BatchObject } from './binary'
 import { JsonObject } from './types/serialized-type'
 import {
   XrplDefinitionsBase,
@@ -15,6 +15,7 @@ const {
   signingData,
   signingClaimData,
   multiSigningData,
+  signingBatchData,
   binaryToJSON,
   serializeObject,
 } = binary
@@ -71,12 +72,10 @@ function encodeForSigning(
 }
 
 /**
- * Encode a transaction and prepare for signing with a claim
+ * Encode a payment channel claim for signing.
  *
- * @param json JSON object representing the transaction
- * @param signer string representing the account to sign the transaction with
- * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns a hex string of the encoded transaction
+ * @param json JSON object representing the claim.
+ * @returns a hex string of the encoded claim.
  */
 function encodeForSigningClaim(json: object): string {
   if (typeof json !== 'object') {
@@ -86,12 +85,12 @@ function encodeForSigningClaim(json: object): string {
 }
 
 /**
- * Encode a transaction and prepare for multi-signing
+ * Encode a transaction and prepare for multi-signing.
  *
- * @param json JSON object representing the transaction
- * @param signer string representing the account to sign the transaction with
+ * @param json JSON object representing the transaction.
+ * @param signer string representing the account to sign the transaction with.
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
- * @returns a hex string of the encoded transaction
+ * @returns a hex string of the encoded transaction.
  */
 function encodeForMultisigning(
   json: object,
@@ -108,6 +107,19 @@ function encodeForMultisigning(
   return bytesToHex(
     multiSigningData(json as JsonObject, signer, definitionsOpt),
   )
+}
+
+/**
+ * Encode a Batch transaction for signing.
+ *
+ * @param json JSON object representing the transaction.
+ * @returns a hex string of the encoded transaction.
+ */
+function encodeForSigningBatch(json: object): string {
+  if (typeof json !== 'object') {
+    throw new Error('Need an object to encode a Batch transaction')
+  }
+  return bytesToHex(signingBatchData(json as BatchObject))
 }
 
 /**
@@ -142,6 +154,7 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningBatch,
   encodeQuality,
   decodeQuality,
   decodeLedgerData,

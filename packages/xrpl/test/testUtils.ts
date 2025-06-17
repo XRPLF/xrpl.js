@@ -5,7 +5,12 @@ import net from 'net'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 
-import { rippleTimeToUnixTime, unixTimeToRippleTime } from '../src'
+import {
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
+  validate,
+  ValidationError,
+} from '../src'
 
 import addresses from './fixtures/addresses.json'
 
@@ -50,6 +55,22 @@ export function assertResultMatch(
     omit(response, ['txJSON', 'tx_json']),
     omit(expected, ['txJSON', 'tx_json']),
   )
+}
+
+/**
+ * Check that a transaction error validation fails properly.
+ *
+ * @param tx The transaction that should fail validation.
+ * @param validateTx The transaction-specific validation function (e.g. `validatePayment`).
+ * @param errorMessage The error message that should be included in the error.
+ */
+export function assertTxValidationError(
+  tx: any,
+  validateTx: (tx: any) => void,
+  errorMessage: string,
+): void {
+  assert.throws(() => validateTx(tx), ValidationError, errorMessage)
+  assert.throws(() => validate(tx), ValidationError, errorMessage)
 }
 
 /**
