@@ -73,7 +73,7 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
   /** Total NFTokens this account's issued that have been burned. This number is always equal or less than MintedNFTokens. */
   BurnedNFTokens?: number
   /** The sequence that the account first minted an NFToken */
-  FirstNFTSequence: number
+  FirstNFTokenSequence?: number
   /** Total NFTokens have been minted by and on behalf of this account. */
   MintedNFTokens?: number
   /** Another account that can mint NFTokens on behalf of this account. */

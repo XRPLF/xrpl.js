@@ -15,6 +15,7 @@ import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { Batch, validateBatch } from './batch'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -23,6 +24,7 @@ import { BaseTransaction, isIssuedCurrency } from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
+import { DelegateSet, validateDelegateSet } from './delegateSet'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -132,6 +134,7 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | Batch
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -141,6 +144,7 @@ export type SubmittableTransaction =
   | CredentialDelete
   | DIDDelete
   | DIDSet
+  | DelegateSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
@@ -307,6 +311,19 @@ export function validate(transaction: Record<string, unknown>): void {
       validateAccountSet(tx)
       break
 
+    case 'Batch':
+      validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
+      break
+
     case 'CheckCancel':
       validateCheckCancel(tx)
       break
@@ -341,6 +358,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'DIDSet':
       validateDIDSet(tx)
+      break
+
+    case 'DelegateSet':
+      validateDelegateSet(tx)
       break
 
     case 'DepositPreauth':

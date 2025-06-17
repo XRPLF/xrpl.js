@@ -34,8 +34,8 @@ describe('encode and decode using new types as a parameter', function () {
   it('can encode and decode a new Field', function () {
     const tx = { ...txJson, NewFieldDefinition: 10 }
 
-    // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Before updating the types, undefined fields will throw an error
+    expect(() => encode(tx)).toThrow()
 
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
@@ -72,8 +72,8 @@ describe('encode and decode using new types as a parameter', function () {
       ],
     }
 
-    // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Before updating the types, undefined fields will throw an error
+    expect(() => encode(tx)).toThrow()
 
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
@@ -141,8 +141,8 @@ describe('encode and decode using new types as a parameter', function () {
       },
     ])
 
-    // Test that before updating the types this tx fails to decode correctly. Note that undefined fields are ignored on encode.
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Test that before updating the types this tx fails to decode correctly. Note that undefined fields will throw an error.
+    expect(() => encode(tx)).toThrow()
 
     class NewType extends UInt32 {
       // Should be the same as UInt32

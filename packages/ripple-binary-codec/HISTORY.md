@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.4.0 (2025-6-09)
+
+### Added
+* Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d).
+* Support for the `Batch` amendment (XLS-56).
+
+### Fixed
+* add `MPTCurrency` support in `Issue` (rippled internal type)
+* Throw an error during serialization if a field is unknown, rather than silently throwing it away.
+
 ## 2.3.0 (2025-2-13)
 
 ### Added
@@ -11,7 +21,7 @@
 ## 2.2.0 (2024-12-23)
 
 ### Added
-* Support for the Multi-Purpose Token amendment (XLS-33)
+* Support for the Multi-Purpose Token amendment (XLS-33).
 
 ## 2.1.0 (2024-06-03)
 

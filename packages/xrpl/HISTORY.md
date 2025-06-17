@@ -4,6 +4,25 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
+
+## 4.3.0 (2025-6-09)
+
+### Added
+* Support for `NFTokenMintOffer` (XLS-52)
+* Add Github Actions step to auto-generate documentation
+* Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d)
+* Add support for `Batch` amendment (XLS-56)
+
+### Fixed
+* Fix `OracleSet` transaction to accept hexadecimal string values for `AssetPrice` field
+* `TransactionStream` model includes `hash` field in APIv2
+* `TransactionStream` model includes `close_time_iso` field only for APIv2
+* Adds `MPTCurrency` type
+* Better faucet support
+* Improve multisign fee calculations
+
 ## 4.2.0 (2025-2-13)
 
 ### Added
@@ -32,6 +51,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TransactionStream` model supports APIv2
 * `TransactionStream` model includes `close_time_iso` field
 * `Ledger` model includes `close_time_iso` field
+* Remove hard-coded reference to 10 drops as the reference transaction cost. Ensure tests passed for all transaction fee scenarios and `AMMCreate` transaction fee calculation is correct in case `owner_reserve` increases.
 
 ## 4.0.0 (2024-07-15)
 

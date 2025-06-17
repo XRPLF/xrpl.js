@@ -97,8 +97,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
       )
     }
     validateAuthAccounts(
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-      tx.Account as string,
+      tx.Account,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
       tx.AuthAccounts as Array<Record<string, unknown>>,
     )
