@@ -95,14 +95,20 @@ export {
 } from './paymentChannelClaim'
 export { PaymentChannelCreate } from './paymentChannelCreate'
 export { PaymentChannelFund } from './paymentChannelFund'
+export { PermissionedDomainSet } from './permissionedDomainSet'
+export { PermissionedDomainDelete } from './permissionedDomainDelete'
 export { SetFee, SetFeePreAmendment, SetFeePostAmendment } from './setFee'
 export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
-export { PermissionedDomainSet } from './permissionedDomainSet'
-export { PermissionedDomainDelete } from './permissionedDomainDelete'
+export {
+  VaultCreate,
+  VaultCreateFlags,
+  VaultCreateFlagsInterface,
+  VaultWithdrawalPolicy,
+} from './vaultCreate'
 export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
 export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
 export { XChainClaim } from './XChainClaim'
