@@ -90,7 +90,7 @@ From the top-level xrpl.js folder, run the following commands:
 ```bash
 npm install
 npm run build
-npm run test:faucet # Assuming this is the command
+npm run test:faucet
 ```
 
 ### Browser Tests
