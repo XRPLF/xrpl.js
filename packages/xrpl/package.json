@@ -29,7 +29,7 @@
     "bignumber.js": "^9.0.0",
     "eventemitter3": "^5.0.1",
     "ripple-address-codec": "^5.0.0",
-    "ripple-binary-codec": "^2.4.0",
+    "ripple-binary-codec": "^2.4.1",
     "ripple-keypairs": "^2.0.0"
   },
   "devDependencies": {
