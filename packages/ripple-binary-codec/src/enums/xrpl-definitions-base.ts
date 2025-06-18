@@ -129,7 +129,9 @@ class XrplDefinitionsBase {
     this.field['TransactionType'].associatedType = this.transactionType
     this.field['TransactionResult'].associatedType = this.transactionResult
     this.field['LedgerEntryType'].associatedType = this.ledgerEntryType
-    this.field['PermissionValue'].associatedType = this.delegatablePermissions
+    if (this.field['PermissionValue']) {
+      this.field['PermissionValue'].associatedType = this.delegatablePermissions
+    }
   }
 
   public getAssociatedTypes(): Record<string, typeof SerializedType> {
