@@ -85,7 +85,7 @@ Faucet tests are designed to ensure the functionality of account funding and oth
 
 To run Faucet tests locally, you'll first need to ensure your development environment is set up and the project is built. Faucet tests do not require a locally running `rippled` instance to execute.
 
-From the top-level xrpl.js folder, run the following commands:
+From the root directory of xrpl.js, run the following commands:
 
 ```bash
 npm install
