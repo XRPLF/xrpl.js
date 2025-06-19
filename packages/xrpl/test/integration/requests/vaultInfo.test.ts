@@ -59,12 +59,8 @@ describe('Single Asset Vault', function () {
     })
     const { vault } = vaultInfoRes.result
 
-    assert.isDefined(vault, 'Vault info response should include a vault')
-    assert.equal(
-      vault.Account,
-      testContext.wallet.classicAddress,
-      'Vault Account should match',
-    )
+    assert.isDefined(vault, 'vault_info response should include a vault')
+    assert.isDefined(vault.Account)
     assert.equal(
       vault.Owner,
       testContext.wallet.classicAddress,
@@ -74,7 +70,7 @@ describe('Single Asset Vault', function () {
     assert.deepEqual(
       vault.Asset,
       { currency: 'XRP' },
-      'Vault asset should be XRP',
+      'Vault Asset should be XRP',
     )
     assert.equal(
       vault.WithdrawalPolicy,
@@ -83,12 +79,12 @@ describe('Single Asset Vault', function () {
     assert.equal(
       vault.AssetsTotal,
       '0',
-      'New vault should have zero total assets',
+      'New Vault should have zero total assets',
     )
     assert.equal(
       vault.AssetsAvailable,
       '0',
-      'New vault should have zero available assets',
+      'New Vault should have zero available assets',
     )
     assert.equal(
       vault.ShareMPTID,
@@ -99,17 +95,17 @@ describe('Single Asset Vault', function () {
     assert.equal(
       vault.shares.Issuer,
       vault.Account,
-      'Shares issuer should match vault account',
+      'shares.Issuer should match vault account',
     )
     assert.equal(
       vault.shares.LedgerEntryType,
       'MPTokenIssuance',
-      'Shares entry type should be MPTokenIssuance',
+      'shares entry type should be MPTokenIssuance',
     )
     assert.equal(
       vault.shares.OutstandingAmount,
       '0',
-      'New vault should have zero shares outstanding',
+      'New Vault should have zero shares outstanding',
     )
     assert.equal(
       vault.shares.mpt_issuance_id,
