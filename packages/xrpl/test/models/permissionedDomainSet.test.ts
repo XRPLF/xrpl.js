@@ -1,7 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
-import { assert } from 'chai'
 
-import { AuthorizeCredential, validate, ValidationError } from '../../src'
+import { AuthorizeCredential } from '../../src'
+import { validatePermissionedDomainSet } from '../../src/models/transactions/permissionedDomainSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validatePermissionedDomainSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePermissionedDomainSet, message)
 
 /**
  * PermissionedDomainSet Transaction Verification Testing.
@@ -9,7 +15,7 @@ import { AuthorizeCredential, validate, ValidationError } from '../../src'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('PermissionedDomainSet', function () {
-  let tx
+  let tx: any
   const sampleCredential: AuthorizeCredential = {
     Credential: {
       CredentialType: stringToHex('Passport'),
@@ -24,69 +30,62 @@ describe('PermissionedDomainSet', function () {
       DomainID:
         'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737',
       AcceptedCredentials: [sampleCredential],
-    } as any
+    }
   })
 
   it('verifies valid PermissionedDomainSet', function () {
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it(`throws with invalid field DomainID`, function () {
     // DomainID is expected to be a string
     tx.DomainID = 1234
     const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing field AcceptedCredentials`, function () {
     delete tx.AcceptedCredentials
     const errorMessage =
       'PermissionedDomainSet: missing field AcceptedCredentials'
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it('throws when AcceptedCredentials exceeds maximum length', function () {
     tx.AcceptedCredentials = Array(11).fill(sampleCredential)
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+
+    assertInvalid(
+      tx,
       'PermissionedDomainSet: Credentials length cannot exceed 10 elements',
     )
   })
 
   it('throws when AcceptedCredentials is empty', function () {
     tx.AcceptedCredentials = []
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'PermissionedDomainSet: Credentials cannot be an empty array',
     )
   })
 
   it('throws when AcceptedCredentials is not an array type', function () {
     tx.AcceptedCredentials = 'AcceptedCredentials is not an array'
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'PermissionedDomainSet: invalid field AcceptedCredentials',
     )
   })
 
   it('throws when AcceptedCredentials contains duplicates', function () {
     tx.AcceptedCredentials = [sampleCredential, sampleCredential]
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'PermissionedDomainSet: Credentials cannot contain duplicate elements',
     )
   })
 
   it('throws when AcceptedCredentials contains invalid format', function () {
     tx.AcceptedCredentials = [{ Field1: 'Value1', Field2: 'Value2' }]
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'PermissionedDomainSet: Invalid Credentials format',
-    )
+    assertInvalid(tx, 'PermissionedDomainSet: Invalid Credentials format')
   })
 })
