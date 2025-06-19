@@ -34,7 +34,7 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '1000000000',
-        // This Fee accounts for high open_ledger_cost with owner reserve fee
+        // This covers owner reserve fee with potentially high open_ledger_cost
         Fee: '5000000',
       }
 
@@ -60,6 +60,9 @@ describe('Single Asset Vault', function () {
       )
       assert.equal(vault.Data, tx.Data)
       assert.equal(assetsMaximum, '1000000000')
+
+      // RPC vault_info
+      const vaultId = vault.index
     },
     TIMEOUT,
   )
