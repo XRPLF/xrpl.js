@@ -135,6 +135,11 @@ export interface VaultInfoResponse extends BaseResponse {
         mpt_issuance_id?: string
 
         /**
+         * The PermissionedDomain object ID associated with the shares of this Vault.
+         */
+        DomainID?: string
+
+        /**
          * Bit-field flags associated with the shares issuance.
          */
         Flags?: number
