@@ -30,7 +30,7 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Hash192,
   Hash256,
   Issue,
-  SerializedNumber,
+  Number: SerializedNumber,
   PathSet,
   STArray,
   STObject,
