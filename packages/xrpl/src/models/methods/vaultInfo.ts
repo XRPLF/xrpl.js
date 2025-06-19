@@ -14,7 +14,7 @@ export interface VaultInfoRequest extends BaseRequest {
   /**
    * The object ID of the Vault to be returned.
    */
-  vault: string
+  vault_id: string
 }
 
 /**

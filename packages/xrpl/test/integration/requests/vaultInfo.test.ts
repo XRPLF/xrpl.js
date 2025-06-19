@@ -55,7 +55,7 @@ describe('Single Asset Vault', function () {
     // Fetch vault_info
     const vaultInfoRes: VaultInfoResponse = await testContext.client.request({
       command: 'vault_info',
-      vault: vaultId,
+      vault_id: vaultId,
     })
     const { vault } = vaultInfoRes.result
 
