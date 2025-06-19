@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
-  isCurrency,
   isIssuedCurrency,
+  isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
 
@@ -87,7 +87,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: missing field Asset')
   }
 
-  if (!isCurrency(tx.Asset)) {
+  if (!isIssuedCurrency(tx.Asset)) {
     throw new ValidationError('AMMWithdraw: Asset must be a Currency')
   }
 
@@ -95,7 +95,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: missing field Asset2')
   }
 
-  if (!isCurrency(tx.Asset2)) {
+  if (!isIssuedCurrency(tx.Asset2)) {
     throw new ValidationError('AMMWithdraw: Asset2 must be a Currency')
   }
 
@@ -105,7 +105,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Amount with EPrice')
   }
 
-  if (tx.LPTokenIn != null && !isIssuedCurrency(tx.LPTokenIn)) {
+  if (tx.LPTokenIn != null && !isIssuedCurrencyAmount(tx.LPTokenIn)) {
     throw new ValidationError(
       'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount',
     )

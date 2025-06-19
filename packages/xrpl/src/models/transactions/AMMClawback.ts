@@ -6,8 +6,8 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
-  isAmount,
-  isCurrency,
+  isIssuedCurrency,
+  isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -81,12 +81,9 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Holder', isAccount)
 
-  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
-  const asset = tx.Asset as IssuedCurrency
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required
-  const amount = tx.Amount as IssuedCurrencyAmount
+  const asset = tx.Asset
 
   if (tx.Holder === asset.issuer) {
     throw new ValidationError(
@@ -100,18 +97,18 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Asset2', isCurrency)
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
-  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount)
 
   if (tx.Amount != null) {
-    if (amount.currency !== asset.currency) {
+    if (tx.Amount.currency !== asset.currency) {
       throw new ValidationError(
         'AMMClawback: Amount.currency must match Asset.currency',
       )
     }
 
-    if (amount.issuer !== asset.issuer) {
+    if (tx.Amount.issuer !== asset.issuer) {
       throw new ValidationError(
         'AMMClawback: Amount.issuer must match Amount.issuer',
       )

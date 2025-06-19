@@ -66,7 +66,7 @@ describe('Payment', function () {
     assert.throws(
       () => validate(paymentTransaction),
       ValidationError,
-      'BaseTransaction: invalid Memos',
+      'MemoType field must be a hex value',
     )
   })
 
