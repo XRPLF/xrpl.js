@@ -25,6 +25,16 @@ describe('Single Asset Vault', function () {
   it(
     'base',
     async () => {
+      const feeResp = await testContext.client.request({ command: 'fee' })
+      // eslint-disable-next-line no-console -- debug
+      console.log('open_ledger_fee:', feeResp.result.drops.open_ledger_fee)
+      // eslint-disable-next-line no-console -- debug
+      console.log('minimum_fee:', feeResp.result.drops.minimum_fee)
+      // eslint-disable-next-line no-console -- debug
+      console.log('median_fee:', feeResp.result.drops.median_fee)
+      // eslint-disable-next-line no-console -- debug
+      console.log('fee_resp:', feeResp.result.drops)
+
       const tx: VaultCreate = {
         TransactionType: 'VaultCreate',
         Account: testContext.wallet.classicAddress,
@@ -35,7 +45,7 @@ describe('Single Asset Vault', function () {
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '1000000000',
         // Owner reserve fee included
-        Fee: '500000',
+        Fee: '1000000',
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
