@@ -99,12 +99,16 @@ describe('SerializedNumber', () => {
   it('throws with invalid input (non-number string)', () => {
     expect(() => {
       SerializedNumber.from('abc123')
-    }).toThrow(/Unable to parse number/)
+    }).toThrow(new Error('Unable to parse number from string: abc123'))
   })
 
   it('throws with invalid input (object)', () => {
     expect(() => {
       SerializedNumber.from({ foo: 'bar' })
-    }).toThrow()
+    }).toThrow(
+      new Error(
+        'SerializedNumber.from: Only string or SerializedNumber instance is supported',
+      ),
+    )
   })
 })
