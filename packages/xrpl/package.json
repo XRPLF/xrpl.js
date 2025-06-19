@@ -60,6 +60,7 @@
     "prepublish": "run-s clean build",
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
+    "test:faucet": "jest --config jest.config.faucet.js",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
