@@ -60,9 +60,6 @@ describe('Single Asset Vault', function () {
       )
       assert.equal(vault.Data, tx.Data)
       assert.equal(assetsMaximum, '1000000000')
-
-      // RPC vault_info
-      const vaultId = vault.index
     },
     TIMEOUT,
   )
