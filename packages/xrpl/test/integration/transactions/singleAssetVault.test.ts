@@ -33,7 +33,7 @@ describe('Single Asset Vault', function () {
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: BigInt(1000000000),
+        AssetsMaximum: '1000000000',
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
@@ -45,7 +45,7 @@ describe('Single Asset Vault', function () {
       })
       const vault = result.result.account_objects[0] as Vault
       const asset = vault.Asset as XRP
-      const assetsMaximum = vault.AssetsMaximum as bigint
+      const assetsMaximum = vault.AssetsMaximum as string
 
       // confirm that the Vault was actually created
       assert.equal(result.result.account_objects.length, 1)
@@ -57,7 +57,7 @@ describe('Single Asset Vault', function () {
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(BigInt(assetsMaximum), BigInt(1000000000))
+      assert.equal(assetsMaximum, '1000000000')
     },
     TIMEOUT,
   )

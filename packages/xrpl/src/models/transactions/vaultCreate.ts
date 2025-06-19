@@ -11,7 +11,6 @@ import {
   isCurrency,
   validateRequiredField,
   isString,
-  isBigInt,
 } from './common'
 
 const DATA_MAX_BYTE_LENGTH = 256
@@ -69,7 +68,7 @@ export interface VaultCreate extends BaseTransaction {
   /**
    * The maximum asset amount that can be held in a vault.
    */
-  AssetsMaximum?: bigint
+  AssetsMaximum?: string
 
   /**
    * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
@@ -102,7 +101,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Asset', isCurrency)
   validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'AssetsMaximum', isBigInt)
+  validateOptionalField(tx, 'AssetsMaximum', isString)
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
   validateOptionalField(tx, 'DomainID', isString)

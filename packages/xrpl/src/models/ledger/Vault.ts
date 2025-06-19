@@ -49,22 +49,22 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The total value of the vault.
    */
-  AssetsTotal: bigint
+  AssetsTotal: string
 
   /**
    * The asset amount that is available in the vault.
    */
-  AssetsAvailable: bigint
+  AssetsAvailable: string
 
   /**
    * The potential loss amount that is not yet realized expressed as the vaults asset.
    */
-  LossUnrealized: bigint
+  LossUnrealized: string
 
   /**
    * The identifier of the share MPTokenIssuance object.
    */
-  MPTokenIssuanceID: bigint
+  MPTokenIssuanceID: string
 
   /**
    * Indicates the withdrawal strategy used by the Vault.
@@ -74,7 +74,7 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The maximum asset amount that can be held in the vault. Zero value 0 indicates there is no cap.
    */
-  AssetsMaximum?: bigint
+  AssetsMaximum?: string
 
   /**
    * Arbitrary metadata about the Vault. Limited to 256 bytes.

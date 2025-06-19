@@ -62,7 +62,7 @@ describe('VaultCreate', function () {
   })
 
   it('throws w/ negative AssetsMaximum', function () {
-    tx.AssetsMaximum = BigInt(-1)
+    tx.AssetsMaximum = '-1'
     const errorMessage = 'VaultCreate: AssetsMaximum cannot be negative.'
     assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
