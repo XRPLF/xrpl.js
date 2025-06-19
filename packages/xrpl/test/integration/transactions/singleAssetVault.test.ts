@@ -35,7 +35,7 @@ describe('Single Asset Vault', function () {
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '1000000000',
         // Owner reserve fee included
-        Fee: '250000',
+        Fee: '500000',
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
