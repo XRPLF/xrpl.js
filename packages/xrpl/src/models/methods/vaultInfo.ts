@@ -14,7 +14,17 @@ export interface VaultInfoRequest extends BaseRequest {
   /**
    * The object ID of the Vault to be returned.
    */
-  vault_id: string
+  vault_id?: string
+
+  /**
+   * ID of the Vault Owner account.
+   */
+  owner?: string
+
+  /**
+   * Sequence number of the vault entry.
+   */
+  seq?: number
 }
 
 /**

@@ -52,14 +52,17 @@ describe('Single Asset Vault', function () {
     const vaultObj = result.result.account_objects[0] as Vault
     const vaultId = vaultObj.index
 
-    // Fetch vault_info
+    // Fetch vault_info using vault_id
     const vaultInfoRes: VaultInfoResponse = await testContext.client.request({
       command: 'vault_info',
       vault_id: vaultId,
     })
     const { vault } = vaultInfoRes.result
 
-    assert.isDefined(vault, 'vault_info response should include a vault')
+    assert.isDefined(
+      vault,
+      'vault_info (vault_id) response should include a vault',
+    )
     assert.isDefined(vault.Account)
     assert.equal(
       vault.Owner,
@@ -112,5 +115,17 @@ describe('Single Asset Vault', function () {
       vault.ShareMPTID,
       'mpt_issuance_id should match ShareMPTID',
     )
+
+    // Fetch vault_info using owner and seq
+    const vaultInfoRes2: VaultInfoResponse = await testContext.client.request({
+      command: 'vault_info',
+      owner: vaultObj.Owner,
+      seq: vaultObj.Sequence,
+    })
+    assert.isDefined(
+      vaultInfoRes2.result.vault,
+      'vault_info (owner, seq) response should include a vault',
+    )
+    assert.equal(vaultInfoRes2.result.vault.index, vault.index)
   })
 })
