@@ -1,7 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { VaultCreate, VaultWithdrawalPolicy, XRP } from '../../../src'
+import { VaultCreate, VaultSet, VaultWithdrawalPolicy, XRP } from '../../../src'
 import { Vault } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
@@ -46,6 +46,7 @@ describe('Single Asset Vault', function () {
         type: 'vault',
       })
       const vault = result.result.account_objects[0] as Vault
+      const vaultId = vault.index
       const asset = vault.Asset as XRP
       const assetsMaximum = vault.AssetsMaximum as string
 
@@ -60,6 +61,30 @@ describe('Single Asset Vault', function () {
       )
       assert.equal(vault.Data, tx.Data)
       assert.equal(assetsMaximum, '1000000000')
+
+      // --- VaultSet Transaction ---
+      // Increase the AssetsMaximum and update Data
+      const vaultSetTx: VaultSet = {
+        TransactionType: 'VaultSet',
+        Account: testContext.wallet.classicAddress,
+        VaultID: vaultId,
+        AssetsMaximum: '2000000000',
+        Data: stringToHex('updated metadata'),
+        Fee: '5000000',
+      }
+
+      await testTransaction(testContext.client, vaultSetTx, testContext.wallet)
+
+      // Fetch the vault again to confirm updates
+      const updatedResult = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'vault',
+      })
+      const updatedVault = updatedResult.result.account_objects[0] as Vault
+
+      assert.equal(updatedVault.AssetsMaximum, '2000000000')
+      assert.equal(updatedVault.Data, stringToHex('updated metadata'))
     },
     TIMEOUT,
   )
