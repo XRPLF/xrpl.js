@@ -8,6 +8,7 @@ import {
   VaultSet,
   VaultWithdraw,
   VaultWithdrawalPolicy,
+  Wallet,
   XRP,
 } from '../../../src'
 import { Vault } from '../../../src/models/ledger'
@@ -17,16 +18,20 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { testTransaction } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('Single Asset Vault', function () {
   let testContext: XrplIntegrationTestContext
+  let vaultOwnerWallet: Wallet
+  let holderWallet: Wallet
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
+    vaultOwnerWallet = testContext.wallet
+    holderWallet = await generateFundedWallet(testContext.client)
   })
   afterEach(async () => teardownClient(testContext))
 
@@ -34,9 +39,10 @@ describe('Single Asset Vault', function () {
     'base',
     // eslint-disable-next-line max-statements -- needed to test all Vault transactions in one sequence flow
     async () => {
+      // --- VaultCreate ---
       const tx: VaultCreate = {
         TransactionType: 'VaultCreate',
-        Account: testContext.wallet.classicAddress,
+        Account: vaultOwnerWallet.classicAddress,
         Asset: { currency: 'XRP' },
         WithdrawalPolicy:
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
@@ -47,11 +53,11 @@ describe('Single Asset Vault', function () {
         Fee: '5000000',
       }
 
-      await testTransaction(testContext.client, tx, testContext.wallet)
+      await testTransaction(testContext.client, tx, vaultOwnerWallet)
 
       const result = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
       const vault = result.result.account_objects[0] as Vault
@@ -62,7 +68,7 @@ describe('Single Asset Vault', function () {
       // confirm that the Vault was actually created
       assert.equal(result.result.account_objects.length, 1)
       assert.isDefined(vault, 'Vault ledger object should exist')
-      assert.equal(vault.Owner, testContext.wallet.classicAddress)
+      assert.equal(vault.Owner, vaultOwnerWallet.classicAddress)
       assert.equal(asset.currency, 'XRP')
       assert.equal(
         vault.WithdrawalPolicy,
@@ -75,19 +81,19 @@ describe('Single Asset Vault', function () {
       // Increase the AssetsMaximum and update Data
       const vaultSetTx: VaultSet = {
         TransactionType: 'VaultSet',
-        Account: testContext.wallet.classicAddress,
+        Account: vaultOwnerWallet.classicAddress,
         VaultID: vaultId,
         AssetsMaximum: '2000000000',
         Data: stringToHex('updated metadata'),
         Fee: '5000000',
       }
 
-      await testTransaction(testContext.client, vaultSetTx, testContext.wallet)
+      await testTransaction(testContext.client, vaultSetTx, vaultOwnerWallet)
 
       // Fetch the vault again to confirm updates
       const updatedResult = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
       const updatedVault = updatedResult.result.account_objects[0] as Vault
@@ -100,22 +106,18 @@ describe('Single Asset Vault', function () {
       const depositAmount = '200000'
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
-        Account: testContext.wallet.classicAddress,
+        Account: holderWallet.classicAddress,
         VaultID: vaultId,
         Amount: depositAmount,
         Fee: '5000000',
       }
 
-      await testTransaction(
-        testContext.client,
-        vaultDepositTx,
-        testContext.wallet,
-      )
+      await testTransaction(testContext.client, vaultDepositTx, holderWallet)
 
       // Fetch the vault again to confirm deposit
       const afterDepositResult = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
       const afterDepositVault = afterDepositResult.result
@@ -133,22 +135,18 @@ describe('Single Asset Vault', function () {
       const withdrawAmount = '123456'
       const vaultWithdrawTx: VaultWithdraw = {
         TransactionType: 'VaultWithdraw',
-        Account: testContext.wallet.classicAddress,
+        Account: holderWallet.classicAddress,
         VaultID: vaultId,
         Amount: withdrawAmount,
         Fee: '5000000',
       }
 
-      await testTransaction(
-        testContext.client,
-        vaultWithdrawTx,
-        testContext.wallet,
-      )
+      await testTransaction(testContext.client, vaultWithdrawTx, holderWallet)
 
       // Fetch the vault again to confirm withdrawal
       const afterWithdrawResult = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
       const afterWithdrawVault = afterWithdrawResult.result
@@ -168,9 +166,9 @@ describe('Single Asset Vault', function () {
       const clawbackAmount = '50000'
       const vaultClawbackTx: VaultClawback = {
         TransactionType: 'VaultClawback',
-        Account: testContext.wallet.classicAddress,
+        Account: vaultOwnerWallet.classicAddress,
         VaultID: vaultId,
-        Holder: testContext.wallet.classicAddress,
+        Holder: holderWallet.classicAddress,
         Amount: clawbackAmount,
         Fee: '5000000',
       }
@@ -178,13 +176,13 @@ describe('Single Asset Vault', function () {
       await testTransaction(
         testContext.client,
         vaultClawbackTx,
-        testContext.wallet,
+        vaultOwnerWallet,
       )
 
       // Fetch the vault again to confirm clawback
       const afterClawbackResult = await testContext.client.request({
         command: 'account_objects',
-        account: testContext.wallet.classicAddress,
+        account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
       const afterClawbackVault = afterClawbackResult.result
