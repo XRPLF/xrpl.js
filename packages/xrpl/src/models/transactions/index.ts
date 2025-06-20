@@ -109,6 +109,7 @@ export {
   VaultCreateFlagsInterface,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
+export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
 export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
 export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
