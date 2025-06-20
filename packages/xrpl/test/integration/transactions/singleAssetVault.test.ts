@@ -1,7 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import { VaultCreate, VaultSet, VaultWithdrawalPolicy, XRP } from '../../../src'
+import {
+  VaultCreate,
+  VaultDeposit,
+  VaultSet,
+  VaultWithdrawalPolicy,
+  XRP,
+} from '../../../src'
 import { Vault } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
@@ -24,6 +30,7 @@ describe('Single Asset Vault', function () {
 
   it(
     'base',
+    // eslint-disable-next-line max-statements -- needed to test all Vault transactions in one sequence flow
     async () => {
       const tx: VaultCreate = {
         TransactionType: 'VaultCreate',
@@ -85,6 +92,39 @@ describe('Single Asset Vault', function () {
 
       assert.equal(updatedVault.AssetsMaximum, '2000000000')
       assert.equal(updatedVault.Data, stringToHex('updated metadata'))
+
+      // --- VaultDeposit Transaction ---
+      // Deposit 123456 XRP to the vault
+      const depositAmount = '123456'
+      const vaultDepositTx: VaultDeposit = {
+        TransactionType: 'VaultDeposit',
+        Account: testContext.wallet.classicAddress,
+        VaultID: vaultId,
+        Amount: depositAmount,
+        Fee: '5000000',
+      }
+
+      await testTransaction(
+        testContext.client,
+        vaultDepositTx,
+        testContext.wallet,
+      )
+
+      // Fetch the vault again to confirm deposit
+      const afterDepositResult = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'vault',
+      })
+      const afterDepositVault = afterDepositResult.result
+        .account_objects[0] as Vault
+
+      // Should have new balance after deposit (this assumes AssetsTotal tracks deposits)
+      assert.equal(
+        afterDepositVault.AssetsTotal,
+        depositAmount,
+        'Vault should reflect deposited assets',
+      )
     },
     TIMEOUT,
   )
