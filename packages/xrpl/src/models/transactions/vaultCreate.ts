@@ -14,6 +14,7 @@ import {
   DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  DEFAULT_VAULT_WITHDRAWAL_POLICY,
 } from './common'
 
 const META_MAX_BYTE_LENGTH = 1024
@@ -22,7 +23,8 @@ const META_MAX_BYTE_LENGTH = 1024
  * Enum representing withdrawal strategies for a Vault.
  */
 export enum VaultWithdrawalPolicy {
-  vaultStrategyFirstComeFirstServe = 0x0001,
+  // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- improves code maintainability
+  vaultStrategyFirstComeFirstServe = DEFAULT_VAULT_WITHDRAWAL_POLICY,
 }
 
 /**
@@ -45,9 +47,6 @@ export interface VaultCreateFlagsInterface extends GlobalFlagsInterface {
   tfVaultPrivate?: boolean
   tfVaultShareNonTransferable?: boolean
 }
-
-export const DEFAULT_VAULT_WITHDRAWAL_POLICY =
-  VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe
 
 /**
  * The VaultCreate transaction creates a new Vault object.

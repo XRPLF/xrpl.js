@@ -11,7 +11,7 @@ import {
   Transaction,
   VaultCreate,
 } from '../models/transactions'
-import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../models/transactions/vaultCreate'
+import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
