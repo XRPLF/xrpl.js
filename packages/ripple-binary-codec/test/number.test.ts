@@ -3,7 +3,7 @@ import { coreTypes } from '../src/types'
 
 const { Number } = coreTypes
 
-describe('SerializedNumber', () => {
+describe('XRPLNumber', () => {
   it('should encode and decode integers', () => {
     const value = '9876543210'
     const sn = Number.from(value)
@@ -109,7 +109,7 @@ describe('SerializedNumber', () => {
       Number.from({ foo: 'bar' })
     }).toThrow(
       new Error(
-        'SerializedNumber.from: Only string or SerializedNumber instance is supported',
+        'XRPLNumber.from: Only string or XRPLNumber instance is supported',
       ),
     )
   })
