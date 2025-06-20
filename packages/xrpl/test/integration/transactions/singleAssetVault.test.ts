@@ -5,6 +5,7 @@ import {
   VaultCreate,
   VaultDeposit,
   VaultSet,
+  VaultWithdraw,
   VaultWithdrawalPolicy,
   XRP,
 } from '../../../src'
@@ -124,6 +125,39 @@ describe('Single Asset Vault', function () {
         afterDepositVault.AssetsTotal,
         depositAmount,
         'Vault should reflect deposited assets',
+      )
+
+      // --- VaultWithdraw Transaction ---
+      // Withdraw 123456 XRP from the vault
+      const withdrawAmount = '123456'
+      const vaultWithdrawTx: VaultWithdraw = {
+        TransactionType: 'VaultWithdraw',
+        Account: testContext.wallet.classicAddress,
+        VaultID: vaultId,
+        Amount: withdrawAmount,
+        Fee: '5000000',
+      }
+
+      await testTransaction(
+        testContext.client,
+        vaultWithdrawTx,
+        testContext.wallet,
+      )
+
+      // Fetch the vault again to confirm withdrawal
+      const afterWithdrawResult = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'vault',
+      })
+      const afterWithdrawVault = afterWithdrawResult.result
+        .account_objects[0] as Vault
+
+      // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
+      assert.equal(
+        afterWithdrawVault.AssetsTotal,
+        '0',
+        'Vault should reflect withdrawn assets',
       )
     },
     TIMEOUT,
