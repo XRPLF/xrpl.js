@@ -11,9 +11,11 @@ import {
   isCurrency,
   validateRequiredField,
   isString,
+  DATA_MAX_BYTE_LENGTH,
+  XRPLNumber,
+  isXRPLNumber,
 } from './common'
 
-const DATA_MAX_BYTE_LENGTH = 256
 const META_MAX_BYTE_LENGTH = 1024
 
 /**
@@ -68,7 +70,7 @@ export interface VaultCreate extends BaseTransaction {
   /**
    * The maximum asset amount that can be held in a vault.
    */
-  AssetsMaximum?: string
+  AssetsMaximum?: XRPLNumber
 
   /**
    * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
@@ -79,7 +81,7 @@ export interface VaultCreate extends BaseTransaction {
    * Indicates the withdrawal strategy used by the Vault.
    * Optional when constructing the transaction object.
    * Will be set by autofill if not provided, but required for validation and submission.
-   * Defaults to {@link VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe}.
+   * Default value should be {@link VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe}.
    */
   WithdrawalPolicy?: number
 
@@ -101,7 +103,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Asset', isCurrency)
   validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'AssetsMaximum', isString)
+  validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
   validateOptionalField(tx, 'DomainID', isString)
@@ -119,7 +121,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.AssetsMaximum !== undefined && BigInt(tx.AssetsMaximum) < 0) {
+  if (tx.AssetsMaximum?.trim().startsWith('-')) {
     throw new ValidationError('VaultCreate: AssetsMaximum cannot be negative.')
   }
 

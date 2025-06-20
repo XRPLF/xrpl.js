@@ -4,6 +4,7 @@ import {
   AccountRootFlagsInterface,
   AccountRootFlags,
 } from '../ledger/AccountRoot'
+import { VaultCreateFlags } from '../transactions'
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
@@ -63,6 +64,7 @@ const txToFlag = {
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,
   TrustSet: TrustSetFlags,
+  VaultCreate: VaultCreateFlags,
   XChainModifyBridge: XChainModifyBridgeFlags,
 }
 

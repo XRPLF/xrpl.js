@@ -93,6 +93,7 @@ import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
 import { VaultCreate, validateVaultCreate } from './vaultCreate'
+import { VaultSet, validateVaultSet } from './vaultSet'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -175,6 +176,7 @@ export type SubmittableTransaction =
   | TicketCreate
   | TrustSet
   | VaultCreate
+  | VaultSet
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -480,6 +482,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'VaultCreate':
       validateVaultCreate(tx)
+      break
+
+    case 'VaultSet':
+      validateVaultSet(tx)
       break
 
     case 'XChainAccountCreateCommit':

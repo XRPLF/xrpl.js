@@ -21,6 +21,9 @@ export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
+// Used for Vault transactions
+export const DATA_MAX_BYTE_LENGTH = 256
+
 function isMemo(obj: { Memo?: unknown }): boolean {
   if (obj.Memo == null) {
     return false
@@ -97,6 +100,28 @@ export function isString(str: unknown): str is string {
  */
 export function isNumber(num: unknown): num is number {
   return typeof num === 'number'
+}
+
+/**
+ * Checks whether the given value is a valid XRPL number string.
+ * Accepts integer, decimal, or scientific notation strings.
+ *
+ * Examples of valid input:
+ *   - "123"
+ *   - "-987.654"
+ *   - "+3.14e10"
+ *   - "-7.2e-9"
+ *
+ * @param value - The value to check.
+ * @returns True if value is a string that matches the XRPL number format, false otherwise.
+ */
+export function isXRPLNumber(value: unknown): value is XRPLNumber {
+  // Matches optional sign, digits, optional decimal, optional exponent (scientific)
+  // Allows leading zeros, but not empty string, lone sign, or missing digits
+  return (
+    typeof value === 'string' &&
+    /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/u.test(value.trim())
+  )
 }
 
 /**
@@ -181,6 +206,15 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
  * Must be a valid account address
  */
 export type Account = string
+
+/**
+ * XRPL Number type represented as a string.
+ *
+ * This string can be an integer (e.g., "123"), a decimal (e.g., "123.45"),
+ * or in scientific notation (e.g., "1.23e5", "-4.56e-7").
+ * Used for fields that accept arbitrary-precision numbers in XRPL transactions and ledger objects.
+ */
+export type XRPLNumber = string
 
 /**
  * Verify a string is in fact a valid account address.
