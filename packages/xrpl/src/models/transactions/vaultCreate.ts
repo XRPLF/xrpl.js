@@ -96,7 +96,7 @@ export interface VaultCreate extends BaseTransaction {
  * @param tx - A {@link VaultCreate} Transaction.
  * @throws When the {@link VaultCreate} is malformed.
  */
-// eslint-disable-next-line max-lines-per-function, max-statements -- required to do all field validations
+// eslint-disable-next-line max-lines-per-function -- required to do all field validations
 export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -118,10 +118,6 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
         `VaultCreate: Data exceeds ${DATA_MAX_BYTE_LENGTH} bytes (actual: ${dataByteLength})`,
       )
     }
-  }
-
-  if (tx.AssetsMaximum?.trim().startsWith('-')) {
-    throw new ValidationError('VaultCreate: AssetsMaximum cannot be negative.')
   }
 
   if (tx.MPTokenMetadata !== undefined) {

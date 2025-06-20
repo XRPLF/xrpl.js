@@ -68,8 +68,4 @@ export function validateVaultSet(tx: Record<string, unknown>): void {
       )
     }
   }
-
-  if (tx.AssetsMaximum?.trim().startsWith('-')) {
-    throw new ValidationError('VaultSet: AssetsMaximum cannot be negative.')
-  }
 }

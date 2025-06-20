@@ -12,7 +12,7 @@ import {
 } from './common'
 
 /**
- * The VaultWithdraw transaction adds liqudity in exchange for vault shares.
+ * The VaultWithdraw transaction withdraws assets in exchange for the vault's shares.
  *
  * @category Transaction Models
  */

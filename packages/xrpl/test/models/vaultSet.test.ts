@@ -55,13 +55,6 @@ describe('VaultSet', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it('throws w/ negative AssetsMaximum', function () {
-    tx.AssetsMaximum = '-1'
-    const errorMessage = 'VaultSet: AssetsMaximum cannot be negative.'
-    assert.throws(() => validateVaultSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
-  })
-
   it('throws w/ non-XRPLNumber AssetsMaximum', function () {
     tx.AssetsMaximum = 'notanumber'
     const errorMessage = 'VaultSet: invalid field AssetsMaximum'

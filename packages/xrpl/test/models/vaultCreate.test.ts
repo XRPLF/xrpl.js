@@ -61,13 +61,6 @@ describe('VaultCreate', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it('throws w/ negative AssetsMaximum', function () {
-    tx.AssetsMaximum = '-1'
-    const errorMessage = 'VaultCreate: AssetsMaximum cannot be negative.'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
-  })
-
   it('throws w/ MPTokenMetadata not hex', function () {
     tx.MPTokenMetadata = 'ggnothex'
     const errorMessage =

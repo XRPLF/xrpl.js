@@ -92,6 +92,7 @@ import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
+import { VaultClawback, validateVaultClawback } from './vaultClawback'
 import { VaultCreate, validateVaultCreate } from './vaultCreate'
 import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
 import { VaultSet, validateVaultSet } from './vaultSet'
@@ -177,6 +178,7 @@ export type SubmittableTransaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | VaultClawback
   | VaultCreate
   | VaultDeposit
   | VaultSet
@@ -482,6 +484,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'VaultClawback':
+      validateVaultClawback(tx)
       break
 
     case 'VaultCreate':

@@ -103,6 +103,7 @@ export { SignerListSet } from './signerListSet'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
+export { VaultClawback } from './vaultClawback'
 export {
   VaultCreate,
   VaultCreateFlags,
