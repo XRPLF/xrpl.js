@@ -111,6 +111,7 @@ export {
 } from './vaultCreate'
 export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
+export { VaultWithdraw } from './vaultWithdraw'
 export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
 export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
 export { XChainClaim } from './XChainClaim'

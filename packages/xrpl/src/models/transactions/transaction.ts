@@ -95,6 +95,7 @@ import { UNLModify } from './UNLModify'
 import { VaultCreate, validateVaultCreate } from './vaultCreate'
 import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
 import { VaultSet, validateVaultSet } from './vaultSet'
+import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -179,6 +180,7 @@ export type SubmittableTransaction =
   | VaultCreate
   | VaultDeposit
   | VaultSet
+  | VaultWithdraw
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -492,6 +494,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'VaultSet':
       validateVaultSet(tx)
+      break
+
+    case 'VaultWithdraw':
+      validateVaultWithdraw(tx)
       break
 
     case 'XChainAccountCreateCommit':
