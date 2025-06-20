@@ -2,6 +2,7 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
+  VaultClawback,
   VaultCreate,
   VaultDeposit,
   VaultSet,
@@ -96,7 +97,7 @@ describe('Single Asset Vault', function () {
 
       // --- VaultDeposit Transaction ---
       // Deposit 123456 XRP to the vault
-      const depositAmount = '123456'
+      const depositAmount = '200000'
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
         Account: testContext.wallet.classicAddress,
@@ -156,8 +157,45 @@ describe('Single Asset Vault', function () {
       // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
       assert.equal(
         afterWithdrawVault.AssetsTotal,
-        '0',
+        (
+          BigInt(afterDepositVault.AssetsTotal) - BigInt(withdrawAmount)
+        ).toString(),
         'Vault should reflect withdrawn assets',
+      )
+
+      // --- VaultClawback Transaction ---
+      // Claw back 50000 XRP from the vault
+      const clawbackAmount = '50000'
+      const vaultClawbackTx: VaultClawback = {
+        TransactionType: 'VaultClawback',
+        Account: testContext.wallet.classicAddress,
+        VaultID: vaultId,
+        Holder: testContext.wallet.classicAddress,
+        Amount: clawbackAmount,
+        Fee: '5000000',
+      }
+
+      await testTransaction(
+        testContext.client,
+        vaultClawbackTx,
+        testContext.wallet,
+      )
+
+      // Fetch the vault again to confirm clawback
+      const afterClawbackResult = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'vault',
+      })
+      const afterClawbackVault = afterClawbackResult.result
+        .account_objects[0] as Vault
+
+      assert.equal(
+        afterClawbackVault.AssetsTotal,
+        (
+          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+        ).toString(),
+        'Vault should reflect assets after clawback',
       )
     },
     TIMEOUT,
