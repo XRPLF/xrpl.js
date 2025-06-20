@@ -10,7 +10,7 @@ import {
   VaultCreate,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
-import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../../src/models/transactions/vaultCreate'
+import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../../src/models/transactions/common'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,
