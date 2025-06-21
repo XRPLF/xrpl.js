@@ -18,7 +18,11 @@ describe('VaultClawback', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       VaultID: 'ABCDEF1234567890',
       Holder: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
-      Amount: '1234.567',
+      Amount: {
+        currency: 'USD',
+        issuer: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        value: '1234',
+      },
     }
   })
 
@@ -75,26 +79,9 @@ describe('VaultClawback', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it('verifies with valid scientific notation Amount', function () {
-    tx.Amount = '1.23e5'
-    assert.doesNotThrow(() => validateVaultClawback(tx))
-    assert.doesNotThrow(() => validate(tx))
-  })
-
-  it('throws w/ non-string Amount', function () {
+  it('throws w/ string Amount', function () {
     // @ts-expect-error for test
-    tx.Amount = 123
-    const errorMessage = 'VaultClawback: invalid field Amount'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
-  })
-
-  it('throws w/ nonsense string Amount', function () {
-    tx.Amount = 'not_a_number'
+    tx.Amount = '123456'
     const errorMessage = 'VaultClawback: invalid field Amount'
     assert.throws(
       () => validateVaultClawback(tx),

@@ -7,6 +7,7 @@ import { ValidationError } from '../../errors'
 import {
   Amount,
   AuthorizeCredential,
+  ClawbackAmount,
   Currency,
   IssuedCurrencyAmount,
   MPTAmount,
@@ -201,6 +202,19 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
     typeof input.value === 'string' &&
     typeof input.mpt_issuance_id === 'string'
   )
+}
+
+/**
+ * Type guard to verify if the input is a valid ClawbackAmount.
+ *
+ * A ClawbackAmount can be either an {@link IssuedCurrencyAmount} or an {@link MPTAmount}.
+ * This function checks if the input matches either type.
+ *
+ * @param input - The value to check for ClawbackAmount structure.
+ * @returns True if the input is an IssuedCurrencyAmount or MPTAmount, otherwise false.
+ */
+export function isClawbackAmount(input: unknown): input is ClawbackAmount {
+  return isIssuedCurrency(input) || isMPTAmount(input)
 }
 
 /**

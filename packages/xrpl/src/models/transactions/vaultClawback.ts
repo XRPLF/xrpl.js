@@ -1,13 +1,14 @@
+import { ClawbackAmount } from '../common'
+
 import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
   isString,
   Account,
-  validateOptionalField,
   isAccount,
-  XRPLNumber,
-  isXRPLNumber,
+  validateOptionalField,
+  isClawbackAmount,
 } from './common'
 
 /**
@@ -36,7 +37,7 @@ export interface VaultClawback extends BaseTransaction {
   /**
    * The asset amount to clawback. When Amount is 0 clawback all funds, up to the total shares the Holder owns.
    */
-  Amount?: XRPLNumber
+  Amount?: ClawbackAmount
 }
 
 /**
@@ -50,5 +51,5 @@ export function validateVaultClawback(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'VaultID', isString)
   validateRequiredField(tx, 'Holder', isAccount)
-  validateOptionalField(tx, 'Amount', isXRPLNumber)
+  validateOptionalField(tx, 'Amount', isClawbackAmount)
 }

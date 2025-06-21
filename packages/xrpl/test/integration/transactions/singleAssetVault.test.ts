@@ -7,6 +7,7 @@ import {
   Payment,
   TrustSet,
   TrustSetFlags,
+  VaultClawback,
   VaultCreate,
   VaultDeposit,
   VaultSet,
@@ -223,40 +224,40 @@ describe('Single Asset Vault', function () {
         'Vault should reflect withdrawn assets',
       )
 
-      // // --- VaultClawback Transaction ---
-      // // Claw back 50000 XRP from the vault
-      // const clawbackAmount = '50000'
-      // const vaultClawbackTx: VaultClawback = {
-      //   TransactionType: 'VaultClawback',
-      //   Account: vaultOwnerWallet.classicAddress,
-      //   VaultID: vaultId,
-      //   Holder: holderWallet.classicAddress,
-      //   Amount: clawbackAmount,
-      //   Fee: '5000000',
-      // }
+      // --- VaultClawback Transaction ---
+      // Claw back 5 USD from the vault
+      const clawbackAmount = '5'
+      const vaultClawbackTx: VaultClawback = {
+        TransactionType: 'VaultClawback',
+        Account: issuerWallet.classicAddress,
+        VaultID: vaultId,
+        Holder: holderWallet.classicAddress,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: clawbackAmount,
+        },
+        Fee: '5000000',
+      }
 
-      // await testTransaction(
-      //   testContext.client,
-      //   vaultClawbackTx,
-      //   vaultOwnerWallet,
-      // )
+      await testTransaction(testContext.client, vaultClawbackTx, issuerWallet)
 
-      // // Fetch the vault again to confirm clawback
-      // const afterClawbackResult = await testContext.client.request({
-      //   command: 'account_objects',
-      //   account: vaultOwnerWallet.classicAddress,
-      //   type: 'vault',
-      // })
-      // const afterClawbackVault = afterClawbackResult.result
-      //   .account_objects[0] as Vault
+      // Fetch the vault again to confirm clawback
+      const afterClawbackResult = await testContext.client.request({
+        command: 'account_objects',
+        account: vaultOwnerWallet.classicAddress,
+        type: 'vault',
+      })
+      const afterClawbackVault = afterClawbackResult.result
+        .account_objects[0] as Vault
 
-      // assert.equal(
-      //   afterClawbackVault.AssetsTotal,
-      //   (
-      //     BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
-      //   ).toString(),
-      //   'Vault should reflect assets after clawback',
-      // )
+      assert.equal(
+        afterClawbackVault.AssetsTotal,
+        (
+          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+        ).toString(),
+        'Vault should reflect assets after clawback',
+      )
     },
     TIMEOUT,
   )
