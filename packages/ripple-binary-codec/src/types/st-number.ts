@@ -50,7 +50,7 @@ function extractNumberPartsFromString(val: string): {
 
   const [, sign, intPart, fracPart, expPart] = match
   // Remove leading zeros (unless the entire intPart is zeros)
-  let cleanIntPart = intPart.replace(/^0+(?=\d)/, '') || '0'
+  const cleanIntPart = intPart.replace(/^0+(?=\d)/, '') || '0'
 
   let mantissaStr = cleanIntPart
   let exponent = 0
@@ -159,7 +159,8 @@ export class STNumber extends SerializedType {
    */
   static fromValue(val: string): STNumber {
     const { mantissa, exponent, isNegative } = extractNumberPartsFromString(val)
-    let normalizedMantissa: bigint, normalizedExponent: number
+    let normalizedMantissa: bigint
+    let normalizedExponent: number
 
     if (mantissa === BigInt(0) && exponent === 0 && !isNegative) {
       normalizedMantissa = BigInt(0)
@@ -215,15 +216,15 @@ export class STNumber extends SerializedType {
 
     // Decimal rendering for -25 <= exp <= -5
     const isNegative = mantissa < BigInt(0)
-    let mantissaAbs = mantissa < BigInt(0) ? -mantissa : mantissa
+    const mantissaAbs = mantissa < BigInt(0) ? -mantissa : mantissa
 
-    const padPrefix = 27,
-      padSuffix = 23
-    let mantissaStr = mantissaAbs.toString()
-    let rawValue = '0'.repeat(padPrefix) + mantissaStr + '0'.repeat(padSuffix)
+    const padPrefix = 27
+    const padSuffix = 23
+    const mantissaStr = mantissaAbs.toString()
+    const rawValue = '0'.repeat(padPrefix) + mantissaStr + '0'.repeat(padSuffix)
     const OFFSET = exponent + 43
-    let integerPart = rawValue.slice(0, OFFSET).replace(/^0+/, '') || '0'
-    let fractionPart = rawValue.slice(OFFSET).replace(/0+$/, '')
+    const integerPart = rawValue.slice(0, OFFSET).replace(/^0+/, '') || '0'
+    const fractionPart = rawValue.slice(OFFSET).replace(/0+$/, '')
 
     return `${isNegative ? '-' : ''}${integerPart}${
       fractionPart ? '.' + fractionPart : ''
