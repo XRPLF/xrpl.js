@@ -28,7 +28,7 @@ describe('VaultDeposit', function () {
 
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
-    delete tx.VaultID
+    tx.VaultID = undefined
     const errorMessage = 'VaultDeposit: missing field VaultID'
     assert.throws(() => validateVaultDeposit(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
@@ -44,7 +44,7 @@ describe('VaultDeposit', function () {
 
   it('throws w/ missing Amount', function () {
     // @ts-expect-error for test
-    delete tx.Amount
+    tx.Amount = undefined
     const errorMessage = 'VaultDeposit: missing field Amount'
     assert.throws(() => validateVaultDeposit(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)

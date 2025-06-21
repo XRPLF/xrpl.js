@@ -4,6 +4,7 @@
 
 ### Added
 * Support for `Single Asset Vault` (XLS-65)
+* Adds new `STNumber` serialization type.
 
 ## 2.4.1 (2025-6-18)
 

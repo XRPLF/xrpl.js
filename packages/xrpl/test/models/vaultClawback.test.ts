@@ -33,7 +33,7 @@ describe('VaultClawback', function () {
 
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
-    delete tx.VaultID
+    tx.VaultID = undefined
     const errorMessage = 'VaultClawback: missing field VaultID'
     assert.throws(
       () => validateVaultClawback(tx),
@@ -57,7 +57,7 @@ describe('VaultClawback', function () {
 
   it('throws w/ missing Holder', function () {
     // @ts-expect-error for test
-    delete tx.Holder
+    tx.Holder = undefined
     const errorMessage = 'VaultClawback: missing field Holder'
     assert.throws(
       () => validateVaultClawback(tx),

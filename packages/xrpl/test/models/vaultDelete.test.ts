@@ -27,7 +27,7 @@ describe('VaultDelete', function () {
 
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
-    delete tx.VaultID
+    tx.VaultID = undefined
     const errorMessage = 'VaultDelete: missing field VaultID'
     assert.throws(() => validateVaultDelete(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)

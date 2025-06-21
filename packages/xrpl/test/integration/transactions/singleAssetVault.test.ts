@@ -191,7 +191,7 @@ describe('Single Asset Vault', function () {
       )
 
       // --- VaultWithdraw Transaction ---
-      // Withdraw 123456 XRP from the vault
+      // Withdraw 5 USD from the vault
       const withdrawAmount = '5'
       const vaultWithdrawTx: VaultWithdraw = {
         TransactionType: 'VaultWithdraw',

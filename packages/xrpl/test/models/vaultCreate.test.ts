@@ -33,7 +33,7 @@ describe('VaultCreate', function () {
 
   it('throws w/ missing Asset', function () {
     // @ts-expect-error for test
-    delete tx.Asset
+    tx.Asset = undefined
     const errorMessage = 'VaultCreate: missing field Asset'
     assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
     assert.throws(() => validate(tx), ValidationError, errorMessage)
