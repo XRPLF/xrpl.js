@@ -110,6 +110,7 @@ export {
   VaultCreateFlagsInterface,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
+export { VaultDelete } from './vaultDelete'
 export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
 export { VaultWithdraw } from './vaultWithdraw'
