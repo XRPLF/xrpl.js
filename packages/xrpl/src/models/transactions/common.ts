@@ -127,16 +127,6 @@ export function isXRPLNumber(value: unknown): value is XRPLNumber {
 }
 
 /**
- * Verify the form and type of a number at runtime.
- *
- * @param num - The object to check the form and type of.
- * @returns Whether the number is properly formed.
- */
-export function isBigInt(num: unknown): num is bigint {
-  return typeof num === 'bigint'
-}
-
-/**
  * Verify the form and type of an IssuedCurrency at runtime.
  *
  * @param input - The input to check the form and type of.
