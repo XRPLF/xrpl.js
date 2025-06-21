@@ -4,6 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `Single Asset Vault` (XLS-65)
+* Add new amount types: `XRPLNumber` and `ClawbackAmount`
+
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
 

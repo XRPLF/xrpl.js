@@ -51,6 +51,44 @@ export function writeUInt32BE(
 }
 
 /**
+ * Writes a signed 32-bit integer to a Uint8Array at the specified offset (big-endian).
+ *
+ * @param array - The Uint8Array to write to.
+ * @param value - The signed 32-bit integer to write.
+ * @param offset - The offset at which to write.
+ */
+export function writeInt32BE(
+  array: Uint8Array,
+  value: number,
+  offset: number,
+): void {
+  new DataView(array.buffer, array.byteOffset, array.byteLength).setInt32(
+    offset,
+    value,
+    false,
+  )
+}
+
+/**
+ * Writes a signed 64-bit integer (BigInt) to a Uint8Array at the specified offset (big-endian).
+ *
+ * @param array - The Uint8Array to write to.
+ * @param value - The signed 64-bit integer (BigInt) to write.
+ * @param offset - The offset at which to write.
+ */
+export function writeInt64BE(
+  array: Uint8Array,
+  value: bigint,
+  offset: number,
+): void {
+  new DataView(array.buffer, array.byteOffset, array.byteLength).setBigInt64(
+    offset,
+    value,
+    false,
+  )
+}
+
+/**
  * Reads an unsigned, big-endian 16-bit integer from the array at the specified offset.
  * @param array Uint8Array to read
  * @param offset Number of bytes to skip before starting to read. Must satisfy 0 <= offset <= buf.length - 2
@@ -66,6 +104,36 @@ export function readUInt16BE(array: Uint8Array, offset: number): string {
  */
 export function readUInt32BE(array: Uint8Array, offset: number): string {
   return new DataView(array.buffer).getUint32(offset, false).toString(10)
+}
+
+/**
+ * Reads a signed 32-bit integer from a Uint8Array at the specified offset (big-endian).
+ *
+ * @param array - The Uint8Array to read from.
+ * @param offset - The offset at which to start reading.
+ * @returns The signed 32-bit integer.
+ */
+export function readInt32BE(array: Uint8Array, offset: number): number {
+  return new DataView(
+    array.buffer,
+    array.byteOffset,
+    array.byteLength,
+  ).getInt32(offset, false)
+}
+
+/**
+ * Reads a signed 64-bit integer (BigInt) from a Uint8Array at the specified offset (big-endian).
+ *
+ * @param array - The Uint8Array to read from.
+ * @param offset - The offset at which to start reading.
+ * @returns The signed 64-bit integer (BigInt).
+ */
+export function readInt64BE(array: Uint8Array, offset: number): bigint {
+  return new DataView(
+    array.buffer,
+    array.byteOffset,
+    array.byteLength,
+  ).getBigInt64(offset, false)
 }
 
 /**
