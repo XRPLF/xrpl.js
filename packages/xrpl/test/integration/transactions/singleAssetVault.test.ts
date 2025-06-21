@@ -2,6 +2,11 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  TrustSet,
+  TrustSetFlags,
   VaultCreate,
   VaultDeposit,
   VaultSet,
@@ -24,12 +29,14 @@ const TIMEOUT = 20000
 
 describe('Single Asset Vault', function () {
   let testContext: XrplIntegrationTestContext
+  let issuerWallet: Wallet
   let vaultOwnerWallet: Wallet
   let holderWallet: Wallet
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
-    vaultOwnerWallet = testContext.wallet
+    issuerWallet = testContext.wallet
+    vaultOwnerWallet = await generateFundedWallet(testContext.client)
     holderWallet = await generateFundedWallet(testContext.client)
   })
   afterEach(async () => teardownClient(testContext))
@@ -38,16 +45,63 @@ describe('Single Asset Vault', function () {
     'base',
     // eslint-disable-next-line max-statements -- needed to test all Vault transactions in one sequence flow
     async () => {
+      // --- Issue an IOU ---
+      const currencyCode = 'USD'
+      const accountSetTx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: issuerWallet.classicAddress,
+        SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+      }
+
+      await testTransaction(testContext.client, accountSetTx, issuerWallet)
+
+      const accountSetTx2: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: issuerWallet.classicAddress,
+        SetFlag: AccountSetAsfFlags.asfAllowTrustLineClawback,
+      }
+
+      await testTransaction(testContext.client, accountSetTx2, issuerWallet)
+
+      const trustSetTx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Flags: TrustSetFlags.tfClearNoRipple,
+        Account: holderWallet.classicAddress,
+        LimitAmount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+
+      await testTransaction(testContext.client, trustSetTx, holderWallet)
+
+      const paymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: issuerWallet.classicAddress,
+        Destination: holderWallet.classicAddress,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+
+      await testTransaction(testContext.client, paymentTx, issuerWallet)
+
       // --- VaultCreate ---
       const tx: VaultCreate = {
         TransactionType: 'VaultCreate',
         Account: vaultOwnerWallet.classicAddress,
-        Asset: { currency: 'XRP' },
+        Asset: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+        },
         WithdrawalPolicy:
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: '1000000000',
+        AssetsMaximum: '500',
         // This covers owner reserve fee with potentially high open_ledger_cost
         Fee: '5000000',
       }
@@ -68,21 +122,22 @@ describe('Single Asset Vault', function () {
       assert.equal(result.result.account_objects.length, 1)
       assert.isDefined(vault, 'Vault ledger object should exist')
       assert.equal(vault.Owner, vaultOwnerWallet.classicAddress)
-      assert.equal(asset.currency, 'XRP')
+      assert.equal(asset.currency, currencyCode)
+      assert.equal(asset.issuer, issuerWallet.classicAddress)
       assert.equal(
         vault.WithdrawalPolicy,
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(assetsMaximum, '1000000000')
+      assert.equal(assetsMaximum, '500')
 
       // --- VaultSet Transaction ---
-      // Increase the AssetsMaximum and update Data
+      // Increase the AssetsMaximum to 1000 and update Data
       const vaultSetTx: VaultSet = {
         TransactionType: 'VaultSet',
         Account: vaultOwnerWallet.classicAddress,
         VaultID: vaultId,
-        AssetsMaximum: '2000000000',
+        AssetsMaximum: '1000',
         Data: stringToHex('updated metadata'),
         Fee: '5000000',
       }
@@ -97,17 +152,21 @@ describe('Single Asset Vault', function () {
       })
       const updatedVault = updatedResult.result.account_objects[0] as Vault
 
-      assert.equal(updatedVault.AssetsMaximum, '2000000000')
+      assert.equal(updatedVault.AssetsMaximum, '1000')
       assert.equal(updatedVault.Data, stringToHex('updated metadata'))
 
       // --- VaultDeposit Transaction ---
-      // Deposit 123456 XRP to the vault
-      const depositAmount = '200000'
+      // Deposit 10 USD to the vault
+      const depositAmount = '10'
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
         Account: holderWallet.classicAddress,
         VaultID: vaultId,
-        Amount: depositAmount,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: depositAmount,
+        },
         Fee: '5000000',
       }
 
@@ -131,12 +190,16 @@ describe('Single Asset Vault', function () {
 
       // --- VaultWithdraw Transaction ---
       // Withdraw 123456 XRP from the vault
-      const withdrawAmount = '123456'
+      const withdrawAmount = '5'
       const vaultWithdrawTx: VaultWithdraw = {
         TransactionType: 'VaultWithdraw',
         Account: holderWallet.classicAddress,
         VaultID: vaultId,
-        Amount: withdrawAmount,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: withdrawAmount,
+        },
         Fee: '5000000',
       }
 
