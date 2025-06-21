@@ -233,11 +233,11 @@ describe('Single Asset Vault', function () {
         Account: issuerWallet.classicAddress,
         VaultID: vaultId,
         Holder: holderWallet.classicAddress,
-        // Amount: {
-        //   currency: currencyCode,
-        //   issuer: issuerWallet.classicAddress,
-        //   value: clawbackAmount,
-        // },
+        Amount: {
+          currency: currencyCode,
+          issuer: issuerWallet.classicAddress,
+          value: clawbackAmount,
+        },
         Fee: '5000000',
       }
 
