@@ -9,6 +9,7 @@ import {
   TrustSetFlags,
   VaultClawback,
   VaultCreate,
+  VaultDelete,
   VaultDeposit,
   VaultSet,
   VaultWithdraw,
@@ -257,6 +258,29 @@ describe('Single Asset Vault', function () {
           BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
         ).toString(),
         'Vault should reflect assets after clawback',
+      )
+
+      // --- VaultDelete Transaction ---
+      const vaultDeleteTx: VaultDelete = {
+        TransactionType: 'VaultDelete',
+        Account: vaultOwnerWallet.classicAddress,
+        VaultID: vaultId,
+        Fee: '5000000',
+      }
+
+      await testTransaction(testContext.client, vaultDeleteTx, vaultOwnerWallet)
+
+      // Fetch the vault again to confirm deletion (should be empty)
+      const afterDeleteResult = await testContext.client.request({
+        command: 'account_objects',
+        account: vaultOwnerWallet.classicAddress,
+        type: 'vault',
+      })
+
+      assert.equal(
+        afterDeleteResult.result.account_objects.length,
+        0,
+        'Vault should be deleted from account objects',
       )
     },
     TIMEOUT,
