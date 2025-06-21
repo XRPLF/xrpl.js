@@ -14,7 +14,6 @@ import {
   DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
-  DEFAULT_VAULT_WITHDRAWAL_POLICY,
 } from './common'
 
 const META_MAX_BYTE_LENGTH = 1024
@@ -23,8 +22,7 @@ const META_MAX_BYTE_LENGTH = 1024
  * Enum representing withdrawal strategies for a Vault.
  */
 export enum VaultWithdrawalPolicy {
-  // eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- improves code maintainability
-  vaultStrategyFirstComeFirstServe = DEFAULT_VAULT_WITHDRAWAL_POLICY,
+  vaultStrategyFirstComeFirstServe = 0x0001,
 }
 
 /**
@@ -78,9 +76,6 @@ export interface VaultCreate extends BaseTransaction {
 
   /**
    * Indicates the withdrawal strategy used by the Vault.
-   * Optional when constructing the transaction object.
-   * Will be set by autofill if not provided, but required for validation and submission.
-   * Default value should be {@link VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe}.
    */
   WithdrawalPolicy?: number
 
@@ -134,13 +129,6 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
       )
     }
   }
-
-  // if (tx.WithdrawalPolicy === undefined) {
-  //   throw new ValidationError(
-  // eslint-disable-next-line max-len -- temp
-  //     `VaultCreate: WithdrawalPolicy is required. Set the default value (${DEFAULT_VAULT_WITHDRAWAL_POLICY}) or use autofill to apply it.`,
-  //   )
-  // }
 
   // If DomainID present, tfVaultPrivate must be set
   if (

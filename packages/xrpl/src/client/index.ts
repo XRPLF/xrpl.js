@@ -69,7 +69,6 @@ import {
   autofillBatchTxn,
   handleDeliverMax,
   getTransactionFee,
-  // handleWithdrawalPolicy,
 } from '../sugar/autofill'
 import { formatBalances } from '../sugar/balances'
 import {
@@ -696,9 +695,6 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'Payment') {
       handleDeliverMax(tx)
     }
-    // if (tx.TransactionType === 'VaultCreate') {
-    //   handleWithdrawalPolicy(tx)
-    // }
 
     return Promise.all(promises).then(() => tx)
   }

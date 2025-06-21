@@ -5,13 +5,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import {
-  Batch,
-  Payment,
-  Transaction,
-  // VaultCreate,
-} from '../models/transactions'
-// import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../models/transactions/common'
+import { Batch, Payment, Transaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -428,21 +422,6 @@ export function handleDeliverMax(tx: Payment): void {
     delete tx.DeliverMax
   }
 }
-
-// /**
-//  * Sets the default WithdrawalPolicy for a VaultCreate transaction if not provided.
-//  *
-//  * If the WithdrawalPolicy field is undefined, this function assigns it the default
-//  * value specified by {@link DEFAULT_VAULT_WITHDRAWAL_POLICY}.
-//  *
-//  * @param tx - The VaultCreate transaction to process.
-//  */
-// export function handleWithdrawalPolicy(tx: VaultCreate): void {
-//   if (tx.WithdrawalPolicy === undefined) {
-//     // eslint-disable-next-line no-param-reassign -- required to autofill default value
-//     tx.WithdrawalPolicy = DEFAULT_VAULT_WITHDRAWAL_POLICY
-//   }
-// }
 
 /**
  * Autofills all the relevant `x` fields.
