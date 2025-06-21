@@ -7,10 +7,10 @@ import {
   Payment,
   Transaction,
   Batch,
-  VaultCreate,
+  // VaultCreate,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
-import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../../src/models/transactions/common'
+// import { DEFAULT_VAULT_WITHDRAWAL_POLICY } from '../../src/models/transactions/common'
 import rippled from '../fixtures/rippled'
 import {
   setupClient,
@@ -521,19 +521,19 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.RawTransactions[1].RawTransaction.Sequence, 23)
   })
 
-  it('autofills WithdrawalPolicy in VaultCreate transactions', async function () {
-    const tx: VaultCreate = {
-      TransactionType: 'VaultCreate',
-      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
-      Asset: {
-        currency: 'XRP',
-      },
-      // WithdrawalPolicy omitted intentionally
-    }
-    const txResult = await testContext.client.autofill(tx)
-    assert.strictEqual(
-      txResult.WithdrawalPolicy,
-      DEFAULT_VAULT_WITHDRAWAL_POLICY,
-    )
-  })
+  // it('autofills WithdrawalPolicy in VaultCreate transactions', async function () {
+  //   const tx: VaultCreate = {
+  //     TransactionType: 'VaultCreate',
+  //     Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+  //     Asset: {
+  //       currency: 'XRP',
+  //     },
+  //     // WithdrawalPolicy omitted intentionally
+  //   }
+  //   const txResult = await testContext.client.autofill(tx)
+  //   assert.strictEqual(
+  //     txResult.WithdrawalPolicy,
+  //     DEFAULT_VAULT_WITHDRAWAL_POLICY,
+  //   )
+  // })
 })

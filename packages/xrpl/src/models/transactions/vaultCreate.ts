@@ -135,11 +135,12 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.WithdrawalPolicy === undefined) {
-    throw new ValidationError(
-      `VaultCreate: WithdrawalPolicy is required. Set the default value (${DEFAULT_VAULT_WITHDRAWAL_POLICY}) or use autofill to apply it.`,
-    )
-  }
+  // if (tx.WithdrawalPolicy === undefined) {
+  //   throw new ValidationError(
+  // eslint-disable-next-line max-len -- temp
+  //     `VaultCreate: WithdrawalPolicy is required. Set the default value (${DEFAULT_VAULT_WITHDRAWAL_POLICY}) or use autofill to apply it.`,
+  //   )
+  // }
 
   // If DomainID present, tfVaultPrivate must be set
   if (

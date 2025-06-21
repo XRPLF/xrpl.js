@@ -99,8 +99,8 @@ describe('Single Asset Vault', function () {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
         },
-        WithdrawalPolicy:
-          VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
+        // WithdrawalPolicy:
+        // VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '500',

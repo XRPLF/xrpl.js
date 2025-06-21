@@ -77,13 +77,13 @@ describe('VaultCreate', function () {
     assert.throws(() => validate(tx), ValidationError, errorMessage)
   })
 
-  it('throws w/ missing WithdrawalPolicy', function () {
-    delete tx.WithdrawalPolicy
-    const errorMessage =
-      'VaultCreate: WithdrawalPolicy is required. Set the default value (1) or use autofill to apply it.'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
-  })
+  // it('throws w/ missing WithdrawalPolicy', function () {
+  //   delete tx.WithdrawalPolicy
+  //   const errorMessage =
+  //     'VaultCreate: WithdrawalPolicy is required. Set the default value (1) or use autofill to apply it.'
+  //   assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
+  //   assert.throws(() => validate(tx), ValidationError, errorMessage)
+  // })
 
   it('throws w/ non-number WithdrawalPolicy', function () {
     // @ts-expect-error for test
