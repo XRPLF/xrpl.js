@@ -101,51 +101,51 @@ function normalize(
 }
 
 /**
- * XRPLNumber: Encodes XRPL's "Number" type.
+ * STNumber: Encodes XRPL's "Number" type.
  *
  * - Always encoded as 12 bytes: 8-byte signed mantissa, 4-byte signed exponent, both big-endian.
- * - Can only be constructed from a valid number string or another XRPLNumber instance.
+ * - Can only be constructed from a valid number string or another STNumber instance.
  *
  * Usage:
- *   XRPLNumber.from("1.2345e5")
- *   XRPLNumber.from("-123")
- *   XRPLNumber.fromParser(parser)
+ *   STNumber.from("1.2345e5")
+ *   STNumber.from("-123")
+ *   STNumber.fromParser(parser)
  */
-export class XRPLNumber extends SerializedType {
+export class STNumber extends SerializedType {
   /** 12 zero bytes, represents canonical zero. */
   static defaultBytes = new Uint8Array(12)
 
   /**
-   * Construct a XRPLNumber from 12 bytes (8 for mantissa, 4 for exponent).
+   * Construct a STNumber from 12 bytes (8 for mantissa, 4 for exponent).
    * @param bytes - 12-byte Uint8Array
    * @throws Error if input is not a Uint8Array of length 12.
    */
   constructor(bytes?: Uint8Array) {
-    const used = bytes ?? XRPLNumber.defaultBytes
+    const used = bytes ?? STNumber.defaultBytes
     if (!(used instanceof Uint8Array) || used.length !== 12) {
       throw new Error(
-        `XRPLNumber must be constructed from a 12-byte Uint8Array, got ${used?.length}`,
+        `STNumber must be constructed from a 12-byte Uint8Array, got ${used?.length}`,
       )
     }
     super(used)
   }
 
   /**
-   * Construct from a number string (or another XRPLNumber).
+   * Construct from a number string (or another STNumber).
    *
-   * @param value - A string, or XRPLNumber instance.
-   * @returns XRPLNumber instance.
-   * @throws Error if not a string or XRPLNumber.
+   * @param value - A string, or STNumber instance.
+   * @returns STNumber instance.
+   * @throws Error if not a string or STNumber.
    */
-  static from(value: unknown): XRPLNumber {
-    if (value instanceof XRPLNumber) {
+  static from(value: unknown): STNumber {
+    if (value instanceof STNumber) {
       return value
     }
     if (typeof value === 'string') {
       return this.fromValue(value)
     }
     throw new Error(
-      'XRPLNumber.from: Only string or XRPLNumber instance is supported',
+      'STNumber.from: Only string or STNumber instance is supported',
     )
   }
 
@@ -154,10 +154,10 @@ export class XRPLNumber extends SerializedType {
    * Handles normalization to XRPL Number constraints.
    *
    * @param val - The number as a string (e.g. '1.23', '-123e5').
-   * @returns XRPLNumber instance
+   * @returns STNumber instance
    * @throws Error if val is not a valid number string.
    */
-  static fromValue(val: string): XRPLNumber {
+  static fromValue(val: string): STNumber {
     const { mantissa, exponent, isNegative } = extractNumberPartsFromString(val)
     let normalizedMantissa: bigint, normalizedExponent: number
 
@@ -172,20 +172,20 @@ export class XRPLNumber extends SerializedType {
     const bytes = new Uint8Array(12)
     writeInt64BE(bytes, normalizedMantissa, 0)
     writeInt32BE(bytes, normalizedExponent, 8)
-    return new XRPLNumber(bytes)
+    return new STNumber(bytes)
   }
 
   /**
-   * Read a XRPLNumber from a BinaryParser stream (12 bytes).
+   * Read a STNumber from a BinaryParser stream (12 bytes).
    * @param parser - BinaryParser positioned at the start of a number
-   * @returns XRPLNumber instance
+   * @returns STNumber instance
    */
-  static fromParser(parser: BinaryParser): XRPLNumber {
-    return new XRPLNumber(parser.read(12))
+  static fromParser(parser: BinaryParser): STNumber {
+    return new STNumber(parser.read(12))
   }
 
   /**
-   * Convert this XRPLNumber to a normalized string representation.
+   * Convert this STNumber to a normalized string representation.
    * The output is decimal or scientific notation, depending on exponent range.
    * Follows XRPL convention: zero is "0", other values are normalized to a canonical string.
    *
@@ -195,7 +195,7 @@ export class XRPLNumber extends SerializedType {
   toJSON(): string {
     const b = this.bytes
     if (!b || b.length !== 12)
-      throw new Error('XRPLNumber internal bytes not set or wrong length')
+      throw new Error('STNumber internal bytes not set or wrong length')
 
     // Signed 64-bit mantissa
     const mantissa = readInt64BE(b, 0)

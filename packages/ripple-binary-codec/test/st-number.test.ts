@@ -3,7 +3,7 @@ import { coreTypes } from '../src/types'
 
 const { Number } = coreTypes
 
-describe('XRPLNumber', () => {
+describe('STNumber', () => {
   it('should encode and decode integers', () => {
     const value = '9876543210'
     const sn = Number.from(value)
@@ -108,9 +108,7 @@ describe('XRPLNumber', () => {
     expect(() => {
       Number.from({ foo: 'bar' })
     }).toThrow(
-      new Error(
-        'XRPLNumber.from: Only string or XRPLNumber instance is supported',
-      ),
+      new Error('STNumber.from: Only string or STNumber instance is supported'),
     )
   })
 })
