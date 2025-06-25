@@ -177,4 +177,29 @@ describe('EscrowCreate', function () {
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
   })
+
+  it(`An Escrow with IOU is missing FinishAfter`, function () {
+    const iou_escrow = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'EscrowCreate',
+      Amount: {
+        currency: 'USD',
+        value: '100',
+        issuer: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      },
+      Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
+      // missing CancelAfter field
+    }
+
+    assert.throws(
+      () => validateEscrowCreate(iou_escrow),
+      ValidationError,
+      'EscrowCreate: CancelAfter is required when creating an Escrow with IOU or MPT',
+    )
+    assert.throws(
+      () => validate(iou_escrow),
+      ValidationError,
+      'EscrowCreate: CancelAfter is required when creating an Escrow with IOU or MPT',
+    )
+  })
 })

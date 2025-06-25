@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { Amount, MPTAmount } from '../common'
 
 import {
   Account,
@@ -18,17 +19,18 @@ import {
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and escrow.
-   * Once escrowed, the XRP can either go to the Destination address (after the.
-   * FinishAfter time) or returned to the sender (after the CancelAfter time).
+   * The amount to deduct from the sender's balance and and set aside in escrow.
+   * Once escrowed, this amount can either go to the Destination address (after any Finish times/conditions)
+   * or returned to the sender (after any cancellation times/conditions). Can represent XRP, in drops,
+   * an IOU token, or an MPT. Must always be a positive value.
    */
-  Amount: string
+  Amount: Amount | MPTAmount
   /** Address to receive escrowed XRP. */
   Destination: Account
   /**
    * The time, in seconds since the Ripple Epoch, when this escrow expires.
    * This value is immutable; the funds can only be returned the sender after.
-   * this time.
+   * this time. Required when creating an Escrow with IOU or MPT
    */
   CancelAfter?: number
   /**
@@ -62,8 +64,16 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: missing field Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('EscrowCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && typeof tx.Amount !== 'object') {
+    throw new ValidationError(
+      'EscrowCreate: Amount must be a string (XRP) or object (IOU or MPT)',
+    )
+  }
+
+  if (typeof tx.Amount !== 'string' && tx.CancelAfter === undefined) {
+    throw new ValidationError(
+      'EscrowCreate: CancelAfter is required when creating an Escrow with IOU or MPT',
+    )
   }
 
   validateRequiredField(tx, 'Destination', isAccount)

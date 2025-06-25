@@ -61,4 +61,16 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
+
+  /**
+   * The transfer rate or fee at which the funds are escrowed, stored at creation
+   *  and used during settlement. Applicable to both IOUs and MPTs.
+   */
+  TransferRate?: number
+
+  /**
+   * (Optional) The ledger index of the issuer's directory node associated with
+   * the Escrow. Used when the issuer is neither the source nor destination account.
+   */
+  IssuerNode?: number
 }
