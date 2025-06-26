@@ -19,7 +19,8 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * successful.
    */
   Destination: string
-  /** The amount of XRP, in drops, to be delivered by the held payment. */
+  /** The amount to be delivered by the held payment. Can represent XRP, an IOU token, or an MPT.
+   * Must always be a positive value. */
   Amount: string
   /**
    * A PREIMAGE-SHA-256 crypto-condition, as hexadecimal. If present, the
