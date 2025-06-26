@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { Amount, MPTAmount } from '../common'
 
 import {
   Account,
@@ -18,11 +19,12 @@ import {
 export interface EscrowCreate extends BaseTransaction {
   TransactionType: 'EscrowCreate'
   /**
-   * Amount of XRP, in drops, to deduct from the sender's balance and escrow.
-   * Once escrowed, the XRP can either go to the Destination address (after the.
-   * FinishAfter time) or returned to the sender (after the CancelAfter time).
+   * The amount to deduct from the sender's balance and and set aside in escrow.
+   * Once escrowed, this amount can either go to the Destination address (after any Finish times/conditions)
+   * or returned to the sender (after any cancellation times/conditions). Can represent XRP, in drops,
+   * an IOU token, or an MPT. Must always be a positive value.
    */
-  Amount: string
+  Amount: Amount | MPTAmount
   /** Address to receive escrowed XRP. */
   Destination: Account
   /**
@@ -62,8 +64,10 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: missing field Amount')
   }
 
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('EscrowCreate: Amount must be a string')
+  if (typeof tx.Amount !== 'string' && typeof tx.Amount !== 'object') {
+    throw new ValidationError(
+      'EscrowCreate: Amount must be a string (XRP) or object (IOU or MPT)',
+    )
   }
 
   validateRequiredField(tx, 'Destination', isAccount)
