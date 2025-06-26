@@ -8,15 +8,12 @@ import {
   EscrowFinish,
   EscrowCreate,
 } from '../../../src'
-
 import serverUrl from '../serverUrl'
-
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-
 import {
   generateFundedWallet,
   testTransaction,

@@ -12,7 +12,8 @@ function useBase10(fieldName: string): boolean {
   return (
     fieldName === 'MaximumAmount' ||
     fieldName === 'OutstandingAmount' ||
-    fieldName === 'MPTAmount'
+    fieldName === 'MPTAmount' ||
+    fieldName === 'LockedAmount'
   )
 }
 

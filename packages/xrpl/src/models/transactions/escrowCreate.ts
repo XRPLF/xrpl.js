@@ -30,7 +30,7 @@ export interface EscrowCreate extends BaseTransaction {
   /**
    * The time, in seconds since the Ripple Epoch, when this escrow expires.
    * This value is immutable; the funds can only be returned the sender after.
-   * this time. Required when creating an Escrow with IOU or MPT
+   * this time.
    */
   CancelAfter?: number
   /**
@@ -67,12 +67,6 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
   if (typeof tx.Amount !== 'string' && typeof tx.Amount !== 'object') {
     throw new ValidationError(
       'EscrowCreate: Amount must be a string (XRP) or object (IOU or MPT)',
-    )
-  }
-
-  if (typeof tx.Amount !== 'string' && tx.CancelAfter === undefined) {
-    throw new ValidationError(
-      'EscrowCreate: CancelAfter is required when creating an Escrow with IOU or MPT',
     )
   }
 
