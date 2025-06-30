@@ -4,11 +4,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### Fixed
-* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
-
 ### Added
 * Implement support for XLS-85d Token Escrow amendment.
+
+### Fixed
+* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
 
 ## 4.3.0 (2025-6-09)
 
