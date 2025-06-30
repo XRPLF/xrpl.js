@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 2.4.1 (2025-6-18)
+
+### Fixed
+* Adds conditional check for `PermissionValue` so custom definitions (based on previous v2.x versions) don't break.
+
+## 2.4.0 (2025-6-09)
+
 ### Added
 * Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d).
 * Support for the `Batch` amendment (XLS-56).
