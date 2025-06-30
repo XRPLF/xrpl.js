@@ -9,6 +9,6 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   Flags: number
   OwnerNode?: string
 
-  // (Optional) The total of all outstanding escrows for this issuance.
+  // The total of all outstanding escrows for this issuance.
   LockedAmount?: string
 }
