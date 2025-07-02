@@ -142,7 +142,7 @@ export class STNumber extends SerializedType {
       return value
     }
     if (typeof value === 'string') {
-      return this.fromValue(value)
+      return STNumber.fromValue(value)
     }
     throw new Error(
       'STNumber.from: Only string or STNumber instance is supported',
