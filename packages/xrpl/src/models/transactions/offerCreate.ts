@@ -8,6 +8,22 @@ import {
   isAmount,
 } from './common'
 
+export function validateDomainID(domainID?: unknown): boolean {
+  if (domainID === undefined || domainID === null) {
+    return true
+  }
+
+  if (typeof domainID !== 'string') {
+    return false
+  }
+
+  if (domainID.length !== 64) {
+    return false
+  }
+
+  return true
+}
+
 /**
  * Transaction Flags for an OfferCreate Transaction.
  *
@@ -42,6 +58,11 @@ export enum OfferCreateFlags {
    * the TakerPays amount in exchange.
    */
   tfSell = 0x00080000,
+  /**
+   * Indicates the offer is hybrid. (meaning it is part of both a domain and open order book)
+   * This flag cannot be set if the offer doesn't have a DomainID
+   */
+  tfHybrid = 0x00100000,
 }
 
 /**
@@ -83,6 +104,7 @@ export interface OfferCreateFlagsInterface extends GlobalFlagsInterface {
   tfImmediateOrCancel?: boolean
   tfFillOrKill?: boolean
   tfSell?: boolean
+  tfHybrid?: boolean
 }
 
 /**
@@ -106,6 +128,9 @@ export interface OfferCreate extends BaseTransaction {
   TakerGets: Amount
   /** The amount and type of currency being requested by the offer creator. */
   TakerPays: Amount
+
+  /** The domain that the offer must be a part of. */
+  DomainID?: string
 }
 
 /**
@@ -139,5 +164,18 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
 
   if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number') {
     throw new ValidationError('OfferCreate: invalid OfferSequence')
+  }
+
+  if (!validateDomainID(tx.DomainID)) {
+    throw new ValidationError('OfferCreate: invalid DomainID')
+  }
+
+  if (
+    (tx.Flags as number | OfferCreateFlags.tfHybrid) != 0 &&
+    tx.DomainID === undefined
+  ) {
+    throw new ValidationError(
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
   }
 }

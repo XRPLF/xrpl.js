@@ -17,6 +17,8 @@ import {
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
+import { validateDomainID } from './offerCreate'
+
 /**
  * Enum representing values for Payment Transaction Flags.
  *
@@ -157,6 +159,19 @@ export interface Payment extends BaseTransaction {
    */
   CredentialIDs?: string[]
   Flags?: number | PaymentFlagsInterface
+
+  /**
+   * The domain the sender intends to use. Both the sender and destination must
+   * be part of this domain. The DomainID can be included if the sender intends
+   * it to be a cross-currency payment (i.e. if the payment is going to interact
+   * with the DEX). The domain will only play it's role if there is a path that
+   * crossing an orderbook.
+   *
+   * Note: it's still possible that DomainID is included but the payment does
+   * not interact with DEX, it simply means that the DomainID will be ignored
+   * during payment paths.
+   */
+  DomainID?: string
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
@@ -193,6 +208,10 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
+  }
+
+  if (!validateDomainID(tx.DomainID)) {
+    throw new ValidationError('PaymentTransaction: invalid DomainID')
   }
 
   if (
