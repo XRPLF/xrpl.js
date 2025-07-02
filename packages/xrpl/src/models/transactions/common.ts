@@ -23,7 +23,7 @@ const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
 // Used for Vault transactions
-export const DATA_MAX_BYTE_LENGTH = 256
+export const VAULT_DATA_MAX_BYTE_LENGTH = 256
 
 function isMemo(obj: { Memo?: unknown }): boolean {
   if (obj.Memo == null) {

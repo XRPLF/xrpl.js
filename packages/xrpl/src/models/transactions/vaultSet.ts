@@ -7,7 +7,7 @@ import {
   validateOptionalField,
   validateRequiredField,
   isString,
-  DATA_MAX_BYTE_LENGTH,
+  VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
 } from './common'
@@ -62,9 +62,9 @@ export function validateVaultSet(tx: Record<string, unknown>): void {
       throw new ValidationError('VaultSet: Data must be a valid hex string')
     }
     const dataByteLength = dataHex.length / 2
-    if (dataByteLength > DATA_MAX_BYTE_LENGTH) {
+    if (dataByteLength > VAULT_DATA_MAX_BYTE_LENGTH) {
       throw new ValidationError(
-        `VaultSet: Data exceeds ${DATA_MAX_BYTE_LENGTH} bytes (actual: ${dataByteLength})`,
+        `VaultSet: Data exceeds ${VAULT_DATA_MAX_BYTE_LENGTH} bytes (actual: ${dataByteLength})`,
       )
     }
   }
