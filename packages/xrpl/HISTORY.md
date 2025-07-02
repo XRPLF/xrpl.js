@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `PermissionedDEX` (XLS-81d)
+
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
 
