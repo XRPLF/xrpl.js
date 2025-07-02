@@ -16,7 +16,6 @@ import {
   MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
-
 import { validateDomainID } from './offerCreate'
 
 /**

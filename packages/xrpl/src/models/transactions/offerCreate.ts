@@ -8,6 +8,15 @@ import {
   isAmount,
 } from './common'
 
+const _DOMAIN_ID_LENGTH = 64
+
+/**
+ * Utility method used across offerCreate and payment transactions to validate the domainID.
+ *
+ * @param domainID - The domainID is a 64-character string that is used to identify a domain.
+ *
+ * @returns true if the domainID is a valid 64-character string, false otherwise
+ */
 export function validateDomainID(domainID?: unknown): boolean {
   if (domainID === undefined || domainID === null) {
     return true
@@ -17,7 +26,7 @@ export function validateDomainID(domainID?: unknown): boolean {
     return false
   }
 
-  if (domainID.length !== 64) {
+  if (domainID.length !== _DOMAIN_ID_LENGTH) {
     return false
   }
 
@@ -171,7 +180,9 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   }
 
   if (
-    (tx.Flags as number | OfferCreateFlags.tfHybrid) != 0 &&
+    typeof tx.Flags === 'number' &&
+    // eslint-disable-next-line no-bitwise -- flags require bitwise operations
+    (tx.Flags | OfferCreateFlags.tfHybrid) !== 0 &&
     tx.DomainID === undefined
   ) {
     throw new ValidationError(

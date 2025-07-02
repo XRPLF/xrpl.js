@@ -5,7 +5,23 @@ import {
   PermissionedDomainSet,
   AuthorizeCredential,
   Wallet,
+  IssuedCurrencyAmount,
 } from '../../../src'
+import DirectoryNode from '../../../src/models/ledger/DirectoryNode'
+import Offer from '../../../src/models/ledger/Offer'
+import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
+import {
+  BookOffersRequest,
+  BookOffersResponse,
+} from '../../../src/models/methods/bookOffers'
+import { SubmitResponse } from '../../../src/models/methods/submit'
+import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
+import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import {
+  OfferCreate,
+  OfferCreateFlags,
+} from '../../../src/models/transactions/offerCreate'
+import { Payment } from '../../../src/models/transactions/payment'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -13,15 +29,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { OfferCreate } from '../../../src/models/transactions/offerCreate'
-import { Payment } from '../../../src/models/transactions/payment'
-import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
-import Offer from '../../../src/models/ledger/Offer'
-import { SubmitResponse } from '../../../src/models/methods/submit'
-import DirectoryNode from '../../../src/models/ledger/DirectoryNode'
-import { OfferCreateFlags } from '../../../src/models/transactions/offerCreate'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -137,9 +144,8 @@ describe('PermissionedDEX', function () {
   afterAll(async () => teardownClient(testContext))
 
   it(
-    'Validate the properties of the Offer ledger object',
+    'Validate the domainID of the Offer ledger object',
     async () => {
-      // validate the status of the Offer ledger object, with regards to the `domain` field.
       offer_ledger_object = (
         await testContext.client.request({
           command: 'ledger_entry',
@@ -150,10 +156,10 @@ describe('PermissionedDEX', function () {
         })
       ).result.node as Offer
 
-      assert.equal(offer_ledger_object?.LedgerEntryType, 'Offer')
-      assert.equal(offer_ledger_object?.DomainID, pd_ledger_object.index)
-      assert.equal(offer_ledger_object?.Account, wallet1.classicAddress)
-      assert.isNotNull(offer_ledger_object?.AdditionalBooks)
+      assert.equal(offer_ledger_object.LedgerEntryType, 'Offer')
+      assert.equal(offer_ledger_object.DomainID, pd_ledger_object.index)
+      assert.equal(offer_ledger_object.Account, wallet1.classicAddress)
+      assert.isNotNull(offer_ledger_object.AdditionalBooks)
     },
     TIMEOUT,
   )
@@ -166,11 +172,8 @@ describe('PermissionedDEX', function () {
         directory: offer_ledger_object.BookDirectory,
       })
 
-      console.log(offer_ledger_object)
-      console.log(directoryNode_ledger_object)
-
       assert.equal(
-        (directoryNode_ledger_object.result.node as DirectoryNode)?.index,
+        (directoryNode_ledger_object.result.node as DirectoryNode).index,
         offer_ledger_object.BookDirectory,
       )
       // Keshava: TODO: DirectoryNode object is missing the `Owner` field.
@@ -180,16 +183,48 @@ describe('PermissionedDEX', function () {
       // )
       assert.equal(
         (directoryNode_ledger_object.result.node as DirectoryNode)
-          ?.LedgerEntryType,
+          .LedgerEntryType,
         'DirectoryNode',
       )
       assert.equal(
-        (directoryNode_ledger_object.result.node as DirectoryNode)?.DomainID,
+        (directoryNode_ledger_object.result.node as DirectoryNode).DomainID,
         pd_ledger_object.index,
       )
     },
     TIMEOUT,
   )
+
+  it(`Validate the bookOffers method`, async () => {
+    const response: BookOffersResponse = await testContext.client.request({
+      command: 'book_offers',
+      taker: wallet2.classicAddress,
+      taker_pays: {
+        currency: 'USD',
+        issuer: testContext.wallet.classicAddress,
+      },
+      taker_gets: {
+        currency: 'XRP',
+      },
+      domain: pd_ledger_object.index,
+    } as BookOffersRequest)
+
+    assert.equal(response.result.offers.length, 1)
+    assert.equal(response.result.offers[0].TakerGets, '1000')
+    assert.equal(
+      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).value,
+      '10',
+    )
+    assert.equal(
+      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).currency,
+      'USD',
+    )
+    assert.equal(
+      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).issuer,
+      testContext.wallet.classicAddress,
+    )
+
+    assert.equal(response.result.offers[0].DomainID, pd_ledger_object.index)
+  })
 
   it(
     'Crossing a PermissionedDEX Offer with a Payment transaction',

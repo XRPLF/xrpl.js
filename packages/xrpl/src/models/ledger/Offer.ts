@@ -59,5 +59,6 @@ export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
 export enum OfferFlags {
   lsfPassive = 0x00010000,
   lsfSell = 0x00020000,
-  lsfHybrid = 0x00040000, // Indicates the offer is hybrid. (meaning it is part of both a domain and open order book)
+  // Indicates the offer is hybrid. (meaning it is part of both a domain and open order book)
+  lsfHybrid = 0x00040000,
 }
