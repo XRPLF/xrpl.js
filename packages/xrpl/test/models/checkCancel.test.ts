@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateCheckCancel } from '../../src/models/transactions/checkCancel'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateCheckCancel)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateCheckCancel, message)
 
 /**
  * CheckCancel Transaction Verification Testing.
@@ -17,8 +19,7 @@ describe('CheckCancel', function () {
         '49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0',
     } as any
 
-    assert.doesNotThrow(() => validateCheckCancel(validCheckCancel))
-    assert.doesNotThrow(() => validate(validCheckCancel))
+    assertValid(validCheckCancel)
   })
 
   it(`throws w/ invalid CheckCancel`, function () {
@@ -28,15 +29,6 @@ describe('CheckCancel', function () {
       CheckID: 4964734566545678,
     } as any
 
-    assert.throws(
-      () => validateCheckCancel(invalidCheckID),
-      ValidationError,
-      'CheckCancel: invalid CheckID',
-    )
-    assert.throws(
-      () => validate(invalidCheckID),
-      ValidationError,
-      'CheckCancel: invalid CheckID',
-    )
+    assertInvalid(invalidCheckID, 'CheckCancel: invalid CheckID')
   })
 })

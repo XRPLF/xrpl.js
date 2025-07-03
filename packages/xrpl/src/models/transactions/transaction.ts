@@ -2,8 +2,6 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, Memo } from '../common'
-import { isHex } from '../utils'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -20,7 +18,11 @@ import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { BaseTransaction, isIssuedCurrency } from './common'
+import {
+  BaseTransaction,
+  isIssuedCurrencyAmount,
+  validateBaseTransaction,
+} from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -216,50 +218,15 @@ export interface TransactionAndMetadata<
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
-  if (tx.TransactionType == null) {
-    throw new ValidationError('Object does not have a `TransactionType`')
-  }
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError("Object's `TransactionType` is not a string")
-  }
 
-  /*
-   * - Memos have exclusively hex data.
-   */
-  if (tx.Memos != null && typeof tx.Memos !== 'object') {
-    throw new ValidationError('Memo must be array')
-  }
-  if (tx.Memos != null) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
-      if (memo?.Memo == null) {
-        throw new ValidationError('Memo data must be in a `Memo` field')
-      }
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-  }
+  // should already be done in the tx-specific validation, but doesn't hurt to check again
+  validateBaseTransaction(tx)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
-    if (tx[key] && isIssuedCurrency(tx[key])) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+    const value = tx[key]
+    if (value && isIssuedCurrencyAmount(value)) {
+      const txCurrency = value.currency
 
       if (
         txCurrency.length === standard_currency_code_len &&
