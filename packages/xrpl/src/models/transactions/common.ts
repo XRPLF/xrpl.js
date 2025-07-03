@@ -15,14 +15,21 @@ import {
   Signer,
   XChainBridge,
 } from '../common'
-import { onlyHasFields } from '../utils'
+import { isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
-function isMemo(obj: unknown): obj is Memo {
+/**
+ * Verify the form and type of a Record/Object at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @param obj
+ * @returns Whether the Record/Object is properly formed.
+ */
+export function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
     return false
   }
@@ -32,9 +39,13 @@ function isMemo(obj: unknown): obj is Memo {
     return false
   }
   const size = Object.keys(memo).length
-  const validData = memo.MemoData == null || isString(memo.MemoData)
-  const validFormat = memo.MemoFormat == null || isString(memo.MemoFormat)
-  const validType = memo.MemoType == null || isString(memo.MemoType)
+  const validData =
+    memo.MemoData == null || (isString(memo.MemoData) && isHex(memo.MemoData))
+  const validFormat =
+    memo.MemoFormat == null ||
+    (isString(memo.MemoFormat) && isHex(memo.MemoFormat))
+  const validType =
+    memo.MemoType == null || (isString(memo.MemoType) && isHex(memo.MemoType))
 
   return (
     size >= 1 &&
@@ -548,16 +559,13 @@ export function validateCredentialType<
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function, max-params -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-params -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
   maxCredentials: number,
 ): void {
-  if (credentials == null) {
-    return
-  }
   if (!isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials must be an array`,

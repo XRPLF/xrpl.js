@@ -2,7 +2,6 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -21,10 +20,8 @@ import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
-  isArray,
   isIssuedCurrencyAmount,
-  isRecord,
-  isString,
+  validateBaseTransaction,
 } from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
@@ -221,46 +218,9 @@ export interface TransactionAndMetadata<
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
-  if (tx.TransactionType == null) {
-    throw new ValidationError('Object does not have a `TransactionType`')
-  }
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError("Object's `TransactionType` is not a string")
-  }
 
-  /*
-   * - Memos have exclusively hex data.
-   */
-  if (tx.Memos != null) {
-    if (!isArray(tx.Memos)) {
-      throw new ValidationError('Memo must be array')
-    }
-    tx.Memos.forEach((memo) => {
-      if (!isRecord(memo)) {
-        throw new ValidationError('Memo must be an object')
-      }
-      if (!isRecord(memo.Memo)) {
-        throw new ValidationError('Memo data must be in a `Memo` field')
-      }
-      if (memo.Memo.MemoData) {
-        if (!isString(memo.Memo.MemoData) || !isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isString(memo.Memo.MemoType) || !isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isString(memo.Memo.MemoFormat) || !isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-  }
+  // should already be done in the tx-specific validation, but doesn't hurt to check again
+  validateBaseTransaction(tx)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
