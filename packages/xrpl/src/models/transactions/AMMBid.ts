@@ -2,7 +2,9 @@ import { ValidationError } from '../../errors'
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
   isArray,
   isCurrency,
@@ -86,28 +88,32 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
 }
 
 function validateAuthAccounts(
-  senderAddress: string,
+  senderAddress: Account,
   authAccounts: unknown[],
 ): boolean {
-  for (const authAccount of authAccounts) {
+  authAccounts.forEach((authAccount, index) => {
     if (!isRecord(authAccount)) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(
+        `AMMBid: invalid field AuthAccounts[0], expected a valid Record`,
+      )
     }
+    const paramName = `AuthAccounts[${index}].AuthAccount`
     if (!isRecord(authAccount.AuthAccount)) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(
+        `AMMBid: invalid field ${paramName}, expected a valid Record`,
+      )
     }
-    if (authAccount.AuthAccount.Account == null) {
-      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
-    }
-    if (typeof authAccount.AuthAccount.Account !== 'string') {
-      throw new ValidationError(`AMMBid: invalid field AuthAccounts`)
-    }
+    const authAccountInner = authAccount.AuthAccount
+    validateRequiredField(authAccountInner, 'Account', isAccount, {
+      paramName,
+      txType: 'AMMBid',
+    })
     if (authAccount.AuthAccount.Account === senderAddress) {
       throw new ValidationError(
         `AMMBid: AuthAccounts must not include sender's address`,
       )
     }
-  }
+  })
 
   return true
 }

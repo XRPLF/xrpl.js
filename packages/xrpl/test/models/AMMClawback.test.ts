@@ -79,7 +79,7 @@ describe('AMMClawback', function () {
   it(`throws w/ invalid field Asset`, function () {
     ammClawback.Asset = '1000'
     const errorMessage =
-      'AMMClawback: invalid field Asset, expected a valid Currency'
+      'AMMClawback: invalid field Asset, expected a valid Issued Currency'
     assertInvalid(ammClawback, errorMessage)
   })
 
@@ -105,7 +105,7 @@ describe('AMMClawback', function () {
   it(`throws w/ invalid field Amount`, function () {
     ammClawback.Amount = 1000
     const errorMessage =
-      'AMMClawback: invalid field Amount, expected a valid Amount'
+      'AMMClawback: invalid field Amount, expected a valid IOU Amount'
     assertInvalid(ammClawback, errorMessage)
   })
 

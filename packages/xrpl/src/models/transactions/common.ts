@@ -103,6 +103,21 @@ export function isString(str: unknown): str is string {
   return typeof str === 'string'
 }
 
+const NON_STANDARD_CURRENCY_LENGTH = 40
+
+/**
+ * Verify the form and type of a Currency string (STCurrency) at runtime.
+ *
+ * @param inp - The object to check the form and type of.
+ * @returns Whether the Currency string is properly formed.
+ */
+export function isCurrencyString(inp: unknown): inp is string {
+  return (
+    (isString(inp) && /^[A-Z]{3}$/u.test(inp)) ||
+    (isHexString(inp) && inp.length === NON_STANDARD_CURRENCY_LENGTH)
+  )
+}
+
 /**
  * Verify the form and type of a hex string at runtime.
  *
@@ -149,6 +164,14 @@ export function isNumberWithBounds(
   return isNumberWithBoundsInternal
 }
 
+function isXRPCurrency(input: unknown): input is Currency {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === XRP_CURRENCY_SIZE &&
+    input.currency === 'XRP'
+  )
+}
+
 /**
  * Verify the form and type of a Currency at runtime.
  *
@@ -156,7 +179,7 @@ export function isNumberWithBounds(
  * @returns Whether the Currency is properly formed.
  */
 export function isCurrency(input: unknown): input is Currency {
-  return isString(input) || isIssuedCurrency(input)
+  return isXRPCurrency(input) || isIssuedCurrency(input)
 }
 
 /**
@@ -168,11 +191,9 @@ export function isCurrency(input: unknown): input is Currency {
 export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
   return (
     isRecord(input) &&
-    ((Object.keys(input).length === ISSUE_SIZE &&
-      isString(input.issuer) &&
-      isString(input.currency)) ||
-      (Object.keys(input).length === XRP_CURRENCY_SIZE &&
-        input.currency === 'XRP'))
+    Object.keys(input).length === ISSUE_SIZE &&
+    isString(input.issuer) &&
+    isString(input.currency)
   )
 }
 
@@ -279,10 +300,10 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
   return (
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
-    typeof input.LockingChainDoor === 'string' &&
-    isIssuedCurrency(input.LockingChainIssue) &&
-    typeof input.IssuingChainDoor === 'string' &&
-    isIssuedCurrency(input.IssuingChainIssue)
+    isString(input.LockingChainDoor) &&
+    isCurrency(input.LockingChainIssue) &&
+    isString(input.IssuingChainDoor) &&
+    isCurrency(input.IssuingChainIssue)
   )
 }
 
@@ -291,8 +312,8 @@ const invalidMessagesMap: Record<string, string> = {
   isAmount: 'Amount',
   isCurrency: 'Currency',
   isXRPAmount: 'XRP Amount',
-  isIssuedCurrency: 'IssuedCurrencyAmount object',
-  isMPTAmount: 'MPTAmount object',
+  isIssuedCurrency: 'Issued Currency',
+  isMPTAmount: 'MPT Amount',
   isXChainBridge: 'XChainBridge object',
   isMemo: 'Memo',
   isSigner: 'Signer',
@@ -302,6 +323,8 @@ const invalidMessagesMap: Record<string, string> = {
   isNumber: 'number',
   isNumberWithBoundsInternal: 'number',
   isArray: 'array',
+  isIssuedCurrencyAmount: 'IOU Amount',
+  isCurrencyString: 'currency string',
 }
 
 // eslint-disable-next-line max-params -- okay for a helper function
@@ -314,6 +337,7 @@ function getErrorMessage(
   let errorMessage = `${txType}: invalid field ${paramName}`
   if (invalidMessage == null) {
     const invalidMessageFromMap = invalidMessagesMap[functionName]
+    // console.log(txType, paramName, functionName, invalidMessageFromMap)
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- okay
     if (invalidMessageFromMap != null) {
       errorMessage += `, expected a valid ${invalidMessageFromMap}`
@@ -543,7 +567,7 @@ export function validateBaseTransaction(
 
   const memos = common.Memos
   if (memos != null && (!isArray(memos) || !memos.every(isMemo))) {
-    throw new ValidationError('BaseTransaction: invalid Memos')
+    throw new ValidationError('BaseTransaction: invalid field Memos')
   }
 
   const signers = common.Signers
@@ -552,7 +576,7 @@ export function validateBaseTransaction(
     signers != null &&
     (!isArray(signers) || signers.length === 0 || !signers.every(isSigner))
   ) {
-    throw new ValidationError('BaseTransaction: invalid Signers')
+    throw new ValidationError('BaseTransaction: invalid field Signers')
   }
 
   validateOptionalField(common, 'SourceTag', isNumber)

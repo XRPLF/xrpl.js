@@ -65,7 +65,7 @@ describe('XChainCommit', function () {
 
     assertInvalid(
       tx,
-      'XChainCommit: invalid field XChainClaimID, expected a number or hex string',
+      'XChainCommit: invalid field XChainClaimID, expected a valid number or hex string',
     )
   })
 

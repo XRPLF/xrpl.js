@@ -45,7 +45,7 @@ describe('TrustSet', function () {
     trustSet.LimitAmount = 1234
     assertInvalid(
       trustSet,
-      'TrustSet: invalid field LimitAmount, expected a valid IssuedCurrencyAmount object',
+      'TrustSet: invalid field LimitAmount, expected a valid IOU Amount',
     )
   })
 

@@ -66,10 +66,7 @@ describe('Payment', function () {
       },
     ]
 
-    assertInvalid(
-      payment,
-      'BaseTransaction: invalid field Memos, expected an array of valid Memo objects',
-    )
+    assertInvalid(payment, 'BaseTransaction: invalid field Memos')
   })
 
   it(`throws when Amount is missing`, function () {

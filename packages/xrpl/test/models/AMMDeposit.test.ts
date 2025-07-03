@@ -124,7 +124,7 @@ describe('AMMDeposit', function () {
   it(`throws w/ LPTokenOut must be an IssuedCurrencyAmount`, function () {
     deposit.LPTokenOut = 1234
     const errorMessage =
-      'AMMDeposit: invalid field LPTokenOut, expected a valid IssuedCurrencyAmount object'
+      'AMMDeposit: invalid field LPTokenOut, expected a valid IOU Amount'
     assertInvalid(deposit, errorMessage)
   })
 

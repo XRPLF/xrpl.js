@@ -1,11 +1,10 @@
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
-import { isHex } from '../utils'
 
 import {
   BaseTransaction,
   isArray,
-  isCurrency,
+  isCurrencyString,
   isHexString,
   isNumber,
   isNumberWithBounds,
@@ -107,9 +106,14 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
       // TODO: add support for handling inner objects easier (similar to validateRequiredField/validateOptionalField)
       value.forEach((priceData, index) => {
-        if (!isRecord(priceData) || !isRecord(priceData.PriceData)) {
+        if (!isRecord(priceData)) {
           throw new ValidationError(
             'OracleSet: PriceDataSeries must be an array of objects',
+          )
+        }
+        if (!isRecord(priceData.PriceData)) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must have a `PriceData` object',
           )
         }
 
@@ -122,12 +126,12 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
         const priceDataInner = priceData.PriceData
 
-        validateRequiredField(priceDataInner, 'BaseAsset', isCurrency, {
+        validateRequiredField(priceDataInner, 'BaseAsset', isCurrencyString, {
           paramName: `PriceDataSeries[${index}].BaseAsset`,
           txType: 'OracleSet',
         })
 
-        validateRequiredField(priceDataInner, 'QuoteAsset', isCurrency, {
+        validateRequiredField(priceDataInner, 'QuoteAsset', isCurrencyString, {
           paramName: `PriceDataSeries[${index}].QuoteAsset`,
           txType: 'OracleSet',
         })

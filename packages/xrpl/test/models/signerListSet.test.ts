@@ -172,7 +172,7 @@ describe('SignerListSet', function () {
       },
     ]
     const errorMessage =
-      'SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value'
+      'SignerListSet: invalid field SignerEntries[0].WalletLocator, expected a valid hex string'
     assertInvalid(signerListSetTx, errorMessage)
   })
 })

@@ -78,13 +78,16 @@ export function assertTxIsValid(tx: any, validateTx: (tx: any) => void): void {
 export function assertTxValidationError(
   tx: any,
   validateTx: (tx: any) => void,
-  errorMessage: string,
+  errorMessage: string | RegExp,
 ): void {
-  const regex = new RegExp(
-    // eslint-disable-next-line require-unicode-regexp -- TS complains if it's included
-    `^${errorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
-    'u',
-  )
+  const regex =
+    typeof errorMessage === 'string'
+      ? new RegExp(
+          // eslint-disable-next-line require-unicode-regexp -- TS complains if it's included
+          `^${errorMessage.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`,
+          'u',
+        )
+      : errorMessage
   assert.throws(() => validateTx(tx), ValidationError, regex)
   assert.throws(() => validate(tx), ValidationError, regex)
 }

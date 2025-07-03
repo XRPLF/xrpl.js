@@ -6,7 +6,7 @@ import {
   GlobalFlagsInterface,
   isAmount,
   isCurrency,
-  isIssuedCurrency,
+  isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -89,7 +89,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Asset', isCurrency)
   validateRequiredField(tx, 'Asset2', isCurrency)
-  validateOptionalField(tx, 'LPTokenOut', isIssuedCurrency)
+  validateOptionalField(tx, 'LPTokenOut', isIssuedCurrencyAmount)
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Amount2', isAmount)
   validateOptionalField(tx, 'EPrice', isAmount)

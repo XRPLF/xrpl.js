@@ -130,7 +130,7 @@ describe('AMMWithdraw', function () {
   it(`throws when LPTokenIn is not an IssuedCurrencyAmount`, function () {
     withdraw.LPTokenIn = 1234
     const errorMessage =
-      'AMMWithdraw: invalid field LPTokenIn, expected a valid IssuedCurrencyAmount object'
+      'AMMWithdraw: invalid field LPTokenIn, expected a valid IOU Amount'
     assertInvalid(withdraw, errorMessage)
   })
 

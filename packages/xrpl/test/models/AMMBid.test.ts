@@ -124,7 +124,7 @@ describe('AMMBid', function () {
       AuthAccount: null,
     }
     const errorMessage =
-      'AMMBid: invalid field AuthAccounts, expected objects in array'
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -133,7 +133,7 @@ describe('AMMBid', function () {
       AuthAccount: undefined,
     }
     const errorMessage =
-      'AMMBid: invalid field AuthAccounts, expected objects in array'
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -142,7 +142,7 @@ describe('AMMBid', function () {
       AuthAccount: 1234,
     }
     const errorMessage =
-      'AMMBid: invalid field AuthAccounts, expected objects in array'
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -152,7 +152,8 @@ describe('AMMBid', function () {
         Account: 1234,
       },
     }
-    const errorMessage = 'AMMBid: invalid field AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid account address'
     assertInvalid(bid, errorMessage)
   })
 

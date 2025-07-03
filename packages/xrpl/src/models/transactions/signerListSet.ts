@@ -8,6 +8,7 @@ import {
   isNumber,
   isRecord,
   validateBaseTransaction,
+  validateOptionalField,
   validateRequiredField,
 } from './common'
 
@@ -73,7 +74,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
       )
     }
     const signerEntry = entry.SignerEntry
-    validateRequiredField(signerEntry, 'WalletLocator', isHexString, {
+    validateOptionalField(signerEntry, 'WalletLocator', isHexString, {
       paramName: `SignerEntries[${index}].WalletLocator`,
       txType: 'SignerListSet',
     })

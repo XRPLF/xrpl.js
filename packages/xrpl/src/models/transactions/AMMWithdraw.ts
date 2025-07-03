@@ -6,7 +6,6 @@ import {
   GlobalFlagsInterface,
   isAmount,
   isCurrency,
-  isIssuedCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
@@ -90,7 +89,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Asset2', isCurrency)
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Amount2', isAmount)
-  validateOptionalField(tx, 'LPTokenIn', isIssuedCurrency)
+  validateOptionalField(tx, 'LPTokenIn', isIssuedCurrencyAmount)
   validateOptionalField(tx, 'EPrice', isAmount)
 
   if (tx.Amount2 != null && tx.Amount == null) {

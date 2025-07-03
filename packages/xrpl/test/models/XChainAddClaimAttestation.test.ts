@@ -201,7 +201,7 @@ describe('XChainAddClaimAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddClaimAttestation: invalid field XChainClaimID, expected a number or hex string',
+      'XChainAddClaimAttestation: invalid field XChainClaimID, expected a valid number or hex string',
     )
   })
 })

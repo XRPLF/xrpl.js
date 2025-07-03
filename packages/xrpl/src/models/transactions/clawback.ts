@@ -9,7 +9,6 @@ import {
   isAccount,
   validateOptionalField,
   validateRequiredField,
-  isIssuedCurrency,
 } from './common'
 
 /**
@@ -49,7 +48,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
     tx,
     'Amount',
     (inp): inp is IssuedCurrencyAmount | MPTAmount =>
-      isIssuedCurrency(inp) || isMPTAmount(inp),
+      isIssuedCurrencyAmount(inp) || isMPTAmount(inp),
     { invalidMessage: 'expected a valid non-XRP Amount' },
   )
 
