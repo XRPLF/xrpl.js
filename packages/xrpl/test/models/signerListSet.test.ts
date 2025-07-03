@@ -66,7 +66,7 @@ describe('SignerListSet', function () {
   it(`throws w/ invalid SignerEntries`, function () {
     signerListSetTx.SignerEntries = 'khgfgyhujk'
 
-    assertInvalid(signerListSetTx, 'SignerListSet: invalid SignerEntries')
+    assertInvalid(signerListSetTx, 'SignerListSet: invalid field SignerEntries')
   })
 
   it(`throws w/ maximum of 32 members allowed in SignerEntries`, function () {
