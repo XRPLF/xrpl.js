@@ -215,11 +215,7 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       Delegate: 1234,
     }
-    assert.throws(
-      () => validateBaseTransaction(invalidDelegate),
-      ValidationError,
-      'Payment: invalid field Delegate',
-    )
+    assertInvalid(invalidDelegate, 'Payment: invalid field Delegate')
   })
 
   it(`Handles Account and Delegate being the same error`, function () {
@@ -229,9 +225,8 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       Delegate: account,
     }
-    assert.throws(
-      () => validateBaseTransaction(invalidDelegate),
-      ValidationError,
+    assertInvalid(
+      invalidDelegate,
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   })
