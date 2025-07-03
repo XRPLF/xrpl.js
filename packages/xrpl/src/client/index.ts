@@ -663,7 +663,6 @@ class Client extends EventEmitter<EventTypes> {
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
-
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -692,11 +691,46 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'Batch') {
       promises.push(autofillBatchTxn(this, tx))
     }
-    if (tx.TransactionType === 'Payment') {
+    if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
       handleDeliverMax(tx)
     }
 
     return Promise.all(promises).then(() => tx)
+  }
+
+  /**
+   * Simulates an unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
+   * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.binary - If true, return the metadata in a binary encoding.
+   *
+   * @returns A promise that contains SimulateResponse.
+   * @throws RippledError if the simulate request fails.
+   */
+
+  public async simulate<Binary extends boolean = false>(
+    transaction: SubmittableTransaction | string,
+    opts?: {
+      // If true, return the binary-encoded representation of the results.
+      binary?: Binary
+    },
+  ): Promise<
+    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
+  > {
+    // send request
+    const binary = opts?.binary ?? false
+    const request: SimulateRequest =
+      typeof transaction === 'string'
+        ? { command: 'simulate', tx_blob: transaction, binary }
+        : { command: 'simulate', tx_json: transaction, binary }
+    return this.request(request)
   }
 
   /**
@@ -749,41 +783,6 @@ class Client extends EventEmitter<EventTypes> {
   }
 
   /**
-   * Simulates an unsigned transaction.
-   * Steps performed on a transaction:
-   *    1. Autofill.
-   *    2. Sign & Encode.
-   *    3. Submit.
-   *
-   * @category Core
-   *
-   * @param transaction - A transaction to autofill, sign & encode, and submit.
-   * @param opts - (Optional) Options used to sign and submit a transaction.
-   * @param opts.binary - If true, return the metadata in a binary encoding.
-   *
-   * @returns A promise that contains SimulateResponse.
-   * @throws RippledError if the simulate request fails.
-   */
-
-  public async simulate<Binary extends boolean = false>(
-    transaction: SubmittableTransaction | string,
-    opts?: {
-      // If true, return the binary-encoded representation of the results.
-      binary?: Binary
-    },
-  ): Promise<
-    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
-  > {
-    // send request
-    const binary = opts?.binary ?? false
-    const request: SimulateRequest =
-      typeof transaction === 'string'
-        ? { command: 'simulate', tx_blob: transaction, binary }
-        : { command: 'simulate', tx_json: transaction, binary }
-    return this.request(request)
-  }
-
-  /**
    * Asynchronously submits a transaction and verifies that it has been included in a
    * validated ledger (or has errored/will not be included for some reason).
    * See [Reliable Transaction Submission](https://xrpl.org/reliable-transaction-submission.html).
@@ -823,7 +822,7 @@ class Client extends EventEmitter<EventTypes> {
    * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
    * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
    *
-   * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
+   * This is similar to `submit`, which does all of the above, but also waits to see if the transaction has been validated.
    * @param transaction - A transaction to autofill, sign & encode, and submit.
    * @param opts - (Optional) Options used to sign and submit a transaction.
    * @param opts.autofill - If true, autofill a transaction.
@@ -863,6 +862,12 @@ class Client extends EventEmitter<EventTypes> {
     }
 
     const response = await submitRequest(this, signedTx, opts?.failHard)
+
+    if (response.result.engine_result.startsWith('tem')) {
+      throw new XrplError(
+        `Transaction failed, ${response.result.engine_result}: ${response.result.engine_result_message}`,
+      )
+    }
 
     const txHash = hashes.hashSignedTx(signedTx)
     return waitForFinalTransactionOutcome(

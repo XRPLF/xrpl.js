@@ -1,8 +1,11 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { VaultClawback } from '../../src/models/transactions'
 import { validateVaultClawback } from '../../src/models/transactions/vaultClawback'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateVaultClawback)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateVaultClawback, message)
 
 /**
  * VaultClawback Transaction Verification Testing.
@@ -27,67 +30,41 @@ describe('VaultClawback', function () {
   })
 
   it('verifies valid VaultClawback', function () {
-    assert.doesNotThrow(() => validateVaultClawback(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = undefined
     const errorMessage = 'VaultClawback: missing field VaultID'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
     const errorMessage = 'VaultClawback: invalid field VaultID'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it('throws w/ missing Holder', function () {
     // @ts-expect-error for test
     tx.Holder = undefined
     const errorMessage = 'VaultClawback: missing field Holder'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it('throws w/ invalid Holder', function () {
     // @ts-expect-error for test
     tx.Holder = 123
     const errorMessage = 'VaultClawback: invalid field Holder'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it('throws w/ string Amount', function () {
     // @ts-expect-error for test
     tx.Amount = '123456'
     const errorMessage = 'VaultClawback: invalid field Amount'
-    assert.throws(
-      () => validateVaultClawback(tx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 })
