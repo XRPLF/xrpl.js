@@ -146,6 +146,12 @@ export interface AccountRootFlagsInterface {
    * This address can claw back issued IOUs. Once enabled, cannot be disabled.
    */
   lsfAllowTrustLineClawback?: boolean
+
+  /**
+   * If the issuer's account does not have the lsfAllowTrustLineLocking flag set,
+   * then Escrow ledger-objects cannot be created with such IOUs.
+   */
+  lsfAllowTrustLineLocking?: boolean
 }
 
 export enum AccountRootFlags {
@@ -210,4 +216,9 @@ export enum AccountRootFlags {
    * This address can claw back issued IOUs. Once enabled, cannot be disabled.
    */
   lsfAllowTrustLineClawback = 0x80000000,
+  /**
+   * If the issuer's account does not have the lsfAllowTrustLineLocking flag set,
+   * then Escrow ledger-objects cannot be created with such IOUs.
+   */
+  lsfAllowTrustLineLocking = 0x40000000,
 }

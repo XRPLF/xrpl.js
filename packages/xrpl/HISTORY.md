@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Implement support for XLS-85d Token Escrow amendment.
+
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
 * Fail faster on `tem` errors with `submitAndWait`
