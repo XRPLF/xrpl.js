@@ -82,12 +82,12 @@ describe('SignerListSet', function () {
     assert.throws(
       () => validateSignerListSet(signerListSetTx),
       ValidationError,
-      'SignerListSet: invalid SignerEntries',
+      'SignerListSet: invalid field SignerEntries',
     )
     assert.throws(
       () => validate(signerListSetTx),
       ValidationError,
-      'SignerListSet: invalid SignerEntries',
+      'SignerListSet: invalid field SignerEntries',
     )
   })
 

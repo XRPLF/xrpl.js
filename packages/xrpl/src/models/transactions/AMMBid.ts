@@ -4,7 +4,9 @@ import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 import {
   BaseTransaction,
   isAmount,
-  isCurrency,
+  isArray,
+  isIssuedCurrency,
+  isRecord,
   validateBaseTransaction,
 } from './common'
 
@@ -65,7 +67,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset')
   }
 
-  if (!isCurrency(tx.Asset)) {
+  if (!isIssuedCurrency(tx.Asset)) {
     throw new ValidationError('AMMBid: Asset must be a Currency')
   }
 
@@ -73,7 +75,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMBid: missing field Asset2')
   }
 
-  if (!isCurrency(tx.Asset2)) {
+  if (!isIssuedCurrency(tx.Asset2)) {
     throw new ValidationError('AMMBid: Asset2 must be a Currency')
   }
 
@@ -86,7 +88,7 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
   }
 
   if (tx.AuthAccounts != null) {
-    if (!Array.isArray(tx.AuthAccounts)) {
+    if (!isArray(tx.AuthAccounts)) {
       throw new ValidationError(
         `AMMBid: AuthAccounts must be an AuthAccount array`,
       )
@@ -96,37 +98,27 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
         `AMMBid: AuthAccounts length must not be greater than ${MAX_AUTH_ACCOUNTS}`,
       )
     }
-    validateAuthAccounts(
-      tx.Account,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-      tx.AuthAccounts as Array<Record<string, unknown>>,
-    )
+    validateAuthAccounts(tx.Account, tx.AuthAccounts)
   }
 }
 
 function validateAuthAccounts(
   senderAddress: string,
-  authAccounts: Array<Record<string, unknown>>,
+  authAccounts: unknown[],
 ): boolean {
   for (const authAccount of authAccounts) {
-    if (
-      authAccount.AuthAccount == null ||
-      typeof authAccount.AuthAccount !== 'object'
-    ) {
+    if (!isRecord(authAccount)) {
       throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
-    // @ts-expect-error -- used for null check
+    if (!isRecord(authAccount.AuthAccount)) {
+      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+    }
     if (authAccount.AuthAccount.Account == null) {
       throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
-    // @ts-expect-error -- used for null check
     if (typeof authAccount.AuthAccount.Account !== 'string') {
       throw new ValidationError(`AMMBid: invalid AuthAccounts`)
     }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- used for null check
-    // @ts-expect-error -- used for null check
     if (authAccount.AuthAccount.Account === senderAddress) {
       throw new ValidationError(
         `AMMBid: AuthAccounts must not include sender's address`,
