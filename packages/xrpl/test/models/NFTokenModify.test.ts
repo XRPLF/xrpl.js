@@ -1,6 +1,6 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import { validateNFTokenModify } from '../../src'
+import { validateNFTokenModify } from '../../src/models/transactions/NFTokenModify'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>

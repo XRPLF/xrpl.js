@@ -513,7 +513,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /MemoType field must be a hex value/u)
+      }, /BaseTransaction: invalid Memos/u)
     })
 
     it('sign throws when MemoData is not a hex value', async function () {
@@ -539,7 +539,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /MemoData field must be a hex value/u)
+      }, /BaseTransaction: invalid Memos/u)
     })
 
     it('sign throws when MemoFormat is not a hex value', async function () {
@@ -565,7 +565,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /MemoFormat field must be a hex value/u)
+      }, /BaseTransaction: invalid Memos/u)
     })
 
     it('sign with EscrowFinish', async function () {
@@ -591,6 +591,17 @@ describe('Wallet', function () {
       const signature = wallet.sign(
         REQUEST_FIXTURES.signAs as Transaction,
         wallet.getXAddress(),
+      )
+      assert.deepEqual(signature, {
+        tx_blob: RESPONSE_FIXTURES.signAs.signedTransaction,
+        hash: 'D8CF5FC93CFE5E131A34599AFB7CE186A5B8D1B9F069E35F4634AD3B27837E35',
+      })
+    })
+
+    it('sign with regular address for multisignAddress', async function () {
+      const signature = wallet.sign(
+        REQUEST_FIXTURES.signAs as Transaction,
+        wallet.address,
       )
       assert.deepEqual(signature, {
         tx_blob: RESPONSE_FIXTURES.signAs.signedTransaction,

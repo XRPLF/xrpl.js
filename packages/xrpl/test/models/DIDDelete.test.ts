@@ -24,9 +24,4 @@ describe('DIDDelete', function () {
   it('verifies valid DIDDelete', function () {
     assertValid(tx)
   })
-
-  it('throws on invalid DIDDelete', function () {
-    tx.FakeField = 'blah'
-    assertValid(tx)
-  })
 })

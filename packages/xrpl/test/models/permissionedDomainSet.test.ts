@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { AuthorizeCredential } from '../../src'
 import { validatePermissionedDomainSet } from '../../src/models/transactions/permissionedDomainSet'

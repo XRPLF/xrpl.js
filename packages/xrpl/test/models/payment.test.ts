@@ -217,7 +217,6 @@ describe('Payment', function () {
     ]
 
     const errorMessage = 'Payment: Credentials length cannot exceed 8 elements'
-
     assertInvalid(payment, errorMessage)
   })
 
@@ -225,7 +224,6 @@ describe('Payment', function () {
     payment.CredentialIDs = []
 
     const errorMessage = 'Payment: Credentials cannot be an empty array'
-
     assertInvalid(payment, errorMessage)
   })
 
@@ -236,7 +234,6 @@ describe('Payment', function () {
     ]
 
     const errorMessage = 'Payment: Invalid Credentials ID list format'
-
     assertInvalid(payment, errorMessage)
   })
 
@@ -248,7 +245,6 @@ describe('Payment', function () {
 
     const errorMessage =
       'Payment: Credentials cannot contain duplicate elements'
-
     assertInvalid(payment, errorMessage)
   })
 })

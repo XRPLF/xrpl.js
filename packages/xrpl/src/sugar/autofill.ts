@@ -1,10 +1,11 @@
+/* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
-import { BaseTransaction, Transaction } from '../models/transactions'
+import { Batch, Payment, Transaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -116,7 +117,7 @@ interface ClassicAccountAndTag {
  *
  * @param tx - The transaction object.
  */
-export function setValidAddresses<T extends BaseTransaction>(tx: T): void {
+export function setValidAddresses(tx: Transaction): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
 
   if ('Destination' in tx) {
@@ -140,8 +141,8 @@ export function setValidAddresses<T extends BaseTransaction>(tx: T): void {
  * @param tagField - The field name for the tag in the transaction object.
  * @throws {ValidationError} If the tag field does not match the tag of the account address.
  */
-function validateAccountAddress<T extends BaseTransaction>(
-  tx: T,
+function validateAccountAddress(
+  tx: Transaction,
   accountField: string,
   tagField: string,
 ): void {
@@ -205,18 +206,27 @@ function getClassicAccountAndTag(
  * @param tx - The transaction object.
  * @param fieldName - The name of the field to convert.export
  */
-function convertToClassicAddress<T extends BaseTransaction>(
-  tx: T,
-  fieldName: string,
-): void {
-  if (fieldName in tx) {
-    const account: unknown = tx[fieldName]
-    if (fieldName in tx && typeof account === 'string') {
-      const { classicAccount } = getClassicAccountAndTag(account)
-      // eslint-disable-next-line no-param-reassign -- param reassign is safe
-      tx[fieldName] = classicAccount
-    }
+function convertToClassicAddress(tx: Transaction, fieldName: string): void {
+  const account = tx[fieldName]
+  if (typeof account === 'string') {
+    const { classicAccount } = getClassicAccountAndTag(account)
+    // eslint-disable-next-line no-param-reassign -- param reassign is safe
+    tx[fieldName] = classicAccount
   }
+}
+
+// Helper function to get the next valid sequence number for an account.
+async function getNextValidSequenceNumber(
+  client: Client,
+  account: string,
+): Promise<number> {
+  const request: AccountInfoRequest = {
+    command: 'account_info',
+    account,
+    ledger_index: 'current',
+  }
+  const data = await client.request(request)
+  return data.result.account_data.Sequence
 }
 
 /**
@@ -231,14 +241,8 @@ export async function setNextValidSequenceNumber(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: AccountInfoRequest = {
-    command: 'account_info',
-    account: tx.Account,
-    ledger_index: 'current',
-  }
-  const data = await client.request(request)
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
-  tx.Sequence = data.result.account_data.Sequence
+  tx.Sequence = await getNextValidSequenceNumber(client, tx.Account)
 }
 
 /**
@@ -265,16 +269,21 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
- * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
+ * @returns A promise that returns the fee.
  */
-export async function calculateFeePerTransactionType(
+
+async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
-): Promise<void> {
+): Promise<BigNumber> {
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
+
+  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
+    tx.TransactionType,
+  )
 
   // EscrowFinish Transaction with Fulfillment
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
@@ -284,14 +293,18 @@ export async function calculateFeePerTransactionType(
       // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
       scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
     )
-  }
-
-  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
-    tx.TransactionType,
-  )
-
-  if (isSpecialTxCost) {
+  } else if (isSpecialTxCost) {
     baseFee = await fetchOwnerReserveFee(client)
+  } else if (tx.TransactionType === 'Batch') {
+    const rawTxFees = await tx.RawTransactions.reduce(async (acc, rawTxn) => {
+      const resolvedAcc = await acc
+      const fee = await calculateFeePerTransactionType(
+        client,
+        rawTxn.RawTransaction,
+      )
+      return BigNumber.sum(resolvedAcc, fee)
+    }, Promise.resolve(new BigNumber(0)))
+    baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
   }
 
   /*
@@ -299,7 +312,7 @@ export async function calculateFeePerTransactionType(
    * BaseFee × (1 + Number of Signatures Provided)
    */
   if (signersCount > 0) {
-    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, 1 + signersCount))
+    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, signersCount))
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
@@ -308,8 +321,25 @@ export async function calculateFeePerTransactionType(
     : BigNumber.min(baseFee, maxFeeDrops)
 
   // Round up baseFee and return it as a string
-  // eslint-disable-next-line no-param-reassign, @typescript-eslint/no-magic-numbers, require-atomic-updates -- safe reassignment.
-  tx.Fee = totalFee.dp(0, BigNumber.ROUND_CEIL).toString(10)
+  return totalFee.dp(0, BigNumber.ROUND_CEIL)
+}
+
+/**
+ * Calculates the fee per transaction type and sets it in the transaction.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
+ */
+export async function getTransactionFee(
+  client: Client,
+  tx: Transaction,
+  signersCount = 0,
+): Promise<void> {
+  const fee = await calculateFeePerTransactionType(client, tx, signersCount)
+  // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
+  tx.Fee = fee.toString(10)
 }
 
 /**
@@ -368,4 +398,99 @@ export async function checkAccountDeleteBlockers(
     }
     resolve()
   })
+}
+
+/**
+ * Replaces Amount with DeliverMax if needed.
+ *
+ * @param tx - The transaction object.
+ * @throws ValidationError if Amount and DeliverMax are both provided but do not match.
+ */
+export function handleDeliverMax(tx: Payment): void {
+  if (tx.DeliverMax != null) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount == null) {
+      // If only DeliverMax is provided, use it to populate the Amount field
+      // eslint-disable-next-line no-param-reassign -- known RPC-level property
+      tx.Amount = tx.DeliverMax
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
+    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+      throw new ValidationError(
+        'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
+      )
+    }
+
+    // eslint-disable-next-line no-param-reassign -- needed here
+    delete tx.DeliverMax
+  }
+}
+
+/**
+ * Autofills all the relevant `x` fields.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
+ */
+// eslint-disable-next-line complexity, max-lines-per-function -- needed here, lots to check
+export async function autofillBatchTxn(
+  client: Client,
+  tx: Batch,
+): Promise<void> {
+  const accountSequences: Record<string, number> = {}
+
+  for await (const rawTxn of tx.RawTransactions) {
+    const txn = rawTxn.RawTransaction
+
+    // Sequence processing
+    if (txn.Sequence == null && txn.TicketSequence == null) {
+      if (txn.Account in accountSequences) {
+        txn.Sequence = accountSequences[txn.Account]
+        accountSequences[txn.Account] += 1
+      } else {
+        const nextSequence = await getNextValidSequenceNumber(
+          client,
+          txn.Account,
+        )
+        const sequence =
+          txn.Account === tx.Account ? nextSequence + 1 : nextSequence
+        accountSequences[txn.Account] = sequence + 1
+        txn.Sequence = sequence
+      }
+    }
+
+    if (txn.Fee == null) {
+      txn.Fee = '0'
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
+    } else if (txn.Fee !== '0') {
+      throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
+    }
+
+    if (txn.SigningPubKey == null) {
+      txn.SigningPubKey = ''
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
+    } else if (txn.SigningPubKey !== '') {
+      throw new XrplError(
+        'Must have `SigningPubKey` of "" in inner Batch transaction.',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
+    if (txn.TxnSignature != null) {
+      throw new XrplError(
+        'Must not have `TxnSignature` in inner Batch transaction.',
+      )
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
+    if (txn.Signers != null) {
+      throw new XrplError('Must not have `Signers` in inner Batch transaction.')
+    }
+
+    if (txn.NetworkID == null && txNeedsNetworkID(client)) {
+      txn.NetworkID = client.networkID
+    }
+  }
 }

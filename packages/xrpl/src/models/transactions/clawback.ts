@@ -4,11 +4,12 @@ import { IssuedCurrencyAmount, MPTAmount } from '../common'
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrency,
+  isIssuedCurrencyAmount,
   isMPTAmount,
   isAccount,
   validateOptionalField,
   validateRequiredField,
+  isIssuedCurrency,
 } from './common'
 
 /**
@@ -49,10 +50,10 @@ export function validateClawback(tx: Record<string, unknown>): void {
     'Amount',
     (inp): inp is IssuedCurrencyAmount | MPTAmount =>
       isIssuedCurrency(inp) || isMPTAmount(inp),
-    'expected a valid non-XRP Amount',
+    { invalidMessage: 'expected a valid non-XRP Amount' },
   )
 
-  if (isIssuedCurrency(tx.Amount)) {
+  if (isIssuedCurrencyAmount(tx.Amount)) {
     if (tx.Account === tx.Amount.issuer) {
       throw new ValidationError(
         'Clawback: Amount.issuer and Account cannot be the same',

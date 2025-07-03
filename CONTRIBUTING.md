@@ -12,7 +12,7 @@
 
 ### Requirements
 
-We use Node v18 for development - that is the version that our linters require.
+We use Node v22 for development - that is the version that our linters require.
 You must also use `npm` v7. You can check your `npm` version with:
 
 ```bash
@@ -78,6 +78,20 @@ Breaking down the command:
 * `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
 * `--entrypoint bash rippleci/rippled:develop` manually overrides the entrypoint (for the latest version of rippled on the `develop` branch)
 *  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
+
+### Faucet Tests
+
+Faucet tests are designed to ensure the functionality of account funding and other interactions that require a funded wallet, typically by interacting with a Faucet service. These tests are crucial for verifying real-world scenarios where new accounts need to be activated on the XRP Ledger.
+
+To run Faucet tests locally, you'll first need to ensure your development environment is set up and the project is built. Faucet tests do not require a locally running `rippled` instance to execute.
+
+From the root directory of xrpl.js, run the following commands:
+
+```bash
+npm install
+npm run build
+npm run test:faucet
+```
 
 ### Browser Tests
 

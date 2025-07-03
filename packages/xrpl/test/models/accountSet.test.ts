@@ -32,7 +32,7 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid SetFlag (out of range)`, function () {
     tx.SetFlag = 20
-    assertInvalid(tx, 'AccountSet: invalid SetFlag value')
+    assertInvalid(tx, 'AccountSet: invalid SetFlag')
   })
 
   it(`throws w/ invalid SetFlag (incorrect type)`, function () {
@@ -45,7 +45,7 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid ClearFlag`, function () {
     tx.ClearFlag = 20
-    assertInvalid(tx, 'AccountSet: invalid ClearFlag value')
+    assertInvalid(tx, 'AccountSet: invalid ClearFlag')
   })
 
   it(`throws w/ invalid Domain`, function () {

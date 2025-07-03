@@ -5,7 +5,7 @@ import { isFlagEnabled } from '../utils'
 import {
   BaseTransaction,
   isAmount,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
   validateRequiredField,
@@ -15,6 +15,7 @@ import {
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
   isHexString,
+  isArray,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -85,7 +86,7 @@ export enum PaymentFlags {
  * // }
  * ```
  */
-export interface PaymentFlagsInterface extends GlobalFlags {
+export interface PaymentFlagsInterface extends GlobalFlagsInterface {
   /**
    * Do not use the default path; only use paths included in the Paths field.
    * This is intended to force the transaction to take arbitrage opportunities.
@@ -181,7 +182,9 @@ export function validatePayment(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateOptionalField(tx, 'InvoiceID', isHexString)
-  validateOptionalField(tx, 'Paths', isPaths, 'expected a valid Paths array')
+  validateOptionalField(tx, 'Paths', isPaths, {
+    invalidMessage: 'expected a valid Paths array',
+  })
 
   validateOptionalField(tx, 'SendMax', isAmount)
   validateOptionalField(tx, 'DeliverMin', isAmount)
@@ -257,7 +260,10 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
   return false
 }
 
-function isPath(path: Array<Record<string, unknown>>): boolean {
+function isPath(path: unknown): path is Path {
+  if (!Array.isArray(path) || path.length === 0) {
+    return false
+  }
   for (const pathStep of path) {
     if (!isPathStep(pathStep)) {
       return false
@@ -267,12 +273,12 @@ function isPath(path: Array<Record<string, unknown>>): boolean {
 }
 
 function isPaths(paths: unknown): paths is Path[] {
-  if (!Array.isArray(paths) || paths.length === 0) {
+  if (!isArray(paths) || paths.length === 0) {
     return false
   }
 
   for (const path of paths) {
-    if (!Array.isArray(path) || path.length === 0) {
+    if (!isArray(path) || path.length === 0) {
       return false
     }
 

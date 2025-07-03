@@ -2,12 +2,12 @@ import { IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
-  isIssuedCurrency,
   isNumber,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isIssuedCurrencyAmount,
 } from './common'
 
 /**
@@ -79,7 +79,7 @@ export enum TrustSetFlags {
  * // }
  * ```
  */
-export interface TrustSetFlagsInterface extends GlobalFlags {
+export interface TrustSetFlagsInterface extends GlobalFlagsInterface {
   /**
    * Authorize the other party to hold currency issued by this account. (No
    * effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.
@@ -139,7 +139,7 @@ export interface TrustSet extends BaseTransaction {
 export function validateTrustSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LimitAmount', isIssuedCurrency)
+  validateRequiredField(tx, 'LimitAmount', isIssuedCurrencyAmount)
 
   validateOptionalField(tx, 'QualityIn', isNumber)
   validateOptionalField(tx, 'QualityOut', isNumber)

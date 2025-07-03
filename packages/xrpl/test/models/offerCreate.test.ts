@@ -37,7 +37,9 @@ describe('OfferCreate', function () {
   })
   it(`verifies valid OfferCreate`, function () {
     assertValid(offer)
+  })
 
+  it(`verifies valid OfferCreate with flags`, function () {
     const offer2 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
@@ -58,7 +60,9 @@ describe('OfferCreate', function () {
     } as any
 
     assertValid(offer2)
+  })
 
+  it(`verifies valid OfferCreate with TakerGets and TakerPays as IOUs`, function () {
     const offer3 = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',

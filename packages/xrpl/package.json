@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "4.2.5",
+  "version": "4.3.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -29,7 +29,7 @@
     "bignumber.js": "^9.0.0",
     "eventemitter3": "^5.0.1",
     "ripple-address-codec": "^5.0.0",
-    "ripple-binary-codec": "^2.3.0",
+    "ripple-binary-codec": "^2.4.1",
     "ripple-keypairs": "^2.0.0"
   },
   "devDependencies": {
@@ -43,7 +43,7 @@
     "lodash": "^4.17.4",
     "react": "^19.0.0",
     "run-s": "^0.0.0",
-    "typedoc": "0.27.9",
+    "typedoc": "0.28.5",
     "ws": "^8.14.2"
   },
   "scripts": {
@@ -60,8 +60,9 @@
     "prepublish": "run-s clean build",
     "test": "jest --config=jest.config.unit.js --verbose false --silent=false",
     "test:integration": "TS_NODE_PROJECT=tsconfig.build.json jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
+    "test:faucet": "jest --config jest.config.faucet.js",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
-    "test:watch": "jest --watch --verbose false --silent=false --runInBand ./test/**/*.test.ts --testPathIgnorePatterns=./test/integration --testPathIgnorePatterns=./test/fixtures",
+    "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
     "perf": "./scripts/perf_test.sh",

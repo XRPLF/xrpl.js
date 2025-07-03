@@ -4,7 +4,9 @@ import { SignerEntry } from '../common'
 import {
   BaseTransaction,
   isArray,
+  isHexString,
   isNumber,
+  isRecord,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -33,8 +35,6 @@ export interface SignerListSet extends BaseTransaction {
 }
 
 const MAX_SIGNERS = 32
-
-const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 
 /**
  * Verify the form and type of an SignerListSet at runtime.
@@ -66,17 +66,16 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     )
   }
 
-  for (const entry of tx.SignerEntries) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
-    const signerEntry = entry as SignerEntry
-    const { WalletLocator } = signerEntry.SignerEntry
-    if (
-      WalletLocator !== undefined &&
-      !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
-    ) {
+  tx.SignerEntries.forEach((entry, index) => {
+    if (!isRecord(entry) || !isRecord(entry.SignerEntry)) {
       throw new ValidationError(
-        `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
+        'SignerListSet: SignerEntries must be an array of SignerEntry objects',
       )
     }
-  }
+    const signerEntry = entry.SignerEntry
+    validateRequiredField(signerEntry, 'WalletLocator', isHexString, {
+      paramName: `SignerEntries[${index}].WalletLocator`,
+      txType: 'SignerListSet',
+    })
+  })
 }

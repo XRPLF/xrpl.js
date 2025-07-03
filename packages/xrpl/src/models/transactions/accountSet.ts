@@ -3,6 +3,7 @@ import { ValidationError } from '../../errors'
 import {
   Account,
   BaseTransaction,
+  GlobalFlagsInterface,
   isAccount,
   isHexString,
   isNumber,
@@ -115,7 +116,7 @@ export enum AccountSetTfFlags {
  * // }
  * ```
  */
-export interface AccountSetFlagsInterface {
+export interface AccountSetFlagsInterface extends GlobalFlagsInterface {
   tfRequireDestTag?: boolean
   tfOptionalDestTag?: boolean
   tfRequireAuth?: boolean

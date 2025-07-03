@@ -9,6 +9,7 @@ module.exports = {
   collectCoverage: true,
   verbose: true,
   testEnvironment: "node",
+  coverageReporters: [["text", { skipFull: true }], "text-summary"],
   globals: {
     TextDecoder: TextDecoder,
     TextEncoder: TextEncoder,

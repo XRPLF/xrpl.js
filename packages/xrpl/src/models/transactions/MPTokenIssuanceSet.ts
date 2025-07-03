@@ -8,7 +8,7 @@ import {
   Account,
   validateOptionalField,
   isAccount,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isHexString,
 } from './common'
 
@@ -34,7 +34,7 @@ export enum MPTokenIssuanceSetFlags {
  *
  * @category Transaction Flags
  */
-export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlags {
+export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
 }
@@ -70,7 +70,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
-  const isTfMPTLock: boolean =
+  const isTfMPTLock =
     typeof flags === 'number'
       ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
       : flags.tfMPTLock === true

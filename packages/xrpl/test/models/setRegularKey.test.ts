@@ -12,10 +12,10 @@ const assertInvalid = (tx: any, message: string): void =>
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('SetRegularKey', function () {
-  let account: any
+  let tx: any
 
   beforeEach(function () {
-    account = {
+    tx = {
       TransactionType: 'SetRegularKey',
       Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
       Fee: '12',
@@ -25,19 +25,19 @@ describe('SetRegularKey', function () {
   })
 
   it(`verifies valid SetRegularKey`, function () {
-    assertValid(account)
+    assertValid(tx)
   })
 
   it(`verifies w/o SetRegularKey`, function () {
-    account.RegularKey = undefined
-    assertValid(account)
+    tx.RegularKey = undefined
+    assertValid(tx)
   })
 
   it(`throws w/ invalid RegularKey`, function () {
-    account.RegularKey = 12369846963
+    tx.RegularKey = 12369846963
 
     assertInvalid(
-      account,
+      tx,
       'SetRegularKey: invalid field RegularKey, expected a valid account address',
     )
   })

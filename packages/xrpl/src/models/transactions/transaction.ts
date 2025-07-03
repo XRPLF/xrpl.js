@@ -2,8 +2,6 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, Memo } from '../common'
-import { isHex } from '../utils'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -15,14 +13,20 @@ import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { Batch, validateBatch } from './batch'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { BaseTransaction, isIssuedCurrency } from './common'
+import {
+  BaseTransaction,
+  isIssuedCurrencyAmount,
+  validateBaseTransaction,
+} from './common'
 import { CredentialAccept, validateCredentialAccept } from './credentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './credentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './credentialDelete'
+import { DelegateSet, validateDelegateSet } from './delegateSet'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -132,6 +136,7 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | Batch
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -141,6 +146,7 @@ export type SubmittableTransaction =
   | CredentialDelete
   | DIDDelete
   | DIDSet
+  | DelegateSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
@@ -212,50 +218,15 @@ export interface TransactionAndMetadata<
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
-  if (tx.TransactionType == null) {
-    throw new ValidationError('Object does not have a `TransactionType`')
-  }
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError("Object's `TransactionType` is not a string")
-  }
 
-  /*
-   * - Memos have exclusively hex data.
-   */
-  if (tx.Memos != null && typeof tx.Memos !== 'object') {
-    throw new ValidationError('Memo must be array')
-  }
-  if (tx.Memos != null) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
-      if (memo?.Memo == null) {
-        throw new ValidationError('Memo data must be in a `Memo` field')
-      }
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-  }
+  // should already be done in the tx-specific validation, but doesn't hurt to check again
+  validateBaseTransaction(tx)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
-    if (tx[key] && isIssuedCurrency(tx[key])) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+    const value = tx[key]
+    if (value && isIssuedCurrencyAmount(value)) {
+      const txCurrency = value.currency
 
       if (
         txCurrency.length === standard_currency_code_len &&
@@ -307,6 +278,19 @@ export function validate(transaction: Record<string, unknown>): void {
       validateAccountSet(tx)
       break
 
+    case 'Batch':
+      validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
+      break
+
     case 'CheckCancel':
       validateCheckCancel(tx)
       break
@@ -341,6 +325,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'DIDSet':
       validateDIDSet(tx)
+      break
+
+    case 'DelegateSet':
+      validateDelegateSet(tx)
       break
 
     case 'DepositPreauth':

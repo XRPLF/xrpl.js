@@ -68,7 +68,7 @@ export function validateXChainCommit(tx: Record<string, unknown>): void {
     tx,
     'XChainClaimID',
     (inp: unknown): inp is number | string => isNumber(inp) || isHexString(inp),
-    'expected a number or hex string',
+    { invalidMessage: 'expected a valid number or hex string' },
   )
 
   validateOptionalField(tx, 'OtherChainDestination', isAccount)

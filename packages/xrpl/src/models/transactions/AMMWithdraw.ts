@@ -3,10 +3,11 @@ import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
   isCurrency,
   isIssuedCurrency,
+  isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -27,7 +28,7 @@ export enum AMMWithdrawFlags {
   tfLimitLPToken = 0x00400000,
 }
 
-export interface AMMWithdrawFlagsInterface extends GlobalFlags {
+export interface AMMWithdrawFlagsInterface extends GlobalFlagsInterface {
   tfLPToken?: boolean
   tfWithdrawAll?: boolean
   tfOneAssetWithdrawAll?: boolean
@@ -98,7 +99,7 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Amount with EPrice')
   }
 
-  if (tx.LPTokenIn != null && !isIssuedCurrency(tx.LPTokenIn)) {
+  if (tx.LPTokenIn != null && !isIssuedCurrencyAmount(tx.LPTokenIn)) {
     throw new ValidationError(
       'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount',
     )
