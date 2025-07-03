@@ -552,13 +552,16 @@ export function validateCredentialType<
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-params -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-params, max-lines-per-function -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
   maxCredentials: number,
 ): void {
+  if (credentials == null) {
+    return
+  }
   if (!isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials must be an array`,
