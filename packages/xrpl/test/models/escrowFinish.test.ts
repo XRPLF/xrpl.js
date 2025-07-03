@@ -86,7 +86,7 @@ describe('EscrowFinish', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
     const errorMessage =
-      'EscrowFinish: invalid field Credentials, expected a valid array'
+      'EscrowFinish: invalid field CredentialIDs, expected a valid array'
 
     assertInvalid(escrow, errorMessage)
   })

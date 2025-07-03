@@ -57,7 +57,7 @@ describe('AccountDelete', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
     const errorMessage =
-      'AccountDelete: invalid field Credentials, expected a valid array'
+      'AccountDelete: invalid field CredentialIDs, expected a valid array'
     assertInvalid(validAccountDelete, errorMessage)
   })
 

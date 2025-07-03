@@ -655,7 +655,7 @@ export function validateCredentialsList(
   }
   if (!isArray(credentials)) {
     throw new ValidationError(
-      `${transactionType}: invalid field Credentials, expected a valid array`,
+      `${transactionType}: invalid field CredentialIDs, expected a valid array`,
     )
   }
   if (credentials.length > maxCredentials) {
