@@ -2,7 +2,11 @@ import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
 import { AMM_MAX_TRADING_FEE } from './AMMCreate'
-import { BaseTransaction, isCurrency, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isIssuedCurrency,
+  validateBaseTransaction,
+} from './common'
 
 /**
  * Vote on the trading fee for an Automated Market Maker (AMM) instance.
@@ -43,7 +47,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: missing field Asset')
   }
 
-  if (!isCurrency(tx.Asset)) {
+  if (!isIssuedCurrency(tx.Asset)) {
     throw new ValidationError('AMMVote: Asset must be a Currency')
   }
 
@@ -51,7 +55,7 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMVote: missing field Asset2')
   }
 
-  if (!isCurrency(tx.Asset2)) {
+  if (!isIssuedCurrency(tx.Asset2)) {
     throw new ValidationError('AMMVote: Asset2 must be a Currency')
   }
 

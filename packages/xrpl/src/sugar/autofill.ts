@@ -394,6 +394,7 @@ export async function checkAccountDeleteBlockers(
     resolve()
   })
 }
+
 /**
  * Replaces Amount with DeliverMax if needed.
  *
@@ -405,8 +406,6 @@ export function handleDeliverMax(tx: Payment): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount == null) {
       // If only DeliverMax is provided, use it to populate the Amount field
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
       // eslint-disable-next-line no-param-reassign -- known RPC-level property
       tx.Amount = tx.DeliverMax
     }
@@ -459,28 +458,28 @@ export async function autofillBatchTxn(
 
     if (txn.Fee == null) {
       txn.Fee = '0'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.Fee !== '0') {
       throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.SigningPubKey !== '') {
       throw new XrplError(
         'Must have `SigningPubKey` of "" in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.TxnSignature != null) {
       throw new XrplError(
         'Must not have `TxnSignature` in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- for JS purposes
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.Signers != null) {
       throw new XrplError('Must not have `Signers` in inner Batch transaction.')
     }
