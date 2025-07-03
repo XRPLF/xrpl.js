@@ -29,6 +29,10 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  RipplePathFindRequest,
+  RipplePathFindResponse,
+} from '../../../src/models/methods/ripplePathFind'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -218,6 +222,73 @@ describe('PermissionedDEX', function () {
 
     assert.equal(response.result.offers[0].DomainID, pd_ledger_object.index)
   })
+
+  it(
+    'Validate the ripple_path_find response',
+    async () => {
+      // wallet1 establishes a trust line for USD IOU Token
+      await testTransaction(
+        testContext.client,
+        {
+          TransactionType: 'TrustSet',
+          Account: wallet1.classicAddress,
+          LimitAmount: {
+            currency: 'USD',
+            issuer: testContext.wallet.classicAddress,
+            value: '10000',
+          },
+        },
+        wallet1,
+      )
+
+      // wallet2 establishes a trust line for USD IOU Token
+      await testTransaction(
+        testContext.client,
+        {
+          TransactionType: 'TrustSet',
+          Account: wallet2.classicAddress,
+          LimitAmount: {
+            currency: 'USD',
+            issuer: testContext.wallet.classicAddress,
+            value: '10000',
+          },
+        },
+        wallet2,
+      )
+
+      // wallet2 requests a path to wallet1, through the USD Token
+      const ripplePathFind: RipplePathFindRequest = {
+        command: 'ripple_path_find',
+        source_account: wallet2.classicAddress,
+        destination_account: wallet1.classicAddress,
+        destination_amount: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10',
+        },
+        source_currencies: [
+          {
+            currency: 'USD',
+            issuer: testContext.wallet.classicAddress,
+          },
+        ],
+        domain: pd_ledger_object.index,
+      }
+
+      const response: RipplePathFindResponse = await testContext.client.request(
+        ripplePathFind,
+      )
+
+      console.log(response)
+
+      assert.equal(response.result.destination_account, wallet1.classicAddress)
+      assert.equal(response.result.source_account, wallet2.classicAddress)
+      assert.equal(response.result.destination_currencies, ['USD'])
+      assert.isNotEmpty(response.result.alternatives)
+      assert.equal(response.result.destination_amount, '10')
+    },
+    TIMEOUT,
+  )
 
   it(
     'Crossing a PermissionedDEX Offer with a Payment transaction',
