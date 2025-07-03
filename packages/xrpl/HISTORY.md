@@ -5,7 +5,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
-* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
+* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
+* Fail faster on `tem` errors with `submitAndWait`
 
 ## 4.3.0 (2025-6-09)
 
@@ -20,7 +21,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TransactionStream` model includes `hash` field in APIv2
 * `TransactionStream` model includes `close_time_iso` field only for APIv2
 * Adds `MPTCurrency` type
-* Better faucet support
+* Improve faucet support
 * Improve multisign fee calculations
 
 ## 4.2.0 (2025-2-13)
