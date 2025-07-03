@@ -157,4 +157,33 @@ describe('encode and decode using new types as a parameter', function () {
     const decoded = decode(encoded, newDefs)
     expect(decoded).toEqual(tx)
   })
+
+  it('removing PermissionValue does not break encoding/decoding', function () {
+    // Make a deep copy of definitions
+    const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
+
+    const originalFieldsLength = definitions.FIELDS.length
+
+    // Remove PermissionValue from definitions
+    if (definitions.FIELDS) {
+      definitions.FIELDS = definitions.FIELDS.filter(
+        (fieldTuple: [string, object]) => fieldTuple[0] !== 'PermissionValue',
+      )
+    }
+
+    // Verify it was deleted
+    const expectedFieldsLength = originalFieldsLength - 1
+    expect(definitions.FIELDS.length).toBe(expectedFieldsLength)
+
+    // Create new custom definitions
+    const customDefs = new XrplDefinitions(definitions)
+
+    const tx = { ...txJson }
+
+    // It should encode and decode normally, even with PermissionValue missing
+    const encoded = encode(tx, customDefs)
+    const decoded = decode(encoded, customDefs)
+
+    expect(decoded).toEqual(tx)
+  })
 })

@@ -1,7 +1,15 @@
 import { ValidationError } from '../../errors'
 import { SignerEntry } from '../common'
 
-import { BaseTransaction, isArray, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isArray,
+  isNumber,
+  isRecord,
+  isString,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 
 /**
  * The SignerListSet transaction creates, replaces, or removes a list of
@@ -39,27 +47,14 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SignerQuorum === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerQuorum')
-  }
-
-  if (typeof tx.SignerQuorum !== 'number') {
-    throw new ValidationError('SignerListSet: invalid SignerQuorum')
-  }
+  validateRequiredField(tx, 'SignerQuorum', isNumber)
 
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
   }
 
-  if (tx.SignerEntries === undefined) {
-    throw new ValidationError('SignerListSet: missing field SignerEntries')
-  }
-
-  if (!isArray(tx.SignerEntries)) {
-    throw new ValidationError('SignerListSet: invalid SignerEntries')
-  }
-
+  validateRequiredField(tx, 'SignerEntries', isArray)
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',
@@ -73,12 +68,17 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   }
 
   for (const entry of tx.SignerEntries) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be a SignerEntry
-    const signerEntry = entry as SignerEntry
-    const { WalletLocator } = signerEntry.SignerEntry
+    if (!isRecord(entry) || !isRecord(entry.SignerEntry)) {
+      throw new ValidationError(
+        'SignerListSet: SignerEntries must be an array of SignerEntry objects',
+      )
+    }
+    const signerEntry = entry.SignerEntry
+    const { WalletLocator } = signerEntry
     if (
-      WalletLocator !== undefined &&
-      !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator)
+      WalletLocator != null &&
+      (!isString(WalletLocator) ||
+        !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator))
     ) {
       throw new ValidationError(
         `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
