@@ -5,7 +5,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
-* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field.
+* Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
+* Fail faster on `tem` errors with `submitAndWait`
 
 ## 4.3.0 (2025-6-09)
 
@@ -22,7 +23,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Adds `MPTCurrency` type
 * Improve faucet support
 * Improve multisign fee calculations
-* Fail faster on `tem` errors with `submitAndWait`
 
 ## 4.2.0 (2025-2-13)
 
