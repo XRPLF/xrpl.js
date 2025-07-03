@@ -83,6 +83,26 @@ describe('OfferCreate', function () {
     assert.doesNotThrow(() => validate(offer3))
   })
 
+  it(`verfies valid offerCreate within permissioned domain`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: 0,
+      Expiration: 10,
+      DomainID:
+        '5D0177045A8750FC5892032A3BA15885B38A88BE315B7DF6A44BB24D67141180',
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assert.doesNotThrow(() => validateOfferCreate(offer))
+    assert.doesNotThrow(() => validate(offer))
+  })
+
   it(`throws w/ invalid Expiration`, function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
