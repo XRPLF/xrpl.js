@@ -121,22 +121,20 @@ describe('PermissionedDEX', function () {
     pd_ledger_object = result.result.account_objects[0] as PermissionedDomain
 
     // Execute an OfferCreate transaction to create a hybrid offer
-    const offerCreateTx: OfferCreate = {
-      TransactionType: 'OfferCreate',
-      Account: wallet1.classicAddress,
-      TakerGets: '1000',
-      TakerPays: {
-        currency: 'USD',
-        issuer: testContext.wallet.classicAddress,
-        value: '10',
-      },
-      Flags: OfferCreateFlags.tfHybrid,
-      DomainID: pd_ledger_object.index,
-    }
-
     offerCreateTxResponse = await testTransaction(
       testContext.client,
-      offerCreateTx,
+      {
+        TransactionType: 'OfferCreate',
+        Account: wallet1.classicAddress,
+        TakerGets: '1000',
+        TakerPays: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10',
+        },
+        Flags: OfferCreateFlags.tfHybrid,
+        DomainID: pd_ledger_object.index,
+      } as OfferCreate,
       wallet1,
     )
   })
@@ -176,11 +174,6 @@ describe('PermissionedDEX', function () {
         (directoryNode_ledger_object.result.node as DirectoryNode).index,
         offer_ledger_object.BookDirectory,
       )
-      // Keshava: TODO: DirectoryNode object is missing the `Owner` field.
-      // assert.equal(
-      //   (directoryNode_ledger_object.result.node as DirectoryNode)?.Owner,
-      //   wallet1.classicAddress,
-      // )
       assert.equal(
         (directoryNode_ledger_object.result.node as DirectoryNode)
           .LedgerEntryType,
