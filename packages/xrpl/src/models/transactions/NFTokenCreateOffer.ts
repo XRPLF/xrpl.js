@@ -146,10 +146,14 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     throw new ValidationError('NFTokenCreateOffer: invalid Amount')
   }
 
-  if (
-    typeof tx.Flags === 'number' &&
-    isFlagEnabled(tx.Flags, NFTokenCreateOfferFlags.tfSellNFToken)
-  ) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
+  const flags = (tx.Flags ?? 0) as number | NFTokenCreateOfferFlagsInterface
+  const isTfSellNFToken =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)
+      : flags.tfSellNFToken ?? false
+
+  if (isTfSellNFToken) {
     validateNFTokenSellOfferCases(tx)
   } else {
     validateNFTokenBuyOfferCases(tx)

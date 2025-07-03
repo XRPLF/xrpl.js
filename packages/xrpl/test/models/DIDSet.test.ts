@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateDIDSet } from '../../src/models/transactions/DIDSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateDIDSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateDIDSet, message)
 
 /**
  * DIDSet Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateDIDSet } from '../../src/models/transactions/DIDSet'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('DIDSet', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -25,53 +27,25 @@ describe('DIDSet', function () {
   })
 
   it('verifies valid DIDSet', function () {
-    assert.doesNotThrow(() => validateDIDSet(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ invalid Data', function () {
     tx.Data = 123
 
-    assert.throws(
-      () => validateDIDSet(tx),
-      ValidationError,
-      'DIDSet: invalid field Data',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'DIDSet: invalid field Data',
-    )
+    assertInvalid(tx, 'DIDSet: invalid field Data')
   })
 
   it('throws w/ invalid DIDDocument', function () {
     tx.DIDDocument = 123
 
-    assert.throws(
-      () => validateDIDSet(tx),
-      ValidationError,
-      'DIDSet: invalid field DIDDocument',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'DIDSet: invalid field DIDDocument',
-    )
+    assertInvalid(tx, 'DIDSet: invalid field DIDDocument')
   })
 
   it('throws w/ invalid URI', function () {
     tx.URI = 123
 
-    assert.throws(
-      () => validateDIDSet(tx),
-      ValidationError,
-      'DIDSet: invalid field URI',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'DIDSet: invalid field URI',
-    )
+    assertInvalid(tx, 'DIDSet: invalid field URI')
   })
 
   it('throws w/ empty DID', function () {
@@ -79,14 +53,8 @@ describe('DIDSet', function () {
     delete tx.DIDDocument
     delete tx.URI
 
-    assert.throws(
-      () => validateDIDSet(tx),
-      ValidationError,
-      'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
     )
   })

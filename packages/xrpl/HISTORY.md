@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
 * Fail faster on `tem` errors with `submitAndWait`
 * Improved type-checking in models
+* Fix issue with some transactions that would crash in validation
 
 ## 4.3.0 (2025-6-09)
 

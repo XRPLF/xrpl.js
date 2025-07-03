@@ -1,8 +1,12 @@
 /* eslint-disable no-bitwise -- bitwise necessary for enabling flags */
-import { assert } from 'chai'
 
-import { AMMWithdrawFlags, validate, ValidationError } from '../../src'
+import { AMMWithdrawFlags } from '../../src'
 import { validateAMMWithdraw } from '../../src/models/transactions/AMMWithdraw'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMWithdraw)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateAMMWithdraw, message)
 
 /**
  * AMMWithdraw Transaction Verification Testing.
@@ -15,7 +19,7 @@ describe('AMMWithdraw', function () {
     issuer: 'rH438jEAzTs5PYtV6CHZqpDpwCKQmPW9Cg',
     value: '1000',
   }
-  let withdraw
+  let withdraw: any
 
   beforeEach(function () {
     withdraw = {
@@ -36,15 +40,13 @@ describe('AMMWithdraw', function () {
   it(`verifies valid AMMWithdraw with LPTokenIn`, function () {
     withdraw.LPTokenIn = LPTokenIn
     withdraw.Flags |= AMMWithdrawFlags.tfLPToken
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw with Amount`, function () {
     withdraw.Amount = '1000'
     withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw with Amount and Amount2`, function () {
@@ -55,81 +57,56 @@ describe('AMMWithdraw', function () {
       value: '2.5',
     }
     withdraw.Flags |= AMMWithdrawFlags.tfTwoAsset
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw with Amount and LPTokenIn`, function () {
     withdraw.Amount = '1000'
     withdraw.LPTokenIn = LPTokenIn
     withdraw.Flags |= AMMWithdrawFlags.tfOneAssetLPToken
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw with Amount and EPrice`, function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = '25'
     withdraw.Flags |= AMMWithdrawFlags.tfLimitLPToken
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw one asset withdraw all`, function () {
     withdraw.Amount = '1000'
     withdraw.Flags |= AMMWithdrawFlags.tfOneAssetWithdrawAll
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`verifies valid AMMWithdraw withdraw all`, function () {
     withdraw.Flags |= AMMWithdrawFlags.tfWithdrawAll
-    assert.doesNotThrow(() => validateAMMWithdraw(withdraw))
-    assert.doesNotThrow(() => validate(withdraw))
+    assertValid(withdraw)
   })
 
   it(`throws w/ missing field Asset`, function () {
     delete withdraw.Asset
     const errorMessage = 'AMMWithdraw: missing field Asset'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Asset must be a Currency`, function () {
     withdraw.Asset = 1234
     const errorMessage = 'AMMWithdraw: Asset must be a Currency'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ missing field Asset2`, function () {
     delete withdraw.Asset2
     const errorMessage = 'AMMWithdraw: missing field Asset2'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     withdraw.Asset2 = 1234
     const errorMessage = 'AMMWithdraw: Asset2 must be a Currency'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ must set Amount with Amount2`, function () {
@@ -139,69 +116,39 @@ describe('AMMWithdraw', function () {
       value: '2.5',
     }
     const errorMessage = 'AMMWithdraw: must set Amount with Amount2'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ must set Amount with EPrice`, function () {
     withdraw.EPrice = '25'
     const errorMessage = 'AMMWithdraw: must set Amount with EPrice'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ LPTokenIn must be an IssuedCurrencyAmount`, function () {
     withdraw.LPTokenIn = 1234
     const errorMessage =
       'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Amount must be an Amount`, function () {
     withdraw.Amount = 1234
     const errorMessage = 'AMMWithdraw: Amount must be an Amount'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     withdraw.Amount = '1000'
     withdraw.Amount2 = 1234
     const errorMessage = 'AMMWithdraw: Amount2 must be an Amount'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = 1234
     const errorMessage = 'AMMWithdraw: EPrice must be an Amount'
-    assert.throws(
-      () => validateAMMWithdraw(withdraw),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(withdraw), ValidationError, errorMessage)
+    assertInvalid(withdraw, errorMessage)
   })
 })

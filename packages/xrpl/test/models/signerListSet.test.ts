@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateSignerListSet } from '../../src/models/transactions/signerListSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateSignerListSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateSignerListSet, message)
 
 /**
  * SignerListSet Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateSignerListSet } from '../../src/models/transactions/signerListS
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('SignerListSet', function () {
-  let signerListSetTx
+  let signerListSetTx: any
 
   beforeEach(function () {
     signerListSetTx = {
@@ -42,36 +45,20 @@ describe('SignerListSet', function () {
   })
 
   it(`verifies valid SignerListSet`, function () {
-    assert.doesNotThrow(() => validateSignerListSet(signerListSetTx))
-    assert.doesNotThrow(() => validate(signerListSetTx))
+    assertValid(signerListSetTx)
   })
 
   it(`throws w/ missing SignerQuorum`, function () {
     signerListSetTx.SignerQuorum = undefined
 
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      'SignerListSet: missing field SignerQuorum',
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      'SignerListSet: missing field SignerQuorum',
-    )
+    assertInvalid(signerListSetTx, 'SignerListSet: missing field SignerQuorum')
   })
 
   it(`throws w/ empty SignerEntries`, function () {
     signerListSetTx.SignerEntries = []
 
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      'SignerListSet: need at least 1 member in SignerEntries',
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
+    assertInvalid(
+      signerListSetTx,
       'SignerListSet: need at least 1 member in SignerEntries',
     )
   })
@@ -79,16 +66,7 @@ describe('SignerListSet', function () {
   it(`throws w/ invalid SignerEntries`, function () {
     signerListSetTx.SignerEntries = 'khgfgyhujk'
 
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      'SignerListSet: invalid field SignerEntries',
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      'SignerListSet: invalid field SignerEntries',
-    )
+    assertInvalid(signerListSetTx, 'SignerListSet: invalid field SignerEntries')
   })
 
   it(`throws w/ maximum of 32 members allowed in SignerEntries`, function () {
@@ -140,16 +118,7 @@ describe('SignerListSet', function () {
 
     const errorMessage =
       'SignerListSet: maximum of 32 members allowed in SignerEntries'
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(signerListSetTx, errorMessage)
   })
 
   it(`verifies valid WalletLocator in SignerEntries`, function () {
@@ -179,8 +148,7 @@ describe('SignerListSet', function () {
       },
     ]
 
-    assert.doesNotThrow(() => validateSignerListSet(signerListSetTx))
-    assert.doesNotThrow(() => validate(signerListSetTx))
+    assertValid(signerListSetTx)
   })
 
   it(`throws w/ invalid WalletLocator in SignerEntries`, function () {
@@ -202,15 +170,6 @@ describe('SignerListSet', function () {
     ]
     const errorMessage =
       'SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value'
-    assert.throws(
-      () => validateSignerListSet(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(signerListSetTx),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(signerListSetTx, errorMessage)
   })
 })
