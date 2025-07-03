@@ -124,6 +124,67 @@ describe('PermissionedDEX', function () {
 
     pd_ledger_object = result.result.account_objects[0] as PermissionedDomain
 
+    // wallet1 establishes a trust line for USD IOU Token
+    await testTransaction(
+      testContext.client,
+      {
+        TransactionType: 'TrustSet',
+        Account: wallet1.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10000',
+        },
+      },
+      wallet1,
+    )
+
+    // wallet2 establishes a trust line for USD IOU Token
+    await testTransaction(
+      testContext.client,
+      {
+        TransactionType: 'TrustSet',
+        Account: wallet2.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10000',
+        },
+      },
+      wallet2,
+    )
+
+    // Ensure sufficient USD Token funds are available in wallet1 and wallet2
+    await testTransaction(
+      testContext.client,
+      {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Amount: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10000',
+        },
+        Destination: wallet1.classicAddress,
+      } as Payment,
+      testContext.wallet,
+    )
+
+    await testTransaction(
+      testContext.client,
+      {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Amount: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10000',
+        },
+        Destination: wallet2.classicAddress,
+      } as Payment,
+      testContext.wallet,
+    )
+
     // Execute an OfferCreate transaction to create a hybrid offer
     offerCreateTxResponse = await testTransaction(
       testContext.client,
@@ -226,36 +287,6 @@ describe('PermissionedDEX', function () {
   it(
     'Validate the ripple_path_find response',
     async () => {
-      // wallet1 establishes a trust line for USD IOU Token
-      await testTransaction(
-        testContext.client,
-        {
-          TransactionType: 'TrustSet',
-          Account: wallet1.classicAddress,
-          LimitAmount: {
-            currency: 'USD',
-            issuer: testContext.wallet.classicAddress,
-            value: '10000',
-          },
-        },
-        wallet1,
-      )
-
-      // wallet2 establishes a trust line for USD IOU Token
-      await testTransaction(
-        testContext.client,
-        {
-          TransactionType: 'TrustSet',
-          Account: wallet2.classicAddress,
-          LimitAmount: {
-            currency: 'USD',
-            issuer: testContext.wallet.classicAddress,
-            value: '10000',
-          },
-        },
-        wallet2,
-      )
-
       // wallet2 requests a path to wallet1, through the USD Token
       const ripplePathFind: RipplePathFindRequest = {
         command: 'ripple_path_find',
@@ -291,18 +322,37 @@ describe('PermissionedDEX', function () {
   )
 
   it(
-    'Crossing a PermissionedDEX Offer with a Payment transaction',
+    'Crossing a PermissionedDEX Offer',
     async () => {
-      // wallet2 "crosses" the offer with a Payment transaction within the domain
-      const paymentTx: Payment = {
-        TransactionType: 'Payment',
+      // wallet2 "crosses" the offer within the domain
+      const offerCrossTx: OfferCreate = {
+        TransactionType: 'OfferCreate',
         Account: wallet2.classicAddress,
-        Amount: '10',
-        Destination: wallet1.classicAddress,
+        TakerPays: '1000',
+        TakerGets: {
+          currency: 'USD',
+          issuer: testContext.wallet.classicAddress,
+          value: '10',
+        },
         DomainID: pd_ledger_object.index,
       }
 
-      await testTransaction(testContext.client, paymentTx, wallet2)
+      await testTransaction(testContext.client, offerCrossTx, wallet2)
+
+      // Validate that Offer ledger objects are consumed in both wallets
+      const wallet1_objects = await testContext.client.request({
+        command: 'account_objects',
+        account: wallet1.classicAddress,
+        type: 'offer',
+      })
+      assert.isEmpty(wallet1_objects.result.account_objects)
+
+      const wallet2_objects = await testContext.client.request({
+        command: 'account_objects',
+        account: wallet2.classicAddress,
+        type: 'offer',
+      })
+      assert.isEmpty(wallet2_objects.result.account_objects)
     },
     TIMEOUT,
   )
