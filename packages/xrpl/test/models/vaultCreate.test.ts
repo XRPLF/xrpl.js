@@ -1,13 +1,16 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
-import { assert } from 'chai'
 
-import { validate, ValidationError } from '../../src'
 import {
   VaultCreate,
   VaultCreateFlags,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateVaultCreate, message)
 
 /**
  * VaultCreate Transaction Verification Testing.
@@ -27,77 +30,62 @@ describe('VaultCreate', function () {
   })
 
   it('verifies valid VaultCreate', function () {
-    assert.doesNotThrow(() => validateVaultCreate(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing Asset', function () {
     // @ts-expect-error for test
     tx.Asset = undefined
-    const errorMessage = 'VaultCreate: missing field Asset'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: missing field Asset')
   })
 
   it('throws w/ invalid Asset', function () {
     // @ts-expect-error for test
     tx.Asset = 123
-    const errorMessage = 'VaultCreate: invalid field Asset'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: invalid field Asset')
   })
 
   it('throws w/ Data field not hex', function () {
     tx.Data = 'zznothex'
-    const errorMessage = 'VaultCreate: Data must be a valid hex string'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: Data must be a valid hex string')
   })
 
   it('throws w/ Data field too large', function () {
     tx.Data = stringToHex('a'.repeat(257))
-    const errorMessage = 'VaultCreate: Data exceeds 256 bytes (actual: 257)'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: Data exceeds 256 bytes (actual: 257)')
   })
 
   it('throws w/ MPTokenMetadata not hex', function () {
     tx.MPTokenMetadata = 'ggnothex'
-    const errorMessage =
-      'VaultCreate: MPTokenMetadata must be a valid hex string'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: MPTokenMetadata must be a valid hex string')
   })
 
   it('throws w/ MPTokenMetadata field too large', function () {
     tx.MPTokenMetadata = stringToHex('a'.repeat(1025))
-    const errorMessage =
-      'VaultCreate: MPTokenMetadata exceeds 1024 bytes (actual: 1025)'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(
+      tx,
+      'VaultCreate: MPTokenMetadata exceeds 1024 bytes (actual: 1025)',
+    )
   })
 
   it('throws w/ non-number WithdrawalPolicy', function () {
     // @ts-expect-error for test
     tx.WithdrawalPolicy = 'invalid'
-    const errorMessage = 'VaultCreate: invalid field WithdrawalPolicy'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultCreate: invalid field WithdrawalPolicy')
   })
 
   it('allows DomainID when tfVaultPrivate flag set', function () {
     tx.DomainID = 'ABCDEF1234567890'
     tx.Flags = VaultCreateFlags.tfVaultPrivate
-    assert.doesNotThrow(() => validateVaultCreate(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ DomainID set but tfVaultPrivate flag missing', function () {
     tx.DomainID = 'ABCDEF1234567890'
     tx.Flags = 0
-    const errorMessage =
-      'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.'
-    assert.throws(() => validateVaultCreate(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(
+      tx,
+      'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.',
+    )
   })
 })

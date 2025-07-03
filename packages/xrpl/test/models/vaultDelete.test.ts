@@ -1,8 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { VaultDelete } from '../../src/models/transactions'
 import { validateVaultDelete } from '../../src/models/transactions/vaultDelete'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultDelete)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateVaultDelete, message)
 
 /**
  * VaultDelete Transaction Verification Testing.
@@ -21,23 +23,18 @@ describe('VaultDelete', function () {
   })
 
   it('verifies valid VaultDelete', function () {
-    assert.doesNotThrow(() => validateVaultDelete(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = undefined
-    const errorMessage = 'VaultDelete: missing field VaultID'
-    assert.throws(() => validateVaultDelete(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultDelete: missing field VaultID')
   })
 
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
-    const errorMessage = 'VaultDelete: invalid field VaultID'
-    assert.throws(() => validateVaultDelete(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, 'VaultDelete: invalid field VaultID')
   })
 })

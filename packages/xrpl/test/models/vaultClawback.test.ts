@@ -36,35 +36,30 @@ describe('VaultClawback', function () {
   it('throws w/ missing VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = undefined
-    const errorMessage = 'VaultClawback: missing field VaultID'
-    assertInvalid(tx, errorMessage)
+    assertInvalid(tx, 'VaultClawback: missing field VaultID')
   })
 
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
-    const errorMessage = 'VaultClawback: invalid field VaultID'
-    assertInvalid(tx, errorMessage)
+    assertInvalid(tx, 'VaultClawback: invalid field VaultID')
   })
 
   it('throws w/ missing Holder', function () {
     // @ts-expect-error for test
     tx.Holder = undefined
-    const errorMessage = 'VaultClawback: missing field Holder'
-    assertInvalid(tx, errorMessage)
+    assertInvalid(tx, 'VaultClawback: missing field Holder')
   })
 
   it('throws w/ invalid Holder', function () {
     // @ts-expect-error for test
     tx.Holder = 123
-    const errorMessage = 'VaultClawback: invalid field Holder'
-    assertInvalid(tx, errorMessage)
+    assertInvalid(tx, 'VaultClawback: invalid field Holder')
   })
 
   it('throws w/ string Amount', function () {
     // @ts-expect-error for test
     tx.Amount = '123456'
-    const errorMessage = 'VaultClawback: invalid field Amount'
-    assertInvalid(tx, errorMessage)
+    assertInvalid(tx, 'VaultClawback: invalid field Amount')
   })
 })
