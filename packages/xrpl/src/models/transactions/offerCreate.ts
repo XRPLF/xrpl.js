@@ -182,7 +182,7 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   if (
     typeof tx.Flags === 'number' &&
     // eslint-disable-next-line no-bitwise -- flags require bitwise operations
-    (tx.Flags | OfferCreateFlags.tfHybrid) !== 0 &&
+    (tx.Flags & OfferCreateFlags.tfHybrid) !== 0 &&
     tx.DomainID === undefined
   ) {
     throw new ValidationError(
