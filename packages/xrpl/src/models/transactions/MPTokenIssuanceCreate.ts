@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -107,7 +108,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   /**
    * Arbitrary metadata about this issuance, in hex format.
    */
-  MPTokenMetadata?: string | null
+  MPTokenMetadata?: string
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
 
@@ -127,23 +128,17 @@ export function validateMPTokenIssuanceCreate(
 ): void {
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'MaximumAmount', isString)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 
-  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
+  if (isHexString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
     throw new ValidationError(
       'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
     )
   }
 
-  if (typeof tx.MPTokenMetadata === 'string' && !isHex(tx.MPTokenMetadata)) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
-    )
-  }
-
-  if (typeof tx.MaximumAmount === 'string') {
+  if (isString(tx.MaximumAmount)) {
     if (!INTEGER_SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
@@ -158,13 +153,11 @@ export function validateMPTokenIssuanceCreate(
 
   if (typeof tx.TransferFee === 'number') {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-    const flags = (tx.Flags ?? 0) as
-      | number
-      | MPTokenIssuanceCreateFlagsInterface
+    const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
     const isTfMPTCanTransfer =
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-        : flags.tfMPTCanTransfer ?? false
+        : flags.tfMPTCanTransfer === true
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(

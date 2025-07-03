@@ -20,6 +20,8 @@ export interface MPTCurrency {
 
 export type Currency = IssuedCurrency | MPTCurrency | XRP
 
+export type XRPAmount = string
+
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
 }
@@ -29,7 +31,7 @@ export interface MPTAmount {
   value: string
 }
 
-export type Amount = IssuedCurrencyAmount | string
+export type Amount = IssuedCurrencyAmount | XRPAmount
 
 export interface Balance {
   currency: string

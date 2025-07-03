@@ -8,6 +8,7 @@ import {
   isMPTAmount,
   isAccount,
   validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -43,28 +44,33 @@ export interface Clawback extends BaseTransaction {
 export function validateClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateRequiredField(
+    tx,
+    'Amount',
+    (inp): inp is IssuedCurrencyAmount | MPTAmount =>
+      isIssuedCurrencyAmount(inp) || isMPTAmount(inp),
+    { invalidMessage: 'expected a valid non-XRP Amount' },
+  )
 
-  if (tx.Amount == null) {
-    throw new ValidationError('Clawback: missing field Amount')
-  }
+  if (isIssuedCurrencyAmount(tx.Amount)) {
+    if (tx.Account === tx.Amount.issuer) {
+      throw new ValidationError(
+        'Clawback: Amount.issuer and Account cannot be the same',
+      )
+    }
 
-  if (!isIssuedCurrencyAmount(tx.Amount) && !isMPTAmount(tx.Amount)) {
-    throw new ValidationError('Clawback: invalid Amount')
-  }
+    if (tx.Holder) {
+      throw new ValidationError('Clawback: cannot have Holder for currency')
+    }
+  } else if (isMPTAmount(tx.Amount)) {
+    if (tx.Account === tx.Holder) {
+      throw new ValidationError(
+        'Clawback: Account and Holder cannot be the same',
+      )
+    }
 
-  if (isIssuedCurrencyAmount(tx.Amount) && tx.Account === tx.Amount.issuer) {
-    throw new ValidationError('Clawback: invalid holder Account')
-  }
-
-  if (isMPTAmount(tx.Amount) && tx.Account === tx.Holder) {
-    throw new ValidationError('Clawback: invalid holder Account')
-  }
-
-  if (isIssuedCurrencyAmount(tx.Amount) && tx.Holder) {
-    throw new ValidationError('Clawback: cannot have Holder for currency')
-  }
-
-  if (isMPTAmount(tx.Amount) && !tx.Holder) {
-    throw new ValidationError('Clawback: missing Holder')
+    if (!tx.Holder) {
+      throw new ValidationError('Clawback: missing field Holder')
+    }
   }
 }

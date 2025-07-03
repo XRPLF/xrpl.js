@@ -49,13 +49,19 @@ describe('XChainModifyBridge', function () {
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assertInvalid(tx, 'XChainModifyBridge: invalid field XChainBridge')
+    assertInvalid(
+      tx,
+      'XChainModifyBridge: invalid field XChainBridge, expected a valid XChainBridge object',
+    )
   })
 
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assertInvalid(tx, 'XChainModifyBridge: invalid field SignatureReward')
+    assertInvalid(
+      tx,
+      'XChainModifyBridge: invalid field SignatureReward, expected a valid Amount',
+    )
   })
 
   it('throws w/ invalid MinAccountCreateAmount', function () {
@@ -63,7 +69,7 @@ describe('XChainModifyBridge', function () {
 
     assertInvalid(
       tx,
-      'XChainModifyBridge: invalid field MinAccountCreateAmount',
+      'XChainModifyBridge: invalid field MinAccountCreateAmount, expected a valid Amount',
     )
   })
 })

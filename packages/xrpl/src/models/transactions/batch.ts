@@ -92,7 +92,7 @@ export function validateBatch(tx: Record<string, unknown>): void {
   tx.RawTransactions.forEach((rawTxObj, index) => {
     if (!isRecord(rawTxObj)) {
       throw new ValidationError(
-        `Batch: RawTransactions[${index}] is not object.`,
+        `Batch: invalid field RawTransactions[${index}], expected a valid Record`,
       )
     }
     validateRequiredField(rawTxObj, 'RawTransaction', isRecord, {

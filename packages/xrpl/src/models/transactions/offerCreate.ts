@@ -1,4 +1,3 @@
-import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
 import {
@@ -6,6 +5,9 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
+  validateRequiredField,
+  validateOptionalField,
+  isNumber,
 } from './common'
 
 /**
@@ -117,27 +119,8 @@ export interface OfferCreate extends BaseTransaction {
 export function validateOfferCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.TakerGets === undefined) {
-    throw new ValidationError('OfferCreate: missing field TakerGets')
-  }
-
-  if (tx.TakerPays === undefined) {
-    throw new ValidationError('OfferCreate: missing field TakerPays')
-  }
-
-  if (typeof tx.TakerGets !== 'string' && !isAmount(tx.TakerGets)) {
-    throw new ValidationError('OfferCreate: invalid TakerGets')
-  }
-
-  if (typeof tx.TakerPays !== 'string' && !isAmount(tx.TakerPays)) {
-    throw new ValidationError('OfferCreate: invalid TakerPays')
-  }
-
-  if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
-    throw new ValidationError('OfferCreate: invalid Expiration')
-  }
-
-  if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number') {
-    throw new ValidationError('OfferCreate: invalid OfferSequence')
-  }
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'OfferSequence', isNumber)
+  validateRequiredField(tx, 'TakerGets', isAmount)
+  validateRequiredField(tx, 'TakerPays', isAmount)
 }
