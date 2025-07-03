@@ -28,7 +28,7 @@
     "@types/lodash": "^4.14.136",
     "@types/node": "^18.19.29",
     "@types/ws": "^8.2.0",
-    "@typescript-eslint/eslint-plugin": "^5.28.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
     "@typescript-eslint/parser": "^5.28.0",
     "@xrplf/eslint-config": "^1.9.1",
     "@xrplf/prettier-config": "^1.9.1",
