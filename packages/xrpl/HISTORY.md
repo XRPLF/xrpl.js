@@ -6,7 +6,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Support for `Single Asset Vault` (XLS-65)
-* Add new amount types: `XRPLNumber` and `ClawbackAmount`
+* Adds `XRPLNumber` amount type used in Vault transactions. This supports integer, decimal, or scientific notation strings.
+* Adds `ClawbackAmount` amount type used in transactions related to Clawback.
 
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
