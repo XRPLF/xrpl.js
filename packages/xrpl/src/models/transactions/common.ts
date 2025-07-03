@@ -22,14 +22,7 @@ export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
-/**
- * Verify the form and type of a Record/Object at runtime.
- *
- * @param value - The object to check the form and type of.
- * @param obj
- * @returns Whether the Record/Object is properly formed.
- */
-export function isMemo(obj: unknown): obj is Memo {
+function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
     return false
   }
