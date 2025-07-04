@@ -56,6 +56,7 @@ export interface Memo {
 }
 
 export type StreamType =
+  | 'book_changes'
   | 'consensus'
   | 'ledger'
   | 'manifests'
