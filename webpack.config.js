@@ -48,7 +48,7 @@ module.exports = {
         const localConfig = merge(config, {
           mode: "production",
           output: {
-            filename: `${filename}-latest.min.js`,
+            filename: `${filename}-latest-min.js`,
           },
         });
 
@@ -57,7 +57,7 @@ module.exports = {
             new BundleAnalyzerPlugin({
               analyzerPort: `auto`,
               analyzerMode: "static",
-            }),
+            })
           );
         }
         return localConfig;
