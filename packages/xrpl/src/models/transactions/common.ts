@@ -112,6 +112,32 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
+ * Verify the form and type of a null value at runtime.
+ *
+ * @param inp - The value to check the form and type of.
+ * @returns Whether the value is properly formed.
+ */
+export function isNull(inp: unknown): inp is null {
+  return inp == null
+}
+
+/**
+ * Verify the form and type of a number at runtime, and ensures that the
+ * number is within the provided bounds. Includes numbers in the form of
+ * strings (e.g. `"7"`).
+ *
+ * @param lower The lower bound (inclusive).
+ * @param upper The upper bound (inclusive).
+ * @param value
+ * @returns Whether the number is properly formed and within the bounds.
+ */
+export function isValue<V>(value: V): (inp: unknown) => inp is V {
+  // eslint-disable-next-line func-style -- returning a function
+  const isValueInternal = (inp: unknown): inp is V => inp === value
+  return isValueInternal
+}
+
+/**
  * Checks whether the given value is a valid XRPL number string.
  * Accepts integer, decimal, or scientific notation strings.
  *
