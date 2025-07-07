@@ -18,6 +18,10 @@ import {
   RipplePathFindRequest,
   RipplePathFindResponse,
 } from '../../../src/models/methods/ripplePathFind'
+import {
+  SubscribeBook,
+  SubscribeRequest,
+} from '../../../src/models/methods/subscribe'
 import { SubmitResponse } from '../../../src/models/methods/submit'
 import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
@@ -282,6 +286,32 @@ describe('PermissionedDEX', function () {
     )
 
     assert.equal(response.result.offers[0].DomainID, pd_ledger_object.index)
+  })
+
+  it(`Validate the subscription stream for PermissionedDEX offers`, async () => {
+    const subscribe_request: SubscribeRequest = {
+      command: 'subscribe',
+      books: [
+        {
+          taker_gets: { currency: 'XRP' },
+          taker_pays: {
+            currency: 'USD',
+            issuer: testContext.wallet.classicAddress,
+          },
+          taker: wallet1.classicAddress,
+          domain: pd_ledger_object.index,
+        } as SubscribeBook,
+      ],
+    }
+
+    const response = await testContext.client.request(subscribe_request)
+    assert.equal(response.type, 'response')
+
+    // Note: The result is empty because no Offer has been created after the creation of the Subscription stream.
+    // This case is tested in the rippled code. To avoid the additional complexity, validating the contents
+    // of the response is skipped in this test.
+    // This test validates that domain_id is an acceptable input parameter to the subscribe command.
+    assert.isEmpty(response.result)
   })
 
   it(
