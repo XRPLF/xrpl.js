@@ -122,13 +122,9 @@ export function isNull(inp: unknown): inp is null {
 }
 
 /**
- * Verify the form and type of a number at runtime, and ensures that the
- * number is within the provided bounds. Includes numbers in the form of
- * strings (e.g. `"7"`).
+ * Verify that a certain field has a certain exact value at runtime.
  *
- * @param lower The lower bound (inclusive).
- * @param upper The upper bound (inclusive).
- * @param value
+ * @param value The value to compare against.
  * @returns Whether the number is properly formed and within the bounds.
  */
 export function isValue<V>(value: V): (inp: unknown) => inp is V {

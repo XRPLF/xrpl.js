@@ -9,7 +9,7 @@ import {
 } from './common'
 
 const PERMISSIONS_MAX_LENGTH = 10
-const NON_DELEGATABLE_TRANSACTIONS = new Set([
+const NON_DELEGABLE_TRANSACTIONS = new Set([
   'AccountSet',
   'SetRegularKey',
   'SignerListSet',
@@ -97,9 +97,9 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     if (typeof permissionValue !== 'string') {
       throw new ValidationError('DelegateSet: PermissionValue must be a string')
     }
-    if (NON_DELEGATABLE_TRANSACTIONS.has(permissionValue)) {
+    if (NON_DELEGABLE_TRANSACTIONS.has(permissionValue)) {
       throw new ValidationError(
-        `DelegateSet: PermissionValue contains a non-delegatable transaction ${permissionValue}`,
+        `DelegateSet: PermissionValue contains a non-delegable transaction ${permissionValue}`,
       )
     }
     permissionValueSet.add(permissionValue)
