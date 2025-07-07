@@ -84,7 +84,7 @@ function validateBatchInnerTransaction(
     )
   }
   validateOptionalField(tx, 'Fee', isValue('0'), {
-    paramName: `RawTransactions[${index}].Fee`,
+    paramName: `RawTransactions[${index}].RawTransaction.Fee`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'SigningPubKey', isValue(''), {
