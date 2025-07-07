@@ -458,28 +458,24 @@ export async function autofillBatchTxn(
 
     if (txn.Fee == null) {
       txn.Fee = '0'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.Fee !== '0') {
       throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.SigningPubKey !== '') {
       throw new XrplError(
         'Must have `SigningPubKey` of "" in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.TxnSignature != null) {
       throw new XrplError(
         'Must not have `TxnSignature` in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.Signers != null) {
       throw new XrplError('Must not have `Signers` in inner Batch transaction.')
     }

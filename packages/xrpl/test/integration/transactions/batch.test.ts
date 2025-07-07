@@ -60,9 +60,11 @@ describe('Batch', function () {
         TransactionType: 'Batch',
         Account: testContext.wallet.classicAddress,
         Flags: BatchFlags.tfAllOrNothing,
-        RawTransactions: [payment, payment, payment].map((rawTx) => ({
-          RawTransaction: rawTx,
-        })),
+        RawTransactions: [payment, { ...payment }, { ...payment }].map(
+          (rawTx) => ({
+            RawTransaction: rawTx,
+          }),
+        ),
       }
       const autofilled = await testContext.client.autofill(tx)
       await testBatchTransaction(autofilled, testContext.wallet)
@@ -80,8 +82,7 @@ describe('Batch', function () {
         Destination: destination.classicAddress,
         Amount: '10000000',
       }
-      const payment2: Payment = { ...payment }
-      payment2.Account = wallet2.address
+      const payment2: Payment = { ...payment, Account: wallet2.classicAddress }
       const tx: Batch = {
         TransactionType: 'Batch',
         Account: testContext.wallet.classicAddress,
