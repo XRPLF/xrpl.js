@@ -83,24 +83,24 @@ function validateBatchInnerTransaction(
       `Batch: RawTransactions[${index}] must contain the \`tfInnerBatchTxn\` flag.`,
     )
   }
-  validateOptionalField(tx, 'Flags', isValue(0), {
-    paramName: `RawTransactions[${index}].RawTransaction`,
+  validateOptionalField(tx, 'Fee', isValue('0'), {
+    paramName: `RawTransactions[${index}].Fee`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'SigningPubKey', isValue(''), {
-    paramName: `RawTransactions[${index}].RawTransaction`,
+    paramName: `RawTransactions[${index}].RawTransaction.SigningPubKey`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'TxnSignature', isNull, {
-    paramName: `RawTransactions[${index}].RawTransaction`,
+    paramName: `RawTransactions[${index}].RawTransaction.TxnSignature`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'Signers', isNull, {
-    paramName: `RawTransactions[${index}].RawTransaction`,
+    paramName: `RawTransactions[${index}].RawTransaction.Signers`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'LastLedgerSequence', isNull, {
-    paramName: `RawTransactions[${index}].RawTransaction`,
+    paramName: `RawTransactions[${index}].RawTransaction.LastLedgerSequence`,
     txType: 'Batch',
   })
 }
@@ -149,19 +149,19 @@ export function validateBatch(tx: Record<string, unknown>): void {
 
     const signer = signerRecord.BatchSigner
     validateRequiredField(signer, 'Account', isString, {
-      paramName: `BatchSigners[${index}].Account`,
+      paramName: `BatchSigners[${index}].BatchSigner.Account`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'SigningPubKey', isString, {
-      paramName: `BatchSigners[${index}].SigningPubKey`,
+      paramName: `BatchSigners[${index}].BatchSigner.SigningPubKey`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'TxnSignature', isString, {
-      paramName: `BatchSigners[${index}].TxnSignature`,
+      paramName: `BatchSigners[${index}].BatchSigner.TxnSignature`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'Signers', isArray, {
-      paramName: `BatchSigners[${index}].Signers`,
+      paramName: `BatchSigners[${index}].BatchSigner.Signers`,
       txType: 'Batch',
     })
   })
