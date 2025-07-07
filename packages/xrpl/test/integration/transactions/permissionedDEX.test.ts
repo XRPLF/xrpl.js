@@ -14,6 +14,10 @@ import {
   BookOffersRequest,
   BookOffersResponse,
 } from '../../../src/models/methods/bookOffers'
+import {
+  RipplePathFindRequest,
+  RipplePathFindResponse,
+} from '../../../src/models/methods/ripplePathFind'
 import { SubmitResponse } from '../../../src/models/methods/submit'
 import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
@@ -29,10 +33,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { generateFundedWallet, testTransaction } from '../utils'
-import {
-  RipplePathFindRequest,
-  RipplePathFindResponse,
-} from '../../../src/models/methods/ripplePathFind'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -309,8 +309,6 @@ describe('PermissionedDEX', function () {
       const response: RipplePathFindResponse = await testContext.client.request(
         ripplePathFind,
       )
-
-      console.log(response)
 
       assert.equal(response.result.destination_account, wallet1.classicAddress)
       assert.equal(response.result.source_account, wallet2.classicAddress)

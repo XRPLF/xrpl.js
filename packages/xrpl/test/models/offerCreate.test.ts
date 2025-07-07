@@ -102,8 +102,7 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
     } as any
 
-    assert.doesNotThrow(() => validateOfferCreate(offer))
-    assert.doesNotThrow(() => validate(offer))
+    assertValid(offer)
   })
 
   it(`throws w/ invalid Expiration`, function () {
