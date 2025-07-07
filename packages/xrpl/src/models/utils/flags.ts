@@ -20,6 +20,7 @@ import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
+import { VaultCreateFlags } from '../transactions/vaultCreate'
 import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
@@ -63,6 +64,7 @@ const txToFlag = {
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,
   TrustSet: TrustSetFlags,
+  VaultCreate: VaultCreateFlags,
   XChainModifyBridge: XChainModifyBridgeFlags,
 }
 

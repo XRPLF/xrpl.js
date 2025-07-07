@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateDelegateSet } from '../../src/models/transactions/delegateSet'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateDelegateSet)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateDelegateSet, message)
 
 /**
  * DelegateSet Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateDelegateSet } from '../../src/models/transactions/delegateSet'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('DelegateSet', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -20,40 +22,35 @@ describe('DelegateSet', function () {
         { Permission: { PermissionValue: 'TrustlineAuthorize' } },
         { Permission: { PermissionValue: 'Payment' } },
       ],
-    } as any
+    }
   })
 
   it('verifies valid DelegateSet', function () {
-    assert.doesNotThrow(() => validateDelegateSet(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it(`throws w/ missing field Authorize`, function () {
     delete tx.Authorize
     const errorMessage = 'DelegateSet: missing field Authorize'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Authorize and Account must be different`, function () {
     tx.Authorize = tx.Account
     const errorMessage = 'DelegateSet: Authorize and Account must be different.'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing field Permissions`, function () {
     delete tx.Permissions
     const errorMessage = 'DelegateSet: missing field Permissions'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ invalid field Permissions`, function () {
     tx.Permissions = 'TrustlineAuthorize'
     const errorMessage = 'DelegateSet: invalid field Permissions'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Permissions array length cannot be greater than max`, function () {
@@ -72,45 +69,39 @@ describe('DelegateSet', function () {
     ]
     const errorMessage =
       'DelegateSet: Permissions array length cannot be greater than 10.'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Permissions array element is malformed`, function () {
     tx.Permissions = ['Payment']
     const errorMessage = 'DelegateSet: Permissions array element is malformed'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ PermissionValue must be defined`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: null } }]
     const errorMessage = 'DelegateSet: PermissionValue must be defined'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ PermissionValue must be a string`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 123 } }]
     const errorMessage = 'DelegateSet: PermissionValue must be a string'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ PermissionValue contains a non-delegatable transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'AccountSet' } }]
     const errorMessage =
       'DelegateSet: PermissionValue contains a non-delegatable transaction AccountSet'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'EnableAmendment' } }]
     const errorMessage =
       'DelegateSet: PermissionValue contains a non-delegatable transaction EnableAmendment'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Permissions array cannot contain duplicate values`, function () {
@@ -121,7 +112,6 @@ describe('DelegateSet', function () {
     ]
     const errorMessage =
       'DelegateSet: Permissions array cannot contain duplicate values'
-    assert.throws(() => validateDelegateSet(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 })

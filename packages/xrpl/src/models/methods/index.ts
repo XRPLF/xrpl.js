@@ -189,6 +189,7 @@ import {
   UnsubscribeRequest,
   UnsubscribeResponse,
 } from './unsubscribe'
+import { VaultInfoRequest, VaultInfoResponse } from './vaultInfo'
 /**
  * @category Requests
  */
@@ -247,6 +248,8 @@ type Request =
   | AMMInfoRequest
   // Price Oracle methods
   | GetAggregatePriceRequest
+  // Vault methods
+  | VaultInfoRequest
 
 /**
  * @category Responses
@@ -306,6 +309,8 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | AMMInfoResponse
   // Price Oracle methods
   | GetAggregatePriceResponse
+  // Vault methods
+  | VaultInfoResponse
 
 export type RequestResponseMap<
   T,
@@ -464,6 +469,8 @@ export type RequestResponseMap<
   ? NFTsByIssuerResponse
   : T extends NFTHistoryRequest
   ? NFTHistoryResponse
+  : T extends VaultInfoRequest
+  ? VaultInfoResponse
   : Response<Version>
 
 export type MarkerRequest = Request & {
@@ -649,4 +656,7 @@ export {
   // AMM methods
   AMMInfoRequest,
   AMMInfoResponse,
+  // Vault methods
+  VaultInfoRequest,
+  VaultInfoResponse,
 }

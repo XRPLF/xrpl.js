@@ -236,47 +236,48 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 ## Release
 
 1. Checkout `main` (or your beta branch) and `git pull`.
-1. Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture updates that take place during this process.
-1. Update `HISTORY.md` to reflect release changes.
+2. Create a new branch (`git checkout -b <BRANCH_NAME>`) to capture updates that take place during this process.
+3. Update `HISTORY.md` to reflect release changes.
 
    - [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
 
-1. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
-1. Run `npm run build` to triple check the build still works
-1. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
+4. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
+5. Run `npm run clean` to delete previously generated artifacts.
+6. Run `npm run build` to triple check the build still works
+7. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
 
    - For each changed package, pick what the new version should be. Lerna will bump the versions, commit version bumps to `main`, and create a new git tag for each published package.
    - If you do NOT want to update the package number, choose "Custom Version" and set the version to be the same as the existing version. Lerna will not publish any changes in this case.
    - If publishing a beta, make sure that the versions are all of the form `a.b.c-beta.d`, where `a`, `b`, and `c` are identical to the last normal release except for one, which has been incremented by 1.
 
-1. Run `npm i` to update the package-lock with the updated versions.
-1. Create a new PR from this branch into `main` and merge it (you can directly merge into the beta branch for a beta).
-1. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
-1. Actually publish the packages with one of the following:
+8. Run `npm i` to update the package-lock with the updated versions.
+9. Create a new PR from this branch into `main` and merge it (you can directly merge into the beta branch for a beta).
+10. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
+11. Actually publish the packages with one of the following:
 
-   - Stable release: Run `npx lerna publish from-package --yes`
-   - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
-     Notice this allows developers to install the package with `npm add xrpl@beta`
+    - Stable release: Run `npx lerna publish from-package --yes`
+    - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
+      Notice this allows developers to install the package with `npm add xrpl@beta`
 
-1. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
+12. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 
-   NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
+    NOW YOU HAVE PUBLISHED! But you're not done; we have to notify people!
 
-1. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
-1. Run `git push --follow-tags`, to push the tags to Github.
-1. On GitHub, click the "Releases" link on the right-hand side of the page.
+13. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
+14. Run `git push --follow-tags`, to push the tags to Github.
+15. On GitHub, click the "Releases" link on the right-hand side of the page.
 
-1. Repeat for each release:
+16. Repeat for each release:
 
-   1. Click "Draft a new release"
-   1. Click "Choose a tag", and choose a tag that you just created.
-   1. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
+    1. Click "Draft a new release"
+    2. Click "Choose a tag", and choose a tag that you just created.
+    3. Edit the name of the release to match the tag (IE \<package\>@\<version\>) and edit the description as you see fit.
 
-1. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
-1. Lastly, send a similar message to the XRPL Discord in the [`javascript` channel](https://discord.com/channels/886050993802985492/886053111179915295). The message should include:
-   1. The version changes for xrpl libraries
-   1. A link to the more detailed changes
-   1. Highlights of important changes
+17. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+18. Lastly, send a similar message to the XRPL Discord in the [`javascript` channel](https://discord.com/channels/886050993802985492/886053111179915295). The message should include:
+    1. The version changes for xrpl libraries
+    2. A link to the more detailed changes
+    3. Highlights of important changes
 
 
 ## Mailing Lists
