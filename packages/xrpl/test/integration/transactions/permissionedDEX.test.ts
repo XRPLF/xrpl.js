@@ -18,11 +18,11 @@ import {
   RipplePathFindRequest,
   RipplePathFindResponse,
 } from '../../../src/models/methods/ripplePathFind'
+import { SubmitResponse } from '../../../src/models/methods/submit'
 import {
   SubscribeBook,
   SubscribeRequest,
 } from '../../../src/models/methods/subscribe'
-import { SubmitResponse } from '../../../src/models/methods/submit'
 import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
 import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
 import {
