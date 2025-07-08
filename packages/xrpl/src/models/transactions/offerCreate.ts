@@ -179,14 +179,15 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('OfferCreate: invalid DomainID')
   }
 
-  if (
-    typeof tx.Flags === 'number' &&
-    // eslint-disable-next-line no-bitwise -- flags require bitwise operations
-    (tx.Flags & OfferCreateFlags.tfHybrid) !== 0 &&
-    tx.DomainID === undefined
-  ) {
-    throw new ValidationError(
-      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
-    )
+  if (tx.DomainID === undefined) {
+    if (
+      (typeof tx.Flags === 'number' &&
+        (tx.Flags & OfferCreateFlags.tfHybrid) !== 0) ||
+      (tx.Flags as OfferCreateFlagsInterface)?.tfHybrid === true
+    ) {
+      throw new ValidationError(
+        'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+      )
+    }
   }
 }

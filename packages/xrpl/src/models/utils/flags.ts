@@ -9,7 +9,7 @@ import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BatchFlags } from '../transactions/batch'
-import { BaseTransaction, GlobalFlags } from '../transactions/common'
+import { GlobalFlags } from '../transactions/common'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
@@ -101,7 +101,7 @@ export function setTransactionFlagsToNumber(tx: Transaction): void {
  * @param tx - A Transaction to parse Flags for
  * @returns A numerical representation of a Transaction's Flags
  */
-export function convertTxFlagsToNumber(tx: BaseTransaction): number {
+export function convertTxFlagsToNumber(tx: Transaction): number {
   const txFlags = tx.Flags
   if (txFlags == null) {
     return 0

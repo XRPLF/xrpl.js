@@ -1,4 +1,7 @@
-import { validateOfferCreate } from '../../src/models/transactions/offerCreate'
+import {
+  OfferCreateFlags,
+  validateOfferCreate,
+} from '../../src/models/transactions/offerCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateOfferCreate)
@@ -103,6 +106,44 @@ describe('OfferCreate', function () {
     } as any
 
     assertValid(offer)
+  })
+
+  it(`throws -- invalid flag (interface) specified without DomainID`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: OfferCreateFlags.tfHybrid,
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(
+      offer,
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
+  })
+
+  it(`throws -- invalid flag (number) specified without DomainID`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: 0x00100000,
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(
+      offer,
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
   })
 
   it(`throws w/ invalid Expiration`, function () {
