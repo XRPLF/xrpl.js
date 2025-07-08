@@ -133,7 +133,7 @@ jobs:
       run: |
         mkdir dist
         npx lerna exec --scope "$PACKAGE_NAME" -- npm pack
-        echo "TARBALL=$(ls dist/*.tgz)" >> $GITHUB_ENV
+        echo "TARBALL=$(ls packages/$PACKAGE_NAME/*.tgz)" >> $GITHUB_ENV
       env:
         NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/.npmrc
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
