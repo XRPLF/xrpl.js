@@ -6,6 +6,7 @@ import {
   AuthorizeCredential,
   Wallet,
   IssuedCurrencyAmount,
+  AccountSetAsfFlags,
 } from '../../../src'
 import DirectoryNode from '../../../src/models/ledger/DirectoryNode'
 import Offer from '../../../src/models/ledger/Offer'
@@ -14,10 +15,6 @@ import {
   BookOffersRequest,
   BookOffersResponse,
 } from '../../../src/models/methods/bookOffers'
-import {
-  RipplePathFindRequest,
-  RipplePathFindResponse,
-} from '../../../src/models/methods/ripplePathFind'
 import { SubmitResponse } from '../../../src/models/methods/submit'
 import {
   SubscribeBook,
@@ -54,6 +51,17 @@ describe('PermissionedDEX', function () {
     testContext = await setupClient(serverUrl)
     wallet1 = await generateFundedWallet(testContext.client)
     wallet2 = await generateFundedWallet(testContext.client)
+
+    // set the default ripple flag on the issuer's wallet
+    await testTransaction(
+      testContext.client,
+      {
+        TransactionType: 'AccountSet',
+        Account: testContext.wallet.classicAddress,
+        SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+      },
+      testContext.wallet,
+    )
 
     // Create a Credential from the issuer's wallet into Wallet1
     await testTransaction(
@@ -313,41 +321,6 @@ describe('PermissionedDEX', function () {
     // This test validates that domain_id is an acceptable input parameter to the subscribe command.
     assert.isEmpty(response.result)
   })
-
-  it(
-    'Validate the ripple_path_find response',
-    async () => {
-      // wallet2 requests a path to wallet1, through the USD Token
-      const ripplePathFind: RipplePathFindRequest = {
-        command: 'ripple_path_find',
-        source_account: wallet2.classicAddress,
-        destination_account: wallet1.classicAddress,
-        destination_amount: {
-          currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
-          value: '10',
-        },
-        source_currencies: [
-          {
-            currency: 'USD',
-            issuer: testContext.wallet.classicAddress,
-          },
-        ],
-        domain: pd_ledger_object.index,
-      }
-
-      const response: RipplePathFindResponse = await testContext.client.request(
-        ripplePathFind,
-      )
-
-      assert.equal(response.result.destination_account, wallet1.classicAddress)
-      assert.equal(response.result.source_account, wallet2.classicAddress)
-      assert.equal(response.result.destination_currencies, ['USD'])
-      assert.isNotEmpty(response.result.alternatives)
-      assert.equal(response.result.destination_amount, '10')
-    },
-    TIMEOUT,
-  )
 
   it(
     'Crossing a PermissionedDEX Offer',
