@@ -132,6 +132,8 @@ jobs:
     - name: Pack tarball
       run: |
         mkdir dist
+        PACKAGE_NAME="${{ github.event.inputs.package_name }}"
+        echo "packageing for $PACKAGE_NAME"
         npx lerna exec --scope "$PACKAGE_NAME" -- npm pack
         echo "TARBALL=$(ls packages/$PACKAGE_NAME/*.tgz)" >> $GITHUB_ENV
       env:
