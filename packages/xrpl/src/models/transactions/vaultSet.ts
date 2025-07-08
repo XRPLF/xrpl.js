@@ -1,15 +1,14 @@
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
-  isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  isHexString,
 } from './common'
 
 /**
@@ -51,16 +50,13 @@ export interface VaultSet extends BaseTransaction {
 export function validateVaultSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateOptionalField(tx, 'Data', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
+  validateOptionalField(tx, 'Data', isHexString)
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
-    if (!isHex(dataHex)) {
-      throw new ValidationError('VaultSet: Data must be a valid hex string')
-    }
     const dataByteLength = dataHex.length / 2
     if (dataByteLength > VAULT_DATA_MAX_BYTE_LENGTH) {
       throw new ValidationError(

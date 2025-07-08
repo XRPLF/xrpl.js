@@ -64,6 +64,9 @@ describe('NFTokenModify', function () {
       URI: '--',
     } as any
 
-    assertInvalid(invalid, 'NFTokenModify: URI must be in hex format')
+    assertInvalid(
+      invalid,
+      'NFTokenModify: invalid field URI, expected a valid hex string',
+    )
   })
 })

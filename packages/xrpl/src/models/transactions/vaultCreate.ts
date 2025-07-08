@@ -1,6 +1,6 @@
 import { ValidationError } from '../../errors'
 import { Currency } from '../common'
-import { hasFlag, isHex } from '../utils'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -10,10 +10,10 @@ import {
   isNumber,
   isCurrency,
   validateRequiredField,
-  isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  isHexString,
 } from './common'
 
 const META_MAX_BYTE_LENGTH = 1024
@@ -91,22 +91,18 @@ export interface VaultCreate extends BaseTransaction {
  * @param tx - A {@link VaultCreate} Transaction.
  * @throws When the {@link VaultCreate} is malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- required to do all field validations
 export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Asset', isCurrency)
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
-    if (!isHex(dataHex)) {
-      throw new ValidationError('VaultCreate: Data must be a valid hex string')
-    }
     const dataByteLength = dataHex.length / 2
     if (dataByteLength > VAULT_DATA_MAX_BYTE_LENGTH) {
       throw new ValidationError(
@@ -117,11 +113,6 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
   if (tx.MPTokenMetadata !== undefined) {
     const metaHex = tx.MPTokenMetadata
-    if (!isHex(metaHex)) {
-      throw new ValidationError(
-        'VaultCreate: MPTokenMetadata must be a valid hex string',
-      )
-    }
     const metaByteLength = metaHex.length / 2
     if (metaByteLength > META_MAX_BYTE_LENGTH) {
       throw new ValidationError(
