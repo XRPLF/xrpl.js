@@ -1,0 +1,238 @@
+name: Release Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'The package name to release (e.g., xrpl, ripple-address-codec)'
+        required: true
+      package_version:
+        description: 'Version to release (e.g., 2.12.1)'
+        required: true
+      git_ref:
+        description: 'Git ref to checkout (branch, tag, or commit SHA)'
+        required: true
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  run_test:
+    name: Run test Pipeline for ${{ github.event.inputs.package_version }}
+    uses: ./.github/workflows/nodejs.yml
+    with:
+      git_ref: ${{ github.event.inputs.git_ref }}
+    secrets: inherit
+
+
+  pre_release:
+    runs-on: ubuntu-latest
+    needs: [run_test]
+    name: Pre Release Pipeline for ${{ github.event.inputs.package_version }}
+
+    steps:
+    - name: Validate package input format (name@version)
+      run: |
+        echo "Validating input: ${{ github.event.inputs.package_version }}"
+        if [[ ! "${{ github.event.inputs.package_version }}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "❌ Invalid format. Expected format: 1.2.3 or v1.2.3 "
+          exit 1
+        fi
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.git_ref }}
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Build package
+      run: |
+        # dubugging info
+        npm --version
+        node --version
+        npm ls webpack-merge
+        ls -l
+        pwd
+
+        #build
+        npm ci
+        npm run build
+
+    - name: Notify Slack if tests fail
+      if: failure()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="❌ Tests failed for xrpl.js ${{ github.event.inputs.package_version }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"
+
+    - name: Install cyclonedx-npm
+      run: npm install -g @cyclonedx/cyclonedx-npm
+
+    - name: Generate CycloneDX SBOM
+      run: cyclonedx-npm --output-format json --output-file sbom.json
+
+    - name: Scan SBOM for vulnerabilities using Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: sbom
+        scan-ref: sbom.json
+        format: table
+        exit-code: 0
+        output: vuln-report.txt
+        severity: CRITICAL,HIGH
+
+    - name: Upload sbom to OWASP
+      run: |
+        curl -X POST \
+          -H "X-Api-Key: ${{ secrets.OWASP_TOKEN }}" \
+          -F "project=1e1ec1b1-c544-43fa-89b0-6d6f97fbf01a" \
+          -F "bom=@sbom.json" \
+          http://owasp-dt-api.stg.ripplex.io/api/v1/bom
+
+    - name: Print scan report
+      run: cat vuln-report.txt
+
+
+    - name: Upload vulnerability report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vulnerability-report
+        path: vuln-report.txt
+    - name: Generate lerna.json for choosen the package
+      run: |
+        PACKAGE_NAME="${{ github.event.inputs.package_name }}"
+
+        echo "🔧 Updating lerna.json to include only packages/${PACKAGE_NAME}"
+
+        # Use jq to update the packages field safely
+        jq --arg pkg "packages/$PACKAGE_NAME" '.packages = [$pkg]' lerna.json > lerna.tmp.json && mv lerna.tmp.json lerna.json
+
+        echo "✅ lerna.json updated:"
+        cat lerna.json
+
+    - name: Pack tarball
+      run: |
+        mkdir dist
+        npx lerna exec --scope "$PACKAGE_NAME" -- npm pack --pack-destination ../../dist
+        echo "TARBALL=$(ls dist/*.tgz)" >> $GITHUB_ENV
+      env:
+        NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/.npmrc
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
+    - name: Upload tarball as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-package-tarball
+        path: ${{ env.TARBALL }}
+
+  review:
+    runs-on: ubuntu-latest
+    needs: [run_test, pre_release]
+    name: Review test and security scan result
+    steps:
+    - name: Get Artifact ID and Print URL for review
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+      run: |
+        ARTIFACT_NAME="vulnerability-report"
+
+        echo "Fetching artifact ID for ${ARTIFACT_NAME}..."
+        ARTIFACTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/$REPO/actions/runs/$RUN_ID/artifacts)
+
+        ARTIFACT_ID=$(echo "$ARTIFACTS" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id")
+
+        if [ -z "$ARTIFACT_ID" ]; then
+          echo "❌ Artifact not found."
+          exit 1
+        fi
+
+        echo "✅ Artifact ID: $ARTIFACT_ID"
+        echo "🔗 Review URL: https://github.com/$REPO/actions/runs/${{ github.run_id }}/artifacts/$ARTIFACT_ID"
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [run_test, pre_release, review]
+    name: Release Pipeline for ${{ github.event.inputs.package_version }}
+    environment:
+      name: manual-approval
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.git_ref }}
+        fetch-depth: 0
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ github.event.inputs.package_version }}
+        name: Release v${{ github.event.inputs.package_version }}
+        draft: false
+        prerelease: false
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: npm-package-tarball
+        path: dist
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        registry-url: 'https://registry.npmjs.org/'
+
+    - name: Publish to npm
+      run: |
+        cd dist
+        PKG=$(ls *.tgz)
+        echo $PKG
+        npm publish "$PKG" --access public --registry=https://registry.npmjs.org/ --dry-run
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Notify Slack success
+      if: success()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="✅ Released xrpl.js v${{ github.event.inputs.package_version }}. Published to npm and GitHub successfully."
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"
+
+    - name: Notify Slack if tests fail
+      if: failure()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="❌ Tests failed for xrpl.js ${{ github.event.inputs.package_version }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"
