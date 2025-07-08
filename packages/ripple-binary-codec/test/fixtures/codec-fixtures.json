@@ -4924,6 +4924,17 @@
         "Account": "rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8",
         "OracleDocumentID": 1234
       }
+    },
+    {
+      "binary": "120041811401476926B590BA3245F63C829116A0A3AF7F382D0318000000000000000000000000555344000000000001476926B590BA3245F63C829116A0A3AF7F382D",
+      "json": {
+        "TransactionType": "VaultCreate",
+        "Account": "rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8",
+        "Asset": {
+          "currency": "USD",
+          "issuer": "rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8"
+        }
+      }
     }
   ],
   "ledgerData": [{
