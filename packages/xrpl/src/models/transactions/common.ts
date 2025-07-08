@@ -358,6 +358,7 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
 const invalidMessagesMap: Record<string, string> = {
   isAccount: 'account address',
   isAmount: 'Amount',
+  isClawbackAmount: 'non-XRP Amount',
   isCurrency: 'Currency',
   isXRPAmount: 'XRP Amount',
   isIssuedCurrency: 'Issued Currency',
@@ -373,6 +374,7 @@ const invalidMessagesMap: Record<string, string> = {
   isArray: 'array',
   isIssuedCurrencyAmount: 'IOU Amount',
   isCurrencyString: 'currency string',
+  isXRPLNumber: 'XRPLNumber',
 }
 
 // eslint-disable-next-line max-params -- okay for a helper function

@@ -46,9 +46,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'Amount', isClawbackAmount)
   validateOptionalField(tx, 'Holder', isAccount)
-  validateRequiredField(tx, 'Amount', isClawbackAmount, {
-    invalidMessage: 'expected a valid non-XRP Amount',
-  })
+  validateRequiredField(tx, 'Amount', isClawbackAmount)
 
   if (isIssuedCurrencyAmount(tx.Amount)) {
     if (tx.Account === tx.Amount.issuer) {
