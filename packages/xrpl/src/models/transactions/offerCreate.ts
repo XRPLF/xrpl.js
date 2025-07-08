@@ -6,6 +6,8 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
+  validateOptionalField,
+  isString,
 } from './common'
 
 const _DOMAIN_ID_LENGTH = 64
@@ -17,20 +19,8 @@ const _DOMAIN_ID_LENGTH = 64
  *
  * @returns true if the domainID is a valid 64-character string, false otherwise
  */
-export function validateDomainID(domainID?: unknown): boolean {
-  if (domainID === undefined || domainID === null) {
-    return true
-  }
-
-  if (typeof domainID !== 'string') {
-    return false
-  }
-
-  if (domainID.length !== _DOMAIN_ID_LENGTH) {
-    return false
-  }
-
-  return true
+export function validateDomainID(domainID: unknown): domainID is string {
+  return isString(domainID) && domainID.length === _DOMAIN_ID_LENGTH
 }
 
 /**
@@ -175,15 +165,18 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('OfferCreate: invalid OfferSequence')
   }
 
-  if (!validateDomainID(tx.DomainID)) {
-    throw new ValidationError('OfferCreate: invalid DomainID')
-  }
+  validateOptionalField(tx, 'DomainID', validateDomainID, {
+    txType: 'OfferCreate',
+    paramName: 'DomainID',
+  })
 
   if (tx.DomainID === undefined) {
     if (
       (typeof tx.Flags === 'number' &&
+        // eslint-disable-next-line no-bitwise -- flags require bitwise operations
         (tx.Flags & OfferCreateFlags.tfHybrid) !== 0) ||
-      (tx.Flags as OfferCreateFlagsInterface)?.tfHybrid === true
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Flags are stored as a number or an interface
+      (tx.Flags as OfferCreateFlagsInterface).tfHybrid
     ) {
       throw new ValidationError(
         'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',

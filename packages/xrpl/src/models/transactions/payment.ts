@@ -213,9 +213,10 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
   }
 
-  if (!validateDomainID(tx.DomainID)) {
-    throw new ValidationError('PaymentTransaction: invalid DomainID')
-  }
+  validateOptionalField(tx, 'DomainID', validateDomainID, {
+    txType: 'PaymentTransaction',
+    paramName: 'DomainID',
+  })
 
   if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
     throw new ValidationError('PaymentTransaction: invalid Paths')

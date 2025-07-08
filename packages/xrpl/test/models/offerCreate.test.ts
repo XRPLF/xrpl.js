@@ -108,6 +108,54 @@ describe('OfferCreate', function () {
     assertValid(offer)
   })
 
+  it(`throws -- invalid DomainID type`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: { sampleDictKey: 1 },
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offer, 'OfferCreate: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , exceeds expected length`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: '5'.repeat(65),
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offer, 'OfferCreate: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , falls short of expected length`, function () {
+    const offer = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: '5'.repeat(63),
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offer, 'OfferCreate: invalid field DomainID')
+  })
+
   it(`throws -- invalid flag (interface) specified without DomainID`, function () {
     const offer = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
