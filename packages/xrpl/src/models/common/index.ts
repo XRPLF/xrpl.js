@@ -33,6 +33,8 @@ export interface MPTAmount {
 
 export type Amount = IssuedCurrencyAmount | XRPAmount
 
+export type ClawbackAmount = IssuedCurrencyAmount | MPTAmount
+
 export interface Balance {
   currency: string
   issuer?: string

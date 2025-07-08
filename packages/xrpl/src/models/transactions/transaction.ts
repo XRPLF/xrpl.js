@@ -94,6 +94,12 @@ import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
+import { VaultClawback, validateVaultClawback } from './vaultClawback'
+import { VaultCreate, validateVaultCreate } from './vaultCreate'
+import { VaultDelete, validateVaultDelete } from './vaultDelete'
+import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
+import { VaultSet, validateVaultSet } from './vaultSet'
+import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -175,6 +181,12 @@ export type SubmittableTransaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | VaultClawback
+  | VaultCreate
+  | VaultDelete
+  | VaultDeposit
+  | VaultSet
+  | VaultWithdraw
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -441,6 +453,30 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'VaultClawback':
+      validateVaultClawback(tx)
+      break
+
+    case 'VaultCreate':
+      validateVaultCreate(tx)
+      break
+
+    case 'VaultDelete':
+      validateVaultDelete(tx)
+      break
+
+    case 'VaultDeposit':
+      validateVaultDeposit(tx)
+      break
+
+    case 'VaultSet':
+      validateVaultSet(tx)
+      break
+
+    case 'VaultWithdraw':
+      validateVaultWithdraw(tx)
       break
 
     case 'XChainAccountCreateCommit':
