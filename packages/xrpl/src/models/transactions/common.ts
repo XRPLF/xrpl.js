@@ -7,6 +7,7 @@ import { ValidationError } from '../../errors'
 import {
   Amount,
   AuthorizeCredential,
+  ClawbackAmount,
   Currency,
   IssuedCurrency,
   IssuedCurrencyAmount,
@@ -21,6 +22,9 @@ const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
+
+// Used for Vault transactions
+export const VAULT_DATA_MAX_BYTE_LENGTH = 256
 
 function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
@@ -108,6 +112,28 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
+ * Checks whether the given value is a valid XRPL number string.
+ * Accepts integer, decimal, or scientific notation strings.
+ *
+ * Examples of valid input:
+ *   - "123"
+ *   - "-987.654"
+ *   - "+3.14e10"
+ *   - "-7.2e-9"
+ *
+ * @param value - The value to check.
+ * @returns True if value is a string that matches the XRPL number format, false otherwise.
+ */
+export function isXRPLNumber(value: unknown): value is XRPLNumber {
+  // Matches optional sign, digits, optional decimal, optional exponent (scientific)
+  // Allows leading zeros, but not empty string, lone sign, or missing digits
+  return (
+    typeof value === 'string' &&
+    /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/u.test(value.trim())
+  )
+}
+
+/**
  * Verify the form and type of a Currency at runtime.
  *
  * @param input - The input to check the form and type of.
@@ -186,9 +212,31 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
 }
 
 /**
+ * Type guard to verify if the input is a valid ClawbackAmount.
+ *
+ * A ClawbackAmount can be either an {@link IssuedCurrencyAmount} or an {@link MPTAmount}.
+ * This function checks if the input matches either type.
+ *
+ * @param input - The value to check for ClawbackAmount structure.
+ * @returns True if the input is an IssuedCurrencyAmount or MPTAmount, otherwise false.
+ */
+export function isClawbackAmount(input: unknown): input is ClawbackAmount {
+  return isIssuedCurrencyAmount(input) || isMPTAmount(input)
+}
+
+/**
  * Must be a valid account address
  */
 export type Account = string
+
+/**
+ * XRPL Number type represented as a string.
+ *
+ * This string can be an integer (e.g., "123"), a decimal (e.g., "123.45"),
+ * or in scientific notation (e.g., "1.23e5", "-4.56e-7").
+ * Used for fields that accept arbitrary-precision numbers in XRPL transactions and ledger objects.
+ */
+export type XRPLNumber = string
 
 /**
  * Verify a string is in fact a valid account address.
