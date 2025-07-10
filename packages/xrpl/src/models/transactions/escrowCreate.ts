@@ -66,7 +66,6 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
   }
 
   validateRequiredField(tx, 'Amount', isAmount)
-
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
