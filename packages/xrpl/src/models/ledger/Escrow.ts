@@ -70,8 +70,8 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
   TransferRate?: number
 
   /**
-   * (Optional) The ledger index of the issuer's directory node associated with
-   * the Escrow. Used when the issuer is neither the source nor destination account.
+   * The ledger index of the issuer's directory node associated with the Escrow.
+   * Used when the issuer is neither the source nor destination account.
    */
   IssuerNode?: number
 }

@@ -5,6 +5,7 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isAmount,
   isNumber,
   validateBaseTransaction,
   validateOptionalField,
@@ -64,11 +65,7 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowCreate: missing field Amount')
   }
 
-  if (typeof tx.Amount !== 'string' && typeof tx.Amount !== 'object') {
-    throw new ValidationError(
-      'EscrowCreate: Amount must be a string (XRP) or object (IOU or MPT)',
-    )
-  }
+  validateRequiredField(tx, 'Amount', isAmount)
 
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
