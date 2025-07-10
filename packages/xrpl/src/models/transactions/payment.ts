@@ -8,6 +8,7 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
+  validateDomainID,
   validateRequiredField,
   validateOptionalField,
   isNumber,
@@ -17,7 +18,6 @@ import {
   isArray,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
-import { validateDomainID } from './offerCreate'
 
 /**
  * Enum representing values for Payment Transaction Flags.

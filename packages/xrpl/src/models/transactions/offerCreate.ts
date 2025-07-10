@@ -7,21 +7,8 @@ import {
   validateBaseTransaction,
   isAmount,
   validateOptionalField,
-  isString,
+  validateDomainID,
 } from './common'
-
-const _DOMAIN_ID_LENGTH = 64
-
-/**
- * Utility method used across offerCreate and payment transactions to validate the domainID.
- *
- * @param domainID - The domainID is a 64-character string that is used to identify a domain.
- *
- * @returns true if the domainID is a valid 64-character string, false otherwise
- */
-export function validateDomainID(domainID: unknown): domainID is string {
-  return isString(domainID) && domainID.length === _DOMAIN_ID_LENGTH
-}
 
 /**
  * Transaction Flags for an OfferCreate Transaction.
