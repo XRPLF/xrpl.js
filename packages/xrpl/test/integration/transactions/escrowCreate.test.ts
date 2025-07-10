@@ -199,12 +199,12 @@ describe('EscrowCreate', function () {
       )
 
       // Step 8: check that the escrow object has been removed
-      const wallet1EscrowObjects = await testContext.client.request({
+      const escrowObjectsSourceWallet = await testContext.client.request({
         command: 'account_objects',
         account: escrowSourceWallet.classicAddress,
         type: 'escrow',
       })
-      assert.equal(wallet1EscrowObjects.result.account_objects.length, 0)
+      assert.equal(escrowObjectsSourceWallet.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
@@ -338,12 +338,12 @@ describe('EscrowCreate', function () {
       )
 
       // Step 8: check that the escrow object has been removed
-      const wallet1EscrowObjects = await testContext.client.request({
+      const escrowObjectsSourceWallet = await testContext.client.request({
         command: 'account_objects',
         account: escrowSourceWallet.classicAddress,
         type: 'escrow',
       })
-      assert.equal(wallet1EscrowObjects.result.account_objects.length, 0)
+      assert.equal(escrowObjectsSourceWallet.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
