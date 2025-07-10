@@ -61,10 +61,6 @@ export interface EscrowCreate extends BaseTransaction {
 export function validateEscrowCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
-    throw new ValidationError('EscrowCreate: missing field Amount')
-  }
-
   validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)

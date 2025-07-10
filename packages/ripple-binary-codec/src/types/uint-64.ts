@@ -8,13 +8,15 @@ const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const BASE10_REGEX = /^[0-9]{1,20}$/
 const mask = BigInt(0x00000000ffffffff)
 
+const BASE10_AMOUNT_FIELDS = new Set([
+  'MaximumAmount',
+  'OutstandingAmount',
+  'MPTAmount',
+  'LockedAmount',
+])
+
 function useBase10(fieldName: string): boolean {
-  return (
-    fieldName === 'MaximumAmount' ||
-    fieldName === 'OutstandingAmount' ||
-    fieldName === 'MPTAmount' ||
-    fieldName === 'LockedAmount'
-  )
+  return BASE10_AMOUNT_FIELDS.has(fieldName)
 }
 
 /**
