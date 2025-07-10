@@ -82,7 +82,7 @@ jobs:
       env:
         SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       run: |
-        MESSAGE="❌ Tests failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        MESSAGE="❌ Build failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST https://slack.com/api/chat.postMessage \
           -H "Authorization: Bearer $SLACK_TOKEN" \
           -H "Content-Type: application/json" \
@@ -115,15 +115,21 @@ jobs:
           -F "bom=@sbom.json" \
           http://owasp-dt-api.stg.ripplex.io/api/v1/bom
 
+    - name: Upload SBOM artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom.json
+
     - name: Print scan report
       run: cat vuln-report.txt
-
 
     - name: Upload vulnerability report artifact
       uses: actions/upload-artifact@v4
       with:
         name: vulnerability-report
         path: vuln-report.txt
+
     - name: Generate lerna.json for choosen the package
       run: |
 
