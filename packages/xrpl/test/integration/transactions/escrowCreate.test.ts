@@ -73,61 +73,65 @@ describe('EscrowCreate', function () {
   it(
     'escrow with IOU -- validate EscrowCreate and EscrowFinish transactions',
     async () => {
-      const wallet1 = await generateFundedWallet(testContext.client)
-      const wallet2 = await generateFundedWallet(testContext.client)
+      const escrowSourceWallet = await generateFundedWallet(testContext.client)
+      const escrowDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
 
-      // Step-1: configure Issuer (testContext.wallet.classicAddress) to allow their IOUs to be used as escrow amounts
+      const issuerWallet = testContext.wallet
+
+      // Step-1: configure issuerWallet (testContext.wallet.classicAddress) to allow their IOUs to be used as escrow amounts
       const setupAccountSetTx: AccountSet = {
         TransactionType: 'AccountSet',
-        Account: testContext.wallet.classicAddress,
+        Account: issuerWallet.classicAddress,
         SetFlag: AccountSetAsfFlags.asfAllowTrustLineLocking,
       }
-      await testTransaction(
-        testContext.client,
-        setupAccountSetTx,
-        testContext.wallet,
-      )
+      await testTransaction(testContext.client, setupAccountSetTx, issuerWallet)
 
       // Step-2: setup appropriate trust lines to transfer the IOU.
-      // This is needed for both wallet1 and wallet2 to hold the USD IOU token.
-      const setupTrustSetTx_1: TrustSet = {
+      // This is needed for both escrowSourceWallet and escrowDestinationWallet to hold the USD IOU token.
+      const setupTrustSetTx1: TrustSet = {
         TransactionType: 'TrustSet',
-        Account: wallet1.classicAddress,
+        Account: escrowSourceWallet.classicAddress,
         LimitAmount: {
           currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
-          value: '1000',
-        },
-      }
-      await testTransaction(testContext.client, setupTrustSetTx_1, wallet1)
-
-      const setupTrustSetTx_2: TrustSet = {
-        TransactionType: 'TrustSet',
-        Account: wallet2.classicAddress,
-        LimitAmount: {
-          currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
-          value: '1000',
-        },
-      }
-      await testTransaction(testContext.client, setupTrustSetTx_2, wallet2)
-
-      // Step-3: transfer the USD IOU token to from Issuer to wallet1
-      const setupPaymentTx: Payment = {
-        TransactionType: 'Payment',
-        Account: testContext.wallet.classicAddress,
-        Destination: wallet1.classicAddress,
-        Amount: {
-          currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
+          issuer: issuerWallet.classicAddress,
           value: '1000',
         },
       }
       await testTransaction(
         testContext.client,
-        setupPaymentTx,
-        testContext.wallet,
+        setupTrustSetTx1,
+        escrowSourceWallet,
       )
+
+      const setupTrustSetTx2: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: escrowDestinationWallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        setupTrustSetTx2,
+        escrowDestinationWallet,
+      )
+
+      // Step-3: transfer the USD IOU token to from Issuer to escrowSourceWallet
+      const setupPaymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: issuerWallet.classicAddress,
+        Destination: escrowSourceWallet.classicAddress,
+        Amount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(testContext.client, setupPaymentTx, issuerWallet)
 
       // Step-4: create the escrow
       // get the most recent close_time from the standalone container for finish after.
@@ -139,43 +143,43 @@ describe('EscrowCreate', function () {
       ).result.ledger.close_time
 
       const tx: EscrowCreate = {
-        Account: wallet1.classicAddress,
+        Account: escrowSourceWallet.classicAddress,
         TransactionType: 'EscrowCreate',
         Amount: {
           currency: 'USD',
-          value: '100',
-          issuer: testContext.wallet.classicAddress,
+          value: '111',
+          issuer: issuerWallet.classicAddress,
         },
-        Destination: wallet2.classicAddress,
+        Destination: escrowDestinationWallet.classicAddress,
         FinishAfter: CLOSE_TIME + 2,
         CancelAfter: CLOSE_TIME + 4,
       }
 
-      const txn_response = await testTransaction(
+      const txnResponse = await testTransaction(
         testContext.client,
         tx,
-        wallet1,
+        escrowSourceWallet,
       )
 
       // Step-5: fetch the escrow object
-      const wallet1_objects = await testContext.client.request({
+      const wallet1Objects = await testContext.client.request({
         command: 'account_objects',
-        account: wallet1.classicAddress,
+        account: escrowSourceWallet.classicAddress,
         type: 'escrow',
       })
-      assert.equal(wallet1_objects.result.account_objects.length, 1)
+      assert.equal(wallet1Objects.result.account_objects.length, 1)
 
       // Step-6: check that the escrow object has the correct particulars
-      const escrowObject = wallet1_objects.result.account_objects[0]
+      const escrowObject = wallet1Objects.result.account_objects[0]
       assert.equal(escrowObject.LedgerEntryType, 'Escrow')
-      assert.equal(escrowObject.PreviousTxnID, txn_response.result.tx_json.hash)
+      assert.equal(escrowObject.PreviousTxnID, txnResponse.result.tx_json.hash)
 
       // Step-7: Execute the EscrowFinish transaction
       const escrowFinishTx: EscrowFinish = {
         TransactionType: 'EscrowFinish',
-        Account: wallet1.classicAddress,
-        Owner: wallet1.classicAddress,
-        OfferSequence: Number(txn_response.result.tx_json.Sequence),
+        Account: escrowSourceWallet.classicAddress,
+        Owner: escrowSourceWallet.classicAddress,
+        OfferSequence: Number(txnResponse.result.tx_json.Sequence),
       }
 
       // Step 7.1: wait for the escrow to be ready to finish
@@ -188,19 +192,19 @@ describe('EscrowCreate', function () {
       await sendLedgerAccept(testContext.client)
 
       // Step 7.3: execute the EscrowFinish transaction
-      await testTransaction(testContext.client, escrowFinishTx, wallet1)
+      await testTransaction(
+        testContext.client,
+        escrowFinishTx,
+        escrowSourceWallet,
+      )
 
       // Step 8: check that the escrow object has been removed
-      const wallet1_objects_after_escrow_finish =
-        await testContext.client.request({
-          command: 'account_objects',
-          account: wallet1.classicAddress,
-          type: 'escrow',
-        })
-      assert.equal(
-        wallet1_objects_after_escrow_finish.result.account_objects.length,
-        0,
-      )
+      const wallet1EscrowObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: escrowSourceWallet.classicAddress,
+        type: 'escrow',
+      })
+      assert.equal(wallet1EscrowObjects.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
@@ -208,61 +212,65 @@ describe('EscrowCreate', function () {
   it(
     'escrow with IOU -- validate EscrowCancel transaction (Identical to previous test, except for Step 7-8)',
     async () => {
-      const wallet1 = await generateFundedWallet(testContext.client)
-      const wallet2 = await generateFundedWallet(testContext.client)
+      const escrowSourceWallet = await generateFundedWallet(testContext.client)
+      const escrowDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
 
-      // Step-1: configure Issuer (testContext.wallet.classicAddress) to allow their IOUs to be used as escrow amounts
+      const issuerWallet = testContext.wallet
+
+      // Step-1: configure issuerWallet (testContext.wallet.classicAddress) to allow their IOUs to be used as escrow amounts
       const setupAccountSetTx: AccountSet = {
         TransactionType: 'AccountSet',
-        Account: testContext.wallet.classicAddress,
+        Account: issuerWallet.classicAddress,
         SetFlag: AccountSetAsfFlags.asfAllowTrustLineLocking,
       }
-      await testTransaction(
-        testContext.client,
-        setupAccountSetTx,
-        testContext.wallet,
-      )
+      await testTransaction(testContext.client, setupAccountSetTx, issuerWallet)
 
       // Step-2: setup appropriate trust lines to transfer the IOU.
-      // This is needed for both wallet1 and wallet2 to hold the USD IOU token.
-      const setupTrustSetTx_1: TrustSet = {
+      // This is needed for both escrowSourceWallet and escrowDestinationWallet to hold the USD IOU token.
+      const setupTrustSetTx1: TrustSet = {
         TransactionType: 'TrustSet',
-        Account: wallet1.classicAddress,
+        Account: escrowSourceWallet.classicAddress,
         LimitAmount: {
           currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
-          value: '1000',
-        },
-      }
-      await testTransaction(testContext.client, setupTrustSetTx_1, wallet1)
-
-      const setupTrustSetTx_2: TrustSet = {
-        TransactionType: 'TrustSet',
-        Account: wallet2.classicAddress,
-        LimitAmount: {
-          currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
-          value: '1000',
-        },
-      }
-      await testTransaction(testContext.client, setupTrustSetTx_2, wallet2)
-
-      // Step-3: transfer the USD IOU token to from Issuer to wallet1
-      const setupPaymentTx: Payment = {
-        TransactionType: 'Payment',
-        Account: testContext.wallet.classicAddress,
-        Destination: wallet1.classicAddress,
-        Amount: {
-          currency: 'USD',
-          issuer: testContext.wallet.classicAddress,
+          issuer: issuerWallet.classicAddress,
           value: '1000',
         },
       }
       await testTransaction(
         testContext.client,
-        setupPaymentTx,
-        testContext.wallet,
+        setupTrustSetTx1,
+        escrowSourceWallet,
       )
+
+      const setupTrustSetTx2: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: escrowDestinationWallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        setupTrustSetTx2,
+        escrowDestinationWallet,
+      )
+
+      // Step-3: transfer the USD IOU token to from Issuer to escrowSourceWallet
+      const setupPaymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: issuerWallet.classicAddress,
+        Destination: escrowSourceWallet.classicAddress,
+        Amount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(testContext.client, setupPaymentTx, issuerWallet)
 
       // Step-4: create the escrow
       // get the most recent close_time from the standalone container for finish after.
@@ -274,43 +282,43 @@ describe('EscrowCreate', function () {
       ).result.ledger.close_time
 
       const tx: EscrowCreate = {
-        Account: wallet1.classicAddress,
+        Account: escrowSourceWallet.classicAddress,
         TransactionType: 'EscrowCreate',
         Amount: {
           currency: 'USD',
           value: '100',
-          issuer: testContext.wallet.classicAddress,
+          issuer: issuerWallet.classicAddress,
         },
-        Destination: wallet2.classicAddress,
+        Destination: escrowDestinationWallet.classicAddress,
         FinishAfter: CLOSE_TIME + 2,
         CancelAfter: CLOSE_TIME + 4,
       }
 
-      const txn_response = await testTransaction(
+      const txnResponse = await testTransaction(
         testContext.client,
         tx,
-        wallet1,
+        escrowSourceWallet,
       )
 
       // Step-5: fetch the escrow object
-      const wallet1_objects = await testContext.client.request({
+      const wallet1Objects = await testContext.client.request({
         command: 'account_objects',
-        account: wallet1.classicAddress,
+        account: escrowSourceWallet.classicAddress,
         type: 'escrow',
       })
-      assert.equal(wallet1_objects.result.account_objects.length, 1)
+      assert.equal(wallet1Objects.result.account_objects.length, 1)
 
       // Step-6: check that the escrow object has the correct particulars
-      const escrowObject = wallet1_objects.result.account_objects[0]
+      const escrowObject = wallet1Objects.result.account_objects[0]
       assert.equal(escrowObject.LedgerEntryType, 'Escrow')
-      assert.equal(escrowObject.PreviousTxnID, txn_response.result.tx_json.hash)
+      assert.equal(escrowObject.PreviousTxnID, txnResponse.result.tx_json.hash)
 
       // Step-7: Execute the EscrowCancel transaction
       const escrowCancelTx: EscrowCancel = {
         TransactionType: 'EscrowCancel',
-        Account: wallet1.classicAddress,
-        Owner: wallet1.classicAddress,
-        OfferSequence: Number(txn_response.result.tx_json.Sequence),
+        Account: escrowSourceWallet.classicAddress,
+        Owner: escrowSourceWallet.classicAddress,
+        OfferSequence: Number(txnResponse.result.tx_json.Sequence),
       }
 
       // Step 7.1: wait for the escrow to be "cancellable"
@@ -323,19 +331,19 @@ describe('EscrowCreate', function () {
       await sendLedgerAccept(testContext.client)
 
       // Step 7.3: execute the EscrowCancel transaction
-      await testTransaction(testContext.client, escrowCancelTx, wallet1)
+      await testTransaction(
+        testContext.client,
+        escrowCancelTx,
+        escrowSourceWallet,
+      )
 
       // Step 8: check that the escrow object has been removed
-      const wallet1_objects_after_escrow_cancel =
-        await testContext.client.request({
-          command: 'account_objects',
-          account: wallet1.classicAddress,
-          type: 'escrow',
-        })
-      assert.equal(
-        wallet1_objects_after_escrow_cancel.result.account_objects.length,
-        0,
-      )
+      const wallet1EscrowObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: escrowSourceWallet.classicAddress,
+        type: 'escrow',
+      })
+      assert.equal(wallet1EscrowObjects.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
