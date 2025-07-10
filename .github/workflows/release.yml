@@ -111,7 +111,7 @@ jobs:
       run: |
         curl -X POST \
           -H "X-Api-Key: ${{ secrets.OWASP_TOKEN }}" \
-          -F "project=1e1ec1b1-c544-43fa-89b0-6d6f97fbf01a" \
+          -F "project=3acaca74-a2e3-433b-a277-04aa37e98b65" \
           -F "bom=@sbom.json" \
           http://owasp-dt-api.stg.ripplex.io/api/v1/bom
 
@@ -164,7 +164,12 @@ jobs:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
     steps:
-    - name: Get Artifact ID and Print URL for review
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.git_ref }}
+        fetch-depth: 0
+    - name: Release summary for review
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPO: ${{ github.repository }}
@@ -187,9 +192,8 @@ jobs:
         echo "📦 Package Name:   $PACKAGE_NAME"
         echo "🔖 Package Version: $PACKAGE_VERSION"
         echo "🌿 Git Ref:         $GIT_REF"
-        echo "🌳 Branch:          $BRANCH"
         echo "🔢 Commit SHA:      $COMMIT_SHA"
-        echo "🔗 Review Vulnerabilities detected: https://github.com/$REPO/actions/runs/${{ github.run_id }}/artifacts/$ARTIFACT_ID"
+        echo "🔗 Please review Vulnerabilities detected: https://github.com/$REPO/actions/runs/${{ github.run_id }}/artifacts/$ARTIFACT_ID"
 
   release:
     runs-on: ubuntu-latest
