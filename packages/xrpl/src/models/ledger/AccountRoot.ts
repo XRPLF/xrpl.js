@@ -148,8 +148,7 @@ export interface AccountRootFlagsInterface {
   lsfAllowTrustLineClawback?: boolean
 
   /**
-   * If the issuer's account does not have the lsfAllowTrustLineLocking flag set,
-   * then Escrow ledger-objects cannot be created with such IOUs.
+   * Allow IOUs to be used as escrow amounts for an issuer
    */
   lsfAllowTrustLineLocking?: boolean
 }
