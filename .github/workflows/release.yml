@@ -23,6 +23,11 @@ jobs:
     outputs:
       package_version: ${{ steps.get_version.outputs.version }}
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.git_ref }}
+        fetch-depth: 0
     - name: Get package version from package.json
       id: get_version
       run: |
