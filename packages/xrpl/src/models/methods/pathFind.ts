@@ -102,13 +102,11 @@ export interface PathFindResponse extends BaseResponse {
      * Continues to send updates each time a new ledger closes.
      */
     full_reply: boolean
-
     /**
      * The object ID of a PermissionedDomain object, if the orderbook shown is
      * for a specific domain.
      */
     domain?: string
-
     /**
      * The ID provided in the WebSocket request is included again at this
      * level.
