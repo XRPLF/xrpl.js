@@ -15,7 +15,7 @@ const BASE10_AMOUNT_FIELDS = new Set([
   'LockedAmount',
 ])
 
-function useBase10(fieldName: string): boolean {
+function isBase10(fieldName: string): boolean {
   return BASE10_AMOUNT_FIELDS.has(fieldName)
 }
 
@@ -67,7 +67,7 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === 'string') {
-      if (useBase10(fieldName)) {
+      if (isBase10(fieldName)) {
         if (!BASE10_REGEX.test(val)) {
           throw new Error(`${fieldName} ${val} is not a valid base 10 string`)
         }
@@ -104,7 +104,7 @@ class UInt64 extends UInt {
     fieldName = '',
   ): string {
     const hexString = bytesToHex(this.bytes)
-    if (useBase10(fieldName)) {
+    if (isBase10(fieldName)) {
       return BigInt('0x' + hexString).toString(10)
     }
 
