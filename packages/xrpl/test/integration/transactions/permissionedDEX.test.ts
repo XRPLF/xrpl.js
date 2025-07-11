@@ -219,8 +219,10 @@ describe('PermissionedDEX', function () {
   afterAll(async () => teardownClient(testContext))
 
   it(
-    'Validate the domainID of the Offer ledger object',
+    'Validate characteristics of the PermissionedDEX Offer',
+    // eslint-disable-next-line max-statements -- this feature is complex and requires multiple assertions
     async () => {
+      // Validate the domainID of the Offer ledger object
       offer_ledger_object = (
         await testContext.client.request({
           command: 'ledger_entry',
@@ -248,13 +250,8 @@ describe('PermissionedDEX', function () {
         offer_ledger_object.AdditionalBooks?.[0].Book.BookDirectory,
         offer_ledger_object.BookDirectory,
       )
-    },
-    TIMEOUT,
-  )
 
-  it(
-    'Validate the properties of the DirectoryNode ledger object (contains the PermissionedDEX Offer object)',
-    async () => {
+      // Validate the properties of the DirectoryNode ledger object (contains the PermissionedDEX Offer object)
       const ledgerEntryResponse = await testContext.client.request({
         command: 'ledger_entry',
         directory: offer_ledger_object.BookDirectory,
@@ -272,71 +269,71 @@ describe('PermissionedDEX', function () {
         (ledgerEntryResponse.result.node as DirectoryNode).DomainID,
         pd_ledger_object.index,
       )
-    },
-    TIMEOUT,
-  )
 
-  it(`Validate the bookOffers method`, async () => {
-    const response: BookOffersResponse = await testContext.client.request({
-      command: 'book_offers',
-      taker: wallet2.classicAddress,
-      taker_pays: {
-        currency: 'USD',
-        issuer: testContext.wallet.classicAddress,
-      },
-      taker_gets: {
-        currency: 'XRP',
-      },
-      domain: pd_ledger_object.index,
-    } as BookOffersRequest)
-
-    assert.equal(response.result.offers.length, 1)
-    assert.equal(response.result.offers[0].TakerGets, '1000')
-    assert.equal(
-      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).value,
-      '10',
-    )
-    assert.equal(
-      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).currency,
-      'USD',
-    )
-    assert.equal(
-      (response.result.offers[0].TakerPays as IssuedCurrencyAmount).issuer,
-      testContext.wallet.classicAddress,
-    )
-
-    assert.equal(response.result.offers[0].DomainID, pd_ledger_object.index)
-  })
-
-  it(`Validate the subscription stream for PermissionedDEX offers`, async () => {
-    const request: SubscribeRequest = {
-      command: 'subscribe',
-      books: [
-        {
-          taker_gets: { currency: 'XRP' },
+      // Validate the bookOffers method
+      const bookOffersResponse: BookOffersResponse =
+        await testContext.client.request({
+          command: 'book_offers',
+          taker: wallet2.classicAddress,
           taker_pays: {
             currency: 'USD',
             issuer: testContext.wallet.classicAddress,
           },
-          taker: wallet1.classicAddress,
+          taker_gets: {
+            currency: 'XRP',
+          },
           domain: pd_ledger_object.index,
-        } as SubscribeBook,
-      ],
-    }
+        } as BookOffersRequest)
 
-    const response = await testContext.client.request(request)
-    assert.equal(response.type, 'response')
+      assert.equal(bookOffersResponse.result.offers.length, 1)
+      assert.equal(bookOffersResponse.result.offers[0].TakerGets, '1000')
+      assert.equal(
+        (bookOffersResponse.result.offers[0].TakerPays as IssuedCurrencyAmount)
+          .value,
+        '10',
+      )
+      assert.equal(
+        (bookOffersResponse.result.offers[0].TakerPays as IssuedCurrencyAmount)
+          .currency,
+        'USD',
+      )
+      assert.equal(
+        (bookOffersResponse.result.offers[0].TakerPays as IssuedCurrencyAmount)
+          .issuer,
+        testContext.wallet.classicAddress,
+      )
 
-    // Note: The result is empty because no Offer has been created after the creation of the Subscription stream.
-    // This case is tested in the rippled code. To avoid the additional complexity, validating the contents
-    // of the response is skipped in this test.
-    // This test validates that domain_id is an acceptable input parameter to the subscribe command.
-    assert.isEmpty(response.result)
-  })
+      assert.equal(
+        bookOffersResponse.result.offers[0].DomainID,
+        pd_ledger_object.index,
+      )
 
-  it(
-    'Crossing a PermissionedDEX Offer',
-    async () => {
+      // Validate the subscribe command
+      const request: SubscribeRequest = {
+        command: 'subscribe',
+        books: [
+          {
+            taker_gets: { currency: 'XRP' },
+            taker_pays: {
+              currency: 'USD',
+              issuer: testContext.wallet.classicAddress,
+            },
+            taker: wallet1.classicAddress,
+            domain: pd_ledger_object.index,
+          } as SubscribeBook,
+        ],
+      }
+
+      const response = await testContext.client.request(request)
+      assert.equal(response.type, 'response')
+
+      // Note: The result is empty because no Offer has been created after the creation of the Subscription stream.
+      // This case is tested in the rippled code. To avoid the additional complexity, validating the contents
+      // of the response is skipped in this test.
+      // This test validates that domain_id is an acceptable input parameter to the subscribe command.
+      assert.isEmpty(response.result)
+
+      // Validate the "crossing" of a PermissionedDEX Offer
       // wallet2 "crosses" the offer within the domain
       const offerCrossTx: OfferCreate = {
         TransactionType: 'OfferCreate',
