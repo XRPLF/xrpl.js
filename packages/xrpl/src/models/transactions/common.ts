@@ -687,7 +687,7 @@ export function containsDuplicates(
 const _DOMAIN_ID_LENGTH = 64
 
 /**
- * Utility method used across offerCreate and payment transactions to validate the domainID.
+ * Utility method used across OfferCreate and Payment transactions to validate the DomainID.
  *
  * @param domainID - The domainID is a 64-character string that is used to identify a domain.
  *
