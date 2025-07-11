@@ -2,6 +2,7 @@ import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags } from '../../src'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -24,7 +25,14 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MPTokenMetadata: stringToHex('http://xrpl.org'),
+      MPTokenMetadata: stringToHex(`{
+        "ticker": "TBILL",
+        "name": "T-Bill Yield Token",
+        "icon": "https://example.org/tbill-icon.png",
+        "asset_class": "rwa",
+        "asset_subclass": "treasury",
+        "issuer_name": "Example Yield Co."
+      }`),
     } as any
 
     assertValid(validMPTokenIssuanceCreate)
@@ -130,4 +138,37 @@ describe('MPTokenIssuanceCreate', function () {
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
   })
+})
+
+/**
+ * MPTokenMetadata warnings tests.
+ */
+describe('MPTokenMetadata warnings', function () {
+  beforeEach(() => {
+    jest.spyOn(console, 'warn')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  for (const testCase of mptMetadataTests) {
+    const testName: string = testCase.testName
+    it(`should validate warnings for: ${testName}`, function () {
+      const validMPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenMetadata: stringToHex(JSON.stringify(testCase.mptMetadata)),
+      }
+
+      assertValid(validMPTokenIssuanceCreate)
+
+      for (const expected of testCase.warningsMessages) {
+        // eslint-disable-next-line no-console -- We are testing for console warnings here.
+        expect(console.warn).toHaveBeenCalledWith(
+          expect.stringContaining(expected),
+        )
+      }
+    })
+  }
 })
