@@ -46,7 +46,7 @@ describe('Payment', function () {
   })
 
   it(`throws -- invalid DomainID type`, function () {
-    const payment_invalid_domain_id_type = {
+    const paymentTx = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: '1234',
@@ -54,14 +54,11 @@ describe('Payment', function () {
       DomainID: { sampleDictKey: 1 },
     } as any
 
-    assertInvalid(
-      payment_invalid_domain_id_type,
-      'PaymentTransaction: invalid field DomainID',
-    )
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
   })
 
   it(`throws -- invalid DomainID , exceeds expected length`, function () {
-    const payment_invalid_domain_id_length = {
+    const paymentTx = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: '1234',
@@ -69,14 +66,11 @@ describe('Payment', function () {
       DomainID: '5'.repeat(65),
     } as any
 
-    assertInvalid(
-      payment_invalid_domain_id_length,
-      'PaymentTransaction: invalid field DomainID',
-    )
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
   })
 
   it(`throws -- invalid DomainID , falls short of expected length`, function () {
-    const payment_invalid_domain_id_length = {
+    const paymentTx = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: '1234',
@@ -84,10 +78,7 @@ describe('Payment', function () {
       DomainID: '5'.repeat(63),
     } as any
 
-    assertInvalid(
-      payment_invalid_domain_id_length,
-      'PaymentTransaction: invalid field DomainID',
-    )
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
   })
 
   it(`Verifies memos correctly`, function () {

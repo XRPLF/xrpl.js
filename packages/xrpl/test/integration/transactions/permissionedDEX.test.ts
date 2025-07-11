@@ -255,22 +255,21 @@ describe('PermissionedDEX', function () {
   it(
     'Validate the properties of the DirectoryNode ledger object (contains the PermissionedDEX Offer object)',
     async () => {
-      const directoryNode_ledger_object = await testContext.client.request({
+      const ledgerEntryResponse = await testContext.client.request({
         command: 'ledger_entry',
         directory: offer_ledger_object.BookDirectory,
       })
 
       assert.equal(
-        (directoryNode_ledger_object.result.node as DirectoryNode).index,
+        (ledgerEntryResponse.result.node as DirectoryNode).index,
         offer_ledger_object.BookDirectory,
       )
       assert.equal(
-        (directoryNode_ledger_object.result.node as DirectoryNode)
-          .LedgerEntryType,
+        (ledgerEntryResponse.result.node as DirectoryNode).LedgerEntryType,
         'DirectoryNode',
       )
       assert.equal(
-        (directoryNode_ledger_object.result.node as DirectoryNode).DomainID,
+        (ledgerEntryResponse.result.node as DirectoryNode).DomainID,
         pd_ledger_object.index,
       )
     },
@@ -310,7 +309,7 @@ describe('PermissionedDEX', function () {
   })
 
   it(`Validate the subscription stream for PermissionedDEX offers`, async () => {
-    const subscribe_request: SubscribeRequest = {
+    const request: SubscribeRequest = {
       command: 'subscribe',
       books: [
         {
@@ -325,7 +324,7 @@ describe('PermissionedDEX', function () {
       ],
     }
 
-    const response = await testContext.client.request(subscribe_request)
+    const response = await testContext.client.request(request)
     assert.equal(response.type, 'response')
 
     // Note: The result is empty because no Offer has been created after the creation of the Subscription stream.
@@ -354,19 +353,19 @@ describe('PermissionedDEX', function () {
       await testTransaction(testContext.client, offerCrossTx, wallet2)
 
       // Validate that Offer ledger objects are consumed in both wallets
-      const wallet1_objects = await testContext.client.request({
+      const wallet1Objects = await testContext.client.request({
         command: 'account_objects',
         account: wallet1.classicAddress,
         type: 'offer',
       })
-      assert.isEmpty(wallet1_objects.result.account_objects)
+      assert.isEmpty(wallet1Objects.result.account_objects)
 
-      const wallet2_objects = await testContext.client.request({
+      const wallet2Objects = await testContext.client.request({
         command: 'account_objects',
         account: wallet2.classicAddress,
         type: 'offer',
       })
-      assert.isEmpty(wallet2_objects.result.account_objects)
+      assert.isEmpty(wallet2Objects.result.account_objects)
     },
     TIMEOUT,
   )
