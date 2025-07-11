@@ -114,7 +114,6 @@ export interface OfferCreate extends BaseTransaction {
   TakerGets: Amount
   /** The amount and type of currency being requested by the offer creator. */
   TakerPays: Amount
-
   /** The domain that the offer must be a part of. */
   DomainID?: string
 }
