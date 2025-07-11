@@ -47,10 +47,8 @@ export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
   OwnerNode: string
   /** The time this Offer expires, in seconds since the Ripple Epoch. */
   Expiration?: number
-
   /** The domain that the offer must be a part of. */
   DomainID?: string
-
   /**
    * An additional list of order book directories that this offer belongs to.
    * Currently this field only applicable to hybrid offers.
