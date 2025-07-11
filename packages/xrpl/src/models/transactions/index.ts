@@ -55,6 +55,8 @@ export {
   MPTokenAuthorizeFlagsInterface,
 } from './MPTokenAuthorize'
 export {
+  MPTokenMetadata,
+  MPTokenMetadataUrl,
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
