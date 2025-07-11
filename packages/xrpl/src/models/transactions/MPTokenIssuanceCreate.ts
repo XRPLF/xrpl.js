@@ -105,7 +105,7 @@ export interface MPTokenIssuanceCreateFlagsInterface
 export interface MPTokenMetadata {
   ticker: string
   name: string
-  desc: string
+  desc?: string
   icon: string
   asset_class: string
   asset_subclass?: string
@@ -340,7 +340,7 @@ function logWarningsForMPTMetadata(input?: string): void {
 
   if (
     !MPT_META_ASSET_CLASSES.includes(
-      mptMPTokenMetadata.asset_class.toLocaleLowerCase(),
+      mptMPTokenMetadata.asset_class.toLowerCase(),
     )
   ) {
     console.warn(
@@ -351,7 +351,7 @@ function logWarningsForMPTMetadata(input?: string): void {
   if (
     mptMPTokenMetadata.asset_subclass != null &&
     !MPT_META_ASSET_SUB_CLASSES.includes(
-      mptMPTokenMetadata.asset_subclass.toLocaleLowerCase(),
+      mptMPTokenMetadata.asset_subclass.toLowerCase(),
     )
   ) {
     console.warn(
@@ -362,7 +362,7 @@ function logWarningsForMPTMetadata(input?: string): void {
   }
 
   if (
-    mptMPTokenMetadata.asset_class.toLocaleLowerCase() === 'rwa' &&
+    mptMPTokenMetadata.asset_class.toLowerCase() === 'rwa' &&
     mptMPTokenMetadata.asset_subclass == null
   ) {
     console.warn(`asset_subclass is required when asset_class is rwa.`)
