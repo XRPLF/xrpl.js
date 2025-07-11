@@ -45,4 +45,7 @@ export default interface DirectoryNode
   TakerGetsCurrency?: string
   /** The issuer of the TakerGets amount from the offers in this directory. */
   TakerGetsIssuer?: string
+
+  /** The domain that the offer directory is a part of. */
+  DomainID?: string
 }

@@ -37,11 +37,48 @@ describe('Payment', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      DomainID: '5'.repeat(64),
     } as any
   })
 
   it(`verifies valid Payment`, function () {
     assertValid(payment)
+  })
+
+  it(`throws -- invalid DomainID type`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: { sampleDictKey: 1 },
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , exceeds expected length`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: '5'.repeat(65),
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , falls short of expected length`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: '5'.repeat(63),
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
   })
 
   it(`Verifies memos correctly`, function () {

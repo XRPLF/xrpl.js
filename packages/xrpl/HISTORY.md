@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Support for `PermissionedDEX` (XLS-81d)
 * Support for `Token Escrow` (XLS-85)
 * Support for `Single Asset Vault` (XLS-65)
 * Adds `XRPLNumber` amount type used in Vault transactions. This supports integer, decimal, or scientific notation strings.
