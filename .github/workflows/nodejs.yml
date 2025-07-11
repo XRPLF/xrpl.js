@@ -30,7 +30,6 @@ jobs:
       matrix:
         node-version: [22.x]
 
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -119,6 +118,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_REF }}
+          fetch-depth: 0
 
       - name: Run docker in background
         run: |
@@ -223,6 +225,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_REF }}
+          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

@@ -36,8 +36,17 @@ jobs:
         echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-  run_test:
-    name: Run integration tests ${{ needs.get_version.outputs.package_version }}
+  run_faucet_test:
+    name: Run faucet tests ${{ needs.get_version.outputs.package_version }}
+    needs: [get_version]
+    uses: ./.github/workflows/faucet_test.yml
+    with:
+      git_ref: ${{ github.event.inputs.git_ref }}
+    secrets: inherit
+
+
+  run_tests:
+    name: Run unit/integration tests ${{ needs.get_version.outputs.package_version }}
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
@@ -46,7 +55,7 @@ jobs:
 
   pre_release:
     runs-on: ubuntu-latest
-    needs: [get_version, run_test]
+    needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
@@ -158,7 +167,7 @@ jobs:
 
   review:
     runs-on: ubuntu-latest
-    needs: [get_version, run_test, pre_release]
+    needs: [get_version, run_faucet_test, run_tests, pre_release]
     name: Review test and security scan result
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
@@ -197,7 +206,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: [get_version, run_test, pre_release, review]
+    needs: [get_version, run_faucet_test, run_tests, pre_release, review]
     name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
