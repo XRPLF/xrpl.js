@@ -29,6 +29,7 @@ export interface MPTAmount {
   value: string
 }
 
+// TODO: add MPTAmount to Amount once MPTv2 is released
 export type Amount = IssuedCurrencyAmount | string
 
 export type ClawbackAmount = IssuedCurrencyAmount | MPTAmount
