@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  printWarningsForMPTMetadata,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -178,5 +179,7 @@ export function validateMPTokenIssuanceCreate(
       )
     }
   }
+
+  printWarningsForMPTMetadata(tx.MPTokenMetadata)
 }
 /* eslint-enable max-lines-per-function */
