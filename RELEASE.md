@@ -48,7 +48,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 ---
 
 ### 2. **Run Tests**
-- Triggers the integration test workflow.
+- Triggers the facucet_test, nodejs workflow which will run unit test, intgration test, faucet test etc.
 - Ensures the code at the given Git ref passes tests.
 
 ---
