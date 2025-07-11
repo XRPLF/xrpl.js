@@ -162,7 +162,6 @@ export interface Payment extends BaseTransaction {
    */
   CredentialIDs?: string[]
   Flags?: number | PaymentFlagsInterface
-
   /**
    * The domain the sender intends to use. Both the sender and destination must
    * be part of this domain. The DomainID can be included if the sender intends
