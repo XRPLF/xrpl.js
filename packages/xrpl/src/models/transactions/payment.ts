@@ -8,7 +8,7 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
-  validateDomainID,
+  isDomainID,
   validateRequiredField,
   validateOptionalField,
   isNumber,
@@ -212,7 +212,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
   }
 
-  validateOptionalField(tx, 'DomainID', validateDomainID, {
+  validateOptionalField(tx, 'DomainID', isDomainID, {
     txType: 'PaymentTransaction',
     paramName: 'DomainID',
   })

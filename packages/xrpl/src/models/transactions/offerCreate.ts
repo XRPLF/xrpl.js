@@ -1,5 +1,6 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -7,7 +8,7 @@ import {
   validateBaseTransaction,
   isAmount,
   validateOptionalField,
-  validateDomainID,
+  isDomainID,
 } from './common'
 
 /**
@@ -151,22 +152,17 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('OfferCreate: invalid OfferSequence')
   }
 
-  validateOptionalField(tx, 'DomainID', validateDomainID, {
+  validateOptionalField(tx, 'DomainID', isDomainID, {
     txType: 'OfferCreate',
     paramName: 'DomainID',
   })
 
-  if (tx.DomainID === undefined) {
-    if (
-      (typeof tx.Flags === 'number' &&
-        // eslint-disable-next-line no-bitwise -- flags require bitwise operations
-        (tx.Flags & OfferCreateFlags.tfHybrid) !== 0) ||
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Flags are stored as a number or an interface
-      (tx.Flags as OfferCreateFlagsInterface).tfHybrid
-    ) {
-      throw new ValidationError(
-        'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
-      )
-    }
+  if (
+    tx.DomainID === undefined &&
+    hasFlag(tx, OfferCreateFlags.tfHybrid, 'tfHybrid')
+  ) {
+    throw new ValidationError(
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
   }
 }
