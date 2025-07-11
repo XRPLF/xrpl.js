@@ -30,7 +30,6 @@ export interface PathFindCreateRequest extends BasePathFindRequest {
    * about, or to check the overall cost to make a payment along a certain path.
    */
   paths?: Path[]
-
   /**
    * The object ID of a PermissionedDomain object. If this field is included,
    * then only valid paths for this domain will be returned.
