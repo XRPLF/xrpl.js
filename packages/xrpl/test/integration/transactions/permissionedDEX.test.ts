@@ -234,7 +234,20 @@ describe('PermissionedDEX', function () {
       assert.equal(offer_ledger_object.LedgerEntryType, 'Offer')
       assert.equal(offer_ledger_object.DomainID, pd_ledger_object.index)
       assert.equal(offer_ledger_object.Account, wallet1.classicAddress)
+
+      // Validate the contents and structure of the AdditionalBooks field
       assert.isNotNull(offer_ledger_object.AdditionalBooks)
+      assert.equal(offer_ledger_object.AdditionalBooks?.length, 1)
+      assert.isNotNull(offer_ledger_object.AdditionalBooks?.[0].Book.BookNode)
+
+      assert.isNotNull(
+        offer_ledger_object.AdditionalBooks?.[0].Book.BookDirectory,
+      )
+      // The book directory of the open-book is different from the book directory of the in-domain offer
+      assert.notEqual(
+        offer_ledger_object.AdditionalBooks?.[0].Book.BookDirectory,
+        offer_ledger_object.BookDirectory,
+      )
     },
     TIMEOUT,
   )

@@ -3,14 +3,16 @@ import { Amount } from '../common'
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface Book {
-  /** The ID of the offer directory that links to this offer. */
-  BookDirectory: string
+  Book: {
+    /** The ID of the offer directory that links to this offer. */
+    BookDirectory: string
 
-  /**
-   * A hint indicating which page of the offer directory links to this entry,
-   * in case the directory consists of multiple pages.
-   */
-  BookNode: string
+    /**
+     * A hint indicating which page of the offer directory links to this entry,
+     * in case the directory consists of multiple pages.
+     */
+    BookNode: string
+  }
 }
 
 export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
