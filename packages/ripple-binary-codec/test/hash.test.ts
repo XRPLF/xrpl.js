@@ -34,8 +34,8 @@ describe('Hash128', function () {
   })
 
   it(`throws when constructed from non-hexadecimal string`, () => {
-    expect(() => Hash128.from('Z'.repeat(16))).toThrow(
-      new Error('Invalid hash string ' + 'Z'.repeat(16)),
+    expect(() => Hash128.from('Z'.repeat(32))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(32)),
     )
   })
 })
@@ -64,8 +64,8 @@ describe('Hash160', function () {
   })
 
   it(`throws when constructed from non-hexadecimal string`, () => {
-    expect(() => Hash160.from('Z'.repeat(20))).toThrow(
-      new Error('Invalid hash string ' + 'Z'.repeat(20)),
+    expect(() => Hash160.from('Z'.repeat(40))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(40)),
     )
   })
 })
@@ -97,8 +97,8 @@ describe('Hash192', function () {
   })
 
   it(`throws when constructed from non-hexadecimal string`, () => {
-    expect(() => Hash192.from('Z'.repeat(24))).toThrow(
-      new Error('Invalid hash string ' + 'Z'.repeat(24)),
+    expect(() => Hash192.from('Z'.repeat(48))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(48)),
     )
   })
 })
@@ -125,8 +125,8 @@ describe('Hash256', function () {
   })
 
   it(`throws when constructed from non-hexadecimal string`, () => {
-    expect(() => Hash256.from('Z'.repeat(32))).toThrow(
-      new Error('Invalid hash string ' + 'Z'.repeat(32)),
+    expect(() => Hash256.from('Z'.repeat(64))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(64)),
     )
   })
 })
