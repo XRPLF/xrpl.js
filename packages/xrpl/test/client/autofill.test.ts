@@ -7,6 +7,7 @@ import {
   Payment,
   Transaction,
   Batch,
+  IssuedCurrencyAmount,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -22,6 +23,7 @@ const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
 
+// eslint-disable-next-line max-statements -- Required for test coverage.
 describe('client.autofill', function () {
   let testContext: XrplTestContext
   const AMOUNT = '1234'
@@ -98,7 +100,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields using amount objects', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = {
       currency: 'USD',
       value: AMOUNT,
@@ -124,7 +125,6 @@ describe('client.autofill', function () {
   })
 
   it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields using objects', async function () {
-    // @ts-expect-error -- DeliverMax is a non-protocol, RPC level field in Payment transactions
     paymentTx.DeliverMax = {
       currency: 'USD',
       value: '31415',
