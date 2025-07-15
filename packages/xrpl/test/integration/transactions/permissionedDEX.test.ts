@@ -42,9 +42,9 @@ describe('PermissionedDEX', function () {
   let testContext: XrplIntegrationTestContext
   let wallet1: Wallet
   let wallet2: Wallet
-  let pd_ledger_object: PermissionedDomain
+  let permDomainLedgerObject: PermissionedDomain
   let offerCreateTxResponse: SubmitResponse
-  let offer_ledger_object: Offer
+  let offerLedgerObject: Offer
 
   beforeAll(async () => {
     // this section describes the pre-requisites for testing PermissionedDEX features
@@ -134,7 +134,8 @@ describe('PermissionedDEX', function () {
       type: 'permissioned_domain',
     })
 
-    pd_ledger_object = result.result.account_objects[0] as PermissionedDomain
+    permDomainLedgerObject = result.result
+      .account_objects[0] as PermissionedDomain
 
     // wallet1 establishes a trust line for USD IOU Token
     await testTransaction(
@@ -210,7 +211,7 @@ describe('PermissionedDEX', function () {
           value: '10',
         },
         Flags: OfferCreateFlags.tfHybrid,
-        DomainID: pd_ledger_object.index,
+        DomainID: permDomainLedgerObject.index,
       } as OfferCreate,
       wallet1,
     )
@@ -223,7 +224,7 @@ describe('PermissionedDEX', function () {
     // eslint-disable-next-line max-statements -- this feature is complex and requires multiple assertions
     async () => {
       // Validate the domainID of the Offer ledger object
-      offer_ledger_object = (
+      offerLedgerObject = (
         await testContext.client.request({
           command: 'ledger_entry',
           offer: {
@@ -233,33 +234,33 @@ describe('PermissionedDEX', function () {
         })
       ).result.node as Offer
 
-      assert.equal(offer_ledger_object.LedgerEntryType, 'Offer')
-      assert.equal(offer_ledger_object.DomainID, pd_ledger_object.index)
-      assert.equal(offer_ledger_object.Account, wallet1.classicAddress)
+      assert.equal(offerLedgerObject.LedgerEntryType, 'Offer')
+      assert.equal(offerLedgerObject.DomainID, permDomainLedgerObject.index)
+      assert.equal(offerLedgerObject.Account, wallet1.classicAddress)
 
       // Validate the contents and structure of the AdditionalBooks field
-      assert.isNotNull(offer_ledger_object.AdditionalBooks)
-      assert.equal(offer_ledger_object.AdditionalBooks?.length, 1)
-      assert.isNotNull(offer_ledger_object.AdditionalBooks?.[0].Book.BookNode)
+      assert.isNotNull(offerLedgerObject.AdditionalBooks)
+      assert.equal(offerLedgerObject.AdditionalBooks?.length, 1)
+      assert.isNotNull(offerLedgerObject.AdditionalBooks?.[0].Book.BookNode)
 
       assert.isNotNull(
-        offer_ledger_object.AdditionalBooks?.[0].Book.BookDirectory,
+        offerLedgerObject.AdditionalBooks?.[0].Book.BookDirectory,
       )
       // The book directory of the open-book is different from the book directory of the in-domain offer
       assert.notEqual(
-        offer_ledger_object.AdditionalBooks?.[0].Book.BookDirectory,
-        offer_ledger_object.BookDirectory,
+        offerLedgerObject.AdditionalBooks?.[0].Book.BookDirectory,
+        offerLedgerObject.BookDirectory,
       )
 
       // Validate the properties of the DirectoryNode ledger object (contains the PermissionedDEX Offer object)
       const ledgerEntryResponse = await testContext.client.request({
         command: 'ledger_entry',
-        directory: offer_ledger_object.BookDirectory,
+        directory: offerLedgerObject.BookDirectory,
       })
 
       assert.equal(
         (ledgerEntryResponse.result.node as DirectoryNode).index,
-        offer_ledger_object.BookDirectory,
+        offerLedgerObject.BookDirectory,
       )
       assert.equal(
         (ledgerEntryResponse.result.node as DirectoryNode).LedgerEntryType,
@@ -267,7 +268,7 @@ describe('PermissionedDEX', function () {
       )
       assert.equal(
         (ledgerEntryResponse.result.node as DirectoryNode).DomainID,
-        pd_ledger_object.index,
+        permDomainLedgerObject.index,
       )
 
       // Validate the bookOffers method
@@ -282,7 +283,7 @@ describe('PermissionedDEX', function () {
           taker_gets: {
             currency: 'XRP',
           },
-          domain: pd_ledger_object.index,
+          domain: permDomainLedgerObject.index,
         } as BookOffersRequest)
 
       assert.equal(bookOffersResponse.result.offers.length, 1)
@@ -305,7 +306,7 @@ describe('PermissionedDEX', function () {
 
       assert.equal(
         bookOffersResponse.result.offers[0].DomainID,
-        pd_ledger_object.index,
+        permDomainLedgerObject.index,
       )
 
       // Validate the subscribe command
@@ -319,7 +320,7 @@ describe('PermissionedDEX', function () {
               issuer: testContext.wallet.classicAddress,
             },
             taker: wallet1.classicAddress,
-            domain: pd_ledger_object.index,
+            domain: permDomainLedgerObject.index,
           } as SubscribeBook,
         ],
       }
@@ -335,7 +336,7 @@ describe('PermissionedDEX', function () {
 
       // Validate the "crossing" of a PermissionedDEX Offer
       // wallet2 "crosses" the offer within the domain
-      const offerCrossTx: OfferCreate = {
+      const offerCreateTx: OfferCreate = {
         TransactionType: 'OfferCreate',
         Account: wallet2.classicAddress,
         TakerPays: '1000',
@@ -344,10 +345,10 @@ describe('PermissionedDEX', function () {
           issuer: testContext.wallet.classicAddress,
           value: '10',
         },
-        DomainID: pd_ledger_object.index,
+        DomainID: permDomainLedgerObject.index,
       }
 
-      await testTransaction(testContext.client, offerCrossTx, wallet2)
+      await testTransaction(testContext.client, offerCreateTx, wallet2)
 
       // Validate that Offer ledger objects are consumed in both wallets
       const wallet1Objects = await testContext.client.request({

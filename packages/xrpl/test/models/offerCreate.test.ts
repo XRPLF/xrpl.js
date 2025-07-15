@@ -90,7 +90,7 @@ describe('OfferCreate', function () {
   })
 
   it(`verfies valid offerCreate within permissioned domain`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Flags: 0,
       Expiration: 10,
@@ -105,7 +105,7 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
     } as any
 
-    assertValid(offer)
+    assertValid(offerTx)
   })
 
   it(`throws -- invalid DomainID type`, function () {

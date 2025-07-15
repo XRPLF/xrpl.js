@@ -161,7 +161,6 @@ export interface Payment extends BaseTransaction {
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
-  Flags?: number | PaymentFlagsInterface
   /**
    * The domain the sender intends to use. Both the sender and destination must
    * be part of this domain. The DomainID can be included if the sender intends
@@ -174,6 +173,7 @@ export interface Payment extends BaseTransaction {
    * during payment paths.
    */
   DomainID?: string
+  Flags?: number | PaymentFlagsInterface
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
