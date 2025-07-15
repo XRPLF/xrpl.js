@@ -275,7 +275,7 @@ export function isAmount(amount: unknown): amount is Amount {
  * @throws When the amounts are not valid.
  */
 export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
-  if(!isAmount(amount1) || !isAmount(amount2)) {
+  if (!isAmount(amount1) || !isAmount(amount2)) {
     throw new ValidationError('Invalid amount')
   }
 
@@ -283,7 +283,7 @@ export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
     return new BigNumber(amount1).eq(amount2)
   }
 
-  if (isIssuedCurrency(amount1) && isIssuedCurrency(amount2)) {
+  if (isIssuedCurrencyAmount(amount1) && isIssuedCurrencyAmount(amount2)) {
     return (
       amount1.currency === amount2.currency &&
       amount1.issuer === amount2.issuer &&

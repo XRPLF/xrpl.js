@@ -52,7 +52,6 @@ import type {
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
 import type { SubmittableTransaction } from '../models/transactions'
-import { areAmountsEqual } from '../models/transactions/common'
 import { convertTxFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
