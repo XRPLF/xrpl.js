@@ -243,7 +243,7 @@ class Client<
    * API Version used by the server this client is connected to
    *
    */
-  public apiVersion: APIVersion
+  public apiVersion: ClientAPIVersion
 
   /**
    * Creates a new Client with a websocket connection to a rippled server.
@@ -273,7 +273,9 @@ class Client<
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
 
-    this.apiVersion = options.apiVersion ?? DEFAULT_API_VERSION
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Necessary for avoiding type error
+    this.apiVersion = (options.apiVersion ??
+      DEFAULT_API_VERSION) as ClientAPIVersion
 
     this.connection = new Connection(server, options)
 
