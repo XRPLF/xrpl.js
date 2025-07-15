@@ -93,18 +93,22 @@ describe('Models Transactions Common', function () {
 
     it('throws error when one amount is invalid', function () {
       const invalidAmount2 = null
-      expect(() => {
-        areAmountsEqual(xrpAmount1, invalidAmount2)
-      }).toThrow(new ValidationError('Invalid amount'))
+      assert.throws(
+        () => areAmountsEqual(xrpAmount1, invalidAmount2),
+        ValidationError,
+        'Invalid amount',
+      )
     })
 
     it('throws error when both amounts are invalid', function () {
       const invalidAmount1 = { issuer: 'rIssuer1', value: '100' }
       const invalidAmount2 = { currency: 'USD', issuer: 'rIssuer1' }
 
-      expect(() => {
-        areAmountsEqual(invalidAmount1, invalidAmount2)
-      }).toThrow(new ValidationError('Invalid amount'))
+      assert.throws(
+        () => areAmountsEqual(invalidAmount1, invalidAmount2),
+        ValidationError,
+        'Invalid amount',
+      )
     })
   })
 })
