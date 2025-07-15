@@ -1,11 +1,14 @@
 import { ValidationError } from '../../errors'
+import { Amount } from '../common'
 import { isHex } from '../utils'
 
 import {
   Account,
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAccount,
+  isAmount,
+  isNumber,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -38,6 +41,10 @@ export enum NFTokenMintFlags {
    * issuer.
    */
   tfTransferable = 0x00000008,
+  /**
+   * If set, indicates that this NFT's URI can be modified.
+   */
+  tfMutable = 0x00000010,
 }
 
 /**
@@ -46,11 +53,12 @@ export enum NFTokenMintFlags {
  *
  * @category Transaction Flags
  */
-export interface NFTokenMintFlagsInterface extends GlobalFlags {
+export interface NFTokenMintFlagsInterface extends GlobalFlagsInterface {
   tfBurnable?: boolean
   tfOnlyXRP?: boolean
   tfTrustLine?: boolean
   tfTransferable?: boolean
+  tfMutable?: boolean
 }
 
 /**
@@ -99,12 +107,34 @@ export interface NFTokenMint extends BaseTransaction {
    * set to `undefined` value if you do not use it.
    */
   URI?: string | null
+  /**
+   * Indicates the amount expected for the Token.
+   *
+   * The amount can be zero. This would indicate that the account is giving
+   * the token away free, either to anyone at all, or to the account identified
+   * by the Destination field.
+   */
+  Amount?: Amount
+  /**
+   * Indicates the time after which the offer will no longer
+   * be valid. The value is the number of seconds since the
+   * Ripple Epoch.
+   */
+  Expiration?: number
+  /**
+   * If present, indicates that this offer may only be
+   * accepted by the specified account. Attempts by other
+   * accounts to accept this offer MUST fail.
+   */
+  Destination?: Account
   Flags?: number | NFTokenMintFlagsInterface
 }
 
 export interface NFTokenMintMetadata extends TransactionMetadataBase {
   // rippled 1.11.0 or later
   nftoken_id?: string
+  // if Amount is present
+  offer_id?: string
 }
 
 /**
@@ -135,4 +165,16 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
   if (tx.NFTokenTaxon == null) {
     throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
   }
+
+  if (tx.Amount == null) {
+    if (tx.Expiration != null || tx.Destination != null) {
+      throw new ValidationError(
+        'NFTokenMint: Amount is required when Expiration or Destination is present',
+      )
+    }
+  }
+
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'Destination', isAccount)
 }

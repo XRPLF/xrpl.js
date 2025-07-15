@@ -4,6 +4,7 @@ import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
+import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
@@ -13,9 +14,11 @@ import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
 import PayChannel from './PayChannel'
+import PermissionedDomain from './PermissionedDomain'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Ticket from './Ticket'
+import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -26,6 +29,7 @@ type LedgerEntry =
   | Bridge
   | Check
   | Credential
+  | Delegate
   | DepositPreauth
   | DirectoryNode
   | Escrow
@@ -35,9 +39,11 @@ type LedgerEntry =
   | Offer
   | Oracle
   | PayChannel
+  | PermissionedDomain
   | RippleState
   | SignerList
   | Ticket
+  | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
 
@@ -48,6 +54,7 @@ type LedgerEntryFilter =
   | 'bridge'
   | 'check'
   | 'credential'
+  | 'delegate'
   | 'deposit_preauth'
   | 'did'
   | 'directory'
@@ -61,9 +68,11 @@ type LedgerEntryFilter =
   | 'offer'
   | 'oracle'
   | 'payment_channel'
+  | 'permissioned_domain'
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'vault'
   | 'xchain_owned_create_account_claim_id'
   | 'xchain_owned_claim_id'
 

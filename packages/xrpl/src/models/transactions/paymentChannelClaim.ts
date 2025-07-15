@@ -2,9 +2,10 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   validateCredentialsList,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -72,7 +73,8 @@ export enum PaymentChannelClaimFlags {
  * // }
  * ```
  */
-export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
+export interface PaymentChannelClaimFlagsInterface
+  extends GlobalFlagsInterface {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
    * channel's immutable CancelAfter time.) Only the source address of the
@@ -150,9 +152,9 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
 
   validateCredentialsList(
     tx.CredentialIDs,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
+    tx.TransactionType,
     true,
+    MAX_AUTHORIZED_CREDENTIALS,
   )
 
   if (tx.Channel === undefined) {

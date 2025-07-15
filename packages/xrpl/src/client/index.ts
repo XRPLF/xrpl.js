@@ -40,8 +40,13 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
+  SimulateRequest,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
+import {
+  SimulateBinaryResponse,
+  SimulateJsonResponse,
+} from '../models/methods/simulate'
 import type {
   EventTypes,
   OnEventToListenerMap,
@@ -59,10 +64,12 @@ import {
 import {
   setValidAddresses,
   setNextValidSequenceNumber,
-  calculateFeePerTransactionType,
   setLatestValidatedLedgerSequence,
   checkAccountDeleteBlockers,
   txNeedsNetworkID,
+  autofillBatchTxn,
+  handleDeliverMax,
+  getTransactionFee,
 } from '../sugar/autofill'
 import { formatBalances } from '../sugar/balances'
 import {
@@ -657,8 +664,6 @@ class Client extends EventEmitter<EventTypes> {
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
-
-  // eslint-disable-next-line complexity -- handling Payment transaction API v2 requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -676,7 +681,7 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(calculateFeePerTransactionType(this, tx, signersCount))
+      promises.push(getTransactionFee(this, tx, signersCount))
     }
     if (tx.LastLedgerSequence == null) {
       promises.push(setLatestValidatedLedgerSequence(this, tx))
@@ -684,36 +689,49 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'AccountDelete') {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    if (tx.TransactionType === 'Batch') {
+      promises.push(autofillBatchTxn(this, tx))
+    }
     if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
-      if (tx.Amount == null) {
-        // If only DeliverMax is provided, use it to populate the Amount field
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-        // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
-        tx.Amount = tx.DeliverMax
-      }
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
-      if (tx.Amount != null && !areAmountsEqual(tx.Amount, tx.DeliverMax)) {
-        return Promise.reject(
-          new ValidationError(
-            'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-          ),
-        )
-      }
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-      delete tx.DeliverMax
+      handleDeliverMax(tx)
     }
 
     return Promise.all(promises).then(() => tx)
+  }
+
+  /**
+   * Simulates an unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
+   * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.binary - If true, return the metadata in a binary encoding.
+   *
+   * @returns A promise that contains SimulateResponse.
+   * @throws RippledError if the simulate request fails.
+   */
+
+  public async simulate<Binary extends boolean = false>(
+    transaction: SubmittableTransaction | string,
+    opts?: {
+      // If true, return the binary-encoded representation of the results.
+      binary?: Binary
+    },
+  ): Promise<
+    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
+  > {
+    // send request
+    const binary = opts?.binary ?? false
+    const request: SimulateRequest =
+      typeof transaction === 'string'
+        ? { command: 'simulate', tx_blob: transaction, binary }
+        : { command: 'simulate', tx_json: transaction, binary }
+    return this.request(request)
   }
 
   /**
@@ -805,7 +823,7 @@ class Client extends EventEmitter<EventTypes> {
    * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
    * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
    *
-   * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
+   * This is similar to `submit`, which does all of the above, but also waits to see if the transaction has been validated.
    * @param transaction - A transaction to autofill, sign & encode, and submit.
    * @param opts - (Optional) Options used to sign and submit a transaction.
    * @param opts.autofill - If true, autofill a transaction.
@@ -845,6 +863,12 @@ class Client extends EventEmitter<EventTypes> {
     }
 
     const response = await submitRequest(this, signedTx, opts?.failHard)
+
+    if (response.result.engine_result.startsWith('tem')) {
+      throw new XrplError(
+        `Transaction failed, ${response.result.engine_result}: ${response.result.engine_result_message}`,
+      )
+    }
 
     const txHash = hashes.hashSignedTx(signedTx)
     return waitForFinalTransactionOutcome(

@@ -34,8 +34,8 @@ describe('encode and decode using new types as a parameter', function () {
   it('can encode and decode a new Field', function () {
     const tx = { ...txJson, NewFieldDefinition: 10 }
 
-    // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Before updating the types, undefined fields will throw an error
+    expect(() => encode(tx)).toThrow()
 
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
@@ -72,8 +72,8 @@ describe('encode and decode using new types as a parameter', function () {
       ],
     }
 
-    // Before updating the types, undefined fields will be ignored on encode
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Before updating the types, undefined fields will throw an error
+    expect(() => encode(tx)).toThrow()
 
     // Normally this would be generated directly from rippled with something like `server_definitions`.
     // Added here to make it easier to see what is actually changing in the definitions.json file.
@@ -141,8 +141,8 @@ describe('encode and decode using new types as a parameter', function () {
       },
     ])
 
-    // Test that before updating the types this tx fails to decode correctly. Note that undefined fields are ignored on encode.
-    expect(decode(encode(tx))).not.toEqual(tx)
+    // Test that before updating the types this tx fails to decode correctly. Note that undefined fields will throw an error.
+    expect(() => encode(tx)).toThrow()
 
     class NewType extends UInt32 {
       // Should be the same as UInt32
@@ -155,6 +155,35 @@ describe('encode and decode using new types as a parameter', function () {
     const encoded = encode(tx, newDefs)
     expect(() => decode(encoded)).toThrow()
     const decoded = decode(encoded, newDefs)
+    expect(decoded).toEqual(tx)
+  })
+
+  it('removing PermissionValue does not break encoding/decoding', function () {
+    // Make a deep copy of definitions
+    const definitions = JSON.parse(JSON.stringify(normalDefinitionsJson))
+
+    const originalFieldsLength = definitions.FIELDS.length
+
+    // Remove PermissionValue from definitions
+    if (definitions.FIELDS) {
+      definitions.FIELDS = definitions.FIELDS.filter(
+        (fieldTuple: [string, object]) => fieldTuple[0] !== 'PermissionValue',
+      )
+    }
+
+    // Verify it was deleted
+    const expectedFieldsLength = originalFieldsLength - 1
+    expect(definitions.FIELDS.length).toBe(expectedFieldsLength)
+
+    // Create new custom definitions
+    const customDefs = new XrplDefinitions(definitions)
+
+    const tx = { ...txJson }
+
+    // It should encode and decode normally, even with PermissionValue missing
+    const encoded = encode(tx, customDefs)
+    const decoded = decode(encoded, customDefs)
+
     expect(decoded).toEqual(tx)
   })
 })

@@ -6,6 +6,7 @@
     "test": "lerna run test --stream",
     "test:browser": "lerna run test:browser --stream",
     "test:integration": "lerna run test:integration --stream",
+    "test:faucet": "lerna run test:faucet --stream",
     "lint": "lerna run lint --stream",
     "clean": "lerna run clean --stream",
     "build": "lerna run build --stream",

@@ -7,6 +7,7 @@ import AMM, { VoteSlot } from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
+import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
 import DID from './DID'
 import DirectoryNode from './DirectoryNode'
@@ -30,6 +31,7 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
+import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -43,6 +45,7 @@ export {
   Bridge,
   Check,
   Credential,
+  Delegate,
   DepositPreauth,
   DirectoryNode,
   DID,
@@ -73,7 +76,8 @@ export {
   SignerList,
   SignerListFlags,
   Ticket,
+  Vault,
+  VoteSlot,
   XChainOwnedClaimID,
   XChainOwnedCreateAccountClaimID,
-  VoteSlot,
 }

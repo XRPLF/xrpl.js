@@ -8,7 +8,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "npm run clean && npm run lint && npm run test && npm run test:browser && npm run build",
-    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
+    "clean": "rm -rf ./build ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "test": "jest --verbose",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "build": "run-s build:lib build:web",
@@ -29,7 +29,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.0",
+    "@xrplf/isomorphic": "^1.0.1",
     "ripple-keypairs": "^2.0.0"
   },
   "prettier": "@xrplf/prettier-config",

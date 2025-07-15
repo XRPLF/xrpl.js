@@ -8,31 +8,42 @@ import { ValidationError } from '../../errors'
 import {
   Amount,
   AuthorizeCredential,
+  ClawbackAmount,
   Currency,
+  IssuedCurrency,
   IssuedCurrencyAmount,
+  MPTAmount,
   Memo,
   Signer,
   XChainBridge,
-  MPTAmount,
 } from '../common'
-import { onlyHasFields } from '../utils'
+import { isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
-const MAX_CREDENTIALS_LIST_LENGTH = 8
+export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 
-function isMemo(obj: { Memo?: unknown }): boolean {
-  if (obj.Memo == null) {
+// Used for Vault transactions
+export const VAULT_DATA_MAX_BYTE_LENGTH = 256
+
+function isMemo(obj: unknown): obj is Memo {
+  if (!isRecord(obj)) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memo = obj.Memo as Record<string, unknown>
+
+  const memo = obj.Memo
+  if (!isRecord(memo)) {
+    return false
+  }
   const size = Object.keys(memo).length
-  const validData = memo.MemoData == null || typeof memo.MemoData === 'string'
+  const validData =
+    memo.MemoData == null || (isString(memo.MemoData) && isHex(memo.MemoData))
   const validFormat =
-    memo.MemoFormat == null || typeof memo.MemoFormat === 'string'
-  const validType = memo.MemoType == null || typeof memo.MemoType === 'string'
+    memo.MemoFormat == null ||
+    (isString(memo.MemoFormat) && isHex(memo.MemoFormat))
+  const validType =
+    memo.MemoType == null || (isString(memo.MemoType) && isHex(memo.MemoType))
 
   return (
     size >= 1 &&
@@ -46,20 +57,21 @@ function isMemo(obj: { Memo?: unknown }): boolean {
 
 const SIGNER_SIZE = 3
 
-function isSigner(obj: unknown): boolean {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const signerWrapper = obj as Record<string, unknown>
-
-  if (signerWrapper.Signer == null) {
+function isSigner(obj: unknown): obj is Signer {
+  if (!isRecord(obj)) {
     return false
   }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS and Signer is previously unknown
-  const signer = signerWrapper.Signer as Record<string, unknown>
+
+  const signer = obj.Signer
+  if (!isRecord(signer)) {
+    return false
+  }
+
   return (
     Object.keys(signer).length === SIGNER_SIZE &&
-    typeof signer.Account === 'string' &&
-    typeof signer.TxnSignature === 'string' &&
-    typeof signer.SigningPubKey === 'string'
+    isString(signer.Account) &&
+    isString(signer.TxnSignature) &&
+    isString(signer.SigningPubKey)
   )
 }
 
@@ -70,8 +82,14 @@ const XCHAIN_BRIDGE_SIZE = 4
 const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object'
+/**
+ * Verify the form and type of a Record/Object at runtime.
+ *
+ * @param value - The object to check the form and type of.
+ * @returns Whether the Record/Object is properly formed.
+ */
+export function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 /**
@@ -95,17 +113,49 @@ export function isNumber(num: unknown): num is number {
 }
 
 /**
+ * Checks whether the given value is a valid XRPL number string.
+ * Accepts integer, decimal, or scientific notation strings.
+ *
+ * Examples of valid input:
+ *   - "123"
+ *   - "-987.654"
+ *   - "+3.14e10"
+ *   - "-7.2e-9"
+ *
+ * @param value - The value to check.
+ * @returns True if value is a string that matches the XRPL number format, false otherwise.
+ */
+export function isXRPLNumber(value: unknown): value is XRPLNumber {
+  // Matches optional sign, digits, optional decimal, optional exponent (scientific)
+  // Allows leading zeros, but not empty string, lone sign, or missing digits
+  return (
+    typeof value === 'string' &&
+    /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/u.test(value.trim())
+  )
+}
+
+/**
+ * Verify the form and type of a Currency at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the Currency is properly formed.
+ */
+export function isCurrency(input: unknown): input is Currency {
+  return isString(input) || isIssuedCurrency(input)
+}
+
+/**
  * Verify the form and type of an IssuedCurrency at runtime.
  *
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrency is properly formed.
  */
-export function isCurrency(input: unknown): input is Currency {
+export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
   return (
     isRecord(input) &&
     ((Object.keys(input).length === ISSUE_SIZE &&
-      typeof input.issuer === 'string' &&
-      typeof input.currency === 'string') ||
+      isString(input.issuer) &&
+      isString(input.currency)) ||
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
         input.currency === 'XRP'))
   )
@@ -117,15 +167,15 @@ export function isCurrency(input: unknown): input is Currency {
  * @param input - The input to check the form and type of.
  * @returns Whether the IssuedCurrencyAmount is properly formed.
  */
-export function isIssuedCurrency(
+export function isIssuedCurrencyAmount(
   input: unknown,
 ): input is IssuedCurrencyAmount {
   return (
     isRecord(input) &&
     Object.keys(input).length === ISSUED_CURRENCY_SIZE &&
-    typeof input.value === 'string' &&
-    typeof input.issuer === 'string' &&
-    typeof input.currency === 'string'
+    isString(input.value) &&
+    isString(input.issuer) &&
+    isString(input.currency)
   )
 }
 
@@ -135,7 +185,9 @@ export function isIssuedCurrency(
  * @param input - The input to check the form and type of
  * @returns Whether the AuthorizeCredential is properly formed
  */
-function isAuthorizeCredential(input: unknown): input is AuthorizeCredential {
+export function isAuthorizeCredential(
+  input: unknown,
+): input is AuthorizeCredential {
   return (
     isRecord(input) &&
     isRecord(input.Credential) &&
@@ -161,9 +213,31 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
 }
 
 /**
+ * Type guard to verify if the input is a valid ClawbackAmount.
+ *
+ * A ClawbackAmount can be either an {@link IssuedCurrencyAmount} or an {@link MPTAmount}.
+ * This function checks if the input matches either type.
+ *
+ * @param input - The value to check for ClawbackAmount structure.
+ * @returns True if the input is an IssuedCurrencyAmount or MPTAmount, otherwise false.
+ */
+export function isClawbackAmount(input: unknown): input is ClawbackAmount {
+  return isIssuedCurrencyAmount(input) || isMPTAmount(input)
+}
+
+/**
  * Must be a valid account address
  */
 export type Account = string
+
+/**
+ * XRPL Number type represented as a string.
+ *
+ * This string can be an integer (e.g., "123"), a decimal (e.g., "123.45"),
+ * or in scientific notation (e.g., "1.23e5", "-4.56e-7").
+ * Used for fields that accept arbitrary-precision numbers in XRPL transactions and ledger objects.
+ */
+export type XRPLNumber = string
 
 /**
  * Verify a string is in fact a valid account address.
@@ -187,7 +261,7 @@ export function isAccount(account: unknown): account is Account {
 export function isAmount(amount: unknown): amount is Amount {
   return (
     typeof amount === 'string' ||
-    isIssuedCurrency(amount) ||
+    isIssuedCurrencyAmount(amount) ||
     isMPTAmount(amount)
   )
 }
@@ -201,13 +275,8 @@ export function isAmount(amount: unknown): amount is Amount {
  * @throws When the amounts are not valid.
  */
 export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
-  const isAmount1Invalid = !isAmount(amount1)
-  if (isAmount1Invalid || !isAmount(amount2)) {
-    throw new ValidationError(
-      `Amount: invalid field. Expected Amount but received ${JSON.stringify(
-        isAmount1Invalid ? amount1 : amount2,
-      )}`,
-    )
+  if(!isAmount(amount1) || !isAmount(amount2)) {
+    throw new ValidationError('Invalid amount')
   }
 
   if (isString(amount1) && isString(amount2)) {
@@ -243,10 +312,20 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
     isRecord(input) &&
     Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
     typeof input.LockingChainDoor === 'string' &&
-    isCurrency(input.LockingChainIssue) &&
+    isIssuedCurrency(input.LockingChainIssue) &&
     typeof input.IssuingChainDoor === 'string' &&
-    isCurrency(input.IssuingChainIssue)
+    isIssuedCurrency(input.IssuingChainIssue)
   )
+}
+
+/**
+ * Verify the form and type of an Array at runtime.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the Array is properly formed.
+ */
+export function isArray<T = unknown>(input: unknown): input is T[] {
+  return input != null && Array.isArray(input)
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
@@ -254,25 +333,39 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
 /**
  * Verify the form and type of a required type for a transaction at runtime.
  *
- * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param tx - The object input to check the form and type of.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param errorOpts.txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @throws ValidationError if the parameter is missing or invalid.
  */
-export function validateRequiredField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
-  if (tx[paramName] == null) {
+// eslint-disable-next-line max-params -- helper function
+export function validateRequiredField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
+  errorOpts: {
+    txType?: string
+    paramName?: string
+  } = {},
+): asserts tx is T & { [P in K]: V } {
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
+  if (tx[param] == null) {
     throw new ValidationError(
-      `${tx.TransactionType}: missing field ${paramName}`,
+      `${txType}: missing field ${String(paramNameStr)}`,
     )
   }
 
-  if (!checkValidity(tx[paramName])) {
+  if (!checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${txType}: invalid field ${String(paramNameStr)}`,
     )
   }
 }
@@ -281,31 +374,50 @@ export function validateRequiredField(
  * Verify the form and type of an optional type for a transaction at runtime.
  *
  * @param tx - The transaction input to check the form and type of.
- * @param paramName - The name of the transaction parameter.
+ * @param param - The object parameter.
  * @param checkValidity - The function to use to check the type.
- * @throws
+ * @param errorOpts - Extra values to make the error message easier to understand.
+ * @param errorOpts.txType - The transaction type throwing the error.
+ * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @throws ValidationError if the parameter is invalid.
  */
-export function validateOptionalField(
-  tx: Record<string, unknown>,
-  paramName: string,
-  checkValidity: (inp: unknown) => boolean,
-): void {
-  if (tx[paramName] !== undefined && !checkValidity(tx[paramName])) {
+// eslint-disable-next-line max-params -- helper function
+export function validateOptionalField<
+  T extends Record<string, unknown>,
+  K extends keyof T,
+  V,
+>(
+  tx: T,
+  param: K,
+  checkValidity: (inp: unknown) => inp is V,
+  errorOpts: {
+    txType?: string
+    paramName?: string
+  } = {},
+): asserts tx is T & { [P in K]: V | undefined } {
+  const paramNameStr = errorOpts.paramName ?? param
+  const txType = errorOpts.txType ?? tx.TransactionType
+  if (tx[param] !== undefined && !checkValidity(tx[param])) {
     throw new ValidationError(
-      `${tx.TransactionType}: invalid field ${paramName}`,
+      `${txType}: invalid field ${String(paramNameStr)}`,
     )
   }
 }
 
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- no global flags right now, so this is fine
-export interface GlobalFlags {}
+export enum GlobalFlags {
+  tfInnerBatchTxn = 0x40000000,
+}
+
+export interface GlobalFlagsInterface {
+  tfInnerBatchTxn?: boolean
+}
 
 /**
  * Every transaction has the same set of common fields.
  */
-export interface BaseTransaction {
+export interface BaseTransaction extends Record<string, unknown> {
   /** The unique address of the transaction sender. */
   Account: Account
   /**
@@ -333,7 +445,7 @@ export interface BaseTransaction {
    */
   AccountTxnID?: string
   /** Set of bit-flags for this transaction. */
-  Flags?: number | GlobalFlags
+  Flags?: number | GlobalFlagsInterface
   /**
    * Highest ledger index this transaction can appear in. Specifying this field
    * places a strict upper limit on how long the transaction can wait to be
@@ -376,6 +488,10 @@ export interface BaseTransaction {
    * The network id of the transaction.
    */
   NetworkID?: number
+  /**
+   * The delegate account that is sending the transaction.
+   */
+  Delegate?: Account
 }
 
 /**
@@ -386,7 +502,16 @@ export interface BaseTransaction {
  * @param common - An interface w/ common transaction fields.
  * @throws When the common param is malformed.
  */
-export function validateBaseTransaction(common: Record<string, unknown>): void {
+// eslint-disable-next-line max-statements, max-lines-per-function -- lines required for validation
+export function validateBaseTransaction(
+  common: unknown,
+): asserts common is BaseTransaction {
+  if (!isRecord(common)) {
+    throw new ValidationError(
+      'BaseTransaction: invalid, expected a valid object',
+    )
+  }
+
   if (common.TransactionType === undefined) {
     throw new ValidationError('BaseTransaction: missing field TransactionType')
   }
@@ -396,7 +521,9 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   }
 
   if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
-    throw new ValidationError('BaseTransaction: Unknown TransactionType')
+    throw new ValidationError(
+      `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
+    )
   }
 
   validateRequiredField(common, 'Account', isString)
@@ -409,18 +536,16 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
 
   validateOptionalField(common, 'LastLedgerSequence', isNumber)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const memos = common.Memos as Array<{ Memo?: unknown }> | undefined
-  if (memos !== undefined && !memos.every(isMemo)) {
+  const memos = common.Memos
+  if (memos != null && (!isArray(memos) || !memos.every(isMemo))) {
     throw new ValidationError('BaseTransaction: invalid Memos')
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-  const signers = common.Signers as Array<Record<string, unknown>> | undefined
+  const signers = common.Signers
 
   if (
-    signers !== undefined &&
-    (signers.length === 0 || !signers.every(isSigner))
+    signers != null &&
+    (!isArray(signers) || signers.length === 0 || !signers.every(isSigner))
   ) {
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
@@ -434,6 +559,15 @@ export function validateBaseTransaction(common: Record<string, unknown>): void {
   validateOptionalField(common, 'TxnSignature', isString)
 
   validateOptionalField(common, 'NetworkID', isNumber)
+
+  validateOptionalField(common, 'Delegate', isAccount)
+
+  const delegate = common.Delegate
+  if (delegate != null && delegate === common.Account) {
+    throw new ValidationError(
+      'BaseTransaction: Account and Delegate addresses cannot be the same',
+    )
+  }
 }
 
 /**
@@ -458,7 +592,9 @@ export function parseAmountValue(amount: unknown): number {
  * @param tx A CredentialType Transaction.
  * @throws when the CredentialType is malformed.
  */
-export function validateCredentialType(tx: Record<string, unknown>): void {
+export function validateCredentialType<
+  T extends BaseTransaction & Record<string, unknown>,
+>(tx: T): void {
   if (typeof tx.TransactionType !== 'string') {
     throw new ValidationError('Invalid TransactionType')
   }
@@ -496,25 +632,28 @@ export function validateCredentialType(tx: Record<string, unknown>): void {
  * @param credentials An array of credential IDs to check for errors
  * @param transactionType The transaction type to include in error messages
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
+ * @param maxCredentials The maximum length of the credentials array.
+ *        PermissionedDomainSet transaction uses 10, other transactions use 8.
  * @throws Validation Error if the formatting is incorrect
  */
-// eslint-disable-next-line max-lines-per-function -- separating logic further will add unnecessary complexity
+// eslint-disable-next-line max-params, max-lines-per-function -- separating logic further will add unnecessary complexity
 export function validateCredentialsList(
   credentials: unknown,
   transactionType: string,
   isStringID: boolean,
+  maxCredentials: number,
 ): void {
   if (credentials == null) {
     return
   }
-  if (!Array.isArray(credentials)) {
+  if (!isArray(credentials)) {
     throw new ValidationError(
       `${transactionType}: Credentials must be an array`,
     )
   }
-  if (credentials.length > MAX_CREDENTIALS_LIST_LENGTH) {
+  if (credentials.length > maxCredentials) {
     throw new ValidationError(
-      `${transactionType}: Credentials length cannot exceed ${MAX_CREDENTIALS_LIST_LENGTH} elements`,
+      `${transactionType}: Credentials length cannot exceed ${maxCredentials} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(
@@ -534,14 +673,49 @@ export function validateCredentialsList(
       )
     }
   })
-  if (containsDuplicates(credentials)) {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
+  if (containsDuplicates(credentials as string[] | AuthorizeCredential[])) {
     throw new ValidationError(
       `${transactionType}: Credentials cannot contain duplicate elements`,
     )
   }
 }
 
-function containsDuplicates(objectList: object[]): boolean {
-  const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
-  return objSet.size !== objectList.length
+// Type guard to ensure we're working with AuthorizeCredential[]
+// Note: This is not a rigorous type-guard. A more thorough solution would be to iterate over the array and check each item.
+function isAuthorizeCredentialArray(
+  list: AuthorizeCredential[] | string[],
+): list is AuthorizeCredential[] {
+  return typeof list[0] !== 'string'
+}
+
+/**
+ * Check if an array of objects contains any duplicates.
+ *
+ * @param objectList - Array of objects to check for duplicates
+ * @returns True if duplicates exist, false otherwise
+ */
+export function containsDuplicates(
+  objectList: AuthorizeCredential[] | string[],
+): boolean {
+  // Case-1: Process a list of string-IDs
+  if (typeof objectList[0] === 'string') {
+    const objSet = new Set(objectList.map((obj) => JSON.stringify(obj)))
+    return objSet.size !== objectList.length
+  }
+
+  // Case-2: Process a list of nested objects
+  const seen = new Set<string>()
+
+  if (isAuthorizeCredentialArray(objectList)) {
+    for (const item of objectList) {
+      const key = `${item.Credential.Issuer}-${item.Credential.CredentialType}`
+      if (seen.has(key)) {
+        return true
+      }
+      seen.add(key)
+    }
+  }
+
+  return false
 }

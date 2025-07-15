@@ -2,15 +2,41 @@
 
 ## Unreleased
 
+### Added
+* Support for `Single Asset Vault` (XLS-65)
+* Adds new `STNumber` serialization type.
+
+## 2.4.1 (2025-6-18)
+
+### Fixed
+* Adds conditional check for `PermissionValue` so custom definitions (based on previous v2.x versions) don't break.
+
+## 2.4.0 (2025-6-09)
+
+### Added
+* Support for `Account Permissions` and `Account Permission Delegation` (XLS-74d, XLS-75d).
+* Support for the `Batch` amendment (XLS-56).
+
+### Fixed
+* add `MPTCurrency` support in `Issue` (rippled internal type)
+* Throw an error during serialization if a field is unknown, rather than silently throwing it away.
+
+## 2.3.0 (2025-2-13)
+
+### Added
+* Support for the AMMClawback amendment (XLS-73)
+* Support for the Permissioned Domains amendment (XLS-80).
+
 ## 2.2.0 (2024-12-23)
 
 ### Added
-* Support for the Multi-Purpose Token amendment (XLS-33)
+* Support for the Multi-Purpose Token amendment (XLS-33).
 
 ## 2.1.0 (2024-06-03)
 
 ### Added
 * Support for the Price Oracles amendment (XLS-47).
+* Support for the `DynamicNFT` amendment (XLS-46)
 
 ### Fixed
 * Better error handling/error messages for serialization/deserialization errors.

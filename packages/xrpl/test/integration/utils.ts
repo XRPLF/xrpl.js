@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 import throttle from 'lodash/throttle'
@@ -13,7 +14,7 @@ import {
   ECDSA,
   AccountLinesRequest,
   IssuedCurrency,
-  Currency,
+  XRP,
 } from '../../src'
 import {
   AMMCreate,
@@ -231,6 +232,8 @@ export async function verifySubmittedTransaction(
  *               the server's sequence numbers. This is a fix to retry the transaction if it fails due to tefPAST_SEQ.
  * @param retry.count - How many times the request should be retried.
  * @param retry.delayMs - How long to wait between retries.
+ * @param errCode - When this parameter is defined, it signifies the transaction should fail with the expected
+ *                  errCode (e.g. tecNO_PERMISSION).
  * @returns The response of the transaction.
  */
 // eslint-disable-next-line max-params -- Test function, many params are needed
@@ -242,6 +245,7 @@ export async function testTransaction(
     count: number
     delayMs: number
   },
+  errCode?: string,
 ): Promise<SubmitResponse> {
   // Accept any un-validated changes.
 
@@ -255,6 +259,11 @@ export async function testTransaction(
 
   // check that the transaction was successful
   assert.equal(response.type, 'response')
+
+  if (errCode) {
+    assert.equal(errCode, response.result.engine_result)
+    return response
+  }
 
   if (response.result.engine_result !== 'tesSUCCESS') {
     // eslint-disable-next-line no-console -- See output
@@ -373,11 +382,14 @@ export async function getIOUBalance(
   return (await client.request(request)).result.lines[0].balance
 }
 
-export async function createAMMPool(client: Client): Promise<{
+export async function createAMMPool(
+  client: Client,
+  enableAMMClawback = false,
+): Promise<{
   issuerWallet: Wallet
   lpWallet: Wallet
-  asset: Currency
-  asset2: Currency
+  asset: XRP
+  asset2: IssuedCurrency
 }> {
   const lpWallet = await generateFundedWallet(client)
   const issuerWallet = await generateFundedWallet(client)
@@ -390,6 +402,16 @@ export async function createAMMPool(client: Client): Promise<{
   }
 
   await testTransaction(client, accountSetTx, issuerWallet)
+
+  if (enableAMMClawback) {
+    const accountSetTx2: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: issuerWallet.classicAddress,
+      SetFlag: AccountSetAsfFlags.asfAllowTrustLineClawback,
+    }
+
+    await testTransaction(client, accountSetTx2, issuerWallet)
+  }
 
   const trustSetTx: TrustSet = {
     TransactionType: 'TrustSet',
@@ -431,8 +453,8 @@ export async function createAMMPool(client: Client): Promise<{
 
   await testTransaction(client, ammCreateTx, lpWallet)
 
-  const asset: Currency = { currency: 'XRP' }
-  const asset2: Currency = {
+  const asset: XRP = { currency: 'XRP' }
+  const asset2: IssuedCurrency = {
     currency: currencyCode,
     issuer: issuerWallet.classicAddress,
   }
@@ -443,4 +465,17 @@ export async function createAMMPool(client: Client): Promise<{
     asset,
     asset2,
   }
+}
+
+export async function fetchAccountReserveFee(
+  client: Client,
+): Promise<string | null> {
+  const response = await client.request({ command: 'server_state' })
+  const fee = response.result.state.validated_ledger?.reserve_base
+
+  if (fee == null) {
+    return null
+  }
+
+  return new BigNumber(fee).dp(0, BigNumber.ROUND_CEIL).toString(10)
 }

@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateAccountDelete } from '../../src/models/transactions/accountDelete'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateAccountDelete)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateAccountDelete, message)
 
 /**
  * AccountDelete Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateAccountDelete } from '../../src/models/transactions/accountDele
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AccountDelete', function () {
-  let validAccountDelete
+  let validAccountDelete: any
 
   beforeEach(() => {
     validAccountDelete = {
@@ -23,60 +26,28 @@ describe('AccountDelete', function () {
       CredentialIDs: [
         'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A',
       ],
-    } as any
+    }
   })
   it(`verifies valid AccountDelete`, function () {
-    assert.doesNotThrow(() => validateAccountDelete(validAccountDelete))
+    assertValid(validAccountDelete)
   })
 
   it(`throws w/ missing Destination`, function () {
     validAccountDelete.Destination = undefined
     const errorMessage = 'AccountDelete: missing field Destination'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ invalid Destination`, function () {
     validAccountDelete.Destination = 65478965
     const errorMessage = 'AccountDelete: invalid field Destination'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
     validAccountDelete.DestinationTag = 'gvftyujnbv'
     const errorMessage = 'AccountDelete: invalid field DestinationTag'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
@@ -84,17 +55,7 @@ describe('AccountDelete', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
     const errorMessage = 'AccountDelete: Credentials must be an array'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws CredentialIDs length exceeds max length`, function () {
@@ -112,34 +73,14 @@ describe('AccountDelete', function () {
 
     const errorMessage =
       'AccountDelete: Credentials length cannot exceed 8 elements'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
     validAccountDelete.CredentialIDs = []
 
     const errorMessage = 'AccountDelete: Credentials cannot be an empty array'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ non-string CredentialIDs`, function () {
@@ -149,17 +90,7 @@ describe('AccountDelete', function () {
     ]
 
     const errorMessage = 'AccountDelete: Invalid Credentials ID list format'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ duplicate CredentialIDs`, function () {
@@ -170,16 +101,6 @@ describe('AccountDelete', function () {
 
     const errorMessage =
       'AccountDelete: Credentials cannot contain duplicate elements'
-
-    assert.throws(
-      () => validateAccountDelete(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(
-      () => validate(validAccountDelete),
-      ValidationError,
-      errorMessage,
-    )
+    assertInvalid(validAccountDelete, errorMessage)
   })
 })
