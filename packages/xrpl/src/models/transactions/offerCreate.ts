@@ -3,7 +3,7 @@ import { Amount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
 } from './common'
@@ -78,7 +78,7 @@ export enum OfferCreateFlags {
  * // }
  * ```
  */
-export interface OfferCreateFlagsInterface extends GlobalFlags {
+export interface OfferCreateFlagsInterface extends GlobalFlagsInterface {
   tfPassive?: boolean
   tfImmediateOrCancel?: boolean
   tfFillOrKill?: boolean

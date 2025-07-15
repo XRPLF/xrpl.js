@@ -3,7 +3,7 @@ import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   validateOptionalField,
   isString,
@@ -58,7 +58,8 @@ export enum MPTokenIssuanceCreateFlags {
  *
  * @category Transaction Flags
  */
-export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlags {
+export interface MPTokenIssuanceCreateFlagsInterface
+  extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
   tfMPTRequireAuth?: boolean
   tfMPTCanEscrow?: boolean
@@ -157,7 +158,9 @@ export function validateMPTokenIssuanceCreate(
 
   if (typeof tx.TransferFee === 'number') {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-    const flags = tx.Flags as number | MPTokenIssuanceCreateFlagsInterface
+    const flags = (tx.Flags ?? 0) as
+      | number
+      | MPTokenIssuanceCreateFlagsInterface
     const isTfMPTCanTransfer =
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)

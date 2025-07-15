@@ -3,7 +3,7 @@ import { IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
   validateBaseTransaction,
 } from './common'
@@ -77,7 +77,7 @@ export enum TrustSetFlags {
  * // }
  * ```
  */
-export interface TrustSetFlagsInterface extends GlobalFlags {
+export interface TrustSetFlagsInterface extends GlobalFlagsInterface {
   /**
    * Authorize the other party to hold currency issued by this account. (No
    * effect unless using the asfRequireAuth AccountSet flag.) Cannot be unset.

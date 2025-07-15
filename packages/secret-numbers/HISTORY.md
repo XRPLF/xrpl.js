@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES:
+* Renamed `build/xrplf-secret-numbers-latest.min.js` to `build/xrplf-secret-numbers-latest-min.js`.
+
 ## 1.0.0 (2024-02-01)
 
 ### BREAKING CHANGES:

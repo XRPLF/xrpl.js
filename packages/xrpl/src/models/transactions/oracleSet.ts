@@ -4,7 +4,9 @@ import { isHex } from '../utils'
 
 import {
   BaseTransaction,
+  isArray,
   isNumber,
+  isRecord,
   isString,
   validateBaseTransaction,
   validateOptionalField,
@@ -86,113 +88,108 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'AssetClass', isString)
 
   /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
-  validateRequiredField(tx, 'PriceDataSeries', (value) => {
-    if (!Array.isArray(value)) {
-      throw new ValidationError('OracleSet: PriceDataSeries must be an array')
-    }
+  validateRequiredField(
+    tx,
+    'PriceDataSeries',
+    (value: unknown): value is PriceData => {
+      if (!isArray(value)) {
+        throw new ValidationError('OracleSet: PriceDataSeries must be an array')
+      }
 
-    if (value.length > PRICE_DATA_SERIES_MAX_LENGTH) {
-      throw new ValidationError(
-        `OracleSet: PriceDataSeries must have at most ${PRICE_DATA_SERIES_MAX_LENGTH} PriceData objects`,
-      )
-    }
-
-    // TODO: add support for handling inner objects easier (similar to validateRequiredField/validateOptionalField)
-    for (const priceData of value) {
-      if (typeof priceData !== 'object') {
+      if (value.length > PRICE_DATA_SERIES_MAX_LENGTH) {
         throw new ValidationError(
-          'OracleSet: PriceDataSeries must be an array of objects',
+          `OracleSet: PriceDataSeries must have at most ${PRICE_DATA_SERIES_MAX_LENGTH} PriceData objects`,
         )
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if (priceData.PriceData == null) {
-        throw new ValidationError(
-          'OracleSet: PriceDataSeries must have a `PriceData` object',
-        )
-      }
+      // TODO: add support for handling inner objects easier (similar to validateRequiredField/validateOptionalField)
+      for (const priceData of value) {
+        if (!isRecord(priceData)) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must be an array of objects',
+          )
+        }
 
-      // check if priceData only has PriceData
-      if (Object.keys(priceData).length !== 1) {
-        throw new ValidationError(
-          'OracleSet: PriceDataSeries must only have a single PriceData object',
-        )
-      }
+        const priceDataInner = priceData.PriceData
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if (typeof priceData.PriceData.BaseAsset !== 'string') {
-        throw new ValidationError(
-          'OracleSet: PriceDataSeries must have a `BaseAsset` string',
-        )
-      }
+        if (!isRecord(priceDataInner)) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must have a `PriceData` object',
+          )
+        }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-      if (typeof priceData.PriceData.QuoteAsset !== 'string') {
-        throw new ValidationError(
-          'OracleSet: PriceDataSeries must have a `QuoteAsset` string',
-        )
-      }
+        // check if priceData only has PriceData
+        if (Object.keys(priceData).length !== 1) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must only have a single PriceData object',
+          )
+        }
 
-      // Either AssetPrice and Scale are both present or both excluded
-      if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        (priceData.PriceData.AssetPrice == null) !==
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        (priceData.PriceData.Scale == null)
-      ) {
-        throw new ValidationError(
-          'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present',
-        )
-      }
+        if (
+          priceDataInner.BaseAsset == null ||
+          typeof priceDataInner.BaseAsset !== 'string'
+        ) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must have a `BaseAsset` string',
+          )
+        }
 
-      /* eslint-disable @typescript-eslint/no-unsafe-member-access, max-depth --
-      we need to validate priceData.PriceData.AssetPrice value */
-      if ('AssetPrice' in priceData.PriceData) {
-        if (!isNumber(priceData.PriceData.AssetPrice)) {
-          if (typeof priceData.PriceData.AssetPrice !== 'string') {
-            throw new ValidationError(
-              'OracleSet: Field AssetPrice must be a string or a number',
-            )
-          }
-          if (!isHex(priceData.PriceData.AssetPrice)) {
-            throw new ValidationError(
-              'OracleSet: Field AssetPrice must be a valid hex string',
-            )
-          }
-          if (
-            priceData.PriceData.AssetPrice.length <
-              MINIMUM_ASSET_PRICE_LENGTH ||
-            priceData.PriceData.AssetPrice.length > MAXIMUM_ASSET_PRICE_LENGTH
-          ) {
-            throw new ValidationError(
-              `OracleSet: Length of AssetPrice field must be between ${MINIMUM_ASSET_PRICE_LENGTH} and ${MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
-            )
+        if (typeof priceDataInner.QuoteAsset !== 'string') {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must have a `QuoteAsset` string',
+          )
+        }
+
+        // Either AssetPrice and Scale are both present or both excluded
+        if (
+          (priceDataInner.AssetPrice == null) !==
+          (priceDataInner.Scale == null)
+        ) {
+          throw new ValidationError(
+            'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present',
+          )
+        }
+
+        /* eslint-disable max-depth --
+      we need to validate priceDataInner.AssetPrice value */
+        if ('AssetPrice' in priceDataInner) {
+          if (!isNumber(priceDataInner.AssetPrice)) {
+            if (typeof priceDataInner.AssetPrice !== 'string') {
+              throw new ValidationError(
+                'OracleSet: Field AssetPrice must be a string or a number',
+              )
+            }
+            if (!isHex(priceDataInner.AssetPrice)) {
+              throw new ValidationError(
+                'OracleSet: Field AssetPrice must be a valid hex string',
+              )
+            }
+            if (
+              priceDataInner.AssetPrice.length < MINIMUM_ASSET_PRICE_LENGTH ||
+              priceDataInner.AssetPrice.length > MAXIMUM_ASSET_PRICE_LENGTH
+            ) {
+              throw new ValidationError(
+                `OracleSet: Length of AssetPrice field must be between ${MINIMUM_ASSET_PRICE_LENGTH} and ${MAXIMUM_ASSET_PRICE_LENGTH} characters long`,
+              )
+            }
           }
         }
-      }
-      /* eslint-enable @typescript-eslint/no-unsafe-member-access, max-depth */
 
-      if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        'Scale' in priceData.PriceData &&
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        !isNumber(priceData.PriceData.Scale)
-      ) {
-        throw new ValidationError('OracleSet: invalid field Scale')
-      }
+        if ('Scale' in priceDataInner) {
+          if (!isNumber(priceDataInner.Scale)) {
+            throw new ValidationError('OracleSet: invalid field Scale')
+          }
 
-      if (
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        priceData.PriceData.Scale < 0 ||
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- we are validating the type
-        priceData.PriceData.Scale > SCALE_MAX
-      ) {
-        throw new ValidationError(
-          `OracleSet: Scale must be in range 0-${SCALE_MAX}`,
-        )
+          if (priceDataInner.Scale < 0 || priceDataInner.Scale > SCALE_MAX) {
+            throw new ValidationError(
+              `OracleSet: Scale must be in range 0-${SCALE_MAX}`,
+            )
+          }
+          /* eslint-enable max-depth */
+        }
       }
-    }
-    return true
-  })
+      return true
+    },
+  )
   /* eslint-enable max-statements, max-lines-per-function */
 }

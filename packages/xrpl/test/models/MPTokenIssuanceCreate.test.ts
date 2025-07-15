@@ -1,11 +1,13 @@
-import { assert } from 'chai'
+import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import {
-  convertStringToHex,
-  validate,
-  ValidationError,
-  MPTokenIssuanceCreateFlags,
-} from '../../src'
+import { MPTokenIssuanceCreateFlags } from '../../src'
+import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenIssuanceCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenIssuanceCreate, message)
 
 /**
  * MPTokenIssuanceCreate Transaction Verification Testing.
@@ -22,10 +24,10 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MPTokenMetadata: convertStringToHex('http://xrpl.org'),
+      MPTokenMetadata: stringToHex('http://xrpl.org'),
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceCreate))
+    assertValid(validMPTokenIssuanceCreate)
   })
 
   it(`throws w/ MPTokenMetadata being an empty string`, function () {
@@ -36,9 +38,8 @@ describe('MPTokenIssuanceCreate', function () {
       MPTokenMetadata: '',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
     )
   })
@@ -51,9 +52,8 @@ describe('MPTokenIssuanceCreate', function () {
       MPTokenMetadata: 'http://xrpl.org',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
     )
   })
@@ -65,11 +65,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '9223372036854775808',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: MaximumAmount out of range',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: MaximumAmount out of range')
 
     invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
@@ -77,11 +73,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '-1',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: Invalid MaximumAmount',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MaximumAmount')
 
     invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
@@ -89,11 +81,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '0x12',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: Invalid MaximumAmount',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MaximumAmount')
   })
 
   it(`throws w/ Invalid TransferFee`, function () {
@@ -103,9 +91,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: -1,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
@@ -115,9 +102,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: 50001,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
@@ -127,9 +113,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: 100,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
 
@@ -140,9 +125,8 @@ describe('MPTokenIssuanceCreate', function () {
       Flags: { tfMPTCanClawback: true },
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
   })

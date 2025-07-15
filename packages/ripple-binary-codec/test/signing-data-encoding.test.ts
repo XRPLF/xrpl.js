@@ -1,9 +1,10 @@
 import { XrplDefinitions } from '../src/enums/xrpl-definitions'
-const {
+import {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
-} = require('../src')
+  encodeForSigningBatch,
+} from '../src'
 
 const normalDefinitions = require('../src/enums/definitions.json')
 
@@ -124,8 +125,8 @@ describe('Signing data', function () {
       TransactionType: 'NotAPayment',
     }
 
-    expect(() => encodeForSigning(invalidTransactionType)).toThrowError(
-      /NotAPayment/u,
+    expect(() => encodeForSigning(invalidTransactionType)).toThrow(
+      new TypeError('Unable to interpret "TransactionType: NotAPayment".'),
     )
   })
 
@@ -242,6 +243,37 @@ describe('Signing data', function () {
         // amount as a uint64
         '00000000000003E8',
       ].join(''),
+    )
+  })
+
+  it('can create batch blob', function () {
+    const flags = 1
+    const txIDs = [
+      'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+      '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+    ]
+    const json = { flags, txIDs }
+    const actual = encodeForSigningBatch(json)
+    expect(actual).toBe(
+      [
+        // hash prefix
+        '42434800',
+        // flags
+        '00000001',
+        // txIds length
+        '00000002',
+        // txIds
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+      ].join(''),
+    )
+  })
+
+  it('encodeForSigningBatch fails on non-object', function () {
+    const flags = 1
+    // @ts-expect-error - testing invalid input for JS users
+    expect(() => encodeForSigningBatch(flags)).toThrow(
+      new Error('Need an object to encode a Batch transaction'),
     )
   })
 })

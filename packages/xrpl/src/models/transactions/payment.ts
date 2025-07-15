@@ -5,7 +5,7 @@ import { isFlagEnabled } from '../utils'
 import {
   BaseTransaction,
   isAmount,
-  GlobalFlags,
+  GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
   validateRequiredField,
@@ -14,6 +14,7 @@ import {
   Account,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  isArray,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -84,7 +85,7 @@ export enum PaymentFlags {
  * // }
  * ```
  */
-export interface PaymentFlagsInterface extends GlobalFlags {
+export interface PaymentFlagsInterface extends GlobalFlagsInterface {
   /**
    * Do not use the default path; only use paths included in the Paths field.
    * This is intended to force the transaction to take arbitrage opportunities.
@@ -119,6 +120,9 @@ export interface Payment extends BaseTransaction {
    * to this amount instead.
    */
   Amount: Amount | MPTAmount
+
+  DeliverMax?: Amount | MPTAmount
+
   /** The unique address of the account receiving the payment. */
   Destination: Account
   /**
@@ -186,8 +190,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
 
   validateCredentialsList(
     tx.CredentialIDs,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- known from base check
-    tx.TransactionType as string,
+    tx.TransactionType,
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
@@ -196,11 +199,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
   }
 
-  if (
-    tx.Paths !== undefined &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    !isPaths(tx.Paths as Array<Array<Record<string, unknown>>>)
-  ) {
+  if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
     throw new ValidationError('PaymentTransaction: invalid Paths')
   }
 
@@ -209,6 +208,12 @@ export function validatePayment(tx: Record<string, unknown>): void {
   }
 
   checkPartialPayment(tx)
+
+  if (tx.DeliverMax != null) {
+    throw new ValidationError(
+      'PaymentTransaction: Cannot have DeliverMax in a submitted transaction',
+    )
+  }
 }
 
 function checkPartialPayment(tx: Record<string, unknown>): void {
@@ -264,7 +269,10 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
   return false
 }
 
-function isPath(path: Array<Record<string, unknown>>): boolean {
+function isPath(path: unknown): path is Path {
+  if (!Array.isArray(path) || path.length === 0) {
+    return false
+  }
   for (const pathStep of path) {
     if (!isPathStep(pathStep)) {
       return false
@@ -273,13 +281,13 @@ function isPath(path: Array<Record<string, unknown>>): boolean {
   return true
 }
 
-function isPaths(paths: Array<Array<Record<string, unknown>>>): boolean {
-  if (!Array.isArray(paths) || paths.length === 0) {
+function isPaths(paths: unknown): paths is Path[] {
+  if (!isArray(paths) || paths.length === 0) {
     return false
   }
 
   for (const path of paths) {
-    if (!Array.isArray(path) || path.length === 0) {
+    if (!isArray(path) || path.length === 0) {
       return false
     }
 
