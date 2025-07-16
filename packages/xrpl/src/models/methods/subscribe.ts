@@ -39,6 +39,12 @@ export interface SubscribeBook {
   snapshot?: boolean
   /** If true, return both sides of the order book. The default is false. */
   both?: boolean
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then the offers will be filtered to only show the valid domain offers for
+   * that domain.
+   */
+  domain?: string
 }
 
 /**

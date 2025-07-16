@@ -1,4 +1,7 @@
-import { validateOfferCreate } from '../../src/models/transactions/offerCreate'
+import {
+  OfferCreateFlags,
+  validateOfferCreate,
+} from '../../src/models/transactions/offerCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateOfferCreate)
@@ -12,7 +15,7 @@ const assertInvalid = (tx: any, message: string): void =>
  */
 describe('OfferCreate', function () {
   it(`verifies valid OfferCreate`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
       Flags: 0,
@@ -33,7 +36,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     }
 
-    assertValid(offer)
+    assertValid(offerTx)
   })
 
   it(`verifies valid OfferCreate with flags`, function () {
@@ -86,8 +89,113 @@ describe('OfferCreate', function () {
     assertValid(offer3)
   })
 
+  it(`verfies valid offerCreate within permissioned domain`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: 0,
+      Expiration: 10,
+      DomainID:
+        '5D0177045A8750FC5892032A3BA15885B38A88BE315B7DF6A44BB24D67141180',
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertValid(offerTx)
+  })
+
+  it(`throws -- invalid DomainID type`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: { sampleDictKey: 1 },
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , exceeds expected length`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: '5'.repeat(65),
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , falls short of expected length`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      DomainID: '5'.repeat(63),
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+  })
+
+  it(`throws -- invalid flag (interface) specified without DomainID`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: OfferCreateFlags.tfHybrid,
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(
+      offerTx,
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
+  })
+
+  it(`throws -- invalid flag (number) specified without DomainID`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      Flags: 0x00100000,
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(
+      offerTx,
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
+  })
+
   it(`throws w/ invalid Expiration`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
       Flags: 0,
@@ -107,11 +215,11 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offer, 'OfferCreate: invalid Expiration')
+    assertInvalid(offerTx, 'OfferCreate: invalid Expiration')
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
       Flags: 0,
@@ -131,11 +239,11 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offer, 'OfferCreate: invalid OfferSequence')
+    assertInvalid(offerTx, 'OfferCreate: invalid OfferSequence')
   })
 
   it(`throws w/ invalid TakerPays`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
       Flags: 0,
@@ -151,11 +259,11 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offer, 'OfferCreate: invalid TakerPays')
+    assertInvalid(offerTx, 'OfferCreate: invalid TakerPays')
   })
 
   it(`throws w/ invalid TakerGets`, function () {
-    const offer = {
+    const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       Fee: '10',
       Flags: 0,
@@ -175,6 +283,6 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offer, 'OfferCreate: invalid TakerGets')
+    assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
   })
 })
