@@ -1,5 +1,5 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
+import { HEX_REGEX, hexToString } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -12,6 +12,7 @@ import {
   IssuedCurrency,
   IssuedCurrencyAmount,
   MPTAmount,
+  MPTokenMetadata,
   Memo,
   Signer,
   XChainBridge,
@@ -22,9 +23,45 @@ const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
+export const MAX_MPT_META_BYTE_LENGTH = 1024
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
+
+// To validate MPTokenMetadata as per XLS-89d
+const TICKER_REGEX = /^[A-Z0-9]{1,6}$/u
+
+const MPT_META_REQUIRED_FIELDS = [
+  'ticker',
+  'name',
+  'icon',
+  'asset_class',
+  'issuer_name',
+]
+
+const MPT_META_ASSET_CLASSES = [
+  'rwa',
+  'memes',
+  'wrapped',
+  'gaming',
+  'defi',
+  'other',
+]
+
+const MPT_META_ASSET_SUB_CLASSES = [
+  'stablecoin',
+  'commodity',
+  'real_estate',
+  'private_credit',
+  'equity',
+  'treasury',
+  'other',
+]
+
+export const MPT_META_WARNING_HEADER =
+  'MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. ' +
+  "While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable " +
+  'by Explorers and Indexers in the XRPL ecosystem.'
 
 function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
@@ -682,4 +719,171 @@ export function containsDuplicates(
   }
 
   return false
+}
+
+/* eslint-disable max-lines-per-function -- Required here as structure validation is verbose. */
+/* eslint-disable max-statements -- Required here as structure validation is verbose. */
+
+/**
+ * Get validation messages if MPTokenMetadata does not adhere to XLS-89d standard.
+ *
+ * @param input - hex encoded MPTokenMetadata.
+ * @returns validation error messages. Empty list if the MPTokenMetadata adheres to XLS-89d standard.
+ */
+export function getValidationMessagesForMPTokenMetadata(input: string): {
+  isValid: boolean
+  validationMessages: string[]
+} {
+  const validationMessages: string[] = []
+
+  if (!isHex(input) || input.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
+    validationMessages.push(
+      `MPTokenMetadata must be in hex format and max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
+    return { validationMessages, isValid: false }
+  }
+
+  let jsonMetaData: unknown
+
+  try {
+    jsonMetaData = JSON.parse(hexToString(input))
+  } catch (_err) {
+    validationMessages.push(
+      'MPTokenMetadata is not properly formatted as JSON.',
+    )
+    return { validationMessages, isValid: false }
+  }
+
+  if (
+    !(
+      jsonMetaData != null &&
+      typeof jsonMetaData === 'object' &&
+      !Array.isArray(jsonMetaData)
+    )
+  ) {
+    validationMessages.push(
+      'MPTokenMetadata is not properly formatted as JSON.',
+    )
+    return { validationMessages, isValid: false }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It must be some JSON object.
+  const obj = jsonMetaData as Record<string, unknown>
+
+  // validating structure
+  const incorrectRequiredFields = MPT_META_REQUIRED_FIELDS.filter(
+    (field) => !isString(obj[field]),
+  )
+
+  if (incorrectRequiredFields.length > 0) {
+    incorrectRequiredFields.forEach((field) =>
+      validationMessages.push(`${field} is required and must be string.`),
+    )
+    return { validationMessages, isValid: false }
+  }
+
+  if (obj.desc != null && !isString(obj.desc)) {
+    validationMessages.push(`desc must be a string.`)
+    return { validationMessages, isValid: false }
+  }
+
+  if (obj.asset_subclass != null && !isString(obj.asset_subclass)) {
+    validationMessages.push(`asset_subclass must be a string.`)
+    return { validationMessages, isValid: false }
+  }
+
+  if (
+    obj.additional_info != null &&
+    !(
+      isString(obj.additional_info) ||
+      (typeof obj.additional_info === 'object' &&
+        !Array.isArray(obj.additional_info))
+    )
+  ) {
+    validationMessages.push(`additional_info must be a string or JSON object.`)
+    return { validationMessages, isValid: false }
+  }
+
+  if (
+    obj.urls != null &&
+    (!Array.isArray(obj.urls) ||
+      !obj.urls.every(isValidMPTokenMetadataUrlStructure))
+  ) {
+    validationMessages.push(
+      `urls field is not properly structured as per the XLS-89d standard.`,
+    )
+    return { validationMessages, isValid: false }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
+  const mptMPTokenMetadata = obj as unknown as MPTokenMetadata
+
+  // validating content
+  if (!TICKER_REGEX.test(mptMPTokenMetadata.ticker)) {
+    validationMessages.push(
+      `ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.`,
+    )
+  }
+
+  if (!mptMPTokenMetadata.icon.startsWith('https://')) {
+    validationMessages.push(`icon should be a valid https url.`)
+  }
+
+  if (
+    !MPT_META_ASSET_CLASSES.includes(
+      mptMPTokenMetadata.asset_class.toLowerCase(),
+    )
+  ) {
+    validationMessages.push(
+      `asset_class should be one of ${MPT_META_ASSET_CLASSES.join(', ')}.`,
+    )
+  }
+
+  if (
+    mptMPTokenMetadata.asset_subclass != null &&
+    !MPT_META_ASSET_SUB_CLASSES.includes(
+      mptMPTokenMetadata.asset_subclass.toLowerCase(),
+    )
+  ) {
+    validationMessages.push(
+      `asset_subclass should be one of ${MPT_META_ASSET_SUB_CLASSES.join(
+        ', ',
+      )}.`,
+    )
+  }
+
+  if (
+    mptMPTokenMetadata.asset_class.toLowerCase() === 'rwa' &&
+    mptMPTokenMetadata.asset_subclass == null
+  ) {
+    validationMessages.push(
+      `asset_subclass is required when asset_class is rwa.`,
+    )
+  }
+
+  if (
+    mptMPTokenMetadata.urls != null &&
+    !mptMPTokenMetadata.urls.every((ele) => ele.url.startsWith('https://'))
+  ) {
+    validationMessages.push(`url should be a valid https url.`)
+  }
+
+  return { validationMessages, isValid: validationMessages.length === 0 }
+}
+/* eslint-enable max-lines-per-function */
+/* eslint-enable max-statements */
+
+function isValidMPTokenMetadataUrlStructure(input: unknown): boolean {
+  if (input == null) {
+    return false
+  }
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
+  const obj = input as Record<string, unknown>
+
+  return (
+    typeof obj === 'object' &&
+    isString(obj.url) &&
+    isString(obj.type) &&
+    isString(obj.title)
+  )
 }

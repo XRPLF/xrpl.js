@@ -1,6 +1,3 @@
-/* eslint-disable max-lines -- required here due to extensive type checks */
-import { hexToString } from '@xrplf/isomorphic/utils'
-
 import { ValidationError } from '../../errors'
 import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
 
@@ -11,40 +8,15 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  getValidationMessagesForMPTokenMetadata,
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
 const MAX_TRANSFER_FEE = 50000
-const TICKER_REGEX = /^[A-Z0-9]{1,6}$/u
-
-const MPT_META_REQUIRED_FIELDS = [
-  'ticker',
-  'name',
-  'icon',
-  'asset_class',
-  'issuer_name',
-]
-
-const MPT_META_ASSET_CLASSES = [
-  'rwa',
-  'memes',
-  'wrapped',
-  'gaming',
-  'defi',
-  'other',
-]
-
-const MPT_META_ASSET_SUB_CLASSES = [
-  'stablecoin',
-  'commodity',
-  'real_estate',
-  'private_credit',
-  'equity',
-  'treasury',
-  'other',
-]
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -97,30 +69,6 @@ export interface MPTokenIssuanceCreateFlagsInterface
   tfMPTCanTrade?: boolean
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
-}
-
-/**
- * MPTokenMetadata object as per the XLS-89d standard.
- */
-export interface MPTokenMetadata {
-  ticker: string
-  name: string
-  desc?: string
-  icon: string
-  asset_class: string
-  asset_subclass?: string
-  issuer_name: string
-  urls?: MPTokenMetadataUrl[]
-  additional_info?: string
-}
-
-/**
- * MPTokenMetadataUrl object as per the XLS-89d standard.
- */
-export interface MPTokenMetadataUrl {
-  url: string
-  type: string
-  title: string
 }
 
 /**
@@ -186,15 +134,13 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 
-  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
+  if (
+    typeof tx.MPTokenMetadata === 'string' &&
+    (!isHex(tx.MPTokenMetadata) ||
+      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+  ) {
     throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
-    )
-  }
-
-  if (typeof tx.MPTokenMetadata === 'string' && !isHex(tx.MPTokenMetadata)) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+      `MPTokenIssuanceCreate: MPTokenMetadata must be in hex format and max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   }
 
@@ -234,163 +180,18 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  logWarningsForMPTMetadata(tx.MPTokenMetadata)
-}
-/* eslint-enable max-lines-per-function */
+  if (tx.MPTokenMetadata != null) {
+    const result = getValidationMessagesForMPTokenMetadata(tx.MPTokenMetadata)
 
-/* eslint-disable max-lines-per-function -- Required here as structure validation is verbose. */
-/* eslint-disable max-statements -- Required here as structure validation is verbose. */
-/* eslint-disable no-console -- This function is meant to print console warnings. */
-/**
- * Logs warning messages if MPTokenMetadata does not adhere to XLS-89d standard.
- *
- * @param input - hex encoded MPTokenMetadata.
- *
- */
-function logWarningsForMPTMetadata(input?: string): void {
-  if (input == null) {
-    return
-  }
+    if (!result.isValid) {
+      const message = [
+        MPT_META_WARNING_HEADER,
+        ...result.validationMessages,
+      ].join('\n')
 
-  let jsonMetaData: unknown
-
-  try {
-    jsonMetaData = JSON.parse(hexToString(input))
-  } catch (_err) {
-    console.warn(
-      'MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. ',
-    )
-    return
-  }
-
-  if (
-    !(
-      jsonMetaData != null &&
-      typeof jsonMetaData === 'object' &&
-      !Array.isArray(jsonMetaData)
-    )
-  ) {
-    console.warn(
-      'MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. ',
-    )
-    return
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It must be some JSON object.
-  const obj = jsonMetaData as Record<string, unknown>
-
-  // validating structure
-  const incorrectRequiredFields = MPT_META_REQUIRED_FIELDS.filter(
-    (field) => !isString(obj[field]),
-  )
-
-  if (incorrectRequiredFields.length > 0) {
-    incorrectRequiredFields.forEach((field) =>
-      console.warn(`${field} is required and must be string.`),
-    )
-    return
-  }
-
-  if (obj.desc != null && !isString(obj.desc)) {
-    console.warn(`desc must be a string.`)
-    return
-  }
-
-  if (obj.asset_subclass != null && !isString(obj.asset_subclass)) {
-    console.warn(`asset_subclass must be a string.`)
-    return
-  }
-
-  if (
-    obj.additional_info != null &&
-    !(
-      isString(obj.additional_info) ||
-      (typeof obj.additional_info === 'object' &&
-        !Array.isArray(obj.additional_info))
-    )
-  ) {
-    console.warn(`additional_info must be a string or JSON object.`)
-    return
-  }
-
-  if (
-    obj.urls != null &&
-    (!Array.isArray(obj.urls) ||
-      !obj.urls.every(isValidMPTokenMetadataUrlStructure))
-  ) {
-    console.warn(
-      `urls field is not properly structured as per the XLS-89d standard.`,
-    )
-    return
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- The structure is validated above.
-  const mptMPTokenMetadata = obj as unknown as MPTokenMetadata
-
-  // validating content
-  if (!TICKER_REGEX.test(mptMPTokenMetadata.ticker)) {
-    console.warn(
-      `ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.`,
-    )
-  }
-
-  if (!mptMPTokenMetadata.icon.startsWith('https://')) {
-    console.warn(`icon should be a valid https url.`)
-  }
-
-  if (
-    !MPT_META_ASSET_CLASSES.includes(
-      mptMPTokenMetadata.asset_class.toLowerCase(),
-    )
-  ) {
-    console.warn(
-      `asset_class should be one of ${MPT_META_ASSET_CLASSES.join(', ')}.`,
-    )
-  }
-
-  if (
-    mptMPTokenMetadata.asset_subclass != null &&
-    !MPT_META_ASSET_SUB_CLASSES.includes(
-      mptMPTokenMetadata.asset_subclass.toLowerCase(),
-    )
-  ) {
-    console.warn(
-      `asset_subclass should be one of ${MPT_META_ASSET_SUB_CLASSES.join(
-        ', ',
-      )}.`,
-    )
-  }
-
-  if (
-    mptMPTokenMetadata.asset_class.toLowerCase() === 'rwa' &&
-    mptMPTokenMetadata.asset_subclass == null
-  ) {
-    console.warn(`asset_subclass is required when asset_class is rwa.`)
-  }
-
-  if (
-    mptMPTokenMetadata.urls != null &&
-    !mptMPTokenMetadata.urls.every((ele) => ele.url.startsWith('https://'))
-  ) {
-    console.warn(`url should be a valid https url.`)
+      // eslint-disable-next-line no-console -- Required here.
+      console.warn(message)
+    }
   }
 }
 /* eslint-enable max-lines-per-function */
-/* eslint-enable max-statements */
-/* eslint-enable no-console */
-
-function isValidMPTokenMetadataUrlStructure(input: unknown): boolean {
-  if (input == null) {
-    return false
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
-  const obj = input as Record<string, unknown>
-
-  return (
-    typeof obj === 'object' &&
-    isString(obj.url) &&
-    isString(obj.type) &&
-    isString(obj.title)
-  )
-}

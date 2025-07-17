@@ -61,6 +61,7 @@
       }
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "ticker is required and must be string."
     ]
   },
@@ -75,6 +76,7 @@
       "issuer_name": "Issuer"
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
     ]
   },
@@ -89,6 +91,7 @@
       "issuer_name": "Issuer"
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "icon should be a valid https url."
     ]
   },
@@ -103,6 +106,7 @@
       "issuer_name": "Issuer"
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "asset_class should be one of rwa, memes, wrapped, gaming, defi, other."
     ]
   },
@@ -117,6 +121,7 @@
       "issuer_name": "Issuer"
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "asset_subclass should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
     ]
   },
@@ -130,6 +135,7 @@
       "issuer_name": "Issuer"
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "asset_subclass is required when asset_class is rwa."
     ]
   },
@@ -151,6 +157,7 @@
       ]
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "url should be a valid https url."
     ]
   },
@@ -168,6 +175,7 @@
       ]
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "additional_info must be a string or JSON object."
     ]
   },
@@ -197,6 +205,7 @@
       }
     },
     "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
       "ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
       "icon should be a valid https url.",
       "asset_class should be one of rwa, memes, wrapped, gaming, defi, other.",
@@ -207,11 +216,21 @@
   {
     "testName": "null mptMetadata",
     "mptMetadata": null,
-    "warningsMessages": []
+    "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
+      "MPTokenMetadata is not properly formatted as JSON."
+    ]
   },
   {
     "testName": "empty mptMetadata",
     "mptMetadata": {},
-    "warningsMessages": []
+    "warningsMessages": [
+      "MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable by Explorers and Indexers in the XRPL ecosystem.",
+      "ticker is required and must be string.",
+      "name is required and must be string.",
+      "icon is required and must be string.",
+      "asset_class is required and must be string.",
+      "issuer_name is required and must be string."
+    ]
   }
 ]

@@ -48,7 +48,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format and max 1024 bytes.',
     )
   })
 
@@ -143,6 +143,7 @@ describe('MPTokenIssuanceCreate', function () {
 /**
  * MPTokenMetadata warnings tests.
  */
+/* eslint-disable no-console -- Require to test console warnings  */
 describe('MPTokenMetadata warnings', function () {
   beforeEach(() => {
     jest.spyOn(console, 'warn')
@@ -163,12 +164,14 @@ describe('MPTokenMetadata warnings', function () {
 
       assertValid(validMPTokenIssuanceCreate)
 
-      for (const expected of testCase.warningsMessages) {
-        // eslint-disable-next-line no-console -- We are testing for console warnings here.
+      if (testCase.warningsMessages.length === 0) {
+        expect(console.warn).toHaveBeenCalledTimes(0)
+      } else {
         expect(console.warn).toHaveBeenCalledWith(
-          expect.stringContaining(expected),
+          expect.stringContaining(testCase.warningsMessages.join('\n')),
         )
       }
     })
   }
 })
+/* eslint-enable no-console  */
