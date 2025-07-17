@@ -1,5 +1,5 @@
 const { merge } = require('webpack-merge')
-const { webpackForTest } = require('../../../weback.test.config')
+const { webpackForTest } = require('../../../webpack.test.config')
 
 module.exports = merge(
   require('../webpack.base.config'),
