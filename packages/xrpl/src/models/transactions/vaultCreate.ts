@@ -72,6 +72,12 @@ export interface VaultCreate extends BaseTransaction {
 
   /**
    * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
+   *
+   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
+   * XLS-89d MPTokenMetadata standard.
+   *
+   * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
+   * may not be discoverable by ecosystem tools such as explorers and indexers.
    */
   MPTokenMetadata?: string
 

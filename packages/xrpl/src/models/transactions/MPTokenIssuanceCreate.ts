@@ -107,10 +107,18 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
    * The field must NOT be present if the `tfMPTCanTransfer` flag is not set.
    */
   TransferFee?: number
+
   /**
-   * Arbitrary metadata about this issuance, in hex format.
+   * Optional arbitrary metadata about this issuance, encoded as a hex string and limited to 1024 bytes.
+   *
+   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
+   * XLS-89d MPTokenMetadata standard.
+   *
+   * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
+   * may not be discoverable by ecosystem tools such as explorers and indexers.
    */
   MPTokenMetadata?: string | null
+
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
 

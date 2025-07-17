@@ -32,6 +32,12 @@ describe('Hash128', function () {
       new Error('Invalid Hash length 17'),
     )
   })
+
+  it(`throws when constructed from non-hexadecimal string`, () => {
+    expect(() => Hash128.from('Z'.repeat(32))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(32)),
+    )
+  })
 })
 describe('Hash160', function () {
   it('has a static width member', function () {
@@ -55,6 +61,12 @@ describe('Hash160', function () {
     expect(() =>
       Hash160.from('100000000000000000000000000000000000000000'),
     ).toThrow(new Error('Invalid Hash length 21'))
+  })
+
+  it(`throws when constructed from non-hexadecimal string`, () => {
+    expect(() => Hash160.from('Z'.repeat(40))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(40)),
+    )
   })
 })
 
@@ -83,6 +95,12 @@ describe('Hash192', function () {
       Hash192.from('10000000000000000000000000000000000000000000000000'),
     ).toThrow(new Error('Invalid Hash length 25'))
   })
+
+  it(`throws when constructed from non-hexadecimal string`, () => {
+    expect(() => Hash192.from('Z'.repeat(48))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(48)),
+    )
+  })
 })
 
 describe('Hash256', function () {
@@ -104,6 +122,12 @@ describe('Hash256', function () {
     expect(h.nibblet(3)).toBe(0x9)
     expect(h.nibblet(4)).toBe(0x0b)
     expect(h.nibblet(5)).toBe(0xd)
+  })
+
+  it(`throws when constructed from non-hexadecimal string`, () => {
+    expect(() => Hash256.from('Z'.repeat(64))).toThrow(
+      new Error('Invalid hash string ' + 'Z'.repeat(64)),
+    )
   })
 })
 
