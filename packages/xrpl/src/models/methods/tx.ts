@@ -89,7 +89,7 @@ export interface TxResponse<
            * Can be undefined if a transaction has not been validated yet. This field is omitted if binary
            * binary format is not requested.
            */
-          meta_blob: string
+          meta_blob?: string
         }
       : {
           tx_json: T
@@ -97,7 +97,7 @@ export interface TxResponse<
            * Transaction metadata, which describes the results of the transaction.
            * Can be undefined if a transaction has not been validated yet.
            */
-          meta: TransactionMetadata<T>
+          meta?: TransactionMetadata<T>
         })
   /**
    * If true, the server was able to search all of the specified ledger
@@ -127,14 +127,7 @@ export interface TxV1Response<
            */
           meta: string
         }
-      : {
-          tx_json: T
-          /**
-           * Transaction metadata, which describes the results of the transaction.
-           * Can be undefined if a transaction has not been validated yet.
-           */
-          meta: TransactionMetadata<T>
-        })
+      : T & { meta?: TransactionMetadata<T> })
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did
