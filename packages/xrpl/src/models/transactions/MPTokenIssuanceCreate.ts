@@ -8,9 +8,9 @@ import {
   validateOptionalField,
   isString,
   isNumber,
-  getValidationMessagesForMPTokenMetadata,
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -181,12 +181,12 @@ export function validateMPTokenIssuanceCreate(
   }
 
   if (tx.MPTokenMetadata != null) {
-    const result = getValidationMessagesForMPTokenMetadata(tx.MPTokenMetadata)
+    const result = validateMPTokenMetadata(tx.MPTokenMetadata)
 
     if (!result.isValid) {
       const message = [
         MPT_META_WARNING_HEADER,
-        ...result.validationMessages,
+        ...result.validationMessages.map((msg) => `- ${msg}`),
       ].join('\n')
 
       // eslint-disable-next-line no-console -- Required here.

@@ -725,12 +725,12 @@ export function containsDuplicates(
 /* eslint-disable max-statements -- Required here as structure validation is verbose. */
 
 /**
- * Get validation messages if MPTokenMetadata does not adhere to XLS-89d standard.
+ * Validates if MPTokenMetadata adheres to XLS-89d standard.
  *
- * @param input - hex encoded MPTokenMetadata.
- * @returns validation error messages. Empty list if the MPTokenMetadata adheres to XLS-89d standard.
+ * @param input - Hex encoded MPTokenMetadata.
+ * @returns Validation error messages and boolean denoting if MPTokenMetadata adheres to XLS-89d standard.
  */
-export function getValidationMessagesForMPTokenMetadata(input: string): {
+export function validateMPTokenMetadata(input: string): {
   isValid: boolean
   validationMessages: string[]
 } {

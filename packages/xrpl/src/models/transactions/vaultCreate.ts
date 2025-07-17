@@ -15,8 +15,8 @@ import {
   XRPLNumber,
   isXRPLNumber,
   MAX_MPT_META_BYTE_LENGTH,
-  getValidationMessagesForMPTokenMetadata,
   MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
 } from './common'
 
 /**
@@ -143,12 +143,12 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   }
 
   if (tx.MPTokenMetadata != null) {
-    const result = getValidationMessagesForMPTokenMetadata(tx.MPTokenMetadata)
+    const result = validateMPTokenMetadata(tx.MPTokenMetadata)
 
     if (!result.isValid) {
       const message = [
         MPT_META_WARNING_HEADER,
-        ...result.validationMessages,
+        ...result.validationMessages.map((msg) => `- ${msg}`),
       ].join('\n')
 
       // eslint-disable-next-line no-console -- Required here.

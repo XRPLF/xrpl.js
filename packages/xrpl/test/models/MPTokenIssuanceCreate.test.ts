@@ -1,8 +1,8 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import { MPTokenIssuanceCreateFlags } from '../../src'
+import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
-import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -141,7 +141,7 @@ describe('MPTokenIssuanceCreate', function () {
 })
 
 /**
- * MPTokenMetadata warnings tests.
+ * Test console warning is logged while validating MPTokenIssuanceCreate for MPTokenMetadata field.
  */
 /* eslint-disable no-console -- Require to test console warnings  */
 describe('MPTokenMetadata warnings', function () {
@@ -153,25 +153,31 @@ describe('MPTokenMetadata warnings', function () {
     jest.restoreAllMocks()
   })
 
-  for (const testCase of mptMetadataTests) {
-    const testName: string = testCase.testName
-    it(`should validate warnings for: ${testName}`, function () {
-      const validMPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-        MPTokenMetadata: stringToHex(JSON.stringify(testCase.mptMetadata)),
-      }
+  it(`logs console warning`, function () {
+    const mptMetaData: MPTokenMetadata = {
+      ticker: 'TBILL',
+      name: 'T-Bill Token',
+      icon: 'http://example.com/icon.png',
+      asset_class: 'rwa',
+      asset_subclass: 'treasury',
+      issuer_name: 'Issuer',
+    }
+    const tx = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenMetadata: stringToHex(JSON.stringify(mptMetaData)),
+    }
 
-      assertValid(validMPTokenIssuanceCreate)
+    assertValid(tx)
 
-      if (testCase.warningsMessages.length === 0) {
-        expect(console.warn).toHaveBeenCalledTimes(0)
-      } else {
-        expect(console.warn).toHaveBeenCalledWith(
-          expect.stringContaining(testCase.warningsMessages.join('\n')),
-        )
-      }
-    })
-  }
+    const expectedMessage = [
+      MPT_META_WARNING_HEADER,
+      '- icon should be a valid https url.',
+    ].join('\n')
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(expectedMessage),
+    )
+  })
 })
 /* eslint-enable no-console  */
