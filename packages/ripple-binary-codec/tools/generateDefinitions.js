@@ -400,13 +400,12 @@ async function main() {
     process.argv.length == 4
       ? process.argv[3]
       : path.join(__dirname, '../src/enums/definitions.json')
-  fs.writeFile(outputFile, output, 'utf8', (err) => {
-    if (err) {
-      console.error('Error writing to file:', err)
-    } else {
-      console.log('File written successfully to', outputFile)
-    }
-  })
+  try {
+    await fs.writeFile(outputFile, output, 'utf8')
+    console.log('File written successfully to', outputFile)
+  } catch (err) {
+    console.error('Error writing to file:', err)
+  }
 }
 
 main()
