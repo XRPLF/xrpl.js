@@ -1,4 +1,4 @@
-export { BaseTransaction, isMPTAmount } from './common'
+export { BaseTransaction, isMPTAmount, validateMPTokenMetadata } from './common'
 export {
   validate,
   PseudoTransaction,

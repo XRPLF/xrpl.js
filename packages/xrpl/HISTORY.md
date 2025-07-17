@@ -11,6 +11,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Adds `XRPLNumber` amount type used in Vault transactions. This supports integer, decimal, or scientific notation strings.
 * Adds `ClawbackAmount` amount type used in transactions related to Clawback.
 * Fixed minified `build/xrpl-latest-min.js` to have all the latest xrpl package changes.
+* Add warning messages to `MPTokenIssuanceCreate` transaction as per [XLS-89d](https://github.com/XRPLF/XRPL-Standards/pull/293).
 
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
