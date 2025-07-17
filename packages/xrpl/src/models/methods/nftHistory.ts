@@ -1,4 +1,9 @@
-import { ResponseOnlyTxInfo } from '../common'
+import {
+  APIVersion,
+  DEFAULT_API_VERSION,
+  ResponseOnlyTxInfo,
+  RIPPLED_API_V2,
+} from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -10,7 +15,9 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  *
  * @category Requests
  */
-export interface NFTHistoryRequest extends BaseRequest, LookupByLedgerRequest {
+export interface NFTHistoryRequest<Binary extends boolean = false>
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'nft_history'
   /**
    * The unique identifier of an NFToken.
@@ -32,7 +39,7 @@ export interface NFTHistoryRequest extends BaseRequest, LookupByLedgerRequest {
    * If true, return transactions as hex strings instead of JSON. The default is
    * false.
    */
-  binary?: boolean
+  binary?: Binary
   /**
    * If true, returns values indexed with the oldest ledger first. Otherwise,
    * the results are indexed with the newest ledger first.
@@ -51,18 +58,7 @@ export interface NFTHistoryRequest extends BaseRequest, LookupByLedgerRequest {
   marker?: unknown
 }
 
-export interface NFTHistoryTransaction {
-  /** The ledger index of the ledger version that included this transaction. */
-  ledger_index: number
-  /**
-   * If binary is True, then this is a hex string of the transaction metadata.
-   * Otherwise, the transaction metadata is included in JSON format.
-   */
-  meta: string | TransactionMetadata
-  /** JSON object defining the transaction. */
-  tx?: Transaction & ResponseOnlyTxInfo
-  /** Unique hashed String representing the transaction. */
-  tx_blob?: string
+interface NFTHistoryTransactionBase {
   /**
    * Whether or not the transaction is included in a validated ledger. Any
    * transaction not yet in a validated ledger is subject to change.
@@ -70,12 +66,58 @@ export interface NFTHistoryTransaction {
   validated: boolean
 }
 
+export type NFTHistoryTransaction<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+  Binary extends boolean = false,
+> = NFTHistoryTransactionBase &
+  (Version extends typeof RIPPLED_API_V2
+    ? Binary extends true
+      ? {
+          /** Hex string of the transaction metadata. */
+          meta_blob: string
+          /** Unique hashed String representing the transaction. */
+          tx_blob: string
+          /** The ledger index of the ledger version that included this transaction. */
+          ledger_index: number
+          date: number
+        }
+      : {
+          /** JSON object defining the transaction. */
+          tx_json: Transaction & ResponseOnlyTxInfo
+          /** The transaction metadata in JSON format. */
+          meta: TransactionMetadata
+          /** The ledger index of the ledger version that included this transaction. */
+          ledger_index: number
+          hash: string
+          close_time_iso: string
+          ledger_hash: string
+        }
+    : Binary extends true
+    ? {
+        /** Unique hashed String representing the transaction. */
+        tx_blob: string
+        /** Hex string of the transaction metadata. */
+        meta: string
+        /** The ledger index of the ledger version that included this transaction. */
+        ledger_index: number
+        date: number
+      }
+    : {
+        /** JSON object defining the transaction. */
+        tx: Transaction & ResponseOnlyTxInfo
+        /** The transaction metadata in JSON format. */
+        meta: TransactionMetadata
+      })
+
 /**
  * Expected response from an {@link NFTHistoryRequest}.
  *
  * @category Responses
  */
-export interface NFTHistoryResponse extends BaseResponse {
+export interface NFTHistoryResponse<
+  Version extends APIVersion = typeof DEFAULT_API_VERSION,
+  Binary extends boolean = false,
+> extends BaseResponse {
   result: {
     /**
      * The unique identifier of an NFToken.
@@ -102,7 +144,7 @@ export interface NFTHistoryResponse extends BaseResponse {
      * Array of transactions matching the request's criteria, as explained
      * below.
      */
-    transactions: NFTHistoryTransaction[]
+    transactions: Array<NFTHistoryTransaction<Version, Binary>>
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to

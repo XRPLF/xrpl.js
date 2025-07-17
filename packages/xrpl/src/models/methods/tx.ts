@@ -1,9 +1,4 @@
-import {
-  APIVersion,
-  DEFAULT_API_VERSION,
-  RIPPLED_API_V1,
-  RIPPLED_API_V2,
-} from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 import { BaseTransaction } from '../transactions/common'
 
@@ -15,7 +10,7 @@ import { BaseRequest, BaseResponse } from './baseMethod'
  *
  * @category Requests
  */
-export interface TxRequest extends BaseRequest {
+export interface TxRequest<Binary extends boolean = false> extends BaseRequest {
   command: 'tx'
   /**
    * The transaction hash to look up. Exactly one of `transaction` or `ctid` must be specified for a TxRequest.
@@ -30,7 +25,7 @@ export interface TxRequest extends BaseRequest {
    * hexadecimal strings. If false, return transaction data and metadata as.
    * JSON. The default is false.
    */
-  binary?: boolean
+  binary?: Binary
   /**
    * Use this with max_ledger to specify a range of up to 1000 ledger indexes,
    * starting with this ledger (inclusive). If the server cannot find the
@@ -52,10 +47,7 @@ export interface TxRequest extends BaseRequest {
  *
  * @category Responses
  */
-interface BaseTxResult<
-  Version extends APIVersion = typeof DEFAULT_API_VERSION,
-  T extends BaseTransaction = Transaction,
-> {
+interface BaseTxResult {
   /** The SHA-512 hash of the transaction. */
   hash: string
   /**
@@ -64,15 +56,6 @@ interface BaseTxResult<
   ctid?: string
   /** The ledger index of the ledger that includes this transaction. */
   ledger_index?: number
-  /** Unique hashed string Transaction metadata blob, which describes the results of the transaction.
-   *  Can be undefined if a transaction has not been validated yet. This field is omitted if binary
-   *  binary format is not requested. */
-  meta_blob?: Version extends typeof RIPPLED_API_V2
-    ? TransactionMetadata<T> | string
-    : never
-  /** Transaction metadata, which describes the results of the transaction.
-   *  Can be undefined if a transaction has not been validated yet. */
-  meta?: TransactionMetadata<T> | string
   /**
    * If true, this data comes from a validated ledger version; if omitted or.
    * Set to false, this data is not final.
@@ -93,9 +76,29 @@ interface BaseTxResult<
  *
  * @category Responses
  */
-export interface TxResponse<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
-  result: BaseTxResult<typeof RIPPLED_API_V2, T> & { tx_json: T }
+export interface TxResponse<
+  T extends BaseTransaction = Transaction,
+  Binary extends boolean = false,
+> extends BaseResponse {
+  result: BaseTxResult &
+    (Binary extends true
+      ? {
+          tx_blob: string
+          /**
+           * Unique hashed string Transaction metadata blob, which describes the results of the transaction.
+           * Can be undefined if a transaction has not been validated yet. This field is omitted if binary
+           * binary format is not requested.
+           */
+          meta_blob: string
+        }
+      : {
+          tx_json: T
+          /**
+           * Transaction metadata, which describes the results of the transaction.
+           * Can be undefined if a transaction has not been validated yet.
+           */
+          meta: TransactionMetadata<T>
+        })
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did
@@ -110,9 +113,28 @@ export interface TxResponse<T extends BaseTransaction = Transaction>
  *
  * @category ResponsesV1
  */
-export interface TxV1Response<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
-  result: BaseTxResult<typeof RIPPLED_API_V1, T> & T
+export interface TxV1Response<
+  T extends BaseTransaction = Transaction,
+  Binary extends boolean = false,
+> extends BaseResponse {
+  result: BaseTxResult &
+    (Binary extends true
+      ? {
+          tx: string
+          /**
+           * Transaction metadata, which describes the results of the transaction.
+           * Can be undefined if a transaction has not been validated yet.
+           */
+          meta: string
+        }
+      : {
+          tx_json: T
+          /**
+           * Transaction metadata, which describes the results of the transaction.
+           * Can be undefined if a transaction has not been validated yet.
+           */
+          meta: TransactionMetadata<T>
+        })
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did
@@ -129,4 +151,7 @@ export interface TxV1Response<T extends BaseTransaction = Transaction>
  */
 export type TxVersionResponseMap<
   Version extends APIVersion = typeof DEFAULT_API_VERSION,
-> = Version extends typeof RIPPLED_API_V1 ? TxV1Response : TxResponse
+  Binary extends boolean = false,
+> = Version extends typeof RIPPLED_API_V1
+  ? TxV1Response<Transaction, Binary>
+  : TxResponse<Transaction, Binary>

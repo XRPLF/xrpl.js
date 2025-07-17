@@ -1,6 +1,7 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
+import { LedgerEntry } from '../ledger'
 
 import {
   AccountChannelsRequest,
@@ -193,7 +194,7 @@ import { VaultInfoRequest, VaultInfoResponse } from './vaultInfo'
 /**
  * @category Requests
  */
-type Request =
+type Request<Binary extends boolean = false> =
   // account methods
   | AccountChannelsRequest
   | AccountCurrenciesRequest
@@ -202,21 +203,21 @@ type Request =
   | AccountNFTsRequest
   | AccountObjectsRequest
   | AccountOffersRequest
-  | AccountTxRequest
+  | AccountTxRequest<Binary>
   | GatewayBalancesRequest
   | NoRippleCheckRequest
   // ledger methods
-  | LedgerRequest
+  | LedgerRequest<Binary>
   | LedgerClosedRequest
   | LedgerCurrentRequest
-  | LedgerDataRequest
-  | LedgerEntryRequest
+  | LedgerDataRequest<Binary>
+  | LedgerEntryRequest<Binary>
   // transaction methods
   | SimulateRequest
   | SubmitRequest
   | SubmitMultisignedRequest
   | TransactionEntryRequest
-  | TxRequest
+  | TxRequest<Binary>
   // path and order book methods
   | BookOffersRequest
   | DepositAuthorizedRequest
@@ -242,7 +243,7 @@ type Request =
   | NFTSellOffersRequest
   // clio only methods
   | NFTInfoRequest
-  | NFTHistoryRequest
+  | NFTHistoryRequest<Binary>
   | NFTsByIssuerRequest
   // AMM methods
   | AMMInfoRequest
@@ -303,7 +304,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | NFTSellOffersResponse
   // clio only methods
   | NFTInfoResponse
-  | NFTHistoryResponse
+  | NFTHistoryResponse<Version>
   | NFTsByIssuerResponse
   // AMM methods
   | AMMInfoResponse
@@ -315,6 +316,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
 export type RequestResponseMap<
   T,
   Version extends APIVersion = typeof DEFAULT_API_VERSION,
+  Binary extends boolean = false,
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountCurrenciesRequest
@@ -329,8 +331,8 @@ export type RequestResponseMap<
   ? AccountObjectsResponse
   : T extends AccountOffersRequest
   ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxVersionResponseMap<Version>
+  : T extends AccountTxRequest<Binary>
+  ? AccountTxVersionResponseMap<Version, Binary>
   : T extends AMMInfoRequest
   ? AMMInfoResponse
   : T extends GatewayBalancesRequest
@@ -397,22 +399,22 @@ export type RequestResponseMap<
   // LedgerResponseExpanded.
   T extends LedgerRequestExpandedTransactionsBinary
   ? LedgerVersionResponseMap<Version>
-  : T extends LedgerRequestExpandedAccountsAndTransactions
+  : T extends LedgerRequestExpandedAccountsAndTransactions<Binary>
   ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequestExpandedTransactionsOnly
+  : T extends LedgerRequestExpandedTransactionsOnly<Binary>
   ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequestExpandedAccountsOnly
+  : T extends LedgerRequestExpandedAccountsOnly<Binary>
   ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequest
+  : T extends LedgerRequest<Binary>
   ? LedgerVersionResponseMap<Version>
   : T extends LedgerClosedRequest
   ? LedgerClosedResponse
   : T extends LedgerCurrentRequest
   ? LedgerCurrentResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : T extends LedgerEntryRequest
-  ? LedgerEntryResponse
+  : T extends LedgerDataRequest<Binary>
+  ? LedgerDataResponse<Binary>
+  : T extends LedgerEntryRequest<Binary>
+  ? LedgerEntryResponse<LedgerEntry, Binary>
   : T extends SimulateBinaryRequest
   ? SimulateBinaryResponse
   : T extends SimulateJsonRequest
@@ -425,8 +427,8 @@ export type RequestResponseMap<
   ? SubmitMultisignedVersionResponseMap<Version>
   : T extends TransactionEntryRequest
   ? TransactionEntryResponse
-  : T extends TxRequest
-  ? TxVersionResponseMap<Version>
+  : T extends TxRequest<Binary>
+  ? TxVersionResponseMap<Version, Binary>
   : T extends BookOffersRequest
   ? BookOffersResponse
   : T extends DepositAuthorizedRequest
@@ -467,8 +469,8 @@ export type RequestResponseMap<
   ? NFTInfoResponse
   : T extends NFTsByIssuerRequest
   ? NFTsByIssuerResponse
-  : T extends NFTHistoryRequest
-  ? NFTHistoryResponse
+  : T extends NFTHistoryRequest<Binary>
+  ? NFTHistoryResponse<Version, Binary>
   : T extends VaultInfoRequest
   ? VaultInfoResponse
   : Response<Version>
