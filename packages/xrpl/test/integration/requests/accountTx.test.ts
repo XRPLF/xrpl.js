@@ -68,28 +68,25 @@ describe('account_tx', function () {
         'tesSUCCESS',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.LastLedgerSequence,
+        typeof response.result.transactions[0].tx_json.LastLedgerSequence,
         'number',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.Sequence,
+        typeof response.result.transactions[0].tx_json.Sequence,
         'number',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.SigningPubKey,
+        typeof response.result.transactions[0].tx_json.SigningPubKey,
         'string',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.TxnSignature,
+        typeof response.result.transactions[0].tx_json.TxnSignature,
         'string',
       )
-      assert.equal(
-        typeof response.result.transactions[0].tx_json?.Fee,
-        'string',
-      )
+      assert.equal(typeof response.result.transactions[0].tx_json.Fee, 'string')
       assert.equal(typeof response.result.transactions[0].hash, 'string')
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.ledger_index,
+        typeof response.result.transactions[0].tx_json.ledger_index,
         'number',
       )
 
@@ -163,25 +160,22 @@ describe('account_tx', function () {
         'tesSUCCESS',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx?.LastLedgerSequence,
+        typeof response.result.transactions[0].tx.LastLedgerSequence,
         'number',
       )
+      assert.equal(typeof response.result.transactions[0].tx.Sequence, 'number')
       assert.equal(
-        typeof response.result.transactions[0].tx?.Sequence,
-        'number',
-      )
-      assert.equal(
-        typeof response.result.transactions[0].tx?.SigningPubKey,
+        typeof response.result.transactions[0].tx.SigningPubKey,
         'string',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx?.TxnSignature,
+        typeof response.result.transactions[0].tx.TxnSignature,
         'string',
       )
-      assert.equal(typeof response.result.transactions[0].tx?.Fee, 'string')
-      assert.equal(typeof response.result.transactions[0].tx?.hash, 'string')
+      assert.equal(typeof response.result.transactions[0].tx.Fee, 'string')
+      assert.equal(typeof response.result.transactions[0].tx.hash, 'string')
       assert.equal(
-        typeof response.result.transactions[0].tx?.ledger_index,
+        typeof response.result.transactions[0].tx.ledger_index,
         'number',
       )
 

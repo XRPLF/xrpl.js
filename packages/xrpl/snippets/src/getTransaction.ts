@@ -20,6 +20,7 @@ async function getTransaction(): Promise<void> {
     console.log(tx)
 
     // The meta field can be undefined if the transaction has not been validated yet (and so has not changed the ledger).
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- in case the type and implementation differ
     if (tx.result.meta == null) {
       throw new Error('meta not included in the response')
     }
