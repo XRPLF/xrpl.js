@@ -48,9 +48,14 @@ async function readFile(folder, filename) {
   }
 }
 
-const read = process.argv[2].includes('github.com')
-  ? readFileFromGitHub
-  : readFile
+const read = (() => {
+  try {
+    const url = new URL(process.argv[2])
+    return url.hostname === 'github.com' ? readFileFromGitHub : readFile
+  } catch {
+    return readFile // Default to readFile if process.argv[2] is not a valid URL
+  }
+})()
 
 async function main() {
   const sfieldHeaderFile = await read(

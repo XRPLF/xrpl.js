@@ -41,7 +41,8 @@ async function readFile(folder, filename) {
 }
 
 async function processRippledSource(folder) {
-  const read = folder.includes('github.com') ? readFileFromGitHub : readFile
+  const folderUrl = new URL(folder)
+  const read = folderUrl.host === 'github.com' ? readFileFromGitHub : readFile
   const sfieldMacroFile = await read(
     folder,
     'include/xrpl/protocol/detail/sfields.macro',
@@ -61,7 +62,6 @@ async function processRippledSource(folder) {
   const txFormatsHits = transactionsMacroFile.matchAll(
     /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*Delegation::[A-Za-z]+[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
   )
-  console.log(txFormatsHits)
   const txFormats = {}
   for (const hit of txFormatsHits) {
     txFormats[hit[1]] = formatTxFormat(hit[2])
