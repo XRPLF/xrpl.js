@@ -45,6 +45,11 @@ describe('Payment', function () {
     assertValid(payment)
   })
 
+  it(`verifies DeliverMax is valid`, function () {
+    payment.DeliverMax = '1234'
+    assertValid(payment)
+  })
+
   it(`throws -- invalid DomainID type`, function () {
     const paymentTx = {
       TransactionType: 'Payment',

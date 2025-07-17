@@ -226,12 +226,6 @@ export function validatePayment(tx: Record<string, unknown>): void {
   }
 
   checkPartialPayment(tx)
-
-  if (tx.DeliverMax != null) {
-    throw new ValidationError(
-      'PaymentTransaction: Cannot have DeliverMax in a submitted transaction',
-    )
-  }
 }
 
 function checkPartialPayment(tx: Record<string, unknown>): void {
