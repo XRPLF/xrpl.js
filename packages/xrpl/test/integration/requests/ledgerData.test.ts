@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { LedgerDataBinaryLedgerEntry, LedgerDataRequest } from '../../../src'
+import { LedgerDataBinaryLedgerEntry } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -22,16 +22,12 @@ describe('ledger_data', function () {
   it(
     'base',
     async () => {
-      const ledgerDataRequest: LedgerDataRequest = {
+      const ledgerDataResponse = await testContext.client.request({
         command: 'ledger_data',
         ledger_index: 'validated',
         limit: 5,
         binary: true,
-      }
-
-      const ledgerDataResponse = await testContext.client.request(
-        ledgerDataRequest,
-      )
+      })
 
       const expected = {
         id: 0,
