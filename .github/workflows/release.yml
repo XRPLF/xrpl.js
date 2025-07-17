@@ -120,9 +120,9 @@ jobs:
       run: |
         curl -X POST \
           -H "X-Api-Key: ${{ secrets.OWASP_TOKEN }}" \
-          -F "project=3acaca74-a2e3-433b-a277-04aa37e98b65" \
+          -F "project=7c40c8ea-ea0f-4a5f-9b9f-368e53232397" \
           -F "bom=@sbom.json" \
-          http://owasp-dt-api.stg.ripplex.io/api/v1/bom
+          https://owasp-dt-api.prod.ripplex.io/api/v1/bom
 
     - name: Upload SBOM artifact
       uses: actions/upload-artifact@v4
