@@ -148,7 +148,7 @@ export function validateMPTokenIssuanceCreate(
       tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
   ) {
     throw new ValidationError(
-      `MPTokenIssuanceCreate: MPTokenMetadata must be in hex format and max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   }
 

@@ -59,7 +59,10 @@ describe('VaultCreate', function () {
 
   it('throws w/ MPTokenMetadata not hex', function () {
     tx.MPTokenMetadata = 'ggnothex'
-    assertInvalid(tx, 'VaultCreate: MPTokenMetadata must be a valid hex string')
+    assertInvalid(
+      tx,
+      'VaultCreate: MPTokenMetadata must be a valid non-empty hex string',
+    )
   })
 
   it('throws w/ MPTokenMetadata field too large', function () {

@@ -579,7 +579,11 @@ describe('Models Utils', function () {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
         const result = validateMPTokenMetadata(
-          stringToHex(JSON.stringify(testCase.mptMetadata)),
+          stringToHex(
+            typeof testCase.mptMetadata === 'string'
+              ? testCase.mptMetadata
+              : JSON.stringify(testCase.mptMetadata),
+          ),
         )
 
         assert.strictEqual(

@@ -127,7 +127,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     const metaHex = tx.MPTokenMetadata
     if (!isHex(metaHex)) {
       throw new ValidationError(
-        'VaultCreate: MPTokenMetadata must be a valid hex string',
+        'VaultCreate: MPTokenMetadata must be a valid non-empty hex string',
       )
     }
     const metaByteLength = metaHex.length / 2

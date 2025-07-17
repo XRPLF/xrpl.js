@@ -760,9 +760,9 @@ export function validateMPTokenMetadata(input: string): {
 
   try {
     jsonMetaData = JSON.parse(hexToString(input))
-  } catch (_err) {
+  } catch (err) {
     validationMessages.push(
-      'MPTokenMetadata is not properly formatted as JSON.',
+      `MPTokenMetadata is not properly formatted as JSON - ${String(err)}`,
     )
     return { validationMessages, isValid: false }
   }
@@ -775,7 +775,7 @@ export function validateMPTokenMetadata(input: string): {
     )
   ) {
     validationMessages.push(
-      'MPTokenMetadata is not properly formatted as JSON.',
+      'MPTokenMetadata is not properly formatted as per XLS-89d.',
     )
     return { validationMessages, isValid: false }
   }

@@ -1,7 +1,10 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
-import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+} from '../../src/models/transactions/common'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -48,7 +51,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format and max 1024 bytes.',
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   })
 
@@ -62,7 +65,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   })
 

@@ -208,7 +208,7 @@
     "testName": "null mptMetadata",
     "mptMetadata": null,
     "validationMessages": [
-      "MPTokenMetadata is not properly formatted as JSON."
+      "MPTokenMetadata is not properly formatted as per XLS-89d."
     ]
   },
   {
@@ -220,6 +220,13 @@
       "icon is required and must be string.",
       "asset_class is required and must be string.",
       "issuer_name is required and must be string."
+    ]
+  },
+  {
+    "testName": "incorrect JSON",
+    "mptMetadata": "not a json",
+    "validationMessages": [
+      "MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'o', \"not a json\" is not valid JSON"
     ]
   }
 ]
