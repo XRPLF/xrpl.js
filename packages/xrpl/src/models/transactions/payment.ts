@@ -8,6 +8,7 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
+  isDomainID,
   validateRequiredField,
   validateOptionalField,
   isNumber,
@@ -160,6 +161,18 @@ export interface Payment extends BaseTransaction {
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
+  /**
+   * The domain the sender intends to use. Both the sender and destination must
+   * be part of this domain. The DomainID can be included if the sender intends
+   * it to be a cross-currency payment (i.e. if the payment is going to interact
+   * with the DEX). The domain will only play it's role if there is a path that
+   * crossing an orderbook.
+   *
+   * Note: it's still possible that DomainID is included but the payment does
+   * not interact with DEX, it simply means that the DomainID will be ignored
+   * during payment paths.
+   */
+  DomainID?: string
   Flags?: number | PaymentFlagsInterface
 }
 
@@ -198,6 +211,11 @@ export function validatePayment(tx: Record<string, unknown>): void {
   if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
     throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
   }
+
+  validateOptionalField(tx, 'DomainID', isDomainID, {
+    txType: 'PaymentTransaction',
+    paramName: 'DomainID',
+  })
 
   if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
     throw new ValidationError('PaymentTransaction: invalid Paths')
