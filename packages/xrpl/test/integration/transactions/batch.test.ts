@@ -1,4 +1,4 @@
-import { Batch, Wallet } from '../../../src'
+import { Batch, Payment, Wallet } from '../../../src'
 import { BatchFlags } from '../../../src/models/transactions/batch'
 import { signMultiBatch } from '../../../src/Wallet/batchSigner'
 import serverUrl from '../serverUrl'
@@ -49,30 +49,22 @@ describe('Batch', function () {
   it(
     'base',
     async () => {
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Flags: 0x40000000,
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        Amount: '10000000',
+      }
       const tx: Batch = {
         TransactionType: 'Batch',
         Account: testContext.wallet.classicAddress,
         Flags: BatchFlags.tfAllOrNothing,
-        RawTransactions: [
-          {
-            RawTransaction: {
-              TransactionType: 'Payment',
-              Flags: 0x40000000,
-              Account: testContext.wallet.classicAddress,
-              Destination: destination.classicAddress,
-              Amount: '10000000',
-            },
-          },
-          {
-            RawTransaction: {
-              TransactionType: 'Payment',
-              Flags: 0x40000000,
-              Account: testContext.wallet.classicAddress,
-              Destination: destination.classicAddress,
-              Amount: '10000000',
-            },
-          },
-        ],
+        RawTransactions: [payment, { ...payment }, { ...payment }].map(
+          (rawTx) => ({
+            RawTransaction: rawTx,
+          }),
+        ),
       }
       const autofilled = await testContext.client.autofill(tx)
       await testBatchTransaction(autofilled, testContext.wallet)
@@ -83,30 +75,21 @@ describe('Batch', function () {
   it(
     'batch multisign',
     async () => {
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Flags: 0x40000000,
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        Amount: '10000000',
+      }
+      const payment2: Payment = { ...payment, Account: wallet2.classicAddress }
       const tx: Batch = {
         TransactionType: 'Batch',
         Account: testContext.wallet.classicAddress,
         Flags: BatchFlags.tfAllOrNothing,
-        RawTransactions: [
-          {
-            RawTransaction: {
-              TransactionType: 'Payment',
-              Flags: 0x40000000,
-              Account: testContext.wallet.classicAddress,
-              Destination: destination.classicAddress,
-              Amount: '10000000',
-            },
-          },
-          {
-            RawTransaction: {
-              TransactionType: 'Payment',
-              Flags: 0x40000000,
-              Account: wallet2.classicAddress,
-              Destination: destination.classicAddress,
-              Amount: '10000000',
-            },
-          },
-        ],
+        RawTransactions: [payment, payment2].map((rawTx) => ({
+          RawTransaction: rawTx,
+        })),
       }
       const autofilled = await testContext.client.autofill(tx, 1)
       signMultiBatch(wallet2, autofilled)
