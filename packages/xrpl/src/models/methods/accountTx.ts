@@ -87,7 +87,7 @@ export interface AccountTxTransaction<
 /**
  * Base interface for account transaction responses.
  */
-interface AccountTxResponseBase<
+export interface AccountTxResponseBase<
   Version extends APIVersion = typeof DEFAULT_API_VERSION,
 > extends BaseResponse {
   result: {
