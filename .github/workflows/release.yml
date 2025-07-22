@@ -6,9 +6,14 @@ on:
       package_name:
         description: 'The package name to release (e.g., xrpl, ripple-address-codec)'
         required: true
-      # package_version:
-      #   description: 'Version to release (e.g., 2.12.1)'
-      #   required: true
+      dry-run:
+        description: 'Perform dry run (create draft release and npm publish with dry-run)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
       git_ref:
         description: 'Git ref to checkout (branch, tag, or commit SHA)'
         required: true
@@ -228,7 +233,7 @@ jobs:
         tag_name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
         name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
         draft: false
-        prerelease: false
+        prerelease: ${{ github.event.inputs.dry-run == 'true' }}
 
     - name: Download artifact
       uses: actions/download-artifact@v4
@@ -247,7 +252,11 @@ jobs:
         cd dist
         PKG=$(ls *.tgz)
         echo $PKG
-        npm publish "$PKG" --access public --registry=https://registry.npmjs.org/ --dry-run
+        if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
+          npm publish "$PKG" --access public --registry=https://registry.npmjs.org/ --dry-run
+        else
+          npm publish "$PKG" --access public --registry=https://registry.npmjs.org/
+        fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
