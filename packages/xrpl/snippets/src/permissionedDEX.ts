@@ -1,21 +1,9 @@
-import {
-  AccountSetAsfFlags,
-  AuthorizeCredential,
-  Client,
-  CredentialAccept,
-  CredentialCreate,
-  OfferCreate,
-  OfferCreateFlags,
-  Payment,
-  PermissionedDomainSet,
-} from '../../src'
-
-import PermissionedDomain from '../../../xrpl/src/models/ledger/PermissionedDomain'
+import { AccountSetAsfFlags, Client, OfferCreateFlags } from '../../src'
 
 const client = new Client('wss://s.devnet.rippletest.net:51233')
 
 // This snippet walks us through the usage of permissioned DEX.
-async function PermDEXExamples(): Promise<void> {
+async function permDEXExamples(): Promise<void> {
   await client.connect()
 
   // creating wallets as prerequisite
@@ -49,7 +37,7 @@ async function PermDEXExamples(): Promise<void> {
       Subject: wallet1.classicAddress,
       Account: issuerWallet.classicAddress,
       CredentialType: 'ABCD',
-    } as CredentialCreate,
+    },
     {
       wallet: issuerWallet,
     },
@@ -62,7 +50,7 @@ async function PermDEXExamples(): Promise<void> {
       Subject: wallet2.classicAddress,
       Account: issuerWallet.classicAddress,
       CredentialType: 'ABCD',
-    } as CredentialCreate,
+    },
     {
       wallet: issuerWallet,
     },
@@ -75,7 +63,7 @@ async function PermDEXExamples(): Promise<void> {
       Account: wallet1.classicAddress,
       Issuer: issuerWallet.classicAddress,
       CredentialType: 'ABCD',
-    } as CredentialAccept,
+    },
     {
       wallet: wallet1,
     },
@@ -88,7 +76,7 @@ async function PermDEXExamples(): Promise<void> {
       Account: wallet2.classicAddress,
       Issuer: issuerWallet.classicAddress,
       CredentialType: 'ABCD',
-    } as CredentialAccept,
+    },
     {
       wallet: wallet2,
     },
@@ -105,9 +93,9 @@ async function PermDEXExamples(): Promise<void> {
             CredentialType: 'ABCD',
             Issuer: issuerWallet.classicAddress,
           },
-        } as AuthorizeCredential,
+        },
       ],
-    } as PermissionedDomainSet,
+    },
     {
       wallet: issuerWallet,
     },
@@ -119,8 +107,7 @@ async function PermDEXExamples(): Promise<void> {
     type: 'permissioned_domain',
   })
 
-  const pd_ledger_object = result.result
-    .account_objects[0] as PermissionedDomain
+  const pd_ledger_object = result.result.account_objects[0]
 
   // create a payment inside the domain
   await client.submitAndWait(
@@ -130,7 +117,7 @@ async function PermDEXExamples(): Promise<void> {
       Amount: '10000',
       Destination: wallet2.classicAddress,
       DomainID: pd_ledger_object.index,
-    } as Payment,
+    },
     {
       wallet: wallet1,
     },
@@ -213,7 +200,7 @@ async function PermDEXExamples(): Promise<void> {
       },
       Flags: OfferCreateFlags.tfHybrid,
       DomainID: pd_ledger_object.index,
-    } as OfferCreate,
+    },
     {
       wallet: wallet1,
     },
@@ -231,7 +218,7 @@ async function PermDEXExamples(): Promise<void> {
       },
       Flags: OfferCreateFlags.tfHybrid,
       DomainID: pd_ledger_object.index,
-    } as OfferCreate,
+    },
     {
       wallet: wallet2,
     },
@@ -240,4 +227,4 @@ async function PermDEXExamples(): Promise<void> {
 
   await client.disconnect()
 }
-void PermDEXExamples()
+void permDEXExamples()
