@@ -107,7 +107,7 @@ jobs:
       run: cyclonedx-npm --output-format json --output-file sbom.json
 
     - name: Scan SBOM for vulnerabilities using Trivy
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@v0.18.0
       with:
         scan-type: sbom
         scan-ref: sbom.json
@@ -185,6 +185,8 @@ jobs:
         RUN_ID: ${{ github.run_id }}
       run: |
         ARTIFACT_NAME="vulnerability-report"
+        GIT_REF="${{ github.event.inputs.git_ref }}"
+        COMMIT_SHA="$(git rev-parse --short HEAD)"
 
         echo "Fetching artifact ID for ${ARTIFACT_NAME}..."
         ARTIFACTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
@@ -268,7 +270,7 @@ jobs:
       env:
         SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
       run: |
-        MESSAGE="❌ Tests failed for xrpl.js ${{ github.event.inputs.package_version }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        MESSAGE="❌ Tests failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         curl -X POST https://slack.com/api/chat.postMessage \
           -H "Authorization: Bearer $SLACK_TOKEN" \
           -H "Content-Type: application/json" \

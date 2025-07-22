@@ -5,6 +5,7 @@ name: Node.js CI
 
 env:
   RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
+  GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
   push:
@@ -24,8 +25,6 @@ jobs:
   build-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      GIT_REF: ${{ inputs.git_ref || github.ref }}
     strategy:
       matrix:
         node-version: [22.x]
