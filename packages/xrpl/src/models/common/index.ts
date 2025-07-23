@@ -225,11 +225,11 @@ export interface PriceData {
 export interface MPTokenMetadata {
   ticker: string
   name: string
-  desc?: string
   icon: string
   asset_class: string
-  asset_subclass?: string
   issuer_name: string
+  desc?: string
+  asset_subclass?: string
   urls?: MPTokenMetadataUrl[]
   additional_info?: string
 }

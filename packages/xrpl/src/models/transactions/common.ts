@@ -31,6 +31,10 @@ export const VAULT_DATA_MAX_BYTE_LENGTH = 256
 // To validate MPTokenMetadata as per XLS-89d
 const TICKER_REGEX = /^[A-Z0-9]{1,6}$/u
 
+const MAX_MPT_META_TOP_LEVEL_FIELD_COUNT = 9
+
+const MPT_META_URL_FIELD_COUNT = 3
+
 const MPT_META_REQUIRED_FIELDS = [
   'ticker',
   'name',
@@ -741,19 +745,21 @@ export function isDomainID(domainID: unknown): domainID is string {
  * Validates if MPTokenMetadata adheres to XLS-89d standard.
  *
  * @param input - Hex encoded MPTokenMetadata.
- * @returns Validation error messages and boolean denoting if MPTokenMetadata adheres to XLS-89d standard.
+ * @returns Validation error messages if MPTokenMetadata does not adheres to XLS-89d standard.
  */
-export function validateMPTokenMetadata(input: string): {
-  isValid: boolean
-  validationMessages: string[]
-} {
+export function validateMPTokenMetadata(input: string): string[] {
   const validationMessages: string[] = []
 
-  if (!isHex(input) || input.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
+  if (!isHex(input)) {
+    validationMessages.push(`MPTokenMetadata must be in hex format.`)
+    return validationMessages
+  }
+
+  if (input.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
     validationMessages.push(
-      `MPTokenMetadata must be in hex format and max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      `MPTokenMetadata must be max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   let jsonMetaData: unknown
@@ -764,26 +770,34 @@ export function validateMPTokenMetadata(input: string): {
     validationMessages.push(
       `MPTokenMetadata is not properly formatted as JSON - ${String(err)}`,
     )
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   if (
-    !(
-      jsonMetaData != null &&
-      typeof jsonMetaData === 'object' &&
-      !Array.isArray(jsonMetaData)
-    )
+    jsonMetaData == null ||
+    typeof jsonMetaData !== 'object' ||
+    Array.isArray(jsonMetaData)
   ) {
     validationMessages.push(
       'MPTokenMetadata is not properly formatted as per XLS-89d.',
     )
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It must be some JSON object.
   const obj = jsonMetaData as Record<string, unknown>
 
   // validating structure
+
+  // check for maximum number of fields
+  const fieldCount = Object.keys(obj).length
+  if (fieldCount > MAX_MPT_META_TOP_LEVEL_FIELD_COUNT) {
+    validationMessages.push(
+      `MPTokenMetadata must not contain more than ${MAX_MPT_META_TOP_LEVEL_FIELD_COUNT} top-level fields (found ${fieldCount}).`,
+    )
+    return validationMessages
+  }
+
   const incorrectRequiredFields = MPT_META_REQUIRED_FIELDS.filter(
     (field) => !isString(obj[field]),
   )
@@ -792,40 +806,40 @@ export function validateMPTokenMetadata(input: string): {
     incorrectRequiredFields.forEach((field) =>
       validationMessages.push(`${field} is required and must be string.`),
     )
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   if (obj.desc != null && !isString(obj.desc)) {
     validationMessages.push(`desc must be a string.`)
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   if (obj.asset_subclass != null && !isString(obj.asset_subclass)) {
     validationMessages.push(`asset_subclass must be a string.`)
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
   if (
     obj.additional_info != null &&
-    !(
-      isString(obj.additional_info) ||
-      (typeof obj.additional_info === 'object' &&
-        !Array.isArray(obj.additional_info))
-    )
+    typeof obj.additional_info !== 'string' &&
+    (typeof obj.additional_info !== 'object' ||
+      Array.isArray(obj.additional_info))
   ) {
     validationMessages.push(`additional_info must be a string or JSON object.`)
-    return { validationMessages, isValid: false }
+    return validationMessages
   }
 
-  if (
-    obj.urls != null &&
-    (!Array.isArray(obj.urls) ||
-      !obj.urls.every(isValidMPTokenMetadataUrlStructure))
-  ) {
-    validationMessages.push(
-      `urls field is not properly structured as per the XLS-89d standard.`,
-    )
-    return { validationMessages, isValid: false }
+  if (obj.urls != null) {
+    if (!Array.isArray(obj.urls)) {
+      validationMessages.push('urls must be an array as per XLS-89d.')
+      return validationMessages
+    }
+    if (!obj.urls.every(isValidMPTokenMetadataUrlStructure)) {
+      validationMessages.push(
+        'One or more urls are not structured per XLS-89d.',
+      )
+      return validationMessages
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
@@ -881,7 +895,7 @@ export function validateMPTokenMetadata(input: string): {
     validationMessages.push(`url should be a valid https url.`)
   }
 
-  return { validationMessages, isValid: validationMessages.length === 0 }
+  return validationMessages
 }
 /* eslint-enable max-lines-per-function */
 /* eslint-enable max-statements */
@@ -897,6 +911,7 @@ function isValidMPTokenMetadataUrlStructure(input: unknown): boolean {
     typeof obj === 'object' &&
     isString(obj.url) &&
     isString(obj.type) &&
-    isString(obj.title)
+    isString(obj.title) &&
+    Object.keys(obj).length === MPT_META_URL_FIELD_COUNT
   )
 }

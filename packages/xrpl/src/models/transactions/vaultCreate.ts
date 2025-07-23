@@ -149,12 +149,12 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   }
 
   if (tx.MPTokenMetadata != null) {
-    const result = validateMPTokenMetadata(tx.MPTokenMetadata)
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
 
-    if (!result.isValid) {
+    if (validationMessages.length > 0) {
       const message = [
         MPT_META_WARNING_HEADER,
-        ...result.validationMessages.map((msg) => `- ${msg}`),
+        ...validationMessages.map((msg) => `- ${msg}`),
       ].join('\n')
 
       // eslint-disable-next-line no-console -- Required here.

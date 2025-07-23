@@ -578,7 +578,7 @@ describe('Models Utils', function () {
     for (const testCase of mptMetadataTests) {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
-        const result = validateMPTokenMetadata(
+        const validationMessages = validateMPTokenMetadata(
           stringToHex(
             typeof testCase.mptMetadata === 'string'
               ? testCase.mptMetadata
@@ -586,15 +586,7 @@ describe('Models Utils', function () {
           ),
         )
 
-        assert.strictEqual(
-          testCase.validationMessages.length === 0,
-          result.isValid,
-        )
-
-        assert.deepStrictEqual(
-          testCase.validationMessages,
-          result.validationMessages,
-        )
+        assert.deepStrictEqual(testCase.validationMessages, validationMessages)
       })
     }
   })

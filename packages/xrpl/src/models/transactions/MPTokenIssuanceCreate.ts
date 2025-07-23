@@ -117,7 +117,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
    * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
    * may not be discoverable by ecosystem tools such as explorers and indexers.
    */
-  MPTokenMetadata?: string | null
+  MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
@@ -189,12 +189,12 @@ export function validateMPTokenIssuanceCreate(
   }
 
   if (tx.MPTokenMetadata != null) {
-    const result = validateMPTokenMetadata(tx.MPTokenMetadata)
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
 
-    if (!result.isValid) {
+    if (validationMessages.length > 0) {
       const message = [
         MPT_META_WARNING_HEADER,
-        ...result.validationMessages.map((msg) => `- ${msg}`),
+        ...validationMessages.map((msg) => `- ${msg}`),
       ].join('\n')
 
       // eslint-disable-next-line no-console -- Required here.
