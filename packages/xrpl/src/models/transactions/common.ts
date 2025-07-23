@@ -684,6 +684,8 @@ export function containsDuplicates(
   return false
 }
 
+const _DOMAIN_ID_LENGTH = 64
+
 /**
  * Utility method used across OfferCreate and Payment transactions to validate the DomainID.
  *
@@ -692,5 +694,9 @@ export function containsDuplicates(
  * @returns true if the domainID is a valid 64-character string, false otherwise
  */
 export function isDomainID(domainID: unknown): domainID is string {
-  return isString(domainID) && /^[0-9a-fA-F]{64}$/u.test(domainID)
+  return (
+    isString(domainID) &&
+    domainID.length === _DOMAIN_ID_LENGTH &&
+    isHex(domainID)
+  )
 }
