@@ -821,9 +821,8 @@ export function validateMPTokenMetadata(input: string): string[] {
 
   if (
     obj.additional_info != null &&
-    typeof obj.additional_info !== 'string' &&
-    (typeof obj.additional_info !== 'object' ||
-      Array.isArray(obj.additional_info))
+    !isString(obj.additional_info) &&
+    !isRecord(obj.additional_info)
   ) {
     validationMessages.push(`additional_info must be a string or JSON object.`)
     return validationMessages

@@ -155,7 +155,7 @@
     ]
   },
   {
-    "testName": "additional_info is invalid type",
+    "testName": "additional_info is invalid type - array",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Token",
@@ -166,6 +166,20 @@
         "not",
         "valid"
       ]
+    },
+    "validationMessages": [
+      "additional_info must be a string or JSON object."
+    ]
+  },
+  {
+    "testName": "additional_info is invalid type - number",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "defi",
+      "issuer_name": "Issuer",
+      "additional_info": 123
     },
     "validationMessages": [
       "additional_info must be a string or JSON object."
