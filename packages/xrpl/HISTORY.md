@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* New util `areAmountsEqual` to check if 2 amounts are strictly equal
 * Support for `PermissionedDEX` (XLS-81d)
 * Support for `Token Escrow` (XLS-85)
 * Support for `Single Asset Vault` (XLS-65)
@@ -13,6 +14,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fixed minified `build/xrpl-latest-min.js` to have all the latest xrpl package changes.
 
 ### Fixed
+* `autofill` function in client not validating amounts correctly
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
 * Fail faster on `tem` errors with `submitAndWait`
 * Improved type-checking in models
