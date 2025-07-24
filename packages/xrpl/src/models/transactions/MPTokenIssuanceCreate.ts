@@ -8,6 +8,9 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -104,10 +107,18 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
    * The field must NOT be present if the `tfMPTCanTransfer` flag is not set.
    */
   TransferFee?: number
+
   /**
-   * Arbitrary metadata about this issuance, in hex format.
+   * Optional arbitrary metadata about this issuance, encoded as a hex string and limited to 1024 bytes.
+   *
+   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
+   * XLS-89d MPTokenMetadata standard.
+   *
+   * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
+   * may not be discoverable by ecosystem tools such as explorers and indexers.
    */
-  MPTokenMetadata?: string | null
+  MPTokenMetadata?: string
+
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
 
@@ -131,15 +142,13 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
 
-  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata === '') {
+  if (
+    typeof tx.MPTokenMetadata === 'string' &&
+    (!isHex(tx.MPTokenMetadata) ||
+      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+  ) {
     throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
-    )
-  }
-
-  if (typeof tx.MPTokenMetadata === 'string' && !isHex(tx.MPTokenMetadata)) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   }
 
@@ -176,6 +185,20 @@ export function validateMPTokenIssuanceCreate(
       throw new ValidationError(
         'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
       )
+    }
+  }
+
+  if (tx.MPTokenMetadata != null) {
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
+
+    if (validationMessages.length > 0) {
+      const message = [
+        MPT_META_WARNING_HEADER,
+        ...validationMessages.map((msg) => `- ${msg}`),
+      ].join('\n')
+
+      // eslint-disable-next-line no-console -- Required here.
+      console.warn(message)
     }
   }
 }

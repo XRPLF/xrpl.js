@@ -164,6 +164,7 @@ describe('subscribe', function () {
           reserve_base: ledgerResponse.reserve_base,
           reserve_inc: ledgerResponse.reserve_inc,
           validated_ledgers: ledgerResponse.validated_ledgers,
+          network_id: ledgerResponse.network_id,
         }
         if (ledgerResponse.fee_ref) {
           expectedResult.fee_ref = ledgerResponse.fee_ref
