@@ -745,7 +745,7 @@ export function isDomainID(domainID: unknown): domainID is string {
  * Validates if MPTokenMetadata adheres to XLS-89d standard.
  *
  * @param input - Hex encoded MPTokenMetadata.
- * @returns Validation error messages if MPTokenMetadata does not adheres to XLS-89d standard.
+ * @returns Validation messages if MPTokenMetadata does not adheres to XLS-89d standard.
  */
 export function validateMPTokenMetadata(input: string): string[] {
   const validationMessages: string[] = []
