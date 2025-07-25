@@ -39,6 +39,12 @@ export interface SubscribeBook {
   snapshot?: boolean
   /** If true, return both sides of the order book. The default is false. */
   both?: boolean
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then the offers will be filtered to only show the valid domain offers for
+   * that domain.
+   */
+  domain?: string
 }
 
 /**
@@ -136,6 +142,11 @@ export interface LedgerStream extends BaseStream {
    * connected but has not yet obtained a ledger from the network.
    */
   validated_ledgers?: string
+
+  /**
+   * The network from which the ledger stream is received.
+   */
+  network_id?: number
 }
 
 /**
@@ -175,6 +186,11 @@ export interface LedgerStreamResponse {
    * connected but has not yet obtained a ledger from the network.
    */
   validated_ledgers?: string
+
+  /**
+   * The network from which the ledger stream is received.
+   */
+  network_id?: number
 }
 
 /**
@@ -259,6 +275,11 @@ export interface ValidationStream extends BaseStream {
    * validator is using a token, this is an ephemeral public key.
    */
   validation_public_key: string
+
+  /**
+   * The network from which the validations stream is received.
+   */
+  network_id?: number
 }
 
 /**
