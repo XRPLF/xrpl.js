@@ -23,7 +23,7 @@ module.exports = {
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base'],
+  extends: ['@patelraj96/eslint-config/base'],
 
   rules: {
     // ** TODO **

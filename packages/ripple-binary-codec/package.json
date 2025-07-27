@@ -40,7 +40,7 @@
   "homepage": "https://github.com/XRPLF/xrpl.js/tree/main/packages/ripple-binary-codec#readme",
   "license": "ISC",
   "readmeFilename": "README.md",
-  "prettier": "@xrplf/prettier-config",
+  "prettier": "@patelraj96/prettier-config",
   "engines": {
     "node": ">= 18"
   }

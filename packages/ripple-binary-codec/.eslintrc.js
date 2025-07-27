@@ -25,7 +25,7 @@ module.exports = {
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base'],
+  extends: ['@patelraj96/eslint-config/base'],
 
   rules: {
     // ** TODO **
@@ -34,7 +34,7 @@ module.exports = {
     // **
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/prefer-readonly': 'off',
-    '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/parameter-properties': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
@@ -86,7 +86,7 @@ module.exports = {
     'jsdoc/require-description': 'off',
     'jsdoc/require-param': 'off',
     'jsdoc/check-param-names': 'off',
-    'jsdoc/newline-after-description': 'off',
+    'jsdoc/tag-lines': 'off',
     'jsdoc/require-returns-check': 'off',
     'tsdoc/syntax': 'off',
     'eslint-comments/require-description': 'off',

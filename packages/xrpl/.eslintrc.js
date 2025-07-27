@@ -32,7 +32,7 @@ module.exports = {
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base'],
+  extends: ['@patelraj96/eslint-config/base'],
   rules: {
     'multiline-comment-style': 'off',
     // Disabled until https://github.com/import-js/eslint-plugin-import/pull/2305 is resolved to

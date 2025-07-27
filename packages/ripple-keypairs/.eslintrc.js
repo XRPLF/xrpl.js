@@ -23,10 +23,10 @@ module.exports = {
   },
 
   plugins: [],
-  extends: ['@xrplf/eslint-config/base'],
+  extends: ['@patelraj96/eslint-config/base'],
 
   rules: {
-    // TODO: put in @xrplf/eslint-config/base ?
+    // TODO: put in @patelraj96/eslint-config/base ?
     '@typescript-eslint/consistent-type-imports': 'error',
 
     // ** TODO **

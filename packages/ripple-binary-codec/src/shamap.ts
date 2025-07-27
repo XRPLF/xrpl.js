@@ -76,7 +76,7 @@ class ShaMapInner extends ShaMapNode {
   private slotBits = 0
   private branches: Array<ShaMapNode> = Array(16)
 
-  constructor(private depth: number = 0) {
+  constructor(private depth = 0) {
     super()
   }
 

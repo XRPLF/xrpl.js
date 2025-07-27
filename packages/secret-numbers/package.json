@@ -32,7 +32,7 @@
     "@xrplf/isomorphic": "^1.0.1",
     "ripple-keypairs": "^2.0.0"
   },
-  "prettier": "@xrplf/prettier-config",
+  "prettier": "@patelraj96/prettier-config",
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"

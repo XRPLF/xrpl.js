@@ -476,7 +476,7 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number = request.limit ?? Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []
@@ -884,6 +884,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
