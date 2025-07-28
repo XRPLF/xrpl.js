@@ -18,6 +18,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fail faster on `tem` errors with `submitAndWait`
 * Improved type-checking in models
 * Fix issue with some transactions that would crash in validation
+* Code snippets are removed from the xrpl.js client library. They have been [moved to a different location](https://github.com/XRPLF/xrpl-dev-portal/tree/master/_code-samples).
 
 ## 4.3.0 (2025-6-09)
 
