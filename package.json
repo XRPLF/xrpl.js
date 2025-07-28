@@ -23,7 +23,7 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@patelraj96/eslint-config": "^1.10.5",
+    "@patelraj96/eslint-config": "^1.10.6",
     "@patelraj96/prettier-config": "^1.9.1",
     "@types/chai": "^4.2.21",
     "@types/jest": "^29.2.2",
@@ -39,7 +39,7 @@
     "eslint-plugin-consistent-default-export-name": "^0.0.15",
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsdoc": "^47.0.0",
+    "eslint-plugin-jsdoc": "^52.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-tsdoc": "^0.2.16",
