@@ -2,20 +2,50 @@
  * A script that generates models and model unit tests.
  * To run it, clone the rippled branch with the source code and run this script against that repo.
  */
-const fs = require('fs')
+const fs = require('fs/promises')
 const path = require('path')
 const createValidate = require('./createValidate')
 const createValidateTests = require('./createValidateTests')
 
-function readFile(filename) {
-  return fs.readFileSync(filename, 'utf-8')
+async function readFileFromGitHub(repo, filename) {
+  if (!repo.includes('tree')) {
+    repo += '/tree/HEAD'
+  }
+  let url = repo.replace('github.com', 'raw.githubusercontent.com')
+  url = url.replace('tree/', '')
+  url += '/' + filename
+
+  if (!url.startsWith('http')) {
+    url = 'https://' + url
+  }
+
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}`)
+    }
+    return await response.text()
+  } catch (e) {
+    console.error(`Error reading ${url}: ${e.message}`)
+    process.exit(1)
+  }
 }
 
-let jsTransactionFile
+async function readFile(folder, filename) {
+  const filePath = path.join(folder, filename)
+  try {
+    return await fs.readFile(filePath, 'utf-8')
+  } catch (e) {
+    throw new Error(`File not found: ${filePath}, ${e.message}`)
+  }
+}
 
-function processRippledSource(folder) {
-  const sfieldMacroFile = readFile(
-    path.join(folder, '/include/xrpl/protocol/detail/sfields.macro'),
+async function processRippledSource(folder) {
+  const folderUrl = new URL(folder)
+  const read = folderUrl.host === 'github.com' ? readFileFromGitHub : readFile
+  const sfieldMacroFile = await read(
+    folder,
+    'include/xrpl/protocol/detail/sfields.macro',
   )
   const sfieldHits = sfieldMacroFile.matchAll(
     /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
@@ -25,22 +55,21 @@ function processRippledSource(folder) {
     sfields[hit[1]] = hit[2]
   }
 
-  const transactionsMacroFile = readFile(
-    path.join(folder, '/include/xrpl/protocol/detail/transactions.macro'),
+  const transactionsMacroFile = await read(
+    folder,
+    'include/xrpl/protocol/detail/transactions.macro',
   )
   const txFormatsHits = transactionsMacroFile.matchAll(
-    /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
+    /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*Delegation::[A-Za-z]+[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
   )
   const txFormats = {}
   for (const hit of txFormatsHits) {
     txFormats[hit[1]] = formatTxFormat(hit[2])
   }
 
-  jsTransactionFile = readFile(
-    path.join(
-      path.dirname(__filename),
-      '../src/models/transactions/transaction.ts',
-    ),
+  const jsTransactionFile = await readFile(
+    path.dirname(__filename),
+    '../src/models/transactions/transaction.ts',
   )
   const transactionMatch = jsTransactionFile.match(
     /export type SubmittableTransaction =([| \nA-Za-z]+)\n\/\*\*/,
@@ -60,7 +89,7 @@ function processRippledSource(folder) {
     }
   }
 
-  return [txsToAdd, txFormats, sfields, transactionMatch]
+  return [txsToAdd, txFormats, sfields, transactionMatch, jsTransactionFile]
 }
 
 function formatTxFormat(rawTxFormat) {
@@ -92,7 +121,7 @@ const typeMap = {
 const allCommonImports = ['Amount', 'Currency', 'Path', 'XChainBridge']
 const additionalValidationImports = ['string', 'number']
 
-function updateTransactionFile(transactionMatch, tx) {
+async function updateTransactionFile(transactionMatch, jsTransactionFile, tx) {
   const transactionMatchSplit = transactionMatch.split('\n  | ')
   const firstLine = transactionMatchSplit[0]
   const allTransactions = transactionMatchSplit.slice(1)
@@ -122,7 +151,7 @@ import {
   )
 
   const validationMatch = newJsTxFile.match(
-    /switch \(tx.TransactionType\) {\n([ \nA-Za-z':()]+)default/,
+    /switch \(tx.TransactionType\) {\n([ \nA-Za-z':()\/@\-\.<>=\{\},]+)default/,
   )[1]
   const caseValidations = validationMatch.split('\n\n')
   caseValidations.push(
@@ -134,7 +163,7 @@ import {
     caseValidations.join('\n\n') + '\n\n    ',
   )
 
-  fs.writeFileSync(
+  await fs.writeFile(
     path.join(
       path.dirname(__filename),
       '../src/models/transactions/transaction.ts',
@@ -146,18 +175,20 @@ import {
   jsTransactionFile = newJsTxFile
 }
 
-function updateIndexFile(tx) {
-  const filename = path.join(
+async function updateIndexFile(tx) {
+  let indexFile = await readFile(
     path.dirname(__filename),
     '../src/models/transactions/index.ts',
   )
-  let indexFile = readFile(filename)
   indexFile = indexFile.replace(
     `} from './XChainModifyBridge'`,
     `} from './XChainModifyBridge'
 export { ${tx} } from './${tx}'`,
   )
-  fs.writeFileSync(filename, indexFile)
+  await fs.writeFile(
+    path.join(path.dirname(__filename), '../src/models/transactions/index.ts'),
+    indexFile,
+  )
 }
 
 function generateParamLine(sfields, param, isRequired) {
@@ -168,8 +199,8 @@ function generateParamLine(sfields, param, isRequired) {
 }
 
 async function main(folder) {
-  const [txsToAdd, txFormats, sfields, transactionMatch] =
-    processRippledSource(folder)
+  const [txsToAdd, txFormats, sfields, transactionMatch, jsTransactionFile] =
+    await processRippledSource(folder)
   txsToAdd.forEach(async (tx) => {
     const txFormat = txFormats[tx]
     const paramLines = txFormat
@@ -224,7 +255,7 @@ ${validationImportLine}`
     imported_models = imported_models.replace('\n\n\n\n', '\n\n')
     imported_models = imported_models.replace('\n\n\n', '\n\n')
     model = model.replace('\n\n\n\n', '\n\n')
-    fs.writeFileSync(
+    await fs.writeFile(
       path.join(
         path.dirname(__filename),
         `../src/models/transactions/${tx}.ts`,
@@ -233,7 +264,7 @@ ${validationImportLine}`
     )
 
     const validate = await createValidate(tx)
-    fs.appendFileSync(
+    await fs.appendFile(
       path.join(
         path.dirname(__filename),
         `../src/models/transactions/${tx}.ts`,
@@ -243,14 +274,14 @@ ${validationImportLine}`
 
     const validateTests = createValidateTests(tx)
     if (validateTests !== '')
-      fs.writeFileSync(
+      await fs.writeFile(
         path.join(path.dirname(__filename), `../test/models/${tx}.test.ts`),
         validateTests,
       )
 
-    updateTransactionFile(transactionMatch, tx)
+    await updateTransactionFile(transactionMatch, jsTransactionFile, tx)
 
-    updateIndexFile(tx)
+    await updateIndexFile(tx)
 
     console.log(`Added ${tx}`)
   })
