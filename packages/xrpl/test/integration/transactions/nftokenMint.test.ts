@@ -88,7 +88,7 @@ describe('NFTokenMint', function () {
 
       const binaryTxResponse = await testContext.client.request({
         ...txRequest,
-        binary: true,
+        binary: true as const,
       })
 
       assert.equal(

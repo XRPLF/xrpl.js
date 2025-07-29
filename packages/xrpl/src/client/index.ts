@@ -14,6 +14,8 @@ import {
   LedgerIndex,
   Balance,
   DEFAULT_API_VERSION,
+  RIPPLED_API_V2,
+  RIPPLED_API_V1,
 } from '../models/common'
 import {
   Request,
@@ -121,15 +123,18 @@ export interface ClientOptions extends ConnectionUserOptions {
 }
 
 // Make sure to update both this and `RequestNextPageReturnMap` at the same time
-type RequestNextPageType =
+type RequestNextPageType<Binary extends boolean = false> =
   | AccountChannelsRequest
   | AccountLinesRequest
   | AccountObjectsRequest
   | AccountOffersRequest
-  | AccountTxRequest
-  | LedgerDataRequest
+  | AccountTxRequest<Binary>
+  | LedgerDataRequest<Binary>
 
-type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
+type RequestNextPageReturnMap<
+  T extends RequestNextPageType<Binary>,
+  Binary extends boolean = false,
+> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
   ? AccountLinesResponse
@@ -137,10 +142,10 @@ type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   ? AccountObjectsResponse
   : T extends AccountOffersRequest
   ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
+  : T extends AccountTxRequest<Binary>
+  ? AccountTxResponse<Binary>
+  : T extends LedgerDataRequest<Binary>
+  ? LedgerDataResponse<Binary>
   : never
 
 /**
@@ -338,9 +343,12 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async request<
-    R extends Request,
-    V extends APIVersion = typeof DEFAULT_API_VERSION,
-    T = RequestResponseMap<R, V>,
+    R extends Request<B>,
+    V extends APIVersion = R['api_version'] extends typeof RIPPLED_API_V1
+      ? typeof RIPPLED_API_V1
+      : typeof RIPPLED_API_V2,
+    B extends boolean = R['binary'] extends true ? true : false,
+    T = RequestResponseMap<R, V, B>,
   >(req: R): Promise<T> {
     const request = {
       ...req,
@@ -383,9 +391,10 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async requestNextPage<
-    T extends RequestNextPageType,
-    U extends RequestNextPageReturnMap<T>,
-  >(req: T, resp: U): Promise<RequestNextPageReturnMap<T>> {
+    T extends RequestNextPageType<B>,
+    U extends RequestNextPageReturnMap<T, B>,
+    B extends T['binary'] extends true ? true : false,
+  >(req: T, resp: U): Promise<RequestNextPageReturnMap<T, B>> {
     if (!resp.result.marker) {
       return Promise.reject(
         new NotFoundError('response does not have a next page'),
