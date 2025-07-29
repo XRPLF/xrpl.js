@@ -23,7 +23,7 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@patelraj96/eslint-config": "^1.10.6",
+    "@patelraj96/eslint-config": "^1.10.8",
     "@patelraj96/prettier-config": "^1.9.1",
     "@types/chai": "^4.2.21",
     "@types/jest": "^29.2.2",
@@ -42,7 +42,7 @@
     "eslint-plugin-jsdoc": "^52.0.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-tsdoc": "^0.2.16",
+    "eslint-plugin-tsdoc": "^0.4.0",
     "expect": "^29.3.1",
     "jest": "^29.3.1",
     "jest-mock": "^29.3.1",
