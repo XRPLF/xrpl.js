@@ -61,8 +61,8 @@ async function claimPayChannel(): Promise<void> {
     Amount: '100',
   }
 
-  const channelClaimResponse = await client.submit(paymentChannelClaim, {
-    wallet: wallet1,
+  const channelClaimResponse = await client.submitAndWait(paymentChannelClaim, {
+    wallet: wallet2,
   })
   console.log(channelClaimResponse)
 
