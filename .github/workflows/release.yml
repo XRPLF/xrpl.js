@@ -101,7 +101,7 @@ jobs:
           -H "Authorization: Bearer $SLACK_TOKEN" \
           -H "Content-Type: application/json" \
           -d "$(jq -n \
-                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg channel "#xrpl-js" \
                 --arg text "$MESSAGE" \
                 '{channel: $channel, text: $text}')"
 
@@ -270,7 +270,7 @@ jobs:
           -H "Authorization: Bearer $SLACK_TOKEN" \
           -H "Content-Type: application/json" \
           -d "$(jq -n \
-                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg channel "#xrpl-js" \
                 --arg text "$MESSAGE" \
                 '{channel: $channel, text: $text}')"
 
@@ -284,6 +284,6 @@ jobs:
           -H "Authorization: Bearer $SLACK_TOKEN" \
           -H "Content-Type: application/json" \
           -d "$(jq -n \
-                --arg channel "#ripplex-test-notifications-non-prod" \
+                --arg channel "#xrpl-js" \
                 --arg text "$MESSAGE" \
                 '{channel: $channel, text: $text}')"
