@@ -240,7 +240,7 @@
     "testName": "incorrect JSON",
     "mptMetadata": "not a json",
     "validationMessages": [
-      "MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token o in JSON at position 1"
+      "MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'o', \"not a json\" is not valid JSON"
     ]
   },
   {

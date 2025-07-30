@@ -1,6 +1,15 @@
 import { assert } from 'chai'
 
-import { EscrowFinish, EscrowCreate, EscrowCancel, Wallet, AccountSet, AccountSetAsfFlags, Payment, TrustSet } from '../../../src'
+import {
+  EscrowFinish,
+  EscrowCreate,
+  EscrowCancel,
+  Wallet,
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  TrustSet,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
