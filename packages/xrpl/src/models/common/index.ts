@@ -29,6 +29,7 @@ export interface MPTAmount {
   value: string
 }
 
+// TODO: add MPTAmount to Amount once MPTv2 is released
 export type Amount = IssuedCurrencyAmount | string
 
 export type ClawbackAmount = IssuedCurrencyAmount | MPTAmount
@@ -216,4 +217,28 @@ export interface PriceData {
      */
     Scale?: number
   }
+}
+
+/**
+ * MPTokenMetadata object as per the XLS-89d standard.
+ */
+export interface MPTokenMetadata {
+  ticker: string
+  name: string
+  icon: string
+  asset_class: string
+  issuer_name: string
+  desc?: string
+  asset_subclass?: string
+  urls?: MPTokenMetadataUrl[]
+  additional_info?: string
+}
+
+/**
+ * MPTokenMetadataUrl object as per the XLS-89d standard.
+ */
+export interface MPTokenMetadataUrl {
+  url: string
+  type: string
+  title: string
 }

@@ -53,7 +53,7 @@ describe('EscrowCreate', function () {
   it(`throws w/ invalid Amount`, function () {
     escrow.Amount = 1000
 
-    assertInvalid(escrow, 'EscrowCreate: Amount must be a string')
+    assertInvalid(escrow, 'EscrowCreate: invalid field Amount')
   })
 
   it(`invalid CancelAfter`, function () {
