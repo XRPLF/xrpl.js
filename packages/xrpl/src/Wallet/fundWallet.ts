@@ -211,7 +211,7 @@ async function processError(response: Response, body): Promise<never> {
     new XRPLFaucetError(
       `Request failed: ${JSON.stringify({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- json response could be anything
-        body: body || {},
+        body: body ?? {},
         contentType: response.headers.get('Content-Type'),
         statusCode: response.status,
       })}`,

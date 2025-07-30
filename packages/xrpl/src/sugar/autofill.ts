@@ -403,12 +403,9 @@ export async function checkAccountDeleteBlockers(
  */
 export function handleDeliverMax(tx: Payment): void {
   if (tx.DeliverMax != null) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
-    if (tx.Amount == null) {
-      // If only DeliverMax is provided, use it to populate the Amount field
-      // eslint-disable-next-line no-param-reassign -- known RPC-level property
-      tx.Amount = tx.DeliverMax
-    }
+    // If only DeliverMax is provided, use it to populate the Amount field
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-param-reassign -- needed here
+    tx.Amount ??= tx.DeliverMax
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {

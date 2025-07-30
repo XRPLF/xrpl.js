@@ -23,15 +23,15 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "@patelraj96/eslint-config": "^1.10.8",
+    "@patelraj96/eslint-config": "^1.10.13",
     "@patelraj96/prettier-config": "^1.9.1",
     "@types/chai": "^4.2.21",
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.136",
     "@types/node": "^18.19.29",
     "@types/ws": "^8.2.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
     "eslint": "^8.40.0",

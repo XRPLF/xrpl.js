@@ -673,9 +673,7 @@ class Client extends EventEmitter<EventTypes> {
     tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
-    if (tx.NetworkID == null) {
-      tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
+    tx.NetworkID ??= txNeedsNetworkID(this) ? this.networkID : undefined
     if (tx.Sequence == null) {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
