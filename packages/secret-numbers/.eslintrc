@@ -1,0 +1,13 @@
+// Kept this file empty to avoid ESLint errors on purpose. This file can be deleted once below mentioned issue is resolved.
+
+// ESLint: 9.32.0
+
+// Error: Error while loading rule 'import/no-unused-modules':
+// Due to the exclusion of certain internal ESLint APIs when using flat config,
+// the import/no-unused-modules rule requires an .eslintrc file to know which
+// files to ignore (even when using flat config).
+// The .eslintrc file only needs to contain "ignorePatterns", or can be empty if
+// you do not want to ignore any files.
+
+// See https://github.com/import-js/eslint-plugin-import/issues/3079
+// for additional context.
