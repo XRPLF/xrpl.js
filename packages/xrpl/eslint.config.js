@@ -9,12 +9,7 @@ module.exports = [
       '**/dist/',
       '**/build/',
       'coverage/',
-      'eslint.config.js',
-      'jest.config.js',
-      'karma.config.js',
-      'test/webpack.config.js',
-      'webpack.base.config.js',
-      'webpack.config.js',
+      '**/*.js',
       'typedoc.mts',
       'tools/',
     ],
@@ -36,11 +31,6 @@ module.exports = [
           '../ripple-address-codec/tsconfig.eslint.json',
           '../ripple-keypairs/tsconfig.eslint.json',
         ],
-
-        ecmaVersion: 2020,
-        ecmaFeatures: {
-          impliedStrict: true, // Enable global strict mode
-        },
 
         globals: {
           ...globals.browser,
@@ -83,6 +73,8 @@ module.exports = [
       'jsdoc/require-description-complete-sentence': 'off',
       'import/prefer-default-export': 'off',
       'max-depth': ['warn', 3],
+      'n/no-unsupported-features/node-builtins': 'off',
+      'import/no-named-as-default': 'off',
     },
   },
   {

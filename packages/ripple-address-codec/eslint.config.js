@@ -11,11 +11,7 @@ module.exports = [
       '.nyc_output/',
       'nyc.config.js',
       '.idea/',
-      'eslint.config.js',
-      '.eslintrc.js',
-      'jest.config.js',
-      'karma.config.js',
-      'test/webpack.config.js',
+      '**/*.js',
       'examples/',
     ],
   },
@@ -29,11 +25,6 @@ module.exports = [
         // Enable linting rules with type information from our tsconfig
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.eslint.json'],
-        ecmaVersion: 2020,
-
-        ecmaFeatures: {
-          impliedStrict: true, // Enable global strict mode
-        },
       },
 
       globals: {

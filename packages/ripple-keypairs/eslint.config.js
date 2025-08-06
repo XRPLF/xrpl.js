@@ -4,15 +4,7 @@ const typescriptParser = require('@typescript-eslint/parser')
 
 module.exports = [
   {
-    ignores: [
-      '**/node_modules/',
-      '**/dist/',
-      'coverage/',
-      'eslint.config.js',
-      'jest.config.js',
-      'karma.config.js',
-      'test/webpack.config.js',
-    ],
+    ignores: ['**/node_modules/', '**/dist/', 'coverage/', '**/*.js'],
   },
   ...eslintConfig,
   {
@@ -25,11 +17,6 @@ module.exports = [
         // Enable linting rules with type information from our tsconfig
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.eslint.json'],
-
-        ecmaVersion: 2020,
-        ecmaFeatures: {
-          impliedStrict: true, // Enable global strict mode
-        },
 
         globals: {
           ...globals.browser,
