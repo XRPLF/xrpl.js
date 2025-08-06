@@ -47,8 +47,7 @@
     "ws": "^8.14.2"
   },
   "scripts": {
-    "build": "run-s build:lib build:snippets build:web",
-    "build:snippets": "tsc --build ./snippets/tsconfig.json",
+    "build": "run-s build:lib build:web",
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
@@ -65,10 +64,7 @@
     "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
     "lint": "eslint . --ext .ts --max-warnings 0",
-    "perf": "./scripts/perf_test.sh",
-    "compile:snippets": "tsc -p snippets/tsconfig.json",
-    "start:snippet": "npm run compile:snippets && node",
-    "inspect:snippet": "npm run compile:snippets && node inspect"
+    "perf": "./scripts/perf_test.sh"
   },
   "prettier": "@xrplf/prettier-config",
   "repository": {
