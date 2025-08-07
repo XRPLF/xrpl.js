@@ -1,4 +1,4 @@
-import { LedgerIndex } from '../common'
+import { LedgerIndex, APIVersion } from '../common'
 
 import type { Request } from '.'
 
@@ -13,7 +13,7 @@ export interface BaseRequest {
   /** The name of the API method. */
   command: string
   /** The API version to use. If omitted, use version 1. */
-  api_version?: number
+  api_version?: APIVersion
 }
 
 export interface LookupByLedgerRequest {
@@ -37,7 +37,7 @@ export interface BaseResponse {
   warning?: 'load'
   warnings?: ResponseWarning[]
   forwarded?: boolean
-  api_version?: number
+  api_version?: APIVersion
 }
 
 /**
@@ -55,5 +55,5 @@ export interface ErrorResponse {
   error_message?: string
   error_exception?: string
   request: Request
-  api_version?: number
+  api_version?: APIVersion
 }
