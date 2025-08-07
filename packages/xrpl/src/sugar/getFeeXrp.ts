@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import { type Client } from '..'
 import { XrplError } from '../errors'
+import { APIVersion, DEFAULT_API_VERSION } from '../models/common'
 
 const NUM_DECIMAL_PLACES = 6
 const BASE_10 = 10
@@ -14,10 +15,9 @@ const BASE_10 = 10
  * @param cushion - The fee cushion to use.
  * @returns The transaction fee.
  */
-export default async function getFeeXrp(
-  client: Client,
-  cushion?: number,
-): Promise<string> {
+export default async function getFeeXrp<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, cushion?: number): Promise<string> {
   const feeCushion = cushion ?? client.feeCushion
 
   const serverInfo = (
