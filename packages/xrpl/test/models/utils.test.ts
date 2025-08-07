@@ -575,6 +575,10 @@ describe('Models Utils', function () {
   })
 
   describe('MPTokenMetadata validation messages', function () {
+    beforeEach(() => {
+      jest.spyOn(console, 'warn').mockImplementation(jest.fn())
+    })
+
     for (const testCase of mptMetadataTests) {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
