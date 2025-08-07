@@ -39,12 +39,9 @@ const secp256k1: SigningScheme = {
         ? privateKey.slice(2)
         : privateKey
 
-    const hexString =  Buffer.from(normalizedPrivateKey).toString('hex')
-    const privKeyBigInt = BigInt(`0x${hexString}`)
+    const buffer = Buffer.from(normalizedPrivateKey, 'hex')
 
-    const publicKey = bytesToHex(
-      nobleSecp256k1.getPublicKey(privKeyBigInt, true),
-    )
+    const publicKey = bytesToHex(nobleSecp256k1.getPublicKey(buffer, true))
     return { privateKey, publicKey }
   },
 

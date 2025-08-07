@@ -27,7 +27,8 @@ const ed25519: SigningScheme = {
       ? privateKey.slice(2)
       : privateKey
 
-    const buffer = Buffer.from(normalizedPrivateKey)
+    const buffer = Buffer.from(normalizedPrivateKey, 'hex')
+
     const publicKey = ED_PREFIX + bytesToHex(nobleEd25519.getPublicKey(buffer))
     return { privateKey, publicKey }
   },

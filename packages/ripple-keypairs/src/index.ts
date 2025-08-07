@@ -96,8 +96,7 @@ function deriveAddress(publicKey: string): string {
 }
 
 function derivePublicKey(privateKey: string): string {
-  const buffer = Buffer.from(privateKey)
-  const algorithm = getAlgorithmFromPrivateKey(buffer.toString('hex'))
+  const algorithm = getAlgorithmFromPrivateKey(privateKey)
 
   if (algorithm === 'ecdsa-secp256k1') {
     return secp256k1.deriveKeypairFromPrivateKey(privateKey).publicKey
