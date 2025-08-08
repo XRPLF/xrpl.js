@@ -436,7 +436,7 @@ export async function autofillBatchTxn(
 ): Promise<void> {
   const accountSequences: Record<string, number> = {}
 
-  for await (const rawTxn of tx.RawTransactions) {
+  for (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
 
     // Sequence processing
@@ -445,6 +445,7 @@ export async function autofillBatchTxn(
         txn.Sequence = accountSequences[txn.Account]
         accountSequences[txn.Account] += 1
       } else {
+        // eslint-disable-next-line no-await-in-loop -- It has to wait
         const nextSequence = await getNextValidSequenceNumber(
           client,
           txn.Account,
