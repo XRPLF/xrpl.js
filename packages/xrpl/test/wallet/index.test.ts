@@ -449,8 +449,8 @@ describe('Wallet', function () {
 
       it('derive keypair from private key', function () {
         const wallet = Wallet.fromPrivateKey(mockWallet_secp256k1.privateKey)
-        expect(wallet.address).toStrictEqual(mockWallet_secp256k1.address)
-        expect(wallet.publicKey).toStrictEqual(mockWallet_secp256k1.publicKey)
+        assert.equal(wallet.address, mockWallet_secp256k1.address)
+        assert.equal(wallet.publicKey, mockWallet_secp256k1.publicKey)
       })
 
       it('expect to throw error if private key incorrect format', function () {
@@ -458,26 +458,26 @@ describe('Wallet', function () {
           Wallet.fromPrivateKey(mockWallet_secp256k1.privateKey.slice(0, 10)),
         )
       })
+    })
 
-      describe('using ed25519 private key', function () {
-        const mockWallet_ed25519 = {
-          address: 'rszPLM97iS8mFTndKQNexGhY1N9ionLVAx',
-          publicKey:
-            'EDFD5C3E305FDEB97A89FC39ED333A710A7ED35E3471443C4989F9E3B8F023488D',
-          privateKey:
-            'EDDA8694C151CE30E8A2C91884E26BC11A75514E3A27EE6CE4615FABA3DCBE1429',
-        }
-        it('derive keypair from private key', function () {
-          const wallet = Wallet.fromPrivateKey(mockWallet_ed25519.privateKey)
-          expect(wallet.address).toStrictEqual(mockWallet_ed25519.address)
-          expect(wallet.publicKey).toStrictEqual(mockWallet_ed25519.publicKey)
-        })
+    describe('using ed25519 private key', function () {
+      const mockWallet_ed25519 = {
+        address: 'rszPLM97iS8mFTndKQNexGhY1N9ionLVAx',
+        publicKey:
+          'EDFD5C3E305FDEB97A89FC39ED333A710A7ED35E3471443C4989F9E3B8F023488D',
+        privateKey:
+          'EDDA8694C151CE30E8A2C91884E26BC11A75514E3A27EE6CE4615FABA3DCBE1429',
+      }
+      it('derive keypair from private key', function () {
+        const wallet = Wallet.fromPrivateKey(mockWallet_ed25519.privateKey)
+        assert.equal(wallet.address, mockWallet_ed25519.address)
+        assert.equal(wallet.publicKey, mockWallet_ed25519.publicKey)
+      })
 
-        it('expect to throw error if private key incorrect format', function () {
-          assert.throws(() =>
-            Wallet.fromPrivateKey(mockWallet_ed25519.privateKey.slice(0, 10)),
-          )
-        })
+      it('expect to throw error if private key incorrect format', function () {
+        assert.throws(() =>
+          Wallet.fromPrivateKey(mockWallet_ed25519.privateKey.slice(0, 10)),
+        )
       })
     })
   })
