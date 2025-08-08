@@ -48,13 +48,17 @@ function normalRippledResponse(request: Request): Record<string, unknown> {
     isBTC((request as BookOffersRequest).taker_gets.currency) &&
     isUSD((request as BookOffersRequest).taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersBidsResponse(request)
+    return rippled.book_offers.fabric.requestBookOffersBidsResponse(
+      request,
+    ) as Record<string, unknown>
   }
   if (
     isUSD((request as BookOffersRequest).taker_gets.currency) &&
     isBTC((request as BookOffersRequest).taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
+    return rippled.book_offers.fabric.requestBookOffersAsksResponse(
+      request,
+    ) as Record<string, unknown>
   }
   throw new XrplError('unexpected end')
 }
