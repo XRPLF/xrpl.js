@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/secret-numbers",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits",
   "main": "dist/index.js",
   "unpkg": "build/xrplf-secret-numbers-latest-min.js",

@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 4.4.0 (2025-07-29)
+
 ### Added
 * Support for `PermissionedDEX` (XLS-81d)
 * Support for `Token Escrow` (XLS-85)
