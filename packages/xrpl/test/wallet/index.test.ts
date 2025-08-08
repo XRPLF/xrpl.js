@@ -453,7 +453,7 @@ describe('Wallet', function () {
         assert.equal(wallet.publicKey, mockWallet_secp256k1.publicKey)
       })
 
-      it('expect to throw error if private key incorrect format', function () {
+      it('throws error for malformed secp256k1 private key', function () {
         assert.throws(() =>
           Wallet.fromPrivateKey(mockWallet_secp256k1.privateKey.slice(0, 10)),
         )
@@ -474,7 +474,7 @@ describe('Wallet', function () {
         assert.equal(wallet.publicKey, mockWallet_ed25519.publicKey)
       })
 
-      it('expect to throw error if private key incorrect format', function () {
+      it('throws error for malformed ed25519 private key', function () {
         assert.throws(() =>
           Wallet.fromPrivateKey(mockWallet_ed25519.privateKey.slice(0, 10)),
         )

@@ -181,6 +181,9 @@ export class Wallet {
    * @returns A Wallet derived from a private key.
    */
   public static fromPrivateKey(privateKey: string): Wallet {
+    if (!privateKey || typeof privateKey !== 'string') {
+      throw new ValidationError('privateKey must be a non-empty string')
+    }
     return new Wallet(derivePublicKey(privateKey), privateKey)
   }
 
