@@ -132,16 +132,16 @@ type RequestNextPageType =
 type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : never
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest
+          ? AccountTxResponse
+          : T extends LedgerDataRequest
+            ? LedgerDataResponse
+            : never
 
 /**
  * Get the response key / property name that contains the listed data for a

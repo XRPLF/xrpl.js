@@ -266,7 +266,7 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
  * @returns A promise that returns the fee.
  */
-
+// eslint-disable-next-line max-lines-per-function -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -291,14 +291,17 @@ async function calculateFeePerTransactionType(
   } else if (isSpecialTxCost) {
     baseFee = await fetchOwnerReserveFee(client)
   } else if (tx.TransactionType === 'Batch') {
-    const rawTxFees = await tx.RawTransactions.reduce(async (acc, rawTxn) => {
-      const resolvedAcc = await acc
-      const fee = await calculateFeePerTransactionType(
-        client,
-        rawTxn.RawTransaction,
-      )
-      return BigNumber.sum(resolvedAcc, fee)
-    }, Promise.resolve(new BigNumber(0)))
+    const rawTxFees = await tx.RawTransactions.reduce(
+      async (acc, rawTxn) => {
+        const resolvedAcc = await acc
+        const fee = await calculateFeePerTransactionType(
+          client,
+          rawTxn.RawTransaction,
+        )
+        return BigNumber.sum(resolvedAcc, fee)
+      },
+      Promise.resolve(new BigNumber(0)),
+    )
     baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
   }
 
