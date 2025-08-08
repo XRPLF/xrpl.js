@@ -38,7 +38,7 @@ function createLedgerTest(ledgerIndex: number): void {
     `fixtures/rippled/ledgerFull${ledgerIndex}.json`,
   )
 
-  // eslint-disable-next-line node/no-sync -- must be sync version when not in async method
+  // eslint-disable-next-line n/no-sync -- must be sync version when not in async method
   const ledgerRaw = fs.readFileSync(fileLocation, { encoding: 'utf8' })
   const ledgerJSON = JSON.parse(ledgerRaw)
 
