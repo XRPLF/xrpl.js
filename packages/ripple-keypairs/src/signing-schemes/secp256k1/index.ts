@@ -34,6 +34,11 @@ const secp256k1: SigningScheme = {
     privateKey: string
     publicKey: string
   } {
+    assert.ok(
+      (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
+        privateKey.length === 64,
+      'Invalid private key length or format',
+    )
     const normalizedPrivateKey =
       privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)
         ? privateKey.slice(2)
@@ -55,6 +60,7 @@ const secp256k1: SigningScheme = {
     )
     const normedPrivateKey =
       privateKey.length === 66 ? privateKey.slice(2) : privateKey
+
     return nobleSecp256k1
       .sign(Sha512.half(message), normedPrivateKey, {
         // "Canonical" signatures

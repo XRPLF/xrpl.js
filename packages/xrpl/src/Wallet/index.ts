@@ -179,6 +179,8 @@ export class Wallet {
    *
    * @param privateKey - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
    * @returns A Wallet derived from a private key.
+   *
+   *  @throws ValidationError if private key is not a valid string
    */
   public static fromPrivateKey(privateKey: string): Wallet {
     if (!privateKey || typeof privateKey !== 'string') {
