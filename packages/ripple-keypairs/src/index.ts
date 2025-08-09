@@ -95,6 +95,15 @@ function deriveAddress(publicKey: string): string {
   return deriveAddressFromBytes(hexToBytes(publicKey))
 }
 
+function derivePublicKey(privateKey: string): string {
+  const algorithm = getAlgorithmFromPrivateKey(privateKey)
+
+  if (algorithm === 'ecdsa-secp256k1') {
+    return secp256k1.deriveKeypairFromPrivateKey(privateKey).publicKey
+  }
+  return ed25519.deriveKeypairFromPrivateKey(privateKey).publicKey
+}
+
 function deriveNodeAddress(publicKey: string): string {
   const generatorBytes = decodeNodePublic(publicKey)
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes)
@@ -104,6 +113,7 @@ function deriveNodeAddress(publicKey: string): string {
 export {
   generateSeed,
   deriveKeypair,
+  derivePublicKey,
   sign,
   verify,
   deriveAddress,
