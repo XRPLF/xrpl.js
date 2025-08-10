@@ -1,6 +1,6 @@
 const globals = require('globals')
 const eslintConfig = require('@patelraj96/eslint-config/base')
-const typescriptParser = require('@typescript-eslint/parser')
+const tseslint = require('typescript-eslint')
 
 module.exports = [
   {
@@ -11,16 +11,17 @@ module.exports = [
     languageOptions: {
       sourceType: 'module', // Allow the use of imports / ES modules
       ecmaVersion: 2020,
-      parser: typescriptParser, // Make ESLint compatible with TypeScript
+      parser: tseslint.parser, // Make ESLint compatible with TypeScript
       parserOptions: {
         // Enable linting rules with type information from our tsconfig
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.eslint.json'],
-
-        globals: {
-          ...globals.browser,
-          ...globals.jest,
-        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+        ...globals.node,
+        ...globals.es2020,
       },
     },
 

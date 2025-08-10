@@ -1,6 +1,6 @@
 const globals = require('globals')
 const eslintConfig = require('@patelraj96/eslint-config/base')
-const typescriptParser = require('@typescript-eslint/parser')
+const tseslint = require('typescript-eslint')
 
 module.exports = [
   {
@@ -21,7 +21,7 @@ module.exports = [
       ecmaVersion: 2020,
 
       // Make ESLint compatible with TypeScript
-      parser: typescriptParser,
+      parser: tseslint.parser,
       parserOptions: {
         // Enable linting rules with type information from our tsconfig
         tsconfigRootDir: __dirname,
@@ -31,11 +31,11 @@ module.exports = [
           '../ripple-address-codec/tsconfig.eslint.json',
           '../ripple-keypairs/tsconfig.eslint.json',
         ],
-
-        globals: {
-          ...globals.browser,
-          ...globals.jest,
-        },
+      },
+      globals: {
+        ...globals.jest,
+        ...globals.node,
+        ...globals.es2020,
       },
     },
 
@@ -44,7 +44,6 @@ module.exports = [
       // Disabled until https://github.com/import-js/eslint-plugin-import/pull/2305 is resolved to
       // accomodate this change https://github.com/XRPLF/xrpl.js/pull/2133
       'import/no-unused-modules': 'off',
-      'eslint-comments/no-unused-disable': 'off',
       // Certain rippled APIs require snake_case naming
       '@typescript-eslint/naming-convention': [
         'error',
@@ -75,17 +74,7 @@ module.exports = [
       'max-depth': ['warn', 3],
       'n/no-unsupported-features/node-builtins': 'off',
       'import/no-named-as-default': 'off',
-    },
-  },
-  {
-    files: ['snippets/src/*.ts'],
-    rules: {
-      'import/no-unused-modules': 'off',
-      // Each file has a particular flow.
-      'max-lines-per-function': 'off',
-      'max-statements': 'off',
-      // Snippets have logs on console to better understand the working.
-      'no-console': 'off',
+      'n/no-unpublished-import': 'off',
     },
   },
   {
@@ -133,19 +122,6 @@ module.exports = [
     files: ['src/models/**/*.ts'],
     rules: {
       complexity: ['off'],
-    },
-  },
-  {
-    files: ['.eslintrc.js', 'jest.config.js'],
-    rules: {
-      // Removed no-commonjs requirement as eslint must be in common js format
-      'import/no-commonjs': 'off',
-
-      // Removed this as eslint prevents us from doing this differently
-      'import/unambiguous': 'off',
-
-      // Javascript files have CommonJS exports
-      'import/no-unused-modules': 'off',
     },
   },
   {
