@@ -16,6 +16,9 @@ module.exports = [
         // Enable linting rules with type information from our tsconfig
         tsconfigRootDir: __dirname,
         project: ['./tsconfig.eslint.json'],
+        ecmaFeatures: {
+          impliedStrict: true, // Enable global strict mode
+        },
       },
       globals: {
         ...globals.browser,

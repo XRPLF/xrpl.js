@@ -31,6 +31,9 @@ module.exports = [
           '../ripple-address-codec/tsconfig.eslint.json',
           '../ripple-keypairs/tsconfig.eslint.json',
         ],
+        ecmaFeatures: {
+          impliedStrict: true, // Enable global strict mode
+        },
       },
       globals: {
         ...globals.jest,
