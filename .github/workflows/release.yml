@@ -1,5 +1,11 @@
 name: Release Pipeline
 
+permissions:
+  id-token: write
+  contents: read
+  attestations: write
+  pages: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -253,9 +259,9 @@ jobs:
         PKG=$(ls *.tgz)
         echo $PKG
         if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
-          npm publish "$PKG" --access public --registry=https://registry.npmjs.org/ --dry-run
+          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --dry-run
         else
-          npm publish "$PKG" --access public --registry=https://registry.npmjs.org/
+          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/
         fi
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
