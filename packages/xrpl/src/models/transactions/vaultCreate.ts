@@ -14,9 +14,10 @@ import {
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
 } from './common'
-
-const META_MAX_BYTE_LENGTH = 1024
 
 /**
  * Enum representing withdrawal strategies for a Vault.
@@ -71,6 +72,12 @@ export interface VaultCreate extends BaseTransaction {
 
   /**
    * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
+   *
+   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
+   * XLS-89d MPTokenMetadata standard.
+   *
+   * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
+   * may not be discoverable by ecosystem tools such as explorers and indexers.
    */
   MPTokenMetadata?: string
 
@@ -85,13 +92,14 @@ export interface VaultCreate extends BaseTransaction {
   DomainID?: string
 }
 
+/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+/* eslint-disable max-statements -- required to do all field validations */
 /**
  * Verify the form and type of an {@link VaultCreate} at runtime.
  *
  * @param tx - A {@link VaultCreate} Transaction.
  * @throws When the {@link VaultCreate} is malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- required to do all field validations
 export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -119,13 +127,13 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     const metaHex = tx.MPTokenMetadata
     if (!isHex(metaHex)) {
       throw new ValidationError(
-        'VaultCreate: MPTokenMetadata must be a valid hex string',
+        'VaultCreate: MPTokenMetadata must be a valid non-empty hex string',
       )
     }
     const metaByteLength = metaHex.length / 2
-    if (metaByteLength > META_MAX_BYTE_LENGTH) {
+    if (metaByteLength > MAX_MPT_META_BYTE_LENGTH) {
       throw new ValidationError(
-        `VaultCreate: MPTokenMetadata exceeds ${META_MAX_BYTE_LENGTH} bytes (actual: ${metaByteLength})`,
+        `VaultCreate: MPTokenMetadata exceeds ${MAX_MPT_META_BYTE_LENGTH} bytes (actual: ${metaByteLength})`,
       )
     }
   }
@@ -139,4 +147,20 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
       'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.',
     )
   }
+
+  if (tx.MPTokenMetadata != null) {
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
+
+    if (validationMessages.length > 0) {
+      const message = [
+        MPT_META_WARNING_HEADER,
+        ...validationMessages.map((msg) => `- ${msg}`),
+      ].join('\n')
+
+      // eslint-disable-next-line no-console -- Required here.
+      console.warn(message)
+    }
+  }
 }
+/* eslint-enable max-lines-per-function */
+/* eslint-enable max-statements */

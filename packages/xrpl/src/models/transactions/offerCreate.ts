@@ -158,7 +158,7 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   })
 
   if (
-    tx.DomainID === undefined &&
+    tx.DomainID == null &&
     hasFlag(tx, OfferCreateFlags.tfHybrid, 'tfHybrid')
   ) {
     throw new ValidationError(

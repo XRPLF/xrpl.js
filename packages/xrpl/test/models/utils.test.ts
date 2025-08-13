@@ -1,5 +1,6 @@
 /* eslint-disable import/no-deprecated -- using deprecated setTransactionFlagsToNumbers to ensure no breaking changes */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
+import { stringToHex } from '@xrplf/isomorphic/src/utils'
 import { assert } from 'chai'
 
 import {
@@ -18,6 +19,7 @@ import { AccountRootFlags } from '../../src/models/ledger'
 import {
   containsDuplicates,
   GlobalFlags,
+  validateMPTokenMetadata,
 } from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
@@ -26,6 +28,7 @@ import {
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
+import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
 
 /**
  * Utils Testing.
@@ -569,5 +572,22 @@ describe('Models Utils', function () {
 
       assert.throws(() => convertTxFlagsToNumber(tx))
     })
+  })
+
+  describe('MPTokenMetadata validation messages', function () {
+    for (const testCase of mptMetadataTests) {
+      const testName: string = testCase.testName
+      it(`should validate messages for: ${testName}`, function () {
+        const validationMessages = validateMPTokenMetadata(
+          stringToHex(
+            typeof testCase.mptMetadata === 'string'
+              ? testCase.mptMetadata
+              : JSON.stringify(testCase.mptMetadata),
+          ),
+        )
+
+        assert.deepStrictEqual(testCase.validationMessages, validationMessages)
+      })
+    }
   })
 })
