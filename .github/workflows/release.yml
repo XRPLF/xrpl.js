@@ -219,6 +219,8 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs: [get_version, run_faucet_test, run_tests, pre_release, review]
     name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     env:
