@@ -18,6 +18,8 @@ export interface SigningScheme {
     options?: DeriveKeyPairOptions,
   ) => KeyPair
 
+  deriveKeypairFromPrivateKey: (privateKey: HexString) => KeyPair
+
   sign: (
     // deriveKeyPair creates a Sha512.half as Uint8Array so that's why it takes this
     // though it /COULD/ take HexString as well

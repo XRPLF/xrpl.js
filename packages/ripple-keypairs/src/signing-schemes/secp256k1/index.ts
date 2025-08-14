@@ -30,6 +30,26 @@ const secp256k1: SigningScheme = {
     return { privateKey, publicKey }
   },
 
+  deriveKeypairFromPrivateKey(privateKey: string): {
+    privateKey: string
+    publicKey: string
+  } {
+    assert.ok(
+      (privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)) ||
+        privateKey.length === 64,
+      'Invalid private key length or format',
+    )
+    const normalizedPrivateKey =
+      privateKey.length === 66 && privateKey.startsWith(SECP256K1_PREFIX)
+        ? privateKey.slice(2)
+        : privateKey
+
+    const buffer = Buffer.from(normalizedPrivateKey, 'hex')
+
+    const publicKey = bytesToHex(nobleSecp256k1.getPublicKey(buffer, true))
+    return { privateKey, publicKey }
+  },
+
   sign(message: Uint8Array, privateKey: HexString): string {
     // Some callers pass the privateKey with the prefix, others without.
     // @noble/curves will throw if the key is not exactly 32 bytes, so we
