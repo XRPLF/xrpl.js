@@ -65,6 +65,9 @@ jobs:
 
   run_tests:
     name: Run unit/integration tests ${{ needs.get_version.outputs.package_version }}
+    permissions:
+      contents: read
+      id-token: write
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
