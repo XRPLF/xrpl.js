@@ -236,7 +236,7 @@ jobs:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
     environment:
-      name: manual-approval
+      name: official-release
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
     - name: Checkout code
