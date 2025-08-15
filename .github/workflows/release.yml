@@ -1,10 +1,7 @@
 name: Release Pipeline
 
 permissions:
-  id-token: write
   contents: read
-  attestations: write
-  pages: write
 
 on:
   workflow_dispatch:
@@ -231,7 +228,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+     id-token: write
+     contents: write
     needs: [get_version, run_faucet_test, run_tests, pre_release, review]
     name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     env:
