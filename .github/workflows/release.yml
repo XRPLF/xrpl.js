@@ -42,10 +42,20 @@ jobs:
     - name: Get package version from package.json
       id: get_version
       run: |
+        set -euo pipefail
         PACKAGE_NAME="${{ github.event.inputs.package_name }}"
-        VERSION=$(jq -r .version "packages/${PACKAGE_NAME}/package.json")
-        echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        PKG_JSON="packages/${PACKAGE_NAME}/package.json"
+        if [[ ! -f "$PKG_JSON" ]]; then
+          echo "package.json not found at $PKG_JSON. Check 'package_name' input." >&2
+          exit 1
+        fi
+        VERSION=$(jq -er .version "$PKG_JSON")
+        if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+          echo "Version is empty or missing in $PKG_JSON" >&2
+          exit 1
+        fi
+        echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   run_faucet_test:
     name: Run faucet tests ${{ needs.get_version.outputs.package_version }}
