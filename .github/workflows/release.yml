@@ -250,9 +250,8 @@ jobs:
       with:
         tag_name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
         name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
-        draft: false
-        prerelease: ${{ github.event.inputs.dry-run == 'true' }}
-
+        draft: ${{ github.event.inputs.dry-run == 'true' }}
+        prerelease: false
     - name: Download artifact
       uses: actions/download-artifact@v4
       with:
