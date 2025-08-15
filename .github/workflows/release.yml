@@ -68,6 +68,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pages: write
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
