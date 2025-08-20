@@ -17,6 +17,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
      "version": "x.y.z"
    }
    ```
+2. Run npm i to update the package-lock with the updated versions and commit the lock file to the releaes branch
 
 ### **Triggering a Release**
 
@@ -34,7 +35,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Reviewing the release details and scan result**
 
-1. The pipelin will pause at the "Review test and security scan result" step, at least 1 approver is required to review and approve the release.
+1. The pipeline will pause at the "Review test and security scan result" step, at least 1 approver is required to review and approve the release.
 
 
 ---
