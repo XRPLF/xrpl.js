@@ -17,8 +17,8 @@ on:
         options:
           - 'true'
           - 'false'
-      git_ref:
-        description: 'Git ref to checkout (branch, tag, or commit SHA)'
+      release_branch:
+        description: 'Release branch the release is generated from'
         required: true
 concurrency:
   group: release
@@ -34,8 +34,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.git_ref }}
+        ref: ${{ github.event.inputs.release_branch }}
         fetch-depth: 0
+    - name: Check if release branch exists
+      run: |
+        if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
+          echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
+        else
+          echo "❌ Release branch ${{ github.event.inputs.release_branch }} not found in remote. Failing workflow."
+          exit 1
+        fi
     - name: Get package version from package.json
       id: get_version
       run: |
@@ -59,7 +67,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
-      git_ref: ${{ github.event.inputs.git_ref }}
+      git_ref: ${{ github.event.inputs.release_branch }}
     secrets: inherit
 
 
@@ -72,7 +80,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
-      git_ref: ${{ github.event.inputs.git_ref }}
+      git_ref: ${{ github.event.inputs.release_branch }}
     secrets: inherit
 
   pre_release:
@@ -87,7 +95,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.git_ref }}
+        ref: ${{ github.event.inputs.release_branch }}
         fetch-depth: 0
 
     - name: Set up Node.js
@@ -199,7 +207,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.git_ref }}
+        ref: ${{ github.event.inputs.release_branch }}
         fetch-depth: 0
     - name: Release summary for review
       env:
@@ -208,7 +216,7 @@ jobs:
         RUN_ID: ${{ github.run_id }}
       run: |
         ARTIFACT_NAME="vulnerability-report"
-        GIT_REF="${{ github.event.inputs.git_ref }}"
+        RELEASE_BRANCH="${{ github.event.inputs.release_branch }}"
         COMMIT_SHA="$(git rev-parse --short HEAD)"
 
         echo "Fetching artifact ID for ${ARTIFACT_NAME}..."
@@ -225,7 +233,7 @@ jobs:
         echo "🔍 Please review the following details before proceeding:"
         echo "📦 Package Name:   $PACKAGE_NAME"
         echo "🔖 Package Version: $PACKAGE_VERSION"
-        echo "🌿 Git Ref:         $GIT_REF"
+        echo "🌿 Release Branc:         $RELEASE_BRANCH"
         echo "🔢 Commit SHA:      $COMMIT_SHA"
         echo "🔗 Please review Vulnerabilities detected: https://github.com/$REPO/actions/runs/${{ github.run_id }}/artifacts/$ARTIFACT_ID"
 
@@ -246,8 +254,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.inputs.git_ref }}
+        ref: ${{ github.event.inputs.release_branch }}
         fetch-depth: 0
+
     - name: Ensure Git tag exists
       id: create_tag
       run: |
@@ -274,9 +283,6 @@ jobs:
         draft: ${{ github.event.inputs.dry-run == 'true' }}
         generate_release_notes: true
         make_latest: ${{ github.event.inputs.dry-run != 'true' }}
-        files: |
-          source_code/xrpl.js-${{ env.PACKAGE_NAME }}-${{ env.PACKAGE_VERSION }}.zip
-          source_code/xrpl.js-${{ env.PACKAGE_NAME }}-${{ env.PACKAGE_VERSION }}.tar.gz
 
     - name: Download artifact
       uses: actions/download-artifact@v4
