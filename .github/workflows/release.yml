@@ -289,11 +289,13 @@ jobs:
         git tag -f "$TAG"
         git push origin -f "$TAG"
 
+        echo "tag_name=$TAG" >> "$GITHUB_OUTPUT"
+
     - name: Create GitHub release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
-        name: "${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
+        tag_name: "${{ steps.create_tag.outputs.tag_name }}"
+        name: "${{ steps.create_tag.outputs.tag_name }}"
         draft: ${{ github.event.inputs.dry-run == 'true' }}
         generate_release_notes: true
         make_latest: ${{ github.event.inputs.dry-run != 'true' }}
