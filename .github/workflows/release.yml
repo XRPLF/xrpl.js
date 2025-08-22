@@ -269,18 +269,25 @@ jobs:
     - name: Ensure Git tag exists
       id: create_tag
       run: |
-        TAG="${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
-        if [ "${{ github.event.inputs.dry-run }}" == "true" ]; then
-          TAG="draft-${TAG}"
+        set -euo pipefail
+        BASE_TAG="${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
+        DRY_RUN="${{ github.event.inputs.dry-run }}"
+        TAG="$BASE_TAG"
+
+        if [ "$DRY_RUN" = "true" ]; then
+          TAG="draft-$BASE_TAG"
         fi
 
-        if git rev-parse "$TAG" >/dev/null 2>&1; then
-          echo "Tag $TAG already exists"
-        else
-          echo "Creating tag $TAG"
-          git tag "$TAG"
-          git push origin "$TAG"
+        git fetch --tags origin
+
+        if git rev-parse "$TAG" >/dev/null 2>&1 && [ "$DRY_RUN" != "true" ]; then
+          echo "❌ Tag $TAG already exists (not a draft). Failing."
+          exit 1
         fi
+
+        echo "🔖 Tagging $TAG"
+        git tag -f "$TAG"
+        git push origin -f "$TAG"
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v2
