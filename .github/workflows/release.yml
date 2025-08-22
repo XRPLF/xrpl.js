@@ -44,6 +44,15 @@ jobs:
           echo "❌ Release branch ${{ github.event.inputs.release_branch }} not found in remote. Failing workflow."
           exit 1
         fi
+
+        echo "🔍 Checking committed changes for 'artifactory.ops.ripple.com'..."
+
+        # Look at the diff between HEAD and its parent
+        if git diff HEAD^ HEAD | grep -q "artifactory.ops.ripple.com"; then
+          echo "❌ artifactory.ops.ripple.com found in committed changes!"
+          exit 1
+        fi
+
     - name: Get package version from package.json
       id: get_version
       run: |
@@ -261,6 +270,10 @@ jobs:
       id: create_tag
       run: |
         TAG="${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
+        if [ "${{ github.event.inputs.dry-run }}" == "true" ]; then
+          TAG="draft-${TAG}"
+        fi
+
         if git rev-parse "$TAG" >/dev/null 2>&1; then
           echo "Tag $TAG already exists"
         else
@@ -268,12 +281,6 @@ jobs:
           git tag "$TAG"
           git push origin "$TAG"
         fi
-    - name: Package source code
-      run: |
-        mkdir -p source_code
-        git archive --format=zip -o "source_code/xrpl.js-${{ env.PACKAGE_NAME }}-${{ env.PACKAGE_VERSION }}.zip" HEAD
-        git archive --format=tar.gz -o "source_code/xrpl.js-${{ env.PACKAGE_NAME }}-${{ env.PACKAGE_VERSION }}.tar.gz" HEAD
-
 
     - name: Create GitHub release
       uses: softprops/action-gh-release@v2

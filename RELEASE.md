@@ -1,6 +1,6 @@
 # 🚀 Release Pipeline Guide
 
-A GitHub Actions workflow has been setup to automate building, scanning, packaging, and releasing npm packages in the `packages/` directory.
+A GitHub Actions workflow has been set up to automate building, scanning, packaging, and releasing npm packages in the `packages/` directory.
 
 ---
 
@@ -11,7 +11,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 ### **Before triggering a release**
 
 1. Create a release branch and update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
-   ```
+   ```json
    {
      "name": "<package_name>",
      "version": "x.y.z"
@@ -49,23 +49,23 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 ---
 
 ### 2. **Run Tests**
-- Triggers the facucet_test, nodejs workflow which will run unit test, intgration test, faucet test etc.
-- Ensures the code at the given Git ref passes tests.
+- Triggers the `faucet_test.yml` and `nodejs.yml` workflows to run unit, integration, and faucet tests against the specified Git ref.
+- Ensures the code at the given Git ref passes all tests.
 
 ---
 
 ### 3. **Pre-Release Steps**
 - Builds the npm package.
 - Generates a CycloneDX SBOM (Software Bill of Materials).
-- Runs a security vulnerability scan with Trivy.
-- Uploads SBOM to OWASP Dependency-Track for tracking the vulnerabilites.
-- Packages the module with lerna and uploads the tarball as an artifact.
-- Posts build failure notifications to Slack.
+- Runs a vulnerability scan with Trivy.
+- Uploads the SBOM to OWASP Dependency-Track for tracking vulnerabilities.
+- Packages the module with Lerna and uploads the tarball as an artifact.
+- Posts failure notifications to Slack..
 
 ---
 
 ### 4. **Review Stage**
-- Genrate a summary of:
+- Generate a summary of:
   - Package name
   - Version
   - Vulnerability scan artifacts
@@ -74,7 +74,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 ---
 
 ### 5. **Release Stage**
-- Requires manual approval (Setup through **GitHub Environment**).
+- Requires manual approval (Set up through **GitHub Environment**).
 - Creates a GitHub Release with a tag like `<package_name>@<version>`.
 - Downloads the built package tarball.
 - Publishes the package to the public npm registry.
@@ -86,7 +86,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 The GitHub release and git tag are named like this:
 
-```
+```text
 <package_name>@<version>
 ```
 
@@ -96,7 +96,7 @@ xrpl@2.3.1
 ```
 
 
-##⚠️ **Important Notes**
+## ⚠️ **Important Notes**
 
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
