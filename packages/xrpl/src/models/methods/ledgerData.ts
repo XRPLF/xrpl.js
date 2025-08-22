@@ -20,13 +20,15 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerDataRequest extends BaseRequest, LookupByLedgerRequest {
+export interface LedgerDataRequest<Binary extends boolean = false>
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'ledger_data'
   /**
    * If set to true, return ledger objects as hashed hex strings instead of
    * JSON.
    */
-  binary?: boolean
+  binary?: Binary
   /**
    * Limit the number of ledger objects to retrieve. The server is not required
    * to honor this value.
@@ -51,17 +53,19 @@ export interface LedgerDataBinaryLedgerEntry {
   data: string
 }
 
-export type LedgerDataLedgerState = { index: string } & (
-  | LedgerDataBinaryLedgerEntry
-  | LedgerDataLabeledLedgerEntry
-)
+export type LedgerDataLedgerState<Binary extends boolean = false> = {
+  index: string
+} & (Binary extends true
+  ? LedgerDataBinaryLedgerEntry
+  : LedgerDataLabeledLedgerEntry)
 
 /**
  * The response expected from a {@link LedgerDataRequest}.
  *
  * @category Responses
  */
-export interface LedgerDataResponse extends BaseResponse {
+export interface LedgerDataResponse<Binary extends boolean = false>
+  extends BaseResponse {
   result: {
     /** The ledger index of this ledger version. */
     ledger_index: number
@@ -71,7 +75,7 @@ export interface LedgerDataResponse extends BaseResponse {
      * Array of JSON objects containing data from the ledger's state tree,
      * as defined below.
      */
-    state: LedgerDataLedgerState[]
+    state: Array<LedgerDataLedgerState<Binary>>
     /**
      * Server-defined value indicating the response is paginated. Pass this to
      * the next call to resume where this call left off.
