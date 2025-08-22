@@ -36,8 +36,9 @@ jobs:
       with:
         ref: ${{ github.event.inputs.release_branch }}
         fetch-depth: 0
-    - name: Check if release branch exists
+    - name: Validate inputs
       run: |
+        set -euo pipefail
         if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
           echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
         else
@@ -45,12 +46,11 @@ jobs:
           exit 1
         fi
 
-        echo "🔍 Checking committed changes for 'artifactory.ops.ripple.com'..."
-
-        # Look at the diff between HEAD and its parent
-        if git diff HEAD^ HEAD | grep -q "artifactory.ops.ripple.com"; then
-          echo "❌ artifactory.ops.ripple.com found in committed changes!"
+        if grep -R --exclude-dir=.git "artifactory.ops.ripple.com" .; then
+          echo "❌ Internal Artifactory URL found"
           exit 1
+        else
+          echo "✅ No Internal Artifactory URL found"
         fi
 
     - name: Get package version from package.json

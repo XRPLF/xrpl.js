@@ -24,7 +24,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
 2. Fill in these fields:
    - **package_name:** The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **git_ref:** The Git branch, tag, or commit SHA to release from.
+   - **release_branch:** The Git branch to release from (e.g., `release/xrpl@4.3.8`).
 
 ➡️ Example:
 
