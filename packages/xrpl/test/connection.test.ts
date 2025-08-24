@@ -390,6 +390,33 @@ describe('Connection', function () {
   )
 
   it(
+    'TimeoutError on send',
+    async () => {
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // Default request timeout is 20s, add 1s to ensure we receive error callback after that
+        const requestTimeoutPlusOne = TIMEOUT + 1000
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, requestTimeoutPlusOne)
+      }
+
+      await clientContext.client
+        .request({ command: 'server_info' })
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+        })
+    },
+    TIMEOUT + 2000,
+  )
+
+  it(
     'DisconnectedError on initial onOpen send',
     async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Testing private member
