@@ -390,33 +390,6 @@ describe('Connection', function () {
   )
 
   it(
-    'TimeoutError on send',
-    async () => {
-      // @ts-expect-error -- Testing private member
-      clientContext.client.connection.ws.send = function (
-        _ignore,
-        sendCallback,
-      ): void {
-        // Default request timeout is 20s, add 1s to ensure we receive error callback after that
-        const requestTimeoutPlusOne = TIMEOUT + 1000
-        setTimeout(() => {
-          sendCallback({ message: 'some error' })
-        }, requestTimeoutPlusOne)
-      }
-
-      await clientContext.client
-        .request({ command: 'server_info' })
-        .then(() => {
-          assert.fail('Should throw TimeoutError')
-        })
-        .catch((error) => {
-          assert(error instanceof TimeoutError)
-        })
-    },
-    TIMEOUT + 2000,
-  )
-
-  it(
     'DisconnectedError on initial onOpen send',
     async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Testing private member
@@ -1003,6 +976,38 @@ describe('Connection', function () {
         XrplError,
         "Response with id 'test' is already pending",
       )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'TimeoutError on send',
+    async () => {
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // server_info request will timeout in 0.5s, but we send an error after 1s
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, 1000)
+      }
+
+      await clientContext.client.connection
+        .request({ command: 'server_info' }, 500)
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+          assert.include(error.message, 'Timeout for request')
+        })
+
+      // wait to ensure that XrplError is not thrown after test is done
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
     },
     TIMEOUT,
   )
