@@ -979,4 +979,36 @@ describe('Connection', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'TimeoutError on send',
+    async () => {
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // server_info request will timeout in 0.5s, but we send an error after 1s
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, 1000)
+      }
+
+      await clientContext.client.connection
+        .request({ command: 'server_info' }, 500)
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+          assert.include(error.message, 'Timeout for request')
+        })
+
+      // wait to ensure that XrplError is not thrown after test is done
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+    },
+    TIMEOUT,
+  )
 })

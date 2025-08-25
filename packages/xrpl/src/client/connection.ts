@@ -301,7 +301,18 @@ export class Connection extends EventEmitter {
     >(request, timeout ?? this.config.timeout)
     this.trace('send', message)
     websocketSendAsync(this.ws, message).catch((error) => {
-      this.requestManager.reject(id, error)
+      try {
+        this.requestManager.reject(id, error)
+      } catch (err) {
+        if (err instanceof XrplError) {
+          this.trace(
+            'send',
+            `send errored after connection was closed: ${err.toString()}`,
+          )
+        } else {
+          this.trace('send', String(err))
+        }
+      }
     })
 
     return responsePromise

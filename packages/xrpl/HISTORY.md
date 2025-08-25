@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fixes node.js process termination when websocket send method errors after connection is closed.
+
 ## 4.4.0 (2025-07-29)
 
 ### Added
