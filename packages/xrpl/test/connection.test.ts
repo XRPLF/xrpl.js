@@ -981,8 +981,17 @@ describe('Connection', function () {
   )
 
   it(
-    'TimeoutError on send',
+    'Delayed websocket error callback on send',
     async () => {
+      const traceMessages: string[] = []
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.trace = (
+        id: string,
+        message: string,
+      ): void => {
+        traceMessages.push(`${id}: ${message}`)
+      }
+
       // @ts-expect-error -- Testing private member
       clientContext.client.connection.ws.send = function (
         _ignore,
@@ -1008,6 +1017,11 @@ describe('Connection', function () {
       await new Promise((resolve) => {
         setTimeout(resolve, 2000)
       })
+
+      assert.includeMembers(traceMessages, [
+        'send: send errored after connection was closed: [XrplError(No existing promise with id 1, ' +
+          '{"type":"reject","error":{"name":"DisconnectedError","data":{"message":"some error"}}})]',
+      ])
     },
     TIMEOUT,
   )
