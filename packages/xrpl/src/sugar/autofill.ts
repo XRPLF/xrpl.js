@@ -4,6 +4,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
+import { APIVersion, DEFAULT_API_VERSION } from '../models/common'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
 import { xrpToDrops } from '../utils'
@@ -92,7 +93,9 @@ function isNotLaterRippledVersion(source: string, target: string): boolean {
  * @param client -- The connected client.
  * @returns True if required networkID, false otherwise.
  */
-export function txNeedsNetworkID(client: Client): boolean {
+export function txNeedsNetworkID<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>): boolean {
   if (
     client.networkID !== undefined &&
     client.networkID > RESTRICTED_NETWORKS
@@ -211,10 +214,9 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
 }
 
 // Helper function to get the next valid sequence number for an account.
-async function getNextValidSequenceNumber(
-  client: Client,
-  account: string,
-): Promise<number> {
+async function getNextValidSequenceNumber<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, account: string): Promise<number> {
   const request: AccountInfoRequest = {
     command: 'account_info',
     account,
@@ -232,10 +234,9 @@ async function getNextValidSequenceNumber(
  * @returns A Promise that resolves when the sequence number is set.
  * @throws {Error} If there is an error retrieving the account information.
  */
-export async function setNextValidSequenceNumber(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function setNextValidSequenceNumber<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
   tx.Sequence = await getNextValidSequenceNumber(client, tx.Account)
 }
@@ -247,7 +248,9 @@ export async function setNextValidSequenceNumber(
  * @returns A Promise that resolves to the owner reserve fee as a BigNumber.
  * @throws {Error} Throws an error if the owner reserve fee cannot be fetched.
  */
-async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
+async function fetchOwnerReserveFee<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
@@ -266,12 +269,9 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
  * @returns A promise that returns the fee.
  */
-
-async function calculateFeePerTransactionType(
-  client: Client,
-  tx: Transaction,
-  signersCount = 0,
-): Promise<BigNumber> {
+export async function calculateFeePerTransactionType<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction, signersCount = 0): Promise<BigNumber> {
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
@@ -327,11 +327,9 @@ async function calculateFeePerTransactionType(
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
-export async function getTransactionFee(
-  client: Client,
-  tx: Transaction,
-  signersCount = 0,
-): Promise<void> {
+export async function getTransactionFee<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction, signersCount = 0): Promise<void> {
   const fee = await calculateFeePerTransactionType(client, tx, signersCount)
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
@@ -355,10 +353,9 @@ function scaleValue(value, multiplier): string {
  * @param tx - The transaction object.
  * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
  */
-export async function setLatestValidatedLedgerSequence(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function setLatestValidatedLedgerSequence<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   const ledgerSequence = await client.getLedgerIndex()
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
@@ -371,10 +368,9 @@ export async function setLatestValidatedLedgerSequence(
  * @param tx - The transaction object.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
-export async function checkAccountDeleteBlockers(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function checkAccountDeleteBlockers<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   const request: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
@@ -430,10 +426,9 @@ export function handleDeliverMax(tx: Payment): void {
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
 // eslint-disable-next-line complexity, max-lines-per-function -- needed here, lots to check
-export async function autofillBatchTxn(
-  client: Client,
-  tx: Batch,
-): Promise<void> {
+export async function autofillBatchTxn<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Batch): Promise<void> {
   const accountSequences: Record<string, number> = {}
 
   for await (const rawTxn of tx.RawTransactions) {
