@@ -1,0 +1,391 @@
+import { assert } from 'chai'
+
+import {
+  EscrowFinish,
+  EscrowCreate,
+  EscrowCancel,
+  Wallet,
+  AccountSet,
+  AccountSetAsfFlags,
+  Payment,
+  TrustSet,
+} from '../../../src'
+import serverUrl from '../serverUrl'
+import {
+  setupClient,
+  teardownClient,
+  type XrplIntegrationTestContext,
+} from '../setup'
+import {
+  generateFundedWallet,
+  getXRPBalance,
+  sendLedgerAccept,
+  testTransaction,
+  getLedgerCloseTime,
+} from '../utils'
+
+// how long before each test case times out
+const TIMEOUT = 30000
+
+describe('Escrow', function () {
+  let testContext: XrplIntegrationTestContext
+  let wallet1: Wallet
+
+  beforeAll(async () => {
+    testContext = await setupClient(serverUrl)
+    wallet1 = await generateFundedWallet(testContext.client)
+  })
+  afterAll(async () => teardownClient(testContext))
+
+  async function closeLedgers(count: number): Promise<void> {
+    for (let _i = 0; _i < count; _i++) {
+      // eslint-disable-next-line no-await-in-loop -- okay here
+      await sendLedgerAccept(testContext.client)
+    }
+  }
+
+  it(
+    'finish escrow',
+    async () => {
+      // get the most recent close_time from the standalone container for cancel & finish after.
+      const CLOSE_TIME = await getLedgerCloseTime(testContext.client)
+
+      const AMOUNT = 10000
+
+      const createTx: EscrowCreate = {
+        Account: testContext.wallet.classicAddress,
+        TransactionType: 'EscrowCreate',
+        Amount: AMOUNT.toString(),
+        Destination: wallet1.classicAddress,
+        FinishAfter: CLOSE_TIME + 2,
+      }
+
+      await testTransaction(testContext.client, createTx, testContext.wallet)
+
+      const initialBalance = await getXRPBalance(testContext.client, wallet1)
+
+      // check that the object was actually created
+      const accountObjects = (
+        await testContext.client.request({
+          command: 'account_objects',
+          account: testContext.wallet.classicAddress,
+        })
+      ).result.account_objects
+
+      assert.equal(accountObjects.length, 1)
+
+      const sequence = (
+        await testContext.client.request({
+          command: 'tx',
+          transaction: accountObjects[0].PreviousTxnID,
+        })
+      ).result.tx_json.Sequence
+
+      const finishTx: EscrowFinish = {
+        TransactionType: 'EscrowFinish',
+        Account: testContext.wallet.classicAddress,
+        Owner: testContext.wallet.classicAddress,
+        OfferSequence: sequence!,
+      }
+
+      // wait for the escrow to be ready to finish
+      await closeLedgers(4)
+
+      // rippled uses the close time of the previous ledger
+      await sendLedgerAccept(testContext.client)
+      await testTransaction(testContext.client, finishTx, testContext.wallet)
+
+      const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))
+      assert.equal(
+        await getXRPBalance(testContext.client, wallet1),
+        expectedBalance,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'cancel escrow',
+    async () => {
+      // get the most recent close_time from the standalone container for cancel & finish after.
+      const CLOSE_TIME: number = (
+        await testContext.client.request({
+          command: 'ledger',
+          ledger_index: 'validated',
+        })
+      ).result.ledger.close_time
+
+      const createTx: EscrowCreate = {
+        Account: testContext.wallet.classicAddress,
+        TransactionType: 'EscrowCreate',
+        Amount: '10000',
+        Destination: wallet1.classicAddress,
+        CancelAfter: CLOSE_TIME + 3,
+        FinishAfter: CLOSE_TIME + 2,
+      }
+
+      await testTransaction(testContext.client, createTx, testContext.wallet)
+
+      const initialBalanceWallet1 = await getXRPBalance(
+        testContext.client,
+        wallet1,
+      )
+
+      // check that the object was actually created
+      const accountObjects = (
+        await testContext.client.request({
+          command: 'account_objects',
+          account: testContext.wallet.classicAddress,
+        })
+      ).result.account_objects
+
+      assert.equal(accountObjects.length, 1)
+
+      const sequence = (
+        await testContext.client.request({
+          command: 'tx',
+          transaction: accountObjects[0].PreviousTxnID,
+        })
+      ).result.tx_json.Sequence
+
+      if (!sequence) {
+        throw new Error('sequence did not exist')
+      }
+
+      const cancelTx: EscrowCancel = {
+        TransactionType: 'EscrowCancel',
+        Account: testContext.wallet.classicAddress,
+        Owner: testContext.wallet.classicAddress,
+        OfferSequence: sequence,
+      }
+
+      await closeLedgers(4)
+
+      // rippled uses the close time of the previous ledger
+      await sendLedgerAccept(testContext.client)
+      await testTransaction(testContext.client, cancelTx, testContext.wallet, {
+        count: 20,
+        delayMs: 2000,
+      })
+
+      // Make sure the Destination wallet did not receive any XRP.
+      assert.equal(
+        await getXRPBalance(testContext.client, wallet1),
+        initialBalanceWallet1,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'finish function',
+    async () => {
+      const FINISH_FUNCTION =
+        '0061736d0100000001150460027f7f017f60037f7f7e017f6000017f60000002300208686f73745f6' +
+        'c69620e6765745f6c65646765725f73716e000008686f73745f6c69620974726163655f6e756d0001' +
+        '030302020305030100110619037f01418080c0000b7f00418b80c0000b7f00419080c0000b072e040' +
+        '66d656d6f727902000666696e69736800020a5f5f646174615f656e6403010b5f5f686561705f6261' +
+        '736503020a69026301027f23808080800041106b22002480808080002000410036020c02402000410' +
+        'c6a41081080808080002201417f4a0d00418080c08000410b2001ac1081808080001a108380808000' +
+        '000b200028020c2101200041106a248080808000200141044b0b0300000b0b140100418080c0000b0' +
+        'b6572726f725f636f64653d00dd01046e616d6500100f6c65646765725f73716e2e7761736d01a301' +
+        '0400355f5a4e387872706c5f73746434686f737431346765745f6c65646765725f73716e313768666' +
+        '5343539333764623461656439366245012f5f5a4e387872706c5f73746434686f7374397472616365' +
+        '5f6e756d3137686139376531613763346138636231333245020666696e69736803305f5a4e34636f7' +
+        '2653970616e69636b696e673970616e69635f666d7431376862393162616461636536656538323837' +
+        '45071201000f5f5f737461636b5f706f696e746572090a0100072e726f64617461004d0970726f647' +
+        '56365727302086c616e6775616765010452757374000c70726f6365737365642d6279010572757374' +
+        '631d312e38352e31202834656231363132353020323032352d30332d31352900490f7461726765745' +
+        'f6665617475726573042b0a6d756c746976616c75652b0f6d757461626c652d676c6f62616c732b0f' +
+        '7265666572656e63652d74797065732b087369676e2d657874'
+
+      // get the most recent close_time from the standalone container for cancel & finish after.
+      const CLOSE_TIME = await getLedgerCloseTime(testContext.client)
+
+      const AMOUNT = 10000
+
+      const createTx: EscrowCreate = {
+        Account: testContext.wallet.classicAddress,
+        TransactionType: 'EscrowCreate',
+        Amount: AMOUNT.toString(),
+        Destination: wallet1.classicAddress,
+        FinishFunction: FINISH_FUNCTION,
+        CancelAfter: CLOSE_TIME + 200,
+      }
+
+      await testTransaction(testContext.client, createTx, testContext.wallet)
+
+      const initialBalance = await getXRPBalance(testContext.client, wallet1)
+
+      // check that the object was actually created
+      const accountObjects = (
+        await testContext.client.request({
+          command: 'account_objects',
+          account: testContext.wallet.classicAddress,
+        })
+      ).result.account_objects
+
+      assert.equal(accountObjects.length, 1)
+
+      const sequence = (
+        await testContext.client.request({
+          command: 'tx',
+          transaction: accountObjects[0].PreviousTxnID,
+        })
+      ).result.tx_json.Sequence
+
+      const finishTx: EscrowFinish = {
+        TransactionType: 'EscrowFinish',
+        Account: testContext.wallet.classicAddress,
+        Owner: testContext.wallet.classicAddress,
+        OfferSequence: sequence!,
+        ComputationAllowance: 20000,
+      }
+
+      await testTransaction(testContext.client, finishTx, testContext.wallet)
+
+      const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))
+      assert.equal(
+        await getXRPBalance(testContext.client, wallet1),
+        expectedBalance,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'escrow with IOU -- validate EscrowCancel transaction (Identical to previous test, except for Step 7-8)',
+    async () => {
+      const escrowSourceWallet = await generateFundedWallet(testContext.client)
+      const escrowDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
+
+      const issuerWallet = testContext.wallet
+
+      // Step-1: configure issuerWallet (testContext.wallet.classicAddress) to allow their IOUs to be used as escrow amounts
+      const setupAccountSetTx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: issuerWallet.classicAddress,
+        SetFlag: AccountSetAsfFlags.asfAllowTrustLineLocking,
+      }
+      await testTransaction(testContext.client, setupAccountSetTx, issuerWallet)
+
+      // Step-2: setup appropriate trust lines to transfer the IOU.
+      // This is needed for both escrowSourceWallet and escrowDestinationWallet to hold the USD IOU token.
+      const setupTrustSetTx1: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: escrowSourceWallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        setupTrustSetTx1,
+        escrowSourceWallet,
+      )
+
+      const setupTrustSetTx2: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: escrowDestinationWallet.classicAddress,
+        LimitAmount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        setupTrustSetTx2,
+        escrowDestinationWallet,
+      )
+
+      // Step-3: transfer the USD IOU token to from Issuer to escrowSourceWallet
+      const setupPaymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: issuerWallet.classicAddress,
+        Destination: escrowSourceWallet.classicAddress,
+        Amount: {
+          currency: 'USD',
+          issuer: issuerWallet.classicAddress,
+          value: '1000',
+        },
+      }
+      await testTransaction(testContext.client, setupPaymentTx, issuerWallet)
+
+      // Step-4: create the escrow
+      // get the most recent close_time from the standalone container for finish after.
+      const CLOSE_TIME: number = (
+        await testContext.client.request({
+          command: 'ledger',
+          ledger_index: 'validated',
+        })
+      ).result.ledger.close_time
+
+      const tx: EscrowCreate = {
+        Account: escrowSourceWallet.classicAddress,
+        TransactionType: 'EscrowCreate',
+        Amount: {
+          currency: 'USD',
+          value: '100',
+          issuer: issuerWallet.classicAddress,
+        },
+        Destination: escrowDestinationWallet.classicAddress,
+        FinishAfter: CLOSE_TIME + 2,
+        CancelAfter: CLOSE_TIME + 4,
+      }
+
+      const txnResponse = await testTransaction(
+        testContext.client,
+        tx,
+        escrowSourceWallet,
+      )
+
+      // Step-5: fetch the escrow object
+      const wallet1Objects = await testContext.client.request({
+        command: 'account_objects',
+        account: escrowSourceWallet.classicAddress,
+        type: 'escrow',
+      })
+      assert.equal(wallet1Objects.result.account_objects.length, 1)
+
+      // Step-6: check that the escrow object has the correct particulars
+      const escrowObject = wallet1Objects.result.account_objects[0]
+      assert.equal(escrowObject.LedgerEntryType, 'Escrow')
+      assert.equal(escrowObject.PreviousTxnID, txnResponse.result.tx_json.hash)
+
+      // Step-7: Execute the EscrowCancel transaction
+      const escrowCancelTx: EscrowCancel = {
+        TransactionType: 'EscrowCancel',
+        Account: escrowSourceWallet.classicAddress,
+        Owner: escrowSourceWallet.classicAddress,
+        OfferSequence: Number(txnResponse.result.tx_json.Sequence),
+      }
+
+      // Step 7.1: wait for the escrow to be "cancellable"
+      await closeLedgers(4)
+
+      // Step 7.2: rippled uses the close time of the previous ledger
+      await sendLedgerAccept(testContext.client)
+
+      // Step 7.3: execute the EscrowCancel transaction
+      await testTransaction(
+        testContext.client,
+        escrowCancelTx,
+        escrowSourceWallet,
+      )
+
+      // Step 8: check that the escrow object has been removed
+      const escrowObjectsSourceWallet = await testContext.client.request({
+        command: 'account_objects',
+        account: escrowSourceWallet.classicAddress,
+        type: 'escrow',
+      })
+      assert.equal(escrowObjectsSourceWallet.result.account_objects.length, 0)
+    },
+    TIMEOUT,
+  )
+})
