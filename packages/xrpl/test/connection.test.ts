@@ -979,4 +979,50 @@ describe('Connection', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'Delayed websocket error callback on send',
+    async () => {
+      const traceMessages: string[] = []
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.trace = (
+        id: string,
+        message: string,
+      ): void => {
+        traceMessages.push(`${id}: ${message}`)
+      }
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // server_info request will timeout in 0.5s, but we send an error after 1s
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, 1000)
+      }
+
+      await clientContext.client.connection
+        .request({ command: 'server_info' }, 500)
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+          assert.include(error.message, 'Timeout for request')
+        })
+
+      // wait to ensure that XrplError is not thrown after test is done
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+
+      assert.includeMembers(traceMessages, [
+        'send: send errored after connection was closed: [XrplError(No existing promise with id 1, ' +
+          '{"type":"reject","error":{"name":"DisconnectedError","data":{"message":"some error"}}})]',
+      ])
+    },
+    TIMEOUT,
+  )
 })
