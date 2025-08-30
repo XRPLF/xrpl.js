@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Export `Batch` (XLS-56) transaction types and utilities
+
 ### Fixed
 * Fixes node.js process termination when websocket send method errors after connection is closed.
 
