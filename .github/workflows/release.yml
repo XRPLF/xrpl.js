@@ -1,0 +1,353 @@
+name: Release Pipeline
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_name:
+        description: 'The package name to release (e.g., xrpl, ripple-address-codec)'
+        required: true
+      dry-run:
+        description: 'Perform dry run (create draft release and npm publish with dry-run)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      release_branch:
+        description: 'Release branch the release is generated from'
+        required: true
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+jobs:
+  get_version:
+    runs-on: ubuntu-latest
+    name: Get release version from package.json
+    outputs:
+      package_version: ${{ steps.get_version.outputs.version }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.release_branch }}
+        fetch-depth: 0
+    - name: Validate inputs
+      run: |
+        set -euo pipefail
+        if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
+          echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
+        else
+          echo "❌ Release branch ${{ github.event.inputs.release_branch }} not found in remote. Failing workflow."
+          exit 1
+        fi
+
+        if grep -R --exclude-dir=.git "artifactory.ops.ripple.com" .; then
+          echo "❌ Internal Artifactory URL found"
+          exit 1
+        else
+          echo "✅ No Internal Artifactory URL found"
+        fi
+
+    - name: Get package version from package.json
+      id: get_version
+      run: |
+        set -euo pipefail
+        PACKAGE_NAME="${{ github.event.inputs.package_name }}"
+        PKG_JSON="packages/${PACKAGE_NAME}/package.json"
+        if [[ ! -f "$PKG_JSON" ]]; then
+          echo "package.json not found at $PKG_JSON. Check 'package_name' input." >&2
+          exit 1
+        fi
+        VERSION=$(jq -er .version "$PKG_JSON")
+        if [[ -z "$VERSION" || "$VERSION" == "null" ]]; then
+          echo "Version is empty or missing in $PKG_JSON" >&2
+          exit 1
+        fi
+        echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  run_faucet_test:
+    name: Run faucet tests ${{ needs.get_version.outputs.package_version }}
+    needs: [get_version]
+    uses: ./.github/workflows/faucet_test.yml
+    with:
+      git_ref: ${{ github.event.inputs.release_branch }}
+    secrets: inherit
+
+
+  run_tests:
+    name: Run unit/integration tests ${{ needs.get_version.outputs.package_version }}
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
+    needs: [get_version]
+    uses: ./.github/workflows/nodejs.yml
+    with:
+      git_ref: ${{ github.event.inputs.release_branch }}
+    secrets: inherit
+
+  pre_release:
+    runs-on: ubuntu-latest
+    needs: [get_version, run_faucet_test, run_tests]
+    name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
+    env:
+      PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
+      PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.release_branch }}
+        fetch-depth: 0
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        registry-url: 'https://registry.npmjs.org'
+
+    - name: Build package
+      run: |
+        # dubugging info
+        npm --version
+        node --version
+        ls -l
+        pwd
+
+        #build
+        npm ci
+        npm run build
+
+    - name: Notify Slack if tests fail
+      if: failure()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="❌ Build failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#xrpl-js" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"
+
+    - name: Install cyclonedx-npm
+      run: npm install -g @cyclonedx/cyclonedx-npm
+
+    - name: Generate CycloneDX SBOM
+      run: cyclonedx-npm --output-format json --output-file sbom.json
+
+    - name: Scan SBOM for vulnerabilities using Trivy
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: sbom
+        scan-ref: sbom.json
+        format: table
+        exit-code: 0
+        output: vuln-report.txt
+        severity: CRITICAL,HIGH
+
+    - name: Upload sbom to OWASP
+      run: |
+        curl -X POST \
+          -H "X-Api-Key: ${{ secrets.OWASP_TOKEN }}" \
+          -F "project=7c40c8ea-ea0f-4a5f-9b9f-368e53232397" \
+          -F "bom=@sbom.json" \
+          https://owasp-dt-api.prod.ripplex.io/api/v1/bom
+
+    - name: Upload SBOM artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom.json
+
+    - name: Print scan report
+      run: cat vuln-report.txt
+
+    - name: Upload vulnerability report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: vulnerability-report
+        path: vuln-report.txt
+
+    - name: Generate lerna.json for choosen the package
+      run: |
+
+        echo "🔧 Updating lerna.json to include only packages/${{ env.PACKAGE_NAME }}"
+
+        # Use jq to update the packages field safely
+        jq --arg pkg "packages/${{ env.PACKAGE_NAME }}" '.packages = [$pkg]' lerna.json > lerna.tmp.json && mv lerna.tmp.json lerna.json
+
+        echo "✅ lerna.json updated:"
+        cat lerna.json
+
+    - name: Pack tarball
+      run: |
+        set -euo pipefail
+        echo "Packaging ${{ env.PACKAGE_NAME }}"
+        find "packages/${{ env.PACKAGE_NAME }}" -maxdepth 1 -name '*.tgz' -delete || true
+        TARBALL=$(npx lerna exec --scope "${{ env.PACKAGE_NAME }}" -- npm pack --json | jq -r '.[0].filename')
+        echo "TARBALL=packages/${{ env.PACKAGE_NAME }}/${TARBALL}" >> "$GITHUB_ENV"
+      env:
+        NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/.npmrc
+
+    - name: Upload tarball as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm-package-tarball
+        path: ${{ env.TARBALL }}
+
+  review:
+    runs-on: ubuntu-latest
+    needs: [get_version, run_faucet_test, run_tests, pre_release]
+    name: Review test and security scan result
+    env:
+      PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
+      PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.release_branch }}
+        fetch-depth: 0
+    - name: Release summary for review
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+      run: |
+        ARTIFACT_NAME="vulnerability-report"
+        RELEASE_BRANCH="${{ github.event.inputs.release_branch }}"
+        COMMIT_SHA="$(git rev-parse --short HEAD)"
+
+        echo "Fetching artifact ID for ${ARTIFACT_NAME}..."
+        ARTIFACTS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/$REPO/actions/runs/$RUN_ID/artifacts)
+
+        ARTIFACT_ID=$(echo "$ARTIFACTS" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id")
+
+        if [ -z "$ARTIFACT_ID" ]; then
+          echo "❌ Artifact not found."
+          exit 1
+        fi
+        echo "🔍 Please review the following details before proceeding:"
+        echo "📦 Package Name:   $PACKAGE_NAME"
+        echo "🔖 Package Version: $PACKAGE_VERSION"
+        echo "🌿 Release Branc:         $RELEASE_BRANCH"
+        echo "🔢 Commit SHA:      $COMMIT_SHA"
+        echo "🔗 Please review Vulnerabilities detected: https://github.com/$REPO/actions/runs/${{ github.run_id }}/artifacts/$ARTIFACT_ID"
+
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+     id-token: write
+     contents: write
+    needs: [get_version, run_faucet_test, run_tests, pre_release, review]
+    name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
+    env:
+      PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
+      PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
+    environment:
+      name: official-release
+      url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.release_branch }}
+        fetch-depth: 0
+
+    - name: Ensure Git tag exists
+      id: create_tag
+      run: |
+        set -euo pipefail
+        BASE_TAG="${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}"
+        DRY_RUN="${{ github.event.inputs.dry-run }}"
+        TAG="$BASE_TAG"
+
+        if [ "$DRY_RUN" = "true" ]; then
+          TAG="draft-$BASE_TAG"
+        fi
+
+        git fetch --tags origin
+
+        if git rev-parse "$TAG" >/dev/null 2>&1 && [ "$DRY_RUN" != "true" ]; then
+          echo "❌ Tag $TAG already exists (not a draft). Failing."
+          exit 1
+        fi
+
+        echo "🔖 Tagging $TAG"
+        git tag -f "$TAG"
+        git push origin -f "$TAG"
+
+        echo "tag_name=$TAG" >> "$GITHUB_OUTPUT"
+
+    - name: Create GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: "${{ steps.create_tag.outputs.tag_name }}"
+        name: "${{ steps.create_tag.outputs.tag_name }}"
+        draft: ${{ github.event.inputs.dry-run == 'true' }}
+        generate_release_notes: true
+        make_latest: ${{ github.event.inputs.dry-run != 'true' }}
+
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: npm-package-tarball
+        path: dist
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        registry-url: 'https://registry.npmjs.org/'
+    - name: Publish to npm
+      run: |
+        cd dist
+        PKG=$(ls *.tgz)
+        echo $PKG
+        if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
+          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --dry-run
+        else
+          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/
+        fi
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    - name: Notify Slack success
+      if: success()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="✅ Released xrpl.js v${{ env.PACKAGE_VERSION }}. Published to npm and GitHub successfully."
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#xrpl-js" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"
+
+    - name: Notify Slack if tests fail
+      if: failure()
+      env:
+        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      run: |
+        MESSAGE="❌ Tests failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        curl -X POST https://slack.com/api/chat.postMessage \
+          -H "Authorization: Bearer $SLACK_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n \
+                --arg channel "#xrpl-js" \
+                --arg text "$MESSAGE" \
+                '{channel: $channel, text: $text}')"

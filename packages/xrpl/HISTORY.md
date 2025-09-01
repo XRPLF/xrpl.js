@@ -9,6 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * `autofill` function in client not validating amounts correctly
+* Fixes node.js process termination when websocket send method errors after connection is closed.
 
 ## 4.4.0 (2025-07-29)
 
