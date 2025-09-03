@@ -1,6 +1,7 @@
 import { Amount, MPTAmount } from '../common'
 
 import { BaseTransaction } from './common'
+import { EscrowFinish, EscrowFinishMetadata } from './escrowFinish'
 import {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateMetadata,
@@ -105,4 +106,6 @@ export type TransactionMetadata<T extends BaseTransaction = Transaction> =
     ? NFTokenCancelOfferMetadata
     : T extends MPTokenIssuanceCreate
     ? MPTokenIssuanceCreateMetadata
+    : T extends EscrowFinish
+    ? EscrowFinishMetadata
     : TransactionMetadataBase
