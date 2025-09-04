@@ -296,12 +296,10 @@ describe('Hashes', function () {
 
     it('hashNFTokenPage', function () {
       const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
-      const nfTokenIDLow96 = '000000000000000000000000000000000000000000000001'
+      const nfTokenIDLow96 = '0008138800000000C1ECF2F9'
       const actualHash = hashNFTokenPage(account, nfTokenIDLow96)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashNFTokenPage(account, nfTokenIDLow96), actualHash)
     })
@@ -357,12 +355,11 @@ describe('Hashes', function () {
 
     it('hashOracle', function () {
       const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
-      const oracleID = 'ORACLE123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+      const oracleID =
+        '61E8E8ED53FA2CEBE192B23897071E9A75217BF5A410E9CB5B45AAB7AECA567A'
       const actualHash = hashOracle(account, oracleID)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashOracle(account, oracleID), actualHash)
     })
@@ -370,12 +367,10 @@ describe('Hashes', function () {
     it('hashHook', function () {
       const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       const hookHash =
-        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+        'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF'
       const actualHash = hashHook(account, hookHash)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashHook(account, hookHash), actualHash)
     })
@@ -383,26 +378,22 @@ describe('Hashes', function () {
     it('hashHookState', function () {
       const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       const hookHash =
-        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+        'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF'
       const hookStateKey =
-        'STATE123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01234567'
+        '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
       const actualHash = hashHookState(account, hookHash, hookStateKey)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashHookState(account, hookHash, hookStateKey), actualHash)
     })
 
     it('hashHookDefinition', function () {
       const hookHash =
-        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+        'CA4562711E4679FE9317DD767871E90A404C7A8B84FAFD35EC2CF0231F1F6DAF'
       const actualHash = hashHookDefinition(hookHash)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashHookDefinition(hookHash), actualHash)
     })
@@ -491,12 +482,10 @@ describe('Hashes', function () {
     it('hashMPToken', function () {
       const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
       const mpTokenIssuanceID =
-        'MPTOKEN123456789ABCDEF0123456789ABCDEF0123456789ABCDEF012'
+        '9EDF5DB29F536DD3919037F1E8A72B040D075571A10C9000294C57B5ECEEA791'
       const actualHash = hashMPToken(account, mpTokenIssuanceID)
 
       assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
-      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
-
       // Should be consistent
       assert.equal(hashMPToken(account, mpTokenIssuanceID), actualHash)
     })

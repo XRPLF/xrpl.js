@@ -242,12 +242,17 @@ export function hashDepositPreauth(
  * @param address - Account that owns the NFTokenPage.
  * @param nfTokenIDLow96 - The low 96 bits of a representative NFTokenID.
  * @returns Hash of the NFTokenPage.
+ * @throws Error if nfTokenIDLow96 is not a 24-character hex string.
  * @category Utilities
  */
 export function hashNFTokenPage(
   address: string,
   nfTokenIDLow96: string,
 ): string {
+  // Validate that nfTokenIDLow96 is a 24-character hex string (96 bits)
+  if (!/^[0-9A-F]{24}$/iu.test(nfTokenIDLow96)) {
+    throw new Error('nfTokenIDLow96 must be a 24-character hex string')
+  }
   return sha512Half(
     ledgerSpaceHex('nfTokenPage') + addressToHex(address) + nfTokenIDLow96,
   )
@@ -309,9 +314,16 @@ export function hashAMMRoot(
  * @param address - Account that created the Oracle.
  * @param oracleID - The unique identifier for this Oracle.
  * @returns Hash of the Oracle.
+ * @throws Error if oracleID is not a 64-character uppercase hex string.
  * @category Utilities
  */
 export function hashOracle(address: string, oracleID: string): string {
+  // Validate that oracleID is a 64-character uppercase hex string
+  if (!/^[0-9A-F]{64}$/u.test(oracleID)) {
+    throw new Error(
+      'oracleID must be a 64-character uppercase hexadecimal string',
+    )
+  }
   return sha512Half(ledgerSpaceHex('oracle') + addressToHex(address) + oracleID)
 }
 
@@ -321,9 +333,14 @@ export function hashOracle(address: string, oracleID: string): string {
  * @param address - Account that installed the Hook.
  * @param hookHash - Hash of the Hook code.
  * @returns Hash of the Hook entry.
+ * @throws Error if hookHash is not a 64-character hex string.
  * @category Utilities
  */
 export function hashHook(address: string, hookHash: string): string {
+  // Validate that hookHash is a 64-character hex string
+  if (!/^[0-9A-F]{64}$/iu.test(hookHash)) {
+    throw new Error('hookHash must be a 64-character hexadecimal string')
+  }
   return sha512Half(ledgerSpaceHex('hook') + addressToHex(address) + hookHash)
 }
 
@@ -334,6 +351,7 @@ export function hashHook(address: string, hookHash: string): string {
  * @param hookHash - Hash of the Hook code.
  * @param hookStateKey - Key for the Hook State entry.
  * @returns Hash of the Hook State entry.
+ * @throws Error if hookHash or hookStateKey are not 64-character hex strings.
  * @category Utilities
  */
 export function hashHookState(
@@ -341,6 +359,13 @@ export function hashHookState(
   hookHash: string,
   hookStateKey: string,
 ): string {
+  // Validate parameters
+  if (!/^[0-9A-F]{64}$/iu.test(hookHash)) {
+    throw new Error('hookHash must be a 64-character hexadecimal string')
+  }
+  if (!/^[0-9A-F]{64}$/iu.test(hookStateKey)) {
+    throw new Error('hookStateKey must be a 64-character hexadecimal string')
+  }
   return sha512Half(
     ledgerSpaceHex('hookState') +
       addressToHex(address) +
@@ -354,9 +379,14 @@ export function hashHookState(
  *
  * @param hookHash - Hash of the Hook code.
  * @returns Hash of the Hook Definition entry.
+ * @throws Error if hookHash is not a 64-character hex string.
  * @category Utilities
  */
 export function hashHookDefinition(hookHash: string): string {
+  // Validate that hookHash is a 64-character hex string
+  if (!/^[0-9A-F]{64}$/iu.test(hookHash)) {
+    throw new Error('hookHash must be a 64-character hexadecimal string')
+  }
   return sha512Half(ledgerSpaceHex('hookDefinition') + hookHash)
 }
 
@@ -452,12 +482,19 @@ export function hashXChainOwnedCreateAccountClaimID(
  * @param address - Account that holds the MPToken.
  * @param mpTokenIssuanceID - The MPToken issuance ID.
  * @returns Hash of the MPToken entry.
+ * @throws Error if mpTokenIssuanceID is not a 64-character hex string.
  * @category Utilities
  */
 export function hashMPToken(
   address: string,
   mpTokenIssuanceID: string,
 ): string {
+  // Validate that mpTokenIssuanceID is a 64-character hex string
+  if (!/^[0-9A-F]{64}$/iu.test(mpTokenIssuanceID)) {
+    throw new Error(
+      'mpTokenIssuanceID must be a 64-character hexadecimal string',
+    )
+  }
   return sha512Half(
     ledgerSpaceHex('mpToken') + addressToHex(address) + mpTokenIssuanceID,
   )
