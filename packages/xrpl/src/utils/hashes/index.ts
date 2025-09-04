@@ -42,6 +42,57 @@ function currencyToHex(currency: string): string {
 }
 
 /**
+ * Convert currency code to hex for Issue serialization.
+ * XRP uses 160-bit zero currency code, others use standard encoding.
+ *
+ * @param code - The currency code to convert.
+ * @returns The hex representation for use in Issue serialization.
+ */
+function toIssueCurrencyHex(code: string): string {
+  const upper = code.toUpperCase()
+  // Native XRP uses 160-bit zero currency code
+  if (upper === 'XRP') {
+    return '00'.repeat(20)
+  }
+  // If already a 160-bit hex code, normalize case
+  if (/^[0-9a-f]{40}$/iu.test(code)) {
+    return code.toUpperCase()
+  }
+  // Otherwise treat as 3-letter ISO-like code
+  return currencyToHex(upper)
+}
+
+/**
+ * Convert a number, bigint, or string to a 64-bit hex string.
+ *
+ * @param id - The ID to convert (number, bigint, or string).
+ * @returns 64-bit hex string representation.
+ * @throws Error if the ID is out of range or invalid format.
+ */
+function toU64Hex(id: bigint | number | string): string {
+  let bi: bigint
+  if (typeof id === 'bigint') {
+    bi = id
+  } else if (typeof id === 'number') {
+    if (!Number.isSafeInteger(id) || id < 0) {
+      throw new Error(
+        'claimID must be a non-negative safe integer, bigint, or decimal string',
+      )
+    }
+    bi = BigInt(id)
+  } else {
+    const str = id.trim()
+    bi =
+      str.startsWith('0x') || str.startsWith('0X') ? BigInt(str) : BigInt(str)
+  }
+  const maxUint64 = BigInt('0xffffffffffffffff')
+  if (bi < BigInt(0) || bi > maxUint64) {
+    throw new Error('claimID out of range for uint64')
+  }
+  return bi.toString(16).toUpperCase().padStart(16, '0')
+}
+
+/**
  * Hash the given binary transaction data with the single-signing prefix.
  *
  * See [Serialization Format](https://xrpl.org/serialization.html).
@@ -249,12 +300,13 @@ export function hashNFTokenPage(
   address: string,
   nfTokenIDLow96: string,
 ): string {
-  // Validate that nfTokenIDLow96 is a 24-character hex string (96 bits)
-  if (!/^[0-9A-F]{24}$/iu.test(nfTokenIDLow96)) {
+  // Normalize and validate a 24-char hex (96 bits)
+  const normalized = nfTokenIDLow96.replace(/^0x/iu, '').toUpperCase()
+  if (!/^[0-9A-F]{24}$/u.test(normalized)) {
     throw new Error('nfTokenIDLow96 must be a 24-character hex string')
   }
   return sha512Half(
-    ledgerSpaceHex('nfTokenPage') + addressToHex(address) + nfTokenIDLow96,
+    ledgerSpaceHex('nfTokenPage') + addressToHex(address) + normalized,
   )
 }
 
@@ -290,8 +342,8 @@ export function hashAMMRoot(
   issuer1?: string,
   issuer2?: string,
 ): string {
-  const cur1Hex = currencyToHex(currency1)
-  const cur2Hex = currencyToHex(currency2)
+  const cur1Hex = toIssueCurrencyHex(currency1)
+  const cur2Hex = toIssueCurrencyHex(currency2)
   const iss1Hex = issuer1 ? addressToHex(issuer1) : '00'.repeat(20)
   const iss2Hex = issuer2 ? addressToHex(issuer2) : '00'.repeat(20)
 
@@ -318,13 +370,16 @@ export function hashAMMRoot(
  * @category Utilities
  */
 export function hashOracle(address: string, oracleID: string): string {
-  // Validate that oracleID is a 64-character uppercase hex string
-  if (!/^[0-9A-F]{64}$/u.test(oracleID)) {
+  const normalized = oracleID.replace(/^0x/iu, '').toUpperCase()
+  // eslint-disable-next-line require-unicode-regexp -- Targeting older ES version
+  if (!/^[0-9A-F]{64}$/.test(normalized)) {
     throw new Error(
       'oracleID must be a 64-character uppercase hexadecimal string',
     )
   }
-  return sha512Half(ledgerSpaceHex('oracle') + addressToHex(address) + oracleID)
+  return sha512Half(
+    ledgerSpaceHex('oracle') + addressToHex(address) + normalized,
+  )
 }
 
 /**
@@ -337,11 +392,12 @@ export function hashOracle(address: string, oracleID: string): string {
  * @category Utilities
  */
 export function hashHook(address: string, hookHash: string): string {
-  // Validate that hookHash is a 64-character hex string
-  if (!/^[0-9A-F]{64}$/iu.test(hookHash)) {
+  const normalized = hookHash.replace(/^0x/iu, '').toUpperCase()
+  // eslint-disable-next-line require-unicode-regexp -- Targeting older ES version
+  if (!/^[0-9A-F]{64}$/.test(normalized)) {
     throw new Error('hookHash must be a 64-character hexadecimal string')
   }
-  return sha512Half(ledgerSpaceHex('hook') + addressToHex(address) + hookHash)
+  return sha512Half(ledgerSpaceHex('hook') + addressToHex(address) + normalized)
 }
 
 /**
@@ -359,18 +415,21 @@ export function hashHookState(
   hookHash: string,
   hookStateKey: string,
 ): string {
-  // Validate parameters
-  if (!/^[0-9A-F]{64}$/iu.test(hookHash)) {
+  const hookHashNorm = hookHash.replace(/^0x/iu, '').toUpperCase()
+  const stateKeyNorm = hookStateKey.replace(/^0x/iu, '').toUpperCase()
+  // eslint-disable-next-line require-unicode-regexp -- Targeting older ES version
+  if (!/^[0-9A-F]{64}$/.test(hookHashNorm)) {
     throw new Error('hookHash must be a 64-character hexadecimal string')
   }
-  if (!/^[0-9A-F]{64}$/iu.test(hookStateKey)) {
+  // eslint-disable-next-line require-unicode-regexp -- Targeting older ES version
+  if (!/^[0-9A-F]{64}$/.test(stateKeyNorm)) {
     throw new Error('hookStateKey must be a 64-character hexadecimal string')
   }
   return sha512Half(
     ledgerSpaceHex('hookState') +
       addressToHex(address) +
-      hookHash +
-      hookStateKey,
+      hookHashNorm +
+      stateKeyNorm,
   )
 }
 
@@ -444,13 +503,13 @@ export function hashBridge(
 export function hashXChainOwnedClaimID(
   address: string,
   bridgeAccount: string,
-  claimID: number,
+  claimID: bigint | number | string,
 ): string {
   return sha512Half(
     ledgerSpaceHex('xchainOwnedClaimID') +
       addressToHex(address) +
       addressToHex(bridgeAccount) +
-      claimID.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+      toU64Hex(claimID),
   )
 }
 
@@ -466,13 +525,13 @@ export function hashXChainOwnedClaimID(
 export function hashXChainOwnedCreateAccountClaimID(
   address: string,
   bridgeAccount: string,
-  claimID: number,
+  claimID: bigint | number | string,
 ): string {
   return sha512Half(
     ledgerSpaceHex('xchainOwnedCreateAccountClaimID') +
       addressToHex(address) +
       addressToHex(bridgeAccount) +
-      claimID.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+      toU64Hex(claimID),
   )
 }
 
