@@ -7,10 +7,10 @@ import { encode } from 'ripple-binary-codec'
 import {
   EnableAmendment,
   OfferCreate,
+  Payment,
   Transaction,
   ValidationError,
 } from '../../src'
-import { BatchInnerTransaction } from '../../src/models/transactions/batch'
 import {
   hashStateTree,
   hashTxTree,
@@ -214,7 +214,7 @@ describe('Hashes', function () {
   })
 
   it('hashSignedTx - batch transaction', function () {
-    const transaction: BatchInnerTransaction = {
+    const transaction: Payment = {
       Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
       Amount: '1000000',
       Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
