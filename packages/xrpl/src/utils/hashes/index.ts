@@ -185,4 +185,308 @@ export function hashPaymentChannel(
   )
 }
 
+/**
+ * Compute the hash of a Ticket.
+ *
+ * @param address - Account that created the Ticket.
+ * @param ticketSequence - The Ticket Sequence number.
+ * @returns Hash of the Ticket.
+ * @category Utilities
+ */
+export function hashTicket(address: string, ticketSequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('ticket') +
+      addressToHex(address) +
+      ticketSequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of a Check.
+ *
+ * @param address - Account that created the Check.
+ * @param sequence - Sequence number of the CheckCreate transaction.
+ * @returns Hash of the Check.
+ * @category Utilities
+ */
+export function hashCheck(address: string, sequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('check') +
+      addressToHex(address) +
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of a DepositPreauth entry.
+ *
+ * @param address - Account that granted the authorization.
+ * @param authorizedAddress - Account that was authorized.
+ * @returns Hash of the DepositPreauth entry.
+ * @category Utilities
+ */
+export function hashDepositPreauth(
+  address: string,
+  authorizedAddress: string,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('depositPreauth') +
+      addressToHex(address) +
+      addressToHex(authorizedAddress),
+  )
+}
+
+/**
+ * Compute the hash of an NFTokenPage.
+ *
+ * @param address - Account that owns the NFTokenPage.
+ * @param nfTokenIDLow96 - The low 96 bits of a representative NFTokenID.
+ * @returns Hash of the NFTokenPage.
+ * @category Utilities
+ */
+export function hashNFTokenPage(
+  address: string,
+  nfTokenIDLow96: string,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('nfTokenPage') + addressToHex(address) + nfTokenIDLow96,
+  )
+}
+
+/**
+ * Compute the hash of an NFTokenOffer.
+ *
+ * @param address - Account that created the NFTokenOffer.
+ * @param sequence - Sequence number of the NFTokenCreateOffer transaction.
+ * @returns Hash of the NFTokenOffer.
+ * @category Utilities
+ */
+export function hashNFTokenOffer(address: string, sequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('nfTokenOffer') +
+      addressToHex(address) +
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of an AMM root.
+ *
+ * @param currency1 - First currency in the AMM pool.
+ * @param currency2 - Second currency in the AMM pool.
+ * @param issuer1 - Issuer of the first currency (omit for XRP).
+ * @param issuer2 - Issuer of the second currency (omit for XRP).
+ * @returns Hash of the AMM root.
+ * @category Utilities
+ */
+export function hashAMMRoot(
+  currency1: string,
+  currency2: string,
+  issuer1?: string,
+  issuer2?: string,
+): string {
+  const cur1Hex = currencyToHex(currency1)
+  const cur2Hex = currencyToHex(currency2)
+  const iss1Hex = issuer1 ? addressToHex(issuer1) : '00'.repeat(20)
+  const iss2Hex = issuer2 ? addressToHex(issuer2) : '00'.repeat(20)
+
+  // Ensure deterministic ordering
+  const asset1 = cur1Hex + iss1Hex
+  const asset2 = cur2Hex + iss2Hex
+  const swap = new BigNumber(asset1, HEX).isGreaterThan(
+    new BigNumber(asset2, HEX),
+  )
+
+  const lowAsset = swap ? asset2 : asset1
+  const highAsset = swap ? asset1 : asset2
+
+  return sha512Half(ledgerSpaceHex('ammRoot') + lowAsset + highAsset)
+}
+
+/**
+ * Compute the hash of an Oracle entry.
+ *
+ * @param address - Account that created the Oracle.
+ * @param oracleID - The unique identifier for this Oracle.
+ * @returns Hash of the Oracle.
+ * @category Utilities
+ */
+export function hashOracle(address: string, oracleID: string): string {
+  return sha512Half(ledgerSpaceHex('oracle') + addressToHex(address) + oracleID)
+}
+
+/**
+ * Compute the hash of a Hook entry.
+ *
+ * @param address - Account that installed the Hook.
+ * @param hookHash - Hash of the Hook code.
+ * @returns Hash of the Hook entry.
+ * @category Utilities
+ */
+export function hashHook(address: string, hookHash: string): string {
+  return sha512Half(ledgerSpaceHex('hook') + addressToHex(address) + hookHash)
+}
+
+/**
+ * Compute the hash of a Hook State entry.
+ *
+ * @param address - Account that owns the Hook State.
+ * @param hookHash - Hash of the Hook code.
+ * @param hookStateKey - Key for the Hook State entry.
+ * @returns Hash of the Hook State entry.
+ * @category Utilities
+ */
+export function hashHookState(
+  address: string,
+  hookHash: string,
+  hookStateKey: string,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('hookState') +
+      addressToHex(address) +
+      hookHash +
+      hookStateKey,
+  )
+}
+
+/**
+ * Compute the hash of a Hook Definition entry.
+ *
+ * @param hookHash - Hash of the Hook code.
+ * @returns Hash of the Hook Definition entry.
+ * @category Utilities
+ */
+export function hashHookDefinition(hookHash: string): string {
+  return sha512Half(ledgerSpaceHex('hookDefinition') + hookHash)
+}
+
+/**
+ * Compute the hash of a DID entry.
+ *
+ * @param address - Account that owns the DID.
+ * @returns Hash of the DID entry.
+ * @category Utilities
+ */
+export function hashDID(address: string): string {
+  return sha512Half(ledgerSpaceHex('did') + addressToHex(address))
+}
+
+/**
+ * Compute the hash of a Bridge entry.
+ *
+ * @param door - The door account of the bridge.
+ * @param otherChainSource - The source account on the other chain.
+ * @param issuingChainDoor - The door account on the issuing chain.
+ * @param issuingChainIssue - The issue specification on the issuing chain.
+ * @param lockingChainDoor - The door account on the locking chain.
+ * @param lockingChainIssue - The issue specification on the locking chain.
+ * @returns Hash of the Bridge entry.
+ * @category Utilities
+ */
+export function hashBridge(
+  door: string,
+  otherChainSource: string,
+  issuingChainDoor: string,
+  issuingChainIssue: string,
+  lockingChainDoor: string,
+  lockingChainIssue: string,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('bridge') +
+      addressToHex(door) +
+      addressToHex(otherChainSource) +
+      addressToHex(issuingChainDoor) +
+      currencyToHex(issuingChainIssue) +
+      addressToHex(lockingChainDoor) +
+      currencyToHex(lockingChainIssue),
+  )
+}
+
+/**
+ * Compute the hash of an XChain Owned Claim ID entry.
+ *
+ * @param address - Account that owns the claim ID.
+ * @param bridgeAccount - The bridge account.
+ * @param claimID - The claim ID.
+ * @returns Hash of the XChain Owned Claim ID entry.
+ * @category Utilities
+ */
+export function hashXChainOwnedClaimID(
+  address: string,
+  bridgeAccount: string,
+  claimID: number,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('xchainOwnedClaimID') +
+      addressToHex(address) +
+      addressToHex(bridgeAccount) +
+      claimID.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of an XChain Owned Create Account Claim ID entry.
+ *
+ * @param address - Account that owns the create account claim ID.
+ * @param bridgeAccount - The bridge account.
+ * @param claimID - The claim ID.
+ * @returns Hash of the XChain Owned Create Account Claim ID entry.
+ * @category Utilities
+ */
+export function hashXChainOwnedCreateAccountClaimID(
+  address: string,
+  bridgeAccount: string,
+  claimID: number,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('xchainOwnedCreateAccountClaimID') +
+      addressToHex(address) +
+      addressToHex(bridgeAccount) +
+      claimID.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of an MPToken entry.
+ *
+ * @param address - Account that holds the MPToken.
+ * @param mpTokenIssuanceID - The MPToken issuance ID.
+ * @returns Hash of the MPToken entry.
+ * @category Utilities
+ */
+export function hashMPToken(
+  address: string,
+  mpTokenIssuanceID: string,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('mpToken') + addressToHex(address) + mpTokenIssuanceID,
+  )
+}
+
+/**
+ * Compute the hash of an MPToken Issuance entry.
+ *
+ * @param sequence - Sequence number of the transaction that created this issuance.
+ * @param address - Account that created the MPToken issuance.
+ * @returns Hash of the MPToken Issuance entry.
+ * @category Utilities
+ */
+export function hashMPTokenIssuance(sequence: number, address: string): string {
+  return sha512Half(
+    ledgerSpaceHex('mpTokenIssuance') +
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0') +
+      addressToHex(address),
+  )
+}
+
+/**
+ * Compute the hash of a NegativeUNL entry.
+ *
+ * @returns Hash of the NegativeUNL entry.
+ * @category Utilities
+ */
+export function hashNegativeUNL(): string {
+  return sha512Half(ledgerSpaceHex('negativeUNL'))
+}
+
 export { hashLedgerHeader, hashSignedTx, hashLedger, hashStateTree, hashTxTree }

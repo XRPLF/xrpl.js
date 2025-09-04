@@ -21,6 +21,23 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
+  hashTicket,
+  hashCheck,
+  hashDepositPreauth,
+  hashNFTokenPage,
+  hashNFTokenOffer,
+  hashAMMRoot,
+  hashOracle,
+  hashHook,
+  hashHookState,
+  hashHookDefinition,
+  hashDID,
+  hashBridge,
+  hashXChainOwnedClaimID,
+  hashXChainOwnedCreateAccountClaimID,
+  hashMPToken,
+  hashMPTokenIssuance,
+  hashNegativeUNL,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -229,5 +246,282 @@ describe('Hashes', function () {
       hashSignedTx(transaction),
       '9EDF5DB29F536DD3919037F1E8A72B040D075571A10C9000294C57B5ECEEA791',
     )
+  })
+
+  describe('New Ledger Entry Hash Functions', function () {
+    /* eslint-disable require-unicode-regexp -- TypeScript target doesn't support u flag in tests */
+    it('hashTicket', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const ticketSequence = 123
+      const actualHash = hashTicket(account, ticketSequence)
+
+      // Ticket hashes should be deterministic
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.isTrue(
+        /^[A-F0-9]+$/.test(actualHash),
+        'Hash should be uppercase hex',
+      )
+
+      // Should be consistent
+      assert.equal(hashTicket(account, ticketSequence), actualHash)
+    })
+
+    it('hashCheck', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const sequence = 456
+      const actualHash = hashCheck(account, sequence)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashCheck(account, sequence), actualHash)
+    })
+
+    it('hashDepositPreauth', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const authorizedAddress = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
+      const actualHash = hashDepositPreauth(account, authorizedAddress)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashDepositPreauth(account, authorizedAddress), actualHash)
+
+      // Different order should give different hash
+      const reverseHash = hashDepositPreauth(authorizedAddress, account)
+      assert.notEqual(actualHash, reverseHash, 'Order should matter')
+    })
+
+    it('hashNFTokenPage', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const nfTokenIDLow96 = '000000000000000000000000000000000000000000000001'
+      const actualHash = hashNFTokenPage(account, nfTokenIDLow96)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashNFTokenPage(account, nfTokenIDLow96), actualHash)
+    })
+
+    it('hashNFTokenOffer', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const sequence = 789
+      const actualHash = hashNFTokenOffer(account, sequence)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashNFTokenOffer(account, sequence), actualHash)
+    })
+
+    it('hashAMMRoot - XRP/USD pair', function () {
+      const currency1 = 'XRP'
+      const currency2 = 'USD'
+      const issuer2 = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const actualHash = hashAMMRoot(currency1, currency2, undefined, issuer2)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent regardless of order
+      const reverseHash = hashAMMRoot(currency2, currency1, issuer2, undefined)
+      assert.equal(
+        actualHash,
+        reverseHash,
+        'Order should not matter for AMM pairs',
+      )
+    })
+
+    it('hashAMMRoot - USD/EUR pair', function () {
+      const currency1 = 'USD'
+      const currency2 = 'EUR'
+      const issuer1 = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const issuer2 = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
+      const actualHash = hashAMMRoot(currency1, currency2, issuer1, issuer2)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent regardless of order
+      const reverseHash = hashAMMRoot(currency2, currency1, issuer2, issuer1)
+      assert.equal(
+        actualHash,
+        reverseHash,
+        'Order should not matter for AMM pairs',
+      )
+    })
+
+    it('hashOracle', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const oracleID = 'ORACLE123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+      const actualHash = hashOracle(account, oracleID)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashOracle(account, oracleID), actualHash)
+    })
+
+    it('hashHook', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const hookHash =
+        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+      const actualHash = hashHook(account, hookHash)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashHook(account, hookHash), actualHash)
+    })
+
+    it('hashHookState', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const hookHash =
+        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+      const hookStateKey =
+        'STATE123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01234567'
+      const actualHash = hashHookState(account, hookHash, hookStateKey)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashHookState(account, hookHash, hookStateKey), actualHash)
+    })
+
+    it('hashHookDefinition', function () {
+      const hookHash =
+        'HOOK123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'
+      const actualHash = hashHookDefinition(hookHash)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashHookDefinition(hookHash), actualHash)
+    })
+
+    it('hashDID', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const actualHash = hashDID(account)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashDID(account), actualHash)
+    })
+
+    it('hashBridge', function () {
+      const door = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const otherChainSource = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
+      const issuingChainDoor = 'r32UufnaCGL82HubijgJGDmdE5hac7ZvLw'
+      const issuingChainIssue = 'USD'
+      const lockingChainDoor = 'rDx69ebzbowuqztksVDmZXjizTd12BVr4x'
+      const lockingChainIssue = 'EUR'
+
+      const actualHash = hashBridge(
+        door,
+        otherChainSource,
+        issuingChainDoor,
+        issuingChainIssue,
+        lockingChainDoor,
+        lockingChainIssue,
+      )
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(
+        hashBridge(
+          door,
+          otherChainSource,
+          issuingChainDoor,
+          issuingChainIssue,
+          lockingChainDoor,
+          lockingChainIssue,
+        ),
+        actualHash,
+      )
+    })
+
+    it('hashXChainOwnedClaimID', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const bridgeAccount = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
+      const claimID = 12345
+      const actualHash = hashXChainOwnedClaimID(account, bridgeAccount, claimID)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(
+        hashXChainOwnedClaimID(account, bridgeAccount, claimID),
+        actualHash,
+      )
+    })
+
+    it('hashXChainOwnedCreateAccountClaimID', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const bridgeAccount = 'rB5TihdPbKgMrkFqrqUC3yLdE8hhv4BdeY'
+      const claimID = 67890
+      const actualHash = hashXChainOwnedCreateAccountClaimID(
+        account,
+        bridgeAccount,
+        claimID,
+      )
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(
+        hashXChainOwnedCreateAccountClaimID(account, bridgeAccount, claimID),
+        actualHash,
+      )
+    })
+
+    it('hashMPToken', function () {
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const mpTokenIssuanceID =
+        'MPTOKEN123456789ABCDEF0123456789ABCDEF0123456789ABCDEF012'
+      const actualHash = hashMPToken(account, mpTokenIssuanceID)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashMPToken(account, mpTokenIssuanceID), actualHash)
+    })
+
+    it('hashMPTokenIssuance', function () {
+      const sequence = 98765
+      const account = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+      const actualHash = hashMPTokenIssuance(sequence, account)
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent
+      assert.equal(hashMPTokenIssuance(sequence, account), actualHash)
+    })
+
+    it('hashNegativeUNL', function () {
+      const actualHash = hashNegativeUNL()
+
+      assert.equal(actualHash.length, 64, 'Hash should be 64 characters')
+      assert.match(actualHash, /^[A-F0-9]+$/, 'Hash should be uppercase hex')
+
+      // Should be consistent (same hash every time since no parameters)
+      assert.equal(hashNegativeUNL(), actualHash)
+    })
+    /* eslint-enable require-unicode-regexp */
   })
 })
