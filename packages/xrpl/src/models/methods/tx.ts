@@ -93,9 +93,11 @@ interface BaseTxResult<
  *
  * @category Responses
  */
-export interface TxResponse<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
-  result: BaseTxResult<typeof RIPPLED_API_V2, T> & { tx_json: T }
+export interface TxResponse<
+  T extends BaseTransaction = Transaction,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+> extends BaseResponse {
+  result: BaseTxResult<V, T> & { tx_json: T }
   /**
    * If true, the server was able to search all of the specified ledger
    * versions, and the transaction was in none of them. If false, the server did

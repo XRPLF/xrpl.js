@@ -503,7 +503,10 @@ export type EventTypes =
   | 'path_find'
   | 'error'
 
-export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
+export type OnEventToListenerMap<
+  T extends EventTypes,
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+> = T extends 'connected'
   ? () => void
   : T extends 'disconnected'
   ? (code: number) => void
@@ -512,7 +515,7 @@ export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   : T extends 'validationReceived'
   ? (validation: ValidationStream) => void
   : T extends 'transaction'
-  ? (transaction: TransactionStream) => void
+  ? (transaction: TransactionStreamBase<V>) => void
   : T extends 'peerStatusChange'
   ? (peerStatus: PeerStatusStream) => void
   : T extends 'consensusPhase'

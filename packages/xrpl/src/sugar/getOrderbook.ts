@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import type { Client } from '../client'
 import { ValidationError } from '../errors'
-import { LedgerIndex } from '../models/common'
+import { APIVersion, DEFAULT_API_VERSION, LedgerIndex } from '../models/common'
 import { OfferFlags } from '../models/ledger/Offer'
 import {
   BookOffer,
@@ -142,10 +142,9 @@ type BookOfferResult = BookOffer[]
  * @param request - The request object.
  * @returns The array of book offer results.
  */
-export async function requestAllOffers(
-  client: Client,
-  request: BookOffersRequest,
-): Promise<BookOfferResult[]> {
+export async function requestAllOffers<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, request: BookOffersRequest): Promise<BookOfferResult[]> {
   const results = await client.requestAll(request)
   return results.map((result) => result.result.offers)
 }
