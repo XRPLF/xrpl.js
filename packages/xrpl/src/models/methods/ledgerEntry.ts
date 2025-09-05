@@ -19,7 +19,9 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
+export interface LedgerEntryRequest<Binary extends boolean = false>
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'ledger_entry'
 
   /**
@@ -64,7 +66,7 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
    * default is false.
    */
-  binary?: boolean
+  binary?: Binary
 
   /*
    * Only one of the following properties should be defined in a single request
@@ -230,28 +232,38 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   }
 }
 
+interface LedgerEntryResponseBase {
+  /** The unique ID of this ledger object. */
+  index: string
+  /** The ledger index of the ledger that was used when retrieving this data. */
+  ledger_current_index: number
+  validated?: boolean
+  /**
+   * (Optional) Indicates the ledger index at which the object was deleted.
+   */
+  deleted_ledger_index?: number
+}
+
 /**
  * Response expected from a {@link LedgerEntryRequest}.
  *
  * @category Responses
  */
-export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
-  result: {
-    /** The unique ID of this ledger object. */
-    index: string
-    /** The ledger index of the ledger that was used when retrieving this data. */
-    ledger_current_index: number
-    /**
-     * Object containing the data of this ledger object, according to the
-     * ledger format.
-     */
-    node?: T
-    /** The binary representation of the ledger object, as hexadecimal. */
-    node_binary?: string
-    validated?: boolean
-    /**
-     * (Optional) Indicates the ledger index at which the object was deleted.
-     */
-    deleted_ledger_index?: number
-  }
+export interface LedgerEntryResponse<
+  T = LedgerEntry,
+  Binary extends boolean = false,
+> extends BaseResponse {
+  result: LedgerEntryResponseBase &
+    (Binary extends true
+      ? {
+          /** The binary representation of the ledger object, as hexadecimal. */
+          node_binary: string
+        }
+      : {
+          /**
+           * Object containing the data of this ledger object, according to the
+           * ledger format.
+           */
+          node: T
+        })
 }

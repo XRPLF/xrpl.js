@@ -26,7 +26,9 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
+export interface LedgerRequest<Binary extends boolean = false>
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'ledger'
   /**
    * Admin required If true, return full information on the entire ledger.
@@ -61,7 +63,7 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
    * transaction information in binary format (hexadecimal string) instead of
    * JSON format.
    */
-  binary?: boolean
+  binary?: Binary
   /**
    * If true, and the command is requesting the current ledger, includes an
    * array of queued transactions in the results.
@@ -93,7 +95,9 @@ export interface LedgerRequest extends BaseRequest, LookupByLedgerRequest {
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedTransactionsOnly extends LedgerRequest {
+export interface LedgerRequestExpandedTransactionsOnly<
+  Binary extends boolean = false,
+> extends LedgerRequest<Binary> {
   expand: true
   transactions: true
 }
@@ -118,7 +122,9 @@ export interface LedgerRequestExpandedTransactionsOnly extends LedgerRequest {
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
+export interface LedgerRequestExpandedAccountsOnly<
+  Binary extends boolean = false,
+> extends LedgerRequest<Binary> {
   expand: true
   accounts: true
 }
@@ -144,8 +150,9 @@ export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedAccountsAndTransactions
-  extends LedgerRequest {
+export interface LedgerRequestExpandedAccountsAndTransactions<
+  Binary extends boolean = false,
+> extends LedgerRequest<Binary> {
   expand: true
   accounts: true
   transactions: true
@@ -173,7 +180,8 @@ export interface LedgerRequestExpandedAccountsAndTransactions
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedTransactionsBinary extends LedgerRequest {
+export interface LedgerRequestExpandedTransactionsBinary
+  extends LedgerRequest<true> {
   expand: true
   transactions: true
   binary: true
