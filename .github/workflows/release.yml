@@ -46,7 +46,7 @@ jobs:
           exit 1
         fi
 
-        if grep -R --exclude-dir=.git "artifactory.ops.ripple.com" .; then
+        if grep -R --exclude-dir=.git --exclude-dir=.github "artifactory.ops.ripple.com" .; then
           echo "❌ Internal Artifactory URL found"
           exit 1
         else
