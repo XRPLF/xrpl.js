@@ -24,6 +24,7 @@ export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 export const MAX_MPT_META_BYTE_LENGTH = 1024
+const SHA_512_HALF_LENGTH = 64
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -331,6 +332,35 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  */
 export function isArray<T = unknown>(input: unknown): input is T[] {
   return input != null && Array.isArray(input)
+}
+
+/**
+ * Verify the form and type of the unique ID of ledger entry.
+ *
+ * @param input - The object to check the form and type of.
+ * @returns Whether the input is a valid ledger entry id.
+ */
+export function isLedgerEntryId(input: unknown): input is string {
+  return isString(input) && isHex(input) && input.length === SHA_512_HALF_LENGTH
+}
+
+/**
+ * Get a function that validates hex strings up to a specified length.
+ *
+ * @param lengthUpto - The maximum length of the hex string.
+ * @returns A function that checks if an input is a valid non-empty hex string of the specified length.
+ */
+export function getHexMetadataValidator(
+  lengthUpto: number,
+): (input: unknown) => input is string {
+  return (input: unknown): input is string => {
+    return (
+      isString(input) &&
+      isHex(input) &&
+      input.length > 0 &&
+      input.length <= lengthUpto
+    )
+  }
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
