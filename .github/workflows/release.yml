@@ -321,8 +321,6 @@ jobs:
         else
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/
         fi
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Notify Slack success
       if: success()
