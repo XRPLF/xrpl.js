@@ -4,8 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 4.4.1 (2025-08-29)
+
 ### Fixed
-* Fixes node.js process termination when websocket send method errors after connection is closed.
+* Prevent Node.js process termination when WebSocket send() errors after the connection is closed.
 
 ## 4.4.0 (2025-07-29)
 
@@ -23,8 +25,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fail faster on `tem` errors with `submitAndWait`
 * Improved type-checking in models
 * Fix issue with some transactions that would crash in validation
+* Improve typing of `Batch` inner transactions
 
-## 4.3.0 (2025-6-09)
+## 4.3.0 (2025-06-09)
 
 ### Added
 * Support for `NFTokenMintOffer` (XLS-52)
