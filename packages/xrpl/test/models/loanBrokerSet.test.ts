@@ -32,21 +32,69 @@ describe('unit test LoanBrokerSet', () => {
 
   test('incorrect VaultID', () => {
     tx.VaultID = 'INCORRECT_VALUE'
-    assertInvalid(tx, 'LoanBrokerSet: invalid field VaultID')
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: VaultID must be 64 characters hexadecimal string',
+    )
 
     delete tx.VaultID
     assertInvalid(tx, 'LoanBrokerSet: missing field VaultID')
   })
 
-  test('incorrect VaultID', () => {
+  test('incorrect LoanBrokerID', () => {
     tx.LoanBrokerID = 'INCORRECT_VALUE'
-    assertInvalid(tx, 'LoanBrokerSet: invalid field LoanBrokerID')
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: LoanBrokerID must be 64 characters hexadecimal string',
+    )
   })
 
   test('incorrect Data', () => {
     tx.Data = 'INCORRECT_VALUE'
-    assertInvalid(tx, 'LoanBrokerSet: invalid field Data')
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: Data must be a valid non-empty hex string up to 512 characters',
+    )
 
-    // TODO: refactor more
+    tx.Data = ''
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: Data must be a valid non-empty hex string up to 512 characters',
+    )
+
+    tx.Data = 'A'.repeat(513)
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: Data must be a valid non-empty hex string up to 512 characters',
+    )
+  })
+
+  test('incorrect ManagementFeeRate', () => {
+    tx.ManagementFeeRate = 123324
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: ManagementFeeRate must be between 0 and 10000 inclusive',
+    )
+  })
+
+  test('incorrect DebtMaximum', () => {
+    tx.DebtMaximum = '-1e10'
+    assertInvalid(tx, 'LoanBrokerSet: DebtMaximum must be a non-negative value')
+  })
+
+  test('incorrect CoverRateMinimum', () => {
+    tx.CoverRateMinimum = 12323487
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: CoverRateMinimum must be between 0 and 100000 inclusive',
+    )
+  })
+
+  test('incorrect CoverRateLiquidation', () => {
+    tx.CoverRateLiquidation = 12323487
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: CoverRateLiquidation must be between 0 and 100000 inclusive',
+    )
   })
 })

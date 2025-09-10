@@ -357,9 +357,9 @@ export function isArray<T = unknown>(input: unknown): input is T[] {
 }
 
 /**
- * Verify the form and type of the unique ID of ledger entry.
+ * Verify the input is a valid ledger entry id.
  *
- * @param input - The object to check the form and type of.
+ * @param input - The object to validate.
  * @returns Whether the input is a valid ledger entry id.
  */
 export function isLedgerEntryId(input: unknown): input is string {
@@ -367,22 +367,22 @@ export function isLedgerEntryId(input: unknown): input is string {
 }
 
 /**
- * Get a function that validates hex strings up to a specified length.
+ * Validate input is non-empty hex string of up to a certain length.
  *
+ * @param input - The metadata to validate.
  * @param lengthUpto - The maximum length of the hex string.
- * @returns A function that checks if an input is a valid non-empty hex string of the specified length.
+ * @returns Whether the input is a valid non-empty hex string up to the specified length.
  */
-export function getHexMetadataValidator(
+export function validateHexMetadata(
+  input: unknown,
   lengthUpto: number,
-): (input: unknown) => input is string {
-  return (input: unknown): input is string => {
-    return (
-      isString(input) &&
-      isHex(input) &&
-      input.length > 0 &&
-      input.length <= lengthUpto
-    )
-  }
+): input is string {
+  return (
+    isString(input) &&
+    isHex(input) &&
+    input.length > 0 &&
+    input.length <= lengthUpto
+  )
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */

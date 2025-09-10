@@ -4,12 +4,13 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
-  getHexMetadataValidator,
+  validateHexMetadata,
   isLedgerEntryId,
   isNumber,
   isXRPLNumber,
   validateBaseTransaction,
   validateOptionalField,
+  isString,
   validateRequiredField,
   XRPLNumber,
 } from './common'
@@ -71,16 +72,35 @@ export interface LoanBrokerSet extends BaseTransaction {
  * @param tx - LoanBrokerSet Transaction.
  * @throws When LoanBrokerSet is Malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- due to exhaustive validations
 export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isLedgerEntryId)
-  validateOptionalField(tx, 'LoanBrokerID', isLedgerEntryId)
-  validateOptionalField(tx, 'Data', getHexMetadataValidator(MAX_DATA_LENGTH))
+  validateRequiredField(tx, 'VaultID', isString)
+  validateOptionalField(tx, 'LoanBrokerID', isString)
+  validateOptionalField(tx, 'Data', isString)
   validateOptionalField(tx, 'ManagementFeeRate', isNumber)
   validateOptionalField(tx, 'DebtMaximum', isXRPLNumber)
   validateOptionalField(tx, 'CoverRateMinimum', isNumber)
   validateOptionalField(tx, 'CoverRateLiquidation', isNumber)
+
+  if (!isLedgerEntryId(tx.VaultID)) {
+    throw new ValidationError(
+      `LoanBrokerSet: VaultID must be 64 characters hexadecimal string`,
+    )
+  }
+
+  if (tx.LoanBrokerID != null && !isLedgerEntryId(tx.LoanBrokerID)) {
+    throw new ValidationError(
+      `LoanBrokerSet: LoanBrokerID must be 64 characters hexadecimal string`,
+    )
+  }
+
+  if (tx.Data != null && !validateHexMetadata(tx.Data, MAX_DATA_LENGTH)) {
+    throw new ValidationError(
+      `LoanBrokerSet: Data must be a valid non-empty hex string up to ${MAX_DATA_LENGTH} characters`,
+    )
+  }
 
   if (
     tx.ManagementFeeRate != null &&
