@@ -34,6 +34,7 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import { validateLoanBrokerSet } from './loanBrokerSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -357,6 +358,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerSet':
+      validateLoanBrokerSet(tx)
       break
 
     case 'MPTokenAuthorize':
