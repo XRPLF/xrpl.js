@@ -314,6 +314,7 @@ jobs:
         cd dist
         PKG=$(ls *.tgz)
         echo $PKG
+        npm install -g npm@latest
         if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --dry-run
         else
