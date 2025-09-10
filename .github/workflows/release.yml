@@ -196,8 +196,6 @@ jobs:
         find "packages/${{ env.PACKAGE_NAME }}" -maxdepth 1 -name '*.tgz' -delete || true
         TARBALL=$(npx lerna exec --scope "@shichengsh001/${{ env.PACKAGE_NAME }}" -- npm pack --json | jq -r '.[0].filename')
         echo "TARBALL=packages/${{ env.PACKAGE_NAME }}/${TARBALL}" >> "$GITHUB_ENV"
-      env:
-        NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/.npmrc
 
     - name: Upload tarball as artifact
       uses: actions/upload-artifact@v4
@@ -316,6 +314,7 @@ jobs:
         cd dist
         PKG=$(ls *.tgz)
         echo $PKG
+        npm whoami
         if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --dry-run
         else
