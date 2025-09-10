@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `Lending Protocol` (XLS-66d)
+
 ## 4.4.1 (2025-08-29)
 
 ### Fixed
