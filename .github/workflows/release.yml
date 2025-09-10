@@ -314,12 +314,13 @@ jobs:
         cd dist
         PKG=$(ls *.tgz)
         echo $PKG
-        npm whoami
         if [[ "${{ github.event.inputs.dry-run }}" == "true" ]]; then
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --dry-run
         else
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/
         fi
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     - name: Notify Slack success
       if: success()
