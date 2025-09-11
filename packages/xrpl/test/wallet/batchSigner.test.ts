@@ -5,14 +5,11 @@ import {
   decode,
   ECDSA,
   encode,
+  SubmittableTransaction,
   ValidationError,
   Wallet,
 } from '../../src'
-import {
-  BatchFlags,
-  BatchInnerTransaction,
-  BatchSigner,
-} from '../../src/models/transactions/batch'
+import { BatchFlags, BatchSigner } from '../../src/models/transactions/batch'
 import {
   combineBatchSigners,
   signMultiBatch,
@@ -44,10 +41,6 @@ const nonBatchTx = {
   Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7',
   Destination: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
   Amount: '1000',
-}
-
-interface RawTransaction {
-  RawTransaction: BatchInnerTransaction
 }
 
 describe('Wallet batch operations', function () {
@@ -291,7 +284,7 @@ describe('Wallet batch operations', function () {
 
     it('removes signer for Batch submitter', function () {
       // add a third inner transaction from the transaction submitter
-      const rawTx3: RawTransaction = {
+      const rawTx3: { RawTransaction: SubmittableTransaction } = {
         RawTransaction: {
           Account: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
           Amount: '1000000',
