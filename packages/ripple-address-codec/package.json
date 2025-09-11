@@ -32,7 +32,7 @@
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo"
   },
-  "prettier": "@patelraj96/prettier-config",
+  "prettier": "@xrplf/prettier-config",
   "engines": {
     "node": ">= 18"
   }

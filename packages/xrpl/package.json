@@ -66,7 +66,7 @@
     "lint": "eslint . --ext .ts --max-warnings 0",
     "perf": "./scripts/perf_test.sh"
   },
-  "prettier": "@patelraj96/prettier-config",
+  "prettier": "@xrplf/prettier-config",
   "repository": {
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
