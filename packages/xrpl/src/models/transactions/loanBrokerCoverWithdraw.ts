@@ -2,90 +2,59 @@ import { ValidationError } from '../../errors'
 import { Amount, MPTAmount } from '../common'
 
 import {
-  Account,
   BaseTransaction,
-  isAccount,
-  isAmount,
-  isNumber,
+  isLedgerEntryId,
   validateBaseTransaction,
-  validateOptionalField,
+  isString,
   validateRequiredField,
+  isAmount,
+  Account,
+  validateOptionalField,
+  isAccount,
 } from './common'
 
 /**
- * Sequester XRP until the escrow process either finishes or is canceled.
+ * The LoanBrokerCoverWithdraw transaction withdraws the First-Loss Capital from the LoanBroker.
  *
  * @category Transaction Models
  */
-export interface EscrowCreate extends BaseTransaction {
-  TransactionType: 'EscrowCreate'
+export interface LoanBrokerCoverWithdraw extends BaseTransaction {
+  TransactionType: 'LoanBrokerCoverWithdraw'
+
   /**
-   * The amount to deduct from the sender's balance and and set aside in escrow.
-   * Once escrowed, this amount can either go to the Destination address (after any Finish times/conditions)
-   * or returned to the sender (after any cancellation times/conditions). Can represent XRP, in drops,
-   * an IOU token, or an MPT. Must always be a positive value.
+   * The Loan Broker ID from which to withdraw First-Loss Capital.
+   */
+  LoanBrokerID: string
+
+  /**
+   * The Fist-Loss Capital amount to withdraw.
    */
   Amount: Amount | MPTAmount
-  /** Address to receive escrowed XRP. */
-  Destination: Account
+
   /**
-   * The time, in seconds since the Ripple Epoch, when this escrow expires.
-   * This value is immutable; the funds can only be returned the sender after.
-   * this time.
+   * An account to receive the assets. It must be able to receive the asset.
    */
-  CancelAfter?: number
-  /**
-   * The time, in seconds since the Ripple Epoch, when the escrowed XRP can be
-   * released to the recipient. This value is immutable; the funds cannot move.
-   * until this time is reached.
-   */
-  FinishAfter?: number
-  /**
-   * Hex value representing a PREIMAGE-SHA-256 crypto-condition . The funds can.
-   * only be delivered to the recipient if this condition is fulfilled.
-   */
-  Condition?: string
-  /**
-   * Arbitrary tag to further specify the destination for this escrowed.
-   * payment, such as a hosted recipient at the destination address.
-   */
-  DestinationTag?: number
+  Destination?: Account
 }
 
 /**
- * Verify the form and type of an EscrowCreate at runtime.
+ * Verify the form and type of an LoanBrokerCoverWithdraw at runtime.
  *
- * @param tx - An EscrowCreate Transaction.
- * @throws When the EscrowCreate is Malformed.
+ * @param tx - LoanBrokerCoverWithdraw Transaction.
+ * @throws When LoanBrokerCoverWithdraw is Malformed.
  */
-export function validateEscrowCreate(tx: Record<string, unknown>): void {
+export function validateLoanBrokerCoverWithdraw(
+  tx: Record<string, unknown>,
+): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'LoanBrokerID', isString)
   validateRequiredField(tx, 'Amount', isAmount)
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'Destination', isAccount)
 
-  if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
+  if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(
-      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
+      `LoanBrokerCoverWithdraw: LoanBrokerID must be 64 characters hexadecimal string`,
     )
-  }
-
-  if (tx.FinishAfter === undefined && tx.Condition === undefined) {
-    throw new ValidationError(
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
-    )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: CancelAfter must be a number')
-  }
-
-  if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: FinishAfter must be a number')
-  }
-
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowCreate: Condition must be a string')
   }
 }

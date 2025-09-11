@@ -35,6 +35,7 @@ import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
 import { validateLoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
+import { validateLoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
 import { validateLoanBrokerDelete } from './loanBrokerDelete'
 import { validateLoanBrokerSet } from './loanBrokerSet'
 import { TransactionMetadata } from './metadata'
@@ -364,6 +365,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'LoanBrokerCoverDeposit':
       validateLoanBrokerCoverDeposit(tx)
+      break
+
+    case 'LoanBrokerCoverWithdraw':
+      validateLoanBrokerCoverWithdraw(tx)
       break
 
     case 'LoanBrokerDelete':
