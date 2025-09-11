@@ -34,6 +34,7 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import { validateLoanBrokerCoverClawback } from './loanBrokerCoverClawback'
 import { validateLoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
 import { validateLoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
 import { validateLoanBrokerDelete } from './loanBrokerDelete'
@@ -361,6 +362,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerCoverClawback':
+      validateLoanBrokerCoverClawback(tx)
       break
 
     case 'LoanBrokerCoverDeposit':

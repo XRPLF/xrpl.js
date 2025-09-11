@@ -330,6 +330,18 @@ export function isAmount(amount: unknown): amount is Amount {
 }
 
 /**
+ * Verify the form and type of IOU/MPT token amount at runtime.
+ *
+ * @param amount - The object to check the form and type of.
+ * @returns Whether the Amount is properly formed.
+ */
+export function isTokenAmount(
+  amount: unknown,
+): amount is IssuedCurrencyAmount | MPTAmount {
+  return isIssuedCurrencyAmount(amount) || isMPTAmount(amount)
+}
+
+/**
  * Verify the form and type of an XChainBridge at runtime.
  *
  * @param input - The input to check the form and type of.

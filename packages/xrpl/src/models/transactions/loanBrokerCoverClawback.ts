@@ -1,91 +1,66 @@
+import BigNumber from 'bignumber.js'
+
 import { ValidationError } from '../../errors'
-import { Amount, MPTAmount } from '../common'
+import { IssuedCurrencyAmount, MPTAmount } from '../common'
 
 import {
-  Account,
   BaseTransaction,
-  isAccount,
-  isAmount,
-  isNumber,
+  isLedgerEntryId,
   validateBaseTransaction,
+  isString,
   validateOptionalField,
-  validateRequiredField,
+  isTokenAmount,
 } from './common'
 
 /**
- * Sequester XRP until the escrow process either finishes or is canceled.
+ * The LoanBrokerCoverClawback transaction claws back the First-Loss Capital from the LoanBroker.
+ * The transaction can only be submitted by the Issuer of the Loan asset.
+ * Furthermore, the transaction can only clawback funds up to the minimum cover required for the current loans.
  *
  * @category Transaction Models
  */
-export interface EscrowCreate extends BaseTransaction {
-  TransactionType: 'EscrowCreate'
+export interface LoanBrokerCoverClawback extends BaseTransaction {
+  TransactionType: 'LoanBrokerCoverClawback'
+
   /**
-   * The amount to deduct from the sender's balance and and set aside in escrow.
-   * Once escrowed, this amount can either go to the Destination address (after any Finish times/conditions)
-   * or returned to the sender (after any cancellation times/conditions). Can represent XRP, in drops,
-   * an IOU token, or an MPT. Must always be a positive value.
+   * The Loan Broker ID from which to withdraw First-Loss Capital.
    */
-  Amount: Amount | MPTAmount
-  /** Address to receive escrowed XRP. */
-  Destination: Account
+  LoanBrokerID?: string
+
   /**
-   * The time, in seconds since the Ripple Epoch, when this escrow expires.
-   * This value is immutable; the funds can only be returned the sender after.
-   * this time.
+   * The First-Loss Capital amount to clawback.
+   * If the amount is 0 or not provided, clawback funds up to LoanBroker.DebtTotal * LoanBroker.CoverRateMinimum.
    */
-  CancelAfter?: number
-  /**
-   * The time, in seconds since the Ripple Epoch, when the escrowed XRP can be
-   * released to the recipient. This value is immutable; the funds cannot move.
-   * until this time is reached.
-   */
-  FinishAfter?: number
-  /**
-   * Hex value representing a PREIMAGE-SHA-256 crypto-condition . The funds can.
-   * only be delivered to the recipient if this condition is fulfilled.
-   */
-  Condition?: string
-  /**
-   * Arbitrary tag to further specify the destination for this escrowed.
-   * payment, such as a hosted recipient at the destination address.
-   */
-  DestinationTag?: number
+  Amount?: IssuedCurrencyAmount | MPTAmount
 }
 
 /**
- * Verify the form and type of an EscrowCreate at runtime.
+ * Verify the form and type of an LoanBrokerCoverClawback at runtime.
  *
- * @param tx - An EscrowCreate Transaction.
- * @throws When the EscrowCreate is Malformed.
+ * @param tx - LoanBrokerCoverClawback Transaction.
+ * @throws When LoanBrokerCoverClawback is Malformed.
  */
-export function validateEscrowCreate(tx: Record<string, unknown>): void {
+export function validateLoanBrokerCoverClawback(
+  tx: Record<string, unknown>,
+): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isAmount)
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'LoanBrokerID', isString)
+  validateOptionalField(tx, 'Amount', isTokenAmount)
 
-  if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
+  if (tx.LoanBrokerID != null && !isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(
-      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
+      `LoanBrokerCoverClawback: LoanBrokerID must be 64 characters hexadecimal string`,
     )
   }
 
-  if (tx.FinishAfter === undefined && tx.Condition === undefined) {
+  if (tx.Amount != null && new BigNumber(tx.Amount.value).isLessThan(0)) {
+    throw new ValidationError(`LoanBrokerCoverClawback: Amount must be >= 0`)
+  }
+
+  if (tx.LoanBrokerID == null && tx.Amount == null) {
     throw new ValidationError(
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
+      `LoanBrokerCoverClawback: Either LoanBrokerID or Amount is required`,
     )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: CancelAfter must be a number')
-  }
-
-  if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: FinishAfter must be a number')
-  }
-
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowCreate: Condition must be a string')
   }
 }
