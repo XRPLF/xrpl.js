@@ -42,7 +42,6 @@ describe('AMMVote', function () {
     assert.ok(preAuctionSlot)
     assert.ok(preVoteSlots)
 
-    // @ts-expect-error: preAuctionSlot should be defined at this point
     const { discounted_fee: preDiscountedFee } = preAuctionSlot
 
     const ammVoteTx: AMMVote = {
@@ -66,7 +65,6 @@ describe('AMMVote', function () {
 
     assert.ok(auction_slot)
 
-    // @ts-expect-error: auction_slot should be defined at this point
     const { discounted_fee } = auction_slot
 
     assert.ok(vote_slots)
@@ -84,7 +82,6 @@ describe('AMMVote', function () {
 
     assert.equal(afterTradingFee, expectedTradingFee)
     assert.equal(afterDiscountedFee, expectedDiscountedFee)
-    // @ts-expect-error: preVoteSlots should be defined at this point
     assert.equal(vote_slots.length - preVoteSlots.length, 1)
   })
 })
