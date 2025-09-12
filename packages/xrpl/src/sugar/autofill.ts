@@ -282,7 +282,7 @@ async function fetchGasPrice(client: Client): Promise<BigNumber> {
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function -- needed here due to the complexity of the fee calculation
+// eslint-disable-next-line max-lines-per-function, complexity -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -319,14 +319,17 @@ async function calculateFeePerTransactionType(
       baseFee = baseFee.plus(extraFee)
     }
   } else if (tx.TransactionType === 'Batch') {
-    const rawTxFees = await tx.RawTransactions.reduce(async (acc, rawTxn) => {
-      const resolvedAcc = await acc
-      const fee = await calculateFeePerTransactionType(
-        client,
-        rawTxn.RawTransaction,
-      )
-      return BigNumber.sum(resolvedAcc, fee)
-    }, Promise.resolve(new BigNumber(0)))
+    const rawTxFees = await tx.RawTransactions.reduce(
+      async (acc, rawTxn) => {
+        const resolvedAcc = await acc
+        const fee = await calculateFeePerTransactionType(
+          client,
+          rawTxn.RawTransaction,
+        )
+        return BigNumber.sum(resolvedAcc, fee)
+      },
+      Promise.resolve(new BigNumber(0)),
+    )
     baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
   } else if (isSpecialTxCost) {
     baseFee = await fetchOwnerReserveFee(client)
@@ -422,12 +425,9 @@ export async function checkAccountDeleteBlockers(
  */
 export function handleDeliverMax(tx: Payment): void {
   if (tx.DeliverMax != null) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
-    if (tx.Amount == null) {
-      // If only DeliverMax is provided, use it to populate the Amount field
-      // eslint-disable-next-line no-param-reassign -- known RPC-level property
-      tx.Amount = tx.DeliverMax
-    }
+    // If only DeliverMax is provided, use it to populate the Amount field
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-param-reassign -- needed here
+    tx.Amount ??= tx.DeliverMax
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
     if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
@@ -455,7 +455,7 @@ export async function autofillBatchTxn(
 ): Promise<void> {
   const accountSequences: Record<string, number> = {}
 
-  for await (const rawTxn of tx.RawTransactions) {
+  for (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
 
     // Sequence processing
@@ -464,6 +464,7 @@ export async function autofillBatchTxn(
         txn.Sequence = accountSequences[txn.Account]
         accountSequences[txn.Account] += 1
       } else {
+        // eslint-disable-next-line no-await-in-loop -- It has to wait
         const nextSequence = await getNextValidSequenceNumber(
           client,
           txn.Account,
@@ -477,28 +478,24 @@ export async function autofillBatchTxn(
 
     if (txn.Fee == null) {
       txn.Fee = '0'
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.Fee !== '0') {
       throw new XrplError('Must have `Fee of "0" in inner Batch transaction.')
     }
 
     if (txn.SigningPubKey == null) {
       txn.SigningPubKey = ''
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     } else if (txn.SigningPubKey !== '') {
       throw new XrplError(
         'Must have `SigningPubKey` of "" in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.TxnSignature != null) {
       throw new XrplError(
         'Must not have `TxnSignature` in inner Batch transaction.',
       )
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed for JS checks
     if (txn.Signers != null) {
       throw new XrplError('Must not have `Signers` in inner Batch transaction.')
     }

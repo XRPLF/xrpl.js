@@ -148,16 +148,16 @@ class STObject extends SerializedType {
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
           : field.type.name === 'STArray'
-          ? STArray.from(xAddressDecoded[field.name], definitions)
-          : field.type.name === 'UInt64'
-          ? UInt64.from(xAddressDecoded[field.name], field.name)
-          : field.associatedType?.from
-          ? field.associatedType.from(xAddressDecoded[field.name])
-          : (() => {
-              throw new Error(
-                `Type ${field.type.name} for field ${field.name} is missing associatedType.from`,
-              )
-            })()
+            ? STArray.from(xAddressDecoded[field.name], definitions)
+            : field.type.name === 'UInt64'
+              ? UInt64.from(xAddressDecoded[field.name], field.name)
+              : field.associatedType?.from
+                ? field.associatedType.from(xAddressDecoded[field.name])
+                : (() => {
+                    throw new Error(
+                      `Type ${field.type.name} for field ${field.name} is missing associatedType.from`,
+                    )
+                  })()
 
       if (associatedValue == undefined) {
         throw new TypeError(

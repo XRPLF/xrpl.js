@@ -151,7 +151,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   const isTfSellNFToken =
     typeof flags === 'number'
       ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)
-      : flags.tfSellNFToken ?? false
+      : (flags.tfSellNFToken ?? false)
 
   if (isTfSellNFToken) {
     validateNFTokenSellOfferCases(tx)

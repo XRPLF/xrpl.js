@@ -132,16 +132,16 @@ type RequestNextPageType =
 type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : never
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest
+          ? AccountTxResponse
+          : T extends LedgerDataRequest
+            ? LedgerDataResponse
+            : never
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -476,7 +476,7 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number = request.limit ?? Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []
@@ -673,9 +673,7 @@ class Client extends EventEmitter<EventTypes> {
     tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
-    if (tx.NetworkID == null) {
-      tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
+    tx.NetworkID ??= txNeedsNetworkID(this) ? this.networkID : undefined
     if (tx.Sequence == null) {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
@@ -884,6 +882,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(

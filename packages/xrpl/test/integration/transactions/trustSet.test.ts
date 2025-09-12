@@ -20,10 +20,8 @@ describe('TrustSet', function () {
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
-    if (!wallet2) {
-      // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
-      wallet2 = await generateFundedWallet(testContext.client)
-    }
+    // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
+    wallet2 ??= await generateFundedWallet(testContext.client)
   })
   afterEach(async () => teardownClient(testContext))
 
