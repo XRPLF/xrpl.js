@@ -9,7 +9,7 @@ import {
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
-import { TransactionMetadataBase } from './metadata'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * Deliver XRP from a held payment to the recipient.
