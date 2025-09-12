@@ -69,7 +69,7 @@ describe('client.submitAndWait', function () {
 
           // Retry if another transaction finished before this one
 
-          if (['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(errorCode || '')) {
+          if (['tefPAST_SEQ', 'tefMAX_LEDGER'].includes(errorCode ?? '')) {
             // eslint-disable-next-line no-await-in-loop, no-promise-executor-return -- We are waiting on retries
             await new Promise((resolve) => setTimeout(resolve, 1000))
           } else {
