@@ -25,9 +25,11 @@ export interface FeeSettingsPostAmendmentFields {
   /** The incremental owner reserve for owning objects, as drops of XRP. */
   ReserveIncrementDrops: string
 
-  ExtensionComputeLimit: number
+  ExtensionComputeLimit?: number
 
-  ExtensionSizeLimit: number
+  ExtensionSizeLimit?: number
+
+  GasPrice?: number
 }
 
 export interface FeeSettingsBase
