@@ -157,7 +157,10 @@ describe('subscribe', function () {
           response.result as LedgerStreamResponse
         // Explicitly checking that there are only known fields in the return
         const expectedResult: LedgerStreamResponse = {
+          extension_compute: ledgerResponse.extension_compute,
+          extension_size: ledgerResponse.extension_size,
           fee_base: ledgerResponse.fee_base,
+          gas_price: ledgerResponse.gas_price,
           ledger_hash: ledgerResponse.ledger_hash,
           ledger_index: ledgerResponse.ledger_index,
           ledger_time: ledgerResponse.ledger_time,

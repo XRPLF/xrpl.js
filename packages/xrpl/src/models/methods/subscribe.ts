@@ -158,9 +158,12 @@ export interface LedgerStreamResponse {
    * If this ledger version includes a SetFee pseudo-transaction the new.
    * Transaction cost applies starting with the following ledger version.
    */
+  extension_compute?: number
+  extension_size?: number
   fee_base: number
   /** The reference transaction cost in "fee units". This is not returned after the SetFees amendment is enabled. */
   fee_ref?: number
+  gas_price?: string
   /** The identifying hash of the ledger version that was closed. */
   ledger_hash: string
   /** The ledger index of the ledger that was closed. */
