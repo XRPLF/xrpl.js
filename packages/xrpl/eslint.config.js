@@ -127,15 +127,4 @@ module.exports = [
       complexity: ['off'],
     },
   },
-  {
-    files: ['tools/*.ts', 'tools/*.js'],
-    rules: {
-      'no-console': ['off'],
-      'n/no-process-exit': ['off'],
-      '@typescript-eslint/no-magic-numbers': ['off'],
-      'max-lines-per-function': ['off'],
-      'max-statements': ['off'],
-      complexity: ['off'],
-    },
-  },
 ]
