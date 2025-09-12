@@ -21,6 +21,9 @@ const REQUIRED_NETWORKID_VERSION = '1.11.0'
 
 const MICRO_DROPS_PER_DROP = 1_000_000
 
+const WASM_FIXED_UPLOAD_COST = 100
+const WASM_DROPS_PER_BYTE = 5
+
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
  * Example usage: isNotLaterRippledVersion('1.10.0', '1.11.0') returns true.
@@ -295,7 +298,9 @@ async function calculateFeePerTransactionType(
 
   // EscrowCreate transaction with FinishFunction
   if (tx.TransactionType === 'EscrowCreate' && tx.FinishFunction != null) {
-    baseFee = baseFee.plus(1000)
+    baseFee = baseFee
+      .plus(WASM_FIXED_UPLOAD_COST)
+      .plus((WASM_DROPS_PER_BYTE * tx.FinishFunction.length) / 2)
   } else if (tx.TransactionType === 'EscrowFinish') {
     // EscrowFinish Transaction with Fulfillment/ComputationAllowance
     if (tx.Fulfillment != null) {
