@@ -44,6 +44,7 @@ function extractNumberPartsFromString(val: string): {
    *   - Leading zeros are accepted and normalized by code after parsing.
    *   - Empty decimal ('123.') and missing integer ('.456') are NOT matched—must be fully specified.
    */
+  // eslint-disable-next-line prefer-named-capture-group
   const regex = /^([-+]?)([0-9]+)(?:\.([0-9]+))?(?:[eE]([+-]?[0-9]+))?$/
   const match = regex.exec(val)
   if (!match) throw new Error(`Unable to parse number from string: ${val}`)
