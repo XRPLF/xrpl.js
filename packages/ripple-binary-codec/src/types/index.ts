@@ -59,6 +59,7 @@ export {
   Hash160,
   Hash192,
   Hash256,
+  Int32,
   PathSet,
   STArray,
   STObject,

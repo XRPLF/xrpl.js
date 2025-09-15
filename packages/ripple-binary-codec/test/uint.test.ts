@@ -1,4 +1,4 @@
-import { UInt8, UInt64 } from '../src/types'
+import { UInt8, UInt64, Int32 } from '../src/types'
 import { encode, decode } from '../src'
 
 const binary =
@@ -160,6 +160,14 @@ it('compareToTest[6]', () => {
 
 it('compareToTest[7]', () => {
   expect(UInt8.from(124).compareTo(13)).toBe(1)
+})
+
+it('compareToTest[8]', () => {
+  expect(Int32.from(124).compareTo(UInt64.from(124))).toBe(0)
+})
+
+it('compareToTest[9]', () => {
+  expect(Int32.from(125).compareTo(UInt64.from(124))).toBe(1)
 })
 
 it('UInt64 from string zero', () => {
