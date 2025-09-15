@@ -36,7 +36,7 @@ class Int32 extends UInt {
     }
 
     if (typeof val === 'number') {
-      Int32.checkUintRange(val, 0, 0xffffffff)
+      Int32.checkUintRange(val, -2147483648, 2147483647)
       writeInt32BE(buf, val, 0)
       return new Int32(buf)
     }
