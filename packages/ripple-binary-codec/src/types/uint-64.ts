@@ -42,6 +42,7 @@ class UInt64 extends UInt {
    * @param val A UInt64, hex-string, bigInt, or number
    * @returns A UInt64 object
    */
+  // eslint-disable-next-line complexity
   static from<T extends UInt64 | string | bigint | number>(
     val: T,
     fieldName = '',

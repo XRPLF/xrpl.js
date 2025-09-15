@@ -63,7 +63,7 @@
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
-    "lint": "eslint . --ext .ts --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "perf": "./scripts/perf_test.sh"
   },
   "prettier": "@xrplf/prettier-config",
