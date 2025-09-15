@@ -53,6 +53,15 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+
+  tfMPTCanMutateCanLock = 0x00000002,
+  tfMPTCanMutateRequireAuth = 0x00000004,
+  tfMPTCanMutateCanEscrow = 0x00000008,
+  tfMPTCanMutateCanTrade = 0x00000010,
+  tfMPTCanMutateCanTransfer = 0x00000020,
+  tfMPTCanMutateCanClawback = 0x00000040,
+  tfMPTCanMutateMetadata = 0x00010000,
+  tfMPTCanMutateTransferFee = 0x00020000,
 }
 
 /**
@@ -69,6 +78,15 @@ export interface MPTokenIssuanceCreateFlagsInterface
   tfMPTCanTrade?: boolean
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
+
+  tfMPTCanMutateCanLock?: boolean
+  tfMPTCanMutateRequireAuth?: boolean
+  tfMPTCanMutateCanEscrow?: boolean
+  tfMPTCanMutateCanTrade?: boolean
+  tfMPTCanMutateCanTransfer?: boolean
+  tfMPTCanMutateCanClawback?: boolean
+  tfMPTCanMutateMetadata?: boolean
+  tfMPTCanMutateTransferFee?: boolean
 }
 
 /**
@@ -120,6 +138,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
+  MutableFlags?: number
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {

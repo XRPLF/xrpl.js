@@ -44,6 +44,13 @@ describe('MPTokenIssuanceSet', function () {
     } as any
 
     assertValid(validMPTokenIssuanceSet)
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags: MPTokenIssuanceSetFlags.tfMPTClearCanTransfer,
+    } as any)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {
