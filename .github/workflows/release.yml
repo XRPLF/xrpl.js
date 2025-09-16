@@ -83,7 +83,6 @@ jobs:
       contents: read
       id-token: write
       pages: write
-      issues: write
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
@@ -94,6 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
+    permissions:
+      issues: write
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
