@@ -1,0 +1,105 @@
+name: "Create Vulnerability Issue (Inline)"
+description: "Creates a GitHub issue only if vuln-report.txt contains CRITICAL/HIGH findings, inlining the report."
+branding:
+  icon: alert-triangle
+  color: red
+
+inputs:
+  report_path:
+    description: "Path to vulnerability report (e.g., vuln-report.txt)"
+    required: true
+  package_name:
+    description: "Package name for context"
+    required: false
+    default: ""
+  package_version:
+    description: "Package version for context"
+    required: false
+    default: ""
+  release_branch:
+    description: "Release branch for context"
+    required: false
+    default: ""
+  title_prefix:
+    description: "Issue title prefix"
+    required: false
+    default: "Security vulnerabilities detected"
+  labels:
+    description: "Comma-separated labels to apply to the issue"
+    required: false
+    default: "security,automated,trivy"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Inspect report for CRITICAL/HIGH
+      id: scan
+      shell: bash
+      run: |
+        set -euo pipefail
+        FILE="${{ inputs.report_path }}"
+
+        if [[ ! -f "$FILE" ]]; then
+          echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          echo "❎ Report not found at $FILE. Skipping issue creation."
+          exit 0
+        fi
+
+        if ! [[ -s "$FILE" ]]; then
+          echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          echo "✅ Report exists but is empty. Skipping issue creation."
+          exit 0
+        fi
+
+        # Look for CRITICAL or HIGH (case-insensitive, whole word)
+        if grep -Eqi '\b(CRITICAL|HIGH)\b' "$FILE"; then
+          echo "has_findings=true" >> "$GITHUB_OUTPUT"
+
+          # Escape backticks so the code block renders correctly in Markdown
+          REPORT_ESCAPED=$(sed 's/`/\\`/g' "$FILE")
+
+          {
+            echo "VULN_BODY<<'EOF_VULN'"
+            echo "$REPORT_ESCAPED"
+            echo "EOF_VULN"
+          } >> "$GITHUB_ENV"
+        else
+          echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          echo "✅ No CRITICAL/HIGH findings in $FILE. Skipping issue creation."
+        fi
+
+    - name: Create GitHub issue with inline report
+      if: steps.scan.outputs.has_findings == 'true'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ github.token }}
+        script: |
+          const labelsCsv = `${{ inputs.labels }}`.trim();
+          const labels = labelsCsv ? labelsCsv.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+          const pkg = `${{ inputs.package_name }}` || '(unknown package)';
+          const version = `${{ inputs.package_version }}` || '(unknown version)';
+          const branch  = `${{ inputs.release_branch }}` || '(unknown branch)';
+          const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+          const report = process.env.VULN_BODY || '(no report content)';
+
+          const title = `${{ inputs.title_prefix }} in ${pkg}@${ver}`;
+          const body =
+            `Automated scan detected **CRITICAL/HIGH** vulnerabilities.\n\n` +
+            `**Package:** ${pkg}\n` +
+            `**Version:** ${version}\n` +
+            `**Release branch:** ${branch}\n` +
+            `**Workflow run:** ${runUrl}\n\n` +
+            `<details><summary>Trivy Report (table)</summary>\n\n` +
+            '```\n' + report + '\n```\n\n' +
+            `</details>\n`;
+
+          const { data: issue } = await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title,
+            body,
+            labels
+          });
+
+          core.info(`✅ Issue created: ${issue.html_url}`);

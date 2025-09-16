@@ -183,7 +183,7 @@ jobs:
           echo "art_url=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ steps.upload_vuln.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
 
       - name: Create issue if CRITICAL/HIGH found
-        uses: ./.github/actions/create-vuln-issue
+        uses: ./.github/actions/create-github-issue
         with:
           vuln_art_url: ${{ steps.vuln_art.outputs.url }}
           report_path: vuln-report.txt
