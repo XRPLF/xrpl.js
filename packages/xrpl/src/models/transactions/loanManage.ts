@@ -1,91 +1,78 @@
 import { ValidationError } from '../../errors'
-import { Amount, MPTAmount } from '../common'
 
 import {
-  Account,
   BaseTransaction,
-  isAccount,
-  isAmount,
-  isNumber,
+  isLedgerEntryId,
   validateBaseTransaction,
-  validateOptionalField,
+  isString,
   validateRequiredField,
+  GlobalFlagsInterface,
 } from './common'
 
 /**
- * Sequester XRP until the escrow process either finishes or is canceled.
+ * The transaction modifies an existing Loan object.
  *
  * @category Transaction Models
  */
-export interface EscrowCreate extends BaseTransaction {
-  TransactionType: 'EscrowCreate'
+export interface LoanManage extends BaseTransaction {
+  TransactionType: 'LoanManage'
+
   /**
-   * The amount to deduct from the sender's balance and and set aside in escrow.
-   * Once escrowed, this amount can either go to the Destination address (after any Finish times/conditions)
-   * or returned to the sender (after any cancellation times/conditions). Can represent XRP, in drops,
-   * an IOU token, or an MPT. Must always be a positive value.
+   * The ID of the Loan object to be updated.
    */
-  Amount: Amount | MPTAmount
-  /** Address to receive escrowed XRP. */
-  Destination: Account
-  /**
-   * The time, in seconds since the Ripple Epoch, when this escrow expires.
-   * This value is immutable; the funds can only be returned the sender after.
-   * this time.
-   */
-  CancelAfter?: number
-  /**
-   * The time, in seconds since the Ripple Epoch, when the escrowed XRP can be
-   * released to the recipient. This value is immutable; the funds cannot move.
-   * until this time is reached.
-   */
-  FinishAfter?: number
-  /**
-   * Hex value representing a PREIMAGE-SHA-256 crypto-condition . The funds can.
-   * only be delivered to the recipient if this condition is fulfilled.
-   */
-  Condition?: string
-  /**
-   * Arbitrary tag to further specify the destination for this escrowed.
-   * payment, such as a hosted recipient at the destination address.
-   */
-  DestinationTag?: number
+  LoanID: string
+
+  Flags?: number | LoanManageFlagsInterface
 }
 
 /**
- * Verify the form and type of an EscrowCreate at runtime.
+ * Transaction Flags for an LoanManage Transaction.
  *
- * @param tx - An EscrowCreate Transaction.
- * @throws When the EscrowCreate is Malformed.
+ * @category Transaction Flags
  */
-export function validateEscrowCreate(tx: Record<string, unknown>): void {
+export enum LoanManageFlags {
+  /**
+   * Indicates that the Loan should be defaulted.
+   */
+  tfLoanDefault = 0x00010000,
+
+  /**
+   * Indicates that the Loan should be impaired.
+   */
+  tfLoanImpair = 0x00020000,
+
+  /**
+   * Indicates that the Loan should be un-impaired.
+   */
+  tfLoanUnimpair = 0x00040000,
+}
+
+/**
+ * Map of flags to boolean values representing {@link LoanManage} transaction
+ * flags.
+ *
+ * @category Transaction Flags
+ */
+export interface LoanManageFlagsInterface extends GlobalFlagsInterface {
+  tfLoanDefault?: boolean
+  tfLoanImpair?: boolean
+  tfLoanUnimpair?: boolean
+}
+
+/**
+ * Verify the form and type of an LoanManage at runtime.
+ *
+ * @param tx - LoanManage Transaction.
+ * @throws When LoanManage is Malformed.
+ */
+export function validateLoanManage(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isAmount)
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'LoanID', isString)
 
-  if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
+  if (!isLedgerEntryId(tx.LoanID)) {
     throw new ValidationError(
-      'EscrowCreate: Either CancelAfter or FinishAfter must be specified',
+      `LoanManage: LoanID must be 64 characters hexadecimal string`,
     )
-  }
-
-  if (tx.FinishAfter === undefined && tx.Condition === undefined) {
-    throw new ValidationError(
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
-    )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: CancelAfter must be a number')
-  }
-
-  if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: FinishAfter must be a number')
-  }
-
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowCreate: Condition must be a string')
   }
 }

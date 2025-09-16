@@ -39,6 +39,10 @@ import { validateLoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
 import { validateLoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
 import { validateLoanBrokerDelete } from './loanBrokerDelete'
 import { validateLoanBrokerSet } from './loanBrokerSet'
+import { validateLoanDelete } from './loanDelete'
+import { validateLoanManage } from './loanManage'
+import { validateLoanPay } from './loanPay'
+import { validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -382,6 +386,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'LoanBrokerSet':
       validateLoanBrokerSet(tx)
+      break
+
+    case 'LoanSet':
+      validateLoanSet(tx)
+      break
+
+    case 'LoanManage':
+      validateLoanManage(tx)
+      break
+
+    case 'LoanDelete':
+      validateLoanDelete(tx)
+      break
+
+    case 'LoanPay':
+      validateLoanPay(tx)
       break
 
     case 'MPTokenAuthorize':
