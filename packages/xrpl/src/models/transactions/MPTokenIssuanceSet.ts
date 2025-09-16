@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isFlagEnabled } from '../utils'
+import { isFlagEnabled, isHex } from '../utils'
 
 import {
   BaseTransaction,
@@ -10,7 +10,11 @@ import {
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  isNumber,
+  MAX_MPT_META_BYTE_LENGTH,
 } from './common'
+
+import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
 
 /**
  * Transaction Flags for an MPTokenIssuanceSet Transaction.
@@ -169,6 +173,10 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
+
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
@@ -184,5 +192,23 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
+  }
+
+  if (typeof tx.TransferFee === 'number') {
+    if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
+      throw new ValidationError(
+        `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+      )
+    }
+  }
+
+  if (
+    typeof tx.MPTokenMetadata === 'string' &&
+    (!isHex(tx.MPTokenMetadata) ||
+      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+  ) {
+    throw new ValidationError(
+      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
   }
 }

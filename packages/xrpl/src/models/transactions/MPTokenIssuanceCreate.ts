@@ -16,7 +16,7 @@ import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
-const MAX_TRANSFER_FEE = 50000
+export const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -160,6 +160,7 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
