@@ -506,22 +506,22 @@ export type EventTypes =
 export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   ? () => void
   : T extends 'disconnected'
-  ? (code: number) => void
-  : T extends 'ledgerClosed'
-  ? (ledger: LedgerStream) => void
-  : T extends 'validationReceived'
-  ? (validation: ValidationStream) => void
-  : T extends 'transaction'
-  ? (transaction: TransactionStream) => void
-  : T extends 'peerStatusChange'
-  ? (peerStatus: PeerStatusStream) => void
-  : T extends 'consensusPhase'
-  ? (consensus: ConsensusStream) => void
-  : T extends 'manifestReceived'
-  ? (manifest: ManifestRequest) => void
-  : T extends 'path_find'
-  ? (path: PathFindStream) => void
-  : T extends 'error'
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-    (...err: any[]) => void
-  : (...args: never[]) => void
+    ? (code: number) => void
+    : T extends 'ledgerClosed'
+      ? (ledger: LedgerStream) => void
+      : T extends 'validationReceived'
+        ? (validation: ValidationStream) => void
+        : T extends 'transaction'
+          ? (transaction: TransactionStream) => void
+          : T extends 'peerStatusChange'
+            ? (peerStatus: PeerStatusStream) => void
+            : T extends 'consensusPhase'
+              ? (consensus: ConsensusStream) => void
+              : T extends 'manifestReceived'
+                ? (manifest: ManifestRequest) => void
+                : T extends 'path_find'
+                  ? (path: PathFindStream) => void
+                  : T extends 'error'
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
+                      (...err: any[]) => void
+                    : (...args: never[]) => void

@@ -21,7 +21,7 @@
     "prepublishOnly": "npm test",
     "test": "npm run build && jest --verbose false --silent=false ./test/*.test.ts",
     "test:browser": "npm run build && karma start ./karma.config.js",
-    "lint": "eslint . --ext .ts --ext .test.js",
+    "lint": "eslint . --max-warnings 0",
     "generateDefinitions": "node ./tools/generateDefinitions.js"
   },
   "keywords": [

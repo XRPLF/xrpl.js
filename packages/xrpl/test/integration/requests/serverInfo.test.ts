@@ -139,18 +139,18 @@ describe('server_info (rippled)', function () {
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting
-      Object.keys(response.result.info.state_accounting).forEach(function (
-        key,
-      ) {
-        assert.equal(
-          typeof response.result.info.state_accounting[key].duration_us,
-          'string',
-        )
-        assert.equal(
-          typeof response.result.info.state_accounting[key].transitions,
-          'string',
-        )
-      })
+      Object.keys(response.result.info.state_accounting).forEach(
+        function (key) {
+          assert.equal(
+            typeof response.result.info.state_accounting[key].duration_us,
+            'string',
+          )
+          assert.equal(
+            typeof response.result.info.state_accounting[key].transitions,
+            'string',
+          )
+        },
+      )
 
       // validated_ledger
       assert.equal(typeof response.result.info.validated_ledger?.hash, 'string')

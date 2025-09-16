@@ -241,7 +241,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     const isTfPartialPayment =
       typeof flags === 'number'
         ? isFlagEnabled(flags, PaymentFlags.tfPartialPayment)
-        : flags.tfPartialPayment ?? false
+        : (flags.tfPartialPayment ?? false)
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
