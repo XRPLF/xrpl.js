@@ -1,4 +1,5 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+
 import { MPTokenIssuanceSetFlags } from '../../src'
 import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/transactions/common'
 import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
@@ -105,7 +106,10 @@ describe('MPTokenIssuanceSet', function () {
       TransferFee: -1,
     } as any
 
-    assertInvalid(invalid, `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`)
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+    )
   })
 
   it(`Throws w/ invalid (too high) value of TransferFee`, function () {
@@ -116,7 +120,10 @@ describe('MPTokenIssuanceSet', function () {
       TransferFee: MAX_TRANSFER_FEE + 1,
     } as any
 
-    assertInvalid(invalid, `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`)
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+    )
   })
 
   it(`Throws w/ invalid type of MutableFlags`, function () {
@@ -149,7 +156,10 @@ describe('MPTokenIssuanceSet', function () {
       MPTokenMetadata: 'zznothex',
     } as any
 
-    assertInvalid(invalid, `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,)
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
   })
 
   it(`Throws w/ invalid (too large) MPTokenMetadata`, function () {
@@ -160,6 +170,9 @@ describe('MPTokenIssuanceSet', function () {
       MPTokenMetadata: stringToHex('a'.repeat(MAX_MPT_META_BYTE_LENGTH + 1)),
     } as any
 
-    assertInvalid(invalid, `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,)
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
   })
 })
