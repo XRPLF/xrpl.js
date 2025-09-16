@@ -78,6 +78,14 @@ Warning: Use at your own risk.
 
 ## Wallets and wallet tools
 
+- **[Joey Wallet](https://joeywallet.xyz)**
+
+  Joey Wallet is a secure, self-custody cryptocurrency wallet and gateway to Web3 decentralized applications (dApps) on the XRP Ledger (XRPL). Documentation and integration details are located at [https://docs.joeywallet.xyz/](https://docs.joeywallet.xyz).
+
+- **[Crossmark Wallet](https://crossmark.io/)**
+
+  Crossmark is a browser-first, self-custodial wallet built for interacting with the XRP Ledger. Send, receive, create value with ease. Documentation can be found at [https://docs.crossmark.io/](https://docs.crossmark.io/).
+
 - **[GemWallet](https://gemwallet.app/)**
 
   Users can use the GemWallet (non-custodial) web extension to interact with the XRPL from their browser. The documentation is available at [https://gemwallet.app/](https://gemwallet.app/docs/user-guide/introduction).
