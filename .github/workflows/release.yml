@@ -249,6 +249,8 @@ jobs:
   review:
     runs-on: ubuntu-latest
     needs: [get_version, run_faucet_test, run_tests, pre_release]
+    permissions:
+      pull-requests: write
     name: Review test and security scan result
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
