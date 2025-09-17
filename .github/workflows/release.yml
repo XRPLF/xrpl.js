@@ -237,7 +237,8 @@ jobs:
           set -euo pipefail
           echo "Packaging ${{ env.PACKAGE_NAME }}"
           find "packages/${{ env.PACKAGE_NAME }}" -maxdepth 1 -name '*.tgz' -delete || true
-          TARBALL=$(npx lerna exec --scope "${{ env.PACKAGE_NAME }}" -- npm pack --json | jq -r '.[0].filename')
+          FULL_PACKAGE_NAME="$(jq -er '.name' packages/${{ env.PACKAGE_NAME }}/package.json)"
+          TARBALL=$(npx lerna exec --scope "$FULL_PACKAGE_NAME" -- npm pack --json | jq -r '.[0].filename')
           echo "TARBALL=packages/${{ env.PACKAGE_NAME }}/${TARBALL}" >> "$GITHUB_ENV"
 
       - name: Upload tarball as artifact
