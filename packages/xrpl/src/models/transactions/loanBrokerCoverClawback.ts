@@ -13,7 +13,7 @@ import {
 } from './common'
 
 /**
- * The LoanBrokerCoverClawback transaction claws back the First-Loss Capital from the LoanBroker.
+ * The LoanBrokerCoverClawback transaction claws back the First-Loss Capital from the Loan Broker.
  * The transaction can only be submitted by the Issuer of the Loan asset.
  * Furthermore, the transaction can only clawback funds up to the minimum cover required for the current loans.
  *
@@ -24,6 +24,8 @@ export interface LoanBrokerCoverClawback extends BaseTransaction {
 
   /**
    * The Loan Broker ID from which to withdraw First-Loss Capital.
+   * Must be provided if the Amount is an MPT, or Amount is an IOU
+   * and issuer is specified as the Account submitting the transaction.
    */
   LoanBrokerID?: string
 

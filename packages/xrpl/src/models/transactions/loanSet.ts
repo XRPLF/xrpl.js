@@ -47,7 +47,7 @@ export interface LoanSet extends BaseTransaction {
   /**
    * The signature of the counterparty over the transaction.
    */
-  CounterpartySignature: CounterpartySignature
+  CounterpartySignature?: CounterpartySignature
 
   /**
    * The address of the counterparty of the Loan.
