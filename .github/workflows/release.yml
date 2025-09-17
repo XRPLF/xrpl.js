@@ -14,8 +14,7 @@ on:
         required: true
       npmjs_dist_tag:
         description: 'npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)'
-        default: ''
-        required: true
+        default: 'latest'
 
 concurrency:
   group: release
@@ -262,9 +261,7 @@ jobs:
           ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
       - name: Create PR from release branch to main (skips for rc/beta)
-        if: |
-          !contains(needs.get_version.outputs.package_version, '-rc') &&
-          !contains(needs.get_version.outputs.package_version, '-beta')
+        if: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -382,23 +379,19 @@ jobs:
           fi
 
           # RC detection: skip step 2 if RC (dist-tag starts with rc OR version contains -rc)
-          IS_RC="false"
-          [[ "${NPMJS_DIST_TAG:-}" =~ ^rc ]] || [[ "${PACKAGE_VERSION:-}" =~ -rc ]] && IS_RC="true"
-
-          # Build Step 2 line with PR URL (if available), unless RC
-          if [ "$IS_RC" = "true" ]; then
-            STEP2_LINE="2. Review the package update PR – **SKIPPED for release candidates**."
-          else
-            if [ -n "${PR_URL:-}" ]; then
-              STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR. (${PR_URL})"
-            else
-              STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR."
-            fi
+          INCLUDE_PR_LINE=false
+          if [ -z "${NPMJS_DIST_TAG:-}" ] || [ "${NPMJS_DIST_TAG:-}" = "latest" ]; then
+            INCLUDE_PR_LINE=true
           fi
 
-          # Compose message robustly
-          printf -v MESSAGE '%s is releasing %s@%s. Two approvers from %s need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)\n%s' \
-            "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL" "$STEP2_LINE"
+          if [ "$INCLUDE_PR_LINE" = true ]; then
+            STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR."
+            printf -v MESSAGE '%s is releasing %s@%s. Two approvers from %s need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)\n%s' \
+              "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL" "$STEP2_LINE"
+          else
+            printf -v MESSAGE '%s is releasing %s@%s. Two approvers from %s need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)' \
+              "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL"
+          fi
 
           echo "$MESSAGE"
 
