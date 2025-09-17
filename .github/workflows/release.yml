@@ -113,6 +113,7 @@ jobs:
       - name: Build package
         run: |
           # dubugging info
+          npm i -g npm@11.6.0
           npm --version
           node --version
           ls -l
@@ -442,10 +443,10 @@ jobs:
           PKG=$(ls *.tgz)
           echo $PKG
           NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
-          if [ -z "$TAG" ]; then
-            TAG="latest"
+          if [ -z "$NPM_DIST_TAG" ]; then
+            NPM_DIST_TAG="latest"
           fi
-          npm install -g npm@latest
+          npm i -g npm@11.6.0
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
 
       - name: Ensure Git tag exists
@@ -476,87 +477,28 @@ jobs:
           generate_release_notes: true
           make_latest: true
 
-      - name: Fetch release notes
-        id: fetch_notes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          TAG:  ${{ steps.create_tag.outputs.tag_name }}
-        run: |
-          set -euo pipefail
-
-          # URL-encode the tag (handles '@' -> %40, etc.)
-          enc_tag="$(printf '%s' "$TAG" | jq -sRr @uri)"
-          endpoint="https://api.github.com/repos/$REPO/releases/tags/$enc_tag"
-
-          tries=8
-          sleep_sec=2
-          resp_file="$(mktemp)"
-
-          # Retry to tolerate eventual consistency after release creation
-          for i in $(seq 1 "$tries"); do
-            code=$(curl -sS -o "$resp_file" -w '%{http_code}' \
-              -H "Authorization: Bearer $GH_TOKEN" \
-              -H "Accept: application/vnd.github+json" \
-              "$endpoint") || code=$?
-
-            if [ "$code" = "200" ]; then
-              break
-            fi
-
-            if [ "$i" -lt "$tries" ]; then
-              sleep "$sleep_sec"
-            else
-              # fallback: give a valid URL and empty notes
-              url="https://github.com/$REPO/releases/tag/$enc_tag"
-              notes="(No release notes were generated.)"
-
-              esc_notes="${notes//'%'/'%25'}"
-              esc_notes="${esc_notes//$'\n'/'%0A'}"
-              esc_notes="${esc_notes//$'\r'/'%0D'}"
-              esc_url="${url//'%'/'%25'}"
-
-              echo "notes=$esc_notes" >> "$GITHUB_OUTPUT"
-              echo "release_url=$esc_url" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          done
-
-          body="$(jq -r '.body // ""' < "$resp_file")"
-          url="$(jq -r '.html_url // ""' < "$resp_file")"
-
-          # Safety: trim very long notes for Slack
-          [ -z "$body" ] && body="(No release notes were generated.)"
-          max=38000
-          [ "${#body}" -gt "$max" ] && body="${body:0:$max}\n…(truncated)"
-          [ -z "$url" ] && url="https://github.com/$REPO/releases/tag/$enc_tag"
-
-          # Escape for GITHUB_OUTPUT
-          esc_notes="${body//'%'/'%25'}"
-          esc_notes="${esc_notes//$'\n'/'%0A'}"
-          esc_notes="${esc_notes//$'\r'/'%0D'}"
-          esc_url="${url//'%'/'%25'}"
-
-          echo "notes=$esc_notes" >> "$GITHUB_OUTPUT"
-          echo "release_url=$esc_url" >> "$GITHUB_OUTPUT"
-
-      - name: Notify Slack success
+      - name: Notify Slack success (single-line)
         if: success()
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          NOTES: ${{ steps.fetch_notes.outputs.notes }}
-          URL:   ${{ steps.fetch_notes.outputs.release_url }}
-          TAG:   ${{ steps.create_tag.outputs.tag_name }}
+          REPO:        ${{ github.repository }}
+          PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
+          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
+          TAG:         ${{ steps.create_tag.outputs.tag_name }}
         run: |
           set -euo pipefail
-          notes="${NOTES//'%0A'/$'\n'}"
-          notes="${notes//'%0D'/}"
-          text="📣 New release: ${TAG}\n${URL}\n\n${notes}"
+
+          # Build release URL from tag (URL-encoded to handle '@' etc.)
+          enc_tag="$(printf '%s' "$TAG" | jq -sRr @uri)"
+          RELEASE_URL="https://github.com/$REPO/releases/tag/$enc_tag"
+
+          text="${PACKAGE_NAME} ${PACKAGE_VERSION} has been succesfully released and published to npm.js. Release URL: ${RELEASE_URL}"
+          text="${text//\\n/ }"
 
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel "#test-alert" --arg text "$text" '{channel: $channel, text: $text}')"
+            -d "$(jq -n --arg channel "#test-alert" --arg text "$text" '{channel:$channel, text:$text}')"
 
       - name: Notify Slack if tests fail
         if: failure()
