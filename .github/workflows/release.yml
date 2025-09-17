@@ -386,7 +386,7 @@ jobs:
 
           if [ "$INCLUDE_PR_LINE" = true ]; then
             STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR."
-            printf -v MESSAGE '%s is releasing %s@%s. Two approvers from %s need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)\n%s' \
+            printf -v MESSAGE '%s is releasing %s@%s. At least two approvers from (%s) need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)\n%s' \
               "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL" "$STEP2_LINE"
           else
             printf -v MESSAGE '%s is releasing %s@%s. Two approvers from %s need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)' \
