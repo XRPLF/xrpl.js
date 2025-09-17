@@ -270,23 +270,48 @@ jobs:
           VERSION: ${{ needs.get_version.outputs.package_version }}
         run: |
           set -euo pipefail
+
           echo "🔎 Checking if a PR already exists for $RELEASE_BRANCH → main…"
-          PR_NUMBER="$(gh pr list --repo "$REPO" --base main --head "$RELEASE_BRANCH" --state open --json number --jq '.[0].number' || true)"
+          OWNER="${REPO%%/*}"
+
+          # List open PRs with base=main and head=OWNER:RELEASE_BRANCH
+          PRS_JSON="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/$REPO/pulls?state=open&base=main&head=${OWNER}:${RELEASE_BRANCH}")"
+
+          PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
+          PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
+
           if [ -n "${PR_NUMBER:-}" ]; then
             echo "ℹ️ PR already exists: #$PR_NUMBER"
-            PR_URL="https://github.com/$REPO/pull/$PR_NUMBER"
           else
             echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main"
-            PR_URL="$(gh pr create \
-              --repo "$REPO" \
-              --base main \
-              --head "$RELEASE_BRANCH" \
-              --title "Release $VERSION: $RELEASE_BRANCH → main" \
-              --body "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/${{ github.run_id }}" \
-              --label release \
-              --json url --jq .url)"
+            CREATE_JSON="$(jq -n \
+              --arg title "Release $VERSION: $RELEASE_BRANCH → main" \
+              --arg head  "$RELEASE_BRANCH" \
+              --arg base  "main" \
+              --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/${{ github.run_id }}" \
+              '{title:$title, head:$head, base:$base, body:$body}')"
+
+            RESP="$(gh api \
+              -H 'Accept: application/vnd.github+json' \
+              --method POST \
+              /repos/$REPO/pulls \
+              --input <(printf '%s' "$CREATE_JSON"))"
+
+            PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
+            PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
+
+            # (Optional) add a label to the PR (labels are an Issues API)
+            gh api \
+              -H 'Accept: application/vnd.github+json' \
+              --method POST \
+              "/repos/$REPO/issues/$PR_NUMBER/labels" \
+              --input <(jq -n --arg l "release" '{labels:[$l]}') >/dev/null || true
           fi
+
           echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
+          echo "✅ PR URL: $PR_URL"
 
       - name: Release summary for review
         env:
