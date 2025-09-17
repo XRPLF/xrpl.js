@@ -173,7 +173,7 @@ export function validateMPTokenIssuanceCreate(
     const isTfMPTCanTransfer =
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-        : flags.tfMPTCanTransfer ?? false
+        : (flags.tfMPTCanTransfer ?? false)
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(

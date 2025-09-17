@@ -15,7 +15,7 @@
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
-    "lint": "eslint . --ext .ts --ext .test.ts --fix",
+    "lint": "eslint . --max-warnings 0",
     "analyze": "webpack --analyze"
   },
   "files": [

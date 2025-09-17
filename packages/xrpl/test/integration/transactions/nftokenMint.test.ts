@@ -103,9 +103,8 @@ describe('NFTokenMint', function () {
         account: testContext.wallet.address,
         ledger_index: 'validated',
       }
-      const accountInfoResponse = await testContext.client.request(
-        accountInfoRequest,
-      )
+      const accountInfoResponse =
+        await testContext.client.request(accountInfoRequest)
       assert.equal(
         accountInfoResponse.result.account_data.FirstNFTokenSequence,
         mintTransactionSeq,
