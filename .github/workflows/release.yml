@@ -483,46 +483,83 @@ jobs:
           generate_release_notes: true
           make_latest: true
 
-      - name: Fetch generated release notes
+      - name: Fetch release notes
         id: fetch_notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          RELEASE_ID: ${{ steps.gh_release.outputs.id }}      # <- reliable key to fetch by
+          TAG:  ${{ steps.create_tag.outputs.tag_name }}
         run: |
           set -euo pipefail
-          resp="$(curl -sSf \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$REPO/releases/$RELEASE_ID")"
 
-          body="$(printf '%s' "$resp" | jq -r '.body // ""')"
-          url="$(printf '%s' "$resp" | jq -r '.html_url // ""')"
+          # URL-encode the tag (handles '@' -> %40, etc.)
+          enc_tag="$(printf '%s' "$TAG" | jq -sRr @uri)"
+          endpoint="https://api.github.com/repos/$REPO/releases/tags/$enc_tag"
 
-          # Fallback if empty and trim if overly long (Slack safety)
-          [ -z "$body" ] || [ "$body" = "null" ] && body="(No release notes were generated.)"
+          tries=8
+          sleep_sec=2
+          resp_file="$(mktemp)"
+
+          # Retry to tolerate eventual consistency after release creation
+          for i in $(seq 1 "$tries"); do
+            code=$(curl -sS -o "$resp_file" -w '%{http_code}' \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$endpoint") || code=$?
+
+            if [ "$code" = "200" ]; then
+              break
+            fi
+
+            if [ "$i" -lt "$tries" ]; then
+              sleep "$sleep_sec"
+            else
+              # fallback: give a valid URL and empty notes
+              url="https://github.com/$REPO/releases/tag/$enc_tag"
+              notes="(No release notes were generated.)"
+
+              esc_notes="${notes//'%'/'%25'}"
+              esc_notes="${esc_notes//$'\n'/'%0A'}"
+              esc_notes="${esc_notes//$'\r'/'%0D'}"
+              esc_url="${url//'%'/'%25'}"
+
+              echo "notes=$esc_notes" >> "$GITHUB_OUTPUT"
+              echo "release_url=$esc_url" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+
+          body="$(jq -r '.body // ""' < "$resp_file")"
+          url="$(jq -r '.html_url // ""' < "$resp_file")"
+
+          # Safety: trim very long notes for Slack
+          [ -z "$body" ] && body="(No release notes were generated.)"
           max=38000
           [ "${#body}" -gt "$max" ] && body="${body:0:$max}\n…(truncated)"
+          [ -z "$url" ] && url="https://github.com/$REPO/releases/tag/$enc_tag"
 
-          esc_body="${body//'%'/'%25'}"
-          esc_body="${esc_body//$'\n'/'%0A'}"
-          esc_body="${esc_body//$'\r'/'%0D'}"
+          # Escape for GITHUB_OUTPUT
+          esc_notes="${body//'%'/'%25'}"
+          esc_notes="${esc_notes//$'\n'/'%0A'}"
+          esc_notes="${esc_notes//$'\r'/'%0D'}"
           esc_url="${url//'%'/'%25'}"
-          echo "notes=$esc_body" >> "$GITHUB_OUTPUT"
+
+          echo "notes=$esc_notes" >> "$GITHUB_OUTPUT"
           echo "release_url=$esc_url" >> "$GITHUB_OUTPUT"
 
       - name: Notify Slack success
         if: success()
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          TAG: ${{ steps.gh_release.outputs.tag_name }}
           NOTES: ${{ steps.fetch_notes.outputs.notes }}
-          RELEASE_URL: ${{ steps.fetch_notes.outputs.release_url }}
+          URL:   ${{ steps.fetch_notes.outputs.release_url }}
+          TAG:   ${{ steps.create_tag.outputs.tag_name }}
         run: |
           set -euo pipefail
           notes="${NOTES//'%0A'/$'\n'}"
           notes="${notes//'%0D'/}"
-          text="📣 New release has been published successfully: ${TAG}\n${RELEASE_URL}\n\n${notes}"
+          text="📣 New release: ${TAG}\n${URL}\n\n${notes}"
+
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
