@@ -1,5 +1,6 @@
 /* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX, hexToString } from '@xrplf/isomorphic/utils'
+import BigNumber from 'bignumber.js'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -326,6 +327,41 @@ export function isAmount(amount: unknown): amount is Amount {
     isIssuedCurrencyAmount(amount) ||
     isMPTAmount(amount)
   )
+}
+
+/**
+ * Check if two amounts are equal.
+ *
+ * @param amount1 - The first amount to compare.
+ * @param amount2 - The second amount to compare.
+ * @returns Whether the two amounts are equal.
+ * @throws When the amounts are not valid.
+ */
+export function areAmountsEqual(amount1: unknown, amount2: unknown): boolean {
+  if (!isAmount(amount1) || !isAmount(amount2)) {
+    throw new ValidationError('Invalid amount')
+  }
+
+  if (isString(amount1) && isString(amount2)) {
+    return new BigNumber(amount1).eq(amount2)
+  }
+
+  if (isIssuedCurrencyAmount(amount1) && isIssuedCurrencyAmount(amount2)) {
+    return (
+      amount1.currency === amount2.currency &&
+      amount1.issuer === amount2.issuer &&
+      new BigNumber(amount1.value).eq(amount2.value)
+    )
+  }
+
+  if (isMPTAmount(amount1) && isMPTAmount(amount2)) {
+    return (
+      amount1.mpt_issuance_id === amount2.mpt_issuance_id &&
+      new BigNumber(amount1.value).eq(amount2.value)
+    )
+  }
+
+  return false
 }
 
 /**
