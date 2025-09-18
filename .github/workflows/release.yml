@@ -286,6 +286,7 @@ jobs:
           ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
       - name: Create PR from release branch to main (skips for rc/beta)
+        id: ensure_pr
         if: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
