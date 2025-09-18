@@ -156,7 +156,7 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#test-alert" \
+                  --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
 
@@ -417,7 +417,7 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
             -d "$(jq -n \
-                  --arg channel "#test-alert" \
+                  --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
 
@@ -514,7 +514,7 @@ jobs:
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel "#test-alert" --arg text "$text" '{channel:$channel, text:$text}')"
+            -d "$(jq -n --arg channel "#xrpl-js" --arg text "$text" '{channel:$channel, text:$text}')"
 
       - name: Notify Slack if tests fail
         if: failure()
@@ -526,6 +526,6 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#test-alert" \
+                  --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
