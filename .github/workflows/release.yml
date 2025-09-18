@@ -491,7 +491,8 @@ jobs:
           name: "${{ steps.create_tag.outputs.tag_name }}"
           draft: false
           generate_release_notes: true
-          make_latest: true
+          prerelease: ${{ github.event.inputs.npmjs_dist_tag != '' && github.event.inputs.npmjs_dist_tag != 'latest' }}
+          make_latest: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
 
       - name: Notify Slack success (single-line)
         if: success()
