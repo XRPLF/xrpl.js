@@ -23,19 +23,26 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
 2. Fill in these fields:
-   - **package_name:** The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **release_branch:** The Git branch to release from (e.g., `release/xrpl@4.3.8`).
+   - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
+   - **release_branch** → The Git branch the release is generated from, e.g., `release/xrpl@4.3.8`.
+   - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
+     - Examples:
+       - `latest` → Standard production release
+       - `beta` → Pre-release for testing
+       - `rc` → Release candidate
 
 ➡️ Example:
 
-| Field         | Example               |
-|---------------|------------------------|
-| package_name  | xrpl                   |
-| git_ref       | release/xrpl@4.3.8     |
+| Field            | Example               |
+|------------------|-----------------------|
+| package_name     | xrpl                  |
+| release_branch   | release/xrpl@4.3.8    |
+| npmjs_dist_tag   | latest                |
+
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Review test and security scan result" step, at least 1 approver is required to review and approve the release.
+1. The pipeline will pause at the "Review test and security scan result" step, at least 2 approvers are required to review and approve the release.
 
 
 ---
@@ -61,6 +68,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 - Uploads the SBOM to OWASP Dependency-Track for tracking vulnerabilities.
 - Packages the module with Lerna and uploads the tarball as an artifact.
 - Posts failure notifications to Slack..
+- Create a Github issue for detected vulnerabilities.
 
 ---
 
@@ -101,5 +109,3 @@ xrpl@2.3.1
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
 - Vulnerability scanning does not block the release, but it is the approvers' responsibility to review the scan results in the Review stage.
-
-- The final release step performs an npm publish --dry-run. We can remove --dry-run when ready for production release.
