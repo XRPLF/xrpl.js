@@ -61,6 +61,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 - Uploads the SBOM to OWASP Dependency-Track for tracking vulnerabilities.
 - Packages the module with Lerna and uploads the tarball as an artifact.
 - Posts failure notifications to Slack..
+- Create a Github issue for detected vulnerabilities.
 
 ---
 
@@ -101,5 +102,3 @@ xrpl@2.3.1
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
 - Vulnerability scanning does not block the release, but it is the approvers' responsibility to review the scan results in the Review stage.
-
-- The final release step performs an npm publish --dry-run. We can remove --dry-run when ready for production release.
