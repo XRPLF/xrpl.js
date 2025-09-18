@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       package_name:
-        description: 'The package name to release (e.g., xrpl, ripple-address-codec)'
+        description: 'Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)'
         required: true
       release_branch:
         description: 'Release branch the release is generated from'
@@ -49,6 +49,29 @@ jobs:
           else
             echo "✅ No Internal Artifactory URL found"
           fi
+
+          # validate dist tag
+          NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
+
+          # Empty → default to 'latest'
+          if [ -z "$NPM_DIST_TAG" ]; then
+            NPM_DIST_TAG="latest"
+            echo "ℹ️ npmjs_dist_tag empty → defaulting to 'latest'."
+          fi
+
+          # Must start with a lowercase letter; then [a-z0-9._-]; max 128 chars
+          if ! [[ "$NPM_DIST_TAG" =~ ^[a-z][a-z0-9._-]{0,127}$ ]]; then
+            echo "❌ Invalid npm dist-tag '$NPM_DIST_TAG'. Must start with a lowercase letter and contain only [a-z0-9._-], max 128 chars." >&2
+            exit 1
+          fi
+
+          # Disallow version-like prefixes (avoid semver/range confusion)
+          if [[ "$NPM_DIST_TAG" =~ ^v[0-9] || "$NPM_DIST_TAG" =~ ^[0-9] ]]; then
+            echo "❌ Invalid npm dist-tag '$NPM_DIST_TAG'. Must not start with 'v' + digit or a digit (e.g., 'v1', '1.2.3')." >&2
+            exit 1
+          fi
+
+          echo "✅ npmjs_dist_tag '$NPM_DIST_TAG' is valid."
 
       - name: Get package version from package.json
         id: get_version
@@ -275,16 +298,15 @@ jobs:
           echo "🔎 Checking if a PR already exists for $RELEASE_BRANCH → main…"
           OWNER="${REPO%%/*}"
 
-          # List open PRs with base=main and head=OWNER:RELEASE_BRANCH
-          PRS_JSON="$(gh api \
-            -H 'Accept: application/vnd.github+json' \
+          # Find existing OPEN PR: base=main, head=OWNER:RELEASE_BRANCH
+          PRS_JSON="$(gh api -H 'Accept: application/vnd.github+json' \
             "/repos/$REPO/pulls?state=open&base=main&head=${OWNER}:${RELEASE_BRANCH}")"
 
           PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
           PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
 
           if [ -n "${PR_NUMBER:-}" ]; then
-            echo "ℹ️ PR already exists: #$PR_NUMBER"
+            echo "ℹ️ Found existing PR: #$PR_NUMBER ($PR_URL)"
           else
             echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main"
             CREATE_JSON="$(jq -n \
@@ -294,25 +316,16 @@ jobs:
               --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/${{ github.run_id }}" \
               '{title:$title, head:$head, base:$base, body:$body}')"
 
-            RESP="$(gh api \
-              -H 'Accept: application/vnd.github+json' \
-              --method POST \
-              /repos/$REPO/pulls \
-              --input <(printf '%s' "$CREATE_JSON"))"
+            RESP="$(gh api -H 'Accept: application/vnd.github+json' \
+              --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
 
             PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
             PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
-
-            # (Optional) add a label to the PR (labels are an Issues API)
-            gh api \
-              -H 'Accept: application/vnd.github+json' \
-              --method POST \
-              "/repos/$REPO/issues/$PR_NUMBER/labels" \
-              --input <(jq -n --arg l "release" '{labels:[$l]}') >/dev/null || true
           fi
 
-          echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
-          echo "✅ PR URL: $PR_URL"
+          # Expose as step outputs (use these in later steps)
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Release summary for review
         env:
@@ -327,6 +340,7 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_URL: ${{ steps.ensure_pr.outputs.pr_url }}
 
         run: |
           set -euo pipefail
@@ -387,11 +401,11 @@ jobs:
           fi
 
           if [ "$INCLUDE_PR_LINE" = true ]; then
-            STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR."
+            STEP2_LINE="2. Review the package update PR and provide two approvals. DO NOT MERGE - ${EXECUTOR} will verify the package on npm registry and merge this approved PR. ${PR_URL}"
             printf -v MESSAGE '%s is releasing %s@%s. At least two approvers from (%s) need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)\n%s' \
               "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL" "$STEP2_LINE"
           else
-            printf -v MESSAGE '%s is releasing %s@%s. At least two approvers from (%s) need to take following actions:\n1. Review the release artifacts and approve/reject the release. (%s)' \
+            printf -v MESSAGE '%s is releasing %s@%s. At least two approvers from (%s) need to take following actions:\nReview the release artifacts and approve/reject the release. (%s)' \
               "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" "$REVIEWERS" "$RUN_URL"
           fi
 
