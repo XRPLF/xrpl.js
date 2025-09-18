@@ -23,19 +23,26 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
 2. Fill in these fields:
-   - **package_name:** The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **release_branch:** The Git branch to release from (e.g., `release/xrpl@4.3.8`).
+   - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
+   - **release_branch** → The Git branch the release is generated from, e.g., `release/xrpl@4.3.8`.
+   - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
+     - Examples:
+       - `latest` → Standard production release
+       - `beta` → Pre-release for testing
+       - `rc` → Release candidate
 
 ➡️ Example:
 
-| Field         | Example               |
-|---------------|------------------------|
-| package_name  | xrpl                   |
-| git_ref       | release/xrpl@4.3.8     |
+| Field            | Example               |
+|------------------|-----------------------|
+| package_name     | xrpl                  |
+| release_branch   | release/xrpl@4.3.8    |
+| npmjs_dist_tag   | latest                |
+
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Review test and security scan result" step, at least 1 approver is required to review and approve the release.
+1. The pipeline will pause at the "Review test and security scan result" step, at least 2 approvers are required to review and approve the release.
 
 
 ---
