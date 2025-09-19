@@ -164,6 +164,22 @@ export function hashEscrow(address: string, sequence: number): string {
 }
 
 /**
+ * Compute the Hash of an Oracle LedgerEntry.
+ *
+ * @param address - Address of the owner of the Oracle.
+ * @param documentId - OracleDocumentID of the Oracle.
+ * @returns The hash of the Oracle LedgerEntry.
+ * @category Utilities
+ */
+export function hashOracle(address: string, documentId: number): string {
+  return sha512Half(
+    ledgerSpaceHex('oracle') +
+      addressToHex(address) +
+      documentId.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
  * Compute the hash of a Payment Channel.
  *
  * @param address - Account of the Payment Channel.
