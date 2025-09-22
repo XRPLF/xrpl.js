@@ -154,6 +154,16 @@ jobs:
 
       - run: npm run build
 
+      - name: Check if Docker container is running
+        run: |
+          docker ps
+          docker ps -a
+          docker inspect rippled-service
+          if ! docker ps | grep -q rippled-service; then
+            echo "rippled-service Docker container is not running"
+            exit 1
+          fi
+
       - name: Run integration test
         run: npm run test:integration
 
@@ -207,6 +217,16 @@ jobs:
         run: npm ci
 
       - run: npm run build
+
+      - name: Check if Docker container is running
+        run: |
+          docker ps
+          docker ps -a
+          docker inspect rippled-service
+          if ! docker ps | grep -q rippled-service; then
+            echo "rippled-service Docker container is not running"
+            exit 1
+          fi
 
       - name: Run integration test
         run: npm run test:browser
