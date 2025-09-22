@@ -53,7 +53,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetFlags.tfMPTClearCanTransfer,
+      MutableFlags: MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer,
     } as any)
   })
 

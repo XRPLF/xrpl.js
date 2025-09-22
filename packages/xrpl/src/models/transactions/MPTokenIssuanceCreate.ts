@@ -54,14 +54,14 @@ export enum MPTokenIssuanceCreateFlags {
    */
   tfMPTCanClawback = 0x00000040,
 
-  tfMPTCanMutateCanLock = 0x00000002,
-  tfMPTCanMutateRequireAuth = 0x00000004,
-  tfMPTCanMutateCanEscrow = 0x00000008,
-  tfMPTCanMutateCanTrade = 0x00000010,
-  tfMPTCanMutateCanTransfer = 0x00000020,
-  tfMPTCanMutateCanClawback = 0x00000040,
-  tfMPTCanMutateMetadata = 0x00010000,
-  tfMPTCanMutateTransferFee = 0x00020000,
+  tmfMPTCanMutateCanLock = 0x00000002,
+  tmfMPTCanMutateRequireAuth = 0x00000004,
+  tmfMPTCanMutateCanEscrow = 0x00000008,
+  tmfMPTCanMutateCanTrade = 0x00000010,
+  tmfMPTCanMutateCanTransfer = 0x00000020,
+  tmfMPTCanMutateCanClawback = 0x00000040,
+  tmfMPTCanMutateMetadata = 0x00010000,
+  tmfMPTCanMutateTransferFee = 0x00020000,
 }
 
 /**
@@ -79,14 +79,14 @@ export interface MPTokenIssuanceCreateFlagsInterface
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
 
-  tfMPTCanMutateCanLock?: boolean
-  tfMPTCanMutateRequireAuth?: boolean
-  tfMPTCanMutateCanEscrow?: boolean
-  tfMPTCanMutateCanTrade?: boolean
-  tfMPTCanMutateCanTransfer?: boolean
-  tfMPTCanMutateCanClawback?: boolean
-  tfMPTCanMutateMetadata?: boolean
-  tfMPTCanMutateTransferFee?: boolean
+  tmfMPTCanMutateCanLock?: boolean
+  tmfMPTCanMutateRequireAuth?: boolean
+  tmfMPTCanMutateCanEscrow?: boolean
+  tmfMPTCanMutateCanTrade?: boolean
+  tmfMPTCanMutateCanTransfer?: boolean
+  tmfMPTCanMutateCanClawback?: boolean
+  tmfMPTCanMutateMetadata?: boolean
+  tmfMPTCanMutateTransferFee?: boolean
 }
 
 /**

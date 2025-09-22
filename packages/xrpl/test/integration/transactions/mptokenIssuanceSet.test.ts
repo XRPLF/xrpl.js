@@ -84,8 +84,8 @@ describe('MPTokenIssuanceDestroy', function () {
         Account: testContext.wallet.classicAddress,
         Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
         MutableFlags:
-          MPTokenIssuanceCreateFlags.tfMPTCanMutateTransferFee +
-          MPTokenIssuanceCreateFlags.tfMPTCanMutateCanTransfer,
+          MPTokenIssuanceCreateFlags.tmfMPTCanMutateTransferFee +
+          MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTransfer,
       }
 
       const mptCreateRes = await testTransaction(
@@ -125,7 +125,7 @@ describe('MPTokenIssuanceDestroy', function () {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
         MPTokenIssuanceID: mptID!,
-        MutableFlags: MPTokenIssuanceSetFlags.tfMPTClearCanTransfer,
+        MutableFlags: MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer,
       }
 
       await testTransaction(
