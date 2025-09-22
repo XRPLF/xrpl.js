@@ -36,7 +36,17 @@ jobs:
       - name: Validate inputs
         run: |
           set -euo pipefail
-
+          # Validate package_name
+          PKG_NAME="${{ github.event.inputs.package_name }}"
+          if ! [[ "$PKG_NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "❌ Invalid package_name '$PKG_NAME' (allowed: [a-z0-9-], must start with alnum)." >&2
+            exit 1
+          fi
+          # Guard against path traversal
+          if [[ "$PKG_NAME" == *".."* || "$PKG_NAME" == *"/"* ]]; then
+            echo "❌ package_name must be a single directory under packages/." >&2
+            exit 1
+          fi
           if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
             echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
           else
