@@ -28,7 +28,7 @@ jobs:
       package_version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
         with:
           ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
@@ -36,6 +36,10 @@ jobs:
       - name: Validate inputs
         run: |
           set -euo pipefail
+          if (( ${GITHUB_RUN_ATTEMPT:-1} > 1 )); then
+            echo "❌ Workflow rerun (attempt ${GITHUB_RUN_ATTEMPT}). Second attempts are not allowed."
+            exit 1
+          fi
           if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
             echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
           else
@@ -88,6 +92,14 @@ jobs:
             echo "Version is empty or missing in $PKG_JSON" >&2
             exit 1
           fi
+          NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
+          if [ -z "$NPM_DIST_TAG" ]; then
+            NPM_DIST_TAG="latest"
+          fi
+          if [[ "$NPM_DIST_TAG" == "latest" ]] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "With npmjs_dist_tag 'latest', version must be of the form x.y.z. Found '$VERSION'." >&2
+            exit 1
+          fi
           echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -122,13 +134,13 @@ jobs:
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
         with:
           ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cd2651c46231bc0d6f48d6b34433b845331235fe
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
@@ -161,13 +173,13 @@ jobs:
                   '{channel: $channel, text: $text}')"
 
       - name: Install cyclonedx-npm
-        run: npm install -g @cyclonedx/cyclonedx-npm
+        run: npm install -g @cyclonedx/cyclonedx-npm@4.0.2
 
       - name: Generate CycloneDX SBOM
         run: cyclonedx-npm --output-format json --output-file sbom.json
 
       - name: Scan SBOM for vulnerabilities using Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8
         with:
           scan-type: sbom
           scan-ref: sbom.json
@@ -185,7 +197,7 @@ jobs:
             https://owasp-dt-api.prod.ripplex.io/api/v1/bom
 
       - name: Upload SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8
         with:
           name: sbom
           path: sbom.json
@@ -195,7 +207,7 @@ jobs:
 
       - name: Upload vulnerability report artifact
         id: upload_vuln
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8
         with:
           name: vulnerability-report
           path: vuln-report.txt
@@ -265,7 +277,7 @@ jobs:
           echo "TARBALL=packages/${{ env.PACKAGE_NAME }}/${TARBALL}" >> "$GITHUB_ENV"
 
       - name: Upload tarball as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@de65e23aa2b7e23d713bb51fbfcb6d502f8667d8
         with:
           name: npm-package-tarball
           path: ${{ env.TARBALL }}
@@ -436,19 +448,19 @@ jobs:
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493
         with:
           ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
 
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@abefc31eafcfbdf6c5336127c1346fdae79ff41c
         with:
           name: npm-package-tarball
           path: dist
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cd2651c46231bc0d6f48d6b34433b845331235fe
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org/'
@@ -485,7 +497,7 @@ jobs:
           echo "tag_name=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@19cd0bcd2b95a5f9e0aab8377b3cae33e51c2234
         with:
           tag_name: "${{ steps.create_tag.outputs.tag_name }}"
           name: "${{ steps.create_tag.outputs.tag_name }}"
