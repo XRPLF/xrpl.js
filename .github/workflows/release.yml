@@ -465,7 +465,7 @@ jobs:
           if [ -n "${PR_URL:-}" ]; then
             MSG="${MSG} \n2) Review the package update PR and provide two approvals. DO NOT MERGE — ${EXECUTOR} will verify the package on npm and merge the approved PR. (${PR_URL})"
           fi
-
+          MSG=$(printf '%b' "$MSG")
           # Post once
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
@@ -504,7 +504,7 @@ jobs:
           set -euo pipefail
 
           MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A member from the infosec team (${SEC_REVIEWERS}) needs to take the following action:\n1) Review the release artifacts and approve/reject the release. (${RUN_URL})"
-
+          MSG=$(printf '%b' "$MSG")
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
