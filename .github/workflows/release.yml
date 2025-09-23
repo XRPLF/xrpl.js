@@ -299,9 +299,9 @@ jobs:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
     outputs:
-      message_dev: ${{ steps.build_messages.outputs.message_dev }}
-      message_sec: ${{ steps.build_messages.outputs.message_sec }}
-      message_pr: ${{ steps.build_messages.outputs.message_pr }}
+      reviewers_dev: ${{ steps.get_reviewers.outputs.reviewers_dev }}
+      reviewers_sec: ${{ steps.get_reviewers.outputs.reviewers_sec }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -351,8 +351,8 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
-      - name: Build approval messages
-        id: build_messages
+      - name: Get reviewers
+        id: get_reviewers
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -369,9 +369,6 @@ jobs:
           GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
         run: |
           set -euo pipefail
-
-          # Who kicked off the workflow
-          EXECUTOR="${GITHUB_TRIGGERING_ACTOR:-$GITHUB_ACTOR}"
 
           fetch_reviewers() {
             local env_name="$1"
@@ -405,41 +402,9 @@ jobs:
           REVIEWERS_DEV="$(fetch_reviewers "$ENV_DEV_NAME")"
           REVIEWERS_SEC="$(fetch_reviewers "$ENV_SEC_NAME")"
 
-          # Helper to escape for GITHUB_OUTPUT
-          esc() {
-            local s="$1"
-            s="${s//'%'/'%25'}"
-            s="${s//$'\n'/'%0A'}"
-            s="${s//$'\r'/'%0D'}"
-            printf '%s' "$s"
-          }
-
-          # Build message 1 (Dev team)
-          printf -v MSG_DEV '%s is releasing %s@%s. A member from dev team (%s) need to take following actions:\nReview the release artifacts and approve/reject the release. (%s)' \
-            "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" \
-            "$REVIEWERS_DEV" "$ENV_DEV_NAME" "$RUN_URL"
-
-          # Build message 2 (Sec team)
-          printf -v MSG_SEC '%s is releasing %s@%s. A member from infosec team (%s) need to take following actions:\nReview the release artifacts and approve/reject the release. (%s)' \
-            "$EXECUTOR" "$PACKAGE_NAME" "$PACKAGE_VERSION" \
-            "$REVIEWERS_SEC" "$ENV_SEC_NAME" "$RUN_URL"
-
-          # Should we include the PR message?
-          INCLUDE_PR_LINE=false
-          if [ -z "${NPMJS_DIST_TAG:-}" ] || [ "${NPMJS_DIST_TAG:-}" = "latest" ]; then
-            INCLUDE_PR_LINE=true
-          fi
-
-          MSG_PR=""
-          if [ "$INCLUDE_PR_LINE" = true ]; then
-            printf -v MSG_PR '3) Review the package update PR and provide two approvals. DO NOT MERGE — %s will verify the package on npm and merge the approved PR. (%s)' \
-              "$EXECUTOR" "${PR_URL:-PR URL unavailable}"
-          fi
-
           # Output messages
-          echo "message_dev=$(esc "$MSG_DEV")" >> "$GITHUB_OUTPUT"
-          echo "message_sec=$(esc "$MSG_SEC")" >> "$GITHUB_OUTPUT"
-          echo "message_pr=$(esc "$MSG_PR")" >> "$GITHUB_OUTPUT"
+          echo "reviewers_dev=$REVIEWERS_DEV" >> "$GITHUB_OUTPUT"
+          echo "reviewers_sec=$REVIEWERS_SEC" >> "$GITHUB_OUTPUT"
 
       - name: Release summary for review
         env:
@@ -481,45 +446,33 @@ jobs:
           echo "🔢 Commit SHA:      $COMMIT_SHA"
           echo "🔗 Vulnerabilities: https://github.com/$REPO/actions/runs/$RUN_ID/artifacts/$ARTIFACT_ID"
 
-      - name: Send Dev + PR messages to Slack
+      - name: Send Dev review message to Slack
         if: always()
         shell: bash
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          DEV_MSG_ESC: ${{ steps.build_messages.outputs.message_dev }}
-          PR_MSG_ESC:  ${{ steps.build_messages.outputs.message_pr }}
-          DEV_CHANNEL: "#test-alert"
-          PR_CHANNEL:  "#test-alert"
+          SLACK_TOKEN:    ${{ secrets.SLACK_TOKEN }}
+          CHANNEL:        "#test-alert"
+          EXECUTOR:       ${{ github.triggering_actor || github.actor }}
+          PACKAGE_NAME:   ${{ env.PACKAGE_NAME }}
+          PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
+          RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.pr_url }}
+          PR_URL:         ${{ steps.ensure_pr.outputs.pr_url }}
         run: |
           set -euo pipefail
 
-          decode() {
-            local s="$1"
-            s="${s//%25/%}"; s="${s//%0D/}"; s="${s//%0A/$'\n'}"
-            printf '%s' "$s"
-          }
+          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A member from the dev team (${DEV_REVIEWERS}) needs to take the following actions: \n1) Review the release artifacts and approve/reject the release. (${RUN_URL})"
 
-          DEV_MSG="$(decode "$DEV_MSG_ESC")"
-          PR_MSG="$(decode "$PR_MSG_ESC")"
-
-          post() {
-            local channel="$1" text="$2"
-            curl -sS -X POST https://slack.com/api/chat.postMessage \
-              -H "Authorization: Bearer $SLACK_TOKEN" \
-              -H "Content-Type: application/json; charset=utf-8" \
-              -d "$(jq -n --arg channel "$channel" --arg text "$text" '{channel:$channel, text:$text}')" \
-              | jq -er '.ok' >/dev/null
-          }
-
-          echo "Posting Dev message to ${DEV_CHANNEL}…"
-          post "$DEV_CHANNEL" "$DEV_MSG"
-
-          if [ -n "${PR_MSG//[[:space:]]/}" ]; then
-            echo "Posting PR message to ${PR_CHANNEL}…"
-            post "$PR_CHANNEL" "$PR_MSG"
-          else
-            echo "PR message empty; skipping."
+          if [ -n "${PR_URL:-}" ]; then
+            MSG="${MSG} \n2) Review the package update PR and provide two approvals. DO NOT MERGE — ${EXECUTOR} will verify the package on npm and merge the approved PR. (${PR_URL})"
           fi
+
+          # Post once
+          curl -sS -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer $SLACK_TOKEN" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" '{channel:$channel, text:$text}')" \
+            | jq -er '.ok' >/dev/null
 
   first_review:
     runs-on: ubuntu-latest
@@ -530,31 +483,33 @@ jobs:
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Awaiting approval
-        run: echo "Awaiting approval Dev team approval"
+        run: echo "Awaiting Dev team approval"
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
-    name: Review test and security scan result -- Sec team
+    name: Review test and security scan result — Sec team
     steps:
-      - name: Send sec message to Slack
+      - name: Send Sec team review request to Slack
         shell: bash
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SEC_MSG_ESC: ${{ needs.ask_for_dev_team_review.outputs.message_sec }}
-          SEC_CHANNEL: "#test-alert"
+          SLACK_TOKEN:     ${{ secrets.SLACK_TOKEN }}
+          CHANNEL:         "#test-alert"
+
+          EXECUTOR:        ${{ github.triggering_actor || github.actor }}
+          PACKAGE_NAME:    ${{ needs.get_version.outputs.package_version && github.event.inputs.package_name }}
+          PACKAGE_VERSION: ${{ needs.get_version.outputs.package_version }}
+          RUN_URL:         https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SEC_REVIEWERS:   ${{ needs.ask_for_dev_team_review.outputs.reviewers_sec }}
         run: |
           set -euo pipefail
-          decode() {
-            local s="$1"
-            s="${s//%25/%}"; s="${s//%0D/}"; s="${s//%0A/$'\n'}"
-            printf '%s' "$s"
-          }
-          SEC_MSG="$(decode "$SEC_MSG_ESC")"
+
+          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A member from the infosec team (${SEC_REVIEWERS}) needs to take the following action:\n1) Review the release artifacts and approve/reject the release. (${RUN_URL})"
+
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel "$SEC_CHANNEL" --arg text "$SEC_MSG" '{channel:$channel, text:$text}')" \
+            -d "$(jq -n --arg channel "$CHANNEL" --arg text "$MSG" '{channel:$channel, text:$text}')" \
             | jq -er '.ok' >/dev/null
 
   release:
