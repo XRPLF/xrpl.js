@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
+
 ## 4.4.1 (2025-08-29)
 
 ### Fixed
