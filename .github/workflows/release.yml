@@ -524,7 +524,7 @@ jobs:
   first_review:
     runs-on: ubuntu-latest
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review]
-    name: First approval gate (dev team)
+    name: First approval (dev team)
     environment:
       name: first-review
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
