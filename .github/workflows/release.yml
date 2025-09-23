@@ -378,9 +378,6 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$REPO/environments/$env_name")" || true
 
-            echo "https://api.github.com/repos/$REPO/environments/$env_name"
-            echo $env_json
-
             reviewers="$(printf '%s' "$env_json" | jq -r '
               (.protection_rules // [])
               | map(select(.type=="required_reviewers") | .reviewers // [])
@@ -394,7 +391,6 @@ jobs:
               | unique
               | join(", ")
             ')"
-            echo "reviewers: $reviewers"
             if [ -z "$reviewers" ] || [ "$reviewers" = "null" ]; then
               reviewers="(no required reviewers configured)"
             fi
@@ -459,7 +455,7 @@ jobs:
           PACKAGE_NAME:   ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
           RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.pr_url }}
+          DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.reviewers_dev }}
           PR_URL:         ${{ steps.ensure_pr.outputs.pr_url }}
         run: |
           set -euo pipefail
