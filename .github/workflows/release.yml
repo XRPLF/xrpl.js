@@ -488,8 +488,8 @@ jobs:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           DEV_MSG_ESC: ${{ steps.build_messages.outputs.message_dev }}
           PR_MSG_ESC:  ${{ steps.build_messages.outputs.message_pr }}
-          DEV_CHANNEL: "#dev-release-approvals"   # ← change if needed
-          PR_CHANNEL:  "#test-alert"                 # ← change if needed
+          DEV_CHANNEL: "#test-alert"
+          PR_CHANNEL:  "#test-alert"
         run: |
           set -euo pipefail
 
