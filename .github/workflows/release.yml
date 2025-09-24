@@ -175,7 +175,7 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#test-alert" \
+                  --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
 
@@ -450,7 +450,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN:    ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:        "#test-alert"
+          CHANNEL:        "#xrpl-js"
           EXECUTOR:       ${{ github.triggering_actor || github.actor }}
           PACKAGE_NAME:   ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
@@ -493,7 +493,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN:     ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:         "#test-alert"
+          CHANNEL:         "#xrpl-js"
 
           EXECUTOR:        ${{ github.triggering_actor || github.actor }}
           PACKAGE_NAME:    ${{ needs.get_version.outputs.package_version && github.event.inputs.package_name }}
@@ -615,7 +615,7 @@ jobs:
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel "#test-alert" --arg text "$text" '{channel:$channel, text:$text}')"
+            -d "$(jq -n --arg channel "#xrpl-js" --arg text "$text" '{channel:$channel, text:$text}')"
 
       - name: Notify Slack if tests fail
         if: failure()
@@ -627,6 +627,6 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#test-alert" \
+                  --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
