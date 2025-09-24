@@ -13,6 +13,7 @@ import {
   TxResponse,
   VaultClawback,
   VaultCreate,
+  VaultCreateFlags,
   VaultDelete,
   VaultDeposit,
   VaultSet,
@@ -21,7 +22,7 @@ import {
   Wallet,
   XRP,
 } from '../../../src'
-import { Vault } from '../../../src/models/ledger'
+import { Vault, VaultFlags } from '../../../src/models/ledger'
 import { MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import serverUrl from '../serverUrl'
 import {
@@ -357,6 +358,7 @@ describe('Single Asset Vault', function () {
         AssetsMaximum: '500',
         // This covers owner reserve fee with potentially high open_ledger_cost
         Fee: '5000000',
+        Flags: VaultCreateFlags.tfVaultShareNonTransferable,
       }
 
       await testTransaction(testContext.client, vaultCreateTx, vaultOwnerWallet)
@@ -370,6 +372,7 @@ describe('Single Asset Vault', function () {
       const vaultId = vault.index
       const asset = vault.Asset as MPTCurrency
       const assetsMaximum = vault.AssetsMaximum as string
+      const vaultFlags = vault.Flags
 
       // confirm that the Vault was actually created
       assert.equal(result.result.account_objects.length, 1)
@@ -382,6 +385,7 @@ describe('Single Asset Vault', function () {
       )
       assert.equal(vault.Data, vaultCreateTx.Data)
       assert.equal(assetsMaximum, '500')
+      assert.notEqual(vaultFlags, VaultFlags.lsfVaultPrivate)
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data

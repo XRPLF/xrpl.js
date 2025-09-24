@@ -80,8 +80,9 @@ class Issue extends SerializedType {
           value.mpt_issuance_id.toString(),
         ).toBytes()
         const issuerAccount = mptIssuanceIdBytes.slice(4)
-        const sequence = Number(readUInt32BE(mptIssuanceIdBytes.slice(0, 4), 0))
+        const sequence = Number(readUInt32BE(mptIssuanceIdBytes.slice(0, 4), 0)) // sequence is in Big-endian format in mpt_issuance_id
 
+        // Convert to Little-endian
         const sequenceBuffer = new Uint8Array(4)
         new DataView(sequenceBuffer.buffer).setUint32(0, sequence, true)
 
@@ -131,6 +132,7 @@ class Issue extends SerializedType {
         true,
       )
 
+      // sequence part of mpt_issuance_id should be in Big-endian
       const sequenceBuffer = new Uint8Array(4)
       writeUInt32BE(sequenceBuffer, sequence, 0)
 
