@@ -6,6 +6,7 @@ import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
 import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
+import { areAmountsEqual } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -411,7 +412,7 @@ export function handleDeliverMax(tx: Payment): void {
     tx.Amount ??= tx.DeliverMax
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
-    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+    if (tx.Amount != null && !areAmountsEqual(tx.Amount, tx.DeliverMax)) {
       throw new ValidationError(
         'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
       )

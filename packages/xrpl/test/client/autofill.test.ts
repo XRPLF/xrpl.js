@@ -7,6 +7,7 @@ import {
   Payment,
   Transaction,
   Batch,
+  IssuedCurrencyAmount,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -22,6 +23,7 @@ const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
 
+// eslint-disable-next-line max-statements -- Required for test coverage.
 describe('client.autofill', function () {
   let testContext: XrplTestContext
   const AMOUNT = '1234'
@@ -97,9 +99,42 @@ describe('client.autofill', function () {
     assert.strictEqual('DeliverMax' in txResult, false)
   })
 
+  it('Validate Payment transaction API v2: Payment Transaction: identical DeliverMax and Amount fields using amount objects', async function () {
+    paymentTx.DeliverMax = {
+      currency: 'USD',
+      value: AMOUNT,
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+    paymentTx.Amount = {
+      currency: 'USD',
+      value: AMOUNT,
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.strictEqual((txResult.Amount as IssuedCurrencyAmount).value, AMOUNT)
+    assert.strictEqual('DeliverMax' in txResult, false)
+  })
+
   it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields', async function () {
     paymentTx.DeliverMax = '6789'
     paymentTx.Amount = '1234'
+
+    await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: differing DeliverMax and Amount fields using objects', async function () {
+    paymentTx.DeliverMax = {
+      currency: 'USD',
+      value: '31415',
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
+    paymentTx.Amount = {
+      currency: 'USD',
+      value: '27182',
+      issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X',
+    }
 
     await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
   })
