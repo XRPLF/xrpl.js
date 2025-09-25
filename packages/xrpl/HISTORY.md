@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `Dynamic MPT` (XLS-94D)
+
 ## 4.4.1 (2025-08-29)
 
 ### Fixed

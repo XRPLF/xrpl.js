@@ -16,7 +16,7 @@ import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
-const MAX_TRANSFER_FEE = 50000
+export const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -53,6 +53,15 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+
+  tmfMPTCanMutateCanLock = 0x00000002,
+  tmfMPTCanMutateRequireAuth = 0x00000004,
+  tmfMPTCanMutateCanEscrow = 0x00000008,
+  tmfMPTCanMutateCanTrade = 0x00000010,
+  tmfMPTCanMutateCanTransfer = 0x00000020,
+  tmfMPTCanMutateCanClawback = 0x00000040,
+  tmfMPTCanMutateMetadata = 0x00010000,
+  tmfMPTCanMutateTransferFee = 0x00020000,
 }
 
 /**
@@ -69,6 +78,15 @@ export interface MPTokenIssuanceCreateFlagsInterface
   tfMPTCanTrade?: boolean
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
+
+  tmfMPTCanMutateCanLock?: boolean
+  tmfMPTCanMutateRequireAuth?: boolean
+  tmfMPTCanMutateCanEscrow?: boolean
+  tmfMPTCanMutateCanTrade?: boolean
+  tmfMPTCanMutateCanTransfer?: boolean
+  tmfMPTCanMutateCanClawback?: boolean
+  tmfMPTCanMutateMetadata?: boolean
+  tmfMPTCanMutateTransferFee?: boolean
 }
 
 /**
@@ -120,6 +138,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
+  MutableFlags?: number
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
@@ -141,6 +160,7 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
