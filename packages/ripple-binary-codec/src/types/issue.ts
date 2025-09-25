@@ -103,19 +103,23 @@ class Issue extends SerializedType {
    * @returns An Issue object
    */
   static fromParser(parser: BinaryParser): Issue {
-    // MPT
-    if (parser.size() === MPT_WIDTH) {
-      const mptBytes = parser.read(MPT_WIDTH)
-      return new Issue(mptBytes)
+    // XRP
+    const currencyOrAccount = parser.read(20)
+    if (new Currency(currencyOrAccount).toJSON() === 'XRP') {
+      return new Issue(currencyOrAccount)
     }
 
-    // XRP/IOU
-    const currency = parser.read(20)
-    if (new Currency(currency).toJSON() === 'XRP') {
-      return new Issue(currency)
+    // MPT
+    const issuerAccountId = new AccountID(parser.read(20))
+    if (NO_ACCOUNT.toHex() === issuerAccountId.toHex()) {
+      const sequence = parser.read(4)
+      return new Issue(
+        concat([currencyOrAccount, NO_ACCOUNT.toBytes(), sequence]),
+      )
     }
-    const currencyAndIssuer = [currency, parser.read(20)]
-    return new Issue(concat(currencyAndIssuer))
+
+    // IOU
+    return new Issue(concat([currencyOrAccount, issuerAccountId.toBytes()]))
   }
 
   /**
