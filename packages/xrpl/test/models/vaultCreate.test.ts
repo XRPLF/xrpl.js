@@ -35,6 +35,20 @@ describe('VaultCreate', function () {
     assertValid(tx)
   })
 
+  it('verifies MPT/IOU Currency as Asset', function () {
+    tx.Asset = {
+      mpt_issuance_id:
+        '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+    }
+    assertValid(tx)
+
+    tx.Asset = {
+      currency: 'USD',
+      issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+    }
+    assertValid(tx)
+  })
+
   it('throws w/ missing Asset', function () {
     // @ts-expect-error for test
     tx.Asset = undefined
