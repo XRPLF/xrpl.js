@@ -19,6 +19,27 @@ const ed25519: SigningScheme = {
     return { privateKey, publicKey }
   },
 
+  deriveKeypairFromPrivateKey(privateKey: string): {
+    privateKey: string
+    publicKey: string
+  } {
+    assert.ok(
+      privateKey.startsWith(ED_PREFIX)
+        ? privateKey.length === 66
+        : privateKey.length === 64,
+      'Invalid ed25519 private key length',
+    )
+
+    const normalizedPrivateKey = privateKey.startsWith(ED_PREFIX)
+      ? privateKey.slice(2)
+      : privateKey
+
+    const buffer = Buffer.from(normalizedPrivateKey, 'hex')
+
+    const publicKey = ED_PREFIX + bytesToHex(nobleEd25519.getPublicKey(buffer))
+    return { privateKey, publicKey }
+  },
+
   sign(message: Uint8Array, privateKey: HexString): string {
     assert.ok(message instanceof Uint8Array, 'message must be array of octets')
     assert.ok(
