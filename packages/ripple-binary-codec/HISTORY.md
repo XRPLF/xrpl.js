@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Fix serialization/deserialization issues in `Issue` serialized type for MPTIssue.
+
 ## 2.5.0 (2025-07-29)
 
 ### Added

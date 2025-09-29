@@ -115,11 +115,16 @@ function isSigner(obj: unknown): obj is Signer {
   )
 }
 
+// Currency object sizes
 const XRP_CURRENCY_SIZE = 1
-const ISSUE_SIZE = 2
-const ISSUED_CURRENCY_SIZE = 3
+const MPT_CURRENCY_SIZE = 1
+const ISSUE_CURRENCY_SIZE = 2
+
+// Currency Amount object sizes
+const MPT_CURRENCY_AMOUNT_SIZE = 2
+const ISSUED_CURRENCY_AMOUNT_SIZE = 3
+
 const XCHAIN_BRIDGE_SIZE = 4
-const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
 /**
@@ -203,7 +208,16 @@ export function isXRPLNumber(value: unknown): value is XRPLNumber {
  * @returns Whether the Currency is properly formed.
  */
 export function isCurrency(input: unknown): input is Currency {
-  return isString(input) || isIssuedCurrency(input)
+  return (
+    isRecord(input) &&
+    ((Object.keys(input).length === ISSUE_CURRENCY_SIZE &&
+      isString(input.issuer) &&
+      isString(input.currency)) ||
+      (Object.keys(input).length === XRP_CURRENCY_SIZE &&
+        input.currency === 'XRP') ||
+      (Object.keys(input).length === MPT_CURRENCY_SIZE &&
+        isString(input.mpt_issuance_id)))
+  )
 }
 
 /**
@@ -215,7 +229,7 @@ export function isCurrency(input: unknown): input is Currency {
 export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
   return (
     isRecord(input) &&
-    ((Object.keys(input).length === ISSUE_SIZE &&
+    ((Object.keys(input).length === ISSUE_CURRENCY_SIZE &&
       isString(input.issuer) &&
       isString(input.currency)) ||
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
@@ -234,7 +248,7 @@ export function isIssuedCurrencyAmount(
 ): input is IssuedCurrencyAmount {
   return (
     isRecord(input) &&
-    Object.keys(input).length === ISSUED_CURRENCY_SIZE &&
+    Object.keys(input).length === ISSUED_CURRENCY_AMOUNT_SIZE &&
     isString(input.value) &&
     isString(input.issuer) &&
     isString(input.currency)
@@ -268,7 +282,7 @@ export function isAuthorizeCredential(
 export function isMPTAmount(input: unknown): input is MPTAmount {
   return (
     isRecord(input) &&
-    Object.keys(input).length === MPTOKEN_SIZE &&
+    Object.keys(input).length === MPT_CURRENCY_AMOUNT_SIZE &&
     typeof input.value === 'string' &&
     typeof input.mpt_issuance_id === 'string'
   )
