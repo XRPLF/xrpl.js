@@ -165,6 +165,7 @@ jobs:
             docker ps
             echo "ERROR: rippled-service Docker container is not running"
             exit 1
+          fi
           docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
@@ -231,6 +232,8 @@ jobs:
             echo "INFO: Currently running docker containers:"
             docker ps
             echo "ERROR: rippled-service Docker container is not running"
+            exit 1
+          fi
           docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
