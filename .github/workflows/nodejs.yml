@@ -161,19 +161,17 @@ jobs:
         id: check-docker-container
         run: |
           if ! docker ps | grep -q rippled-service; then
-            echo "rippled-service Docker container is not running"
-            echo "docker-container-running=false" >> $GITHUB_OUTPUT
-          else
-            echo "docker-container-running=true" >> $GITHUB_OUTPUT
-          fi
+            echo "INFO: Currently running docker containers:"
+            docker ps
+            echo "ERROR: rippled-service Docker container is not running"
+            exit 1
           docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
-        if: steps.check-docker-container.outputs.docker-container-running == 'true'
         run: npm run test:integration
 
       - name: Stop docker container
-        if: steps.check-docker-container.outputs.docker-container-running == 'true'
+        if: always()
         run: docker stop rippled-service
 
   browser:
@@ -230,19 +228,16 @@ jobs:
         id: check-docker-container
         run: |
           if ! docker ps | grep -q rippled-service; then
-            echo "rippled-service Docker container is not running"
-            echo "docker-container-running=false" >> $GITHUB_OUTPUT
-          else
-            echo "docker-container-running=true" >> $GITHUB_OUTPUT
-          fi
+            echo "INFO: Currently running docker containers:"
+            docker ps
+            echo "ERROR: rippled-service Docker container is not running"
           docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
-        if: steps.check-docker-container.outputs.docker-container-running == 'true'
         run: npm run test:browser
 
       - name: Stop docker container
-        if: steps.check-docker-container.outputs.docker-container-running == 'true'
+        if: always()
         run: docker stop rippled-service
 
   generate-documentation:
