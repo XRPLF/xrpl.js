@@ -3,7 +3,10 @@ import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 import { MPTokenIssuanceSetFlags } from '../../src'
 import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/transactions/common'
 import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
-import { validateMPTokenIssuanceSet } from '../../src/models/transactions/MPTokenIssuanceSet'
+import {
+  validateMPTokenIssuanceSet,
+  tmfMPTokenIssuanceSetMutableMask,
+} from '../../src/models/transactions/MPTokenIssuanceSet'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -135,6 +138,17 @@ describe('MPTokenIssuanceSet', function () {
     } as any
 
     assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MutableFlags')
+  })
+
+  it(`Throws w/ invalid MutableFlags value`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags: tmfMPTokenIssuanceSetMutableMask,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
   })
 
   it(`Throws w/ invalid type of MPTokenMetadata`, function () {

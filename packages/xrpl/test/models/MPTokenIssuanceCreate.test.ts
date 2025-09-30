@@ -5,7 +5,10 @@ import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
 } from '../../src/models/transactions/common'
-import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+import {
+  tmfMPTokenIssuanceCreateMutableMask,
+  validateMPTokenIssuanceCreate,
+} from '../../src/models/transactions/MPTokenIssuanceCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -141,6 +144,16 @@ describe('MPTokenIssuanceCreate', function () {
       invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
+  })
+
+  it(`throws w/ invalid MutableFlags value`, async () => {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MutableFlags: tmfMPTokenIssuanceCreateMutableMask,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
   })
 })
 

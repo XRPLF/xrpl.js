@@ -88,6 +88,19 @@ export enum MPTokenIssuanceCreateFlags {
   tmfMPTCanMutateTransferFee = 0x00020000,
 }
 
+/* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
+export const tmfMPTokenIssuanceCreateMutableMask = ~(
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanLock |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateRequireAuth |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanEscrow |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTrade |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTransfer |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanClawback |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateMetadata |
+  MPTokenIssuanceCreateFlags.tmfMPTCanMutateTransferFee
+)
+/* eslint-enable no-bitwise */
+
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceCreate} transaction
  * flags.
@@ -216,7 +229,7 @@ export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
   mpt_issuance_id?: string
 }
 
-/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+/* eslint-disable max-lines-per-function, max-statements -- Not needed to reduce function */
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
@@ -232,6 +245,16 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
+
+  if (
+    tx.MutableFlags != null &&
+    // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+    tx.MutableFlags & tmfMPTokenIssuanceCreateMutableMask
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: Invalid MutableFlags value',
+    )
+  }
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
@@ -293,4 +316,4 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 }
-/* eslint-enable max-lines-per-function */
+/* eslint-enable max-lines-per-function, max-statements */

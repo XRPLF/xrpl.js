@@ -56,6 +56,23 @@ export enum MPTokenIssuanceSetFlags {
   tmfMPTClearCanClawback = 0x00000800,
 }
 
+/* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
+export const tmfMPTokenIssuanceSetMutableMask = ~(
+  MPTokenIssuanceSetFlags.tmfMPTSetCanLock |
+  MPTokenIssuanceSetFlags.tmfMPTClearCanLock |
+  MPTokenIssuanceSetFlags.tmfMPTSetRequireAuth |
+  MPTokenIssuanceSetFlags.tmfMPTClearRequireAuth |
+  MPTokenIssuanceSetFlags.tmfMPTSetCanEscrow |
+  MPTokenIssuanceSetFlags.tmfMPTClearCanEscrow |
+  MPTokenIssuanceSetFlags.tmfMPTSetCanTrade |
+  MPTokenIssuanceSetFlags.tmfMPTClearCanTrade |
+  MPTokenIssuanceSetFlags.tmfMPTSetCanTransfer |
+  MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer |
+  MPTokenIssuanceSetFlags.tmfMPTSetCanClawback |
+  MPTokenIssuanceSetFlags.tmfMPTClearCanClawback
+)
+/* eslint-enable no-bitwise */
+
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceSet} transaction
  * flags.
@@ -114,6 +131,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
   MutableFlags?: number
 }
 
+/* eslint-disable max-lines-per-function -- All validation rules are needed */
 /**
  * Verify the form and type of an MPTokenIssuanceSet at runtime.
  *
@@ -127,6 +145,14 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
+
+  if (
+    tx.MutableFlags != null &&
+    // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+    tx.MutableFlags & tmfMPTokenIssuanceSetMutableMask
+  ) {
+    throw new ValidationError('MPTokenIssuanceSet: Invalid MutableFlags value')
+  }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
@@ -162,3 +188,4 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 }
+/* eslint-enable max-lines-per-function */
