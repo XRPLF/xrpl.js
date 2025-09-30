@@ -54,13 +54,37 @@ export enum MPTokenIssuanceCreateFlags {
    */
   tfMPTCanClawback = 0x00000040,
 
+  /**
+   * If set, Indicates flag lsfMPTCanLock can be changed.
+   */
   tmfMPTCanMutateCanLock = 0x00000002,
+  /**
+   * If set, Indicates flag lsfMPTRequireAuth can be changed
+   */
   tmfMPTCanMutateRequireAuth = 0x00000004,
+  /**
+   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   */
   tmfMPTCanMutateCanEscrow = 0x00000008,
+  /**
+   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   */
   tmfMPTCanMutateCanTrade = 0x00000010,
+  /**
+   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   */
   tmfMPTCanMutateCanTransfer = 0x00000020,
+  /**
+   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   */
   tmfMPTCanMutateCanClawback = 0x00000040,
+  /**
+   * If set, Allows field MPTokenMetadata to be modified.
+   */
   tmfMPTCanMutateMetadata = 0x00010000,
+  /**
+   * If set, Allows field TransferFee to be modified.
+   */
   tmfMPTCanMutateTransferFee = 0x00020000,
 }
 
@@ -72,20 +96,67 @@ export enum MPTokenIssuanceCreateFlags {
  */
 export interface MPTokenIssuanceCreateFlagsInterface
   extends GlobalFlagsInterface {
+  /**
+   * If set, indicates that the MPT can be locked both individually and globally.
+   * If not set, the MPT cannot be locked in any way.
+   */
   tfMPTCanLock?: boolean
+  /**
+   * If set, indicates that individual holders must be authorized.
+   * This enables issuers to limit who can hold their assets.
+   */
   tfMPTRequireAuth?: boolean
+  /**
+   * If set, indicates that individual holders can place their balances into an escrow.
+   */
   tfMPTCanEscrow?: boolean
+  /**
+   * If set, indicates that individual holders can trade their balances
+   *  using the XRP Ledger DEX or AMM.
+   */
   tfMPTCanTrade?: boolean
+  /**
+   * If set, indicates that tokens may be transferred to other accounts
+   *  that are not the issuer.
+   */
   tfMPTCanTransfer?: boolean
+  /**
+   * If set, indicates that the issuer may use the Clawback transaction
+   * to clawback value from individual holders.
+   */
   tfMPTCanClawback?: boolean
 
+  /**
+   * If set, Indicates flag lsfMPTCanLock can be changed.
+   */
   tmfMPTCanMutateCanLock?: boolean
+  /**
+   * If set, Indicates flag lsfMPTRequireAuth can be changed.
+   */
   tmfMPTCanMutateRequireAuth?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   */
   tmfMPTCanMutateCanEscrow?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   */
   tmfMPTCanMutateCanTrade?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   */
   tmfMPTCanMutateCanTransfer?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   */
   tmfMPTCanMutateCanClawback?: boolean
+  /**
+   * If set, Allows field MPTokenMetadata to be modified.
+   */
   tmfMPTCanMutateMetadata?: boolean
+  /**
+   * If set, Allows field TransferFee to be modified.
+   */
   tmfMPTCanMutateTransferFee?: boolean
 }
 
