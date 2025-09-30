@@ -27,35 +27,35 @@ export interface MPTokenIssuanceFlagsInterface {
   /**
    * Indicates flag lsfMPTCanLock can be changed
    */
-  lmfMPTCanMutateCanLock?: boolean
+  lsmfMPTCanMutateCanLock?: boolean
   /**
    * Indicates flag lsfMPTRequireAuth can be changed
    */
-  lmfMPTCanMutateRequireAuth?: boolean
+  lsmfMPTCanMutateRequireAuth?: boolean
   /**
    * Indicates flag lsfMPTCanEscrow can be changed
    */
-  lmfMPTCanMutateCanEscrow?: boolean
+  lsmfMPTCanMutateCanEscrow?: boolean
   /**
    * Indicates flag lsfMPTCanTrade can be changed
    */
-  lmfMPTCanMutateCanTrade?: boolean
+  lsmfMPTCanMutateCanTrade?: boolean
   /**
    * Indicates flag lsfMPTCanTransfer can be changed
    */
-  lmfMPTCanMutateCanTransfer?: boolean
+  lsmfMPTCanMutateCanTransfer?: boolean
   /**
    * Indicates flag lsfMPTCanClawback can be changed
    */
-  lmfMPTCanMutateCanClawback?: boolean
+  lsmfMPTCanMutateCanClawback?: boolean
   /**
    * Allows field MPTokenMetadata to be modified
    */
-  lmfMPTCanMutateMetadata?: boolean
+  lsmfMPTCanMutateMetadata?: boolean
   /**
    * Allows field TransferFee to be modified
    */
-  lmfMPTCanMutateTransferFee?: boolean
+  lsmfMPTCanMutateTransferFee?: boolean
 }
 
 export enum MPTokenIssuanceFlags {
@@ -70,33 +70,33 @@ export enum MPTokenIssuanceFlags {
   /**
    * Indicates flag lsfMPTCanLock can be changed
    */
-  lmfMPTCanMutateCanLock = 0x00000002,
+  lsmfMPTCanMutateCanLock = 0x00000002,
   /**
    * Indicates flag lsfMPTRequireAuth can be changed
    */
-  lmfMPTCanMutateRequireAuth = 0x00000004,
+  lsmfMPTCanMutateRequireAuth = 0x00000004,
   /**
    * Indicates flag lsfMPTCanEscrow can be changed
    */
-  lmfMPTCanMutateCanEscrow = 0x00000008,
+  lsmfMPTCanMutateCanEscrow = 0x00000008,
   /**
    * Indicates flag lsfMPTCanTrade can be changed
    */
-  lmfMPTCanMutateCanTrade = 0x00000010,
+  lsmfMPTCanMutateCanTrade = 0x00000010,
   /**
    * Indicates flag lsfMPTCanTransfer can be changed
    */
-  lmfMPTCanMutateCanTransfer = 0x00000020,
+  lsmfMPTCanMutateCanTransfer = 0x00000020,
   /**
    * Indicates flag lsfMPTCanClawback can be changed
    */
-  lmfMPTCanMutateCanClawback = 0x00000040,
+  lsmfMPTCanMutateCanClawback = 0x00000040,
   /**
    * Allows field MPTokenMetadata to be modified
    */
-  lmfMPTCanMutateMetadata = 0x00010000,
+  lsmfMPTCanMutateMetadata = 0x00010000,
   /**
    * Allows field TransferFee to be modified
    */
-  lmfMPTCanMutateTransferFee = 0x00020000,
+  lsmfMPTCanMutateTransferFee = 0x00020000,
 }
