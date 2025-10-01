@@ -45,6 +45,11 @@ export interface LoanSet extends BaseTransaction {
   PrincipalRequested: XRPLNumber
 
   /**
+   * The timestamp of when the Loan starts since Ripple Epoch.
+   */
+  StartDate: number
+
+  /**
    * The signature of the counterparty over the transaction.
    */
   CounterpartySignature?: CounterpartySignature
@@ -177,8 +182,9 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'LoanBrokerID', isString)
-  validateRequiredField(tx, 'CounterpartySignature', isRecord)
   validateRequiredField(tx, 'PrincipalRequested', isXRPLNumber)
+  validateRequiredField(tx, 'StartDate', isNumber)
+  validateOptionalField(tx, 'CounterpartySignature', isRecord)
   validateOptionalField(tx, 'Data', isString)
   validateOptionalField(tx, 'Counterparty', isAccount)
   validateOptionalField(tx, 'LoanOriginationFee', isXRPLNumber)

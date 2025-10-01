@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- required to test entire flow */
 import { assert } from 'chai'
 
 import {
@@ -9,6 +10,9 @@ import {
   type VaultDeposit,
   type LoanBrokerSet,
   Wallet,
+  type LoanSet,
+  unixTimeToRippleTime,
+  type SignerListSet,
 } from '../../../src'
 import { type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
@@ -46,6 +50,13 @@ describe('Lending Protocol IT', () => {
       const vaultOwnerWallet = await generateFundedWallet(testContext.client)
       const mptIssuerWallet = await generateFundedWallet(testContext.client)
       const depositorWallet = await generateFundedWallet(testContext.client)
+      const borrowerWallet = await generateFundedWallet(testContext.client)
+      const signer1 = await generateFundedWallet(testContext.client)
+      const signer2 = await generateFundedWallet(testContext.client)
+
+      // Setup Multi-Signing
+      await setupMultiSigning(testContext, borrowerWallet, signer1, signer2)
+
       // The Vault Owner and Loan Broker must be on the same account.
       const loanBrokerWallet = vaultOwnerWallet
 
@@ -60,15 +71,15 @@ describe('Lending Protocol IT', () => {
       const mptAuthorizeTx: MPTokenAuthorize = {
         TransactionType: 'MPTokenAuthorize',
         MPTokenIssuanceID: vaultObj.mptIssuanceId,
-        Account: depositorWallet.classicAddress,
+        Account: depositorWallet.address,
       }
       await testTransaction(testContext.client, mptAuthorizeTx, depositorWallet)
 
       // Transfer some MPTs from the issuer to depositor
       const paymentTx: Payment = {
         TransactionType: 'Payment',
-        Account: mptIssuerWallet.classicAddress,
-        Destination: depositorWallet.classicAddress,
+        Account: mptIssuerWallet.address,
+        Destination: depositorWallet.address,
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '1000',
@@ -80,7 +91,7 @@ describe('Lending Protocol IT', () => {
       const depositAmount = '500'
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
-        Account: depositorWallet.classicAddress,
+        Account: depositorWallet.address,
         VaultID: vaultObj.vaultObjectId,
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
@@ -93,7 +104,7 @@ describe('Lending Protocol IT', () => {
       // Create LoanBroker ledger object to capture attributes of the Lending Protocol
       const loanBrokerSetTx: LoanBrokerSet = {
         TransactionType: 'LoanBrokerSet',
-        Account: loanBrokerWallet.classicAddress,
+        Account: loanBrokerWallet.address,
         VaultID: vaultObj.vaultObjectId,
         DebtMaximum: '400',
       }
@@ -112,7 +123,7 @@ describe('Lending Protocol IT', () => {
 
       const loanBrokerObjects = await testContext.client.request({
         command: 'account_objects',
-        account: loanBrokerWallet.classicAddress,
+        account: loanBrokerWallet.address,
         type: 'loan_broker',
       })
 
@@ -123,6 +134,26 @@ describe('Lending Protocol IT', () => {
 
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
+
+      // Create a Loan object
+      const loanStartTimestamp = unixTimeToRippleTime(
+        Date.now() + 1000 * 60 * 60,
+      )
+      const loanSetTx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        PrincipalRequested: '100',
+        StartDate: loanStartTimestamp,
+      }
+
+      await testTransaction(
+        testContext.client,
+        loanSetTx,
+        loanBrokerWallet,
+        undefined,
+        'temBAD_SIGNER',
+      )
     },
     TIMEOUT,
   )
@@ -184,4 +215,24 @@ async function createMPToken(
 
   return (txResponse.result.meta as MPTokenIssuanceCreateMetadata)
     .mpt_issuance_id as string
+}
+
+// eslint-disable-next-line max-params -- required here for three wallets
+async function setupMultiSigning(
+  testContext: XrplIntegrationTestContext,
+  wallet: Wallet,
+  singer1: Wallet,
+  singer2: Wallet,
+): Promise<void> {
+  const transaction: SignerListSet = {
+    TransactionType: 'SignerListSet',
+    Account: wallet.address,
+    SignerQuorum: 2,
+    SignerEntries: [
+      { SignerEntry: { Account: singer1.address, SignerWeight: 1 } },
+      { SignerEntry: { Account: singer2.address, SignerWeight: 1 } },
+    ],
+  }
+
+  await testTransaction(testContext.client, transaction, wallet)
 }
