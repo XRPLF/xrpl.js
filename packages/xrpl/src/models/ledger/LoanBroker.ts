@@ -1,17 +1,14 @@
-import { HasPreviousTxnID } from './BaseLedgerEntry'
+import { XRPLNumber } from '../transactions/common'
+
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The LoanBroker object captures attributes of the Lending Protocol.
  *
  * @category Ledger Entries
  */
-export default interface LoanBroker extends HasPreviousTxnID {
+export default interface LoanBroker extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'LoanBroker'
-
-  /**
-   * Ledger object identifier.
-   */
-  LedgerIndex: string
 
   /**
    * Ledger object flags.
@@ -61,17 +58,17 @@ export default interface LoanBroker extends HasPreviousTxnID {
   /**
    * The total asset amount the protocol owes the Vault, including interest.
    */
-  DebtTotal: number
+  DebtTotal: XRPLNumber
 
   /**
    *  The maximum amount the protocol can owe the Vault. The default value of 0 means there is no limit to the debt.
    */
-  DebtMaximum: number
+  DebtMaximum: XRPLNumber
 
   /**
    * The total amount of first-loss capital deposited into the Lending Protocol.
    */
-  CoverAvailable: number
+  CoverAvailable: XRPLNumber
 
   /**
    * The 1/10th basis point of the DebtTotal that the first loss capital must cover.

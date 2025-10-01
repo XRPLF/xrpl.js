@@ -46,6 +46,8 @@ import {
   hashLedgerHeader,
   hashEscrow,
   hashPaymentChannel,
+  hashVault,
+  hashLoanBroker,
 } from './hashes'
 import parseNFTokenID from './parseNFTokenID'
 import {
@@ -179,6 +181,8 @@ const hashes = {
   hashLedgerHeader,
   hashEscrow,
   hashPaymentChannel,
+  hashVault,
+  hashLoanBroker,
 }
 
 export {

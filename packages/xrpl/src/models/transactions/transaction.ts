@@ -34,15 +34,24 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
-import { validateLoanBrokerCoverClawback } from './loanBrokerCoverClawback'
-import { validateLoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
-import { validateLoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
-import { validateLoanBrokerDelete } from './loanBrokerDelete'
-import { validateLoanBrokerSet } from './loanBrokerSet'
-import { validateLoanDelete } from './loanDelete'
-import { validateLoanManage } from './loanManage'
-import { validateLoanPay } from './loanPay'
-import { validateLoanSet } from './loanSet'
+import {
+  LoanBrokerCoverClawback,
+  validateLoanBrokerCoverClawback,
+} from './loanBrokerCoverClawback'
+import {
+  LoanBrokerCoverDeposit,
+  validateLoanBrokerCoverDeposit,
+} from './loanBrokerCoverDeposit'
+import {
+  LoanBrokerCoverWithdraw,
+  validateLoanBrokerCoverWithdraw,
+} from './loanBrokerCoverWithdraw'
+import { LoanBrokerDelete, validateLoanBrokerDelete } from './loanBrokerDelete'
+import { LoanBrokerSet, validateLoanBrokerSet } from './loanBrokerSet'
+import { LoanDelete, validateLoanDelete } from './loanDelete'
+import { LoanManage, validateLoanManage } from './loanManage'
+import { LoanPay, validateLoanPay } from './loanPay'
+import { LoanSet, validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -166,6 +175,15 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LoanBrokerSet
+  | LoanBrokerCoverClawback
+  | LoanBrokerCoverDeposit
+  | LoanBrokerCoverWithdraw
+  | LoanBrokerDelete
+  | LoanSet
+  | LoanDelete
+  | LoanManage
+  | LoanPay
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy

@@ -1,11 +1,11 @@
-import { HasPreviousTxnID } from './BaseLedgerEntry'
+import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * A Loan ledger entry captures various Loan terms on-chain. It is an agreement between the Borrower and the loan issuer.
  *
  * @category Ledger Entries
  */
-export default interface Loan extends HasPreviousTxnID {
+export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Loan'
 
   /**

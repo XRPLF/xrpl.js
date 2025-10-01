@@ -21,6 +21,8 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
+  hashVault,
+  hashLoanBroker,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -145,6 +147,26 @@ describe('Hashes', function () {
     const expectedEntryHash =
       'E35708503B3C3143FB522D749AAFCC296E8060F0FB371A9A56FAE0B1ED127366'
     const actualEntryHash = hashPaymentChannel(account, dstAccount, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcVaultEntryHash', function () {
+    const account = 'rDcMtA1XpH5DGwiaqFif2cYCvgk5vxHraS'
+    const sequence = 18
+    const expectedEntryHash =
+      '9C3208D7F99E5644643542518859401A96C93D80CC5F757AF0DF1781046C0A6A'
+    const actualEntryHash = hashVault(account, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcLoanBrokerHash', function () {
+    const account = 'rNTrjogemt4dZD13PaqphezBWSmiApNH4K'
+    const sequence = 84
+    const expectedEntryHash =
+      'E799B84AC949CE2D8F27435C784F15C72E6A23ACA6841BA6D2F37A1E5DA4110F'
+    const actualEntryHash = hashLoanBroker(account, sequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
