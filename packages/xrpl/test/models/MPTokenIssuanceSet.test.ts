@@ -1,5 +1,12 @@
+import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+
 import { MPTokenIssuanceSetFlags } from '../../src'
-import { validateMPTokenIssuanceSet } from '../../src/models/transactions/MPTokenIssuanceSet'
+import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/transactions/common'
+import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
+import {
+  validateMPTokenIssuanceSet,
+  tmfMPTokenIssuanceSetMutableMask,
+} from '../../src/models/transactions/MPTokenIssuanceSet'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -44,6 +51,13 @@ describe('MPTokenIssuanceSet', function () {
     } as any
 
     assertValid(validMPTokenIssuanceSet)
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags: MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer,
+    } as any)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {
@@ -74,5 +88,105 @@ describe('MPTokenIssuanceSet', function () {
     invalid.Flags = { tfMPTLock: true, tfMPTUnlock: true }
 
     assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
+  })
+
+  it(`Throws w/ invalid type of TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      TransferFee: '100',
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field TransferFee')
+  })
+
+  it(`Throws w/ invalid (too low) value of TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      TransferFee: -1,
+    } as any
+
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+    )
+  })
+
+  it(`Throws w/ invalid (too high) value of TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      TransferFee: MAX_TRANSFER_FEE + 1,
+    } as any
+
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+    )
+  })
+
+  it(`Throws w/ invalid type of MutableFlags`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags: '100',
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MutableFlags')
+  })
+
+  it(`Throws w/ invalid MutableFlags value`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags: tmfMPTokenIssuanceSetMutableMask,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+  })
+
+  it(`Throws w/ invalid type of MPTokenMetadata`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MPTokenMetadata: 1234,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MPTokenMetadata')
+  })
+
+  it(`Throws w/ invalid (non-hex characters) MPTokenMetadata`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MPTokenMetadata: 'zznothex',
+    } as any
+
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
+  })
+
+  it(`Throws w/ invalid (too large) MPTokenMetadata`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MPTokenMetadata: stringToHex('a'.repeat(MAX_MPT_META_BYTE_LENGTH + 1)),
+    } as any
+
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+    )
   })
 })
