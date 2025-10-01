@@ -1,5 +1,6 @@
 /* eslint-disable max-statements -- required to test entire flow */
 import { assert } from 'chai'
+import { sign } from 'ripple-keypairs'
 
 import {
   type MPTokenAuthorize,
@@ -11,8 +12,10 @@ import {
   type LoanBrokerSet,
   Wallet,
   type LoanSet,
-  unixTimeToRippleTime,
-  type SignerListSet,
+  decode,
+  verifySignature,
+  encodeForSigning,
+  SignerListSet,
 } from '../../../src'
 import { type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
@@ -136,17 +139,17 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
       // Create a Loan object
-      const loanStartTimestamp = unixTimeToRippleTime(
-        Date.now() + 1000 * 60 * 60,
-      )
-      const loanSetTx: LoanSet = {
+
+      let loanSetTx: LoanSet = {
         TransactionType: 'LoanSet',
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '100',
-        StartDate: loanStartTimestamp,
+        Counterparty: borrowerWallet.address,
+        Fee: '100',
       }
 
+      // Fails as loan borrower has not signed yet.
       await testTransaction(
         testContext.client,
         loanSetTx,
@@ -154,6 +157,45 @@ describe('Lending Protocol IT', () => {
         undefined,
         'temBAD_SIGNER',
       )
+
+      // Loan broker signs the transaction and sends it to the borrower
+      loanSetTx = await testContext.client.autofill(loanSetTx)
+      const { tx_blob } = loanBrokerWallet.sign(loanSetTx)
+      loanSetTx = decode(tx_blob) as LoanSet
+
+      // Borrower first verifies the TxnSignature for authenticity
+      assert.isTrue(verifySignature(loanSetTx, loanSetTx.SigningPubKey))
+
+      console.log(loanSetTx)
+      // Borrower signs the transaction
+      const sign1 = sign(encodeForSigning(loanSetTx), signer1.privateKey)
+      const sign2 = sign(encodeForSigning(loanSetTx), signer2.privateKey)
+
+      loanSetTx.CounterpartySignature = {}
+      loanSetTx.CounterpartySignature.Signers = []
+      console.log(`Signer 1: ${signer1.address}`)
+      console.log(`Signer 1 public key:${signer1.publicKey}`)
+      console.log(`Signer 1 private key:${signer1.privateKey}`)
+      console.log(`Signer 2: ${signer2.address}`)
+      console.log(`Signer 2 public key:${signer2.publicKey}`)
+      console.log(`Signer 2 private key:${signer2.privateKey}`)
+      loanSetTx.CounterpartySignature.Signers.push({
+        Signer: {
+          Account: signer1.address,
+          SigningPubKey: signer1.publicKey,
+          TxnSignature: sign1,
+        },
+      })
+      loanSetTx.CounterpartySignature.Signers.push({
+        Signer: {
+          Account: signer2.address,
+          SigningPubKey: signer2.publicKey,
+          TxnSignature: sign2,
+        },
+      })
+
+      console.dir(loanSetTx, { depth: null })
+      await testTransaction(testContext.client, loanSetTx, borrowerWallet)
     },
     TIMEOUT,
   )

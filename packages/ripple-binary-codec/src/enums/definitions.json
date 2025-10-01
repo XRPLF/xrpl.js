@@ -691,7 +691,7 @@
       }
     ],
     [
-      "StartDate",
+      "MutableFlags",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -701,7 +701,7 @@
       }
     ],
     [
-      "PaymentInterval",
+      "StartDate",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -711,7 +711,7 @@
       }
     ],
     [
-      "GracePeriod",
+      "PaymentInterval",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -721,7 +721,7 @@
       }
     ],
     [
-      "PreviousPaymentDate",
+      "GracePeriod",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -731,7 +731,7 @@
       }
     ],
     [
-      "NextPaymentDueDate",
+      "PreviousPaymentDate",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -741,7 +741,7 @@
       }
     ],
     [
-      "PaymentRemaining",
+      "NextPaymentDueDate",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -751,7 +751,7 @@
       }
     ],
     [
-      "PaymentTotal",
+      "PaymentRemaining",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -761,7 +761,7 @@
       }
     ],
     [
-      "LoanSequence",
+      "PaymentTotal",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -771,7 +771,7 @@
       }
     ],
     [
-      "CoverRateMinimum",
+      "LoanSequence",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -781,7 +781,7 @@
       }
     ],
     [
-      "CoverRateLiquidation",
+      "CoverRateMinimum",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -791,7 +791,7 @@
       }
     ],
     [
-      "OverpaymentFee",
+      "CoverRateLiquidation",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -801,7 +801,7 @@
       }
     ],
     [
-      "InterestRate",
+      "OverpaymentFee",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -811,7 +811,7 @@
       }
     ],
     [
-      "LateInterestRate",
+      "InterestRate",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -821,7 +821,7 @@
       }
     ],
     [
-      "CloseInterestRate",
+      "LateInterestRate",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -831,12 +831,22 @@
       }
     ],
     [
-      "OverpaymentInterestRate",
+      "CloseInterestRate",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 67,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OverpaymentInterestRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 68,
         "type": "UInt32"
       }
     ],
@@ -2441,6 +2451,16 @@
       }
     ],
     [
+      "DummyInt32",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
+        "type": "Int32"
+      }
+    ],
+    [
       "TransactionMetaData",
       {
         "isSerialized": true,
@@ -3697,6 +3717,8 @@
     "Hash160": 17,
     "Hash192": 21,
     "Hash256": 5,
+    "Int32": 10,
+    "Int64": 11,
     "Issue": 24,
     "LedgerEntry": 10002,
     "Metadata": 10004,
