@@ -20,6 +20,7 @@ import {
 import { type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoanBroker, hashVault } from '../../../src/utils/hashes'
+import { compareSigners } from '../../../src/Wallet/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -179,20 +180,39 @@ describe('Lending Protocol IT', () => {
       console.log(`Signer 2: ${signer2.address}`)
       console.log(`Signer 2 public key:${signer2.publicKey}`)
       console.log(`Signer 2 private key:${signer2.privateKey}`)
-      loanSetTx.CounterpartySignature.Signers.push({
-        Signer: {
-          Account: signer1.address,
-          SigningPubKey: signer1.publicKey,
-          TxnSignature: sign1,
+      const signers = [
+        {
+          Signer: {
+            Account: signer1.address,
+            SigningPubKey: signer1.publicKey,
+            TxnSignature: sign1,
+          },
         },
-      })
-      loanSetTx.CounterpartySignature.Signers.push({
-        Signer: {
-          Account: signer2.address,
-          SigningPubKey: signer2.publicKey,
-          TxnSignature: sign2,
+        {
+          Signer: {
+            Account: signer2.address,
+            SigningPubKey: signer2.publicKey,
+            TxnSignature: sign2,
+          },
         },
-      })
+      ]
+      // loanSetTx.CounterpartySignature.Signers.push({
+      //   Signer: {
+      //     Account: signer1.address,
+      //     SigningPubKey: signer1.publicKey,
+      //     TxnSignature: sign1,
+      //   },
+      // })
+      // loanSetTx.CounterpartySignature.Signers.push({
+      //   Signer: {
+      //     Account: signer2.address,
+      //     SigningPubKey: signer2.publicKey,
+      //     TxnSignature: sign2,
+      //   },
+      // })
+
+      signers.sort((s1, s2) => compareSigners(s1.Signer, s2.Signer))
+      loanSetTx.CounterpartySignature.Signers = signers
 
       console.dir(loanSetTx, { depth: null })
       await testTransaction(testContext.client, loanSetTx, borrowerWallet)
