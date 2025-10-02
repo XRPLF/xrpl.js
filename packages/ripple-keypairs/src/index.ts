@@ -95,6 +95,19 @@ function deriveAddress(publicKey: string): string {
   return deriveAddressFromBytes(hexToBytes(publicKey))
 }
 
+function derivePublicKey(privateKey: string): string {
+  const algorithm = getAlgorithmFromPrivateKey(privateKey)
+
+  if (algorithm === 'ecdsa-secp256k1') {
+    return secp256k1.deriveKeypairFromPrivateKey(privateKey).publicKey
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (algorithm === 'ed25519') {
+    return ed25519.deriveKeypairFromPrivateKey(privateKey).publicKey
+  }
+  throw new Error('Unknown signing scheme algorithm')
+}
+
 function deriveNodeAddress(publicKey: string): string {
   const generatorBytes = decodeNodePublic(publicKey)
   const accountPublicBytes = accountPublicFromPublicGenerator(generatorBytes)
@@ -107,6 +120,7 @@ export {
   sign,
   verify,
   deriveAddress,
+  derivePublicKey,
   deriveNodeAddress,
   decodeSeed,
 }
