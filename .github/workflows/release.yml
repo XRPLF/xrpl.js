@@ -17,10 +17,6 @@ concurrency:
   group: release
   cancel-in-progress: true
 
-env:
-  RELEASE_REF: ${{ github.ref }}
-  RELEASE_BRANCH: ${{ github.ref_name }}
-
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -35,7 +31,7 @@ jobs:
 
       - name: Validate inputs
         env:
-          RELEASE_BRANCH: ${{ env.RELEASE_BRANCH }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           # Validate package_name
@@ -111,7 +107,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
-      git_ref: ${{ env.RELEASE_REF }}
+      git_ref: ${{ github.ref }}
     secrets: inherit
 
   run_tests:
@@ -123,7 +119,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
-      git_ref: ${{ env.RELEASE_REF }}
+      git_ref: ${{ github.ref }}
     secrets: inherit
 
   pre_release:
@@ -135,7 +131,7 @@ jobs:
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
-      RELEASE_BRANCH: "${{ env.RELEASE_BRANCH }}"
+      RELEASE_BRANCH: "${{ github.ref_name }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -241,7 +237,7 @@ jobs:
           REPO: ${{ github.repository }}
           PKG_NAME: ${{ env.PACKAGE_NAME }}
           PKG_VER: ${{ env.PACKAGE_VERSION }}
-          REL_BRANCH: ${{ env.RELEASE_BRANCH }}
+          REL_BRANCH: ${{ github.ref_name }}
           VULN_ART_URL: ${{ steps.vuln_art.outputs.art_url }}
           LABELS: security
         run: |
@@ -294,7 +290,7 @@ jobs:
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
-      RELEASE_BRANCH: "${{ env.RELEASE_BRANCH }}"
+      RELEASE_BRANCH: "${{ github.ref_name }}"
     outputs:
       reviewers_dev: ${{ steps.get_reviewers.outputs.reviewers_dev }}
       reviewers_sec: ${{ steps.get_reviewers.outputs.reviewers_sec }}
@@ -310,7 +306,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          RELEASE_BRANCH: ${{ env.RELEASE_BRANCH }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
           VERSION: ${{ needs.get_version.outputs.package_version }}
         run: |
           set -euo pipefail
