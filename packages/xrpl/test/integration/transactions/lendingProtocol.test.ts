@@ -167,19 +167,19 @@ describe('Lending Protocol IT', () => {
       // Borrower first verifies the TxnSignature for authenticity
       assert.isTrue(verifySignature(loanSetTx, loanSetTx.SigningPubKey))
 
-      console.log(loanSetTx)
       // Borrower signs the transaction
       const sign1 = sign(encodeForSigning(loanSetTx), signer1.privateKey)
       const sign2 = sign(encodeForSigning(loanSetTx), signer2.privateKey)
 
+      console.log(JSON.stringify(loanSetTx))
+      console.log(signer1.classicAddress)
+      console.log(signer1.privateKey)
+      console.log(signer1.seed)
+      console.log(sign1)
+
       loanSetTx.CounterpartySignature = {}
       loanSetTx.CounterpartySignature.Signers = []
-      console.log(`Signer 1: ${signer1.address}`)
-      console.log(`Signer 1 public key:${signer1.publicKey}`)
-      console.log(`Signer 1 private key:${signer1.privateKey}`)
-      console.log(`Signer 2: ${signer2.address}`)
-      console.log(`Signer 2 public key:${signer2.publicKey}`)
-      console.log(`Signer 2 private key:${signer2.privateKey}`)
+
       const signers = [
         {
           Signer: {
@@ -196,25 +196,10 @@ describe('Lending Protocol IT', () => {
           },
         },
       ]
-      // loanSetTx.CounterpartySignature.Signers.push({
-      //   Signer: {
-      //     Account: signer1.address,
-      //     SigningPubKey: signer1.publicKey,
-      //     TxnSignature: sign1,
-      //   },
-      // })
-      // loanSetTx.CounterpartySignature.Signers.push({
-      //   Signer: {
-      //     Account: signer2.address,
-      //     SigningPubKey: signer2.publicKey,
-      //     TxnSignature: sign2,
-      //   },
-      // })
 
       signers.sort((s1, s2) => compareSigners(s1.Signer, s2.Signer))
       loanSetTx.CounterpartySignature.Signers = signers
 
-      console.dir(loanSetTx, { depth: null })
       await testTransaction(testContext.client, loanSetTx, borrowerWallet)
     },
     TIMEOUT,
