@@ -217,6 +217,7 @@ jobs:
 
   generate-documentation:
     runs-on: ubuntu-latest
+    needs: [build-and-lint, unit, integration, browser]
 
     strategy:
       matrix:
