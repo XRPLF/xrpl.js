@@ -42,7 +42,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also "Release Pipeline for 4.4.73-beta.2" step, relevant team should review the release details and scan result.
+1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result.
 
 
 ---
