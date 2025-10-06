@@ -18,12 +18,12 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
      "version": "x.y.z"
    }
    ```
-3. Run npm i to update the package-lock with the updated versions and commit the lock file to the releaes branch
+3. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
 
 ### **Triggering a Release**
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
-2. Chooese the release branch from dropdown
+2. Choose the release branch from dropdown
 3. Fill in these fields:
    - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
    - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
