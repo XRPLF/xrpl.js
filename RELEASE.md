@@ -24,7 +24,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
 2. Fill in these fields:
    - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **release_branch** → The Git branch the release is generated from, e.g., `release/xrpl@4.3.8`.
+   - **release_branch** → The Git branch the release is generated from, A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
    - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
      - Examples:
        - `latest` → Standard production release
