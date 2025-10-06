@@ -1,11 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+// import { MPTokenIssuanceCreateMutableFlags } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
 } from '../../src/models/transactions/common'
 import {
+  MPTokenIssuanceCreateMutableFlags,
   tmfMPTokenIssuanceCreateMutableMask,
   validateMPTokenIssuanceCreate,
 } from '../../src/models/transactions/MPTokenIssuanceCreate'
@@ -31,7 +33,8 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MutableFlags: MPTokenIssuanceCreateFlags.tmfMPTCanMutateTransferFee,
+      MutableFlags:
+        MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
       MPTokenMetadata: stringToHex(`{
         "ticker": "TBILL",
         "name": "T-Bill Yield Token",

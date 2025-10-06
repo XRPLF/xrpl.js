@@ -53,7 +53,9 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+}
 
+export enum MPTokenIssuanceCreateMutableFlags {
   /**
    * If set, Indicates flag lsfMPTCanLock can be changed.
    */
@@ -90,14 +92,14 @@ export enum MPTokenIssuanceCreateFlags {
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
 export const tmfMPTokenIssuanceCreateMutableMask = ~(
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanLock |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateRequireAuth |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanEscrow |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTrade |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTransfer |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanClawback |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateMetadata |
-  MPTokenIssuanceCreateFlags.tmfMPTCanMutateTransferFee
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateRequireAuth |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanEscrow |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTrade |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanClawback |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee
 )
 /* eslint-enable no-bitwise */
 
@@ -138,7 +140,9 @@ export interface MPTokenIssuanceCreateFlagsInterface
    * to clawback value from individual holders.
    */
   tfMPTCanClawback?: boolean
+}
 
+export interface MPTokenIssuanceCreateMutableFlagsInterface {
   /**
    * If set, Indicates flag lsfMPTCanLock can be changed.
    */
