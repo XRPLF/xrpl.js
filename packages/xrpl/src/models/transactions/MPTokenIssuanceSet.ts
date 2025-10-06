@@ -29,7 +29,9 @@ export enum MPTokenIssuanceSetFlags {
    * If set, indicates that issuer unlocks the MPT
    */
   tfMPTUnlock = 0x00000002,
-  // The below flags are used in the MutableFlags field
+}
+
+export enum MPTokenIssuanceSetMutableFlags {
   /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
   tmfMPTSetCanLock = 0x00000001,
   /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */
@@ -58,18 +60,18 @@ export enum MPTokenIssuanceSetFlags {
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
 export const tmfMPTokenIssuanceSetMutableMask = ~(
-  MPTokenIssuanceSetFlags.tmfMPTSetCanLock |
-  MPTokenIssuanceSetFlags.tmfMPTClearCanLock |
-  MPTokenIssuanceSetFlags.tmfMPTSetRequireAuth |
-  MPTokenIssuanceSetFlags.tmfMPTClearRequireAuth |
-  MPTokenIssuanceSetFlags.tmfMPTSetCanEscrow |
-  MPTokenIssuanceSetFlags.tmfMPTClearCanEscrow |
-  MPTokenIssuanceSetFlags.tmfMPTSetCanTrade |
-  MPTokenIssuanceSetFlags.tmfMPTClearCanTrade |
-  MPTokenIssuanceSetFlags.tmfMPTSetCanTransfer |
-  MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer |
-  MPTokenIssuanceSetFlags.tmfMPTSetCanClawback |
-  MPTokenIssuanceSetFlags.tmfMPTClearCanClawback
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback
 )
 /* eslint-enable no-bitwise */
 
@@ -82,7 +84,9 @@ export const tmfMPTokenIssuanceSetMutableMask = ~(
 export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
-  // The below flags are used in the MutableFlags field
+}
+
+export interface MPTokenIssuanceSetMutableFlagsInterface {
   /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
   tmfMPTSetCanLock?: boolean
   /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */

@@ -6,6 +6,7 @@ import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceC
 import {
   validateMPTokenIssuanceSet,
   tmfMPTokenIssuanceSetMutableMask,
+  MPTokenIssuanceSetMutableFlags,
 } from '../../src/models/transactions/MPTokenIssuanceSet'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -56,7 +57,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer,
+      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
     } as any)
   })
 

@@ -6,6 +6,8 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSetFlags,
   TransactionMetadata,
+  MPTokenIssuanceCreateMutableFlags,
+  MPTokenIssuanceSetMutableFlags,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -84,8 +86,8 @@ describe('MPTokenIssuanceDestroy', function () {
         Account: testContext.wallet.classicAddress,
         Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
         MutableFlags:
-          MPTokenIssuanceCreateFlags.tmfMPTCanMutateTransferFee +
-          MPTokenIssuanceCreateFlags.tmfMPTCanMutateCanTransfer,
+          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee +
+          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer,
       }
 
       const mptCreateRes = await testTransaction(
@@ -125,7 +127,7 @@ describe('MPTokenIssuanceDestroy', function () {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
         MPTokenIssuanceID: mptID!,
-        MutableFlags: MPTokenIssuanceSetFlags.tmfMPTClearCanTransfer,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
       }
 
       await testTransaction(
