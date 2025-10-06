@@ -294,7 +294,7 @@ jobs:
     needs: [get_version, run_faucet_test, run_tests, pre_release]
     permissions:
       pull-requests: write
-    name: Review test and security scan result -- Dev team
+    name: Print Test/Security scan result and invite Dev team to review
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
@@ -487,7 +487,7 @@ jobs:
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
-    name: Review test and security scan result — Sec team
+    name: Invite sec team to review
     steps:
       - name: Send Sec team review request to Slack
         shell: bash
@@ -622,7 +622,7 @@ jobs:
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
         run: |
-          MESSAGE="❌ Tests failed for xrpl.js ${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          MESSAGE="❌ Release failed for ${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
