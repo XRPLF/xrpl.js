@@ -158,6 +158,50 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
   })
+
+  it(`throws with Zero MaximumAmount`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MaximumAmount: '0',
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: MaximumAmount out of range')
+  })
+
+  it(`throws with Zero DomainID`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: '0'.repeat(64),
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: invalid field DomainID')
+  })
+
+  it(`throws with DomainID and tfMPTRequireAuth flag not set`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: '1'.repeat(64),
+      Flags: 0,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Cannot set DomainID unless tfMPTRequireAuth flag is set.',
+    )
+  })
+
+  it(`throws with invalid type of DomainID`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: 1,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: invalid field DomainID')
+  })
 })
 
 /**

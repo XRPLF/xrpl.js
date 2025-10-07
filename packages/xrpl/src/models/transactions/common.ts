@@ -774,7 +774,8 @@ export function isDomainID(domainID: unknown): domainID is string {
   return (
     isString(domainID) &&
     domainID.length === _DOMAIN_ID_LENGTH &&
-    isHex(domainID)
+    isHex(domainID) &&
+    domainID !== '0'.repeat(_DOMAIN_ID_LENGTH)
   )
 }
 

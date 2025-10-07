@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled, hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -11,6 +11,7 @@ import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
   validateMPTokenMetadata,
+  isDomainID,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -227,6 +228,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
   MutableFlags?: number
+  DomainID?: string
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
@@ -249,6 +251,20 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'DomainID', isDomainID)
+
+  if (
+    tx.DomainID != null &&
+    !hasFlag(
+      tx,
+      MPTokenIssuanceCreateFlags.tfMPTRequireAuth,
+      'tfMPTRequireAuth',
+    )
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: Cannot set DomainID unless tfMPTRequireAuth flag is set.',
+    )
+  }
 
   if (
     tx.MutableFlags != null &&
@@ -275,7 +291,7 @@ export function validateMPTokenIssuanceCreate(
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
       BigInt(tx.MaximumAmount) > BigInt(MAX_AMT) ||
-      BigInt(tx.MaximumAmount) < BigInt(`0`)
+      BigInt(tx.MaximumAmount) <= BigInt(`0`)
     ) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: MaximumAmount out of range',
