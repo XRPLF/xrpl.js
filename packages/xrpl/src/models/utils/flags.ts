@@ -12,6 +12,7 @@ import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+// eslint-disable-next-line import/no-cycle -- this method is needed to map txn flags
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'

@@ -1,5 +1,7 @@
 import { ValidationError } from '../../errors'
 import { isFlagEnabled, isHex } from '../utils'
+// eslint-disable-next-line import/no-cycle -- this method is needed to convert txn flags to number
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import {
   BaseTransaction,
@@ -12,8 +14,11 @@ import {
   GlobalFlagsInterface,
   isNumber,
   MAX_MPT_META_BYTE_LENGTH,
+  isDomainID,
 } from './common'
 import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
+
+import type { Transaction } from '.'
 
 /**
  * Transaction Flags for an MPTokenIssuanceSet Transaction.
@@ -133,9 +138,10 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
   MPTokenMetadata?: string
   TransferFee?: number
   MutableFlags?: number
+  DomainID?: string
 }
 
-/* eslint-disable max-lines-per-function -- All validation rules are needed */
+/* eslint-disable max-lines-per-function, max-statements -- All validation rules are needed */
 /**
  * Verify the form and type of an MPTokenIssuanceSet at runtime.
  *
@@ -149,7 +155,13 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'DomainID', isDomainID)
 
+  if (tx.DomainID != null && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Cannot set both DomainID and Holder fields.',
+    )
+  }
   if (
     tx.MutableFlags != null &&
     // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
@@ -174,6 +186,80 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
   }
 
+  if (tx.Holder != null && tx.Holder === tx.Account) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder cannot be the same as the Account.',
+    )
+  }
+
+  const isMutate =
+    tx.MutableFlags != null ||
+    tx.MPTokenMetadata != null ||
+    tx.TransferFee != null
+  if (
+    (tx.Flags === 0 || tx.Flags === undefined) &&
+    tx.DomainID == null &&
+    !isMutate
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
+    )
+  }
+
+  if (isMutate && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder field is not allowed when mutating MPTokenIssuance.',
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
+  if (isMutate && convertTxFlagsToNumber(tx as Transaction) !== 0) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
+    )
+  }
+
+  const MPTMutabilityFlags: Array<{ setFlag: number; clearFlag: number }> = [
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback,
+    },
+  ]
+
+  // Can not set and clear the same flag
+  if (tx.MutableFlags != null) {
+    for (const flagPair of MPTMutabilityFlags) {
+      if (
+        isFlagEnabled(tx.MutableFlags, flagPair.setFlag) &&
+        isFlagEnabled(tx.MutableFlags, flagPair.clearFlag)
+      ) {
+        throw new ValidationError(
+          'MPTokenIssuanceSet: Can not set and clear the same flag.',
+        )
+      }
+    }
+  }
+
   if (typeof tx.TransferFee === 'number') {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
@@ -192,4 +278,4 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 }
-/* eslint-enable max-lines-per-function */
+/* eslint-enable max-lines-per-function, max-statements */
