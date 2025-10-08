@@ -19,7 +19,7 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * A bit-map of boolean flags.
    */
-  Flags: 0
+  Flags: number
 
   /**
    * The transaction sequence number that created the vault.
@@ -80,4 +80,11 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
    * Arbitrary metadata about the Vault. Limited to 256 bytes.
    */
   Data?: string
+}
+
+export enum VaultFlags {
+  /**
+   * If set, indicates that the vault is private.
+   */
+  lsfVaultPrivate = 0x00010000,
 }
