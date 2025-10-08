@@ -30,10 +30,18 @@ jobs:
           fetch-depth: 0
 
       - name: Validate inputs
-        env:
-          RELEASE_BRANCH: ${{ github.ref_name }}
         run: |
           set -euo pipefail
+          RELEASE_BRANCH="$(git branch --show-current || true)"
+          if [[ -z "$RELEASE_BRANCH" ]]; then
+            RELEASE_BRANCH="${{ github.ref_name }}"
+          fi
+
+          if [[ -z "$RELEASE_BRANCH" ]]; then
+            echo "❌ Unable to determine branch name." >&2
+            exit 1
+          fi
+
           # Validate package_name
           PKG_NAME="${{ github.event.inputs.package_name }}"
           if ! [[ "$PKG_NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
@@ -43,6 +51,11 @@ jobs:
           # Guard against path traversal
           if [[ "$PKG_NAME" == *".."* || "$PKG_NAME" == *"/"* ]]; then
             echo "❌ package_name must be a single directory under packages/." >&2
+            exit 1
+          fi
+
+          if [[ ! "${RELEASE_BRANCH,,}" =~ ^release[-/] ]]; then
+            echo "❌ Release branch '$RELEASE_BRANCH' must start with 'release-' or 'release/'." >&2
             exit 1
           fi
 
@@ -131,7 +144,6 @@ jobs:
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
-      RELEASE_BRANCH: "${{ github.ref_name }}"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
