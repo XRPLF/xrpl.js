@@ -681,7 +681,7 @@
       }
     ],
     [
-      "ExtensionComputeLimit",
+      "MutableFlags",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -691,7 +691,7 @@
       }
     ],
     [
-      "ExtensionSizeLimit",
+      "ExtensionComputeLimit",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -701,7 +701,7 @@
       }
     ],
     [
-      "GasPrice",
+      "ExtensionSizeLimit",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -711,7 +711,7 @@
       }
     ],
     [
-      "ComputationAllowance",
+      "GasPrice",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -721,12 +721,22 @@
       }
     ],
     [
-      "GasUsed",
+      "ComputationAllowance",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 57,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "GasUsed",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 58,
         "type": "UInt32"
       }
     ],
@@ -3422,7 +3432,6 @@
     "VaultSet": 66,
     "VaultWithdraw": 69,
     "XChainAccountCreateCommit": 44,
-    "XChainAddAccountCreateAttestation": 46,
     "XChainAddClaimAttestation": 45,
     "XChainClaim": 43,
     "XChainCommit": 42,
