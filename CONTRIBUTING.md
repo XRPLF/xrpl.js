@@ -241,7 +241,7 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
    - [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
 
-4. (This step is performed by `generate-documentation` nodejs.yml Github Actions workflow) Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
+4. (This step is performed by `generate-documentation` nodejs.yml Github Actions workflow. This is not required to be done manually) Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 5. Run `npm run clean` to delete previously generated artifacts.
 6. Run `npm run build` to triple check the build still works
 7. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
@@ -265,7 +265,7 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
 13. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 14. Run `git push --follow-tags`, to push the tags to Github.
-Note: Pushing a tag in the format of `vA.B.C` triggers the `deploy-docs-pages` workflow in the `nodejs.yml` Github Actions workflow. This updates the documentation in js.xrpl.org to match the code changes in the checked out git branch.
+Note: Pushing a tag in the format of `xrpl@A.B.C` triggers the `generate-documentation` and `deploy-docs-pages` workflow in the `nodejs.yml` Github Actions workflow. This updates the documentation in js.xrpl.org to match the code changes in the checked out git branch.
 
 15. On GitHub, click the "Releases" link on the right-hand side of the page.
 
