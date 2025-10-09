@@ -9,9 +9,6 @@ on:
       package_name:
         description: 'Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)'
         required: true
-      release_branch:
-        description: 'Release branch the release is generated from'
-        required: true
       npmjs_dist_tag:
         description: 'npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)'
         default: 'latest'
@@ -30,12 +27,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
 
       - name: Validate inputs
         run: |
           set -euo pipefail
+          RELEASE_BRANCH="$(git branch --show-current || true)"
+          if [[ -z "$RELEASE_BRANCH" ]]; then
+            RELEASE_BRANCH="${{ github.ref_name }}"
+          fi
+
+          if [[ -z "$RELEASE_BRANCH" ]]; then
+            echo "❌ Unable to determine branch name." >&2
+            exit 1
+          fi
+
           # Validate package_name
           PKG_NAME="${{ github.event.inputs.package_name }}"
           if ! [[ "$PKG_NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
@@ -47,10 +53,9 @@ jobs:
             echo "❌ package_name must be a single directory under packages/." >&2
             exit 1
           fi
-          if git ls-remote --exit-code origin "refs/heads/${{ github.event.inputs.release_branch }}" > /dev/null; then
-            echo "✅ Found release branch: ${{ github.event.inputs.release_branch }}"
-          else
-            echo "❌ Release branch ${{ github.event.inputs.release_branch }} not found in remote. Failing workflow."
+
+          if [[ ! "${RELEASE_BRANCH,,}" =~ ^release[-/] ]]; then
+            echo "❌ Release branch '$RELEASE_BRANCH' must start with 'release-' or 'release/'." >&2
             exit 1
           fi
 
@@ -115,7 +120,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
-      git_ref: ${{ github.event.inputs.release_branch }}
+      git_ref: ${{ github.ref }}
     secrets: inherit
 
   run_tests:
@@ -127,7 +132,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
-      git_ref: ${{ github.event.inputs.release_branch }}
+      git_ref: ${{ github.ref }}
     secrets: inherit
 
   pre_release:
@@ -143,7 +148,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
 
       - name: Set up Node.js
@@ -245,7 +249,7 @@ jobs:
           REPO: ${{ github.repository }}
           PKG_NAME: ${{ env.PACKAGE_NAME }}
           PKG_VER: ${{ env.PACKAGE_VERSION }}
-          REL_BRANCH: ${{ github.event.inputs.release_branch }}
+          REL_BRANCH: ${{ github.ref_name }}
           VULN_ART_URL: ${{ steps.vuln_art.outputs.art_url }}
           LABELS: security
         run: |
@@ -298,6 +302,7 @@ jobs:
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
+      RELEASE_BRANCH: "${{ github.ref_name }}"
     outputs:
       reviewers_dev: ${{ steps.get_reviewers.outputs.reviewers_dev }}
       reviewers_sec: ${{ steps.get_reviewers.outputs.reviewers_sec }}
@@ -306,7 +311,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
       - name: Create PR from release branch to main (skips for rc/beta)
         id: ensure_pr
@@ -314,7 +318,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
-          RELEASE_BRANCH: ${{ github.event.inputs.release_branch }}
+          RELEASE_BRANCH: ${{ github.ref_name }}
           VERSION: ${{ needs.get_version.outputs.package_version }}
         run: |
           set -euo pipefail
@@ -423,7 +427,6 @@ jobs:
         run: |
           set -euo pipefail
           ARTIFACT_NAME="vulnerability-report"
-          RELEASE_BRANCH="${{ github.event.inputs.release_branch }}"
           COMMIT_SHA="$(git rev-parse --short HEAD)"
 
           echo "Fetching artifact ID for ${ARTIFACT_NAME}..."
@@ -534,7 +537,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.release_branch }}
           fetch-depth: 0
 
       - name: Download artifact
