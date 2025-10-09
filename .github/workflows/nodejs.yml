@@ -281,7 +281,7 @@ jobs:
       - name: Detect version tag
         id: check-tag
         run: |
-          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/xrpl@[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "published_version_tag=true" >> $GITHUB_OUTPUT
               echo "version tag detected in the github push event"
           fi
