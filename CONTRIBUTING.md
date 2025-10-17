@@ -241,7 +241,6 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
    - [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
 
-4. (This step is performed by `generate-documentation` nodejs.yml Github Actions workflow. This is not required to be done manually) Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 5. Run `npm run clean` to delete previously generated artifacts.
 6. Run `npm run build` to triple check the build still works
 7. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
