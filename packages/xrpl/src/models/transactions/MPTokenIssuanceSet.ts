@@ -15,6 +15,8 @@ import {
   isNumber,
   MAX_MPT_META_BYTE_LENGTH,
   isDomainID,
+  validateMPTokenMetadata,
+  MPT_META_WARNING_HEADER,
 } from './common'
 import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
 
@@ -268,14 +270,28 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     }
   }
 
-  if (
-    typeof tx.MPTokenMetadata === 'string' &&
-    (!isHex(tx.MPTokenMetadata) ||
-      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
-  ) {
-    throw new ValidationError(
-      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
-    )
+  if (tx.MPTokenMetadata != null) {
+    if (
+      typeof tx.MPTokenMetadata === 'string' &&
+      (!isHex(tx.MPTokenMetadata) ||
+        tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+    ) {
+      throw new ValidationError(
+        `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      )
+    }
+
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
+
+    if (validationMessages.length > 0) {
+      const message = [
+        MPT_META_WARNING_HEADER,
+        ...validationMessages.map((msg) => `- ${msg}`),
+      ].join('\n')
+
+      // eslint-disable-next-line no-console -- Required here.
+      console.warn(message)
+    }
   }
 }
 /* eslint-enable max-lines-per-function, max-statements */
