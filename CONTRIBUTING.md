@@ -264,7 +264,6 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
 13. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 14. Run `git push --follow-tags`, to push the tags to Github.
-Note: Pushing a tag in the format of `xrpl@A.B.C` triggers the `generate-documentation` and `deploy-docs-pages` workflow in the `nodejs.yml` Github Actions workflow. This updates the documentation in js.xrpl.org to match the code changes in the checked out git branch.
 
 15. On GitHub, click the "Releases" link on the right-hand side of the page.
 
