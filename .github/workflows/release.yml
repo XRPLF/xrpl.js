@@ -639,7 +639,7 @@ jobs:
     uses: ./.github/workflows/generate-documentation.yml
     needs: [get_version, release]
     with:
-      git_ref: ${{ github.event.inputs.release_branch }}
+      git_ref: ${{ github.ref_name }}
     permissions:
       contents: read
       id-token: write
