@@ -19,6 +19,8 @@ import {
 } from '../common'
 import { isHex, onlyHasFields } from '../utils'
 
+import { Sponsor, SponsorSignature } from './sponsorshipSet'
+
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
@@ -533,6 +535,14 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The sponsor of the transaction.
+   */
+  Sponsor?: Sponsor
+  /**
+   * The signature of the sponsor.
+   */
+  SponsorSignature?: SponsorSignature
 }
 
 /**
@@ -607,6 +617,21 @@ export function validateBaseTransaction(
   if (delegate != null && delegate === common.Account) {
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- avoid type unknown for Sponsor
+  const sponsor = common.Sponsor as Sponsor | undefined
+  if (sponsor != null && sponsor.Account === common.Account) {
+    throw new ValidationError(
+      'BaseTransaction: Account and Sponsor addresses cannot be the same',
+    )
+  }
+
+  const sponsorSignature = common.SponsorSignature
+  if (sponsor == null && sponsorSignature != null) {
+    throw new ValidationError(
+      'BaseTransaction: Sponsor is required when SponsorSignature is provided',
     )
   }
 }
