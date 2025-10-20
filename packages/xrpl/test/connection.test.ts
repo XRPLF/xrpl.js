@@ -81,11 +81,12 @@ async function createServer(): Promise<net.Server> {
 
 describe('Connection', function () {
   let clientContext: XrplTestContext
+  const CONNECTION_TIMEOUT = 1000
 
   beforeEach(async () => {
     // console.log(`before: `, expect.getState().currentTestName)
     clientContext = await setupClient({
-      clientOptions: { connectionTimeout: 500 },
+      clientOptions: { connectionTimeout: CONNECTION_TIMEOUT },
     })
   })
   afterEach(async () => {
@@ -427,7 +428,7 @@ describe('Connection', function () {
       } catch (error) {
         // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
-          "Error: connect() timed out after 500 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
+          `Error: connect() timed out after ${CONNECTION_TIMEOUT} ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         )
         expect(spy).toHaveBeenCalled()
         // @ts-expect-error -- Promise throws timeout error after test is done
