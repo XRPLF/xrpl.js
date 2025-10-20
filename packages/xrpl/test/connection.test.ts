@@ -87,8 +87,6 @@ describe('Connection', function () {
     clientContext = await setupClient({
       clientOptions: { connectionTimeout: 500 },
     })
-    jest.useRealTimers()
-    start = performance.now()
   })
   afterEach(async () => {
     // console.log(`after: `, expect.getState().currentTestName)
@@ -640,7 +638,7 @@ describe('Connection', function () {
           reject(new XrplError(`should not throw error, got ${String(error)}`))
         })
 
-        setTimeout(resolve, 5000)
+        setTimeout(resolve, 500)
       })
 
       const disconnectedPromise = new Promise<void>((resolve) => {
@@ -919,7 +917,7 @@ describe('Connection', function () {
         reject(new XrplError('Should not emit error.'))
       })
 
-      setTimeout(resolve, 5000)
+      setTimeout(resolve, 500)
     })
 
     let disconnectedCount = 0
@@ -1019,7 +1017,7 @@ describe('Connection', function () {
 
       // wait to ensure that XrplError is not thrown after test is done
       await new Promise((resolve) => {
-        setTimeout(resolve, 2000)
+        setTimeout(resolve, 1500)
       })
 
       assert.includeMembers(traceMessages, [
