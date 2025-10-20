@@ -7,8 +7,10 @@ import {
   GlobalFlags,
   GlobalFlagsInterface,
   isArray,
+  isNull,
   isRecord,
   isString,
+  isValue,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -40,18 +42,6 @@ export interface BatchFlagsInterface extends GlobalFlagsInterface {
   tfIndependent?: boolean
 }
 
-export type BatchInnerTransaction = SubmittableTransaction & {
-  Fee?: '0'
-
-  SigningPubKey?: ''
-
-  TxnSignature?: never
-
-  Signers?: never
-
-  LastLedgerSequence?: never
-}
-
 export interface BatchSigner {
   BatchSigner: {
     Account: string
@@ -73,8 +63,46 @@ export interface Batch extends BaseTransaction {
   BatchSigners?: BatchSigner[]
 
   RawTransactions: Array<{
-    RawTransaction: BatchInnerTransaction
+    RawTransaction: SubmittableTransaction
   }>
+}
+
+function validateBatchInnerTransaction(
+  tx: Record<string, unknown>,
+  index: number,
+): void {
+  if (tx.TransactionType === 'Batch') {
+    throw new ValidationError(
+      `Batch: RawTransactions[${index}] is a Batch transaction. Cannot nest Batch transactions.`,
+    )
+  }
+
+  // Check for the `tfInnerBatchTxn` flag in the inner transactions
+  if (!hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
+    throw new ValidationError(
+      `Batch: RawTransactions[${index}] must contain the \`tfInnerBatchTxn\` flag.`,
+    )
+  }
+  validateOptionalField(tx, 'Fee', isValue('0'), {
+    paramName: `RawTransactions[${index}].RawTransaction.Fee`,
+    txType: 'Batch',
+  })
+  validateOptionalField(tx, 'SigningPubKey', isValue(''), {
+    paramName: `RawTransactions[${index}].RawTransaction.SigningPubKey`,
+    txType: 'Batch',
+  })
+  validateOptionalField(tx, 'TxnSignature', isNull, {
+    paramName: `RawTransactions[${index}].RawTransaction.TxnSignature`,
+    txType: 'Batch',
+  })
+  validateOptionalField(tx, 'Signers', isNull, {
+    paramName: `RawTransactions[${index}].RawTransaction.Signers`,
+    txType: 'Batch',
+  })
+  validateOptionalField(tx, 'LastLedgerSequence', isNull, {
+    paramName: `RawTransactions[${index}].RawTransaction.LastLedgerSequence`,
+    txType: 'Batch',
+  })
 }
 
 /**
@@ -101,18 +129,7 @@ export function validateBatch(tx: Record<string, unknown>): void {
     })
 
     const rawTx = rawTxObj.RawTransaction
-    if (rawTx.TransactionType === 'Batch') {
-      throw new ValidationError(
-        `Batch: RawTransactions[${index}] is a Batch transaction. Cannot nest Batch transactions.`,
-      )
-    }
-
-    // Check for the `tfInnerBatchTxn` flag in the inner transactions
-    if (!hasFlag(rawTx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
-      throw new ValidationError(
-        `Batch: RawTransactions[${index}] must contain the \`tfInnerBatchTxn\` flag.`,
-      )
-    }
+    validateBatchInnerTransaction(rawTx, index)
 
     // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
   })
@@ -132,19 +149,19 @@ export function validateBatch(tx: Record<string, unknown>): void {
 
     const signer = signerRecord.BatchSigner
     validateRequiredField(signer, 'Account', isString, {
-      paramName: `BatchSigners[${index}].Account`,
+      paramName: `BatchSigners[${index}].BatchSigner.Account`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'SigningPubKey', isString, {
-      paramName: `BatchSigners[${index}].SigningPubKey`,
+      paramName: `BatchSigners[${index}].BatchSigner.SigningPubKey`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'TxnSignature', isString, {
-      paramName: `BatchSigners[${index}].TxnSignature`,
+      paramName: `BatchSigners[${index}].BatchSigner.TxnSignature`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'Signers', isArray, {
-      paramName: `BatchSigners[${index}].Signers`,
+      paramName: `BatchSigners[${index}].BatchSigner.Signers`,
       txType: 'Batch',
     })
   })

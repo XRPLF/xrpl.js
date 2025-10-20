@@ -1,9 +1,11 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
+import { MPTokenMetadata } from '../../src'
 import {
   VaultCreateFlags,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
+import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -29,6 +31,20 @@ describe('VaultCreate', function () {
   })
 
   it('verifies valid VaultCreate', function () {
+    assertValid(tx)
+  })
+
+  it('verifies MPT/IOU Currency as Asset', function () {
+    tx.Asset = {
+      mpt_issuance_id:
+        '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+    }
+    assertValid(tx)
+
+    tx.Asset = {
+      currency: 'USD',
+      issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+    }
     assertValid(tx)
   })
 
@@ -97,3 +113,47 @@ describe('VaultCreate', function () {
     )
   })
 })
+
+/**
+ * Test console warning is logged while validating VaultCreate for MPTokenMetadata field.
+ */
+/* eslint-disable no-console -- Require to test console warnings  */
+describe('MPTokenMetadata warnings', function () {
+  beforeEach(() => {
+    jest.spyOn(console, 'warn')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it(`logs console warning`, function () {
+    const mptMetaData: MPTokenMetadata = {
+      ticker: 'TBILL',
+      name: 'T-Bill Token',
+      icon: 'http://example.com/icon.png',
+      asset_class: 'rwa',
+      asset_subclass: 'treasury',
+      issuer_name: 'Issuer',
+    }
+    const tx = {
+      TransactionType: 'VaultCreate',
+      Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      Asset: { currency: 'XRP' },
+      WithdrawalPolicy: VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
+      MPTokenMetadata: stringToHex(JSON.stringify(mptMetaData)),
+    }
+
+    assertValid(tx)
+
+    const expectedMessage = [
+      MPT_META_WARNING_HEADER,
+      '- icon should be a valid https url.',
+    ].join('\n')
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(expectedMessage),
+    )
+  })
+})
+/* eslint-enable no-console  */

@@ -1,6 +1,7 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
-import { MPTokenIssuanceCreateFlags } from '../../src'
+import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -24,7 +25,14 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MPTokenMetadata: stringToHex('http://xrpl.org'),
+      MPTokenMetadata: stringToHex(`{
+        "ticker": "TBILL",
+        "name": "T-Bill Yield Token",
+        "icon": "https://example.org/tbill-icon.png",
+        "asset_class": "rwa",
+        "asset_subclass": "treasury",
+        "issuer_name": "Example Yield Co."
+      }`),
     } as any
 
     assertValid(validMPTokenIssuanceCreate)
@@ -40,7 +48,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+      `MPTokenIssuanceCreate: MPTokenMetadata must not be empty string`,
     )
   })
 
@@ -131,3 +139,45 @@ describe('MPTokenIssuanceCreate', function () {
     )
   })
 })
+
+/**
+ * Test console warning is logged while validating MPTokenIssuanceCreate for MPTokenMetadata field.
+ */
+/* eslint-disable no-console -- Require to test console warnings  */
+describe('MPTokenMetadata warnings', function () {
+  beforeEach(() => {
+    jest.spyOn(console, 'warn')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it(`logs console warning`, function () {
+    const mptMetaData: MPTokenMetadata = {
+      ticker: 'TBILL',
+      name: 'T-Bill Token',
+      icon: 'http://example.com/icon.png',
+      asset_class: 'rwa',
+      asset_subclass: 'treasury',
+      issuer_name: 'Issuer',
+    }
+    const tx = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenMetadata: stringToHex(JSON.stringify(mptMetaData)),
+    }
+
+    assertValid(tx)
+
+    const expectedMessage = [
+      MPT_META_WARNING_HEADER,
+      '- icon should be a valid https url.',
+    ].join('\n')
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(expectedMessage),
+    )
+  })
+})
+/* eslint-enable no-console  */

@@ -10,6 +10,7 @@ import {
   isAccount,
   GlobalFlagsInterface,
   isHexString,
+  isNumber,
 } from './common'
 
 /**
@@ -70,15 +71,13 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
-  const isTfMPTLock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : flags.tfMPTLock === true
+  const isTfMPTLock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
+    : flags.tfMPTLock === true
 
-  const isTfMPTUnlock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : flags.tfMPTUnlock === true
+  const isTfMPTUnlock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
+    : flags.tfMPTUnlock === true
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')

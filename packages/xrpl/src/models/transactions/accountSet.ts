@@ -64,6 +64,8 @@ export enum AccountSetAsfFlags {
   asfDisallowIncomingTrustline = 15,
   /** Permanently gain the ability to claw back issued IOUs */
   asfAllowTrustLineClawback = 16,
+  /** Issuers allow their IOUs to be used as escrow amounts */
+  asfAllowTrustLineLocking = 17,
 }
 
 /**

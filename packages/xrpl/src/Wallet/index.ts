@@ -252,6 +252,7 @@ export class Wallet {
       )
     }
 
+    // eslint-disable-next-line n/no-sync -- Using async would break fromMnemonic; this rule should be disabled entirely later.
     const seed = mnemonicToSeedSync(mnemonic)
     const masterNode = HDKey.fromMasterSeed(seed)
     const node = masterNode.derive(

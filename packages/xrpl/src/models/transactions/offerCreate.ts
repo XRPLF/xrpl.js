@@ -1,4 +1,6 @@
+import { ValidationError } from '../..'
 import { Amount } from '../common'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -8,6 +10,7 @@ import {
   validateRequiredField,
   validateOptionalField,
   isNumber,
+  isDomainID,
 } from './common'
 
 /**
@@ -44,6 +47,11 @@ export enum OfferCreateFlags {
    * the TakerPays amount in exchange.
    */
   tfSell = 0x00080000,
+  /**
+   * Indicates the offer is hybrid. (meaning it is part of both a domain and open order book)
+   * This flag cannot be set if the offer doesn't have a DomainID
+   */
+  tfHybrid = 0x00100000,
 }
 
 /**
@@ -85,6 +93,7 @@ export interface OfferCreateFlagsInterface extends GlobalFlagsInterface {
   tfImmediateOrCancel?: boolean
   tfFillOrKill?: boolean
   tfSell?: boolean
+  tfHybrid?: boolean
 }
 
 /**
@@ -108,6 +117,8 @@ export interface OfferCreate extends BaseTransaction {
   TakerGets: Amount
   /** The amount and type of currency being requested by the offer creator. */
   TakerPays: Amount
+  /** The domain that the offer must be a part of. */
+  DomainID?: string
 }
 
 /**
@@ -123,4 +134,18 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'OfferSequence', isNumber)
   validateRequiredField(tx, 'TakerGets', isAmount)
   validateRequiredField(tx, 'TakerPays', isAmount)
+
+  validateOptionalField(tx, 'DomainID', isDomainID, {
+    txType: 'OfferCreate',
+    paramName: 'DomainID',
+  })
+
+  if (
+    tx.DomainID == null &&
+    hasFlag(tx, OfferCreateFlags.tfHybrid, 'tfHybrid')
+  ) {
+    throw new ValidationError(
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
+  }
 }

@@ -118,7 +118,7 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
       }
 
       return txFlags[flag]
-        ? resultFlags | (flagEnum[flag] || GlobalFlags[flag])
+        ? resultFlags | (flagEnum[flag] ?? GlobalFlags[flag])
         : resultFlags
     }, 0)
   }

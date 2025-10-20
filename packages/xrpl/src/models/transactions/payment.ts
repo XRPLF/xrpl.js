@@ -8,6 +8,7 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAccount,
+  isDomainID,
   validateRequiredField,
   validateOptionalField,
   isNumber,
@@ -161,6 +162,18 @@ export interface Payment extends BaseTransaction {
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
+  /**
+   * The domain the sender intends to use. Both the sender and destination must
+   * be part of this domain. The DomainID can be included if the sender intends
+   * it to be a cross-currency payment (i.e. if the payment is going to interact
+   * with the DEX). The domain will only play it's role if there is a path that
+   * crossing an orderbook.
+   *
+   * Note: it's still possible that DomainID is included but the payment does
+   * not interact with DEX, it simply means that the DomainID will be ignored
+   * during payment paths.
+   */
+  DomainID?: string
   Flags?: number | PaymentFlagsInterface
 }
 
@@ -195,14 +208,12 @@ export function validatePayment(tx: Record<string, unknown>): void {
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
+  validateOptionalField(tx, 'DomainID', isDomainID, {
+    txType: 'PaymentTransaction',
+    paramName: 'DomainID',
+  })
 
   checkPartialPayment(tx)
-
-  if (tx.DeliverMax != null) {
-    throw new ValidationError(
-      'Payment: DeliverMax is not allowed when submitting a transaction',
-    )
-  }
 }
 
 function checkPartialPayment(tx: Record<string, unknown>): void {
@@ -218,7 +229,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
     const isTfPartialPayment =
       typeof flags === 'number'
         ? isFlagEnabled(flags, PaymentFlags.tfPartialPayment)
-        : flags.tfPartialPayment ?? false
+        : (flags.tfPartialPayment ?? false)
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
