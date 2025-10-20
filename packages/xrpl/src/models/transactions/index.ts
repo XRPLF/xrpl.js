@@ -43,7 +43,6 @@ export {
   Batch,
   BatchFlags,
   BatchFlagsInterface,
-  BatchInnerTransaction,
   BatchSigner,
 } from './batch'
 export { CheckCancel } from './checkCancel'
