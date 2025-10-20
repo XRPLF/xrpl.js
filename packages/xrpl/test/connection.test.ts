@@ -84,7 +84,11 @@ describe('Connection', function () {
 
   beforeEach(async () => {
     // console.log(`before: `, expect.getState().currentTestName)
-    clientContext = await setupClient()
+    clientContext = await setupClient({
+      clientOptions: { connectionTimeout: 500 },
+    })
+    jest.useRealTimers()
+    start = performance.now()
   })
   afterEach(async () => {
     // console.log(`after: `, expect.getState().currentTestName)
@@ -425,7 +429,7 @@ describe('Connection', function () {
       } catch (error) {
         // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
-          "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
+          "Error: connect() timed out after 500 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
         )
         expect(spy).toHaveBeenCalled()
         // @ts-expect-error -- Promise throws timeout error after test is done
