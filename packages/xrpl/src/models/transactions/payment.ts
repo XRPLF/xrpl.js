@@ -43,6 +43,10 @@ export enum PaymentFlags {
    * details.
    */
   tfLimitQuality = 0x00040000,
+  /**
+   * The destination account will created as a sponsored Account.
+   */
+  tfSponsorCreatedAccount = 0x00080000,
 }
 
 /**

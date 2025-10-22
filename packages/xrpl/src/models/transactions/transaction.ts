@@ -91,6 +91,11 @@ import {
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
+import { SponsorshipSet, validateSponsorshipSet } from './sponsorshipSet'
+import {
+  SponsorshipTransfer,
+  validateSponsorshipTransfer,
+} from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
@@ -179,6 +184,8 @@ export type SubmittableTransaction =
   | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
+  | SponsorshipSet
+  | SponsorshipTransfer
   | TicketCreate
   | TrustSet
   | VaultClawback
@@ -445,6 +452,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'SignerListSet':
       validateSignerListSet(tx)
+      break
+
+    case 'SponsorshipSet':
+      validateSponsorshipSet(tx)
+      break
+
+    case 'SponsorshipTransfer':
+      validateSponsorshipTransfer(tx)
       break
 
     case 'TicketCreate':

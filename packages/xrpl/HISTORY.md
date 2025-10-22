@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `Sponsor` (XLS-68d)
+
 ### Fixed
 * Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
 
