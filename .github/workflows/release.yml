@@ -633,3 +633,15 @@ jobs:
                   --arg channel "#xrpl-js" \
                   --arg text "$MESSAGE" \
                   '{channel: $channel, text: $text}')"
+
+  generate-documentation:
+    name: Generate and Publish documentation for ${{ needs.get_version.outputs.package_version }}
+    if: ${{ github.event.inputs.npmjs_dist_tag == 'latest' }}
+    uses: ./.github/workflows/generate-documentation.yml
+    needs: [get_version, release]
+    with:
+      git_ref: ${{ github.ref_name }}
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
