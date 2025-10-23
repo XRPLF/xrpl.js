@@ -203,7 +203,9 @@ jobs:
         run: |
           curl -X POST \
             -H "X-Api-Key: ${{ secrets.OWASP_TOKEN }}" \
-            -F "project=7c40c8ea-ea0f-4a5f-9b9f-368e53232397" \
+            -F "autoCreate=true" \
+            -F "projectName=xrpl-js" \
+            -F "projectVersion=${{ env.PACKAGE_VERSION }}" \
             -F "bom=@sbom.json" \
             https://owasp-dt-api.prod.ripplex.io/api/v1/bom
 
@@ -496,8 +498,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN:     ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:         "#xrpl-js"
-
+          CHANNEL:         "#ripplex-security"
           EXECUTOR:        ${{ github.triggering_actor || github.actor }}
           PACKAGE_NAME:    ${{ needs.get_version.outputs.package_version && github.event.inputs.package_name }}
           PACKAGE_VERSION: ${{ needs.get_version.outputs.package_version }}
@@ -520,7 +521,7 @@ jobs:
       id-token: write
       contents: write
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review, ask_for_sec_team_review]
-    name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
+    name: Release for ${{ needs.get_version.outputs.package_version }}
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
