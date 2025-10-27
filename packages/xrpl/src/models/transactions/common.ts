@@ -999,17 +999,50 @@ export function isDomainID(domainID: unknown): domainID is string {
   )
 }
 
+/**
+ * Shortens long field names to their compact form equivalents.
+ * Reverse operation of expandKeys.
+ *
+ * @param input - Object with potentially long field names.
+ * @param mappings - Array of field mappings with long and compact names.
+ * @returns Object with shortened compact field names.
+ */
 function shortenKeys(
   input: Record<string, unknown>,
   mappings: Array<{ long: string; compact: string }>,
 ): Record<string, unknown> {
-  const output: Record<string, unknown> = input
+  const output: Record<string, unknown> = { ...input }
 
   for (const { long, compact } of mappings) {
     if (input[long] !== undefined && input[compact] === undefined) {
       output[compact] = input[long]
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Required and valid here
       delete output[long]
+    }
+  }
+
+  return output
+}
+
+/**
+ * Expands compact field names to their long form equivalents.
+ * Reverse operation of shortenKeys.
+ *
+ * @param input - Object with potentially compact field names.
+ * @param mappings - Array of field mappings with long and compact names.
+ * @returns Object with expanded long field names.
+ */
+function expandKeys(
+  input: Record<string, unknown>,
+  mappings: Array<{ long: string; compact: string }>,
+): Record<string, unknown> {
+  const output: Record<string, unknown> = { ...input }
+
+  for (const { long, compact } of mappings) {
+    if (input[compact] !== undefined && input[long] === undefined) {
+      output[long] = input[compact]
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Required and valid here
+      delete output[compact]
     }
   }
 
@@ -1036,14 +1069,77 @@ export function encodeMPTokenMetadata(
   input = shortenKeys(input, MPT_META_ALL_FIELDS)
 
   if (Array.isArray(input.uris)) {
-    input.uris = input.uris.map((uri) => shortenKeys(uri, MPT_META_URI_FIELDS))
+    input.uris = input.uris.map((uri: unknown): unknown => {
+      if (isRecord(uri)) {
+        return shortenKeys(uri, MPT_META_URI_FIELDS)
+      }
+      return uri
+    })
   }
 
   if (Array.isArray(input.us)) {
-    input.us = input.us.map((uri) => shortenKeys(uri, MPT_META_URI_FIELDS))
+    input.us = input.us.map((uri: unknown): unknown => {
+      if (isRecord(uri)) {
+        return shortenKeys(uri, MPT_META_URI_FIELDS)
+      }
+      return uri
+    })
   }
 
-  return stringToHex(JSON.stringify(input))
+  return stringToHex(JSON.stringify(input)).toUpperCase()
+}
+
+/**
+ * Decodes hex encoded MPTokenMetadata to a JSON object with long field names.
+ * Converts compact field names back to their long form equivalents.
+ *
+ * @param input - Hex encoded MPTokenMetadata.
+ * @returns Decoded MPTokenMetadata object with long field names.
+ * @throws Error if input is not valid hex or cannot be parsed as JSON.
+ */
+export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
+  if (!isHex(input)) {
+    throw new Error('MPTokenMetadata must be in hex format.')
+  }
+
+  let jsonMetaData: unknown
+  try {
+    jsonMetaData = JSON.parse(hexToString(input))
+  } catch (err) {
+    throw new Error(
+      `MPTokenMetadata is not properly formatted as JSON - ${String(err)}`,
+    )
+  }
+
+  if (!isRecord(jsonMetaData)) {
+    throw new Error('MPTokenMetadata must be a JSON object.')
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here to expand keys
+  let output = jsonMetaData as unknown as Record<string, unknown>
+
+  output = expandKeys(output, MPT_META_ALL_FIELDS)
+
+  if (Array.isArray(output.uris)) {
+    output.uris = output.uris.map((uri: unknown): unknown => {
+      if (isRecord(uri)) {
+        return expandKeys(uri, MPT_META_URI_FIELDS)
+      }
+      return uri
+    })
+  }
+
+  if (Array.isArray(output.us)) {
+    output.us = output.us.map((uri: unknown): unknown => {
+      if (isRecord(uri)) {
+        return expandKeys(uri, MPT_META_URI_FIELDS)
+      }
+      return uri
+    })
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here as output is now properly formatted
+  return output as unknown as MPTokenMetadata
 }
 
 /**

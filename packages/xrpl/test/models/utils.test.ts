@@ -14,10 +14,12 @@ import {
   TrustSet,
   TrustSetFlags,
 } from '../../src'
-import { AuthorizeCredential } from '../../src/models/common'
+import { AuthorizeCredential, MPTokenMetadata } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
 import {
   containsDuplicates,
+  decodeMPTokenMetadata,
+  encodeMPTokenMetadata,
   GlobalFlags,
   validateMPTokenMetadata,
 } from '../../src/models/transactions/common'
@@ -28,7 +30,8 @@ import {
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
-import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
+import mptMetadataEncodeDecodeTests from '../fixtures/transactions/mptokenMetadataEncodeDecodeData.json'
+import mptMetadataValidationTests from '../fixtures/transactions/mptokenMetadataValidationData.json'
 
 /**
  * Utils Testing.
@@ -575,7 +578,7 @@ describe('Models Utils', function () {
   })
 
   describe('MPTokenMetadata validation messages', function () {
-    for (const testCase of mptMetadataTests) {
+    for (const testCase of mptMetadataValidationTests) {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
         const validationMessages = validateMPTokenMetadata(
@@ -587,6 +590,21 @@ describe('Models Utils', function () {
         )
 
         assert.deepStrictEqual(validationMessages, testCase.validationMessages)
+      })
+    }
+  })
+
+  describe('MPTokenMetadata encode/decode', function () {
+    for (const testCase of mptMetadataEncodeDecodeTests) {
+      const testName: string = testCase.testName
+      it(`encode/decode: ${testName}`, function () {
+        const encodedHex = encodeMPTokenMetadata(
+          testCase.mptMetadata as MPTokenMetadata,
+        )
+        // assert.equal(encodedHex, testCase.hex)
+
+        const decoded = decodeMPTokenMetadata(encodedHex)
+        assert.deepStrictEqual(decoded, testCase.expectedLongForm)
       })
     }
   })
