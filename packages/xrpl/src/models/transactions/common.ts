@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access -- Required here */
 /* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX, hexToString, stringToHex } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
@@ -191,6 +190,10 @@ const MPT_META_ALL_FIELDS = [
         ]
       }
 
+      if (value === undefined) {
+        return []
+      }
+
       const MPT_META_ASSET_SUB_CLASSES = [
         'stablecoin',
         'commodity',
@@ -281,7 +284,7 @@ const MPT_META_ALL_FIELDS = [
 ]
 
 export const MPT_META_WARNING_HEADER =
-  'MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. ' +
+  'MPTokenMetadata is not properly formatted as JSON as per the XLS-89 standard. ' +
   "While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable " +
   'by Explorers and Indexers in the XRPL ecosystem.'
 
@@ -1014,7 +1017,7 @@ function shortenKeys(
 }
 
 /**
- * Encodes MPTokenMetadata as per XLS-89d standard.
+ * Encodes MPTokenMetadata as per XLS-89 standard.
  *
  * @param mptokenMetadata - MPTokenMetadata to encode.
  * @returns Hex encoded MPTokenMetadata.
@@ -1023,15 +1026,10 @@ function shortenKeys(
 export function encodeMPTokenMetadata(
   mptokenMetadata: MPTokenMetadata,
 ): string {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here to access compact keys in TS
   let input = mptokenMetadata as unknown as Record<string, unknown>
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Required here
-  if (input == null) {
-    throw new Error('MPTokenMetadata is required')
-  }
-
-  if (typeof input !== 'object' || Array.isArray(input)) {
+  if (!isRecord(input)) {
     throw new Error('MPTokenMetadata must be JSON object')
   }
 
@@ -1045,8 +1043,7 @@ export function encodeMPTokenMetadata(
     input.us = input.us.map((uri) => shortenKeys(uri, MPT_META_URI_FIELDS))
   }
 
-  const str = JSON.stringify(input)
-  return stringToHex(str)
+  return stringToHex(JSON.stringify(input))
 }
 
 /**
@@ -1086,9 +1083,17 @@ export function validateMPTokenMetadata(input: string): string[] {
   // Validate JSON structure
   if (!isRecord(jsonMetaData)) {
     validationMessages.push(
-      'MPTokenMetadata is not properly formatted JSON object as per XLS-89d.',
+      'MPTokenMetadata is not properly formatted JSON object as per XLS-89.',
     )
     return validationMessages
+  }
+
+  if (Object.keys(jsonMetaData).length > MPT_META_ALL_FIELDS.length) {
+    validationMessages.push(
+      `MPTokenMetadata must not contain more than ${MPT_META_ALL_FIELDS.length} top-level fields (found ${
+        Object.keys(jsonMetaData).length
+      }).`,
+    )
   }
 
   const obj = jsonMetaData

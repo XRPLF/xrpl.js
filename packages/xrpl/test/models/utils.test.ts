@@ -586,7 +586,7 @@ describe('Models Utils', function () {
           ),
         )
 
-        assert.deepStrictEqual(testCase.validationMessages, validationMessages)
+        assert.deepStrictEqual(validationMessages, testCase.validationMessages)
       })
     }
   })

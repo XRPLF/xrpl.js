@@ -9,15 +9,15 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "https://exampleyield.co/tbill",
-          "type": "website",
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
           "title": "Product Page"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         }
       ],
@@ -40,15 +40,15 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "https://exampleyield.co/tbill",
-          "type": "website",
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
           "title": "Product Page"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         }
       ],
@@ -61,7 +61,7 @@
       }
     },
     "validationMessages": [
-      "ticker is required and must be string."
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
     ]
   },
   {
@@ -75,21 +75,21 @@
       "issuer_name": "Issuer"
     },
     "validationMessages": [
-      "ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
     ]
   },
   {
-    "testName": "icon not https",
+    "testName": "icon not present",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Token",
-      "icon": "http://example.com/icon.png",
+      "icon": null,
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Issuer"
     },
     "validationMessages": [
-      "icon should be a valid https url."
+      "icon/i: should be a non-empty string."
     ]
   },
   {
@@ -103,7 +103,7 @@
       "issuer_name": "Issuer"
     },
     "validationMessages": [
-      "asset_class should be one of rwa, memes, wrapped, gaming, defi, other."
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other."
     ]
   },
   {
@@ -117,7 +117,7 @@
       "issuer_name": "Issuer"
     },
     "validationMessages": [
-      "asset_subclass should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
     ]
   },
   {
@@ -130,7 +130,7 @@
       "issuer_name": "Issuer"
     },
     "validationMessages": [
-      "asset_subclass is required when asset_class is rwa."
+      "asset_subclass/as: required when asset_class is rwa."
     ]
   },
   {
@@ -142,16 +142,10 @@
       "asset_class": "defi",
       "issuer_name": "Issuer",
       "asset_subclass": "stablecoin",
-      "urls": [
-        {
-          "url": "http://notsecure.com",
-          "type": "website",
-          "title": "Homepage"
-        }
-      ]
+      "uris": []
     },
     "validationMessages": [
-      "url should be a valid https url."
+      "uris/us: should be a non-empty array."
     ]
   },
   {
@@ -168,7 +162,7 @@
       ]
     },
     "validationMessages": [
-      "additional_info must be a string or JSON object."
+      "additional_info/ai: should be a string or JSON object."
     ]
   },
   {
@@ -182,7 +176,7 @@
       "additional_info": 123
     },
     "validationMessages": [
-      "additional_info must be a string or JSON object."
+      "additional_info/ai: should be a string or JSON object."
     ]
   },
   {
@@ -195,9 +189,9 @@
       "asset_class": "rwamemes",
       "asset_subclass": "treasurymemes",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "http://notsecure.com",
+          "uri": "http://notsecure.com",
           "type": "website",
           "title": "Homepage"
         }
@@ -211,29 +205,27 @@
       }
     },
     "validationMessages": [
-      "ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
-      "icon should be a valid https url.",
-      "asset_class should be one of rwa, memes, wrapped, gaming, defi, other.",
-      "asset_subclass should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other.",
-      "url should be a valid https url."
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
     ]
   },
   {
     "testName": "null mptMetadata",
     "mptMetadata": null,
     "validationMessages": [
-      "MPTokenMetadata is not properly formatted as per XLS-89d."
+      "MPTokenMetadata is not properly formatted JSON object as per XLS-89."
     ]
   },
   {
     "testName": "empty mptMetadata",
     "mptMetadata": {},
     "validationMessages": [
-      "ticker is required and must be string.",
-      "name is required and must be string.",
-      "icon is required and must be string.",
-      "asset_class is required and must be string.",
-      "issuer_name is required and must be string."
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "name/n: should be a non-empty string.",
+      "icon/i: should be a non-empty string.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "issuer_name/in: should be a non-empty string."
     ]
   },
   {
@@ -284,10 +276,10 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "https://notsecure.com",
-          "type": "website",
+          "uri": "https://notsecure.com",
+          "category": "website",
           "title": "Homepage",
           "footer": "footer"
         }
@@ -314,7 +306,7 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": "urls",
+      "uris": "uris",
       "additional_info": {
         "interest_rate": "5.00%",
         "interest_type": "variable",
@@ -324,7 +316,7 @@
       }
     },
     "validationMessages": [
-      "urls must be an array as per XLS-89d."
+      "uris/us: should be a non-empty array."
     ]
   },
   {
@@ -337,7 +329,7 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         1,
         2
       ],
