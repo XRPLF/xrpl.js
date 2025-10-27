@@ -166,5 +166,59 @@
       "additional_info": "Gaming ecosystem token"
     },
     "hex": "7B2274223A2243525950544F222C226E223A2243727970746F20546F6B656E222C2269223A2268747470733A2F2F6578616D706C652E6F72672F63727970746F2D69636F6E2E706E67222C226163223A2267616D696E67222C2264223A22412067616D696E6720746F6B656E20666F72207669727475616C20776F726C64732E222C22696E223A2247616D696E672053747564696F7320496E632E222C226173223A22657175697479222C227573223A5B7B2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D222C2263223A2277656273697465222C2274223A224D61696E2057656273697465227D2C7B2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D222C2263223A2277656273697465222C2274223A224D61696E2057656273697465227D5D2C226169223A2247616D696E672065636F73797374656D20746F6B656E227D"
+  },
+  {
+    "testName": "with extra fields",
+    "mptMetadata": {
+      "ticker": "CRYPTO",
+      "n": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "d": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "as": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "c": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "t": "Main Website"
+        }
+      ],
+      "ai": "Gaming ecosystem token",
+      "extra": {
+        "extra": "extra"
+      }
+    },
+    "expectedLongForm": {
+      "ticker": "CRYPTO",
+      "name": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "desc": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "asset_subclass": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ],
+      "additional_info": "Gaming ecosystem token",
+      "extra": {
+        "extra": "extra"
+      }
+    },
+    "hex": "7B2274223A2243525950544F222C226E223A2243727970746F20546F6B656E222C2269223A2268747470733A2F2F6578616D706C652E6F72672F63727970746F2D69636F6E2E706E67222C226163223A2267616D696E67222C2264223A22412067616D696E6720746F6B656E20666F72207669727475616C20776F726C64732E222C22696E223A2247616D696E672053747564696F7320496E632E222C226173223A22657175697479222C227573223A5B7B2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D222C2263223A2277656273697465222C2274223A224D61696E2057656273697465227D2C7B2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D222C2263223A2277656273697465222C2274223A224D61696E2057656273697465227D5D2C226169223A2247616D696E672065636F73797374656D20746F6B656E222C226578747261223A7B226578747261223A226578747261227D7D"
   }
 ]

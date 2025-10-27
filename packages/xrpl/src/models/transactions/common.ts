@@ -1,4 +1,5 @@
 /* eslint-disable max-lines -- common utility file */
+/* eslint-disable no-continue -- makes logic easier to write and read in this case */
 import { HEX_REGEX, hexToString, stringToHex } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
@@ -241,7 +242,6 @@ const MPT_META_ALL_FIELDS = [
           messages.push(
             `${this.long}/${this.compact}: should be an array of objects each with uri/u, category/c, and title/t properties.`,
           )
-          // eslint-disable-next-line no-continue -- Required here
           continue
         }
 
@@ -1011,39 +1011,28 @@ function shortenKeys(
   input: Record<string, unknown>,
   mappings: Array<{ long: string; compact: string }>,
 ): Record<string, unknown> {
-  const output: Record<string, unknown> = { ...input }
+  const output: Record<string, unknown> = {}
 
-  for (const { long, compact } of mappings) {
-    if (input[long] !== undefined && input[compact] === undefined) {
-      output[compact] = input[long]
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Required and valid here
-      delete output[long]
+  for (const [key, value] of Object.entries(input)) {
+    const mapping = mappings.find(
+      ({ long, compact }) => long === key || compact === key,
+    )
+    // Extra key
+    if (mapping === undefined) {
+      output[key] = value
+      continue
     }
-  }
 
-  return output
-}
-
-/**
- * Expands compact field names to their long form equivalents.
- * Reverse operation of shortenKeys.
- *
- * @param input - Object with potentially compact field names.
- * @param mappings - Array of field mappings with long and compact names.
- * @returns Object with expanded long field names.
- */
-function expandKeys(
-  input: Record<string, unknown>,
-  mappings: Array<{ long: string; compact: string }>,
-): Record<string, unknown> {
-  const output: Record<string, unknown> = { ...input }
-
-  for (const { long, compact } of mappings) {
-    if (input[compact] !== undefined && input[long] === undefined) {
-      output[long] = input[compact]
-      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Required and valid here
-      delete output[compact]
+    // Both long and compact forms are present
+    if (
+      input[mapping.long] !== undefined &&
+      input[mapping.compact] !== undefined
+    ) {
+      output[key] = value
+      continue
     }
+
+    output[mapping.compact] = value
   }
 
   return output
@@ -1087,6 +1076,45 @@ export function encodeMPTokenMetadata(
   }
 
   return stringToHex(JSON.stringify(input)).toUpperCase()
+}
+
+/**
+ * Expands compact field names to their long form equivalents.
+ * Reverse operation of shortenKeys.
+ *
+ * @param input - Object with potentially compact field names.
+ * @param mappings - Array of field mappings with long and compact names.
+ * @returns Object with expanded long field names.
+ */
+function expandKeys(
+  input: Record<string, unknown>,
+  mappings: Array<{ long: string; compact: string }>,
+): Record<string, unknown> {
+  const output: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(input)) {
+    const mapping = mappings.find(
+      ({ long, compact }) => long === key || compact === key,
+    )
+    // Extra key
+    if (mapping === undefined) {
+      output[key] = value
+      continue
+    }
+
+    // Both long and compact forms are present
+    if (
+      input[mapping.long] !== undefined &&
+      input[mapping.compact] !== undefined
+    ) {
+      output[key] = value
+      continue
+    }
+
+    output[mapping.long] = value
+  }
+
+  return output
 }
 
 /**

@@ -601,7 +601,7 @@ describe('Models Utils', function () {
         const encodedHex = encodeMPTokenMetadata(
           testCase.mptMetadata as MPTokenMetadata,
         )
-        // assert.equal(encodedHex, testCase.hex)
+        assert.equal(encodedHex, testCase.hex)
 
         const decoded = decodeMPTokenMetadata(encodedHex)
         assert.deepStrictEqual(decoded, testCase.expectedLongForm)
