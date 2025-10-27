@@ -158,10 +158,10 @@ const MPT_META_ALL_FIELDS = [
         ]
       }
 
-      const value = obj[this.long] ?? obj[this.compact]
-      if (value === undefined) {
+      if (obj[this.long] === undefined && obj[this.compact] === undefined) {
         return []
       }
+      const value = obj[this.long] ?? obj[this.compact]
       if (!isString(value) || value.length === 0) {
         return [`${this.long}/${this.compact}: should be a non-empty string.`]
       }
@@ -190,7 +190,7 @@ const MPT_META_ALL_FIELDS = [
         ]
       }
 
-      if (value === undefined) {
+      if (obj[this.long] === undefined && obj[this.compact] === undefined) {
         return []
       }
 
@@ -224,10 +224,10 @@ const MPT_META_ALL_FIELDS = [
         ]
       }
 
-      const value = obj[this.long] ?? obj[this.compact]
-      if (value === undefined) {
+      if (obj[this.long] === undefined && obj[this.compact] === undefined) {
         return []
       }
+      const value = obj[this.long] ?? obj[this.compact]
       if (!Array.isArray(value) || value.length === 0) {
         return [`${this.long}/${this.compact}: should be a non-empty array.`]
       }
@@ -254,7 +254,7 @@ const MPT_META_ALL_FIELDS = [
           )
         }
       }
-      return []
+      return messages
     },
   },
   {
@@ -268,10 +268,10 @@ const MPT_META_ALL_FIELDS = [
         ]
       }
 
-      const value = obj[this.long] ?? obj[this.compact]
-      if (value === undefined) {
+      if (obj[this.long] === undefined && obj[this.compact] === undefined) {
         return []
       }
+      const value = obj[this.long] ?? obj[this.compact]
       if (!isString(value) && !isRecord(value)) {
         return [
           `${this.long}/${this.compact}: should be a string or JSON object.`,
@@ -1006,7 +1006,7 @@ function shortenKeys(
   const output: Record<string, unknown> = input
 
   for (const { long, compact } of mappings) {
-    if (input[long] != null && input[compact] == null) {
+    if (input[long] !== undefined && input[compact] === undefined) {
       output[compact] = input[long]
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Required and valid here
       delete output[long]

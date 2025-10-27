@@ -32,6 +32,79 @@
     "validationMessages": []
   },
   {
+    "testName": "valid MPTokenMetadata with all short field names",
+    "mptMetadata": {
+      "t": "TBILL",
+      "n": "T-Bill Yield Token",
+      "d": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "i": "https://example.org/tbill-icon.png",
+      "ac": "rwa",
+      "as": "treasury",
+      "in": "Example Yield Co.",
+      "us": [
+        {
+          "u": "https://exampleyield.co/tbill",
+          "c": "website",
+          "t": "Product Page"
+        },
+        {
+          "u": "https://exampleyield.co/docs",
+          "c": "docs",
+          "t": "Yield Token Docs"
+        }
+      ],
+      "ai": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": []
+  },
+  {
+    "testName": "valid MPTokenMetadata with mixed short and long field names",
+    "mptMetadata": {
+      "ticker": "CRYPTO",
+      "n": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "d": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "as": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "c": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "t": "Main Website"
+        }
+      ],
+      "ai": "Gaming ecosystem token"
+    },
+    "validationMessages": []
+  },
+  {
+    "testName": "conflicting short and long fields - ticker and t",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "t": "BILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "ticker/t: both long and compact forms present. expected only one."
+    ]
+  },
+  {
     "testName": "missing ticker",
     "mptMetadata": {
       "name": "T-Bill Yield Token",
@@ -134,7 +207,7 @@
     ]
   },
   {
-    "testName": "urls not https",
+    "testName": "uris empty",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Token",
@@ -207,7 +280,8 @@
     "validationMessages": [
       "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
       "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
-      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
     ]
   },
   {
@@ -247,10 +321,10 @@
       "issuer_name": "Example Yield Co.",
       "issuer_address": "123 Example Yield Co.",
       "issuer_account": "321 Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "http://notsecure.com",
-          "type": "website",
+          "uri": "http://notsecure.com",
+          "category": "website",
           "title": "Homepage"
         }
       ],
@@ -267,7 +341,7 @@
     ]
   },
   {
-    "testName": "more than 3 url fields",
+    "testName": "more than 3 uri fields",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Yield Token",
@@ -293,11 +367,11 @@
       }
     },
     "validationMessages": [
-      "One or more urls are not structured per XLS-89d."
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
     ]
   },
   {
-    "testName": "invalid url structure",
+    "testName": "invalid uris structure",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Yield Token",
@@ -320,7 +394,7 @@
     ]
   },
   {
-    "testName": "invalid url inner structure",
+    "testName": "invalid uri inner structure",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Yield Token",
@@ -342,7 +416,8 @@
       }
     },
     "validationMessages": [
-      "One or more urls are not structured per XLS-89d."
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
     ]
   },
   {
@@ -355,65 +430,65 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "urls": [
+      "uris": [
         {
-          "url": "https://exampleyield.co/tbill",
-          "type": "website",
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
           "title": "Product Page"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         },
         {
-          "url": "https://exampleyield.co/docs",
-          "type": "docs",
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
           "title": "Yield Token Docs"
         }
       ],
@@ -427,6 +502,31 @@
     },
     "validationMessages": [
       "MPTokenMetadata must be max 1024 bytes."
+    ]
+  },
+  {
+    "testName": "null values",
+    "mptMetadata": {
+      "ticker": null,
+      "name": null,
+      "desc": null,
+      "icon": null,
+      "asset_class": null,
+      "asset_subclass": null,
+      "issuer_name": null,
+      "uris": null,
+      "additional_info": null
+    },
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "name/n: should be a non-empty string.",
+      "icon/i: should be a non-empty string.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "issuer_name/in: should be a non-empty string.",
+      "desc/d: should be a non-empty string.",
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other.",
+      "uris/us: should be a non-empty array.",
+      "additional_info/ai: should be a string or JSON object."
     ]
   }
 ]
