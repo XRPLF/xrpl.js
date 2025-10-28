@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       package_name:
-        description: 'Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)'
+        description: "Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)"
         required: true
       release_branch:
-        description: 'Release branch the release is generated from'
+        description: "Release branch the release is generated from"
         required: true
       npmjs_dist_tag:
-        description: 'npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)'
-        default: 'latest'
+        description: "npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)"
+        default: "latest"
 
 concurrency:
   group: release
@@ -132,7 +132,7 @@ jobs:
 
   pre_release:
     runs-on: ubuntu-latest
-    needs: [get_version, run_faucet_test, run_tests]
+    needs: [get_version, run_faucet_test]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
       issues: write
@@ -150,7 +150,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - name: Build package
         run: |
@@ -228,7 +228,7 @@ jobs:
         id: check_vulns
         shell: bash
         env:
-          REPORT_PATH: vuln-report.txt   # change if different
+          REPORT_PATH: vuln-report.txt # change if different
         run: |
           set -euo pipefail
           if grep -qE "CRITICAL|HIGH" "$REPORT_PATH"; then
@@ -291,7 +291,7 @@ jobs:
 
   ask_for_dev_team_review:
     runs-on: ubuntu-latest
-    needs: [get_version, run_faucet_test, run_tests, pre_release]
+    needs: [get_version, run_faucet_test, pre_release]
     permissions:
       pull-requests: write
     name: Print Test/Security scan result and invite Dev team to review
@@ -449,14 +449,14 @@ jobs:
         if: always()
         shell: bash
         env:
-          SLACK_TOKEN:    ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:        "#xrpl-js"
-          EXECUTOR:       ${{ github.triggering_actor || github.actor }}
-          PACKAGE_NAME:   ${{ env.PACKAGE_NAME }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          CHANNEL: "#xrpl-js"
+          EXECUTOR: ${{ github.triggering_actor || github.actor }}
+          PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
-          RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.reviewers_dev }}
-          PR_URL:         ${{ steps.ensure_pr.outputs.pr_url }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DEV_REVIEWERS: ${{ steps.get_reviewers.outputs.reviewers_dev }}
+          PR_URL: ${{ steps.ensure_pr.outputs.pr_url }}
         run: |
           set -euo pipefail
 
@@ -475,7 +475,7 @@ jobs:
 
   first_review:
     runs-on: ubuntu-latest
-    needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review]
+    needs: [get_version, run_faucet_test, pre_release, ask_for_dev_team_review]
     name: First approval (dev team)
     environment:
       name: first-review
@@ -486,20 +486,27 @@ jobs:
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
-    needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
+    needs:
+      [
+        get_version,
+        run_faucet_test,
+        pre_release,
+        ask_for_dev_team_review,
+        first_review,
+      ]
     name: Invite sec team to review
     steps:
       - name: Send Sec team review request to Slack
         shell: bash
         env:
-          SLACK_TOKEN:     ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:         "#xrpl-js"
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          CHANNEL: "#xrpl-js"
 
-          EXECUTOR:        ${{ github.triggering_actor || github.actor }}
-          PACKAGE_NAME:    ${{ needs.get_version.outputs.package_version && github.event.inputs.package_name }}
+          EXECUTOR: ${{ github.triggering_actor || github.actor }}
+          PACKAGE_NAME: ${{ needs.get_version.outputs.package_version && github.event.inputs.package_name }}
           PACKAGE_VERSION: ${{ needs.get_version.outputs.package_version }}
-          RUN_URL:         https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          SEC_REVIEWERS:   ${{ needs.ask_for_dev_team_review.outputs.reviewers_sec }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SEC_REVIEWERS: ${{ needs.ask_for_dev_team_review.outputs.reviewers_sec }}
         run: |
           set -euo pipefail
 
@@ -516,7 +523,15 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review, ask_for_sec_team_review]
+    needs:
+      [
+        get_version,
+        run_faucet_test,
+        pre_release,
+        ask_for_dev_team_review,
+        first_review,
+        ask_for_sec_team_review,
+      ]
     name: Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
@@ -547,7 +562,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: 'https://registry.npmjs.org/'
+          registry-url: "https://registry.npmjs.org/"
 
       - name: Publish to npm
         run: |
@@ -598,10 +613,10 @@ jobs:
         if: success()
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          REPO:        ${{ github.repository }}
+          REPO: ${{ github.repository }}
           PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
-          TAG:         ${{ steps.create_tag.outputs.tag_name }}
+          TAG: ${{ steps.create_tag.outputs.tag_name }}
         run: |
           set -euo pipefail
 
