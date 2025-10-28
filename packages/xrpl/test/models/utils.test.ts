@@ -603,9 +603,34 @@ describe('Models Utils', function () {
         )
         assert.equal(encodedHex, testCase.hex)
 
-        const decoded = decodeMPTokenMetadata(encodedHex)
+        const decoded = decodeMPTokenMetadata(encodedHex) as unknown as Record<
+          string,
+          unknown
+        >
         assert.deepStrictEqual(decoded, testCase.expectedLongForm)
       })
     }
+
+    it('throws error for invalid JSON', function () {
+      assert.throws(
+        () =>
+          encodeMPTokenMetadata('invalid json' as unknown as MPTokenMetadata),
+        `MPTokenMetadata must be JSON object.`,
+      )
+    })
+
+    it('throws error for invalid hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('invalid'),
+        `MPTokenMetadata must be in hex format.`,
+      )
+    })
+
+    it('throws error for invalid JSON underneath hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('464F4F'),
+        `MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'F', "FOO" is not valid JSON`,
+      )
+    })
   })
 })

@@ -1053,27 +1053,31 @@ export function encodeMPTokenMetadata(
   let input = mptokenMetadata as unknown as Record<string, unknown>
 
   if (!isRecord(input)) {
-    throw new Error('MPTokenMetadata must be JSON object')
+    throw new Error('MPTokenMetadata must be JSON object.')
   }
 
   input = shortenKeys(input, MPT_META_ALL_FIELDS)
 
   if (Array.isArray(input.uris)) {
-    input.uris = input.uris.map((uri: unknown): unknown => {
-      if (isRecord(uri)) {
-        return shortenKeys(uri, MPT_META_URI_FIELDS)
-      }
-      return uri
-    })
+    input.uris = input.uris.map(
+      (uri: Record<string, unknown>): Record<string, unknown> => {
+        if (isRecord(uri)) {
+          return shortenKeys(uri, MPT_META_URI_FIELDS)
+        }
+        return uri
+      },
+    )
   }
 
   if (Array.isArray(input.us)) {
-    input.us = input.us.map((uri: unknown): unknown => {
-      if (isRecord(uri)) {
-        return shortenKeys(uri, MPT_META_URI_FIELDS)
-      }
-      return uri
-    })
+    input.us = input.us.map(
+      (uri: Record<string, unknown>): Record<string, unknown> => {
+        if (isRecord(uri)) {
+          return shortenKeys(uri, MPT_META_URI_FIELDS)
+        }
+        return uri
+      },
+    )
   }
 
   return stringToHex(JSON.stringify(input)).toUpperCase()
@@ -1150,21 +1154,25 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
   output = expandKeys(output, MPT_META_ALL_FIELDS)
 
   if (Array.isArray(output.uris)) {
-    output.uris = output.uris.map((uri: unknown): unknown => {
-      if (isRecord(uri)) {
-        return expandKeys(uri, MPT_META_URI_FIELDS)
-      }
-      return uri
-    })
+    output.uris = output.uris.map(
+      (uri: Record<string, unknown>): Record<string, unknown> => {
+        if (isRecord(uri)) {
+          return expandKeys(uri, MPT_META_URI_FIELDS)
+        }
+        return uri
+      },
+    )
   }
 
   if (Array.isArray(output.us)) {
-    output.us = output.us.map((uri: unknown): unknown => {
-      if (isRecord(uri)) {
-        return expandKeys(uri, MPT_META_URI_FIELDS)
-      }
-      return uri
-    })
+    output.us = output.us.map(
+      (uri: Record<string, unknown>): Record<string, unknown> => {
+        if (isRecord(uri)) {
+          return expandKeys(uri, MPT_META_URI_FIELDS)
+        }
+        return uri
+      },
+    )
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here as output is now properly formatted
