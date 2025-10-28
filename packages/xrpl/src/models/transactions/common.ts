@@ -1045,6 +1045,7 @@ function shortenKeys(
  * @param mptokenMetadata - MPTokenMetadata to encode.
  * @returns Hex encoded MPTokenMetadata.
  * @throws Error if input is not a JSON object.
+ * @category Utilities
  */
 export function encodeMPTokenMetadata(
   mptokenMetadata: MPTokenMetadata,
@@ -1129,6 +1130,7 @@ function expandKeys(
  * @param input - Hex encoded MPTokenMetadata.
  * @returns Decoded MPTokenMetadata object with long field names.
  * @throws Error if input is not valid hex or cannot be parsed as JSON.
+ * @category Utilities
  */
 export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
   if (!isHex(input)) {
@@ -1184,6 +1186,7 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
  *
  * @param input - Hex encoded MPTokenMetadata.
  * @returns Validation messages if MPTokenMetadata does not adheres to XLS-89 standard.
+ * @category Utilities
  */
 export function validateMPTokenMetadata(input: string): string[] {
   const validationMessages: string[] = []
