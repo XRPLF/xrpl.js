@@ -1017,7 +1017,7 @@ function shortenKeys(
     const mapping = mappings.find(
       ({ long, compact }) => long === key || compact === key,
     )
-    // Extra key
+    // Extra keys stays there
     if (mapping === undefined) {
       output[key] = value
       continue
@@ -1039,7 +1039,8 @@ function shortenKeys(
 }
 
 /**
- * Encodes MPTokenMetadata as per XLS-89 standard.
+ * Encodes MPTokenMetadata object to a hex string.
+ * Shortens long field names to their compact form along the way.
  *
  * @param mptokenMetadata - MPTokenMetadata to encode.
  * @returns Hex encoded MPTokenMetadata.
@@ -1048,7 +1049,7 @@ function shortenKeys(
 export function encodeMPTokenMetadata(
   mptokenMetadata: MPTokenMetadata,
 ): string {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here to access compact keys in TS
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here to implement type-guard
   let input = mptokenMetadata as unknown as Record<string, unknown>
 
   if (!isRecord(input)) {
@@ -1096,7 +1097,7 @@ function expandKeys(
     const mapping = mappings.find(
       ({ long, compact }) => long === key || compact === key,
     )
-    // Extra key
+    // Extra keys stays there
     if (mapping === undefined) {
       output[key] = value
       continue
@@ -1143,7 +1144,7 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
     throw new Error('MPTokenMetadata must be a JSON object.')
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here to expand keys
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know its a record
   let output = jsonMetaData as unknown as Record<string, unknown>
 
   output = expandKeys(output, MPT_META_ALL_FIELDS)
@@ -1171,7 +1172,7 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
 }
 
 /**
- * Validates if MPTokenMetadata adheres to XLS-89 standard.
+ * Validates MPTokenMetadata adheres to XLS-89 standard.
  *
  * @param input - Hex encoded MPTokenMetadata.
  * @returns Validation messages if MPTokenMetadata does not adheres to XLS-89 standard.

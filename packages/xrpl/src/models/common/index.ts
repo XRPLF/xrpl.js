@@ -223,7 +223,8 @@ export interface PriceData {
  * MPTokenMetadata object as per the XLS-89 standard.
  * Represents metadata for a Multi-Purpose Token using long-form field names.
  * This format is more human-readable and is recommended for client-side usage.
- * For on-ledger storage, use {@link encodeMPTokenMetadata} to minimize byte usage.
+ * Use {@link encodeMPTokenMetadata} utility function to convert to a compact hex string for on-ledger storage.
+ * Use {@link decodeMPTokenMetadata} utility function to convert from a hex string to this format.
  */
 export interface MPTokenMetadata {
   /**

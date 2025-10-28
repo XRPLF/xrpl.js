@@ -4,8 +4,13 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add `encodeMPTokenMetadata` and `decodeMPTokenMetadata` helper functions to encode and decode MPTokenMetadata as per XLS-89 standard.
+
 ### Fixed
 * Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
+* [Breaking change] Fix `MPTokenMetadata` type to adhere to the XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump.
+* [Breaking change] Fix `validateMPTokenMetadata` to correctly validate MPTokenMetadata as per XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump.
 
 ## 4.4.2 (2025-09-25)
 
