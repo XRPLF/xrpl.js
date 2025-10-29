@@ -361,7 +361,7 @@ async function main() {
 
   let txHits = [
     ...transactionsMacroFile.matchAll(
-      /^ *TRANSACTION\(tt[A-Z_]+[ \n]*,* ([0-9]+)[ \n]*,[ \n]*([A-Za-z]+).*$/gm,
+      /^ *TRANSACTION\(tt[A-Z_]+[ \n]*,[ \n]*([0-9]+)[ \n]*,[ \n]*([A-Za-z]+).*$/gm,
     ),
   ]
   txHits.push(['', '-1', 'Invalid'])
