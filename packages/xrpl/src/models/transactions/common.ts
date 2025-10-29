@@ -1,6 +1,7 @@
 /* eslint-disable max-lines -- common utility file */
 /* eslint-disable no-continue -- makes logic easier to write and read in this case */
 import { HEX_REGEX, hexToString, stringToHex } from '@xrplf/isomorphic/utils'
+import stableStringify from 'fast-json-stable-stringify'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
@@ -1040,7 +1041,11 @@ function shortenKeys(
 
 /**
  * Encodes MPTokenMetadata object to a hex string.
- * Shortens long field names to their compact form along the way.
+ * Steps:
+ * 1. Shorten long field names to their compact form equivalents.
+ * 2. Sort the fields alphabetically for deterministic encoding.
+ * 3. Stringify the object.
+ * 4. Convert to hex.
  *
  * @param mptokenMetadata - MPTokenMetadata to encode.
  * @returns Hex encoded MPTokenMetadata.
@@ -1081,7 +1086,7 @@ export function encodeMPTokenMetadata(
     )
   }
 
-  return stringToHex(JSON.stringify(input)).toUpperCase()
+  return stringToHex(stableStringify(input)).toUpperCase()
 }
 
 /**

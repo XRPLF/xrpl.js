@@ -30,7 +30,8 @@
     "eventemitter3": "^5.0.1",
     "ripple-address-codec": "^5.0.0",
     "ripple-binary-codec": "^2.5.0",
-    "ripple-keypairs": "^2.0.0"
+    "ripple-keypairs": "^2.0.0",
+    "fast-json-stable-stringify": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
