@@ -681,6 +681,16 @@
       }
     ],
     [
+      "MutableFlags",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 53,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -2131,6 +2141,16 @@
       }
     ],
     [
+      "DummyInt32",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 1,
+        "type": "Int32"
+      }
+    ],
+    [
       "TransactionMetaData",
       {
         "isSerialized": true,
@@ -3366,6 +3386,8 @@
     "Hash160": 17,
     "Hash192": 21,
     "Hash256": 5,
+    "Int32": 10,
+    "Int64": 11,
     "Issue": 24,
     "LedgerEntry": 10002,
     "Metadata": 10004,

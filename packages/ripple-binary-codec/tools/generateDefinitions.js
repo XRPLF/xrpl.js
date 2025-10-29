@@ -138,12 +138,14 @@ async function main() {
   // process STypes
   let stypeHits = [
     ...sfieldHeaderFile.matchAll(
-      /^ *STYPE\(STI_([^ ]*?) *, *([0-9-]+) *\) *\\?$/gm,
+      /^ *STYPE\(STI_([^ ]*?)[ \n]*,[ \n]*([0-9-]+)[ \n]*\)[ \n]*\\?$/gm,
     ),
   ]
   if (stypeHits.length === 0)
     stypeHits = [
-      ...sfieldHeaderFile.matchAll(/^ *STI_([^ ]*?) *= *([0-9-]+) *,?$/gm),
+      ...sfieldHeaderFile.matchAll(
+        /^ *STI_([^ ]*?)[ \n]*=[ \n]*([0-9-]+)[ \n]*,?$/gm,
+      ),
     ]
   const stypeMap = {}
   stypeHits.forEach(([_, key, value]) => {
@@ -248,7 +250,7 @@ async function main() {
   // Parse SField.cpp for all the SFields and their serialization info
   let sfieldHits = [
     ...sfieldMacroFile.matchAll(
-      /^ *[A-Z]*TYPED_SFIELD *\( *sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
+      /^ *[A-Z]*TYPED_SFIELD[ \n]*\([ \n]*sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
     ),
   ]
   sfieldHits.push(
@@ -298,7 +300,7 @@ async function main() {
   }
   hits = [
     ...ledgerFormatsMacroFile.matchAll(
-      /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+ *, *([x0-9a-f]+) *, *([^,]+), *([^,]+), \({$/gm,
+      /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+[ \n]*,[ \n]*([x0-9a-f]+)[ \n]*,[ \n]*([^,]+),[ \n]*([^,]+), \({$/gm,
     ),
   ]
   hits.push(['', '-1', 'Invalid'])
@@ -321,7 +323,7 @@ async function main() {
 
   let terHits = [
     ...cleanedTerFile.matchAll(
-      /^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)( *= *([0-9-]+))? *,? *(\/\/[^\n]*)?$/gm,
+      /^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)([ \n]*=[ \n]*([0-9-]+))?[ \n]*,?[ \n]*(\/\/[^\n]*)?$/gm,
     ),
   ]
   let upto = -1
@@ -359,7 +361,7 @@ async function main() {
 
   let txHits = [
     ...transactionsMacroFile.matchAll(
-      /^ *TRANSACTION\(tt[A-Z_]+ *,* ([0-9]+) *, *([A-Za-z]+).*$/gm,
+      /^ *TRANSACTION\(tt[A-Z_]+[ \n]*,* ([0-9]+)[ \n]*,[ \n]*([A-Za-z]+).*$/gm,
     ),
   ]
   txHits.push(['', '-1', 'Invalid'])
