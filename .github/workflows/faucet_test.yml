@@ -7,10 +7,9 @@ on:
   workflow_call:
     inputs:
       git_ref:
-        description: 'Git ref to checkout (branch, tag, or commit SHA)'
+        description: "Git ref to checkout (branch, tag, or commit SHA)"
         required: true
         type: string
-
 
 jobs:
   faucet-test:
@@ -20,7 +19,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v4
