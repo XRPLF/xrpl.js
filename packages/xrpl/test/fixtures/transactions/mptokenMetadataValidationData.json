@@ -421,7 +421,7 @@
     ]
   },
   {
-    "testName": "invalid uri inner structure",
+    "testName": "conflicting uri long and compact forms",
     "mptMetadata": {
       "ticker": "TBILL",
       "name": "T-Bill Yield Token",
