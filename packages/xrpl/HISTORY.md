@@ -9,6 +9,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
+* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for MPTIssue.
 
 ## 4.4.2 (2025-09-25)
 
