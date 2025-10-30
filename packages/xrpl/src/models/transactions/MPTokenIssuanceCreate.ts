@@ -231,6 +231,7 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   /* Indicate specific fields or flags mutable */
   MutableFlags?: number
 
+  /* The domainID that governs admissibility pertaining to the MPToken. */
   DomainID?: string
 }
 
