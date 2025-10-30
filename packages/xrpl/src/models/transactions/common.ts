@@ -1002,7 +1002,7 @@ export function isDomainID(domainID: unknown): domainID is string {
 
 /**
  * Shortens long field names to their compact form equivalents.
- * Reverse operation of expandKeys.
+ * Reverse operation of {@link expandKeys}.
  *
  * @param input - Object with potentially long field names.
  * @param mappings - Array of field mappings with long and compact names.
@@ -1040,15 +1040,15 @@ function shortenKeys(
 }
 
 /**
- * Encodes MPTokenMetadata object to a hex string.
+ * Encodes {@link MPTokenMetadata} object to a hex string.
  * Steps:
  * 1. Shorten long field names to their compact form equivalents.
  * 2. Sort the fields alphabetically for deterministic encoding.
  * 3. Stringify the object.
  * 4. Convert to hex.
  *
- * @param mptokenMetadata - MPTokenMetadata to encode.
- * @returns Hex encoded MPTokenMetadata.
+ * @param mptokenMetadata - {@link MPTokenMetadata} to encode.
+ * @returns Hex encoded {@link MPTokenMetadata}.
  * @throws Error if input is not a JSON object.
  * @category Utilities
  */
@@ -1091,7 +1091,7 @@ export function encodeMPTokenMetadata(
 
 /**
  * Expands compact field names to their long form equivalents.
- * Reverse operation of shortenKeys.
+ * Reverse operation of {@link shortenKeys}.
  *
  * @param input - Object with potentially compact field names.
  * @param mappings - Array of field mappings with long and compact names.
@@ -1129,11 +1129,11 @@ function expandKeys(
 }
 
 /**
- * Decodes hex encoded MPTokenMetadata to a JSON object with long field names.
- * Converts compact field names back to their long form equivalents.
+ * Decodes hex-encoded {@link MPTokenMetadata} into a JSON object.
+ * Converts compact field names to their corresponding long-form equivalents.
  *
- * @param input - Hex encoded MPTokenMetadata.
- * @returns Decoded MPTokenMetadata object with long field names.
+ * @param input - Hex encoded {@link MPTokenMetadata}.
+ * @returns Decoded {@link MPTokenMetadata} object with long field names.
  * @throws Error if input is not valid hex or cannot be parsed as JSON.
  * @category Utilities
  */
@@ -1187,10 +1187,10 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
 }
 
 /**
- * Validates MPTokenMetadata adheres to XLS-89 standard.
+ * Validates {@link MPTokenMetadata} adheres to XLS-89 standard.
  *
- * @param input - Hex encoded MPTokenMetadata.
- * @returns Validation messages if MPTokenMetadata does not adheres to XLS-89 standard.
+ * @param input - Hex encoded {@link MPTokenMetadata}.
+ * @returns Validation messages if {@link MPTokenMetadata} does not adheres to XLS-89 standard.
  * @category Utilities
  */
 export function validateMPTokenMetadata(input: string): string[] {
