@@ -227,7 +227,10 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
+
+  /* Indicate specific fields or flags mutable */
   MutableFlags?: number
+
   DomainID?: string
 }
 
