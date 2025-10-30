@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled, hasFlag } from '../utils'
 
 import {
   BaseTransaction,
@@ -11,12 +11,13 @@ import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
   validateMPTokenMetadata,
+  isDomainID,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
-const MAX_TRANSFER_FEE = 50000
+export const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -55,6 +56,54 @@ export enum MPTokenIssuanceCreateFlags {
   tfMPTCanClawback = 0x00000040,
 }
 
+export enum MPTokenIssuanceCreateMutableFlags {
+  /**
+   * If set, Indicates flag lsfMPTCanLock can be changed.
+   */
+  tmfMPTCanMutateCanLock = 0x00000002,
+  /**
+   * If set, Indicates flag lsfMPTRequireAuth can be changed
+   */
+  tmfMPTCanMutateRequireAuth = 0x00000004,
+  /**
+   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   */
+  tmfMPTCanMutateCanEscrow = 0x00000008,
+  /**
+   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   */
+  tmfMPTCanMutateCanTrade = 0x00000010,
+  /**
+   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   */
+  tmfMPTCanMutateCanTransfer = 0x00000020,
+  /**
+   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   */
+  tmfMPTCanMutateCanClawback = 0x00000040,
+  /**
+   * If set, Allows field MPTokenMetadata to be modified.
+   */
+  tmfMPTCanMutateMetadata = 0x00010000,
+  /**
+   * If set, Allows field TransferFee to be modified.
+   */
+  tmfMPTCanMutateTransferFee = 0x00020000,
+}
+
+/* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
+export const tmfMPTokenIssuanceCreateMutableMask = ~(
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateRequireAuth |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanEscrow |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTrade |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanClawback |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee
+)
+/* eslint-enable no-bitwise */
+
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceCreate} transaction
  * flags.
@@ -63,12 +112,70 @@ export enum MPTokenIssuanceCreateFlags {
  */
 export interface MPTokenIssuanceCreateFlagsInterface
   extends GlobalFlagsInterface {
+  /**
+   * If set, indicates that the MPT can be locked both individually and globally.
+   * If not set, the MPT cannot be locked in any way.
+   */
   tfMPTCanLock?: boolean
+  /**
+   * If set, indicates that individual holders must be authorized.
+   * This enables issuers to limit who can hold their assets.
+   */
   tfMPTRequireAuth?: boolean
+  /**
+   * If set, indicates that individual holders can place their balances into an escrow.
+   */
   tfMPTCanEscrow?: boolean
+  /**
+   * If set, indicates that individual holders can trade their balances
+   *  using the XRP Ledger DEX or AMM.
+   */
   tfMPTCanTrade?: boolean
+  /**
+   * If set, indicates that tokens may be transferred to other accounts
+   *  that are not the issuer.
+   */
   tfMPTCanTransfer?: boolean
+  /**
+   * If set, indicates that the issuer may use the Clawback transaction
+   * to clawback value from individual holders.
+   */
   tfMPTCanClawback?: boolean
+}
+
+export interface MPTokenIssuanceCreateMutableFlagsInterface {
+  /**
+   * If set, Indicates flag lsfMPTCanLock can be changed.
+   */
+  tmfMPTCanMutateCanLock?: boolean
+  /**
+   * If set, Indicates flag lsfMPTRequireAuth can be changed.
+   */
+  tmfMPTCanMutateRequireAuth?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   */
+  tmfMPTCanMutateCanEscrow?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   */
+  tmfMPTCanMutateCanTrade?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   */
+  tmfMPTCanMutateCanTransfer?: boolean
+  /**
+   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   */
+  tmfMPTCanMutateCanClawback?: boolean
+  /**
+   * If set, Allows field MPTokenMetadata to be modified.
+   */
+  tmfMPTCanMutateMetadata?: boolean
+  /**
+   * If set, Allows field TransferFee to be modified.
+   */
+  tmfMPTCanMutateTransferFee?: boolean
 }
 
 /**
@@ -120,13 +227,19 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
+
+  /* Indicate specific fields or flags mutable */
+  MutableFlags?: number
+
+  /* The domainID that governs admissibility pertaining to the MPToken. */
+  DomainID?: string
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
   mpt_issuance_id?: string
 }
 
-/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+/* eslint-disable max-lines-per-function, max-statements -- Not needed to reduce function */
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
@@ -141,6 +254,31 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'DomainID', isDomainID)
+
+  if (
+    tx.DomainID != null &&
+    !hasFlag(
+      tx,
+      MPTokenIssuanceCreateFlags.tfMPTRequireAuth,
+      'tfMPTRequireAuth',
+    )
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: Cannot set DomainID unless tfMPTRequireAuth flag is set.',
+    )
+  }
+
+  if (
+    tx.MutableFlags != null &&
+    // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+    tx.MutableFlags & tmfMPTokenIssuanceCreateMutableMask
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: Invalid MutableFlags value',
+    )
+  }
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
@@ -157,7 +295,7 @@ export function validateMPTokenIssuanceCreate(
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
       BigInt(tx.MaximumAmount) > BigInt(MAX_AMT) ||
-      BigInt(tx.MaximumAmount) < BigInt(`0`)
+      BigInt(tx.MaximumAmount) <= BigInt(`0`)
     ) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: MaximumAmount out of range',
@@ -202,4 +340,4 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 }
-/* eslint-enable max-lines-per-function */
+/* eslint-enable max-lines-per-function, max-statements */

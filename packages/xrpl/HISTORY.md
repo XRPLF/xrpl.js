@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Support for `Dynamic MPT` (XLS-94D)
 * Export `Batch` (XLS-56) transaction types and utilities
 
 ### Fixed

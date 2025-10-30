@@ -6,6 +6,8 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSetFlags,
   TransactionMetadata,
+  MPTokenIssuanceCreateMutableFlags,
+  MPTokenIssuanceSetMutableFlags,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -72,6 +74,67 @@ describe('MPTokenIssuanceDestroy', function () {
       }
 
       await testTransaction(testContext.client, setTx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Test Mutability of Flags as per Dynamic MPT (XLS-94D) amendment',
+    async () => {
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+        MutableFlags:
+          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee +
+          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer,
+      }
+
+      const mptCreateRes = await testTransaction(
+        testContext.client,
+        createTx,
+        testContext.wallet,
+      )
+
+      const txHash = mptCreateRes.result.tx_json.hash
+
+      const txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result
+        .meta as TransactionMetadata<MPTokenIssuanceCreate>
+
+      const mptID = meta.mpt_issuance_id
+
+      const setTransferFeeTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: mptID!,
+        // set the transfer fee to a non-zero value
+        TransferFee: 200,
+      }
+
+      await testTransaction(
+        testContext.client,
+        setTransferFeeTx,
+        testContext.wallet,
+      )
+
+      // remove the ability to transfer the MPT
+      const clearTransferFlagTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: mptID!,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+      }
+
+      await testTransaction(
+        testContext.client,
+        clearTransferFlagTx,
+        testContext.wallet,
+      )
     },
     TIMEOUT,
   )

@@ -10,6 +10,7 @@ import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
+import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
@@ -46,6 +47,7 @@ type LedgerEntry =
   | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
+  | MPTokenIssuance
 
 type LedgerEntryFilter =
   | 'account'

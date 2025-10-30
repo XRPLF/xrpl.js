@@ -1,11 +1,16 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+// import { MPTokenIssuanceCreateMutableFlags } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
 } from '../../src/models/transactions/common'
-import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceCreateMutableFlags,
+  tmfMPTokenIssuanceCreateMutableMask,
+  validateMPTokenIssuanceCreate,
+} from '../../src/models/transactions/MPTokenIssuanceCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -28,6 +33,8 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      MutableFlags:
+        MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
       MPTokenMetadata: stringToHex(`{
         "ticker": "TBILL",
         "name": "T-Bill Yield Token",
@@ -140,6 +147,60 @@ describe('MPTokenIssuanceCreate', function () {
       invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
+  })
+
+  it(`throws w/ invalid MutableFlags value`, async () => {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MutableFlags: tmfMPTokenIssuanceCreateMutableMask,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+  })
+
+  it(`throws with Zero MaximumAmount`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MaximumAmount: '0',
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: MaximumAmount out of range')
+  })
+
+  it(`throws with Zero DomainID`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: '0'.repeat(64),
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: invalid field DomainID')
+  })
+
+  it(`throws with DomainID and tfMPTRequireAuth flag not set`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: '1'.repeat(64),
+      Flags: 0,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Cannot set DomainID unless tfMPTRequireAuth flag is set.',
+    )
+  })
+
+  it(`throws with invalid type of DomainID`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      DomainID: 1,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: invalid field DomainID')
   })
 })
 

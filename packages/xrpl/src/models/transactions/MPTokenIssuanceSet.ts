@@ -1,5 +1,7 @@
 import { ValidationError } from '../../errors'
-import { isFlagEnabled } from '../utils'
+import { isFlagEnabled, isHex } from '../utils'
+// eslint-disable-next-line import/no-cycle -- this method is needed to convert txn flags to number
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import {
   BaseTransaction,
@@ -10,7 +12,15 @@ import {
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  isNumber,
+  MAX_MPT_META_BYTE_LENGTH,
+  isDomainID,
+  validateMPTokenMetadata,
+  MPT_META_WARNING_HEADER,
 } from './common'
+import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
+
+import type { Transaction } from '.'
 
 /**
  * Transaction Flags for an MPTokenIssuanceSet Transaction.
@@ -28,6 +38,50 @@ export enum MPTokenIssuanceSetFlags {
   tfMPTUnlock = 0x00000002,
 }
 
+export enum MPTokenIssuanceSetMutableFlags {
+  /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
+  tmfMPTSetCanLock = 0x00000001,
+  /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */
+  tmfMPTClearCanLock = 0x00000002,
+  /* Sets the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
+  tmfMPTSetRequireAuth = 0x00000004,
+  /* Clears the lsfMPTRequireAuth flag. Holders are not required to be authorized. */
+  tmfMPTClearRequireAuth = 0x00000008,
+  /* Sets the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
+  tmfMPTSetCanEscrow = 0x00000010,
+  /* Clears the lsfMPTCanEscrow flag. Disallows holders from placing balances into escrow. */
+  tmfMPTClearCanEscrow = 0x00000020,
+  /* Sets the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
+  tmfMPTSetCanTrade = 0x00000040,
+  /* Clears the lsfMPTCanTrade flag. Disallows holders from trading balances on the XRPL DEX. */
+  tmfMPTClearCanTrade = 0x00000080,
+  /* Sets the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
+  tmfMPTSetCanTransfer = 0x00000100,
+  /* Clears the lsfMPTCanTransfer flag. Disallows transfers to non-issuer accounts. */
+  tmfMPTClearCanTransfer = 0x00000200,
+  /* Sets the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
+  tmfMPTSetCanClawback = 0x00000400,
+  /* Clears the lsfMPTCanClawback flag. The token can not be clawed back. */
+  tmfMPTClearCanClawback = 0x00000800,
+}
+
+/* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
+export const tmfMPTokenIssuanceSetMutableMask = ~(
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
+  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback
+)
+/* eslint-enable no-bitwise */
+
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceSet} transaction
  * flags.
@@ -37,6 +91,33 @@ export enum MPTokenIssuanceSetFlags {
 export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
+}
+
+export interface MPTokenIssuanceSetMutableFlagsInterface {
+  /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
+  tmfMPTSetCanLock?: boolean
+  /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */
+  tmfMPTClearCanLock?: boolean
+  /* Sets the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
+  tmfMPTSetRequireAuth?: boolean
+  /* Clears the lsfMPTRequireAuth flag. Holders are not required to be authorized. */
+  tmfMPTClearRequireAuth?: boolean
+  /* Sets the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
+  tmfMPTSetCanEscrow?: boolean
+  /* Clears the lsfMPTCanEscrow flag. Disallows holders from placing balances into escrow. */
+  tmfMPTClearCanEscrow?: boolean
+  /* Sets the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
+  tmfMPTSetCanTrade?: boolean
+  /* Clears the lsfMPTCanTrade flag. Disallows holders from trading balances on the XRPL DEX. */
+  tmfMPTClearCanTrade?: boolean
+  /* Sets the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
+  tmfMPTSetCanTransfer?: boolean
+  /* Clears the lsfMPTCanTransfer flag. Disallows transfers to non-issuer accounts. */
+  tmfMPTClearCanTransfer?: boolean
+  /* Sets the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
+  tmfMPTSetCanClawback?: boolean
+  /* Clears the lsfMPTCanClawback flag. The token can not be clawed back. */
+  tmfMPTClearCanClawback?: boolean
 }
 
 /**
@@ -55,8 +136,14 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    */
   Holder?: Account
   Flags?: number | MPTokenIssuanceSetFlagsInterface
+
+  MPTokenMetadata?: string
+  TransferFee?: number
+  MutableFlags?: number
+  DomainID?: string
 }
 
+/* eslint-disable max-lines-per-function, max-statements -- All validation rules are needed */
 /**
  * Verify the form and type of an MPTokenIssuanceSet at runtime.
  *
@@ -67,6 +154,23 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'DomainID', isDomainID)
+
+  if (tx.DomainID != null && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Cannot set both DomainID and Holder fields.',
+    )
+  }
+  if (
+    tx.MutableFlags != null &&
+    // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+    tx.MutableFlags & tmfMPTokenIssuanceSetMutableMask
+  ) {
+    throw new ValidationError('MPTokenIssuanceSet: Invalid MutableFlags value')
+  }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
@@ -83,4 +187,111 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
   }
+
+  if (tx.Holder != null && tx.Holder === tx.Account) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder cannot be the same as the Account.',
+    )
+  }
+
+  const isMutate =
+    tx.MutableFlags != null ||
+    tx.MPTokenMetadata != null ||
+    tx.TransferFee != null
+  if (
+    (tx.Flags === 0 || tx.Flags === undefined) &&
+    tx.DomainID == null &&
+    !isMutate
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
+    )
+  }
+
+  if (isMutate && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder field is not allowed when mutating MPTokenIssuance.',
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
+  if (isMutate && convertTxFlagsToNumber(tx as Transaction) !== 0) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
+    )
+  }
+
+  const MPTMutabilityFlags: Array<{ setFlag: number; clearFlag: number }> = [
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+    },
+    {
+      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback,
+    },
+  ]
+
+  // Can not set and clear the same flag
+  if (tx.MutableFlags != null) {
+    for (const flagPair of MPTMutabilityFlags) {
+      if (
+        isFlagEnabled(tx.MutableFlags, flagPair.setFlag) &&
+        isFlagEnabled(tx.MutableFlags, flagPair.clearFlag)
+      ) {
+        throw new ValidationError(
+          'MPTokenIssuanceSet: Can not set and clear the same flag.',
+        )
+      }
+    }
+  }
+
+  if (typeof tx.TransferFee === 'number') {
+    if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
+      throw new ValidationError(
+        `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+      )
+    }
+  }
+
+  if (tx.MPTokenMetadata != null) {
+    if (
+      typeof tx.MPTokenMetadata === 'string' &&
+      (!isHex(tx.MPTokenMetadata) ||
+        tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+    ) {
+      throw new ValidationError(
+        `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      )
+    }
+
+    const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
+
+    if (validationMessages.length > 0) {
+      const message = [
+        MPT_META_WARNING_HEADER,
+        ...validationMessages.map((msg) => `- ${msg}`),
+      ].join('\n')
+
+      // eslint-disable-next-line no-console -- Required here.
+      console.warn(message)
+    }
+  }
 }
+/* eslint-enable max-lines-per-function, max-statements */

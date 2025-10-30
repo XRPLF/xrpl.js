@@ -64,12 +64,16 @@ export {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
+  MPTokenIssuanceCreateMutableFlags,
+  MPTokenIssuanceCreateMutableFlagsInterface,
 } from './MPTokenIssuanceCreate'
 export { MPTokenIssuanceDestroy } from './MPTokenIssuanceDestroy'
 export {
   MPTokenIssuanceSet,
   MPTokenIssuanceSetFlags,
   MPTokenIssuanceSetFlagsInterface,
+  MPTokenIssuanceSetMutableFlags,
+  MPTokenIssuanceSetMutableFlagsInterface,
 } from './MPTokenIssuanceSet'
 export { NFTokenAcceptOffer } from './NFTokenAcceptOffer'
 export { NFTokenBurn } from './NFTokenBurn'
