@@ -10,10 +10,10 @@ import {
   isNumber,
   isCurrency,
   validateRequiredField,
-  isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  isHexString,
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
   validateMPTokenMetadata,
@@ -104,17 +104,14 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Asset', isCurrency)
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
-    if (!isHex(dataHex)) {
-      throw new ValidationError('VaultCreate: Data must be a valid hex string')
-    }
     const dataByteLength = dataHex.length / 2
     if (dataByteLength > VAULT_DATA_MAX_BYTE_LENGTH) {
       throw new ValidationError(

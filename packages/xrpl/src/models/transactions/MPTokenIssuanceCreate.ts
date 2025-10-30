@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { INTEGER_SANITY_CHECK, isFlagEnabled, isHex } from '../utils'
 
 import {
   BaseTransaction,
@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  isHexString,
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
   validateMPTokenMetadata,
@@ -138,9 +139,15 @@ export function validateMPTokenIssuanceCreate(
 ): void {
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'MaximumAmount', isString)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+
+  if (isHexString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+    )
+  }
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
@@ -152,7 +159,7 @@ export function validateMPTokenIssuanceCreate(
     )
   }
 
-  if (typeof tx.MaximumAmount === 'string') {
+  if (isString(tx.MaximumAmount)) {
     if (!INTEGER_SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
@@ -165,15 +172,12 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  if (typeof tx.TransferFee === 'number') {
+  if (isNumber(tx.TransferFee)) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-    const flags = (tx.Flags ?? 0) as
-      | number
-      | MPTokenIssuanceCreateFlagsInterface
-    const isTfMPTCanTransfer =
-      typeof flags === 'number'
-        ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-        : (flags.tfMPTCanTransfer ?? false)
+    const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
+    const isTfMPTCanTransfer = isNumber(flags)
+      ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
+      : flags.tfMPTCanTransfer === true
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(

@@ -20,8 +20,8 @@ import {
   SubscribeBook,
   SubscribeRequest,
 } from '../../../src/models/methods/subscribe'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import { CredentialAccept } from '../../../src/models/transactions/credentialAccept'
+import { CredentialCreate } from '../../../src/models/transactions/credentialCreate'
 import {
   OfferCreate,
   OfferCreateFlags,
