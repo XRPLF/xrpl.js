@@ -6,8 +6,8 @@ import {
   VaultCreateFlags,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
-import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
+import { MPT_META_WARNING_HEADER } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)

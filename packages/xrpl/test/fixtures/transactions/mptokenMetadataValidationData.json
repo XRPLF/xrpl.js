@@ -421,6 +421,36 @@
     ]
   },
   {
+    "testName": "invalid uri inner structure",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "u": "website",
+          "title": "Product Page"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "uris/us: should not have both uri and u fields.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
+    ]
+  },
+  {
     "testName": "exceeds 1024 bytes",
     "mptMetadata": {
       "ticker": "TBILL",

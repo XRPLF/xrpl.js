@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 import { hasFlag, isHex } from '../utils'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -14,9 +19,6 @@ import {
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-  validateMPTokenMetadata,
 } from './common'
 
 /**

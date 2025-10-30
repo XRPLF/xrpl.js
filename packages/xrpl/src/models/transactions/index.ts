@@ -3,9 +3,6 @@ export {
   GlobalFlags,
   GlobalFlagsInterface,
   isMPTAmount,
-  validateMPTokenMetadata,
-  encodeMPTokenMetadata,
-  decodeMPTokenMetadata,
 } from './common'
 export {
   validate,

@@ -1,11 +1,11 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
-} from '../../src/models/transactions/common'
-import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+} from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>

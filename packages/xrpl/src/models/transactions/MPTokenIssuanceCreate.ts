@@ -1,5 +1,10 @@
 import { ValidationError } from '../../errors'
 import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -8,9 +13,6 @@ import {
   validateOptionalField,
   isString,
   isNumber,
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-  validateMPTokenMetadata,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 

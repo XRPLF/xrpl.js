@@ -18,10 +18,7 @@ import { AuthorizeCredential, MPTokenMetadata } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
 import {
   containsDuplicates,
-  decodeMPTokenMetadata,
-  encodeMPTokenMetadata,
   GlobalFlags,
-  validateMPTokenMetadata,
 } from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
@@ -30,6 +27,11 @@ import {
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
+import {
+  decodeMPTokenMetadata,
+  encodeMPTokenMetadata,
+  validateMPTokenMetadata,
+} from '../../src/models/utils/mptokenMetadata'
 import mptMetadataEncodeDecodeTests from '../fixtures/transactions/mptokenMetadataEncodeDecodeData.json'
 import mptMetadataValidationTests from '../fixtures/transactions/mptokenMetadataValidationData.json'
 
