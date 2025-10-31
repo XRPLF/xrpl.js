@@ -10,7 +10,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Before triggering a release**
 
-1. Create a release branch. A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
+1. Create a release branch. A qualified branch name should start with "release-" or "release/". e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`, `release-xrpl@5.0.0-alpha.1`.
 2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
    ```json
    {
@@ -18,7 +18,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
      "version": "x.y.z"
    }
    ```
-3. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
+3. Run `npm i` to update the `package-lock.json` with the updated versions and commit the lock file to the release branch.
 
 ### **Triggering a Release**
 
@@ -28,17 +28,23 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
    - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
    - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
      - Examples:
-       - `latest` → Standard production release
-       - `beta` → Pre-release for testing
+       - `latest` → Stable release
+       - `beta`, `feature-name` → Pre-release for testing
        - `rc` → Release candidate
 
-➡️ Example:
+➡️ Stable release example:
 
 | Field            | Example               |
 |------------------|-----------------------|
 | package_name     | xrpl                  |
 | npmjs_dist_tag   | latest                |
 
+➡️ Beta release example:
+
+| Field            | Example               |
+|------------------|-----------------------|
+| package_name     | xrpl                  |
+| npmjs_dist_tag   | smart-escrow          |
 
 ### **Reviewing the release details and scan result**
 
@@ -90,6 +96,17 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ---
 
+### 6. Send an email to [xrpl-announce](https://groups.google.com/g/xrpl-announce).
+
+---
+
+### 7. Lastly, send a similar message to the XRPL Discord in the [`javascript` channel](https://discord.com/channels/886050993802985492/886053111179915295). The message should include:
+    1. The version changes for xrpl libraries
+    2. A link to the more detailed changes
+    3. Highlights of important changes
+
+---
+
 ## 📁 **Tag Format**
 
 The GitHub release and git tag are named like this:
@@ -105,6 +122,8 @@ xrpl@2.3.1
 
 
 ## ⚠️ **Important Notes**
+
+- PR created from release branch to main branch needs to closed and reopened for the tests to automatically execute. This won't be needed going forward as this step will be removed.
 
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
