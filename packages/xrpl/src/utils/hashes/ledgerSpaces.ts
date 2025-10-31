@@ -29,6 +29,21 @@ const ledgerSpaces = {
   paychan: 'x',
   check: 'C',
   depositPreauth: 'p',
+  // Additional ledger entry types
+  negativeUNL: 'N',
+  nfTokenPage: 'P',
+  nfTokenOffer: 't',
+  ammRoot: 'A',
+  oracle: 'R',
+  hook: 'H',
+  hookState: 'h',
+  hookDefinition: 'D',
+  did: 'I',
+  bridge: 'X',
+  xchainOwnedClaimID: 'K',
+  xchainOwnedCreateAccountClaimID: 'k',
+  mpToken: 'M',
+  mpTokenIssuance: 'm',
 }
 
 export default ledgerSpaces
