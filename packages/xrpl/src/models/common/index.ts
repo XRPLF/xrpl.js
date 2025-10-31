@@ -220,25 +220,109 @@ export interface PriceData {
 }
 
 /**
- * MPTokenMetadata object as per the XLS-89d standard.
+ * {@link MPTokenMetadata} object as per the XLS-89 standard.
+ * Use {@link encodeMPTokenMetadata} utility function to convert to a compact hex string for on-ledger storage.
+ * Use {@link decodeMPTokenMetadata} utility function to convert from a hex string to this format.
  */
 export interface MPTokenMetadata {
+  /**
+   * Ticker symbol used to represent the token.
+   * Uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.
+   *
+   * @example "TBILL"
+   */
   ticker: string
+
+  /**
+   * Display name of the token.
+   * Any UTF-8 string.
+   *
+   * @example "T-Bill Yield Token"
+   */
   name: string
-  icon: string
-  asset_class: string
-  issuer_name: string
+
+  /**
+   * Short description of the token.
+   * Any UTF-8 string.
+   *
+   * @example "A yield-bearing stablecoin backed by short-term U.S. Treasuries"
+   */
   desc?: string
+
+  /**
+   * URI to the token icon.
+   * Can be a `hostname/path` (HTTPS assumed) or full URI for other protocols (e.g., ipfs://).
+   *
+   * @example "example.org/token-icon.png" or "ipfs://QmXxxx"
+   */
+  icon: string
+
+  /**
+   * Top-level classification of token purpose.
+   * Allowed values: "rwa", "memes", "wrapped", "gaming", "defi", "other"
+   *
+   * @example "rwa"
+   */
+  asset_class: string
+
+  /**
+   * Optional subcategory of the asset class.
+   * Required if `asset_class` is "rwa".
+   * Allowed values: "stablecoin", "commodity", "real_estate", "private_credit", "equity", "treasury", "other"
+   *
+   * @example "treasury"
+   */
   asset_subclass?: string
-  urls?: MPTokenMetadataUrl[]
-  additional_info?: string
+
+  /**
+   * The name of the issuer account.
+   * Any UTF-8 string.
+   *
+   * @example "Example Yield Co."
+   */
+  issuer_name: string
+
+  /**
+   * List of related URIs (site, dashboard, social media, documentation, etc.).
+   * Each URI object contains the link, its category, and a human-readable title.
+   */
+  uris?: MPTokenMetadataUri[]
+
+  /**
+   * Freeform field for key token details like interest rate, maturity date, term, or other relevant info.
+   * Can be any valid JSON object or UTF-8 string.
+   *
+   * @example { "interest_rate": "5.00%", "maturity_date": "2045-06-30" }
+   */
+  additional_info?: string | Record<string, unknown>
 }
 
 /**
- * MPTokenMetadataUrl object as per the XLS-89d standard.
+ * {@link MPTokenMetadataUri} object as per the XLS-89 standard.
+ * Used within the `uris` array of {@link MPTokenMetadata}.
  */
-export interface MPTokenMetadataUrl {
-  url: string
-  type: string
+export interface MPTokenMetadataUri {
+  /**
+   * URI to the related resource.
+   * Can be a `hostname/path` (HTTPS assumed) or full URI for other protocols (e.g., ipfs://).
+   *
+   * @example "exampleyield.com/tbill" or "ipfs://QmXxxx"
+   */
+  uri: string
+
+  /**
+   * The category of the link.
+   * Allowed values: "website", "social", "docs", "other"
+   *
+   * @example "website"
+   */
+  category: string
+
+  /**
+   * A human-readable label for the link.
+   * Any UTF-8 string.
+   *
+   * @example "Product Page"
+   */
   title: string
 }

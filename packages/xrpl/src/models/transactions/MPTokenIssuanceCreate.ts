@@ -1,5 +1,10 @@
 import { ValidationError } from '../../errors'
 import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -8,9 +13,6 @@ import {
   validateOptionalField,
   isString,
   isNumber,
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-  validateMPTokenMetadata,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -109,10 +111,9 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   TransferFee?: number
 
   /**
-   * Optional arbitrary metadata about this issuance, encoded as a hex string and limited to 1024 bytes.
-   *
-   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
-   * XLS-89d MPTokenMetadata standard.
+   * Should follow {@link https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0089-multi-purpose-token-metadata-schema | XLS-89} standard.
+   * Use {@link encodeMPTokenMetadata} utility function to convert to convert {@link MPTokenMetadata} to a blob.
+   * Use {@link decodeMPTokenMetadata} utility function to convert from a blob to {@link MPTokenMetadata}.
    *
    * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
    * may not be discoverable by ecosystem tools such as explorers and indexers.
