@@ -5,6 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Export `Batch` (XLS-56) transaction types and utilities
 * Support for `Lending Protocol` (XLS-66d)
 
 ### Fixed
