@@ -220,7 +220,7 @@ In order to update the list, follow these steps from the top level of the librar
 Note: The same updated config can be used to update xrpl-py's CI as well.
 
 
-## Release process + checklist
+## Manual Release process + checklist
 
 ## PR process
 
@@ -279,6 +279,7 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
     2. A link to the more detailed changes
     3. Highlights of important changes
 
+## Automated Release - See [RELEASE.md](./RELEASE.md)
 
 ## Mailing Lists
 
