@@ -1,4 +1,4 @@
-import { Client } from '../src/client'
+import { Client, ClientOptions } from '../src/client'
 
 import createMockRippled, {
   type MockedWebSocketServer,
@@ -16,11 +16,14 @@ export interface XrplTestContext {
 
 async function setupMockRippledConnection(
   port: number,
+  options: {
+    clientOptions?: ClientOptions
+  } = {},
 ): Promise<XrplTestContext> {
   const context: XrplTestContext = {
     mockRippled: createMockRippled(port),
     _mockedServerPort: port,
-    client: new Client(`ws://localhost:${port}`),
+    client: new Client(`ws://localhost:${port}`, options.clientOptions ?? {}),
     servers: [port],
   }
 
@@ -35,9 +38,13 @@ async function setupMockRippledConnection(
   return context.client.connect().then(() => context)
 }
 
-async function setupClient(): Promise<XrplTestContext> {
+async function setupClient(
+  options: {
+    clientOptions?: ClientOptions
+  } = {},
+): Promise<XrplTestContext> {
   return getFreePort().then(async (port) => {
-    return setupMockRippledConnection(port)
+    return setupMockRippledConnection(port, options)
   })
 }
 
