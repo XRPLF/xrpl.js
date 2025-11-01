@@ -17,6 +17,7 @@ import {
 import {
   deriveAddress,
   deriveKeypair,
+  derivePublicKey,
   generateSeed,
   sign,
 } from 'ripple-keypairs'
@@ -171,6 +172,21 @@ export class Wallet {
       algorithm: opts.algorithm,
       masterAddress: opts.masterAddress,
     })
+  }
+
+  /**
+   * Derives a wallet from a private key.
+   *
+   * @param privateKey - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
+   * @returns A Wallet derived from a private key.
+   *
+   *  @throws ValidationError if private key is not a valid string
+   */
+  public static fromPrivateKey(privateKey: string): Wallet {
+    if (!privateKey || typeof privateKey !== 'string') {
+      throw new ValidationError('privateKey must be a non-empty string')
+    }
+    return new Wallet(derivePublicKey(privateKey), privateKey)
   }
 
   /**
