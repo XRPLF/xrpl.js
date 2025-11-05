@@ -9,6 +9,9 @@ on:
       package_name:
         description: 'Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)'
         required: true
+      release_branch_name:
+        description: 'Name of the release branch to be used'
+        required: true
       npmjs_dist_tag:
         description: 'npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)'
         default: 'latest'
@@ -23,6 +26,12 @@ jobs:
     name: Get release version from package.json
     outputs:
       package_version: ${{ steps.get_version.outputs.version }}
+      npm_dist_tags: ${{ steps.get_version.outputs.dist_tags }}
+      npm_is_beta: ${{ steps.get_version.outputs.is_beta }}
+      npm_primary_dist_tag: ${{ steps.get_version.outputs.primary_dist_tag }}
+      release_branch: ${{ steps.validate_inputs.outputs.release_branch }}
+      release_pr_number: ${{ steps.validate_inputs.outputs.release_pr_number }}
+      release_pr_url: ${{ steps.validate_inputs.outputs.release_pr_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,10 +39,18 @@ jobs:
           fetch-depth: 0
 
       - name: Validate inputs
+        id: validate_inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+
+          RELEASE_BRANCH_INPUT="${{ github.event.inputs.release_branch_name }}"
           RELEASE_BRANCH="$(git branch --show-current || true)"
-          if [[ -z "$RELEASE_BRANCH" ]]; then
+          if [[ -n "$RELEASE_BRANCH_INPUT" ]]; then
+            RELEASE_BRANCH="$RELEASE_BRANCH_INPUT"
+          elif [[ -z "$RELEASE_BRANCH" ]]; then
             RELEASE_BRANCH="${{ github.ref_name }}"
           fi
 
@@ -66,28 +83,92 @@ jobs:
             echo "✅ No Internal Artifactory URL found"
           fi
 
-          # validate dist tag
-          NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
+          # validate dist tag(s)
+          RAW_DIST_TAGS="${{ github.event.inputs.npmjs_dist_tag }}"
+          declare -a TAGS
+          declare -A SEEN=()
 
-          # Empty → default to 'latest'
-          if [ -z "$NPM_DIST_TAG" ]; then
-            NPM_DIST_TAG="latest"
+          if [ -z "$RAW_DIST_TAGS" ]; then
+            TAGS=("latest")
             echo "ℹ️ npmjs_dist_tag empty → defaulting to 'latest'."
+          else
+            IFS=',' read -ra INPUT_TAGS <<< "$RAW_DIST_TAGS"
+            for raw_tag in "${INPUT_TAGS[@]}"; do
+              tag="$(printf '%s' "$raw_tag" | tr -d '[:space:]')"
+              if [ -z "$tag" ]; then
+                echo "❌ npmjs_dist_tag contains an empty tag entry." >&2
+                exit 1
+              fi
+              if ! [[ "$tag" =~ ^[a-z][a-z0-9._-]{0,127}$ ]]; then
+                echo "❌ Invalid npm dist-tag '$tag'. Must start with a lowercase letter and contain only [a-z0-9._-], max 128 chars." >&2
+                exit 1
+              fi
+              if [[ "$tag" =~ ^v[0-9] || "$tag" =~ ^[0-9] ]]; then
+                echo "❌ Invalid npm dist-tag '$tag'. Must not start with 'v' + digit or a digit (e.g., 'v1', '1.2.3')." >&2
+                exit 1
+              fi
+              if [[ -n "${SEEN[$tag]:-}" ]]; then
+                echo "❌ Duplicate npm dist-tag '$tag'." >&2
+                exit 1
+              fi
+              SEEN[$tag]=1
+              TAGS+=("$tag")
+            done
           fi
 
-          # Must start with a lowercase letter; then [a-z0-9._-]; max 128 chars
-          if ! [[ "$NPM_DIST_TAG" =~ ^[a-z][a-z0-9._-]{0,127}$ ]]; then
-            echo "❌ Invalid npm dist-tag '$NPM_DIST_TAG'. Must start with a lowercase letter and contain only [a-z0-9._-], max 128 chars." >&2
-            exit 1
+          NORMALIZED_TAGS=$(IFS=','; printf '%s' "${TAGS[*]}")
+          HAS_LATEST="false"
+          for tag in "${TAGS[@]}"; do
+            if [ "$tag" = "latest" ]; then
+              HAS_LATEST="true"
+            fi
+          done
+
+          if [ "$HAS_LATEST" = "true" ]; then
+            IS_BETA="false"
+          else
+            IS_BETA="true"
           fi
 
-          # Disallow version-like prefixes (avoid semver/range confusion)
-          if [[ "$NPM_DIST_TAG" =~ ^v[0-9] || "$NPM_DIST_TAG" =~ ^[0-9] ]]; then
-            echo "❌ Invalid npm dist-tag '$NPM_DIST_TAG'. Must not start with 'v' + digit or a digit (e.g., 'v1', '1.2.3')." >&2
-            exit 1
+          PRIMARY_TAG="${TAGS[0]}"
+
+          echo "✅ npmjs_dist_tag normalized to '$NORMALIZED_TAGS'."
+          PR_NUMBER=""
+          PR_URL=""
+
+          if [ "$IS_BETA" = "false" ]; then
+            OWNER="${REPO%%/*}"
+            echo "🔎 Validating that a release PR exists for ${RELEASE_BRANCH} → main…"
+            PRS_JSON="$(gh api -H 'Accept: application/vnd.github+json' \
+              --method GET \
+              -f state=open \
+              -f base=main \
+              -f head="${OWNER}:${RELEASE_BRANCH}" \
+              "/repos/$REPO/pulls")"
+            PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
+            PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
+            if [ -z "$PR_NUMBER" ]; then
+              echo "❌ No open PR found from ${RELEASE_BRANCH} to main. Please create the release PR before running this workflow." >&2
+              exit 1
+            fi
+            echo "ℹ️ Found release PR: #$PR_NUMBER ($PR_URL)"
+          else
+            echo "ℹ️ Beta release detected; skipping PR existence check."
           fi
 
-          echo "✅ npmjs_dist_tag '$NPM_DIST_TAG' is valid."
+          {
+            echo "NPM_DIST_TAGS=$NORMALIZED_TAGS"
+            echo "NPM_IS_BETA=$IS_BETA"
+            echo "NPM_PRIMARY_DIST_TAG=$PRIMARY_TAG"
+            echo "RELEASE_BRANCH=$RELEASE_BRANCH"
+          } >> "$GITHUB_ENV"
+
+          {
+            echo "release_branch=$RELEASE_BRANCH"
+            echo "release_pr_number=$PR_NUMBER"
+            echo "release_pr_url=$PR_URL"
+            echo "is_beta=$IS_BETA"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Get package version from package.json
         id: get_version
@@ -104,16 +185,16 @@ jobs:
             echo "Version is empty or missing in $PKG_JSON" >&2
             exit 1
           fi
-          NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
-          if [ -z "$NPM_DIST_TAG" ]; then
-            NPM_DIST_TAG="latest"
-          fi
-          if [[ "$NPM_DIST_TAG" == "latest" ]] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          NPM_IS_BETA="${NPM_IS_BETA:-false}"
+          if [[ "$NPM_IS_BETA" != "true" ]] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "With npmjs_dist_tag 'latest', version must be of the form x.y.z. Found '$VERSION'." >&2
             exit 1
           fi
           echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "dist_tags=${NPM_DIST_TAGS:-latest}" >> "$GITHUB_OUTPUT"
+          echo "is_beta=${NPM_IS_BETA:-false}" >> "$GITHUB_OUTPUT"
+          echo "primary_dist_tag=${NPM_PRIMARY_DIST_TAG:-latest}" >> "$GITHUB_OUTPUT"
 
   run_faucet_test:
     name: Run faucet tests ${{ needs.get_version.outputs.package_version }}
@@ -125,6 +206,7 @@ jobs:
 
   run_tests:
     name: Run unit/integration tests ${{ needs.get_version.outputs.package_version }}
+    continue-on-error: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
     permissions:
       contents: read
       id-token: write
@@ -137,6 +219,7 @@ jobs:
 
   pre_release:
     runs-on: ubuntu-latest
+    if: ${{ needs.get_version.result == 'success' && needs.run_faucet_test.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
@@ -149,6 +232,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ needs.get_version.outputs.release_branch }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -297,6 +381,7 @@ jobs:
 
   ask_for_dev_team_review:
     runs-on: ubuntu-latest
+    if: ${{ needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release]
     permissions:
       pull-requests: write
@@ -304,7 +389,7 @@ jobs:
     env:
       PACKAGE_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PACKAGE_NAME: "${{ github.event.inputs.package_name }}"
-      RELEASE_BRANCH: "${{ github.ref_name }}"
+      RELEASE_BRANCH: "${{ github.event.inputs.release_branch_name }}"
     outputs:
       reviewers_dev: ${{ steps.get_reviewers.outputs.reviewers_dev }}
       reviewers_sec: ${{ steps.get_reviewers.outputs.reviewers_sec }}
@@ -314,48 +399,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Create PR from release branch to main (skips for rc/beta)
-        id: ensure_pr
-        if: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          RELEASE_BRANCH: ${{ github.ref_name }}
-          VERSION: ${{ needs.get_version.outputs.package_version }}
-        run: |
-          set -euo pipefail
-
-          echo "🔎 Checking if a PR already exists for $RELEASE_BRANCH → main…"
-          OWNER="${REPO%%/*}"
-
-          # Find existing OPEN PR: base=main, head=OWNER:RELEASE_BRANCH
-          PRS_JSON="$(gh api -H 'Accept: application/vnd.github+json' \
-            "/repos/$REPO/pulls?state=open&base=main&head=${OWNER}:${RELEASE_BRANCH}")"
-
-          PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
-          PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
-
-          if [ -n "${PR_NUMBER:-}" ]; then
-            echo "ℹ️ Found existing PR: #$PR_NUMBER ($PR_URL)"
-          else
-            echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main"
-            CREATE_JSON="$(jq -n \
-              --arg title "Release $VERSION: $RELEASE_BRANCH → main" \
-              --arg head  "$RELEASE_BRANCH" \
-              --arg base  "main" \
-              --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/${{ github.run_id }}" \
-              '{title:$title, head:$head, base:$base, body:$body}')"
-
-            RESP="$(gh api -H 'Accept: application/vnd.github+json' \
-              --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
-
-            PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
-            PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
-          fi
-
-          # Expose as step outputs (use these in later steps)
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
-          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Get reviewers
         id: get_reviewers
@@ -369,8 +412,8 @@ jobs:
           ENV_SEC_NAME: official-release
           PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
-          NPMJS_DIST_TAG: ${{ github.event.inputs.npmjs_dist_tag }}
-          PR_URL: ${{ steps.ensure_pr.outputs.pr_url }}
+          NPM_DIST_TAGS: ${{ needs.get_version.outputs.npm_dist_tags }}
+          PR_URL: ${{ needs.get_version.outputs.release_pr_url }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
         run: |
@@ -420,11 +463,11 @@ jobs:
           ENV_NAME: official-release
           PACKAGE_NAME: ${{ env.PACKAGE_NAME }}
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
-          NPMJS_DIST_TAG: ${{ github.event.inputs.npmjs_dist_tag }}
+          NPM_DIST_TAGS: ${{ needs.get_version.outputs.npm_dist_tags }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          PR_URL: ${{ steps.ensure_pr.outputs.pr_url }}
+          PR_URL: ${{ needs.get_version.outputs.release_pr_url }}
 
         run: |
           set -euo pipefail
@@ -461,7 +504,7 @@ jobs:
           PACKAGE_VERSION: ${{ env.PACKAGE_VERSION }}
           RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.reviewers_dev }}
-          PR_URL:         ${{ steps.ensure_pr.outputs.pr_url }}
+          PR_URL:         ${{ needs.get_version.outputs.release_pr_url }}
         run: |
           set -euo pipefail
 
@@ -480,6 +523,7 @@ jobs:
 
   first_review:
     runs-on: ubuntu-latest
+    if: ${{ needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review]
     name: First approval (dev team)
     environment:
@@ -491,6 +535,7 @@ jobs:
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
+    if: ${{ needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
     name: Invite sec team to review
     steps:
@@ -507,7 +552,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A member from the infosec team (${SEC_REVIEWERS}) needs to take the following action:\n Review the release artifacts and approve/reject the release. (${RUN_URL})"
+          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A sec reviewer from (${SEC_REVIEWERS}) needs to take the following action:\n Review the release artifacts and approve/reject the release. (${RUN_URL})"
           MSG=$(printf '%b' "$MSG")
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
@@ -520,6 +565,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: ${{ needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review, ask_for_sec_team_review]
     name: Release for ${{ needs.get_version.outputs.package_version }}
     env:
@@ -553,20 +599,53 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Publish to npm
+        env:
+          PRIMARY_NPM_TAG: ${{ needs.get_version.outputs.npm_primary_dist_tag }}
+          NPM_DIST_TAGS: ${{ needs.get_version.outputs.npm_dist_tags }}
+          NPM_IS_BETA: ${{ needs.get_version.outputs.npm_is_beta }}
         run: |
+          set -euo pipefail
           cd dist
           PKG=$(ls *.tgz)
-          echo $PKG
-          NPM_DIST_TAG="${{ github.event.inputs.npmjs_dist_tag }}"
-          if [ -z "$NPM_DIST_TAG" ]; then
-            NPM_DIST_TAG="latest"
-          fi
-          if [[ "$NPM_DIST_TAG" == "latest" ]] && ! [[ "${{ env.PACKAGE_VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "With npmjs_dist_tag 'latest', version must be of the form x.y.z. Found '${{ env.PACKAGE_VERSION }}'." >&2
+          echo "$PKG"
+
+          if [ -z "${PRIMARY_NPM_TAG:-}" ]; then
+            echo "❌ Primary npm dist-tag is not set." >&2
             exit 1
           fi
+
+          if [ -z "${NPM_DIST_TAGS:-}" ]; then
+            echo "❌ No npm dist-tags provided." >&2
+            exit 1
+          fi
+
+          if [[ "${NPM_IS_BETA}" != "true" ]] && ! [[ "${PACKAGE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Stable releases (tagged with 'latest') must use x.y.z SemVer. Found '${PACKAGE_VERSION}'." >&2
+            exit 1
+          fi
+
           npm i -g npm@11.6.0
-          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
+          # fix warning: npm warn Unknown user config always-auth
+          npm config delete always-auth --location=user
+          npm config set //registry.npmjs.org/:always-auth true --location=user
+
+          npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$PRIMARY_NPM_TAG"
+
+          PACKAGE_JSON_PATH="../packages/${PACKAGE_NAME}/package.json"
+          if [ ! -f "$PACKAGE_JSON_PATH" ]; then
+            echo "❌ package.json not found at $PACKAGE_JSON_PATH" >&2
+            exit 1
+          fi
+
+          FULL_PACKAGE_NAME=$(jq -er '.name' "$PACKAGE_JSON_PATH")
+
+          IFS=',' read -ra TAGS <<< "$NPM_DIST_TAGS"
+          for tag in "${TAGS[@]}"; do
+            if [ "$tag" = "$PRIMARY_NPM_TAG" ]; then
+              continue
+            fi
+            npm dist-tag add "$FULL_PACKAGE_NAME@${PACKAGE_VERSION}" "$tag"
+          done
 
       - name: Ensure Git tag exists
         id: create_tag
@@ -594,8 +673,8 @@ jobs:
           name: "${{ steps.create_tag.outputs.tag_name }}"
           draft: false
           generate_release_notes: true
-          prerelease: ${{ github.event.inputs.npmjs_dist_tag != '' && github.event.inputs.npmjs_dist_tag != 'latest' }}
-          make_latest: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
+          prerelease: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
+          make_latest: ${{ needs.get_version.outputs.npm_is_beta != 'true' }}
 
       - name: Notify Slack success (single-line)
         if: success()
@@ -620,13 +699,32 @@ jobs:
             -H "Content-Type: application/json; charset=utf-8" \
             -d "$(jq -n --arg channel "#xrpl-js" --arg text "$text" '{channel:$channel, text:$text}')"
 
-      - name: Notify Slack if tests fail
-        if: failure()
+  generate-documentation:
+    name: Generate and Publish documentation for ${{ needs.get_version.outputs.package_version }}
+    if: ${{ needs.get_version.outputs.npm_is_beta != 'true' }}
+    uses: ./.github/workflows/generate-documentation.yml
+    needs: [get_version, release]
+    with:
+      git_ref: ${{ github.ref_name }}
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
+
+  notify_release_failure:
+    runs-on: ubuntu-latest
+    needs: [get_version, release]
+    if: ${{ needs.release.result == 'failure' }}
+    steps:
+      - name: Notify Slack release failed
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          PACKAGE_NAME: ${{ github.event.inputs.package_name }}
+          PACKAGE_VERSION: ${{ needs.get_version.outputs.package_version }}
         run: |
-          MESSAGE="❌ Release failed for ${{ env.PACKAGE_NAME }}@${{ env.PACKAGE_VERSION }}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          curl -X POST https://slack.com/api/chat.postMessage \
+          set -euo pipefail
+          MESSAGE="❌ Release failed for ${PACKAGE_NAME}@${PACKAGE_VERSION}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
