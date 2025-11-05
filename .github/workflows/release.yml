@@ -37,6 +37,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.inputs.release_branch_name }}
 
       - name: Validate inputs
         id: validate_inputs
@@ -46,14 +47,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          RELEASE_BRANCH_INPUT="${{ github.event.inputs.release_branch_name }}"
-          RELEASE_BRANCH="$(git branch --show-current || true)"
-          if [[ -n "$RELEASE_BRANCH_INPUT" ]]; then
-            RELEASE_BRANCH="$RELEASE_BRANCH_INPUT"
-          elif [[ -z "$RELEASE_BRANCH" ]]; then
-            RELEASE_BRANCH="${{ github.ref_name }}"
-          fi
-
+          RELEASE_BRANCH="${{ github.event.inputs.release_branch_name }}"
           if [[ -z "$RELEASE_BRANCH" ]]; then
             echo "❌ Unable to determine branch name." >&2
             exit 1
@@ -71,11 +65,6 @@ jobs:
             exit 1
           fi
 
-          if [[ ! "${RELEASE_BRANCH,,}" =~ ^release[-/] ]]; then
-            echo "❌ Release branch '$RELEASE_BRANCH' must start with 'release-' or 'release/'." >&2
-            exit 1
-          fi
-
           if grep -R --exclude-dir=.git --exclude-dir=.github "artifactory.ops.ripple.com" .; then
             echo "❌ Internal Artifactory URL found"
             exit 1
@@ -87,9 +76,12 @@ jobs:
           RAW_DIST_TAGS="${{ github.event.inputs.npmjs_dist_tag }}"
           declare -a TAGS
           declare -A SEEN=()
+          HAS_LATEST="false"
+          HAS_EXPERIMENTAL="false"
 
           if [ -z "$RAW_DIST_TAGS" ]; then
             TAGS=("latest")
+            HAS_LATEST="true"
             echo "ℹ️ npmjs_dist_tag empty → defaulting to 'latest'."
           else
             IFS=',' read -ra INPUT_TAGS <<< "$RAW_DIST_TAGS"
@@ -113,21 +105,33 @@ jobs:
               fi
               SEEN[$tag]=1
               TAGS+=("$tag")
+              if [ "$tag" = "latest" ]; then
+                HAS_LATEST="true"
+              fi
+              if [[ "${tag,,}" == *experimental* ]]; then
+                HAS_EXPERIMENTAL="true"
+              fi
             done
           fi
 
           NORMALIZED_TAGS=$(IFS=','; printf '%s' "${TAGS[*]}")
-          HAS_LATEST="false"
-          for tag in "${TAGS[@]}"; do
-            if [ "$tag" = "latest" ]; then
-              HAS_LATEST="true"
-            fi
-          done
 
           if [ "$HAS_LATEST" = "true" ]; then
             IS_BETA="false"
           else
             IS_BETA="true"
+          fi
+
+          if [ "$IS_BETA" = "true" ]; then
+            if [ "$HAS_EXPERIMENTAL" != "true" ]; then
+              echo "❌ Beta releases must include an npm dist-tag containing 'experimental'. Provided tags: '$NORMALIZED_TAGS'." >&2
+              exit 1
+            fi
+          fi
+
+          if [ "$IS_BETA" != "true" ] && [[ ! "${RELEASE_BRANCH,,}" =~ ^release[-/] ]]; then
+            echo "❌ Release branch '$RELEASE_BRANCH' must start with 'release-' or 'release/' for stable releases." >&2
+            exit 1
           fi
 
           PRIMARY_TAG="${TAGS[0]}"
@@ -136,6 +140,7 @@ jobs:
           PR_NUMBER=""
           PR_URL=""
 
+          // For stable releases, check that a PR exists from the release branch to main
           if [ "$IS_BETA" = "false" ]; then
             OWNER="${REPO%%/*}"
             echo "🔎 Validating that a release PR exists for ${RELEASE_BRANCH} → main…"
