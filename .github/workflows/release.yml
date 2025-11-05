@@ -140,7 +140,7 @@ jobs:
           PR_NUMBER=""
           PR_URL=""
 
-          // For stable releases, check that a PR exists from the release branch to main
+          # For stable releases, check that a PR exists from the release branch to main
           if [ "$IS_BETA" = "false" ]; then
             OWNER="${REPO%%/*}"
             echo "🔎 Validating that a release PR exists for ${RELEASE_BRANCH} → main…"
@@ -211,12 +211,12 @@ jobs:
 
   run_tests:
     name: Run unit/integration tests ${{ needs.get_version.outputs.package_version }}
-    continue-on-error: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
       git_ref: ${{ github.ref }}
     secrets: inherit
+    continue-on-error: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
 
   pre_release:
     runs-on: ubuntu-latest
