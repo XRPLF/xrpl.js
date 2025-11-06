@@ -24,7 +24,7 @@ jobs:
   faucet-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: ${{ inputs.allow_failure }}
+    continue-on-error: ${{ github.event_name == 'workflow_call' && (inputs.allow_failure == true || inputs.allow_failure == 'true') }}
 
     strategy:
       max-parallel: 1
