@@ -241,14 +241,14 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Normalize npm auth config
-        run: |
-          set -euo pipefail
-          CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
-          touch "$CONFIG_FILE"
-          tmp="$(mktemp)"
-          grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
-          mv "$tmp" "$CONFIG_FILE"
+      # - name: Normalize npm auth config
+      #   run: |
+      #     set -euo pipefail
+      #     CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+      #     touch "$CONFIG_FILE"
+      #     tmp="$(mktemp)"
+      #     grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
+      #     mv "$tmp" "$CONFIG_FILE"
 
       - name: Build package
         run: |
@@ -591,10 +591,6 @@ jobs:
             echo "❌ Workflow rerun (attempt ${GITHUB_RUN_ATTEMPT}). Second attempts are not allowed."
             exit 1
           fi
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Download artifact
         uses: actions/download-artifact@v4
