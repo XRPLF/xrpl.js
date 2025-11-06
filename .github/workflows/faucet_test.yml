@@ -2,7 +2,6 @@ name: Faucet Tests
 
 env:
   GIT_REF: ${{ inputs.git_ref || github.ref }}
-  ALLOW_FAILURE: ${{ inputs.allow_failure || false }}
 
 on:
   push:
@@ -25,7 +24,7 @@ jobs:
   faucet-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
+    continue-on-error: ${{ inputs.allow_failure }}
 
     strategy:
       max-parallel: 1
