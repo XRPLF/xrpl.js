@@ -30,7 +30,7 @@ jobs:
   build-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ github.event_name == 'workflow_call' && (inputs.allow_failure == true || inputs.allow_failure == 'true') }}
+    continue-on-error: ${{ inputs.allow_failure || false }}
     strategy:
       matrix:
         node-version: [24.x]
@@ -73,7 +73,7 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ github.event_name == 'workflow_call' && (inputs.allow_failure == true || inputs.allow_failure == 'true') }}
+    continue-on-error: ${{ inputs.allow_failure || false }}
 
     strategy:
       matrix:
@@ -117,7 +117,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ github.event_name == 'workflow_call' && (inputs.allow_failure == true || inputs.allow_failure == 'true') }}
+    continue-on-error: ${{ inputs.allow_failure || false }}
 
     strategy:
       matrix:
