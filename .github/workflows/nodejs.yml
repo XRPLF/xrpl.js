@@ -6,6 +6,7 @@ name: Node.js CI
 env:
   RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
   GIT_REF: ${{ inputs.git_ref || github.ref }}
+  ALLOW_FAILURE: ${{ inputs.allow_failure || false }}
 
 on:
   push:
@@ -20,11 +21,17 @@ on:
         description: 'Git ref to checkout (branch, tag, or commit SHA)'
         required: true
         type: string
+      allow_failure:
+        description: 'Allow workflow jobs to continue on error when invoked as a reusable workflow'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
     strategy:
       matrix:
         node-version: [24.x]
@@ -67,6 +74,7 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
 
     strategy:
       matrix:
@@ -110,6 +118,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
 
     strategy:
       matrix:

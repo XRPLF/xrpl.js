@@ -1,5 +1,9 @@
 name: Faucet Tests
 
+env:
+  GIT_REF: ${{ inputs.git_ref || github.ref }}
+  ALLOW_FAILURE: ${{ inputs.allow_failure || false }}
+
 on:
   push:
     branches: [main]
@@ -10,12 +14,18 @@ on:
         description: 'Git ref to checkout (branch, tag, or commit SHA)'
         required: true
         type: string
+      allow_failure:
+        description: 'Allow workflow jobs to continue on error when invoked as a reusable workflow'
+        required: false
+        default: false
+        type: boolean
 
 
 jobs:
   faucet-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    continue-on-error: ${{ env.ALLOW_FAILURE == 'true' }}
 
     strategy:
       max-parallel: 1
@@ -25,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.git_ref || github.ref }}
+          ref: ${{ env.GIT_REF }}
           fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

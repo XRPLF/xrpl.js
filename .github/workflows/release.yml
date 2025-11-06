@@ -206,6 +206,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
+      allow_failure: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
       git_ref: ${{ github.ref }}
     secrets: inherit
 
@@ -214,13 +215,13 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
+      allow_failure: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
       git_ref: ${{ github.ref }}
     secrets: inherit
-    continue-on-error: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
 
   pre_release:
     runs-on: ubuntu-latest
-    if: ${{ needs.get_version.result == 'success' && needs.run_faucet_test.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
