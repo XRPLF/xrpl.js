@@ -241,16 +241,21 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Normalize npm auth config
+        run: |
+          npm config delete always-auth --location=user || true
+          npm config set //registry.npmjs.org/:always-auth true --location=user
+
       - name: Build package
         run: |
-          # dubugging info
+          # debugging info
           npm i -g npm@11.6.0
           npm --version
           node --version
           ls -l
           pwd
 
-          #build
+          # build
           npm ci
           npm run build
 
@@ -599,6 +604,11 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org/'
 
+      - name: Normalize npm auth config
+        run: |
+          npm config delete always-auth --location=user || true
+          npm config set //registry.npmjs.org/:always-auth true --location=user
+
       - name: Publish to npm
         env:
           PRIMARY_NPM_TAG: ${{ needs.get_version.outputs.npm_primary_dist_tag }}
@@ -626,9 +636,6 @@ jobs:
           fi
 
           npm i -g npm@11.6.0
-          # fix warning: npm warn Unknown user config always-auth
-          npm config delete always-auth --location=user
-          npm config set //registry.npmjs.org/:always-auth true --location=user
 
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$PRIMARY_NPM_TAG"
 
