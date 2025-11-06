@@ -608,14 +608,14 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org/'
 
-      - name: Normalize npm auth config
-        run: |
-          set -euo pipefail
-          CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
-          touch "$CONFIG_FILE"
-          tmp="$(mktemp)"
-          grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
-          mv "$tmp" "$CONFIG_FILE"
+      # - name: Normalize npm auth config
+      #   run: |
+      #     set -euo pipefail
+      #     CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+      #     touch "$CONFIG_FILE"
+      #     tmp="$(mktemp)"
+      #     grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
+      #     mv "$tmp" "$CONFIG_FILE"
 
       - name: Publish to npm
         env:
