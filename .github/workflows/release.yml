@@ -32,6 +32,7 @@ jobs:
       release_branch: ${{ steps.validate_inputs.outputs.release_branch }}
       release_pr_number: ${{ steps.validate_inputs.outputs.release_pr_number }}
       release_pr_url: ${{ steps.validate_inputs.outputs.release_pr_url }}
+      is_beta: ${{ steps.validate_inputs.outputs.is_beta }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -206,7 +207,7 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
-      allow_failure: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
+      allow_failure: ${{ needs.get_version.outputs.is_beta == 'true' }}
       git_ref: ${{ needs.get_version.outputs.release_branch }}
     secrets: inherit
 
@@ -215,13 +216,13 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
-      allow_failure: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
+      allow_failure: ${{ needs.get_version.outputs.is_beta == 'true' }}
       git_ref: ${{ needs.get_version.outputs.release_branch }}
     secrets: inherit
 
   pre_release:
     runs-on: ubuntu-latest
-    if: ${{ needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
@@ -383,7 +384,7 @@ jobs:
 
   ask_for_dev_team_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release]
     permissions:
       pull-requests: write
@@ -525,7 +526,7 @@ jobs:
 
   first_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review]
     name: First approval (dev team)
     environment:
@@ -537,7 +538,7 @@ jobs:
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
     name: Invite sec team to review
     steps:
@@ -567,7 +568,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    if: ${{ needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.npm_is_beta == 'true') }}
+    if: ${{ needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review, ask_for_sec_team_review]
     name: Release for ${{ needs.get_version.outputs.package_version }}
     env:
@@ -604,7 +605,7 @@ jobs:
         env:
           PRIMARY_NPM_TAG: ${{ needs.get_version.outputs.npm_primary_dist_tag }}
           NPM_DIST_TAGS: ${{ needs.get_version.outputs.npm_dist_tags }}
-          NPM_IS_BETA: ${{ needs.get_version.outputs.npm_is_beta }}
+          NPM_IS_BETA: ${{ needs.get_version.outputs.is_beta }}
         run: |
           set -euo pipefail
           cd dist
@@ -675,8 +676,8 @@ jobs:
           name: "${{ steps.create_tag.outputs.tag_name }}"
           draft: false
           generate_release_notes: true
-          prerelease: ${{ needs.get_version.outputs.npm_is_beta == 'true' }}
-          make_latest: ${{ needs.get_version.outputs.npm_is_beta != 'true' }}
+          prerelease: ${{ needs.get_version.outputs.is_beta == 'true' }}
+          make_latest: ${{ needs.get_version.outputs.is_beta != 'true' }}
 
       - name: Notify Slack success (single-line)
         if: success()
@@ -703,7 +704,7 @@ jobs:
 
   generate-documentation:
     name: Generate and Publish documentation for ${{ needs.get_version.outputs.package_version }}
-    if: ${{ needs.get_version.outputs.npm_is_beta != 'true' }}
+    if: ${{ needs.get_version.outputs.is_beta != 'true' }}
     uses: ./.github/workflows/generate-documentation.yml
     needs: [get_version, release]
     permissions:
