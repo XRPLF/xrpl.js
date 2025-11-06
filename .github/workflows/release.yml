@@ -247,11 +247,8 @@ jobs:
           CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
           touch "$CONFIG_FILE"
           tmp="$(mktemp)"
-          grep -v '^always-auth[[:space:]]*=' "$CONFIG_FILE" > "$tmp" || true
+          grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
           mv "$tmp" "$CONFIG_FILE"
-          if ! grep -q '^//registry.npmjs.org/:always-auth' "$CONFIG_FILE"; then
-            printf '//registry.npmjs.org/:always-auth=true\n' >> "$CONFIG_FILE"
-          fi
 
       - name: Build package
         run: |
@@ -617,11 +614,8 @@ jobs:
           CONFIG_FILE="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
           touch "$CONFIG_FILE"
           tmp="$(mktemp)"
-          grep -v '^always-auth[[:space:]]*=' "$CONFIG_FILE" > "$tmp" || true
+          grep -v 'always-auth' "$CONFIG_FILE" > "$tmp" || true
           mv "$tmp" "$CONFIG_FILE"
-          if ! grep -q '^//registry.npmjs.org/:always-auth' "$CONFIG_FILE"; then
-            printf '//registry.npmjs.org/:always-auth=true\n' >> "$CONFIG_FILE"
-          fi
 
       - name: Publish to npm
         env:
