@@ -706,6 +706,10 @@ jobs:
     if: ${{ needs.get_version.outputs.npm_is_beta != 'true' }}
     uses: ./.github/workflows/generate-documentation.yml
     needs: [get_version, release]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     with:
       git_ref: ${{ github.ref_name }}
 
