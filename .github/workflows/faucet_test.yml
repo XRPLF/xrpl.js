@@ -13,18 +13,12 @@ on:
         description: 'Git ref to checkout (branch, tag, or commit SHA)'
         required: true
         type: string
-      allow_failure:
-        description: 'Allow workflow jobs to continue on error when invoked as a reusable workflow'
-        required: false
-        default: false
-        type: boolean
 
 
 jobs:
   faucet-test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: ${{ inputs.allow_failure || false }}
 
     strategy:
       max-parallel: 1

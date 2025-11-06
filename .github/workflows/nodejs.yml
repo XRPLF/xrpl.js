@@ -20,17 +20,11 @@ on:
         description: 'Git ref to checkout (branch, tag, or commit SHA)'
         required: true
         type: string
-      allow_failure:
-        description: 'Allow workflow jobs to continue on error when invoked as a reusable workflow'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ inputs.allow_failure || false }}
     strategy:
       matrix:
         node-version: [24.x]
@@ -73,7 +67,6 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ inputs.allow_failure || false }}
 
     strategy:
       matrix:
@@ -117,7 +110,6 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    continue-on-error: ${{ inputs.allow_failure || false }}
 
     strategy:
       matrix:

@@ -207,7 +207,6 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/faucet_test.yml
     with:
-      allow_failure: ${{ needs.get_version.outputs.is_beta == 'true' }}
       git_ref: ${{ needs.get_version.outputs.release_branch }}
     secrets: inherit
 
@@ -216,13 +215,12 @@ jobs:
     needs: [get_version]
     uses: ./.github/workflows/nodejs.yml
     with:
-      allow_failure: ${{ needs.get_version.outputs.is_beta == 'true' }}
       git_ref: ${{ needs.get_version.outputs.release_branch }}
     secrets: inherit
 
   pre_release:
     runs-on: ubuntu-latest
-    if: ${{ needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
@@ -384,7 +382,7 @@ jobs:
 
   ask_for_dev_team_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release]
     permissions:
       pull-requests: write
@@ -526,7 +524,7 @@ jobs:
 
   first_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review]
     name: First approval (dev team)
     environment:
@@ -538,7 +536,7 @@ jobs:
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
-    if: ${{ needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review]
     name: Invite sec team to review
     steps:
@@ -568,7 +566,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    if: ${{ needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release, ask_for_dev_team_review, first_review, ask_for_sec_team_review]
     name: Release for ${{ needs.get_version.outputs.package_version }}
     env:
