@@ -661,19 +661,51 @@ jobs:
     with:
       git_ref: ${{ github.ref_name }}
 
-  notify_release_failure:
+  notify_failures:
     runs-on: ubuntu-latest
-    needs: [get_version, release]
-    if: ${{ needs.release.result == 'failure' }}
+    needs:
+      [
+        get_version,
+        run_faucet_test,
+        run_tests,
+        pre_release,
+        ask_for_dev_team_review,
+        first_review,
+        ask_for_sec_team_review,
+        release,
+        generate-documentation
+      ]
+    if: ${{ always() && (
+      needs.get_version.result == 'failure' ||
+      needs.run_faucet_test.result == 'failure' ||
+      needs.run_tests.result == 'failure' ||
+      needs.pre_release.result == 'failure' ||
+      needs.ask_for_dev_team_review.result == 'failure' ||
+      needs.first_review.result == 'failure' ||
+      needs.ask_for_sec_team_review.result == 'failure' ||
+      needs.release.result == 'failure' ||
+      needs.generate-documentation.result == 'failure'
+    ) }}
     steps:
-      - name: Notify Slack release failed
+      - name: Notify Slack about workflow failure
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
           PACKAGE_NAME: ${{ github.event.inputs.package_name }}
           PACKAGE_VERSION: ${{ needs.get_version.outputs.package_version }}
+          NEEDS_JSON: ${{ toJson(needs) }}
         run: |
           set -euo pipefail
-          MESSAGE="❌ Release failed for ${PACKAGE_NAME}@${PACKAGE_VERSION}. Check the logs: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          FAILED_JOBS=$(printf '%s' "$NEEDS_JSON" | jq -r '
+            to_entries
+            | map(select(.value.result=="failure") | .key)
+            | join(", ")
+          ')
+          if [ -z "$FAILED_JOBS" ]; then
+            echo "No failed jobs detected; skipping notification."
+            exit 0
+          fi
+
+          MESSAGE="❌ Workflow failure for ${PACKAGE_NAME}@${PACKAGE_VERSION}. Release failed at ${FAILED_JOBS}. For details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
