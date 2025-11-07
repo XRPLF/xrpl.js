@@ -600,7 +600,7 @@ jobs:
           name: npm-package-tarball
           path: dist
 
-      - uses: electron/npm-trusted-auth-action@v1
+      - uses: electron/npm-trusted-auth-action@v1.0.0
         with:
           package-name: 'xrpl'
       - name: Publish to npm
