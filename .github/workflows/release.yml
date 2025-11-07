@@ -594,6 +594,11 @@ jobs:
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org/'
+      - name: Checkout release branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.get_version.outputs.release_branch }}
 
       - name: Publish to npm
         env:
@@ -602,6 +607,14 @@ jobs:
           NPM_IS_BETA: ${{ needs.get_version.outputs.is_beta }}
         run: |
           set -euo pipefail
+          REPO_ROOT="$PWD"
+          PACKAGE_JSON_PATH="$REPO_ROOT/packages/${PACKAGE_NAME}/package.json"
+          if [ ! -f "$PACKAGE_JSON_PATH" ]; then
+            echo "❌ package.json not found at $PACKAGE_JSON_PATH" >&2
+            exit 1
+          fi
+          FULL_PACKAGE_NAME=$(jq -er '.name' "$PACKAGE_JSON_PATH")
+
           cd dist
           PKG=$(ls *.tgz)
           echo "$PKG"
@@ -625,21 +638,15 @@ jobs:
 
           npm publish "$PKG" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$PRIMARY_NPM_TAG"
 
-          PACKAGE_JSON_PATH="../packages/${PACKAGE_NAME}/package.json"
-          if [ ! -f "$PACKAGE_JSON_PATH" ]; then
-            echo "❌ package.json not found at $PACKAGE_JSON_PATH" >&2
-            exit 1
-          fi
-
-          FULL_PACKAGE_NAME=$(jq -er '.name' "$PACKAGE_JSON_PATH")
-
           IFS=',' read -ra TAGS <<< "$NPM_DIST_TAGS"
           for tag in "${TAGS[@]}"; do
-            if [ "$tag" = "$PRIMARY_NPM_TAG" ]; then
+            tag="$(printf '%s' "$tag" | tr -d '[:space:]')"
+            if [ -z "$tag" ] || [ "$tag" = "$PRIMARY_NPM_TAG" ]; then
               continue
             fi
             npm dist-tag add "$FULL_PACKAGE_NAME@${PACKAGE_VERSION}" "$tag"
           done
+
 
       - name: Ensure Git tag exists
         id: create_tag
