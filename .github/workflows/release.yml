@@ -644,7 +644,19 @@ jobs:
             if [ -z "$tag" ] || [ "$tag" = "$PRIMARY_NPM_TAG" ]; then
               continue
             fi
-            npm dist-tag add "$FULL_PACKAGE_NAME@${PACKAGE_VERSION}" "$tag"
+            echo "➡️  Adding dist-tag '$tag' to ${FULL_PACKAGE_NAME}@${PACKAGE_VERSION}"
+            for attempt in 1 2 3; do
+              if npm dist-tag add "$FULL_PACKAGE_NAME@${PACKAGE_VERSION}" "$tag"; then
+                echo "✅ Added tag '$tag'"
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "❌ Failed to add tag '$tag' after 3 attempts." >&2
+                exit 1
+              fi
+              echo "⚠️  Tag '$tag' failed (attempt $attempt). Retrying in 5s…"
+              sleep 5
+            done
           done
 
 
