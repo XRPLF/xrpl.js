@@ -675,17 +675,18 @@ jobs:
         release,
         generate-documentation
       ]
-    if: ${{ always() && (
-      needs.get_version.result == 'failure' ||
-      needs.run_faucet_test.result == 'failure' ||
-      needs.run_tests.result == 'failure' ||
-      needs.pre_release.result == 'failure' ||
-      needs.ask_for_dev_team_review.result == 'failure' ||
-      needs.first_review.result == 'failure' ||
-      needs.ask_for_sec_team_review.result == 'failure' ||
-      needs.release.result == 'failure' ||
-      needs.generate-documentation.result == 'failure'
-    ) }}
+    if: >-
+      ${{ always() && (
+        needs.get_version.result == 'failure' ||
+        needs.run_faucet_test.result == 'failure' ||
+        needs.run_tests.result == 'failure' ||
+        needs.pre_release.result == 'failure' ||
+        needs.ask_for_dev_team_review.result == 'failure' ||
+        needs.first_review.result == 'failure' ||
+        needs.ask_for_sec_team_review.result == 'failure' ||
+        needs.release.result == 'failure' ||
+        needs.generate-documentation.result == 'failure'
+      ) }}
     steps:
       - name: Notify Slack about workflow failure
         env:
