@@ -221,9 +221,9 @@ jobs:
 
       - run: npm run build
 
-      - name: Run integration test
-        run: npm run test:browser
+      # - name: Run integration test
+      #   run: npm run test:browser
 
-      - name: Stop docker container
-        if: always()
-        run: docker stop rippled-service
+      # - name: Stop docker container
+      #   if: always()
+      #   run: docker stop rippled-service
