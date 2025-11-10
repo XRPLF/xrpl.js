@@ -517,7 +517,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A sec reviewer from (${SEC_REVIEWERS}) needs to take the following action:\n Review the release artifacts and approve/reject the release. (${RUN_URL})"
+          MSG="${EXECUTOR} is releasing ${PACKAGE_NAME}@${PACKAGE_VERSION}. A sec reviewer from (${SEC_REVIEWERS}) needs to take the following action:\nReview the release artifacts and approve/reject the release. (${RUN_URL})"
           MSG=$(printf '%b' "$MSG")
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_TOKEN" \
