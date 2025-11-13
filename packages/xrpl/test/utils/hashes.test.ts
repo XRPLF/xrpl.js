@@ -16,6 +16,7 @@ import {
   hashTxTree,
   hashTrustline,
   hashEscrow,
+  hashOracle,
   hashPaymentChannel,
   hashSignedTx,
   hashAccountRoot,
@@ -134,6 +135,16 @@ describe('Hashes', function () {
     const expectedEntryHash =
       '61E8E8ED53FA2CEBE192B23897071E9A75217BF5A410E9CB5B45AAB7AECA567A'
     const actualEntryHash = hashEscrow(account, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcOracleEntryHash', function () {
+    const account = 'rsNvoAZ9MquZSRhu4cEY9wTv1VqHXpVPPt'
+    const documentId = 1
+    const expectedEntryHash =
+      'D463D13ACF77206306BE891DF410655213FBD2C1F2B58A492E7F556A41A44338'
+    const actualEntryHash = hashOracle(account, documentId)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })
