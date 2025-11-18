@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Get release version from package.json
     outputs:
-      package_version: ${{ steps.get_version.outputs.version }}
+      package_version: ${{ steps.get_version.outputs.package_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
