@@ -437,6 +437,51 @@ describe('Wallet', function () {
     })
   })
 
+  describe('from PrivateKey', function () {
+    describe('using secp256k1 private key', function () {
+      const mockWallet_secp256k1 = {
+        address: 'rhvh5SrgBL5V8oeV9EpDuVszeJSSCEkbPc',
+        publicKey:
+          '030E58CDD076E798C84755590AAF6237CA8FAE821070A59F648B517A30DC6F589D',
+        privateKey:
+          '00141BA006D3363D2FB2785E8DF4E44D3A49908780CB4FB51F6D217C08C021429F',
+      }
+
+      it('derive keypair from private key', function () {
+        const wallet = Wallet.fromPrivateKey(mockWallet_secp256k1.privateKey)
+        assert.equal(wallet.address, mockWallet_secp256k1.address)
+        assert.equal(wallet.publicKey, mockWallet_secp256k1.publicKey)
+      })
+
+      it('throws error for malformed secp256k1 private key', function () {
+        assert.throws(() =>
+          Wallet.fromPrivateKey(mockWallet_secp256k1.privateKey.slice(0, 10)),
+        )
+      })
+    })
+
+    describe('using ed25519 private key', function () {
+      const mockWallet_ed25519 = {
+        address: 'rszPLM97iS8mFTndKQNexGhY1N9ionLVAx',
+        publicKey:
+          'EDFD5C3E305FDEB97A89FC39ED333A710A7ED35E3471443C4989F9E3B8F023488D',
+        privateKey:
+          'EDDA8694C151CE30E8A2C91884E26BC11A75514E3A27EE6CE4615FABA3DCBE1429',
+      }
+      it('derive keypair from private key', function () {
+        const wallet = Wallet.fromPrivateKey(mockWallet_ed25519.privateKey)
+        assert.equal(wallet.address, mockWallet_ed25519.address)
+        assert.equal(wallet.publicKey, mockWallet_ed25519.publicKey)
+      })
+
+      it('throws error for malformed ed25519 private key', function () {
+        assert.throws(() =>
+          Wallet.fromPrivateKey(mockWallet_ed25519.privateKey.slice(0, 10)),
+        )
+      })
+    })
+  })
+
   // eslint-disable-next-line max-statements -- Required for test coverage.
   describe('sign', function () {
     let wallet: Wallet
