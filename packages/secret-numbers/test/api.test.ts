@@ -9,7 +9,7 @@ describe('API: XRPL Secret Numbers', () => {
     it('Output sanity checks', () => {
       expect(account.getAddress()).toMatch(/^r[a-zA-Z0-9]{19,}$/u)
       const entropy = secretToEntropy(`${account.toString()}`.split(' '))
-      const familySeed = generateSeed({ entropy })
+      const familySeed = generateSeed({ entropy, algorithm: 'ed25519' })
       const keypair = deriveKeypair(familySeed)
       const address = deriveAddress(keypair.publicKey)
       expect(address).toEqual(account.getAddress())
@@ -22,10 +22,10 @@ describe('API: XRPL Secret Numbers', () => {
     const account = new Account(entropy)
 
     it('familySeed as expected', () => {
-      expect(account.getFamilySeed()).toEqual('sp5DmDCut79BpgumfHhvRzdxXYQyU')
+      expect(account.getFamilySeed()).toEqual('sEdSKUm3MuTvN745ezpSM94Xw45BsbA')
     })
     it('address as expected', () => {
-      expect(account.getAddress()).toEqual('rMCcybKHfwCSkDHd3M36PAeUniEoygwjR3')
+      expect(account.getAddress()).toEqual('rMjDw1h3vQZUfYkQJV7PXeToajAA4JtkFJ')
     })
     it('Account object to string as expected', () => {
       const accountAsStr =
@@ -47,6 +47,63 @@ describe('API: XRPL Secret Numbers', () => {
     ]
 
     const account = new Account(secret)
+
+    it('familySeed as expected', () => {
+      expect(account.getFamilySeed()).toEqual('sEdSmrWh6iszywyGQCgguErD9DiuBY8')
+    })
+    it('publicKey as expected', () => {
+      const pubkey =
+        'EDBB1A131EA944C5D07D1DE39CAD2E128329CD1321F2F5759D2BB3EB94D5B8AB2F'
+      expect(account.getKeypair().publicKey).toEqual(pubkey)
+    })
+    it('privateKey as expected', () => {
+      const privkey =
+        'EDB55E7518A732963CD444E6D1E682DCD6AD60DD53AA5743854D4C4AB52E2D6800'
+      expect(account.getKeypair().privateKey).toEqual(privkey)
+    })
+    it('address as expected', () => {
+      expect(account.getAddress()).toEqual('rJmyR83BfJdRpJabbkBH2ES8mkR168bNVJ')
+    })
+    it('Account object to string as expected', () => {
+      const accountAsStr =
+        '084677 005323 580272 282388 626800 105300 560913 071783'
+      expect(`${account.toString()}`).toEqual(accountAsStr)
+    })
+  })
+
+  describe('Validate the default signing algorithm', () => {
+    const secret = [
+      '084677',
+      '005323',
+      '580272',
+      '282388',
+      '626800',
+      '105300',
+      '560913',
+      '071783',
+    ]
+
+    const account1 = new Account(secret)
+    const account2 = new Account(secret, 'ed25519')
+
+    it('default signing algorithm is ed25519 in the Account class', () => {
+      expect(account1).toEqual(account2)
+    })
+  })
+
+  describe('Account based on existing secret, explicitly specify secp256k1 algorithm', () => {
+    const secret = [
+      '084677',
+      '005323',
+      '580272',
+      '282388',
+      '626800',
+      '105300',
+      '560913',
+      '071783',
+    ]
+
+    const account = new Account(secret, 'ecdsa-secp256k1')
 
     it('familySeed as expected', () => {
       expect(account.getFamilySeed()).toEqual('sswpWwri7Y11dNCSmXdphgcoPZk3y')
