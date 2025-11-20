@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 import { hasFlag, isHex } from '../utils'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -14,9 +19,6 @@ import {
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-  validateMPTokenMetadata,
 } from './common'
 
 /**
@@ -71,10 +73,9 @@ export interface VaultCreate extends BaseTransaction {
   AssetsMaximum?: XRPLNumber
 
   /**
-   * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
-   *
-   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
-   * XLS-89d MPTokenMetadata standard.
+   * Should follow {@link https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0089-multi-purpose-token-metadata-schema | XLS-89} standard.
+   * Use {@link encodeMPTokenMetadata} utility function to convert to convert {@link MPTokenMetadata} to a blob.
+   * Use {@link decodeMPTokenMetadata} utility function to convert from a blob to {@link MPTokenMetadata}.
    *
    * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
    * may not be discoverable by ecosystem tools such as explorers and indexers.
