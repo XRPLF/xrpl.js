@@ -43,6 +43,7 @@ jobs:
         id: validate_inputs
         env:
           GH_TOKEN: ${{ github.token }}
+          PKG_NAME: ${{ github.event.inputs.package_name }}
           REPO: ${{ github.repository }}
           RELEASE_BRANCH: ${{ github.event.inputs.release_branch_name }}
           NPM_DIST_TAG: ${{ github.event.inputs.npmjs_dist_tag }}
