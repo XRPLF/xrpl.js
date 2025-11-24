@@ -613,8 +613,8 @@ jobs:
             exit 1
           fi
 
-          if [[ "${NPM_IS_BETA}" != "true" ]] && ! [[ "${PACKAGE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Stable releases (tagged with 'latest') must use x.y.z SemVer. Found '${PACKAGE_VERSION}'." >&2
+          if [[ "${NPM_IS_BETA}" != "true" ]] && ! [[ "${PKG_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Stable releases (tagged with 'latest') must use x.y.z SemVer. Found '${PKG_VERSION}'." >&2
             exit 1
           fi
 
