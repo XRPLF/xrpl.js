@@ -27,7 +27,6 @@ jobs:
     outputs:
       package_version: ${{ steps.get_version.outputs.package_version }}
       dist_tag: ${{ steps.get_version.outputs.dist_tag }}
-      npm_is_beta: ${{ steps.get_version.outputs.is_beta }}
       release_branch: ${{ steps.validate_inputs.outputs.release_branch }}
       release_pr_number: ${{ steps.validate_inputs.outputs.release_pr_number }}
       release_pr_url: ${{ steps.validate_inputs.outputs.release_pr_url }}
@@ -593,7 +592,7 @@ jobs:
       - name: Publish to npm
         env:
           NPM_DIST_TAG: ${{ needs.get_version.outputs.dist_tag }}
-          NPM_IS_BETA: ${{ needs.get_version.outputs.is_beta }}
+          IS_BETA: ${{ needs.get_version.outputs.is_beta }}
         run: |
           set -euo pipefail
           REPO_ROOT="$PWD"
@@ -613,7 +612,7 @@ jobs:
             exit 1
           fi
 
-          if [[ "${NPM_IS_BETA}" != "true" ]] && ! [[ "${PKG_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ "${IS_BETA}" != "true" ]] && ! [[ "${PKG_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Stable releases (tagged with 'latest') must use x.y.z SemVer. Found '${PKG_VERSION}'." >&2
             exit 1
           fi
