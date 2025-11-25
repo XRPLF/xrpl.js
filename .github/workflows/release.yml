@@ -20,6 +20,10 @@ concurrency:
   group: release
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   get_version:
     runs-on: ubuntu-latest
@@ -45,6 +49,7 @@ jobs:
           PKG_NAME: ${{ github.event.inputs.package_name }}
           REPO: ${{ github.repository }}
           RELEASE_BRANCH: ${{ github.event.inputs.release_branch_name }}
+          TRIGGER_BRANCH: ${{ github.ref_name }}
           NPM_DIST_TAG: ${{ github.event.inputs.npmjs_dist_tag }}
         run: |
           set -euo pipefail
@@ -100,6 +105,11 @@ jobs:
             exit 1
           fi
 
+          if [[ "$TRIGGER_BRANCH" != "main" ]]; then
+            echo "❌ Release pipeline can only be triggered from the 'main' branch. Current branch: '$TRIGGER_BRANCH'." >&2
+            exit 1
+          fi
+
           {
             echo "NPM_DIST_TAG=$NPM_DIST_TAG"
             echo "RELEASE_BRANCH=$RELEASE_BRANCH"
@@ -142,7 +152,6 @@ jobs:
         env:
           IS_BETA: ${{ steps.validate_inputs.outputs.is_beta }}
           PKG_NAME: ${{ github.event.inputs.package_name }}
-          NPM_DIST_TAG: ${{ github.event.inputs.npmjs_dist_tag }}
         run: |
           set -euo pipefail
           PKG_JSON="packages/${PKG_NAME}/package.json"
@@ -156,12 +165,10 @@ jobs:
             exit 1
           fi
 
-          NPM_DIST_TAG="${NPM_DIST_TAG:-latest}"
           if [[ "${IS_BETA:-false}" != "true" ]] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "With npmjs_dist_tag 'latest', version must be of the form x.y.z. Found '$VERSION'." >&2
             exit 1
           fi
-          echo "PACKAGE_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "package_version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "dist_tag=${NPM_DIST_TAG}" >> "$GITHUB_OUTPUT"
 
