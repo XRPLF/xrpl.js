@@ -10,17 +10,30 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Before triggering a release**
 
-**Stable release (`npmjs_dist_tag = latest`)**
-1. Branch: must start with `release-` or `release/` (case-insensitive), e.g., `release/xrpl@4.3.8` or `release-xrpl-4.3.8`.
-2. Version: `packages/<package_name>/package.json` must use strict SemVer `x.y.z`.
-3. Tag: leave `npmjs_dist_tag` blank or set to `latest`.
-4. Lockfile: run `npm i` to refresh `package-lock.json` and commit it.
+**Stable release **
+1. Create a release branch. A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
+2. Raise a PR from the release branch to main branch
+3. Update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
+   ```json
+   {
+     "name": "<package_name>",
+     "version": "x.y.z"
+   }
+   ```
+4. Set `npm distribution tag` to `latest`.
+5. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
 
-**Beta/experimental release (any other `npmjs_dist_tag`)**
-1. Branch: no `release-`/`release/` naming requirement.
-2. Version: `packages/<package_name>/package.json` can be prerelease/other valid SemVer.
-3. Tag: choose a non-`latest` `npmjs_dist_tag` matching `[a-z][a-z0-9._-]{0,127}` and not starting with `v` + digit or a digit; the workflow publishes it as `<tag>-experimental`.
-4. Lockfile: run `npm i` to refresh `package-lock.json` and commit it.
+**Beta release **
+1. Create a release branch. There is no restriction for branch name.
+2. 2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended beta release version.
+   ```json
+   {
+     "name": "<package_name>",
+     "version": "x.y.z-<beta|rc>.a"
+   }
+   ```
+3. Provide a non-`latest` `npm distribution tag` and not starting with `v` + digit or a digit. The workflow will automatically append `-experimental`, as `<tag>-experimental`.
+4. Run `npm i` to refresh `package-lock.json` and commit it.
 
 ### **Triggering a Release**
 
@@ -45,7 +58,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result.
+1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result. Stable release release will be reviewed by infosec team as Sec reviewer. Beta release will be reviewed by security champions from Dev team.
 
 
 ---
