@@ -680,7 +680,7 @@ jobs:
       pages: write
       id-token: write
     with:
-      git_ref: ${{ github.ref_name }}
+      git_ref: ${{ needs.get_version.outputs.release_branch }}
 
   notify_failures:
     runs-on: ubuntu-latest
