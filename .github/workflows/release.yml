@@ -30,7 +30,7 @@ jobs:
     name: Get release version from package.json
     outputs:
       package_version: ${{ steps.get_version.outputs.package_version }}
-      dist_tag: ${{ steps.get_version.outputs.dist_tag }}
+      dist_tag: ${{ steps.validate_inputs.outputs.dist_tag }}
       release_branch: ${{ steps.validate_inputs.outputs.release_branch }}
       release_pr_number: ${{ steps.validate_inputs.outputs.release_pr_number }}
       release_pr_url: ${{ steps.validate_inputs.outputs.release_pr_url }}
@@ -144,6 +144,7 @@ jobs:
             echo "release_pr_number=$PR_NUMBER"
             echo "release_pr_url=$PR_URL"
             echo "is_beta=$IS_BETA"
+            echo "dist_tag=$NPM_DIST_TAG"
           } >> "$GITHUB_OUTPUT"
 
 
@@ -170,7 +171,6 @@ jobs:
             exit 1
           fi
           echo "package_version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "dist_tag=${NPM_DIST_TAG}" >> "$GITHUB_OUTPUT"
 
   run_faucet_test:
     name: Run faucet tests ${{ needs.get_version.outputs.package_version }}
