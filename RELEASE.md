@@ -10,21 +10,23 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Before triggering a release**
 
-1. Create a release branch. A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
-2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
-   ```json
-   {
-     "name": "<package_name>",
-     "version": "x.y.z"
-   }
-   ```
-3. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
+**Stable release (`npmjs_dist_tag = latest`)**
+1. Branch: must start with `release-` or `release/` (case-insensitive), e.g., `release/xrpl@4.3.8` or `release-xrpl-4.3.8`.
+2. Version: `packages/<package_name>/package.json` must use strict SemVer `x.y.z`.
+3. Tag: leave `npmjs_dist_tag` blank or set to `latest`.
+4. Lockfile: run `npm i` to refresh `package-lock.json` and commit it.
+
+**Beta/experimental release (any other `npmjs_dist_tag`)**
+1. Branch: no `release-`/`release/` naming requirement.
+2. Version: `packages/<package_name>/package.json` can be prerelease/other valid SemVer.
+3. Tag: choose a non-`latest` `npmjs_dist_tag` matching `[a-z][a-z0-9._-]{0,127}` and not starting with `v` + digit or a digit; the workflow publishes it as `<tag>-experimental`.
+4. Lockfile: run `npm i` to refresh `package-lock.json` and commit it.
 
 ### **Triggering a Release**
 
-1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
-2. Choose the release branch from dropdown
-3. Fill in these fields:
+1. Go to **GitHub → Actions → Release Pipeline → Run workflow** (must be triggered from `main`).
+2. Fill in these fields:
+   - **release_branch_name** → Name of the release branch to run against.
    - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
    - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
      - Examples:
@@ -34,10 +36,11 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ➡️ Example:
 
-| Field            | Example               |
-|------------------|-----------------------|
-| package_name     | xrpl                  |
-| npmjs_dist_tag   | latest                |
+| Field               | Example               |
+|---------------------|-----------------------|
+| release_branch_name | release/xrpl@4.3.8   |
+| package_name        | xrpl                  |
+| npmjs_dist_tag      | latest                |
 
 
 ### **Reviewing the release details and scan result**
@@ -58,6 +61,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 ### 2. **Run Tests**
 - Triggers the `faucet_test.yml` and `nodejs.yml` workflows to run unit, integration, and faucet tests against the specified Git ref.
 - Ensures the code at the given Git ref passes all tests.
+- Tests are allowed to fail for beta releases.
 
 ---
 
