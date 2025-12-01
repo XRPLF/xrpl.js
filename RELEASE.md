@@ -25,7 +25,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 **Beta release **
 1. Create a release branch. There is no restriction for branch name.
-2. 2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended beta release version.
+2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended beta release version.
    ```json
    {
      "name": "<package_name>",
@@ -58,7 +58,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result. Stable release release will be reviewed by infosec team as Sec reviewer. Beta release will be reviewed by security champions from Dev team.
+1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result. Stable release will be reviewed by infosec team as Sec reviewer. Beta release will be reviewed by security champions from Dev team.
 
 
 ---
