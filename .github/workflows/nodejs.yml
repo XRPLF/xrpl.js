@@ -80,7 +80,7 @@ jobs:
       - run: npm run lint
 
   unit:
-    if: ${{ inputs.run_unit_tests != false }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_unit_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -124,7 +124,7 @@ jobs:
       - run: npm test
 
   integration:
-    if: ${{ inputs.run_integration_tests != false }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_integration_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -179,7 +179,7 @@ jobs:
         run: docker stop rippled-service
 
   browser:
-    if: ${{ inputs.run_browser_tests != false }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_browser_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
