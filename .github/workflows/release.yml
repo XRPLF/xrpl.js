@@ -100,7 +100,7 @@ jobs:
             NPM_DIST_TAG="${NPM_DIST_TAG}-experimental"
           fi
 
-          if [ "$IS_BETA" != "true" ] && [[ ! "${RELEASE_BRANCH,,}" =~ ^release[-/] ]]; then
+          if [ "$IS_BETA" != "true" ] && [[ ! "${RELEASE_BRANCH}" =~ ^[Rr][Ee][Ll][Ee][Aa][Ss][Ee][-/] ]]; then
             echo "❌ Release branch '$RELEASE_BRANCH' must start with 'release-' or 'release/' for stable releases." >&2
             exit 1
           fi
@@ -178,6 +178,7 @@ jobs:
     uses: ./.github/workflows/faucet_test.yml
     with:
       git_ref: ${{ needs.get_version.outputs.release_branch }}
+      run_faucet_tests: ${{ needs.get_version.outputs.is_beta != 'true' }}
     secrets: inherit
 
   run_tests:
@@ -186,11 +187,14 @@ jobs:
     uses: ./.github/workflows/nodejs.yml
     with:
       git_ref: ${{ needs.get_version.outputs.release_branch }}
+      run_unit_tests: true
+      run_integration_tests: ${{ needs.get_version.outputs.is_beta != 'true' }}
+      run_browser_tests: ${{ needs.get_version.outputs.is_beta != 'true' }}
     secrets: inherit
 
   pre_release:
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.get_version.outputs.is_beta == 'true') && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.get_version.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') && needs.run_tests.result == 'success' }}
     needs: [get_version, run_faucet_test, run_tests]
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
@@ -358,7 +362,7 @@ jobs:
 
   ask_for_dev_team_review:
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.pre_release.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.pre_release.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs: [get_version, run_faucet_test, run_tests, pre_release]
     permissions:
       pull-requests: write
@@ -493,7 +497,7 @@ jobs:
 
   first_review:
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.ask_for_dev_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.ask_for_dev_team_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
         get_version,
@@ -512,7 +516,7 @@ jobs:
 
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.first_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.first_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
         get_version,
@@ -552,7 +556,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    if: ${{ always() && needs.ask_for_sec_team_review.result == 'success' && (needs.run_tests.result == 'success' || needs.get_version.outputs.is_beta == 'true') }}
+    if: ${{ always() && needs.ask_for_sec_team_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
         get_version,
