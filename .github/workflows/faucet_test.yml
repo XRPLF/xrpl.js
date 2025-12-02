@@ -19,7 +19,7 @@ on:
 
 jobs:
   faucet-test:
-    if: ${{ !(github.event_name == 'workflow_call' && inputs.run_faucet_tests == false) }}
+    if: ${{ inputs.run_faucet_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
