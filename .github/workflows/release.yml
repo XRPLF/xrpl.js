@@ -267,7 +267,7 @@ jobs:
           curl -X POST \
             -H "X-Api-Key: ${OWASP_TOKEN}" \
             -F "autoCreate=true" \
-            -F "projectName=test-alert" \
+            -F "projectName=xrpl-js" \
             -F "projectVersion=${PKG_VERSION}" \
             -F "bom=@sbom.json" \
             https://owasp-dt-api.prod.ripplex.io/api/v1/bom
