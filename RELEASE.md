@@ -124,3 +124,7 @@ xrpl@2.3.1
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
 - Vulnerability scanning does not block the release, but it is the approvers' responsibility to review the scan results in the Review stage.
+
+- If the workflow auto-creates the release PR, close and reopen it so CI runs (or update the automation to ensure tests fire on bot-created PRs).
+
+- After the release PR merges, restore the release branch (it is currently auto-deleted) so the tagged commit still exists on a branch that matches the automation tag.
