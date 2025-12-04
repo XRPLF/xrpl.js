@@ -2451,7 +2451,37 @@
       }
     ],
     [
-      "DummyInt32",
+      "TotalValueOutstanding",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 15,
+        "type": "Number"
+      }
+    ],
+    [
+      "PeriodicPayment",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 16,
+        "type": "Number"
+      }
+    ],
+    [
+      "ManagementFeeOutstanding",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 17,
+        "type": "Number"
+      }
+    ],
+    [
+      "LoanScale",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -3619,6 +3649,7 @@
     "terNO_ACCOUNT": -96,
     "terNO_AMM": -87,
     "terNO_AUTH": -95,
+    "terNO_DELEGATE_PERMISSION": -85,
     "terNO_LINE": -94,
     "terNO_RIPPLE": -90,
     "terOWNERS": -93,
@@ -3663,7 +3694,6 @@
     "LoanBrokerDelete": 75,
     "LoanBrokerSet": 74,
     "LoanDelete": 81,
-    "LoanDraw": 83,
     "LoanManage": 82,
     "LoanPay": 84,
     "LoanSet": 80,

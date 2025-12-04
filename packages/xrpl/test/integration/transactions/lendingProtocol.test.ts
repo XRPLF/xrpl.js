@@ -1,6 +1,8 @@
 /* eslint-disable max-statements -- required to test entire flow */
+
 import { assert } from 'chai'
-import { sign } from 'ripple-keypairs'
+import { decode } from 'ripple-binary-codec'
+import { sign } from 'ripple-keypairs/src'
 
 import {
   type MPTokenAuthorize,
@@ -12,10 +14,9 @@ import {
   type LoanBrokerSet,
   Wallet,
   type LoanSet,
-  decode,
   verifySignature,
-  encodeForSigning,
   SignerListSet,
+  encodeForMultiSigning,
 } from '../../../src'
 import { type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
@@ -49,7 +50,7 @@ describe('Lending Protocol IT', () => {
   }, TIMEOUT)
 
   it(
-    'Successful LoanBroker creation and loan payment',
+    'Lending protocol integration test with multi-signing',
     async () => {
       const vaultOwnerWallet = await generateFundedWallet(testContext.client)
       const mptIssuerWallet = await generateFundedWallet(testContext.client)
@@ -147,7 +148,7 @@ describe('Lending Protocol IT', () => {
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '100',
         Counterparty: borrowerWallet.address,
-        Fee: '100',
+        Fee: '5000000',
       }
 
       // Fails as loan borrower has not signed yet.
@@ -168,14 +169,14 @@ describe('Lending Protocol IT', () => {
       assert.isTrue(verifySignature(loanSetTx, loanSetTx.SigningPubKey))
 
       // Borrower signs the transaction
-      const sign1 = sign(encodeForSigning(loanSetTx), signer1.privateKey)
-      const sign2 = sign(encodeForSigning(loanSetTx), signer2.privateKey)
-
-      console.log(JSON.stringify(loanSetTx))
-      console.log(signer1.classicAddress)
-      console.log(signer1.privateKey)
-      console.log(signer1.seed)
-      console.log(sign1)
+      const sign1 = sign(
+        encodeForMultiSigning(loanSetTx, signer1.address),
+        signer1.privateKey,
+      )
+      const sign2 = sign(
+        encodeForMultiSigning(loanSetTx, signer2.address),
+        signer2.privateKey,
+      )
 
       loanSetTx.CounterpartySignature = {}
       loanSetTx.CounterpartySignature.Signers = []
