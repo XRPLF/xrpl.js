@@ -18,9 +18,9 @@ import {
   SignerListSet,
   encodeForMultiSigning,
 } from '../../../src'
-import { type LoanBroker } from '../../../src/models/ledger'
+import { type Loan, type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
-import { hashLoanBroker, hashVault } from '../../../src/utils/hashes'
+import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
 import { compareSigners } from '../../../src/Wallet/utils'
 import serverUrl from '../serverUrl'
 import {
@@ -87,13 +87,13 @@ describe('Lending Protocol IT', () => {
         Destination: depositorWallet.address,
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
-          value: '1000',
+          value: '500000',
         },
       }
       await testTransaction(testContext.client, paymentTx, mptIssuerWallet)
 
-      // Depositor deposits 500 MPTs into the vault
-      const depositAmount = '500'
+      // Depositor deposits 200000 MPTs into the vault
+      const depositAmount = '200000'
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
         Account: depositorWallet.address,
@@ -111,7 +111,7 @@ describe('Lending Protocol IT', () => {
         TransactionType: 'LoanBrokerSet',
         Account: loanBrokerWallet.address,
         VaultID: vaultObj.vaultObjectId,
-        DebtMaximum: '400',
+        DebtMaximum: '100000',
       }
 
       const loanBrokerTxResp = await testTransaction(
@@ -141,13 +141,13 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
       // Create a Loan object
-
       let loanSetTx: LoanSet = {
         TransactionType: 'LoanSet',
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
-        PrincipalRequested: '100',
+        PrincipalRequested: '100000',
         Counterparty: borrowerWallet.address,
+        InterestRate: 0.1,
         Fee: '5000000',
       }
 
@@ -165,10 +165,11 @@ describe('Lending Protocol IT', () => {
       const { tx_blob } = loanBrokerWallet.sign(loanSetTx)
       loanSetTx = decode(tx_blob) as LoanSet
 
-      // Borrower first verifies the TxnSignature for authenticity
+      // Borrower first verifies the TxnSignature for to make sure that it came from the loan broker.
       assert.isTrue(verifySignature(loanSetTx, loanSetTx.SigningPubKey))
 
-      // Borrower signs the transaction
+      // Borrower signs the transaction and fills in the CounterpartySignature to confirm the
+      // loan terms.
       const sign1 = sign(
         encodeForMultiSigning(loanSetTx, signer1.address),
         signer1.privateKey,
@@ -180,7 +181,6 @@ describe('Lending Protocol IT', () => {
 
       loanSetTx.CounterpartySignature = {}
       loanSetTx.CounterpartySignature.Signers = []
-
       const signers = [
         {
           Signer: {
@@ -202,6 +202,25 @@ describe('Lending Protocol IT', () => {
       loanSetTx.CounterpartySignature.Signers = signers
 
       await testTransaction(testContext.client, loanSetTx, borrowerWallet)
+
+      const loanObjectId = hashLoan(
+        borrowerWallet.address,
+        loanBrokerObjectId,
+        loanBrokerObject.LoanSequence,
+      )
+
+      const loanObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+
+      const loanObject: Loan = loanObjects.result.account_objects.find(
+        (obj) => obj.index === loanObjectId,
+      ) as Loan
+
+      assert.equal(loanObject.index, loanObjectId)
+      assert.equal(loanObject.InterestRate, loanSetTx.InterestRate)
     },
     TIMEOUT,
   )
@@ -243,7 +262,6 @@ async function createMPToken(
 ): Promise<string> {
   const mptCreateTx: MPTokenIssuanceCreate = {
     TransactionType: 'MPTokenIssuanceCreate',
-    AssetScale: 2,
     Flags: {
       tfMPTCanTransfer: true,
     },

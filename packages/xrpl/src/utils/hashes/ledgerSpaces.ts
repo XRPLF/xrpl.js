@@ -31,6 +31,7 @@ const ledgerSpaces = {
   depositPreauth: 'p',
   vault: 'V',
   loanBroker: 'l',
+  loan: 'L',
 }
 
 export default ledgerSpaces

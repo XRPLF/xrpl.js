@@ -217,4 +217,26 @@ export function hashLoanBroker(address: string, sequence: number): string {
   )
 }
 
+/**
+ * Compute the hash of a Loan.
+ *
+ * @param address - The AccountID of the Borrower account.
+ * @param loanBrokerId - The LoanBrokerID of the associated LoanBroker object.
+ * @param loanSequence - The LoanSequence of the LoanBroker object (The sequence number of the Loan.)
+ * @returns The computed hash of the Loan object.
+ * @category Utilities
+ */
+export function hashLoan(
+  address: string,
+  loanBrokerId: string,
+  loanSequence: number,
+): string {
+  return sha512Half(
+    ledgerSpaceHex('loan') +
+      addressToHex(address) +
+      loanBrokerId +
+      loanSequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
 export { hashLedgerHeader, hashSignedTx, hashLedger, hashStateTree, hashTxTree }

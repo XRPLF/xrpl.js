@@ -9,11 +9,6 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'Loan'
 
   /**
-   * Ledger object identifier.
-   */
-  LedgerIndex: string
-
-  /**
    * Ledger object flags.
    */
   Flags: number
