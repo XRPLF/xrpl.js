@@ -218,7 +218,7 @@ jobs:
               --arg head  "$RELEASE_BRANCH" \
               --arg base  "main" \
               --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/$RUN_ID" \
-              '{title:$title, head:$head, base:$base, body:$body}')"
+              '{title:$title, head:$head, base:$base, body:$body, draft:true}')"
             RESP="$(gh api -H 'Accept: application/vnd.github+json' \
               --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
             PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
