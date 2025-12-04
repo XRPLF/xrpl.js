@@ -1,11 +1,11 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
-} from '../../src/models/transactions/common'
-import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
+} from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -164,7 +164,8 @@ describe('MPTokenMetadata warnings', function () {
       asset_class: 'rwa',
       asset_subclass: 'treasury',
       issuer_name: 'Issuer',
-    }
+      uris: ['apple'],
+    } as unknown as MPTokenMetadata
     const tx = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
@@ -175,7 +176,7 @@ describe('MPTokenMetadata warnings', function () {
 
     const expectedMessage = [
       MPT_META_WARNING_HEADER,
-      '- icon should be a valid https url.',
+      '- uris/us: should be an array of objects each with uri/u, category/c, and title/t properties.',
     ].join('\n')
 
     expect(console.warn).toHaveBeenCalledWith(

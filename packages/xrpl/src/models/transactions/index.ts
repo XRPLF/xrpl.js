@@ -1,9 +1,8 @@
 export {
   BaseTransaction,
-  isMPTAmount,
-  validateMPTokenMetadata,
   GlobalFlags,
   GlobalFlagsInterface,
+  isMPTAmount,
 } from './common'
 export {
   validate,
