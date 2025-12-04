@@ -1,4 +1,9 @@
-export { BaseTransaction, isMPTAmount, validateMPTokenMetadata } from './common'
+export {
+  BaseTransaction,
+  GlobalFlags,
+  GlobalFlagsInterface,
+  isMPTAmount,
+} from './common'
 export {
   validate,
   PseudoTransaction,
@@ -33,7 +38,7 @@ export {
   AMMWithdrawFlagsInterface,
   AMMWithdraw,
 } from './AMMWithdraw'
-export { Batch } from './batch'
+export { Batch, BatchFlags, BatchFlagsInterface, BatchSigner } from './batch'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'

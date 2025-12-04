@@ -10,32 +10,39 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Before triggering a release**
 
-1. Create a release branch and update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
+1. Create a release branch. A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
+2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
    ```json
    {
      "name": "<package_name>",
      "version": "x.y.z"
    }
    ```
-2. Run npm i to update the package-lock with the updated versions and commit the lock file to the releaes branch
+3. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
 
 ### **Triggering a Release**
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
-2. Fill in these fields:
-   - **package_name:** The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **release_branch:** The Git branch to release from (e.g., `release/xrpl@4.3.8`).
+2. Choose the release branch from dropdown
+3. Fill in these fields:
+   - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
+   - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
+     - Examples:
+       - `latest` → Standard production release
+       - `beta` → Pre-release for testing
+       - `rc` → Release candidate
 
 ➡️ Example:
 
-| Field         | Example               |
-|---------------|------------------------|
-| package_name  | xrpl                   |
-| git_ref       | release/xrpl@4.3.8     |
+| Field            | Example               |
+|------------------|-----------------------|
+| package_name     | xrpl                  |
+| npmjs_dist_tag   | latest                |
+
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Review test and security scan result" step, at least 1 approver is required to review and approve the release.
+1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result.
 
 
 ---
@@ -61,6 +68,7 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 - Uploads the SBOM to OWASP Dependency-Track for tracking vulnerabilities.
 - Packages the module with Lerna and uploads the tarball as an artifact.
 - Posts failure notifications to Slack..
+- Create a Github issue for detected vulnerabilities.
 
 ---
 
@@ -101,5 +109,3 @@ xrpl@2.3.1
 - The release workflow does not overwrite existing tags. If the same version tag already exists, the workflow will fail.
 
 - Vulnerability scanning does not block the release, but it is the approvers' responsibility to review the scan results in the Review stage.
-
-- The final release step performs an npm publish --dry-run. We can remove --dry-run when ready for production release.
