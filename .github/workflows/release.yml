@@ -211,23 +211,27 @@ jobs:
           PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
           if [ -n "${PR_NUMBER:-}" ]; then
             echo "ℹ️ Found existing PR: #$PR_NUMBER ($PR_URL)"
-            echo "↩️ Converting PR #$PR_NUMBER to draft…"
-            gh api -H 'Accept: application/vnd.github+json' \
-              --method POST \
-              "/repos/$REPO/pulls/$PR_NUMBER/draft"
-          else
-            echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main"
-            CREATE_JSON="$(jq -n \
-              --arg title "Release $VERSION: $RELEASE_BRANCH → main" \
-              --arg head  "$RELEASE_BRANCH" \
-              --arg base  "main" \
-              --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/$RUN_ID" \
-              '{title:$title, head:$head, base:$base, body:$body, draft:true}')"
-            RESP="$(gh api -H 'Accept: application/vnd.github+json' \
-              --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
-            PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
-            PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
+            echo "🛑 Closing existing PR #$PR_NUMBER before opening a draft…"
+            CLOSE_JSON="$(jq -n --arg state "closed" '{state:$state}')"
+            if ! gh api -H 'Accept: application/vnd.github+json' \
+              --method PATCH \
+              "/repos/$REPO/pulls/$PR_NUMBER" \
+              --input <(printf '%s' "$CLOSE_JSON"); then
+              echo "⚠️ Unable to close PR #$PR_NUMBER automatically. You may need to close it manually." >&2
+            fi
           fi
+
+          echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main (as draft)"
+          CREATE_JSON="$(jq -n \
+            --arg title "Release $VERSION: $RELEASE_BRANCH → main" \
+            --arg head  "$RELEASE_BRANCH" \
+            --arg base  "main" \
+            --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/$RUN_ID" \
+            '{title:$title, head:$head, base:$base, body:$body, draft:true}')"
+          RESP="$(gh api -H 'Accept: application/vnd.github+json' \
+            --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
+          PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
+          PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
           # Expose as step outputs (use these in later steps)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
