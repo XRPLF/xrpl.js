@@ -21,12 +21,12 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * Identifies the page where this item is referenced in the Borrower owner's directory.
    */
-  OwnerNode: number
+  OwnerNode: string
 
   /**
    * Identifies the page where this item is referenced in the LoanBrokers owner's directory.
    */
-  LoanBrokerNode: number
+  LoanBrokerNode: string
 
   /**
    * The ID of the LoanBroker associated with this Loan Instance.
@@ -118,7 +118,17 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The principal amount requested by the Borrower.
    */
-  PrincipalOutstanding: number
+  PrincipalOutstanding: string
+
+  /**
+   * The calculated periodic payment amount for each payment interval.
+   */
+  PeriodicPayment: string
+
+  /**
+   * The total outstanding value of the Loan, including all fees and interest.
+   */
+  TotalValueOutstanding: string
 }
 
 export enum LoanFlags {

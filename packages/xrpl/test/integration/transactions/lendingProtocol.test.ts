@@ -203,12 +203,11 @@ describe('Lending Protocol IT', () => {
 
       await testTransaction(testContext.client, loanSetTx, borrowerWallet)
 
+      // Assert Loan object exists in objects tracked by Borrower.
       const loanObjectId = hashLoan(
-        borrowerWallet.address,
         loanBrokerObjectId,
         loanBrokerObject.LoanSequence,
       )
-
       const loanObjects = await testContext.client.request({
         command: 'account_objects',
         account: borrowerWallet.address,
@@ -220,7 +219,10 @@ describe('Lending Protocol IT', () => {
       ) as Loan
 
       assert.equal(loanObject.index, loanObjectId)
-      assert.equal(loanObject.InterestRate, loanSetTx.InterestRate)
+      assert.equal(
+        loanObject.PrincipalOutstanding,
+        loanSetTx.PrincipalRequested,
+      )
     },
     TIMEOUT,
   )
