@@ -211,6 +211,10 @@ jobs:
           PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
           if [ -n "${PR_NUMBER:-}" ]; then
             echo "ℹ️ Found existing PR: #$PR_NUMBER ($PR_URL)"
+            echo "↩️ Converting PR #$PR_NUMBER to draft…"
+            gh api -H 'Accept: application/vnd.github+json' \
+              --method POST \
+              "/repos/$REPO/pulls/$PR_NUMBER/draft"
           else
             echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main"
             CREATE_JSON="$(jq -n \
