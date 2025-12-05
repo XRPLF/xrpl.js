@@ -5,7 +5,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Fixed
-* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for MPTIssue.
+* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
+* Better faucet error handling
 
 ## 4.4.3 (2025-11-07)
 
@@ -17,7 +18,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
 * [Breaking change] Fix `MPTokenMetadata` type to adhere to the XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `MPTokenMetadata` in your code, please verify that it adheres to the updated type definition.
 * [Breaking change] Fix `validateMPTokenMetadata` to correctly validate MPTokenMetadata as per XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `validateMPTokenMetadata` in your code, expect it to change as per the XLS-89 standard.
-* Better faucet error handling
 
 ## 4.4.2 (2025-09-25)
 
