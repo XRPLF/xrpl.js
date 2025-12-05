@@ -23,6 +23,7 @@ import {
   hashSignerListId,
   hashVault,
   hashLoanBroker,
+  hashLoan,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -167,6 +168,17 @@ describe('Hashes', function () {
     const expectedEntryHash =
       'E799B84AC949CE2D8F27435C784F15C72E6A23ACA6841BA6D2F37A1E5DA4110F'
     const actualEntryHash = hashLoanBroker(account, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcLoanHash', function () {
+    const loanBrokerId =
+      'AEB642A65066A6E6F03D312713475D958E0B320B74AD1A76B5B2EABB752E52AA'
+    const loanSequence = 1
+    const expectedEntryHash =
+      'E93874AB62125DF2E86FB6C724B261F8E654E0334715C4D7160C0F148CDC9B47'
+    const actualEntryHash = hashLoan(loanBrokerId, loanSequence)
 
     assert.equal(actualEntryHash, expectedEntryHash)
   })

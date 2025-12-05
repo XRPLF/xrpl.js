@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-### Added
-* Support for `Lending Protocol` (XLS-66d)
-
 ## 2.5.1 (2025-10-29)
 
 ### Fixed
