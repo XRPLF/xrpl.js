@@ -102,7 +102,6 @@ describe('Lending Protocol IT', () => {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: depositAmount,
         },
-        Fee: '5000000',
       }
       await testTransaction(testContext.client, vaultDepositTx, depositorWallet)
 
@@ -241,7 +240,6 @@ async function createSingleAssetVault(
       mpt_issuance_id: mptIssuanceId,
     },
     Account: vaultOwnerWallet.address,
-    Fee: '5000000',
   }
 
   const vaultCreateResp = await testTransaction(
