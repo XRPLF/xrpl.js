@@ -4,6 +4,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for MPTIssue.
+
+## 4.4.3 (2025-11-07)
+
 ### Added
 * Export `Batch` (XLS-56) transaction types and utilities
 * Add `encodeMPTokenMetadata` and `decodeMPTokenMetadata` helper functions to encode and decode MPTokenMetadata as per XLS-89 standard.
