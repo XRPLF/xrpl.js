@@ -1,22 +1,8 @@
-# Checks for patch version updates weekly and minor/major version updates quarterly
 version: 2
 updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: weekly
+    interval: monthly
     time: "15:00"
-  open-pull-requests-limit: 10
-  ignore:
-    - dependency-name: "*"
-      update-types: ["version-update:semver-minor", "version-update:semver-major"]
-
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: "quarterly"
-    time: "15:00"
-  open-pull-requests-limit: 10
-  ignore:
-    - dependency-name: "*"
-      update-types: ["version-update:semver-patch"]
+  open-pull-requests-limit: 20
