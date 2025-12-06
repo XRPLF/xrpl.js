@@ -32,8 +32,6 @@ describe('Single Asset Vault', function () {
       Data: stringToHex('vault metadata'),
       MPTokenMetadata: stringToHex('share metadata'),
       AssetsMaximum: '1000000000',
-      // This covers owner reserve fee with potentially high open_ledger_cost
-      Fee: '5000000',
     }
 
     await testTransaction(testContext.client, tx, testContext.wallet)

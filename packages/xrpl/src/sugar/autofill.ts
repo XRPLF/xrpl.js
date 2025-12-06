@@ -276,9 +276,11 @@ async function calculateFeePerTransactionType(
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 
-  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
-    tx.TransactionType,
-  )
+  const isSpecialTxCost = [
+    'AccountDelete',
+    'AMMCreate',
+    'VaultCreate',
+  ].includes(tx.TransactionType)
 
   // EscrowFinish Transaction with Fulfillment
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
