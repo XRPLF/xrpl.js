@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_call:
     inputs:
       git_ref:
@@ -19,7 +21,7 @@ on:
 
 jobs:
   faucet-test:
-    if: ${{ !(github.event_name == 'workflow_call' && inputs.run_faucet_tests == false) }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_faucet_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 

@@ -27,13 +27,13 @@ defaults:
 jobs:
   get_version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Get release version from package.json
     outputs:
       package_version: ${{ steps.get_version.outputs.package_version }}
       dist_tag: ${{ steps.validate_inputs.outputs.dist_tag }}
       release_branch: ${{ steps.validate_inputs.outputs.release_branch }}
-      release_pr_number: ${{ steps.validate_inputs.outputs.release_pr_number }}
-      release_pr_url: ${{ steps.validate_inputs.outputs.release_pr_url }}
       is_beta: ${{ steps.validate_inputs.outputs.is_beta }}
     steps:
       - name: Checkout code
@@ -118,31 +118,8 @@ jobs:
           PR_NUMBER=""
           PR_URL=""
 
-          # For stable releases, check that a PR exists from the release branch to main
-          if [ "$IS_BETA" = "false" ]; then
-            OWNER="${REPO%%/*}"
-            echo "🔎 Validating that a release PR exists for ${RELEASE_BRANCH} → main…"
-            PRS_JSON="$(gh api -H 'Accept: application/vnd.github+json' \
-              --method GET \
-              -f state=open \
-              -f base=main \
-              -f head="${OWNER}:${RELEASE_BRANCH}" \
-              "/repos/$REPO/pulls")"
-            PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
-            PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
-            if [ -z "$PR_NUMBER" ]; then
-              echo "❌ No open PR found from ${RELEASE_BRANCH} to main. Please create the release PR before running this workflow." >&2
-              exit 1
-            fi
-            echo "ℹ️ Found release PR: #$PR_NUMBER ($PR_URL)"
-          else
-            echo "ℹ️ Beta release detected; skipping PR existence check."
-          fi
-
           {
             echo "release_branch=$RELEASE_BRANCH"
-            echo "release_pr_number=$PR_NUMBER"
-            echo "release_pr_url=$PR_URL"
             echo "is_beta=$IS_BETA"
             echo "dist_tag=$NPM_DIST_TAG"
           } >> "$GITHUB_OUTPUT"
@@ -199,15 +176,65 @@ jobs:
     name: Pre Release Pipeline for ${{ needs.get_version.outputs.package_version }}
     permissions:
       issues: write
+      pull-requests: write
     env:
       PKG_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PKG_NAME: "${{ github.event.inputs.package_name }}"
+    outputs:
+      release_pr_number: ${{ steps.ensure_pr.outputs.pr_number }}
+      release_pr_url: ${{ steps.ensure_pr.outputs.pr_url }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ needs.get_version.outputs.release_branch }}
+
+      - name: Create PR from release branch to main (skips for rc/beta)
+        id: ensure_pr
+        if: ${{ github.event.inputs.npmjs_dist_tag == '' || github.event.inputs.npmjs_dist_tag == 'latest' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RELEASE_BRANCH: ${{ needs.get_version.outputs.release_branch }}
+          VERSION: ${{ needs.get_version.outputs.package_version }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          echo "🔎 Checking if a PR already exists for $RELEASE_BRANCH → main…"
+          OWNER="${REPO%%/*}"
+          # Find existing OPEN PR: base=main, head=OWNER:RELEASE_BRANCH
+          PRS_JSON="$(gh api -H 'Accept: application/vnd.github+json' \
+            "/repos/$REPO/pulls?state=open&base=main&head=${OWNER}:${RELEASE_BRANCH}")"
+          PR_NUMBER="$(printf '%s' "$PRS_JSON" | jq -r '.[0].number // empty')"
+          PR_URL="$(printf '%s' "$PRS_JSON" | jq -r '.[0].html_url // empty')"
+          if [ -n "${PR_NUMBER:-}" ]; then
+            echo "ℹ️ Found existing PR: #$PR_NUMBER ($PR_URL)"
+            echo "🛑 Closing existing PR #$PR_NUMBER before opening a draft…"
+            CLOSE_JSON="$(jq -n --arg state "closed" '{state:$state}')"
+            if ! gh api -H 'Accept: application/vnd.github+json' \
+              --method PATCH \
+              "/repos/$REPO/pulls/$PR_NUMBER" \
+              --input <(printf '%s' "$CLOSE_JSON"); then
+              echo "⚠️ Unable to close PR #$PR_NUMBER automatically. You may need to close it manually." >&2
+            fi
+          fi
+
+          echo "📝 Creating PR for release $VERSION from $RELEASE_BRANCH → main (as draft)"
+          CREATE_JSON="$(jq -n \
+            --arg title "Release $VERSION: $RELEASE_BRANCH → main" \
+            --arg head  "$RELEASE_BRANCH" \
+            --arg base  "main" \
+            --arg body  "Automated PR for release **$VERSION** from **$RELEASE_BRANCH** → **main**. Workflow Run: https://github.com/$REPO/actions/runs/$RUN_ID" \
+            '{title:$title, head:$head, base:$base, body:$body, draft:true}')"
+          RESP="$(gh api -H 'Accept: application/vnd.github+json' \
+            --method POST /repos/$REPO/pulls --input <(printf '%s' "$CREATE_JSON"))"
+          PR_NUMBER="$(printf '%s' "$RESP" | jq -r '.number')"
+          PR_URL="$(printf '%s' "$RESP" | jq -r '.html_url')"
+          # Expose as step outputs (use these in later steps)
+          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -440,7 +467,7 @@ jobs:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          PR_URL: ${{ needs.get_version.outputs.release_pr_url }}
+          PR_URL: ${{ needs.pre_release.outputs.release_pr_url }}
 
         run: |
           set -euo pipefail
@@ -477,7 +504,7 @@ jobs:
           REPO:           ${{ github.repository }}
           RUN_ID:         ${{ github.run_id }}
           DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.reviewers_dev }}
-          PR_URL:         ${{ needs.get_version.outputs.release_pr_url }}
+          PR_URL:         ${{ needs.pre_release.outputs.release_pr_url }}
         run: |
           set -euo pipefail
           RUN_URL="https://github.com/${REPO}/actions/runs/${RUN_ID}"
