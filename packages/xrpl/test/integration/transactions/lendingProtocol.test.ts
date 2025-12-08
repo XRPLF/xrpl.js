@@ -12,11 +12,19 @@ import {
   type VaultCreate,
   type VaultDeposit,
   type LoanBrokerSet,
+  type LoanBrokerDelete,
+  type LoanBrokerCoverDeposit,
+  type LoanBrokerCoverWithdraw,
+  type LoanBrokerCoverClawback,
   Wallet,
   type LoanSet,
+  type LoanDelete,
+  type LoanManage,
+  type LoanPay,
   verifySignature,
-  SignerListSet,
+  type SignerListSet,
   encodeForMultiSigning,
+  LoanManageFlags,
 } from '../../../src'
 import { type Loan, type LoanBroker } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
@@ -91,6 +99,34 @@ describe('Lending Protocol IT', () => {
         },
       }
       await testTransaction(testContext.client, paymentTx, mptIssuerWallet)
+
+      // Loan Broker Authorizes to hold MPT
+      const loanBrokerMptAuthorizeTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        MPTokenIssuanceID: vaultObj.mptIssuanceId,
+        Account: loanBrokerWallet.address,
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerMptAuthorizeTx,
+        loanBrokerWallet,
+      )
+
+      // Transfer some MPTs from the issuer to Loan Broker
+      const loanBrokerPaymentTx: Payment = {
+        TransactionType: 'Payment',
+        Account: mptIssuerWallet.address,
+        Destination: loanBrokerWallet.address,
+        Amount: {
+          mpt_issuance_id: vaultObj.mptIssuanceId,
+          value: '500000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerPaymentTx,
+        mptIssuerWallet,
+      )
 
       // Depositor deposits 200000 MPTs into the vault
       const depositAmount = '200000'
@@ -221,6 +257,95 @@ describe('Lending Protocol IT', () => {
         loanObject.PrincipalOutstanding,
         loanSetTx.PrincipalRequested,
       )
+
+      // Test LoanBrokerCoverDeposit
+      const loanBrokerCoverDepositTx: LoanBrokerCoverDeposit = {
+        TransactionType: 'LoanBrokerCoverDeposit',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        Amount: {
+          mpt_issuance_id: vaultObj.mptIssuanceId,
+          value: '50000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerCoverDepositTx,
+        loanBrokerWallet,
+      )
+
+      // Test LoanBrokerCoverWithdraw
+      const loanBrokerCoverWithdrawTx: LoanBrokerCoverWithdraw = {
+        TransactionType: 'LoanBrokerCoverWithdraw',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        Amount: {
+          mpt_issuance_id: vaultObj.mptIssuanceId,
+          value: '25000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerCoverWithdrawTx,
+        loanBrokerWallet,
+      )
+
+      // Test LoanManage - Mark loan as impaired
+      const loanManageTx: LoanManage = {
+        TransactionType: 'LoanManage',
+        Account: loanBrokerWallet.address,
+        LoanID: loanObjectId,
+        Flags: LoanManageFlags.tfLoanImpair,
+      }
+      await testTransaction(testContext.client, loanManageTx, loanBrokerWallet)
+
+      // Test LoanPay
+      const loanPayTx: LoanPay = {
+        TransactionType: 'LoanPay',
+        Account: borrowerWallet.address,
+        LoanID: loanObjectId,
+        Amount: {
+          mpt_issuance_id: vaultObj.mptIssuanceId,
+          value: '100000',
+        },
+      }
+      await testTransaction(testContext.client, loanPayTx, borrowerWallet)
+
+      // Test LoanDelete
+      const loanDeleteTx: LoanDelete = {
+        TransactionType: 'LoanDelete',
+        Account: borrowerWallet.address,
+        LoanID: loanObjectId,
+      }
+      await testTransaction(testContext.client, loanDeleteTx, borrowerWallet)
+
+      // Test LoanBrokerCoverClawback
+      const loanBrokerCoverClawbackTx: LoanBrokerCoverClawback = {
+        TransactionType: 'LoanBrokerCoverClawback',
+        Account: mptIssuerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        Amount: {
+          mpt_issuance_id: vaultObj.mptIssuanceId,
+          value: '10000',
+        },
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerCoverClawbackTx,
+        mptIssuerWallet,
+      )
+
+      // Test LoanBrokerDelete
+      const loanBrokerDeleteTx: LoanBrokerDelete = {
+        TransactionType: 'LoanBrokerDelete',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerDeleteTx,
+        loanBrokerWallet,
+      )
     },
     TIMEOUT,
   )
@@ -263,6 +388,7 @@ async function createMPToken(
     TransactionType: 'MPTokenIssuanceCreate',
     Flags: {
       tfMPTCanTransfer: true,
+      tfMPTCanClawback: true,
     },
     Account: mptIssuerWallet.address,
   }
