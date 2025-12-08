@@ -145,9 +145,8 @@ describe('Lending Protocol IT', () => {
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '100000',
-        Counterparty: borrowerWallet.address,
         InterestRate: 0.1,
-        Fee: '5000000',
+        Counterparty: borrowerWallet.address,
       }
 
       // Fails as loan borrower has not signed yet.

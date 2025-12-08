@@ -1,11 +1,18 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions -- required here */
 /* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { AccountInfoRequest, AccountObjectsRequest } from '../models/methods'
+import { LoanBroker } from '../models/ledger'
+import {
+  AccountInfoRequest,
+  AccountObjectsRequest,
+  LedgerEntryRequest,
+} from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
+import { Account } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -148,7 +155,6 @@ function validateAccountAddress(
 ): void {
   // if X-address is given, convert it to classic address
   const { classicAccount, tag } = getClassicAccountAndTag(
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
     tx[accountField] as string,
   )
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
@@ -259,6 +265,44 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
 }
 
 /**
+ * Fetches the total number of signers for the counterparty of a LoanSet transaction.
+ *
+ * @param client - The client object used to make the request.
+ * @param tx - The transaction object for which the counterparty signers count needs to be fetched.
+ * @returns A Promise that resolves to the number of signers for the counterparty.
+ */
+async function fetchCounterPartySignersCount(
+  client: Client,
+  tx: Transaction,
+): Promise<number> {
+  let counterParty: Account | undefined = tx.Counterparty as Account | undefined
+  // Loan Borrower initiated the transaction, Loan Broker is the counterparty.
+  if (counterParty == null) {
+    const resp = (
+      await client.request({
+        command: 'ledger_entry',
+        index: tx.LoanBrokerID,
+        ledger_index: 'validated',
+      } as LedgerEntryRequest)
+    ).result.node as LoanBroker
+
+    counterParty = resp.Owner
+  }
+
+  // Now fetch the signer list for the counterparty.
+  const signerListRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account: counterParty,
+    ledger_index: 'validated',
+    signer_lists: true,
+  }
+
+  const signerListResponse = await client.request(signerListRequest)
+  const signerList = signerListResponse.result.signer_lists?.[0]
+  return signerList?.SignerEntries.length ?? 0
+}
+
+/**
  * Calculates the fee per transaction type.
  *
  * @param client - The client object.
@@ -313,6 +357,22 @@ async function calculateFeePerTransactionType(
    */
   if (signersCount > 0) {
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, signersCount))
+  }
+
+  // LoanSet transactions have additional fees based on the number of signers for the counterparty.
+  if (tx.TransactionType === 'LoanSet') {
+    const counterPartySignersCount = await fetchCounterPartySignersCount(
+      client,
+      tx,
+    )
+    baseFee = BigNumber.sum(
+      baseFee,
+      scaleValue(netFeeDrops, counterPartySignersCount),
+    )
+    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+    console.log(
+      `The autofill method over-estimates the fees required for LoanSet transaction, by including all possible counterparty signers. If users prefer to optimize this transaction fees, they need to manually compute it and fill it themselves.`,
+    )
   }
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
