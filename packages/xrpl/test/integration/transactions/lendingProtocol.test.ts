@@ -25,8 +25,13 @@ import {
   type SignerListSet,
   encodeForMultiSigning,
   LoanManageFlags,
+  type MPTAmount,
 } from '../../../src'
-import { type Loan, type LoanBroker } from '../../../src/models/ledger'
+import {
+  LoanFlags,
+  type Loan,
+  type LoanBroker,
+} from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
 import { compareSigners } from '../../../src/Wallet/utils'
@@ -155,7 +160,6 @@ describe('Lending Protocol IT', () => {
         loanBrokerWallet,
       )
 
-      // Assert LoanBroker object exists in objects tracked by Lender.
       const loanBrokerObjectId = hashLoanBroker(
         loanBrokerTxResp.result.tx_json.Account,
         loanBrokerTxResp.result.tx_json.Sequence as number,
@@ -172,6 +176,7 @@ describe('Lending Protocol IT', () => {
           (obj) => obj.index === loanBrokerObjectId,
         ) as LoanBroker
 
+      // Assert LoanBroker object exists in objects tracked by Lender.
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
@@ -183,6 +188,7 @@ describe('Lending Protocol IT', () => {
         PrincipalRequested: '100000',
         InterestRate: 0.1,
         Counterparty: borrowerWallet.address,
+        PaymentTotal: 1,
       }
 
       // Fails as loan borrower has not signed yet.
@@ -248,7 +254,7 @@ describe('Lending Protocol IT', () => {
         type: 'loan',
       })
 
-      const loanObject: Loan = loanObjects.result.account_objects.find(
+      let loanObject: Loan = loanObjects.result.account_objects.find(
         (obj) => obj.index === loanObjectId,
       ) as Loan
 
@@ -257,6 +263,9 @@ describe('Lending Protocol IT', () => {
         loanObject.PrincipalOutstanding,
         loanSetTx.PrincipalRequested,
       )
+      assert.equal(loanObject.LoanBrokerID, loanBrokerObject.index)
+      assert.equal(loanObject.Borrower, borrowerWallet.address)
+      assert.equal(loanObject.PaymentRemaining, loanSetTx.PaymentTotal)
 
       // Test LoanBrokerCoverDeposit
       const loanBrokerCoverDepositTx: LoanBrokerCoverDeposit = {
@@ -272,6 +281,18 @@ describe('Lending Protocol IT', () => {
         testContext.client,
         loanBrokerCoverDepositTx,
         loanBrokerWallet,
+      )
+
+      // Assert LoanBroker object has updated CoverAvailable
+      const loanBrokerCoverDepositResult = await testContext.client.request({
+        command: 'ledger_entry',
+        index: loanBrokerObjectId,
+      })
+      const loanBrokerCoverDepositObject = loanBrokerCoverDepositResult.result
+        .node as LoanBroker
+      assert.equal(
+        loanBrokerCoverDepositObject.CoverAvailable,
+        (loanBrokerCoverDepositTx.Amount as MPTAmount).value,
       )
 
       // Test LoanBrokerCoverWithdraw
@@ -290,6 +311,21 @@ describe('Lending Protocol IT', () => {
         loanBrokerWallet,
       )
 
+      // Assert LoanBroker object has updated CoverAvailable
+      const loanBrokerCoverWithdrawResult = await testContext.client.request({
+        command: 'ledger_entry',
+        index: loanBrokerObjectId,
+      })
+      const loanBrokerCoverWithdrawObject = loanBrokerCoverWithdrawResult.result
+        .node as LoanBroker
+      assert.equal(
+        loanBrokerCoverWithdrawObject.CoverAvailable,
+        (
+          BigInt(loanBrokerCoverDepositObject.CoverAvailable as string) -
+          BigInt((loanBrokerCoverWithdrawTx.Amount as MPTAmount).value)
+        ).toString(),
+      )
+
       // Test LoanManage - Mark loan as impaired
       const loanManageTx: LoanManage = {
         TransactionType: 'LoanManage',
@@ -298,6 +334,17 @@ describe('Lending Protocol IT', () => {
         Flags: LoanManageFlags.tfLoanImpair,
       }
       await testTransaction(testContext.client, loanManageTx, loanBrokerWallet)
+
+      // Assert Loan object is impaired
+      const loanManageResult = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+      loanObject = loanManageResult.result.account_objects.find(
+        (obj) => obj.index === loanObjectId,
+      ) as Loan
+      assert.equal(loanObject.Flags, LoanFlags.lsfLoanImpaired)
 
       // Test LoanPay
       const loanPayTx: LoanPay = {
@@ -311,6 +358,17 @@ describe('Lending Protocol IT', () => {
       }
       await testTransaction(testContext.client, loanPayTx, borrowerWallet)
 
+      loanObject = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanObjectId,
+        })
+      ).result.node as Loan
+      // Loan gets un-impaired when a payment is made
+      assert.equal(loanObject.Flags, 0)
+      // Entire loan is paid off
+      assert.isUndefined(loanObject.TotalValueOutstanding)
+
       // Test LoanDelete
       const loanDeleteTx: LoanDelete = {
         TransactionType: 'LoanDelete',
@@ -318,6 +376,14 @@ describe('Lending Protocol IT', () => {
         LoanID: loanObjectId,
       }
       await testTransaction(testContext.client, loanDeleteTx, borrowerWallet)
+
+      // Assert Loan object is deleted
+      const loanDeleteResult = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+      assert.equal(loanDeleteResult.result.account_objects.length, 0)
 
       // Test LoanBrokerCoverClawback
       const loanBrokerCoverClawbackTx: LoanBrokerCoverClawback = {
@@ -334,6 +400,20 @@ describe('Lending Protocol IT', () => {
         loanBrokerCoverClawbackTx,
         mptIssuerWallet,
       )
+      const loanBrokerCoverClawbackResult = await testContext.client.request({
+        command: 'ledger_entry',
+        index: loanBrokerObjectId,
+      })
+
+      const loanBrokerCoverClawbackObject = loanBrokerCoverClawbackResult.result
+        .node as LoanBroker
+      assert.equal(
+        loanBrokerCoverClawbackObject.CoverAvailable,
+        (
+          BigInt(loanBrokerCoverWithdrawObject.CoverAvailable as string) -
+          BigInt((loanBrokerCoverClawbackTx.Amount as MPTAmount).value)
+        ).toString(),
+      )
 
       // Test LoanBrokerDelete
       const loanBrokerDeleteTx: LoanBrokerDelete = {
@@ -346,6 +426,12 @@ describe('Lending Protocol IT', () => {
         loanBrokerDeleteTx,
         loanBrokerWallet,
       )
+      const loanBrokerDeleteResult = await testContext.client.request({
+        command: 'account_objects',
+        account: loanBrokerWallet.address,
+        type: 'loan_broker',
+      })
+      assert.equal(loanBrokerDeleteResult.result.account_objects.length, 0)
     },
     TIMEOUT,
   )
