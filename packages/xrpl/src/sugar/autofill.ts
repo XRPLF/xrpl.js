@@ -370,7 +370,7 @@ async function calculateFeePerTransactionType(
       scaleValue(netFeeDrops, counterPartySignersCount),
     )
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
-    console.log(
+    console.warn(
       `For LoanSet transaction the auto calculated Fee accounts for total number of signers the counterparty has to avoid transaction failure.`,
     )
   }
