@@ -58,8 +58,8 @@ describe('Lending Protocol IT', () => {
     testContext = await setupClient(serverUrl)
   }, TIMEOUT)
 
-  afterEach(() => {
-    teardownClient(testContext)
+  afterEach(async () => {
+    await teardownClient(testContext)
   }, TIMEOUT)
 
   it(
@@ -498,16 +498,16 @@ async function createMPToken(
 async function setupMultiSigning(
   testContext: XrplIntegrationTestContext,
   wallet: Wallet,
-  singer1: Wallet,
-  singer2: Wallet,
+  signer1: Wallet,
+  signer2: Wallet,
 ): Promise<void> {
   const transaction: SignerListSet = {
     TransactionType: 'SignerListSet',
     Account: wallet.address,
     SignerQuorum: 2,
     SignerEntries: [
-      { SignerEntry: { Account: singer1.address, SignerWeight: 1 } },
-      { SignerEntry: { Account: singer2.address, SignerWeight: 1 } },
+      { SignerEntry: { Account: signer1.address, SignerWeight: 1 } },
+      { SignerEntry: { Account: signer2.address, SignerWeight: 1 } },
     ],
   }
 

@@ -24,7 +24,7 @@ export interface LoanBrokerCoverDeposit extends BaseTransaction {
   LoanBrokerID: string
 
   /**
-   * The Fist-Loss Capital amount to deposit.
+   * The First-Loss Capital amount to deposit.
    */
   Amount: Amount | MPTAmount
 }

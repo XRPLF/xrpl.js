@@ -211,7 +211,7 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
     (tx.OverpaymentFee < 0 || tx.OverpaymentFee > MAX_OVER_PAYMENT_FEE_RATE)
   ) {
     throw new ValidationError(
-      `LoanSet: OverpaymentFee must be must be between 0 and ${MAX_OVER_PAYMENT_FEE_RATE} inclusive`,
+      `LoanSet: OverpaymentFee must be between 0 and ${MAX_OVER_PAYMENT_FEE_RATE} inclusive`,
     )
   }
 
@@ -220,7 +220,7 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
     (tx.InterestRate < 0 || tx.InterestRate > MAX_INTEREST_RATE)
   ) {
     throw new ValidationError(
-      `LoanSet: InterestRate must be must be between 0 and ${MAX_INTEREST_RATE} inclusive`,
+      `LoanSet: InterestRate must be between 0 and ${MAX_INTEREST_RATE} inclusive`,
     )
   }
 
@@ -229,7 +229,7 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
     (tx.LateInterestRate < 0 || tx.LateInterestRate > MAX_LATE_INTEREST_RATE)
   ) {
     throw new ValidationError(
-      `LoanSet: LateInterestRate must be must be between 0 and ${MAX_LATE_INTEREST_RATE} inclusive`,
+      `LoanSet: LateInterestRate must be between 0 and ${MAX_LATE_INTEREST_RATE} inclusive`,
     )
   }
 
@@ -238,7 +238,7 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
     (tx.CloseInterestRate < 0 || tx.CloseInterestRate > MAX_CLOSE_INTEREST_RATE)
   ) {
     throw new ValidationError(
-      `LoanSet: CloseInterestRate must be must be between 0 and ${MAX_CLOSE_INTEREST_RATE} inclusive`,
+      `LoanSet: CloseInterestRate must be between 0 and ${MAX_CLOSE_INTEREST_RATE} inclusive`,
     )
   }
 
@@ -248,23 +248,13 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
       tx.OverpaymentInterestRate > MAX_OVER_PAYMENT_INTEREST_RATE)
   ) {
     throw new ValidationError(
-      `LoanSet: OverpaymentInterestRate must be must be between 0 and ${MAX_OVER_PAYMENT_INTEREST_RATE} inclusive`,
-    )
-  }
-
-  if (
-    tx.OverpaymentInterestRate != null &&
-    (tx.OverpaymentInterestRate < 0 ||
-      tx.OverpaymentInterestRate > MAX_OVER_PAYMENT_INTEREST_RATE)
-  ) {
-    throw new ValidationError(
-      `LoanSet: OverpaymentInterestRate must be must be between 0 and ${MAX_OVER_PAYMENT_INTEREST_RATE} inclusive`,
+      `LoanSet: OverpaymentInterestRate must be between 0 and ${MAX_OVER_PAYMENT_INTEREST_RATE} inclusive`,
     )
   }
 
   if (tx.PaymentInterval != null && tx.PaymentInterval < MIN_PAYMENT_INTERVAL) {
     throw new ValidationError(
-      `LoanSet: PaymentInterval must be must be greater than or equal to ${MIN_PAYMENT_INTERVAL}`,
+      `LoanSet: PaymentInterval must be greater than or equal to ${MIN_PAYMENT_INTERVAL}`,
     )
   }
 

@@ -27,7 +27,7 @@ export interface LoanBrokerCoverWithdraw extends BaseTransaction {
   LoanBrokerID: string
 
   /**
-   * The Fist-Loss Capital amount to withdraw.
+   * The First-Loss Capital amount to withdraw.
    */
   Amount: Amount | MPTAmount
 
