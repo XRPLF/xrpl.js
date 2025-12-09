@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
 * Better faucet error handling
+* Mark the `AssetsAvailable`, `AssetsTotal`, and `LossUnrealized` fields of the Vault object as optional.
 
 ## 4.4.3 (2025-11-07)
 
