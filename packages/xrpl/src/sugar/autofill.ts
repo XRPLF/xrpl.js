@@ -371,7 +371,7 @@ async function calculateFeePerTransactionType(
     )
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.log(
-      `The autofill method over-estimates the fees required for LoanSet transaction, by including all possible counterparty signers. If users prefer to optimize this transaction fees, they need to manually compute it and fill it themselves.`,
+      `For LoanSet transaction the auto calculated Fee accounts for total number of signers the counterparty has to avoid transaction failure.`,
     )
   }
 
