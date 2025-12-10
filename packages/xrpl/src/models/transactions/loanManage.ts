@@ -77,8 +77,24 @@ export function validateLoanManage(tx: Record<string, unknown>): void {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know its number
-  const flags = tx.Flags as number
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- for LoanManage it should be among these two
+  const txFlags = (tx as { Flags?: number | LoanManageFlagsInterface }).Flags
+  if (txFlags == null) {
+    return
+  }
+
+  let flags = 0
+  if (typeof txFlags === 'number') {
+    flags = txFlags
+  } else {
+    if (txFlags.tfLoanImpair) {
+      flags |= LoanManageFlags.tfLoanImpair
+    }
+    if (txFlags.tfLoanUnimpair) {
+      flags |= LoanManageFlags.tfLoanUnimpair
+    }
+  }
+
   if (
     (flags & LoanManageFlags.tfLoanImpair) === LoanManageFlags.tfLoanImpair &&
     (flags & LoanManageFlags.tfLoanUnimpair) === LoanManageFlags.tfLoanUnimpair

@@ -270,6 +270,7 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @param client - The client object used to make the request.
  * @param tx - The transaction object for which the counterparty signers count needs to be fetched.
  * @returns A Promise that resolves to the number of signers for the counterparty.
+ * @throws {ValidationError} Throws an error if LoanBrokerID is not provided in the transaction.
  */
 async function fetchCounterPartySignersCount(
   client: Client,
@@ -278,6 +279,11 @@ async function fetchCounterPartySignersCount(
   let counterParty: Account | undefined = tx.Counterparty as Account | undefined
   // Loan Borrower initiated the transaction, Loan Broker is the counterparty.
   if (counterParty == null) {
+    if (tx.LoanBrokerID == null) {
+      throw new ValidationError(
+        'LoanBrokerID is required for LoanSet transaction',
+      )
+    }
     const resp = (
       await client.request({
         command: 'ledger_entry',
