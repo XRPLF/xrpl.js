@@ -72,7 +72,7 @@ export interface LoanBrokerSet extends BaseTransaction {
  * @param tx - LoanBrokerSet Transaction.
  * @throws When LoanBrokerSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- due to exhaustive validations
+// eslint-disable-next-line max-statements, max-lines-per-function -- due to exhaustive validations
 export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise -- required to check flags */
 import { ValidationError } from '../../errors'
 
 import {
@@ -73,6 +74,17 @@ export function validateLoanManage(tx: Record<string, unknown>): void {
   if (!isLedgerEntryId(tx.LoanID)) {
     throw new ValidationError(
       `LoanManage: LoanID must be 64 characters hexadecimal string`,
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know its number
+  const flags = tx.Flags as number
+  if (
+    (flags & LoanManageFlags.tfLoanImpair) === LoanManageFlags.tfLoanImpair &&
+    (flags & LoanManageFlags.tfLoanUnimpair) === LoanManageFlags.tfLoanUnimpair
+  ) {
+    throw new ValidationError(
+      'LoanManage: tfLoanImpair and tfLoanUnimpair cannot both be present',
     )
   }
 }
