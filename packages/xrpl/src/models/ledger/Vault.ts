@@ -49,17 +49,17 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The total value of the vault.
    */
-  AssetsTotal: string
+  AssetsTotal?: string
 
   /**
    * The asset amount that is available in the vault.
    */
-  AssetsAvailable: string
+  AssetsAvailable?: string
 
   /**
    * The potential loss amount that is not yet realized expressed as the vaults asset.
    */
-  LossUnrealized: string
+  LossUnrealized?: string
 
   /**
    * The identifier of the share MPTokenIssuance object.
