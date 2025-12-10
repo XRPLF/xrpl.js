@@ -1,5 +1,7 @@
 export interface BaseLedgerEntry {
   index: string
+  /** The account that is sponsoring the account or object. */
+  SponsorAccount?: string
 }
 
 export interface HasPreviousTxnID {
