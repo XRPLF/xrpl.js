@@ -55,7 +55,7 @@ export interface LoanSet extends BaseTransaction {
   Counterparty?: Account
 
   /**
-   * Arbitrary metadata in hex format. The field is limited to 256 bytes.
+   * Arbitrary metadata in hex format. The field is limited to 512 characters.
    */
   Data?: string
 

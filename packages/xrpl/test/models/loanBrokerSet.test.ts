@@ -97,4 +97,34 @@ describe('unit test LoanBrokerSet', () => {
       'LoanBrokerSet: CoverRateLiquidation must be between 0 and 100000 inclusive',
     )
   })
+
+  test('CoverRateMinimum and CoverRateLiquidation both zero', () => {
+    tx.CoverRateMinimum = 0
+    tx.CoverRateLiquidation = 0
+    assertValid(tx)
+  })
+
+  test('CoverRateMinimum and CoverRateLiquidation both non-zero', () => {
+    tx.CoverRateMinimum = 10
+    tx.CoverRateLiquidation = 20
+    assertValid(tx)
+  })
+
+  test('CoverRateMinimum is zero and CoverRateLiquidation is non-zero', () => {
+    tx.CoverRateMinimum = 0
+    tx.CoverRateLiquidation = 10
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: CoverRateMinimum and CoverRateLiquidation must both be zero or both be non-zero',
+    )
+  })
+
+  test('CoverRateMinimum is non-zero and CoverRateLiquidation is zero', () => {
+    tx.CoverRateMinimum = 10
+    tx.CoverRateLiquidation = 0
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: CoverRateMinimum and CoverRateLiquidation must both be zero or both be non-zero',
+    )
+  })
 })

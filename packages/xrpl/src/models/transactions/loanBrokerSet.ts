@@ -39,12 +39,12 @@ export interface LoanBrokerSet extends BaseTransaction {
   LoanBrokerID?: string
 
   /**
-   * Arbitrary metadata in hex format. The field is limited to 256 bytes.
+   * Arbitrary metadata in hex format. The field is limited to 512 characters.
    */
   Data?: string
 
   /**
-   * The 1/10th basis point fee charged by the Lending Protocol Owner. Valid values are between 0 and 10000 inclusive.
+   * The 1/10th basis point fee charged by the Lending Protocol Owner. Valid values are between 0 and 10000 inclusive (1% - 10%).
    */
   ManagementFeeRate?: number
 
@@ -133,6 +133,20 @@ export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError(
       `LoanBrokerSet: CoverRateLiquidation must be between 0 and ${MAX_COVER_RATE_LIQUIDATION} inclusive`,
+    )
+  }
+
+  // Validate that either both CoverRateMinimum and CoverRateLiquidation are zero,
+  // or both are non-zero.
+  const coverRateMinimumValue = tx.CoverRateMinimum ?? 0
+  const coverRateLiquidationValue = tx.CoverRateLiquidation ?? 0
+
+  if (
+    (coverRateMinimumValue === 0 && coverRateLiquidationValue !== 0) ||
+    (coverRateMinimumValue !== 0 && coverRateLiquidationValue === 0)
+  ) {
+    throw new ValidationError(
+      'LoanBrokerSet: CoverRateMinimum and CoverRateLiquidation must both be zero or both be non-zero',
     )
   }
 }

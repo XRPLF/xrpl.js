@@ -299,7 +299,7 @@ async function fetchCounterPartySignersCount(
 
   const signerListResponse = await client.request(signerListRequest)
   const signerList = signerListResponse.result.signer_lists?.[0]
-  return signerList?.SignerEntries.length ?? 0
+  return signerList?.SignerEntries.length ?? 1
 }
 
 /**
