@@ -80,12 +80,12 @@ describe('Single Asset Vault', function () {
       VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
     )
     assert.equal(
-      vault.AssetsTotal,
+      vault.AssetsTotal ?? '0',
       '0',
       'New Vault should have zero total assets',
     )
     assert.equal(
-      vault.AssetsAvailable,
+      vault.AssetsAvailable ?? '0',
       '0',
       'New Vault should have zero available assets',
     )

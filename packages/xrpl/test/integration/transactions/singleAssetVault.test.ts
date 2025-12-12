@@ -191,7 +191,7 @@ describe('Single Asset Vault', function () {
 
       // Should have new balance after deposit (this assumes AssetsTotal tracks deposits)
       assert.equal(
-        afterDepositVault.AssetsTotal,
+        afterDepositVault.AssetsTotal ?? '0',
         depositAmount,
         'Vault should reflect deposited assets',
       )
@@ -224,9 +224,9 @@ describe('Single Asset Vault', function () {
 
       // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
       assert.equal(
-        afterWithdrawVault.AssetsTotal,
+        afterWithdrawVault.AssetsTotal ?? '0',
         (
-          BigInt(afterDepositVault.AssetsTotal) - BigInt(withdrawAmount)
+          BigInt(afterDepositVault.AssetsTotal ?? '0') - BigInt(withdrawAmount)
         ).toString(),
         'Vault should reflect withdrawn assets',
       )
@@ -255,13 +255,14 @@ describe('Single Asset Vault', function () {
         account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
+
       const afterClawbackVault = afterClawbackResult.result
         .account_objects[0] as Vault
 
       assert.equal(
-        afterClawbackVault.AssetsTotal,
+        afterClawbackVault.AssetsTotal ?? '0',
         (
-          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+          BigInt(afterWithdrawVault.AssetsTotal ?? '0') - BigInt(clawbackAmount)
         ).toString(),
         'Vault should reflect assets after clawback',
       )
@@ -470,9 +471,9 @@ describe('Single Asset Vault', function () {
 
       // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
       assert.equal(
-        afterWithdrawVault.AssetsTotal,
+        afterWithdrawVault.AssetsTotal ?? '0',
         (
-          BigInt(afterDepositVault.AssetsTotal) - BigInt(withdrawAmount)
+          BigInt(afterDepositVault.AssetsTotal ?? '0') - BigInt(withdrawAmount)
         ).toString(),
         'Vault should reflect withdrawn assets',
       )
@@ -504,9 +505,9 @@ describe('Single Asset Vault', function () {
         .account_objects[0] as Vault
 
       assert.equal(
-        afterClawbackVault.AssetsTotal,
+        afterClawbackVault.AssetsTotal ?? '0',
         (
-          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+          BigInt(afterWithdrawVault.AssetsTotal ?? '0') - BigInt(clawbackAmount)
         ).toString(),
         'Vault should reflect assets after clawback',
       )
