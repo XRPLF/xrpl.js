@@ -28,6 +28,22 @@ const tx_json = {
     'ED5F5AC8B98974A3CA843326D9B88CEBD0560177B973EE0B149F782CFAA06DC66A',
 }
 
+const multiSigningTxJson = {
+  TransactionType: 'LoanSet',
+  Flags: 0,
+  Sequence: 3606,
+  LastLedgerSequence: 3634,
+  LoanBrokerID:
+    'B91CD2033E73E0DD17AF043FBD458CE7D996850A83DCED23FB122A3BFAA7F430',
+  Fee: '12',
+  SigningPubKey:
+    'EDCEDEBC063D32FD4327C272ED2C46851129C47BE41FCA4222D4D94205AB1B587B',
+  TxnSignature:
+    'CCF8287A8A8EC0CF47C67219639C2F7BC7E7FCF2648FD328A518E9B9FA05ADB9A28A6EFB02D17A776DAEE5D1E25623FFBEFC06B5BBC1F77104188602F865A70F',
+  Account: 'rHLLL3Z7uBLK49yZcMaj8FAP7DU12Nw5A5',
+  PrincipalRequested: '100000',
+}
+
 describe('Signing data', function () {
   it('can create single signing blobs', function () {
     const actual = encodeForSigning(tx_json)
@@ -171,6 +187,50 @@ describe('Signing data', function () {
         'B5F762798A53D543A014CAF8B297CFF8F2F937E8',
         // signingAccount suffix
         'C0A5ABEF242802EFED4B041E8F2D4A8CC86AE3D1',
+      ].join(''),
+    )
+  })
+
+  it('can create multi signing blobs with non-empty SigningPubKey', function () {
+    const signingAccount = 'rJ73aumLPTQQmy5wnGhvrogqf5DDhjuzc9'
+    const actual = encodeForMultisigning(multiSigningTxJson, signingAccount)
+    expect(actual).toBe(
+      [
+        '534D5400', // signingPrefix
+        // TransactionType
+        '12',
+        '0050', // LoanSet = 80
+        // Flags
+        '22',
+        '00000000',
+        // Sequence
+        '24',
+        '00000E16', // 3606
+        // LastLedgerSequence
+        '201B',
+        '00000E32', // 3634
+        // LoanBrokerID
+        '5025',
+        'B91CD2033E73E0DD17AF043FBD458CE7D996850A83DCED23FB122A3BFAA7F430',
+        // Fee
+        '68',
+        // native amount
+        '400000000000000C',
+        // SigningPubKey
+        '73',
+        // VLLength
+        '21', // 33 bytes
+        'EDCEDEBC063D32FD4327C272ED2C46851129C47BE41FCA4222D4D94205AB1B587B',
+        // Account
+        '81',
+        // VLLength
+        '14',
+        'B32A0D322D38281C81D4F49DCCDC260A81879B57',
+        // PrincipalRequested
+        '9E',
+        '00038D7EA4C68000FFFFFFF6',
+        // signingAccount suffix
+        'BF9B4C3302798C111649BFA38DB60525C6E1021C',
       ].join(''),
     )
   })

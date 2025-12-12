@@ -110,8 +110,6 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)
@@ -357,8 +355,6 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
         Flags: VaultCreateFlags.tfVaultShareNonTransferable,
       }
 

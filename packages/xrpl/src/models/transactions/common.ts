@@ -1,5 +1,4 @@
 /* eslint-disable max-lines -- common utility file */
-
 import { HEX_REGEX } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
@@ -23,6 +22,7 @@ const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
+const SHA_512_HALF_LENGTH = 64
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -303,6 +303,18 @@ export function isAmount(amount: unknown): amount is Amount {
 }
 
 /**
+ * Verify the form and type of IOU/MPT token amount at runtime.
+ *
+ * @param amount - The object to check the form and type of.
+ * @returns Whether the Amount is properly formed.
+ */
+export function isTokenAmount(
+  amount: unknown,
+): amount is IssuedCurrencyAmount | MPTAmount {
+  return isIssuedCurrencyAmount(amount) || isMPTAmount(amount)
+}
+
+/**
  * Verify the form and type of an XChainBridge at runtime.
  *
  * @param input - The input to check the form and type of.
@@ -327,6 +339,35 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  */
 export function isArray<T = unknown>(input: unknown): input is T[] {
   return input != null && Array.isArray(input)
+}
+
+/**
+ * Verify the input is a valid ledger entry id.
+ *
+ * @param input - The object to validate.
+ * @returns Whether the input is a valid ledger entry id.
+ */
+export function isLedgerEntryId(input: unknown): input is string {
+  return isString(input) && isHex(input) && input.length === SHA_512_HALF_LENGTH
+}
+
+/**
+ * Validate input is non-empty hex string of up to a certain length.
+ *
+ * @param input - The metadata to validate.
+ * @param lengthUpto - The maximum length of the hex string.
+ * @returns Whether the input is a valid non-empty hex string up to the specified length.
+ */
+export function validateHexMetadata(
+  input: unknown,
+  lengthUpto: number,
+): input is string {
+  return (
+    isString(input) &&
+    isHex(input) &&
+    input.length > 0 &&
+    input.length <= lengthUpto
+  )
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
