@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.6.0 (2025-12-16)
+
 ### Added
 * Allow `encodeForMultisigning` to work with transactions that have non-empty `SigningPubKey`. Required to encode `LoanSet` transaction by counterparty signers for signing.
 
