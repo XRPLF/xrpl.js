@@ -515,6 +515,6 @@ function removeTrailingZeros(tx: Transaction): void {
 
 export { signMultiBatch, combineBatchSigners } from './batchSigner'
 
-export { multisign } from './signer'
+export { multisign, verifySignature } from './signer'
 
 export { authorizeChannel } from './authorizeChannel'
