@@ -20,6 +20,7 @@ import {
   encodeForMultisigning as rbcEncodeForMultisigning,
   encodeForSigning as rbcEncodeForSigning,
   encodeForSigningClaim as rbcEncodeForSigningClaim,
+  encodeForSigningBatch as rbcEncodeForSigningBatch,
 } from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
 
@@ -128,6 +129,16 @@ function encodeForMultiSigning(object: Transaction, signer: string): string {
 }
 
 /**
+ * Encodes a Batched Transaction for multi-account signing
+ *
+ * @param object - Batched Transaction in JSON format.
+ * @returns A hex string representing the encoded object.
+ */
+function encodeForSigningBatch(object: Transaction): string {
+  return rbcEncodeForSigningBatch(object)
+}
+
+/**
  * Decodes a hex string into a transaction | ledger entry
  *
  * @param hex - hex string in the XRPL serialization format.
@@ -231,6 +242,7 @@ export {
   decode,
   encodeForMultiSigning,
   encodeForSigning,
+  encodeForSigningBatch,
   encodeForSigningClaim,
   getNFTokenID,
   parseNFTokenID,
