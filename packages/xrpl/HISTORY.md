@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 4.5.0 (2025-12-16)
+
 ### Added
 * Support for `Lending Protocol` (XLS-66d).
 * Export signing and binary codec utilities.
