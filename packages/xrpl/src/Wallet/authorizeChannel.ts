@@ -1,7 +1,7 @@
 import { encodeForSigningClaim } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
-import { Wallet } from './index'
+import type { Wallet } from './index'
 
 /**
  * Creates a signature that can be used to redeem a specific amount of XRP from a payment channel.
