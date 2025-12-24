@@ -14,12 +14,11 @@ import {
   TrustSet,
   TrustSetFlags,
 } from '../../src'
-import { AuthorizeCredential } from '../../src/models/common'
+import { AuthorizeCredential, MPTokenMetadata } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
 import {
   containsDuplicates,
   GlobalFlags,
-  validateMPTokenMetadata,
 } from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
@@ -28,7 +27,13 @@ import {
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
-import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
+import {
+  decodeMPTokenMetadata,
+  encodeMPTokenMetadata,
+  validateMPTokenMetadata,
+} from '../../src/models/utils/mptokenMetadata'
+import mptMetadataEncodeDecodeTests from '../fixtures/transactions/mptokenMetadataEncodeDecodeData.json'
+import mptMetadataValidationTests from '../fixtures/transactions/mptokenMetadataValidationData.json'
 
 /**
  * Utils Testing.
@@ -575,11 +580,7 @@ describe('Models Utils', function () {
   })
 
   describe('MPTokenMetadata validation messages', function () {
-    beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(jest.fn())
-    })
-
-    for (const testCase of mptMetadataTests) {
+    for (const testCase of mptMetadataValidationTests) {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
         const validationMessages = validateMPTokenMetadata(
@@ -590,8 +591,48 @@ describe('Models Utils', function () {
           ),
         )
 
-        assert.deepStrictEqual(testCase.validationMessages, validationMessages)
+        assert.deepStrictEqual(validationMessages, testCase.validationMessages)
       })
     }
+  })
+
+  describe('MPTokenMetadata encode/decode', function () {
+    for (const testCase of mptMetadataEncodeDecodeTests) {
+      const testName: string = testCase.testName
+      it(`encode/decode: ${testName}`, function () {
+        const encodedHex = encodeMPTokenMetadata(
+          testCase.mptMetadata as MPTokenMetadata,
+        )
+        assert.equal(encodedHex, testCase.hex)
+
+        const decoded = decodeMPTokenMetadata(encodedHex) as unknown as Record<
+          string,
+          unknown
+        >
+        assert.deepStrictEqual(decoded, testCase.expectedLongForm)
+      })
+    }
+
+    it('throws error for invalid JSON', function () {
+      assert.throws(
+        () =>
+          encodeMPTokenMetadata('invalid json' as unknown as MPTokenMetadata),
+        `MPTokenMetadata must be JSON object.`,
+      )
+    })
+
+    it('throws error for invalid hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('invalid'),
+        `MPTokenMetadata must be in hex format.`,
+      )
+    })
+
+    it('throws error for invalid JSON underneath hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('464F4F'),
+        `MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'F', "FOO" is not valid JSON`,
+      )
+    })
   })
 })

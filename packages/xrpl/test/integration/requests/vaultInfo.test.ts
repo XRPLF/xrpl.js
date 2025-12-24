@@ -32,8 +32,6 @@ describe('Single Asset Vault', function () {
       Data: stringToHex('vault metadata'),
       MPTokenMetadata: stringToHex('share metadata'),
       AssetsMaximum: '1000000000',
-      // This covers owner reserve fee with potentially high open_ledger_cost
-      Fee: '5000000',
     }
 
     await testTransaction(testContext.client, tx, testContext.wallet)
@@ -80,12 +78,12 @@ describe('Single Asset Vault', function () {
       VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
     )
     assert.equal(
-      vault.AssetsTotal,
+      vault.AssetsTotal ?? '0',
       '0',
       'New Vault should have zero total assets',
     )
     assert.equal(
-      vault.AssetsAvailable,
+      vault.AssetsAvailable ?? '0',
       '0',
       'New Vault should have zero available assets',
     )

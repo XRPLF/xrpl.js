@@ -1,5 +1,12 @@
 {
   "version": "independent",
-  "useWorkspaces": true,
+  "packages": [
+    "packages/xrpl",
+    "packages/ripple-binary-codec",
+    "packages/ripple-keypairs",
+    "packages/ripple-address-codec",
+    "packages/isomorphic",
+    "packages/secret-numbers"
+  ],
   "npmClient": "npm"
 }

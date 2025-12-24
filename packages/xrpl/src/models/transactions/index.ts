@@ -1,9 +1,8 @@
 export {
   BaseTransaction,
-  isMPTAmount,
-  validateMPTokenMetadata,
   GlobalFlags,
   GlobalFlagsInterface,
+  isMPTAmount,
 } from './common'
 export {
   validate,
@@ -55,6 +54,19 @@ export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
+export { LoanBrokerSet } from './loanBrokerSet'
+export { LoanBrokerDelete } from './loanBrokerDelete'
+export { LoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
+export { LoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
+export { LoanBrokerCoverClawback } from './loanBrokerCoverClawback'
+export { LoanSet, LoanSetFlags, LoanSetFlagsInterface } from './loanSet'
+export { LoanDelete } from './loanDelete'
+export {
+  LoanManage,
+  LoanManageFlags,
+  LoanManageFlagsInterface,
+} from './loanManage'
+export { LoanPay } from './loanPay'
 export {
   MPTokenAuthorize,
   MPTokenAuthorizeFlags,

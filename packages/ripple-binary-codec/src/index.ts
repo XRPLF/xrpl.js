@@ -100,9 +100,7 @@ function encodeForMultisigning(
   if (typeof json !== 'object') {
     throw new Error()
   }
-  if (json['SigningPubKey'] !== '') {
-    throw new Error()
-  }
+
   const definitionsOpt = definitions ? { definitions } : undefined
   return bytesToHex(
     multiSigningData(json as JsonObject, signer, definitionsOpt),

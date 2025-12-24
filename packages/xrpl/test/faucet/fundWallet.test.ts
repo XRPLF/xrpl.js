@@ -131,12 +131,13 @@ describe('fundWallet', function () {
 
       throw new Error('Error not thrown')
     } catch (error) {
-      await api.disconnect()
       expect(error).toEqual(
         new XRPLFaucetError(
-          'Request failed: {"body":{"error":"Invalid amount","detail":"Must be an integer"},"contentType":"application/json; charset=utf-8","statusCode":400}',
+          'Request failed: {"contentType":"application/json; charset=utf-8","statusCode":400,"body":{"error":"Invalid amount","detail":"Must be an integer"}}',
         ),
       )
+    } finally {
+      await api.disconnect()
     }
   })
 })

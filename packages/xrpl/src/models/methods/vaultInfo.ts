@@ -48,12 +48,12 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Amount of assets currently available for withdrawal.
        */
-      AssetsAvailable: string
+      AssetsAvailable?: string
 
       /**
        * Total amount of assets in the vault.
        */
-      AssetsTotal: string
+      AssetsTotal?: string
 
       /**
        * Ledger entry type, always "Vault".

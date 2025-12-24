@@ -6,8 +6,8 @@ import {
   VaultCreateFlags,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
-import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
+import { MPT_META_WARNING_HEADER } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)
@@ -126,11 +126,10 @@ describe('MPTokenMetadata warnings', function () {
     const mptMetaData: MPTokenMetadata = {
       ticker: 'TBILL',
       name: 'T-Bill Token',
-      icon: 'http://example.com/icon.png',
       asset_class: 'rwa',
       asset_subclass: 'treasury',
       issuer_name: 'Issuer',
-    }
+    } as MPTokenMetadata
     const tx = {
       TransactionType: 'VaultCreate',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
@@ -143,7 +142,7 @@ describe('MPTokenMetadata warnings', function () {
 
     const expectedMessage = [
       MPT_META_WARNING_HEADER,
-      '- icon should be a valid https url.',
+      '- icon/i: should be a non-empty string.',
     ].join('\n')
 
     expect(console.warn).toHaveBeenCalledWith(
