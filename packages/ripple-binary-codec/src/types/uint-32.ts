@@ -37,7 +37,7 @@ class UInt32 extends UInt {
       return new UInt32(buf)
     }
 
-    if (typeof val === 'number') {
+    if (typeof val === 'number' && Number.isInteger(val)) {
       UInt32.checkUintRange(val, 0, 0xffffffff)
       writeUInt32BE(buf, val, 0)
       return new UInt32(buf)
