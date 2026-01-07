@@ -200,19 +200,19 @@ describe('UInt decimal validation', () => {
   describe('UInt8', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => UInt8.from(1.5)).toThrow(
-        'Cannot construct UInt8 from given value',
+        new Error('Cannot construct UInt8 from given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => UInt8.from(-1.5)).toThrow(
-        'Cannot construct UInt8 from given value',
+        new Error('Cannot construct UInt8 from given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => UInt8.from(0.1)).toThrow(
-        'Cannot construct UInt8 from given value',
+        new Error('Cannot construct UInt8 from given value'),
       )
     })
 
@@ -226,19 +226,19 @@ describe('UInt decimal validation', () => {
   describe('UInt16', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => UInt16.from(100.5)).toThrow(
-        'Can not construct UInt16 with given value',
+        new Error('Can not construct UInt16 with given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => UInt16.from(-100.5)).toThrow(
-        'Can not construct UInt16 with given value',
+        new Error('Can not construct UInt16 with given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => UInt16.from(0.001)).toThrow(
-        'Can not construct UInt16 with given value',
+        new Error('Can not construct UInt16 with given value'),
       )
     })
 
@@ -252,19 +252,19 @@ describe('UInt decimal validation', () => {
   describe('UInt32', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => UInt32.from(1000.5)).toThrow(
-        'Cannot construct UInt32 from given value',
+        new Error('Cannot construct UInt32 from given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => UInt32.from(-1000.5)).toThrow(
-        'Cannot construct UInt32 from given value',
+        new Error('Cannot construct UInt32 from given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => UInt32.from(0.0001)).toThrow(
-        'Cannot construct UInt32 from given value',
+        new Error('Cannot construct UInt32 from given value'),
       )
     })
 
@@ -278,19 +278,19 @@ describe('UInt decimal validation', () => {
   describe('UInt64', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => UInt64.from(10000.5)).toThrow(
-        'Cannot construct UInt64 from given value',
+        new Error('Cannot construct UInt64 from given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => UInt64.from(-10000.5)).toThrow(
-        'Cannot construct UInt64 from given value',
+        new Error('Cannot construct UInt64 from given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => UInt64.from(0.00001)).toThrow(
-        'Cannot construct UInt64 from given value',
+        new Error('Cannot construct UInt64 from given value'),
       )
     })
 
