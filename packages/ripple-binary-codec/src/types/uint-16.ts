@@ -37,7 +37,7 @@ class UInt16 extends UInt {
       return new UInt16(buf)
     }
 
-    throw new Error('Can not construct UInt16 from given value')
+    throw new Error('Cannot construct UInt16 from given value')
   }
 
   /**
