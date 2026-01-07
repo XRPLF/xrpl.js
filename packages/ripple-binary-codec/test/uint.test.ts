@@ -226,19 +226,19 @@ describe('UInt decimal validation', () => {
   describe('UInt16', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => UInt16.from(100.5)).toThrow(
-        new Error('Can not construct UInt16 with given value'),
+        new Error('Can not construct UInt16 from given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => UInt16.from(-100.5)).toThrow(
-        new Error('Can not construct UInt16 with given value'),
+        new Error('Can not construct UInt16 from given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => UInt16.from(0.001)).toThrow(
-        new Error('Can not construct UInt16 with given value'),
+        new Error('Can not construct UInt16 from given value'),
       )
     })
 
