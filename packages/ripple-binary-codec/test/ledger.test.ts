@@ -1,11 +1,11 @@
-import ledgerFull38129 from './fixtures/ledger-full-38129.json'
-import ledgerFull40000 from './fixtures/ledger-full-40000.json'
+import ledgerFull38129 from './fixtures/ledger-full-38129.json' assert { type: 'json' }
+import ledgerFull40000 from './fixtures/ledger-full-40000.json' assert { type: 'json' }
 
-const {
+import {
   transactionTreeHash,
   ledgerHash,
   accountStateHash,
-} = require('../src/ledger-hashes')
+} from '../src/ledger-hashes'
 
 describe('Ledger Hashes', function () {
   function testFactory(

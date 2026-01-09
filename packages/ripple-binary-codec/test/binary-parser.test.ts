@@ -6,9 +6,9 @@ import { encodeAccountID } from 'ripple-address-codec'
 import { Field, TransactionType } from '../src/enums'
 import { makeParser, readJSON } from '../src/binary'
 import { BytesList } from '../src/serdes/binary-serializer'
-import fixtures from './fixtures/data-driven-tests.json'
+import fixtures from './fixtures/data-driven-tests.json' assert { type: 'json' }
 
-const { bytesToHex } = require('@xrplf/isomorphic/utils')
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 function toJSON(v) {
   return v.toJSON ? v.toJSON() : v

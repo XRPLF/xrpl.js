@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenMetadata } from '../../src'

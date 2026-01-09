@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 import { assert } from 'chai'
 import { encode } from 'ripple-binary-codec'
@@ -35,6 +36,7 @@ import { assertResultMatch } from '../testUtils'
  */
 function createLedgerTest(ledgerIndex: number): void {
   const ledgerIndexString = String(ledgerIndex)
+  const __dirname = path.dirname(fileURLToPath(import.meta.url))
   const fileLocation = path.join(
     __dirname,
     '..',
