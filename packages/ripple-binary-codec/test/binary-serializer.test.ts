@@ -1,6 +1,29 @@
 import fixtures from './fixtures/data-driven-tests.json' assert { type: 'json' }
 import deliverMinTx from './fixtures/delivermin-tx.json' assert { type: 'json' }
 import deliverMinTxBinary from './fixtures/delivermin-tx-binary.json' assert { type: 'json' }
+import signerListSetTx from './fixtures/signerlistset-tx.json' assert { type: 'json' }
+import signerListSetBinary from './fixtures/signerlistset-tx-binary.json' assert { type: 'json' }
+import signerListSetMeta from './fixtures/signerlistset-tx-meta-binary.json' assert { type: 'json' }
+import depositPreauthTx from './fixtures/deposit-preauth-tx.json' assert { type: 'json' }
+import depositPreauthBinary from './fixtures/deposit-preauth-tx-binary.json' assert { type: 'json' }
+import depositPreauthMeta from './fixtures/deposit-preauth-tx-meta-binary.json' assert { type: 'json' }
+import escrowCreateTx from './fixtures/escrow-create-tx.json' assert { type: 'json' }
+import escrowCreateBinary from './fixtures/escrow-create-binary.json' assert { type: 'json' }
+import escrowFinishTx from './fixtures/escrow-finish-tx.json' assert { type: 'json' }
+import escrowFinishBinary from './fixtures/escrow-finish-binary.json' assert { type: 'json' }
+import escrowFinishMeta from './fixtures/escrow-finish-meta-binary.json' assert { type: 'json' }
+import escrowCancelTx from './fixtures/escrow-cancel-tx.json' assert { type: 'json' }
+import escrowCancelBinary from './fixtures/escrow-cancel-binary.json' assert { type: 'json' }
+import paymentChannelCreateTx from './fixtures/payment-channel-create-tx.json' assert { type: 'json' }
+import paymentChannelCreateBinary from './fixtures/payment-channel-create-binary.json' assert { type: 'json' }
+import paymentChannelFundTx from './fixtures/payment-channel-fund-tx.json' assert { type: 'json' }
+import paymentChannelFundBinary from './fixtures/payment-channel-fund-binary.json' assert { type: 'json' }
+import paymentChannelClaimTx from './fixtures/payment-channel-claim-tx.json' assert { type: 'json' }
+import paymentChannelClaimBinary from './fixtures/payment-channel-claim-binary.json' assert { type: 'json' }
+import ticketCreateTx from './fixtures/ticket-create-tx.json' assert { type: 'json' }
+import ticketCreateBinary from './fixtures/ticket-create-binary.json' assert { type: 'json' }
+import NegativeUNL from './fixtures/negative-unl.json' assert { type: 'json' }
+import nfTokenFixtures from './fixtures/nf-token.json' assert { type: 'json' }
 
 import { binary } from '../src/coretypes'
 import { encode, decode } from '../src'
@@ -10,49 +33,49 @@ const { makeParser, BytesList, BinarySerializer } = binary
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
 
 const SignerListSet = {
-  tx: require('./fixtures/signerlistset-tx.json'),
-  binary: require('./fixtures/signerlistset-tx-binary.json'),
-  meta: require('./fixtures/signerlistset-tx-meta-binary.json'),
+  tx: signerListSetTx,
+  binary: signerListSetBinary,
+  meta: signerListSetMeta,
 }
 const DepositPreauth = {
-  tx: require('./fixtures/deposit-preauth-tx.json'),
-  binary: require('./fixtures/deposit-preauth-tx-binary.json'),
-  meta: require('./fixtures/deposit-preauth-tx-meta-binary.json'),
+  tx: depositPreauthTx,
+  binary: depositPreauthBinary,
+  meta: depositPreauthMeta,
 }
 const Escrow = {
   create: {
-    tx: require('./fixtures/escrow-create-tx.json'),
-    binary: require('./fixtures/escrow-create-binary.json'),
+    tx: escrowCreateTx,
+    binary: escrowCreateBinary,
   },
   finish: {
-    tx: require('./fixtures/escrow-finish-tx.json'),
-    binary: require('./fixtures/escrow-finish-binary.json'),
-    meta: require('./fixtures/escrow-finish-meta-binary.json'),
+    tx: escrowFinishTx,
+    binary: escrowFinishBinary,
+    meta: escrowFinishMeta,
   },
   cancel: {
-    tx: require('./fixtures/escrow-cancel-tx.json'),
-    binary: require('./fixtures/escrow-cancel-binary.json'),
+    tx: escrowCancelTx,
+    binary: escrowCancelBinary,
   },
 }
 const PaymentChannel = {
   create: {
-    tx: require('./fixtures/payment-channel-create-tx.json'),
-    binary: require('./fixtures/payment-channel-create-binary.json'),
+    tx: paymentChannelCreateTx,
+    binary: paymentChannelCreateBinary,
   },
   fund: {
-    tx: require('./fixtures/payment-channel-fund-tx.json'),
-    binary: require('./fixtures/payment-channel-fund-binary.json'),
+    tx: paymentChannelFundTx,
+    binary: paymentChannelFundBinary,
   },
   claim: {
-    tx: require('./fixtures/payment-channel-claim-tx.json'),
-    binary: require('./fixtures/payment-channel-claim-binary.json'),
+    tx: paymentChannelClaimTx,
+    binary: paymentChannelClaimBinary,
   },
 }
 
 const Ticket = {
   create: {
-    tx: require('./fixtures/ticket-create-tx.json'),
-    binary: require('./fixtures/ticket-create-binary.json'),
+    tx: ticketCreateTx,
+    binary: ticketCreateBinary,
   },
 }
 
@@ -102,8 +125,6 @@ let json_omitted = {
   Flags: 524288,
   LastLedgerSequence: 6220135,
 }
-
-const NegativeUNL = require('./fixtures/negative-unl.json')
 
 function bytesListTest() {
   const list = new BytesList()
@@ -252,12 +273,10 @@ function ticketTest() {
 }
 
 function nfTokenTest() {
-  const fixtures = require('./fixtures/nf-token.json')
-
-  for (const txName of Object.keys(fixtures)) {
+  for (const txName of Object.keys(nfTokenFixtures)) {
     it(`can serialize transaction ${txName}`, () => {
-      expect(encode(fixtures[txName].tx.json)).toEqual(
-        fixtures[txName].tx.binary,
+      expect(encode(nfTokenFixtures[txName].tx.json)).toEqual(
+        nfTokenFixtures[txName].tx.binary,
       )
     })
 
