@@ -196,7 +196,7 @@ export class STNumber extends SerializedType {
   // eslint-disable-next-line complexity -- required
   toJSON(): string {
     const b = this.bytes
-    if (b?.length !== 12)
+    if (!b || b?.length !== 12)
       throw new Error('STNumber internal bytes not set or wrong length')
 
     // Signed 64-bit mantissa

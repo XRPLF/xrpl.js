@@ -82,7 +82,6 @@ module.exports = [
     rules: {
       'n/no-extraneous-import': 'off',
       'import/no-extraneous-dependencies': 'off',
-      'import/no-unresolved': 'off', // Disable for test files that use module subpaths
     },
   },
 ]
