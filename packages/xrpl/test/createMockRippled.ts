@@ -1,6 +1,5 @@
 import { EventEmitter } from 'eventemitter3'
 import ws from 'ws'
-const { Server: WebSocketServer } = ws
 import type { WebSocket, Server } from 'ws'
 
 import type { Request } from '../src'
@@ -11,6 +10,8 @@ import type {
 } from '../src/models/methods/baseMethod'
 
 import { destroyServer, getFreePort } from './testUtils'
+
+const { Server: WebSocketServer } = ws
 
 export function createResponse(
   request: { id: number | string },
