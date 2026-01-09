@@ -4,7 +4,7 @@ import {
   hexToString,
   randomBytes,
   stringToHex,
-} from '../utils'
+} from '../src/utils/index.js'
 
 describe('utils', function () {
   it('randomBytes', () => {
