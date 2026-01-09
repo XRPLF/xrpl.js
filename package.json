@@ -32,7 +32,7 @@
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.136",
     "@types/node": "^18.19.29",
-    "typescript-eslint": "^8.39.0",
+    "typescript-eslint": "^8.52.0",
     "@types/ws": "^8.2.0",
     "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
