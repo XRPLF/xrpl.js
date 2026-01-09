@@ -1,13 +1,13 @@
-import fixtures from './fixtures/data-driven-tests.json'
+import fixtures from './fixtures/data-driven-tests.json' assert { type: 'json' }
 
-const { binary } = require('../src/coretypes')
-const { encode, decode } = require('../src')
+import { binary } from '../src/coretypes'
+import { encode, decode } from '../src'
 const { makeParser, BytesList, BinarySerializer } = binary
-const { coreTypes } = require('../src/types')
+import { coreTypes } from '../src/types'
 const { UInt8, UInt16, UInt32, UInt64, STObject } = coreTypes
 
-const deliverMinTx = require('./fixtures/delivermin-tx.json')
-const deliverMinTxBinary = require('./fixtures/delivermin-tx-binary.json')
+import deliverMinTx from './fixtures/delivermin-tx.json' assert { type: 'json' }
+import deliverMinTxBinary from './fixtures/delivermin-tx-binary.json' assert { type: 'json' }
 const SignerListSet = {
   tx: require('./fixtures/signerlistset-tx.json'),
   binary: require('./fixtures/signerlistset-tx-binary.json'),

@@ -1,5 +1,5 @@
-const { quality } = require('../src/coretypes')
-const { bytesToHex } = require('@xrplf/isomorphic/utils')
+import { quality } from '../src/coretypes'
+import { bytesToHex } from '@xrplf/isomorphic/utils'
 
 describe('Quality encode/decode', function () {
   const bookDirectory =

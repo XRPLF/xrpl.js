@@ -5,8 +5,7 @@ import {
   encodeForMultisigning,
   encodeForSigningBatch,
 } from '../src'
-
-const normalDefinitions = require('../src/enums/definitions.json')
+import normalDefinitions from '../src/enums/definitions.json' assert { type: 'json' }
 
 const tx_json = {
   Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
