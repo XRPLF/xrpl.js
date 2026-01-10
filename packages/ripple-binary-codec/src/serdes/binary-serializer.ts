@@ -81,7 +81,8 @@ class BinarySerializer {
    * @param type the type to write
    * @param value a value of that type
    */
-  writeType(type: typeof SerializedType, value: SerializedType): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  writeType(type: typeof SerializedType, value: any): void {
     this.write(type.from(value))
   }
 

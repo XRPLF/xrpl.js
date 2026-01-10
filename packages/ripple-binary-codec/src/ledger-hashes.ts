@@ -120,7 +120,7 @@ function accountStateHash(param: Array<JsonObject>): Hash256 {
  * Interface describing a ledger header
  */
 interface ledgerObject {
-  ledger_index: number
+  ledger_index: number | string
   total_coins: string | number | bigint
   parent_hash: string
   transaction_hash: string
@@ -147,7 +147,7 @@ function ledgerHash(header: ledgerObject): Hash256 {
     throw new Error()
   }
 
-  UInt32.from<number>(header.ledger_index).toBytesSink(hash)
+  UInt32.from<number>(Number(header.ledger_index)).toBytesSink(hash)
   UInt64.from<bigint>(BigInt(String(header.total_coins))).toBytesSink(hash)
   Hash256.from<string>(header.parent_hash).toBytesSink(hash)
   Hash256.from<string>(header.transaction_hash).toBytesSink(hash)

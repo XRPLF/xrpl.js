@@ -132,7 +132,9 @@ function bytesListTest() {
     .put(Uint8Array.from([2, 3]))
     .put(Uint8Array.from([4, 5]))
   it('is an Array<Uint8Array>', function () {
+    // @ts-expect-error - testing private property for internal structure validation
     expect(Array.isArray(list.bytesArray)).toBe(true)
+    // @ts-expect-error - testing private property for internal structure validation
     expect(list.bytesArray[0] instanceof Uint8Array).toBe(true)
   })
   it('keeps track of the length itself', function () {
@@ -281,20 +283,20 @@ function nfTokenTest() {
     })
 
     it(`can deserialize transaction ${txName}`, () => {
-      expect(decode(fixtures[txName].tx.binary)).toEqual(
-        fixtures[txName].tx.json,
+      expect(decode(nfTokenFixtures[txName].tx.binary)).toEqual(
+        nfTokenFixtures[txName].tx.json,
       )
     })
 
     it(`can serialize meta ${txName}`, () => {
-      expect(encode(fixtures[txName].meta.json)).toEqual(
-        fixtures[txName].meta.binary,
+      expect(encode(nfTokenFixtures[txName].meta.json)).toEqual(
+        nfTokenFixtures[txName].meta.binary,
       )
     })
 
     it(`can deserialize meta ${txName}`, () => {
-      expect(decode(fixtures[txName].meta.binary)).toEqual(
-        fixtures[txName].meta.json,
+      expect(decode(nfTokenFixtures[txName].meta.binary)).toEqual(
+        nfTokenFixtures[txName].meta.json,
       )
     })
   }
