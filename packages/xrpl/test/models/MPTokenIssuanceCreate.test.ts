@@ -1,4 +1,5 @@
 import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { jest } from '@jest/globals'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'

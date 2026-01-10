@@ -1,6 +1,5 @@
 import { EventEmitter } from 'eventemitter3'
-import ws from 'ws'
-import type { WebSocket, Server } from 'ws'
+import ws, { type Server as WSServer, type WebSocket } from 'ws'
 
 import type { Request } from '../src'
 import { XrplError } from '../src/errors'
@@ -50,7 +49,7 @@ export interface PortResponse extends BaseResponse {
  * properties not defined on the normal WebSocketServer object.
  */
 
-export type MockedWebSocketServer = Server &
+export type MockedWebSocketServer = WSServer &
   EventEmitter & {
     responses: Record<string, unknown>
     suppressOutput: boolean
