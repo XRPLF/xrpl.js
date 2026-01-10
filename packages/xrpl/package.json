@@ -59,7 +59,7 @@
     "prepare": "copyfiles ../../README.md xrpl/README.md",
     "prepublish": "run-s clean build",
     "test": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --config=jest.config.unit.js --verbose false --silent=false",
-    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
+    "test:integration": "TS_NODE_PROJECT=tsconfig.build.json NODE_OPTIONS='--experimental-vm-modules --no-warnings --max-old-space-size=6144' jest --config=jest.config.integration.js --verbose false --silent=false --runInBand",
     "test:faucet": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --config jest.config.faucet.js",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --watch --config=jest.config.unit.js --verbose false --silent=false",
