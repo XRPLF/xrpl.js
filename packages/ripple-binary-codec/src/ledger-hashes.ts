@@ -119,6 +119,10 @@ function accountStateHash(param: Array<JsonObject>): Hash256 {
 /**
  * Interface describing a ledger header
  */
+/**
+ * Ledger header object interface
+ * Note: ledger_index accepts both number and string to support JSON fixtures that use strings
+ */
 interface ledgerObject {
   ledger_index: number | string
   total_coins: string | number | bigint
