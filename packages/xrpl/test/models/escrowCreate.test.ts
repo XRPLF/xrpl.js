@@ -96,7 +96,7 @@ describe('EscrowCreate', function () {
 
     assertInvalid(
       escrow,
-      'EscrowCreate: Either Condition or FinishAfter must be specified',
+      'EscrowCreate: Either FinishAfter, Condition, or FinishFunction must be specified',
     )
   })
 })
