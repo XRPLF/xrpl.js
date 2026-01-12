@@ -335,6 +335,8 @@ export class Connection extends EventEmitter {
    *
    * @param message - The message received from the server.
    */
+
+  // eslint-disable-next-line max-lines-per-function, complexity -- Message handler needs to work with a lot of data
   private onMessage(message): void {
     this.trace('receive', message)
     let data: Record<string, unknown>
@@ -365,6 +367,21 @@ export class Connection extends EventEmitter {
         } else {
           this.emit('error', 'badMessage', error, error)
         }
+      }
+    }
+    if (data.type === 'error' && data.value != null) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- needed
+      const parsedValue: Record<string, unknown> = JSON.parse(
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+        data.value as string,
+      )
+      if (parsedValue.id != null) {
+        this.requestManager.reject(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          parsedValue.id as string | number,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          new Error(data.error as string),
+        )
       }
     }
   }
