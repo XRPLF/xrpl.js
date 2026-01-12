@@ -5,6 +5,7 @@ import { assert } from 'chai'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 
 import {
+  AccountInfoRequest,
   Client,
   ConnectionError,
   DisconnectedError,
@@ -1028,4 +1029,23 @@ describe('Connection', function () {
     },
     TIMEOUT,
   )
+
+  it('should handle jsonInvalid errors', async function () {
+    const response = {
+      error: 'jsonInvalid',
+      type: 'error',
+      value: '{"command":"submit","tx_json":"badjson"}',
+    }
+    // doesn't matter what the request is, since we're mocking the response
+    const request: AccountInfoRequest = {
+      command: 'account_info',
+      account: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+    }
+    clientContext.mockRippled?.addResponse(request.command, response)
+
+    await clientContext.client.request(request).catch((error) => {
+      assert.strictEqual(error.name, 'Error')
+      assert.strictEqual(error.message, 'jsonInvalid')
+    })
+  }, 4000)
 })

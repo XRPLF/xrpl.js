@@ -351,7 +351,7 @@ export class Connection extends EventEmitter {
     }
     if (data.type == null && data.error) {
       // e.g. slowDown
-      this.emit('error', data.error, data.error_message, data)
+      this.emit('error', data.error, data.error_message ?? data.error, data)
       return
     }
     if (data.type) {
