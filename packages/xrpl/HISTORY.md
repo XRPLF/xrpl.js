@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Better error handling in the `Client` for edge case errors
+
 ## 4.5.0 (2025-12-16)
 
 ### Added
