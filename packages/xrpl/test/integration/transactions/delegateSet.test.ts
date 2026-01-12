@@ -15,11 +15,7 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import {
-  generateFundedWallet,
-  isAmendmentEnabled,
-  testTransaction,
-} from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -41,18 +37,6 @@ describe('DelegateSet', function () {
   it(
     'base',
     async () => {
-      const isEnabled = await isAmendmentEnabled(
-        testContext.client,
-        'PermissionDelegation',
-      )
-      if (!isEnabled) {
-        // eslint-disable-next-line no-console -- Informing user about skipped test
-        console.warn(
-          'Skipping DelegateSet test: PermissionDelegation amendment is not enabled on the server',
-        )
-        return
-      }
-
       // Authorize Bob account to execute Payment transactions and
       // modify the domain of an account behalf of Alice's account.
       const delegateTx: DelegateSet = {
@@ -104,13 +88,13 @@ describe('DelegateSet', function () {
         EmailHash: '10000000002000000000300000000012',
       }
 
-      // Expect transaction to fail with tecNO_DELEGATE_PERMISSION error
+      // Expect transaction to fail with terNO_DELEGATE_PERMISSION error
       await testTransaction(
         testContext.client,
         accountSetTx,
         bob,
         undefined,
-        'tecNO_DELEGATE_PERMISSION',
+        'terNO_DELEGATE_PERMISSION',
       )
     },
     TIMEOUT,
