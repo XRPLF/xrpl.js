@@ -9,7 +9,7 @@ class Hash128 extends Hash {
   static readonly ZERO_128: Hash128 = new Hash128(new Uint8Array(Hash128.width))
 
   constructor(bytes: Uint8Array) {
-    if (bytes && bytes.byteLength === 0) {
+    if (bytes?.byteLength === 0) {
       bytes = Hash128.ZERO_128.bytes
     }
 

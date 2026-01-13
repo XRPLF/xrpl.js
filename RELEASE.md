@@ -10,21 +10,22 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 
 ### **Before triggering a release**
 
-1. Create a release branch and update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
+1. Create a release branch. A qualified branch name should start with "release-" or "release/", case-insensitive. e.g: `release/xrpl@4.3.8`, `release-xrpl-4.3.8`, `Release/xrpl@4.3.8`.
+2. Update the **`version`** field in `packages/<package_name>/package.json` to the intended release version.
    ```json
    {
      "name": "<package_name>",
      "version": "x.y.z"
    }
    ```
-2. Run npm i to update the package-lock with the updated versions and commit the lock file to the releaes branch
+3. Run npm i to update the package-lock with the updated versions and commit the lock file to the release branch
 
 ### **Triggering a Release**
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow**
-2. Fill in these fields:
+2. Choose the release branch from dropdown
+3. Fill in these fields:
    - **package_name** → The folder name under `packages/`, e.g., `xrpl` or `ripple-address-codec`.
-   - **release_branch** → The Git branch the release is generated from, e.g., `release/xrpl@4.3.8`.
    - **npmjs_dist_tag** → The npm distribution tag to publish under. Defaults to `latest`.
      - Examples:
        - `latest` → Standard production release
@@ -36,13 +37,12 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
 | Field            | Example               |
 |------------------|-----------------------|
 | package_name     | xrpl                  |
-| release_branch   | release/xrpl@4.3.8    |
 | npmjs_dist_tag   | latest                |
 
 
 ### **Reviewing the release details and scan result**
 
-1. The pipeline will pause at the "Review test and security scan result" step, at least 2 approvers are required to review and approve the release.
+1. The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result.
 
 
 ---
