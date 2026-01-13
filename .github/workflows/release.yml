@@ -267,7 +267,7 @@ jobs:
             -H "Authorization: Bearer ${SLACK_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#xrpl-js" \
+                  --arg channel "#test-alert" \
                   --arg text "${MESSAGE}" \
                   '{channel: $channel, text: $text}')"
 
@@ -498,7 +498,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN:    ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:        "#xrpl-js"
+          CHANNEL:        "#test-alert"
           EXECUTOR:       ${{ github.triggering_actor || github.actor }}
           RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           REPO:           ${{ github.repository }}
@@ -559,7 +559,8 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          CHANNEL: "#ripplex-security"
+          # CHANNEL: "#ripplex-security"
+          CHANNEL: "#test-alert"
           EXECUTOR: ${{ github.triggering_actor || github.actor }}
           PKG_NAME: ${{ github.event.inputs.package_name }}
           PKG_VERSION: ${{ needs.get_version.outputs.package_version }}
@@ -706,7 +707,7 @@ jobs:
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer ${SLACK_TOKEN}" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel '#xrpl-js' --arg text "${text}" '{channel:$channel, text:$text}')"
+            -d "$(jq -n --arg channel '#test-alert' --arg text "${text}" '{channel:$channel, text:$text}')"
 
   generate-documentation:
     name: Generate and Publish documentation for ${{ needs.get_version.outputs.package_version }}
@@ -770,6 +771,6 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel '#xrpl-js' \
+                  --arg channel '#test-alert' \
                   --arg text "${MESSAGE}" \
                   '{channel: $channel, text: $text}')"
