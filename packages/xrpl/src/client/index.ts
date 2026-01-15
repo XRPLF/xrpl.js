@@ -1162,7 +1162,7 @@ class Client extends EventEmitter<EventTypes> {
    *
    * Example 3: Fund wallet using a local faucet server
    *
-   * For local development with a faucet running on http://, use the faucetProtocol option:
+   * To interact with a faucet server running on http://, use the faucetProtocol option:
    *
    * ```ts
    * const newWallet = Wallet.generate()
@@ -1182,7 +1182,7 @@ class Client extends EventEmitter<EventTypes> {
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
    * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
-   * Defaults to 'https'. Use 'http' for local development with a faucet running on http://.
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,

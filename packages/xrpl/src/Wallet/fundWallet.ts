@@ -34,8 +34,8 @@ export interface FundingOptions {
    */
   faucetPath?: string
   /**
-   * The protocol to use for the faucet server. Defaults to 'https'. Use 'http' for local development
-   * with a faucet running on http:// (e.g., 'http://localhost:8000').
+   * The protocol to use for the faucet server. Defaults to 'https'. Use 'http' to interact with a local faucet server
+   * running on http://
    */
   faucetProtocol?: 'http' | 'https'
   /**
@@ -128,7 +128,7 @@ export interface FundWalletOptions {
  * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
  * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
  * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
- * Defaults to 'https'. Use 'http' for local development with a faucet running on http://.
+ * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @param client - A connection to the XRPL to send requests and transactions.
  * @param startingBalance - The amount of XRP in the given walletToFund on ledger already.
