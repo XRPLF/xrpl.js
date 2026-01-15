@@ -1150,7 +1150,7 @@ class Client extends EventEmitter<EventTypes> {
    * const newWallet = Wallet.generate()
    * const { balance, wallet  } = await client.fundWallet(newWallet, {
    *       amount: '10',
-   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetHost: 'custom-faucet.example.com',
    *       faucetPath: '/accounts'
    *     })
    *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
@@ -1160,6 +1160,20 @@ class Client extends EventEmitter<EventTypes> {
    * }
    * ```
    *
+   * Example 3: Fund wallet using a local faucet server
+   *
+   * For local development with a faucet running on http://, use the faucetProtocol option:
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'localhost:8000',
+   *       faucetPath: '/accounts',
+   *       faucetProtocol: 'http'
+   *     })
+   * ```
+   *
    * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
    * @param options - See below.
    * @param options.faucetHost - A custom host for a faucet server. On devnet,
@@ -1167,6 +1181,8 @@ class Client extends EventEmitter<EventTypes> {
    * attempt to determine the correct server automatically. In other environments,
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' for local development with a faucet running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,
