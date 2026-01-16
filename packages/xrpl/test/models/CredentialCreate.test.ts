@@ -1,6 +1,6 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
-import { validateCredentialCreate } from '../../src/models/transactions/CredentialCreate'
+import { validateCredentialCreate } from '../../src/models/transactions/credentialCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -41,7 +41,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Account not string`, function () {
     credentialCreate.Account = 123
-    const errorMessage = 'CredentialCreate: invalid field Account'
+    const errorMessage =
+      'CredentialCreate: invalid field Account, expected a valid account address'
     assertInvalid(credentialCreate, errorMessage)
   })
 
@@ -53,7 +54,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Subject not string`, function () {
     credentialCreate.Subject = 123
-    const errorMessage = 'CredentialCreate: invalid field Subject'
+    const errorMessage =
+      'CredentialCreate: invalid field Subject, expected a valid account address'
     assertInvalid(credentialCreate, errorMessage)
   })
 
@@ -80,19 +82,21 @@ describe('credentialCreate', function () {
   it(`throws w/ credentialType field not hex`, function () {
     credentialCreate.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialCreate: CredentialType must be encoded in hex'
+      'CredentialCreate: invalid field CredentialType, expected a valid hex string'
     assertInvalid(credentialCreate, errorMessage)
   })
 
   it(`throws w/ Expiration field not number`, function () {
     credentialCreate.Expiration = 'this is not a number'
-    const errorMessage = 'CredentialCreate: invalid field Expiration'
+    const errorMessage =
+      'CredentialCreate: invalid field Expiration, expected a valid number'
     assertInvalid(credentialCreate, errorMessage)
   })
 
   it(`throws w/ URI field not a string`, function () {
     credentialCreate.URI = 123
-    const errorMessage = 'CredentialCreate: invalid field URI'
+    const errorMessage =
+      'CredentialCreate: invalid field URI, expected a valid hex string'
     assertInvalid(credentialCreate, errorMessage)
   })
 
@@ -110,7 +114,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ URI field not hex`, function () {
     credentialCreate.URI = 'this is not hex'
-    const errorMessage = 'CredentialCreate: URI must be encoded in hex'
+    const errorMessage =
+      'CredentialCreate: invalid field URI, expected a valid hex string'
     assertInvalid(credentialCreate, errorMessage)
   })
 })

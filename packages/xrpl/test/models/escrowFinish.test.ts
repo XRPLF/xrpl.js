@@ -48,32 +48,45 @@ describe('EscrowFinish', function () {
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
 
-    assertInvalid(escrow, 'EscrowFinish: invalid field Owner')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Owner, expected a valid account address',
+    )
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
     escrow.OfferSequence = 'random'
 
-    assertInvalid(escrow, 'EscrowFinish: OfferSequence must be a number')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field OfferSequence, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid Condition`, function () {
     escrow.Condition = 10
 
-    assertInvalid(escrow, 'EscrowFinish: Condition must be a string')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Condition, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid Fulfillment`, function () {
     escrow.Fulfillment = 0x142341
 
-    assertInvalid(escrow, 'EscrowFinish: Fulfillment must be a string')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Fulfillment, expected a valid hex string',
+    )
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
     escrow.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'EscrowFinish: Credentials must be an array'
+    const errorMessage =
+      'EscrowFinish: invalid field CredentialIDs, expected a valid array'
 
     assertInvalid(escrow, errorMessage)
   })

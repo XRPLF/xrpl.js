@@ -1,6 +1,6 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
-import { validateCredentialAccept } from '../../src/models/transactions/CredentialAccept'
+import { validateCredentialAccept } from '../../src/models/transactions/credentialAccept'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -39,7 +39,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ Account not a string`, function () {
     credentialAccept.Account = 123
-    const errorMessage = 'CredentialAccept: invalid field Account'
+    const errorMessage =
+      'CredentialAccept: invalid field Account, expected a valid account address'
     assertInvalid(credentialAccept, errorMessage)
   })
 
@@ -51,7 +52,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ Issuer not a string`, function () {
     credentialAccept.Issuer = 123
-    const errorMessage = 'CredentialAccept: invalid field Issuer'
+    const errorMessage =
+      'CredentialAccept: invalid field Issuer, expected a valid account address'
     assertInvalid(credentialAccept, errorMessage)
   })
 
@@ -78,7 +80,7 @@ describe('CredentialAccept', function () {
   it(`throws w/ credentialType field not hex`, function () {
     credentialAccept.CredentialType = 'this is not hex'
     const errorMessage =
-      'CredentialAccept: CredentialType must be encoded in hex'
+      'CredentialAccept: invalid field CredentialType, expected a valid hex string'
     assertInvalid(credentialAccept, errorMessage)
   })
 })

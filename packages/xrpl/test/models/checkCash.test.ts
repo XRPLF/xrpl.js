@@ -32,7 +32,10 @@ describe('CheckCash', function () {
       CheckID: 83876645678567890,
     } as any
 
-    assertInvalid(invalidCheckID, 'CheckCash: invalid CheckID')
+    assertInvalid(
+      invalidCheckID,
+      'CheckCash: invalid field CheckID, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid Amount`, function () {
@@ -44,7 +47,10 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assertInvalid(invalidAmount, 'CheckCash: invalid Amount')
+    assertInvalid(
+      invalidAmount,
+      'CheckCash: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it(`throws w/ having both Amount and DeliverMin`, function () {
@@ -52,7 +58,7 @@ describe('CheckCash', function () {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
       Amount: '100000000',
-      DeliverMin: 852156963,
+      DeliverMin: '852156963',
       CheckID:
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
@@ -72,6 +78,9 @@ describe('CheckCash', function () {
         '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
     } as any
 
-    assertInvalid(invalidDeliverMin, 'CheckCash: invalid DeliverMin')
+    assertInvalid(
+      invalidDeliverMin,
+      'CheckCash: invalid field DeliverMin, expected a valid Amount',
+    )
   })
 })
