@@ -1,10 +1,10 @@
-const globals = require('globals')
-const eslintConfig = require('@xrplf/eslint-config/base')
-const tseslint = require('typescript-eslint')
+import globals from 'globals'
+import eslintConfig from '@xrplf/eslint-config/base'
+import tseslint from 'typescript-eslint'
 
-module.exports = [
+export default [
   {
-    ignores: ['**/node_modules/', '**/dist/', 'coverage/', '**/*.js'],
+    ignores: ['**/node_modules/', '**/dist/', 'coverage/', '**/*.js', 'eslint.config.mjs'],
   },
   ...eslintConfig,
   {
@@ -15,7 +15,7 @@ module.exports = [
       parser: tseslint.parser, // Make ESLint compatible with TypeScript
       parserOptions: {
         // Enable linting rules with type information from our tsconfig
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
         project: ['./tsconfig.eslint.json'],
         ecmaFeatures: {
           impliedStrict: true, // Enable global strict mode

@@ -1,8 +1,8 @@
-const globals = require('globals')
-const eslintConfig = require('@xrplf/eslint-config/base')
-const tseslint = require('typescript-eslint')
+import globals from 'globals'
+import eslintConfig from '@xrplf/eslint-config/base'
+import tseslint from 'typescript-eslint'
 
-module.exports = [
+export default [
   {
     ignores: [
       '**/node_modules/',
@@ -12,6 +12,7 @@ module.exports = [
       '**/*.js',
       'typedoc.mts',
       'tools/',
+      'eslint.config.mjs',
     ],
   },
   ...eslintConfig,
@@ -24,7 +25,7 @@ module.exports = [
       parser: tseslint.parser,
       parserOptions: {
         // Enable linting rules with type information from our tsconfig
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
         project: [
           './tsconfig.eslint.json',
           '../ripple-binary-codec/tsconfig.eslint.json',
