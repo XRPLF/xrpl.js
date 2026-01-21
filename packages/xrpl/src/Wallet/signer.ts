@@ -1,12 +1,11 @@
-import { bytesToHex } from '@xrplf/isomorphic/utils'
-import { BigNumber } from 'bignumber.js'
-import { decodeAccountID } from 'ripple-address-codec'
-import { decode, encode, encodeForSigning } from 'ripple-binary-codec'
+import { encode, encodeForSigning } from 'ripple-binary-codec'
 import { verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
+
+import { compareSigners, getDecodedTransaction } from './utils'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
@@ -121,7 +120,7 @@ function getTransactionWithAllSigners(
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: Signer[] = transactions
     .flatMap((tx) => tx.Signers ?? [])
-    .sort(compareSigners)
+    .sort((signer1, signer2) => compareSigners(signer1.Signer, signer2.Signer))
 
   return { ...transactions[0], Signers: sortedSigners }
 }

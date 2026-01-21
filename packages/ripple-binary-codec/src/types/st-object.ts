@@ -148,10 +148,10 @@ class STObject extends SerializedType {
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
           : field.type.name === 'STArray'
-          ? STArray.from(xAddressDecoded[field.name], definitions)
-          : field.type.name === 'UInt64'
-          ? UInt64.from(xAddressDecoded[field.name], field.name)
-          : field.associatedType.from(xAddressDecoded[field.name])
+            ? STArray.from(xAddressDecoded[field.name], definitions)
+            : field.type.name === 'UInt64'
+              ? UInt64.from(xAddressDecoded[field.name], field.name)
+              : field.associatedType.from(xAddressDecoded[field.name])
 
       if (associatedValue == undefined) {
         throw new TypeError(

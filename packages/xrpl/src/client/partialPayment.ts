@@ -68,6 +68,7 @@ function amountsEqual(
 /* eslint-enable complexity */
 /* eslint-enable @typescript-eslint/consistent-type-assertions */
 
+/* eslint-disable complexity -- required here for multiple checks */
 function isPartialPayment(
   tx?: Transaction,
   metadata?: TransactionMetadata | string,
@@ -96,10 +97,8 @@ function isPartialPayment(
   }
 
   const delivered = meta.delivered_amount
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- DeliverMax is a valid field on Payment response
-  // @ts-expect-error -- DeliverMax is a valid field on Payment response
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a valid field on Payment response
-  const amount = tx.DeliverMax
+
+  const amount = tx.DeliverMax ?? tx.Amount
 
   if (delivered === undefined) {
     return false
@@ -107,6 +106,7 @@ function isPartialPayment(
 
   return !amountsEqual(delivered, amount)
 }
+/* eslint-enable complexity */
 
 function txHasPartialPayment(response: TxResponse): boolean {
   return isPartialPayment(response.result.tx_json, response.result.meta)

@@ -88,19 +88,21 @@ export interface TransactionMetadataBase {
   delivered_amount?: Amount | MPTAmount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
+
+  ParentBatchID?: string
 }
 
 export type TransactionMetadata<T extends BaseTransaction = Transaction> =
   T extends Payment
     ? PaymentMetadata
     : T extends NFTokenMint
-    ? NFTokenMintMetadata
-    : T extends NFTokenCreateOffer
-    ? NFTokenCreateOfferMetadata
-    : T extends NFTokenAcceptOffer
-    ? NFTokenAcceptOfferMetadata
-    : T extends NFTokenCancelOffer
-    ? NFTokenCancelOfferMetadata
-    : T extends MPTokenIssuanceCreate
-    ? MPTokenIssuanceCreateMetadata
-    : TransactionMetadataBase
+      ? NFTokenMintMetadata
+      : T extends NFTokenCreateOffer
+        ? NFTokenCreateOfferMetadata
+        : T extends NFTokenAcceptOffer
+          ? NFTokenAcceptOfferMetadata
+          : T extends NFTokenCancelOffer
+            ? NFTokenCancelOfferMetadata
+            : T extends MPTokenIssuanceCreate
+              ? MPTokenIssuanceCreateMetadata
+              : TransactionMetadataBase

@@ -8,7 +8,7 @@ class Hash192 extends Hash {
   static readonly ZERO_192: Hash192 = new Hash192(new Uint8Array(Hash192.width))
 
   constructor(bytes?: Uint8Array) {
-    if (bytes && bytes.byteLength === 0) {
+    if (bytes?.byteLength === 0) {
       bytes = Hash192.ZERO_192.bytes
     }
 

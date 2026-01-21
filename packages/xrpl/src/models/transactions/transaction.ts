@@ -2,8 +2,6 @@
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, Memo } from '../common'
-import { isHex } from '../utils'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
@@ -15,11 +13,16 @@ import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { Batch, validateBatch } from './batch'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
-import { BaseTransaction, isIssuedCurrency } from './common'
+import {
+  BaseTransaction,
+  isIssuedCurrencyAmount,
+  validateBaseTransaction,
+} from './common'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -31,6 +34,24 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import {
+  LoanBrokerCoverClawback,
+  validateLoanBrokerCoverClawback,
+} from './loanBrokerCoverClawback'
+import {
+  LoanBrokerCoverDeposit,
+  validateLoanBrokerCoverDeposit,
+} from './loanBrokerCoverDeposit'
+import {
+  LoanBrokerCoverWithdraw,
+  validateLoanBrokerCoverWithdraw,
+} from './loanBrokerCoverWithdraw'
+import { LoanBrokerDelete, validateLoanBrokerDelete } from './loanBrokerDelete'
+import { LoanBrokerSet, validateLoanBrokerSet } from './loanBrokerSet'
+import { LoanDelete, validateLoanDelete } from './loanDelete'
+import { LoanManage, validateLoanManage } from './loanManage'
+import { LoanPay, validateLoanPay } from './loanPay'
+import { LoanSet, validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -91,6 +112,12 @@ import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
+import { VaultClawback, validateVaultClawback } from './vaultClawback'
+import { VaultCreate, validateVaultCreate } from './vaultCreate'
+import { VaultDelete, validateVaultDelete } from './vaultDelete'
+import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
+import { VaultSet, validateVaultSet } from './vaultSet'
+import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -133,6 +160,7 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | Batch
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -147,6 +175,15 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LoanBrokerSet
+  | LoanBrokerCoverClawback
+  | LoanBrokerCoverDeposit
+  | LoanBrokerCoverWithdraw
+  | LoanBrokerDelete
+  | LoanSet
+  | LoanDelete
+  | LoanManage
+  | LoanPay
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
@@ -171,6 +208,12 @@ export type SubmittableTransaction =
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | VaultClawback
+  | VaultCreate
+  | VaultDelete
+  | VaultDeposit
+  | VaultSet
+  | VaultWithdraw
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -214,50 +257,15 @@ export interface TransactionAndMetadata<
  */
 export function validate(transaction: Record<string, unknown>): void {
   const tx = { ...transaction }
-  if (tx.TransactionType == null) {
-    throw new ValidationError('Object does not have a `TransactionType`')
-  }
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError("Object's `TransactionType` is not a string")
-  }
 
-  /*
-   * - Memos have exclusively hex data.
-   */
-  if (tx.Memos != null && typeof tx.Memos !== 'object') {
-    throw new ValidationError('Memo must be array')
-  }
-  if (tx.Memos != null) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
-      if (memo?.Memo == null) {
-        throw new ValidationError('Memo data must be in a `Memo` field')
-      }
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-  }
+  // should already be done in the tx-specific validation, but doesn't hurt to check again
+  validateBaseTransaction(tx)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
-    if (tx[key] && isIssuedCurrency(tx[key])) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+    const value = tx[key]
+    if (value && isIssuedCurrencyAmount(value)) {
+      const txCurrency = value.currency
 
       if (
         txCurrency.length === standard_currency_code_len &&
@@ -307,6 +315,19 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AccountSet':
       validateAccountSet(tx)
+      break
+
+    case 'Batch':
+      validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
       break
 
     case 'CheckCancel':
@@ -363,6 +384,42 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerCoverClawback':
+      validateLoanBrokerCoverClawback(tx)
+      break
+
+    case 'LoanBrokerCoverDeposit':
+      validateLoanBrokerCoverDeposit(tx)
+      break
+
+    case 'LoanBrokerCoverWithdraw':
+      validateLoanBrokerCoverWithdraw(tx)
+      break
+
+    case 'LoanBrokerDelete':
+      validateLoanBrokerDelete(tx)
+      break
+
+    case 'LoanBrokerSet':
+      validateLoanBrokerSet(tx)
+      break
+
+    case 'LoanSet':
+      validateLoanSet(tx)
+      break
+
+    case 'LoanManage':
+      validateLoanManage(tx)
+      break
+
+    case 'LoanDelete':
+      validateLoanDelete(tx)
+      break
+
+    case 'LoanPay':
+      validateLoanPay(tx)
       break
 
     case 'MPTokenAuthorize':
@@ -459,6 +516,30 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'VaultClawback':
+      validateVaultClawback(tx)
+      break
+
+    case 'VaultCreate':
+      validateVaultCreate(tx)
+      break
+
+    case 'VaultDelete':
+      validateVaultDelete(tx)
+      break
+
+    case 'VaultDeposit':
+      validateVaultDeposit(tx)
+      break
+
+    case 'VaultSet':
+      validateVaultSet(tx)
+      break
+
+    case 'VaultWithdraw':
+      validateVaultWithdraw(tx)
       break
 
     case 'XChainAccountCreateCommit':

@@ -12,6 +12,8 @@ import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
 import { LedgerVersionMap } from '../../models/ledger/Ledger'
 import { Transaction, TransactionMetadata } from '../../models/transactions'
+import { GlobalFlags } from '../../models/transactions/common'
+import { hasFlag } from '../../models/utils'
 
 import HashPrefix from './HashPrefix'
 import sha512Half from './sha512Half'
@@ -66,7 +68,7 @@ function addLengthPrefix(hex: string): string {
  *
  * @param tx - A transaction to hash. Tx may be in binary blob form. Tx must be signed.
  * @returns A hash of tx.
- * @throws ValidationError if the Transaction is unsigned.\
+ * @throws ValidationError if the Transaction is unsigned.
  * @category Utilities
  */
 export function hashSignedTx(tx: Transaction | string): string {
@@ -84,7 +86,8 @@ export function hashSignedTx(tx: Transaction | string): string {
   if (
     txObject.TxnSignature === undefined &&
     txObject.Signers === undefined &&
-    txObject.SigningPubKey === undefined
+    txObject.SigningPubKey === undefined &&
+    !hasFlag(txObject, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')
   ) {
     throw new ValidationError('The transaction must be signed to hash it.')
   }

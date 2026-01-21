@@ -10,6 +10,8 @@ import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
+import Loan from './Loan'
+import LoanBroker from './LoanBroker'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
@@ -18,6 +20,7 @@ import PermissionedDomain from './PermissionedDomain'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Ticket from './Ticket'
+import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -34,6 +37,8 @@ type LedgerEntry =
   | Escrow
   | FeeSettings
   | LedgerHashes
+  | Loan
+  | LoanBroker
   | NegativeUNL
   | Offer
   | Oracle
@@ -42,6 +47,7 @@ type LedgerEntry =
   | RippleState
   | SignerList
   | Ticket
+  | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
 
@@ -59,6 +65,8 @@ type LedgerEntryFilter =
   | 'escrow'
   | 'fee'
   | 'hashes'
+  | 'loan'
+  | 'loan_broker'
   | 'mpt_issuance'
   | 'mptoken'
   | 'nft_offer'
@@ -70,6 +78,7 @@ type LedgerEntryFilter =
   | 'signer_list'
   | 'state'
   | 'ticket'
+  | 'vault'
   | 'xchain_owned_create_account_claim_id'
   | 'xchain_owned_claim_id'
 

@@ -301,7 +301,18 @@ export class Connection extends EventEmitter {
     >(request, timeout ?? this.config.timeout)
     this.trace('send', message)
     websocketSendAsync(this.ws, message).catch((error) => {
-      this.requestManager.reject(id, error)
+      try {
+        this.requestManager.reject(id, error)
+      } catch (err) {
+        if (err instanceof XrplError) {
+          this.trace(
+            'send',
+            `send errored after connection was closed: ${err.toString()}`,
+          )
+        } else {
+          this.trace('send', String(err))
+        }
+      }
     })
 
     return responsePromise
@@ -349,7 +360,6 @@ export class Connection extends EventEmitter {
       try {
         this.requestManager.handleResponse(data)
       } catch (error) {
-        // eslint-disable-next-line max-depth -- okay here
         if (error instanceof Error) {
           this.emit('error', 'badMessage', error.message, message)
         } else {
