@@ -85,9 +85,15 @@ describe('STNumber', () => {
   })
 
   it('-ve normal value', () => {
-    const value = '-987'
+    const value = '-987654321'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual('-987654321')
+  })
+
+  it('+v2 normal value', () => {
+    const value = '987654321'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('987654321')
   })
 
   it('roundtrip via parser', () => {

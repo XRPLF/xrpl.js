@@ -220,7 +220,7 @@ export class STNumber extends SerializedType {
     // Signed 64-bit mantissa
     const mantissa = readInt64BE(b, 0)
     // Signed 32-bit exponent
-    const exponent = readInt32BE(b, 8)
+    let exponent = readInt32BE(b, 8)
 
     // Special zero: XRPL encodes canonical zero as mantissa=0, exponent=DEFAULT_VALUE_EXPONENT.
     if (mantissa === BigInt(0) && exponent === DEFAULT_VALUE_EXPONENT) {
@@ -229,6 +229,13 @@ export class STNumber extends SerializedType {
 
     const isNegative = mantissa < BigInt(0)
     let mantissaAbs = isNegative ? -mantissa : mantissa
+
+    // If mantissa < MIN_MANTISSA, it was shrunk for int64 serialization (mantissa > 2^63-1).
+    // Restore it for proper string rendering to match rippled's internal representation.
+    if (mantissaAbs !== BigInt(0) && mantissaAbs < MIN_MANTISSA) {
+      mantissaAbs *= BigInt(10)
+      exponent -= 1
+    }
 
     // For large mantissa range (default), rangeLog = 18
     const rangeLog = 18
