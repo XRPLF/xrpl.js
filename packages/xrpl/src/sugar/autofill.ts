@@ -403,7 +403,7 @@ async function calculateFeePerTransactionType(
     )
     baseFee = BigNumber.sum(
       baseFee,
-      scaleValue(netFeeDrops, counterPartySignersCount),
+      netFeeDrops.multipliedBy(counterPartySignersCount),
     )
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.warn(
@@ -436,17 +436,6 @@ export async function getTransactionFee(
   const fee = await calculateFeePerTransactionType(client, tx, signersCount)
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
-}
-
-/**
- * Scales the given value by multiplying it with the provided multiplier.
- *
- * @param value - The value to be scaled.
- * @param multiplier - The multiplier to scale the value.
- * @returns The scaled value as a string.
- */
-function scaleValue(value: BigNumber, multiplier: number): string {
-  return new BigNumber(value).times(multiplier).toString()
 }
 
 /**
