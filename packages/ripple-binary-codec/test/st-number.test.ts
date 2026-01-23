@@ -136,6 +136,14 @@ describe('STNumber', () => {
     expect(num.toJSON()).toEqual('-120')
   })
 
+  it('decimal without exponent', () => {
+    const value = '0.5'
+    const num = STNumber.from(value)
+    const parser = new BinaryParser(num.toHex())
+    const parsedNum = STNumber.fromParser(parser)
+    expect(parsedNum.toJSON()).toEqual('0.5')
+  })
+
   it('throws with invalid input (non-number string)', () => {
     expect(() => {
       STNumber.from('abc123')
