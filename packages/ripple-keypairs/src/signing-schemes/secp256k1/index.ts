@@ -1,6 +1,6 @@
 import { numberToBytesBE } from '@noble/curves/abstract/utils'
 import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
-import { bytesToHex } from '@xrplf/isomorphic/utils'
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
 
 import type {
   DeriveKeyPairOptions,
@@ -47,7 +47,7 @@ const secp256k1: SigningScheme = {
         // Would fail tests if signatures aren't deterministic
         extraEntropy: undefined,
       })
-      .toDERHex(true)
+      .toDERHex()
       .toUpperCase()
   },
 
@@ -56,8 +56,11 @@ const secp256k1: SigningScheme = {
     signature: HexString,
     publicKey: HexString,
   ): boolean {
-    const decoded = nobleSecp256k1.Signature.fromDER(signature)
-    return nobleSecp256k1.verify(decoded, Sha512.half(message), publicKey)
+    return nobleSecp256k1.verify(
+      hexToBytes(signature),
+      Sha512.half(message),
+      hexToBytes(publicKey),
+    )
   },
 }
 

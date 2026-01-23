@@ -20,7 +20,9 @@ export const bytesToHex: typeof BytesToHexFn = (bytes) => {
 }
 
 // A clone of hexToBytes from @noble/hashes without the length checks. This allows us to do our own checks.
-export const hexToBytes: typeof HexToBytesFn = (hex): Uint8Array => {
+export const hexToBytes: typeof HexToBytesFn = (
+  hex,
+): Uint8Array<ArrayBuffer> => {
   const len = hex.length
   const array = new Uint8Array(len / 2)
   if (!HEX_REGEX.test(hex)) {

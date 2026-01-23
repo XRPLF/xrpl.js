@@ -19,8 +19,10 @@ export function compareSigners<T extends { Account: string }>(
   left: T,
   right: T,
 ): number {
-  return addressToBigNumber(left.Account).comparedTo(
-    addressToBigNumber(right.Account),
+  return (
+    addressToBigNumber(left.Account).comparedTo(
+      addressToBigNumber(right.Account),
+    ) ?? 0
   )
 }
 

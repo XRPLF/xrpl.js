@@ -10,7 +10,7 @@ export declare function BytesToHexFn(bytes: Uint8Array | number[]): string
  *
  * @param hex - {string} to convert to a Uint8Array
  */
-export declare function HexToBytesFn(hex: string): Uint8Array
+export declare function HexToBytesFn(hex: string): Uint8Array<ArrayBuffer>
 
 /**
  * Create a Uint8Array of the supplied size.

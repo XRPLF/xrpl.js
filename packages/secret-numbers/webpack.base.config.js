@@ -1,5 +1,5 @@
 "use strict";
-const { merge } = require("webpack-merge");
+const merge = require("webpack-merge");
 const { getDefaultConfiguration, wrapForEnv } = require("../../webpack.config");
 const path = require("path");
 

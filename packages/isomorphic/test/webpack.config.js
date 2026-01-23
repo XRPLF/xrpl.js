@@ -1,5 +1,5 @@
 'use strict'
-const { merge } = require('webpack-merge')
+const merge = require('webpack-merge')
 const { webpackForTest } = require('../../../webpack.test.config')
 const { getDefaultConfiguration } = require('../../../webpack.config')
 

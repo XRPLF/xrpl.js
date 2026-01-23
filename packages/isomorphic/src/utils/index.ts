@@ -68,7 +68,7 @@ export const hexToBytes: typeof HexToBytesFn = (hex) => {
   if (!HEX_REGEX.test(hex)) {
     throw new Error('Invalid hex string')
   }
-  return toUint8Array(Buffer.from(hex, 'hex'))
+  return toUint8Array(Buffer.from(hex, 'hex')) as Uint8Array<ArrayBuffer>
 }
 
 export const randomBytes: typeof RandomBytesFn = (size) => {

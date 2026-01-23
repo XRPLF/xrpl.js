@@ -1,7 +1,7 @@
 "use strict";
 const webpack = require("webpack");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const { merge } = require("webpack-merge");
+const merge = require("webpack-merge");
 
 function getDefaultConfiguration() {
   return {
