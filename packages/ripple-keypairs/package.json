@@ -23,6 +23,11 @@
     "@xrplf/isomorphic": "^1.0.1",
     "ripple-address-codec": "^5.0.0"
   },
+  "devDependencies": {
+    "@xrplf/eslint-config": "*",
+    "globals": "^16.0.0",
+    "typescript-eslint": "^8.0.0"
+  },
   "keywords": [
     "ripple",
     "xrp",

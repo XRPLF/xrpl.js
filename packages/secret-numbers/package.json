@@ -32,6 +32,11 @@
     "@xrplf/isomorphic": "^1.0.1",
     "ripple-keypairs": "^2.0.0"
   },
+  "devDependencies": {
+    "@xrplf/eslint-config": "*",
+    "globals": "^16.0.0",
+    "typescript-eslint": "^8.0.0"
+  },
   "prettier": "@xrplf/prettier-config",
   "repository": {
     "type": "git",

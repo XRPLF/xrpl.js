@@ -35,7 +35,9 @@
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
+    "@xrplf/eslint-config": "*",
     "eventemitter3": "^5.0.1",
+    "globals": "^16.0.0",
     "https-proxy-agent": "^7.0.1",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
@@ -45,6 +47,7 @@
     "react": "^19.0.0",
     "run-s": "^0.0.0",
     "typedoc": "0.28.15",
+    "typescript-eslint": "^8.0.0",
     "ws": "^8.14.2"
   },
   "scripts": {

@@ -15,6 +15,11 @@
     "bignumber.js": "^9.0.0",
     "ripple-address-codec": "^5.0.0"
   },
+  "devDependencies": {
+    "@xrplf/eslint-config": "*",
+    "globals": "^16.0.0",
+    "typescript-eslint": "^8.0.0"
+  },
   "scripts": {
     "build": "tsc --build tsconfig.build.json && copyfiles ./src/enums/definitions.json ./dist/enums/",
     "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
