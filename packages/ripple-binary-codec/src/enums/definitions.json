@@ -731,7 +731,7 @@
       }
     ],
     [
-      "PreviousPaymentDate",
+      "PreviousPaymentDueDate",
       {
         "isSerialized": true,
         "isSigningField": true,
