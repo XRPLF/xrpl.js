@@ -1,3 +1,4 @@
+/* eslint-disable complexity -- required for various checks */
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType } from './serialized-type'
 import { writeInt32BE, writeInt64BE, readInt32BE, readInt64BE } from '../utils'
@@ -6,8 +7,9 @@ import { writeInt32BE, writeInt64BE, readInt32BE, readInt64BE } from '../utils'
  * Constants for mantissa and exponent normalization per XRPL Number spec.
  * These define allowed magnitude for mantissa and exponent after normalization.
  */
-const MIN_MANTISSA = BigInt('1000000000000000')
-const MAX_MANTISSA = BigInt('9999999999999999')
+const MIN_MANTISSA = BigInt('1000000000000000000') // 10^18
+const MAX_MANTISSA = BigInt('9999999999999999999') // 10^19 - 1
+const MAX_INT64 = BigInt('9223372036854775807') // 2^63 - 1, max signed 64-bit integer
 const MIN_EXPONENT = -32768
 const MAX_EXPONENT = 32768
 const DEFAULT_VALUE_EXPONENT = -2147483648
@@ -73,6 +75,7 @@ function extractNumberPartsFromString(val: string): {
  * Normalize the mantissa and exponent to XRPL constraints.
  *
  * Ensures that after normalization, the mantissa is between MIN_MANTISSA and MAX_MANTISSA (unless zero).
+ * Ensures that the mantissa fits within the range allowed by a signed 64-bit integer (2^63-1).
  * Adjusts the exponent as needed by shifting the mantissa left/right (multiplying/dividing by 10).
  *
  * @param mantissa - The unnormalized mantissa (BigInt).
@@ -87,16 +90,40 @@ function normalize(
   let m = mantissa < BigInt(0) ? -mantissa : mantissa
   const isNegative = mantissa < BigInt(0)
 
-  while (m !== BigInt(0) && m < MIN_MANTISSA && exponent > MIN_EXPONENT) {
+  // Handle zero
+  if (m === BigInt(0)) {
+    return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
+  }
+
+  // Grow mantissa until it reaches MIN_MANTISSA
+  while (m < MIN_MANTISSA && exponent > MIN_EXPONENT) {
     exponent -= 1
     m *= BigInt(10)
   }
+
+  // Shrink mantissa until it fits within MAX_MANTISSA
   while (m > MAX_MANTISSA) {
-    if (exponent >= MAX_EXPONENT)
+    if (exponent >= MAX_EXPONENT) {
       throw new Error('Mantissa and exponent are too large')
+    }
     exponent += 1
     m /= BigInt(10)
   }
+
+  // Handle underflow: if exponent too small or mantissa too small, return zero
+  if (exponent < MIN_EXPONENT || m < MIN_MANTISSA) {
+    return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
+  }
+
+  // If mantissa exceeds MAX_INT64 (2^63-1), shrink further for int64 serialization
+  if (m > MAX_INT64) {
+    if (exponent >= MAX_EXPONENT) {
+      throw new Error('Mantissa and exponent are too large')
+    }
+    exponent += 1
+    m /= BigInt(10)
+  }
+
   if (isNegative) m = -m
   return { mantissa: m, exponent }
 }
@@ -159,17 +186,9 @@ export class STNumber extends SerializedType {
    * @throws Error if val is not a valid number string.
    */
   static fromValue(val: string): STNumber {
-    const { mantissa, exponent, isNegative } = extractNumberPartsFromString(val)
-    let normalizedMantissa: bigint
-    let normalizedExponent: number
-
-    if (mantissa === BigInt(0) && exponent === 0 && !isNegative) {
-      normalizedMantissa = BigInt(0)
-      normalizedExponent = DEFAULT_VALUE_EXPONENT
-    } else {
-      ;({ mantissa: normalizedMantissa, exponent: normalizedExponent } =
-        normalize(mantissa, exponent))
-    }
+    const { mantissa, exponent } = extractNumberPartsFromString(val)
+    const { mantissa: normalizedMantissa, exponent: normalizedExponent } =
+      normalize(mantissa, exponent)
 
     const bytes = new Uint8Array(12)
     writeInt64BE(bytes, normalizedMantissa, 0)
@@ -193,7 +212,6 @@ export class STNumber extends SerializedType {
    *
    * @returns String representation of the value
    */
-  // eslint-disable-next-line complexity -- required
   toJSON(): string {
     const b = this.bytes
     if (!b || b?.length !== 12)
@@ -208,24 +226,45 @@ export class STNumber extends SerializedType {
     if (mantissa === BigInt(0) && exponent === DEFAULT_VALUE_EXPONENT) {
       return '0'
     }
-    if (exponent === 0) return mantissa.toString()
 
-    // Use scientific notation for small/large exponents, decimal otherwise
-    if (exponent < -25 || exponent > -5) {
-      return `${mantissa}e${exponent}`
+    const isNegative = mantissa < BigInt(0)
+    let mantissaAbs = isNegative ? -mantissa : mantissa
+
+    // For large mantissa range (default), rangeLog = 18
+    const rangeLog = 18
+
+    // Use scientific notation for exponents that are too small or too large
+    // Condition from rippled: exponent != 0 AND (exponent < -(rangeLog + 10) OR exponent > -(rangeLog - 10))
+    // For rangeLog = 18: exponent != 0 AND (exponent < -28 OR exponent > -8)
+    if (
+      exponent !== 0 &&
+      (exponent < -(rangeLog + 10) || exponent > -(rangeLog - 10))
+    ) {
+      // Strip trailing zeros from mantissa (matches rippled behavior)
+      let exp = exponent
+      while (
+        mantissaAbs !== BigInt(0) &&
+        mantissaAbs % BigInt(10) === BigInt(0) &&
+        exp < MAX_EXPONENT
+      ) {
+        mantissaAbs /= BigInt(10)
+        exp += 1
+      }
+      const sign = isNegative ? '-' : ''
+      return `${sign}${mantissaAbs}e${exp}`
     }
 
-    // Decimal rendering for -25 <= exp <= -5
-    const isNegative = mantissa < BigInt(0)
-    const mantissaAbs = mantissa < BigInt(0) ? -mantissa : mantissa
+    // Decimal rendering for -(rangeLog + 10) <= exponent <= -(rangeLog - 10)
+    // i.e., -28 <= exponent <= -8, or exponent == 0
+    const padPrefix = rangeLog + 12 // 30
+    const padSuffix = rangeLog + 8 // 26
 
-    const padPrefix = 27
-    const padSuffix = 23
     const mantissaStr = mantissaAbs.toString()
     const rawValue = '0'.repeat(padPrefix) + mantissaStr + '0'.repeat(padSuffix)
-    const OFFSET = exponent + 43
-    const integerPart = rawValue.slice(0, OFFSET).replace(/^0+/, '') || '0'
-    const fractionPart = rawValue.slice(OFFSET).replace(/0+$/, '')
+    const offset = exponent + padPrefix + rangeLog + 1 // exponent + 49
+
+    const integerPart = rawValue.slice(0, offset).replace(/^0+/, '') || '0'
+    const fractionPart = rawValue.slice(offset).replace(/0+$/, '')
 
     return `${isNegative ? '-' : ''}${integerPart}${
       fractionPart ? '.' + fractionPart : ''

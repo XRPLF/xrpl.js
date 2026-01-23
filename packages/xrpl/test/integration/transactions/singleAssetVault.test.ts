@@ -78,7 +78,7 @@ describe('Single Asset Vault', function () {
         LimitAmount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999999999e80',
         },
       }
 
@@ -91,7 +91,7 @@ describe('Single Asset Vault', function () {
         Amount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999999999e80',
         },
       }
 
@@ -109,7 +109,7 @@ describe('Single Asset Vault', function () {
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: '500',
+        AssetsMaximum: '9999999999999999e70',
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)

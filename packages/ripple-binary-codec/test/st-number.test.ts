@@ -4,21 +4,58 @@ import { coreTypes } from '../src/types'
 const { Number: STNumber } = coreTypes
 
 describe('STNumber', () => {
-  it('should encode and decode integers', () => {
-    const value = '9876543210'
+  it('+ve normal value', () => {
+    const value = '123'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual(value)
   })
-  it('roundtrip integer', () => {
-    const value = '123456789'
-    const num = STNumber.from(value)
-    expect(num.toJSON()).toEqual('123456789')
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve very large value', () => {
+    const value = '100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e11')
   })
 
-  it('roundtrip negative integer', () => {
-    const value = '-987654321'
-    const num = STNumber.from(value)
-    expect(num.toJSON()).toEqual('-987654321')
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve large value', () => {
+    const value = '10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('10000000000')
+  })
+
+  it('-ve normal value', () => {
+    const value = '-123'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual(value)
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve very large value', () => {
+    const value = '-100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-1e11')
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve large value', () => {
+    const value = '-10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-10000000000')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve very small value', () => {
+    const value = '0.00000000001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e-11')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve small value', () => {
+    const value = '0.0001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0001')
   })
 
   it('roundtrip zero', () => {
@@ -36,26 +73,21 @@ describe('STNumber', () => {
   it('roundtrip scientific notation positive', () => {
     const value = '1.23e5'
     const num = STNumber.from(value)
-    // NOTE: The codec always outputs the normalized value as a decimal string,
-    // not necessarily in scientific notation. Only exponents < -25 or > -5
-    // will use scientific notation. So "1.23e5" becomes "123000".
+    // scientific notation triggers in when abs(value) >= 10^11
     expect(num.toJSON()).toEqual('123000')
   })
 
   it('roundtrip scientific notation negative', () => {
     const value = '-4.56e-7'
     const num = STNumber.from(value)
-    // NOTE: The output is the normalized decimal form of the value.
-    // "-4.56e-7" becomes "-0.000000456" as per XRPL codec behavior.
+    // scientific notation triggers in when abs(value) < 10^-10
     expect(num.toJSON()).toEqual('-0.000000456')
   })
 
-  it('roundtrip large exponent', () => {
-    const value = '7.89e+20'
-    const num = STNumber.from(value)
-    // NOTE: The XRPL codec will output this in normalized scientific form,
-    // as mantissa=7890000000000000, exponent=5, so the output is '7890000000000000e5'.
-    expect(num.toJSON()).toEqual('7890000000000000e5')
+  it('-ve normal value', () => {
+    const value = '-987'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-987654321')
   })
 
   it('roundtrip via parser', () => {
