@@ -7,7 +7,7 @@ function hexData(count: number) {
 
 // Remove leading tabs
 function dedent(str) {
-  return `${str}`.replace(/(\n)\s+/gu, '$1')
+  return `${str}`.replace(/\n\s+/gu, '\n')
 }
 
 describe('getAlgorithmFromKey', () => {

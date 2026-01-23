@@ -62,10 +62,11 @@ describe('client.submitAndWait', function () {
           if (!(err instanceof Error)) {
             throw err
           }
-          const errorCodeRegex = /(?:Preliminary result:\s)(?<errorCode>.*)$/gu
+          // eslint-disable-next-line prefer-named-capture-group -- Named groups require ES2018+
+          const errorCodeRegex = /(?:Preliminary result:\s)(.*)$/gu
           const message = err.message
           const matches = errorCodeRegex.exec(message)
-          const errorCode = matches?.groups?.errorCode
+          const errorCode = matches?.[1]
 
           // Retry if another transaction finished before this one
 
