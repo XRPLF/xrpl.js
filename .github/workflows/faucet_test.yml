@@ -10,9 +10,15 @@ on:
         description: "Git ref to checkout (branch, tag, or commit SHA)"
         required: true
         type: string
+      run_faucet_tests:
+        description: 'Run faucet tests job'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   faucet-test:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_faucet_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
