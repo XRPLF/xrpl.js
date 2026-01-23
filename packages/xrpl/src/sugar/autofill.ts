@@ -439,6 +439,17 @@ export async function getTransactionFee(
 }
 
 /**
+ * Scales the given value by multiplying it with the provided multiplier.
+ *
+ * @param value - The value to be scaled.
+ * @param multiplier - The multiplier to scale the value.
+ * @returns The scaled value as a string.
+ */
+function scaleValue(value: BigNumber, multiplier: number): string {
+  return new BigNumber(value).times(multiplier).toString()
+}
+
+/**
  * Sets the latest validated ledger sequence for the transaction.
  *
  * @param client - The client object.
