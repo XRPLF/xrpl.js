@@ -144,6 +144,20 @@ describe('STNumber', () => {
     expect(parsedNum.toJSON()).toEqual('0.5')
   })
 
+  it('throws on exponent overflow (value too large)', () => {
+    // 1e40000 has exponent 40000, after normalization exponent = 40000 - 18 = 39982
+    // which exceeds MAX_EXPONENT (32768)
+    expect(() => {
+      STNumber.from('1e40000')
+    }).toThrow('Exponent overflow: value too large to represent')
+  })
+
+  it('underflow returns zero (value too small)', () => {
+    // 1e-40000 has exponent -40000, which is less than MIN_EXPONENT (-32768)
+    const num = STNumber.from('1e-40000')
+    expect(num.toJSON()).toEqual('0')
+  })
+
   it('throws with invalid input (non-number string)', () => {
     expect(() => {
       STNumber.from('abc123')

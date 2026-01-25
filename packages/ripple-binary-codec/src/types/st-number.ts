@@ -115,6 +115,11 @@ function normalize(
     return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
   }
 
+  // Handle overflow: if exponent exceeds MAX_EXPONENT after growing.
+  if (exponent > MAX_EXPONENT) {
+    throw new Error('Exponent overflow: value too large to represent')
+  }
+
   // If mantissa exceeds MAX_INT64 (2^63-1), shrink further for int64 serialization
   if (m > MAX_INT64) {
     if (exponent >= MAX_EXPONENT) {
