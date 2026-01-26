@@ -1,5 +1,5 @@
 import stringify from 'fast-json-stable-stringify'
-import { decode, encode } from 'ripple-binary-codec'
+import { encode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../errors'
 import { LoanSet, Signer, Transaction, validate } from '../models'
