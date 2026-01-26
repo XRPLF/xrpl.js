@@ -144,6 +144,18 @@ describe('STNumber', () => {
     expect(parsedNum.toJSON()).toEqual('0.5')
   })
 
+  it('rounding test', () => {
+    const value = '9223372036854775895'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9223372036854775900')
+  })
+
+  it('mantissa overflow', () => {
+    expect(() => {
+      STNumber.from('9999999999999999999999999999999999999999999999')
+    }).toThrow('Mantissa overflow: value too large to represent')
+  })
+
   it('throws on exponent overflow (value too large)', () => {
     // 1e40000 has exponent 40000, after normalization exponent = 40000 - 18 = 39982
     // which exceeds MAX_EXPONENT (32768)

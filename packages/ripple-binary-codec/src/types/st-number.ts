@@ -90,6 +90,10 @@ function normalize(
   let m = mantissa < BigInt(0) ? -mantissa : mantissa
   const isNegative = mantissa < BigInt(0)
 
+  if (m > MAX_MANTISSA) {
+    throw new Error('Mantissa overflow: value too large to represent')
+  }
+
   // Handle zero
   if (m === BigInt(0)) {
     return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
@@ -99,15 +103,6 @@ function normalize(
   while (m < MIN_MANTISSA && exponent > MIN_EXPONENT) {
     exponent -= 1
     m *= BigInt(10)
-  }
-
-  // Shrink mantissa until it fits within MAX_MANTISSA
-  while (m > MAX_MANTISSA) {
-    if (exponent >= MAX_EXPONENT) {
-      throw new Error('Mantissa and exponent are too large')
-    }
-    exponent += 1
-    m /= BigInt(10)
   }
 
   // Handle underflow: if exponent too small or mantissa too small, return zero
@@ -123,10 +118,14 @@ function normalize(
   // If mantissa exceeds MAX_INT64 (2^63-1), shrink further for int64 serialization
   if (m > MAX_INT64) {
     if (exponent >= MAX_EXPONENT) {
-      throw new Error('Mantissa and exponent are too large')
+      throw new Error('Exponent overflow: value too large to represent')
     }
+    let lastDigit = m % BigInt(10)
     exponent += 1
     m /= BigInt(10)
+    if (lastDigit >= BigInt(5)) {
+      m += BigInt(1)
+    }
   }
 
   if (isNegative) m = -m
