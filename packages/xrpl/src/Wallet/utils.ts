@@ -1,7 +1,17 @@
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
-import { decodeAccountID } from 'ripple-address-codec'
-import { decode, encode } from 'ripple-binary-codec'
+import {
+  decodeAccountID,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
+import {
+  decode,
+  encode,
+  encodeForMultisigning,
+  encodeForSigning,
+} from 'ripple-binary-codec'
+import { sign } from 'ripple-keypairs'
 
 import { Transaction } from '../models'
 
@@ -55,4 +65,28 @@ export function getDecodedTransaction(
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
   return decode(txOrBlob) as unknown as Transaction
+}
+
+/**
+ * Signs a transaction with the proper signing encoding.
+ *
+ * @param tx - A transaction to sign.
+ * @param privateKey - A key to sign the transaction with.
+ * @param signAs - Multisign only. An account address to include in the Signer field.
+ * Can be either a classic address or an XAddress.
+ * @returns A signed transaction in the proper format.
+ */
+export function computeSignature(
+  tx: Transaction,
+  privateKey: string,
+  signAs?: string,
+): string {
+  if (signAs) {
+    const classicAddress = isValidXAddress(signAs)
+      ? xAddressToClassicAddress(signAs).classicAddress
+      : signAs
+
+    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+  }
+  return sign(encodeForSigning(tx), privateKey)
 }
