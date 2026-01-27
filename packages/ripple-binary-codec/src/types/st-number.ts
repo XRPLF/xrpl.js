@@ -8,7 +8,6 @@ import { writeInt32BE, writeInt64BE, readInt32BE, readInt64BE } from '../utils'
  * These define allowed magnitude for mantissa and exponent after normalization.
  */
 const MIN_MANTISSA = BigInt('1000000000000000000') // 10^18
-const MAX_MANTISSA = BigInt('9999999999999999999') // 10^19 - 1
 const MAX_INT64 = BigInt('9223372036854775807') // 2^63 - 1, max signed 64-bit integer
 const MIN_EXPONENT = -32768
 const MAX_EXPONENT = 32768
@@ -74,8 +73,7 @@ function extractNumberPartsFromString(val: string): {
 /**
  * Normalize the mantissa and exponent to XRPL constraints.
  *
- * Ensures that after normalization, the mantissa is between MIN_MANTISSA and MAX_MANTISSA (unless zero).
- * Ensures that the mantissa fits within the range allowed by a signed 64-bit integer (2^63-1).
+ * Ensures that after normalization, the mantissa is between MIN_MANTISSA and MAX_INT64.
  * Adjusts the exponent as needed by shifting the mantissa left/right (multiplying/dividing by 10).
  *
  * @param mantissa - The unnormalized mantissa (BigInt).
@@ -90,7 +88,7 @@ function normalize(
   let m = mantissa < BigInt(0) ? -mantissa : mantissa
   const isNegative = mantissa < BigInt(0)
 
-  if (m > MAX_MANTISSA) {
+  if (m > MAX_INT64) {
     throw new Error('Mantissa overflow: value too large to represent')
   }
 
@@ -105,9 +103,9 @@ function normalize(
     m *= BigInt(10)
   }
 
-  // Handle underflow: if exponent too small or mantissa too small, return zero
+  // Handle underflow: if exponent too small or mantissa too small, throw error
   if (exponent < MIN_EXPONENT || m < MIN_MANTISSA) {
-    return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
+    throw new Error('Underflow: value too small to represent')
   }
 
   // Handle overflow: if exponent exceeds MAX_EXPONENT after growing.
@@ -115,12 +113,13 @@ function normalize(
     throw new Error('Exponent overflow: value too large to represent')
   }
 
-  // If mantissa exceeds MAX_INT64 (2^63-1), shrink further for int64 serialization
+  // Handle overflow: if mantissa exceeds MAX_INT64 (2^63-1) after growing.
+  // Round up if the last digit is 5 or more.
   if (m > MAX_INT64) {
     if (exponent >= MAX_EXPONENT) {
       throw new Error('Exponent overflow: value too large to represent')
     }
-    let lastDigit = m % BigInt(10)
+    const lastDigit = m % BigInt(10)
     exponent += 1
     m /= BigInt(10)
     if (lastDigit >= BigInt(5)) {

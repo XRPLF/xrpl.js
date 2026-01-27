@@ -5,7 +5,7 @@ const { Number: STNumber } = coreTypes
 
 describe('STNumber', () => {
   it('+ve normal value', () => {
-    const value = '123'
+    const value = '99'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual(value)
   })
@@ -90,7 +90,7 @@ describe('STNumber', () => {
     expect(sn.toJSON()).toEqual('-987654321')
   })
 
-  it('+v2 normal value', () => {
+  it('+ve normal value', () => {
     const value = '987654321'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual('987654321')
@@ -144,10 +144,11 @@ describe('STNumber', () => {
     expect(parsedNum.toJSON()).toEqual('0.5')
   })
 
-  it('rounding test', () => {
+  it('throws error on mantissa overflow', () => {
     const value = '9223372036854775895'
-    const num = STNumber.from(value)
-    expect(num.toJSON()).toEqual('9223372036854775900')
+    expect(() => {
+      STNumber.from(value)
+    }).toThrow('Mantissa overflow: value too large to represent')
   })
 
   it('mantissa overflow', () => {
@@ -166,8 +167,9 @@ describe('STNumber', () => {
 
   it('underflow returns zero (value too small)', () => {
     // 1e-40000 has exponent -40000, which is less than MIN_EXPONENT (-32768)
-    const num = STNumber.from('1e-40000')
-    expect(num.toJSON()).toEqual('0')
+    expect(() => {
+      STNumber.from('1e-40000')
+    }).toThrow('Underflow: value too small to represent')
   })
 
   it('throws with invalid input (non-number string)', () => {

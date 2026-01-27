@@ -135,7 +135,7 @@ describe('Single Asset Vault', function () {
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(assetsMaximum, '9999999999999999e70')
+      assert.equal(assetsMaximum, tx.AssetsMaximum)
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data
