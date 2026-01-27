@@ -14,17 +14,22 @@ export interface FaucetWallet {
 export enum FaucetNetwork {
   Testnet = 'faucet.altnet.rippletest.net',
   Devnet = 'faucet.devnet.rippletest.net',
+  WasmDevnet = 'wasmfaucet.devnet.rippletest.net',
 }
 
 export const faucetNetworkPaths: Record<string, string> = {
   [FaucetNetwork.Testnet]: '/accounts',
   [FaucetNetwork.Devnet]: '/accounts',
+  [FaucetNetwork.WasmDevnet]: '/accounts',
 }
 
+/* eslint-disable @typescript-eslint/no-magic-numbers -- this is where they're being defined */
 export const faucetNetworkIDs: Map<number, FaucetNetwork> = new Map([
   [1, FaucetNetwork.Testnet],
   [2, FaucetNetwork.Devnet],
+  [2002, FaucetNetwork.WasmDevnet],
 ])
+/* eslint-enable @typescript-eslint/no-magic-numbers */
 
 /**
  * Get the faucet host based on the Client connection.
