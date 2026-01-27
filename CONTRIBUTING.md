@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'mkdir -p /var/lib/rippled/db/ && rippled -a'
 npm run build
 npm run test:integration
 ```

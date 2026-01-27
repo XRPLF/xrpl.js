@@ -3,23 +3,9 @@ import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
-import {
-  classicAddressToXAddress,
-  isValidXAddress,
-  xAddressToClassicAddress,
-  encodeSeed,
-} from 'ripple-address-codec'
-import {
-  encodeForSigning,
-  encodeForMultisigning,
-  encode,
-} from 'ripple-binary-codec'
-import {
-  deriveAddress,
-  deriveKeypair,
-  generateSeed,
-  sign,
-} from 'ripple-keypairs'
+import { classicAddressToXAddress, encodeSeed } from 'ripple-address-codec'
+import { encode } from 'ripple-binary-codec'
+import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
@@ -32,6 +18,7 @@ import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 import { rfc1751MnemonicToKey } from './rfc1751'
 import { verifySignature } from './signer'
+import { computeSignature } from './utils'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -468,30 +455,6 @@ export class Wallet {
 }
 
 /**
- * Signs a transaction with the proper signing encoding.
- *
- * @param tx - A transaction to sign.
- * @param privateKey - A key to sign the transaction with.
- * @param signAs - Multisign only. An account address to include in the Signer field.
- * Can be either a classic address or an XAddress.
- * @returns A signed transaction in the proper format.
- */
-function computeSignature(
-  tx: Transaction,
-  privateKey: string,
-  signAs?: string,
-): string {
-  if (signAs) {
-    const classicAddress = isValidXAddress(signAs)
-      ? xAddressToClassicAddress(signAs).classicAddress
-      : signAs
-
-    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
-  }
-  return sign(encodeForSigning(tx), privateKey)
-}
-
-/**
  * Remove trailing insignificant zeros for non-XRP Payment amount.
  * This resolves the serialization mismatch bug when encoding/decoding a non-XRP Payment transaction
  * with an amount that contains trailing insignificant zeros; for example, '123.4000' would serialize
@@ -518,3 +481,8 @@ export { signMultiBatch, combineBatchSigners } from './batchSigner'
 export { multisign, verifySignature } from './signer'
 
 export { authorizeChannel } from './authorizeChannel'
+
+export {
+  signLoanSetByCounterparty,
+  combineLoanSetCounterpartySigners,
+} from './counterpartySigner'
