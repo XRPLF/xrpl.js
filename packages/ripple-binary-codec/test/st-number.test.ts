@@ -148,13 +148,13 @@ describe('STNumber', () => {
     const value = '9223372036854775895'
     expect(() => {
       STNumber.from(value)
-    }).toThrow('Mantissa overflow: value too large to represent')
+    }).toThrow(new Error('Mantissa overflow: value too large to represent'))
   })
 
   it('mantissa overflow', () => {
     expect(() => {
       STNumber.from('9999999999999999999999999999999999999999999999')
-    }).toThrow('Mantissa overflow: value too large to represent')
+    }).toThrow(new Error('Mantissa overflow: value too large to represent'))
   })
 
   it('throws on exponent overflow (value too large)', () => {
@@ -162,14 +162,14 @@ describe('STNumber', () => {
     // which exceeds MAX_EXPONENT (32768)
     expect(() => {
       STNumber.from('1e40000')
-    }).toThrow('Exponent overflow: value too large to represent')
+    }).toThrow(new Error('Exponent overflow: value too large to represent'))
   })
 
   it('underflow returns zero (value too small)', () => {
     // 1e-40000 has exponent -40000, which is less than MIN_EXPONENT (-32768)
     expect(() => {
       STNumber.from('1e-40000')
-    }).toThrow('Underflow: value too small to represent')
+    }).toThrow(new Error('Underflow: value too small to represent'))
   })
 
   it('throws with invalid input (non-number string)', () => {
