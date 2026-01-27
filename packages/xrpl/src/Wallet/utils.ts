@@ -23,15 +23,25 @@ import { Transaction } from '../models'
  *
  * @param left - A Signer to compare with.
  * @param right - A second Signer to compare with.
- * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
+ * @returns 1 if left \> right, 0 if left = right, -1 if left \< right.
+ * @throws Error if either Account is null, undefined, or invalid.
  */
 export function compareSigners<T extends { Account: string }>(
   left: T,
   right: T,
 ): number {
-  return addressToBigNumber(left.Account).comparedTo(
+  if (!left.Account || !right.Account) {
+    throw new Error('compareSigners: Account cannot be null or undefined')
+  }
+  const result = addressToBigNumber(left.Account).comparedTo(
     addressToBigNumber(right.Account),
   )
+  if (result === null) {
+    throw new Error(
+      'compareSigners: Invalid account address comparison resulted in NaN',
+    )
+  }
+  return result
 }
 
 export const NUM_BITS_IN_HEX = 16

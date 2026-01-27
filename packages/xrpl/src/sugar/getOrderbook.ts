@@ -17,7 +17,7 @@ function sortOffers(offers: BookOffer[]): BookOffer[] {
     const qualityA = offerA.quality ?? 0
     const qualityB = offerB.quality ?? 0
 
-    return new BigNumber(qualityA).comparedTo(qualityB)
+    return new BigNumber(qualityA).comparedTo(qualityB) ?? 0
   })
 }
 
