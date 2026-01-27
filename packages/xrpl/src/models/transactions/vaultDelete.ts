@@ -2,7 +2,7 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
-  isString,
+  isHexString,
 } from './common'
 
 /**
@@ -28,5 +28,5 @@ export interface VaultDelete extends BaseTransaction {
 export function validateVaultDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
 }
