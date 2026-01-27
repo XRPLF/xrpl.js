@@ -114,17 +114,13 @@ function normalize(
   }
 
   // Handle overflow: if mantissa exceeds MAX_INT64 (2^63-1) after growing.
-  // Round up if the last digit is 5 or more.
+  // Rounding is not required because last digit is always 0 after growing.
   if (m > MAX_INT64) {
     if (exponent >= MAX_EXPONENT) {
       throw new Error('Exponent overflow: value too large to represent')
     }
-    const lastDigit = m % BigInt(10)
     exponent += 1
     m /= BigInt(10)
-    if (lastDigit >= BigInt(5)) {
-      m += BigInt(1)
-    }
   }
 
   if (isNegative) m = -m
