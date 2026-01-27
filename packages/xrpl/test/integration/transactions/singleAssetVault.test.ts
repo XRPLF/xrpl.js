@@ -91,7 +91,7 @@ describe('Single Asset Vault', function () {
         Amount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '9999999999999999e80',
+          value: '9999999999',
         },
       }
 
