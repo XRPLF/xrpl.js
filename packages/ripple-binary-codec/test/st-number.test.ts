@@ -151,6 +151,24 @@ describe('STNumber', () => {
     }).toThrow(new Error('Mantissa overflow: value too large to represent'))
   })
 
+  it('small value with trailing zeros', () => {
+    const value = '0.002500'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0025')
+  })
+
+  it('large value with trailing zeros', () => {
+    const value = '9900000000000000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e20')
+  })
+
+  it('small value with leading zeros', () => {
+    const value = '0.0000000000000000000099'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e-22')
+  })
+
   it('mantissa overflow', () => {
     expect(() => {
       STNumber.from('9999999999999999999999999999999999999999999999')

@@ -109,7 +109,7 @@ describe('Single Asset Vault', function () {
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: '9999999999999999e70',
+        AssetsMaximum: '9999900000000000000000000',
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)
@@ -135,7 +135,7 @@ describe('Single Asset Vault', function () {
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(assetsMaximum, tx.AssetsMaximum)
+      assert.equal(assetsMaximum, '99999e20')
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data

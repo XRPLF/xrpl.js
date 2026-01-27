@@ -63,6 +63,12 @@ function extractNumberPartsFromString(val: string): {
   }
   if (expPart) exponent += parseInt(expPart, 10)
 
+  // Remove trailing zeros from mantissa and adjust exponent
+  while (mantissaStr.length > 1 && mantissaStr.endsWith('0')) {
+    mantissaStr = mantissaStr.slice(0, -1)
+    exponent += 1
+  }
+
   let mantissa = BigInt(mantissaStr)
   if (sign === '-') mantissa = -mantissa
   const isNegative = mantissa < BigInt(0)
