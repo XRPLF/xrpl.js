@@ -94,6 +94,15 @@ function normalize(
   let m = mantissa < BigInt(0) ? -mantissa : mantissa
   const isNegative = mantissa < BigInt(0)
 
+  // This behavior is different from rippled. rippled will round the mantissa to fit within
+  // the 64-bit signed integer range, but we will throw an error as we don't want to silently
+  // change the user's input before serialization.
+  // For numbers where mantissa > 2^63-1, (e.g. 9,999,999,999,999,999,123,000,000,000)
+  // The mantissa would be 9,999,999,999,999,999,123 and since it is > 2^63-1, we would need
+  // to round it to fit within the 64-bit signed integer range. This would mean that mantissa
+  // would be rounded down to 9,999,999,999,999,999,120, since 9,999,999,999,999,999,123 % 10 < 5.
+  // This results in total loss of 9,999,999,999,999,999,123,000,000,000 - 9,999,999,999,999,999,120 = 3,000,000,000
+  // Which is a significant change in overall value.
   if (m > MAX_INT64) {
     throw new Error('Mantissa overflow: value too large to represent')
   }
