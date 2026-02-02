@@ -80,7 +80,7 @@ function extractNumberPartsFromString(val: string): {
 /**
  * Normalize the mantissa and exponent to XRPL constraints.
  *
- * Ensures that after normalization, the mantissa is between MIN_MANTISSA and MAX_MANTISSA.
+ * Ensures that after normalization, the mantissa is between MIN_MANTISSA and MAX_INT64.
  * Adjusts the exponent as needed by shifting the mantissa left/right (multiplying/dividing by 10).
  *
  * @param mantissa - The unnormalized mantissa (BigInt).

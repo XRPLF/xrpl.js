@@ -84,13 +84,13 @@ describe('STNumber', () => {
     expect(num.toJSON()).toEqual('-0.000000456')
   })
 
-  it('-ve normal value', () => {
+  it('-ve medium value', () => {
     const value = '-987654321'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual('-987654321')
   })
 
-  it('+ve normal value', () => {
+  it('+ve medium value', () => {
     const value = '987654321'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual('987654321')
