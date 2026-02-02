@@ -144,11 +144,16 @@ describe('STNumber', () => {
     expect(parsedNum.toJSON()).toEqual('0.5')
   })
 
-  it('throws error on mantissa overflow', () => {
+  it('rounds up mantissa', () => {
     const value = '9223372036854775895'
-    expect(() => {
-      STNumber.from(value)
-    }).toThrow(new Error('Mantissa overflow: value too large to represent'))
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9223372036854775900')
+  })
+
+  it('rounds down mantissa', () => {
+    const value = '9323372036854775804'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9323372036854775800')
   })
 
   it('small value with trailing zeros', () => {
