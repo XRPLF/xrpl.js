@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add `faucetProtocol` (http or https) option to `fundWallet` method. Makes `fundWallet` work with locally running faucet servers.
+
 ## 4.5.0 (2025-12-16)
 
 ### Added
