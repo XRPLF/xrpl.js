@@ -174,10 +174,10 @@ describe('STNumber', () => {
     expect(sn.toJSON()).toEqual('99e-22')
   })
 
-  it('mantissa overflow', () => {
-    expect(() => {
-      STNumber.from('9999999999999999999999999999999999999999999999')
-    }).toThrow(new Error('Mantissa overflow: value too large to represent'))
+  it('mantissa > MAX_MANTISSA', () => {
+    const value = '9999999999999999999999'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e22')
   })
 
   it('throws on exponent overflow (value too large)', () => {

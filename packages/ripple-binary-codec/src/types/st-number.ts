@@ -95,11 +95,6 @@ function normalize(
   let m = mantissa < BigInt(0) ? -mantissa : mantissa
   const isNegative = mantissa < BigInt(0)
 
-  // Mantissa is too large, throw error as rippled fails transaction with invalidParams
-  if (m > MAX_MANTISSA) {
-    throw new Error('Mantissa overflow: value too large to represent')
-  }
-
   // Handle zero
   if (m === BigInt(0)) {
     return { mantissa: BigInt(0), exponent: DEFAULT_VALUE_EXPONENT }
@@ -111,12 +106,15 @@ function normalize(
     m *= BigInt(10)
   }
 
+  let lastDigit: bigint | null = null
+
   // Shrink mantissa until it fits within MAX_MANTISSA
   while (m > MAX_MANTISSA) {
     if (exponent >= MAX_EXPONENT) {
       throw new Error('Mantissa and exponent are too large')
     }
     exponent += 1
+    lastDigit = m % BigInt(10)
     m /= BigInt(10)
   }
 
@@ -136,11 +134,12 @@ function normalize(
       throw new Error('Exponent overflow: value too large to represent')
     }
     exponent += 1
-    let lastDigit = m % BigInt(10)
+    lastDigit = m % BigInt(10)
     m /= BigInt(10)
-    if (lastDigit >= BigInt(5)) {
-      m += BigInt(1)
-    }
+  }
+
+  if (lastDigit != null && lastDigit >= BigInt(5)) {
+    m += BigInt(1)
   }
 
   if (isNegative) m = -m
