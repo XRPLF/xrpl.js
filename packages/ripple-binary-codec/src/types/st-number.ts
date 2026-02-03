@@ -140,6 +140,18 @@ function normalize(
 
   if (lastDigit != null && lastDigit >= BigInt(5)) {
     m += BigInt(1)
+    // After rounding, mantissa may exceed MAX_INT64 again
+    if (m > MAX_INT64) {
+      if (exponent >= MAX_EXPONENT) {
+        throw new Error('Exponent overflow: value too large to represent')
+      }
+      lastDigit = m % BigInt(10)
+      exponent += 1
+      m /= BigInt(10)
+      if (lastDigit >= BigInt(5)) {
+        m += BigInt(1)
+      }
+    }
   }
 
   if (isNegative) m = -m

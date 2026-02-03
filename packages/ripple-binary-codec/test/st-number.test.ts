@@ -180,6 +180,12 @@ describe('STNumber', () => {
     expect(sn.toJSON()).toEqual('1e22')
   })
 
+  it('mantissa > MAX_INT64', () => {
+    const value = '92233720368547758079'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('922337203685477581e2')
+  })
+
   it('throws on exponent overflow (value too large)', () => {
     // 1e40000 has exponent 40000, after normalization exponent = 40000 - 18 = 39982
     // which exceeds MAX_EXPONENT (32768)
