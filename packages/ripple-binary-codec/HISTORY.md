@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
+* Error if a decimal is passed into a `UInt`-typed field.
 
 ## 2.6.0 (2025-12-16)
 

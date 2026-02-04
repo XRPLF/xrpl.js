@@ -309,7 +309,7 @@ describe('Lending Protocol IT', () => {
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '100000',
-        InterestRate: 0.1,
+        InterestRate: 0,
         Counterparty: borrowerWallet.address,
         PaymentTotal: 1,
       }
