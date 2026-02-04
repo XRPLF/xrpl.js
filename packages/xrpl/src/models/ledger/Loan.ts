@@ -105,7 +105,7 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The timestamp of when the previous payment was made in Ripple Epoch.
    */
-  PreviousPaymentDate?: number
+  PreviousPaymentDueDate?: number
 
   /**
    * The timestamp of when the next payment is due in Ripple Epoch.
