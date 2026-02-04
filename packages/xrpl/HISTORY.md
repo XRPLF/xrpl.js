@@ -8,6 +8,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add `faucetProtocol` (http or https) option to `fundWallet` method. Makes `fundWallet` work with locally running faucet servers.
 * Add `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` helper functions to sign and combine LoanSet transactions signed by the counterparty.
 
+### Fixed
+* Better error handling in the `Client` for edge case errors
+
 ## 4.5.0 (2025-12-16)
 
 ### Added
