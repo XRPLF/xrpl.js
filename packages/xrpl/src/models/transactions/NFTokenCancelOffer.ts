@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, isArray, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isArray,
+  validateBaseTransaction,
+  validateRequiredField,
+} from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 /**
@@ -41,11 +46,9 @@ export interface NFTokenCancelOfferMetadata extends TransactionMetadataBase {
 export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (!isArray(tx.NFTokenOffers)) {
-    throw new ValidationError('NFTokenCancelOffer: missing field NFTokenOffers')
-  }
+  validateRequiredField(tx, 'NFTokenOffers', isArray)
 
-  if (tx.NFTokenOffers.length < 1) {
+  if (tx.NFTokenOffers.length === 0) {
     throw new ValidationError('NFTokenCancelOffer: empty field NFTokenOffers')
   }
 }

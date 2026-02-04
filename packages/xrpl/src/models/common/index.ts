@@ -20,6 +20,8 @@ export interface MPTCurrency {
 
 export type Currency = IssuedCurrency | MPTCurrency | XRP
 
+export type XRPAmount = string
+
 export interface IssuedCurrencyAmount extends IssuedCurrency {
   value: string
 }
@@ -30,7 +32,7 @@ export interface MPTAmount {
 }
 
 // TODO: add MPTAmount to Amount once MPTv2 is released
-export type Amount = IssuedCurrencyAmount | string
+export type Amount = IssuedCurrencyAmount | XRPAmount
 
 export type ClawbackAmount = IssuedCurrencyAmount | MPTAmount
 
