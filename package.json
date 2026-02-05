@@ -23,7 +23,7 @@
     "xrpl": "file:packages/xrpl"
   },
   "devDependencies": {
-    "globals": "^16.3.0",
+    "globals": "^17.2.0",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.5.0",
     "@eslint/js": "^9.32.0",
     "@xrplf/eslint-config": "^3.0.0",
