@@ -61,7 +61,7 @@ describe('Lending Protocol IT', () => {
   }, TIMEOUT)
 
   it(
-    'LoanSet: with single signing',
+    'Lending protocol integration test with single signing',
     async () => {
       const vaultOwnerWallet = await generateFundedWallet(testContext.client)
       const depositorWallet = await generateFundedWallet(testContext.client)
@@ -416,6 +416,8 @@ describe('Lending Protocol IT', () => {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '25000',
         },
+        Destination: loanBrokerWallet.address,
+        DestinationTag: 10,
       }
       await testTransaction(
         testContext.client,

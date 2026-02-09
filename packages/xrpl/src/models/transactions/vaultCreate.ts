@@ -91,6 +91,12 @@ export interface VaultCreate extends BaseTransaction {
    * The PermissionedDomain object ID associated with the shares of this Vault.
    */
   DomainID?: string
+
+  /**
+   * The scaling factor for vault shares. Only applicable for IOU assets.
+   * Valid values are between 0 and 18 inclusive. For XRP and MPT, this must not be provided.
+   */
+  Scale?: number
 }
 
 /* eslint-disable max-lines-per-function -- Not needed to reduce function */
@@ -110,6 +116,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
   validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'Scale', isNumber)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
@@ -147,6 +154,30 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.',
     )
+  }
+
+  // Validate Scale field based on asset type
+  const asset = tx.Asset as unknown as Record<string, unknown>
+  const isXRP = asset.currency === 'XRP'
+  const isMPT = 'mpt_issuance_id' in asset
+  const isIOU = !isXRP && !isMPT
+
+  if (tx.Scale !== undefined) {
+    // Scale must not be provided for XRP or MPT assets
+    if (isXRP || isMPT) {
+      throw new ValidationError(
+        'VaultCreate: Scale parameter must not be provided for XRP or MPT assets',
+      )
+    }
+
+    // For IOU assets, Scale must be between 0 and 18 inclusive
+    if (isIOU) {
+      if (typeof tx.Scale !== 'number' || tx.Scale < 0 || tx.Scale > 18) {
+        throw new ValidationError(
+          'VaultCreate: Scale must be a number between 0 and 18 inclusive for IOU assets',
+        )
+      }
+    }
   }
 
   if (tx.MPTokenMetadata != null) {

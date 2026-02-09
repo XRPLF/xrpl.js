@@ -118,9 +118,19 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   PaymentRemaining: number
 
   /**
+   * The total outstanding value of the Loan, including all fees and interest.
+   */
+  TotalValueOutstanding: XRPLNumber
+
+  /**
    * The principal amount requested by the Borrower.
    */
   PrincipalOutstanding: XRPLNumber
+
+  /**
+   * The remaining Management Fee owed to the LoanBroker.
+   */
+  ManagementFeeOutstanding?: XRPLNumber
 
   /**
    * The calculated periodic payment amount for each payment interval.
@@ -128,9 +138,9 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   PeriodicPayment: XRPLNumber
 
   /**
-   * The total outstanding value of the Loan, including all fees and interest.
+   * The scale factor that ensures all computed amounts are rounded to the same number of decimal places. It is determined based on the total loan value at creation time.
    */
-  TotalValueOutstanding: XRPLNumber
+  LoanScale?: number
 }
 
 export enum LoanFlags {
