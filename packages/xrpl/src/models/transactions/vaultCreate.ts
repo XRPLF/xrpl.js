@@ -21,6 +21,8 @@ import {
   isXRPLNumber,
 } from './common'
 
+const MAX_SCALE = 18
+
 /**
  * Enum representing withdrawal strategies for a Vault.
  */
@@ -156,7 +158,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     )
   }
 
-  // Validate Scale field based on asset type
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required to check asset type
   const asset = tx.Asset as unknown as Record<string, unknown>
   const isXRP = asset.currency === 'XRP'
   const isMPT = 'mpt_issuance_id' in asset
@@ -172,9 +174,13 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
     // For IOU assets, Scale must be between 0 and 18 inclusive
     if (isIOU) {
-      if (typeof tx.Scale !== 'number' || tx.Scale < 0 || tx.Scale > 18) {
+      if (
+        typeof tx.Scale !== 'number' ||
+        tx.Scale < 0 ||
+        tx.Scale > MAX_SCALE
+      ) {
         throw new ValidationError(
-          'VaultCreate: Scale must be a number between 0 and 18 inclusive for IOU assets',
+          `VaultCreate: Scale must be a number between 0 and ${MAX_SCALE} inclusive for IOU assets`,
         )
       }
     }

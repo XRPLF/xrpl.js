@@ -148,7 +148,7 @@ describe('Lending Protocol IT', () => {
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '5000000',
         Counterparty: borrowerWallet.address,
-        PaymentTotal: 3, // 3 payments required
+        PaymentTotal: 3,
         Data: '010203',
       }
       loanSetTx = await testContext.client.autofill(loanSetTx)
@@ -193,7 +193,7 @@ describe('Lending Protocol IT', () => {
 
       // ========== STEP 5: Make Loan Payment ==========
       // Borrower makes a periodic payment on the loan
-      const paymentAmount = '2500000' // Pay half of the principal
+      const paymentAmount = '2500000'
       const loanPayTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -216,8 +216,8 @@ describe('Lending Protocol IT', () => {
 
       // After payment, the principal outstanding should be reduced
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding) <
-          parseInt(loanObject.PrincipalOutstanding),
+        parseInt(paidLoan.PrincipalOutstanding, 10) <
+          parseInt(loanObject.PrincipalOutstanding, 10),
         'Principal should decrease after payment',
       )
       // Payment remaining should be decremented
@@ -229,7 +229,7 @@ describe('Lending Protocol IT', () => {
 
       // assert principal outstanding is not zero
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding) > 0,
+        parseInt(paidLoan.PrincipalOutstanding, 10) > 0,
         'Principal should not be zero',
       )
 

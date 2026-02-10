@@ -138,7 +138,8 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   PeriodicPayment: XRPLNumber
 
   /**
-   * The scale factor that ensures all computed amounts are rounded to the same number of decimal places. It is determined based on the total loan value at creation time.
+   * The scale factor that ensures all computed amounts are rounded to the same number of decimal places.
+   * It is determined based on the total loan value at creation time.
    */
   LoanScale?: number
 }

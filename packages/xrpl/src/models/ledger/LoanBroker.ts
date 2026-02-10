@@ -61,7 +61,8 @@ export default interface LoanBroker extends BaseLedgerEntry, HasPreviousTxnID {
   Data?: string
 
   /**
-   * The 1/10th basis point fee charged by the Lending Protocol. Valid values are between 0 and 10000 inclusive. A value of 1 is equivalent to 1/10 bps or 0.001%
+   * The 1/10th basis point fee charged by the Lending Protocol. Valid values are between 0 and 10000 inclusive.
+   * A value of 1 is equivalent to 1/10 bps or 0.001%
    */
   ManagementFeeRate?: number
 

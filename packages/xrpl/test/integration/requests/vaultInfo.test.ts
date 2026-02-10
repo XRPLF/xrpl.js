@@ -25,6 +25,7 @@ describe('Single Asset Vault', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
+  // eslint-disable-next-line max-statements -- comprehensive vault_info test requires multiple assertions
   it('base', async function () {
     const tx: VaultCreate = {
       TransactionType: 'VaultCreate',
@@ -170,11 +171,14 @@ describe('Single Asset Vault', function () {
       account: testContext.wallet.classicAddress,
       type: 'vault',
     })
-    const vaultObj = result.result.account_objects.find(
-      (obj: any) =>
-        obj.Asset?.currency === 'USD' &&
-        obj.Asset?.issuer === testContext.wallet.classicAddress,
-    ) as Vault
+    const vaultObj = result.result.account_objects.find((obj) => {
+      const vault = obj as Vault
+      const asset = vault.Asset as unknown as Record<string, unknown>
+      return (
+        asset.currency === 'USD' &&
+        asset.issuer === testContext.wallet.classicAddress
+      )
+    }) as Vault
     assert.isDefined(vaultObj, 'Should find IOU vault')
 
     // Fetch vault_info using vault_id

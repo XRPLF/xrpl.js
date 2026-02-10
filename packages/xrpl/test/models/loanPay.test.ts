@@ -42,6 +42,7 @@ describe('unit test LoanPay', () => {
   })
 
   test('throws w/ multiple flags set (numeric) - tfLoanOverpayment and tfLoanFullPayment', () => {
+    // eslint-disable-next-line no-bitwise -- testing flag combinations
     tx.Flags = LoanPayFlags.tfLoanOverpayment | LoanPayFlags.tfLoanFullPayment
     assertInvalid(
       tx,

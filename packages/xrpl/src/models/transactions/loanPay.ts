@@ -1,5 +1,6 @@
 import { ValidationError } from '../../errors'
 import { Amount, MPTAmount } from '../common'
+import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
@@ -10,7 +11,6 @@ import {
   isAmount,
   GlobalFlagsInterface,
 } from './common'
-import { isFlagEnabled } from '../utils'
 
 /**
  * Enum representing values of {@link LoanPay} transaction flags.
@@ -96,8 +96,9 @@ export function validateLoanPay(tx: Record<string, unknown>): void {
         'LoanPay: Only one of tfLoanLatePayment, tfLoanFullPayment, or tfLoanOverpayment flags can be set',
       )
     }
-  } else if (typeof tx.Flags === 'object' && tx.Flags !== null) {
-    const flags = tx.Flags as Record<string, unknown>
+  } else if (tx.Flags != null && typeof tx.Flags === 'object') {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required to check flag values
+    const flags = tx.Flags as unknown as Record<string, unknown>
     const flagsSet = [
       flags.tfLoanLatePayment,
       flags.tfLoanFullPayment,
