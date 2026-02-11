@@ -3,41 +3,35 @@ import { LedgerEntry, LedgerEntryFilter } from '../ledger/LedgerEntry'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
-export type AccountObjectType = Exclude<
+export type AccountSponsoringObjectType = Exclude<
   LedgerEntryFilter,
   'amendments' | 'fee' | 'hashes'
 >
+
 /**
- * The account_objects command returns the raw ledger format for all objects
- * owned by an account. For a higher-level view of an account's trust lines and
- * balances, see the account_lines method instead. Expects a response in the
- * form of an {@link AccountObjectsResponse}.
+ * The account_sponsoring command returns a list of objects that an account is
+ * sponsoring; namely, a list of objects where the Sponsor is the given account.
+ * This is a Clio-specific RPC method.
  *
  * @category Requests
  */
-export interface AccountObjectsRequest
+export interface AccountSponsoringRequest
   extends BaseRequest,
     LookupByLedgerRequest {
-  command: 'account_objects'
-  /** A unique identifier for the account, most commonly the account's address. */
+  command: 'account_sponsoring'
+  /** The sponsor account to get sponsored objects for. */
   account: string
-  /**
-   * If included, filter results to include only this type of ledger object.
-   */
-  type?: AccountObjectType
   /**
    * If true, the response only includes objects that would block this account
    * from being deleted. The default is false.
    */
   deletion_blockers_only?: boolean
   /**
-   * If true, only return ledger entries that are sponsored. If false, only
-   * return ledger entries that are not sponsored. If omitted, return all objects.
+   * Filter results by a ledger entry type. Some examples are 'offer' and 'escrow'.
    */
-  sponsored?: boolean
+  type?: AccountSponsoringObjectType
   /**
-   * The maximum number of objects to include in the results. Must be within
-   * the inclusive range 10 to 400 on non-admin connections. The default is 200.
+   * The maximum number of objects to include in the results.
    */
   limit?: number
   /**
@@ -48,28 +42,28 @@ export interface AccountObjectsRequest
 }
 
 /**
- * Account Objects can be a Check, a DepositPreauth, an Escrow, an Offer, a
- * PayChannel, a SignerList, a Ticket, or a RippleState.
+ * Sponsored objects can be any ledger entry type except Amendments, FeeSettings,
+ * and LedgerHashes.
  */
-export type AccountObject = Exclude<
+export type SponsoredObject = Exclude<
   LedgerEntry,
   Amendments | FeeSettings | LedgerHashes
 >
 
 /**
- * Response expected from an {@link AccountObjectsRequest}.
+ * Response expected from an {@link AccountSponsoringRequest}.
  *
  * @category Responses
  */
-export interface AccountObjectsResponse extends BaseResponse {
+export interface AccountSponsoringResponse extends BaseResponse {
   result: {
-    /** Unique Address of the account this request corresponds to. */
+    /** The account this request corresponds to. */
     account: string
     /**
-     * Array of objects owned by this account. Each object is in its raw
-     * ledger format.
+     * Array of ledger entries that this account is sponsoring. Each object
+     * is in its raw ledger format.
      */
-    account_objects: AccountObject[]
+    sponsored_objects: SponsoredObject[]
     /**
      * The identifying hash of the ledger that was used to generate this
      * response.
@@ -92,7 +86,7 @@ export interface AccountObjectsResponse extends BaseResponse {
      * the next call to resume where this call left off. Omitted when there are
      * no additional pages after this one.
      */
-    marker?: string
+    marker?: unknown
     /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to
@@ -101,3 +95,4 @@ export interface AccountObjectsResponse extends BaseResponse {
     validated?: boolean
   }
 }
+
