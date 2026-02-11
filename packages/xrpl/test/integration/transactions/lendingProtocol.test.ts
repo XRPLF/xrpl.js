@@ -1,8 +1,6 @@
 /* eslint-disable max-statements -- required to test entire flow */
 
 import { assert } from 'chai'
-import { decode } from 'ripple-binary-codec'
-import { sign } from 'ripple-keypairs/src'
 
 import {
   type MPTokenAuthorize,
@@ -23,9 +21,10 @@ import {
   type LoanPay,
   verifySignature,
   type SignerListSet,
-  encodeForMultiSigning,
   LoanManageFlags,
   type MPTAmount,
+  signLoanSetByCounterparty,
+  combineLoanSetCounterpartySigners,
 } from '../../../src'
 import {
   LoanFlags,
@@ -34,7 +33,6 @@ import {
 } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
-import { compareSigners } from '../../../src/Wallet/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -61,6 +59,131 @@ describe('Lending Protocol IT', () => {
   afterEach(async () => {
     await teardownClient(testContext)
   }, TIMEOUT)
+
+  it(
+    'LoanSet: with single signing',
+    async () => {
+      const vaultOwnerWallet = await generateFundedWallet(testContext.client)
+      const depositorWallet = await generateFundedWallet(testContext.client)
+      const borrowerWallet = await generateFundedWallet(testContext.client)
+
+      // The Vault Owner and Loan Broker must be on the same account.
+      const loanBrokerWallet = vaultOwnerWallet
+
+      const vaultCreateTx: VaultCreate = {
+        TransactionType: 'VaultCreate',
+        Asset: {
+          currency: 'XRP',
+        },
+        Account: vaultOwnerWallet.address,
+        AssetsMaximum: '1e17',
+      }
+
+      const vaultCreateResp = await testTransaction(
+        testContext.client,
+        vaultCreateTx,
+        vaultOwnerWallet,
+      )
+
+      const vaultObjectId = hashVault(
+        vaultCreateResp.result.tx_json.Account,
+        vaultCreateResp.result.tx_json.Sequence as number,
+      )
+
+      // Depositor deposits 10 XRP into the vault
+      const vaultDepositTx: VaultDeposit = {
+        TransactionType: 'VaultDeposit',
+        Account: depositorWallet.address,
+        VaultID: vaultObjectId,
+        Amount: '10000000',
+      }
+
+      await testTransaction(testContext.client, vaultDepositTx, depositorWallet)
+
+      // Create LoanBroker ledger object to capture attributes of the Lending Protocol
+      const loanBrokerSetTx: LoanBrokerSet = {
+        TransactionType: 'LoanBrokerSet',
+        Account: loanBrokerWallet.address,
+        VaultID: vaultObjectId,
+        DebtMaximum: '25000000',
+      }
+
+      const loanBrokerTxResp = await testTransaction(
+        testContext.client,
+        loanBrokerSetTx,
+        loanBrokerWallet,
+      )
+
+      const loanBrokerObjectId = hashLoanBroker(
+        loanBrokerTxResp.result.tx_json.Account,
+        loanBrokerTxResp.result.tx_json.Sequence as number,
+      )
+
+      // Assert LoanBroker object exists in objects tracked by Lender.
+      const loanBrokerObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: loanBrokerWallet.address,
+        type: 'loan_broker',
+      })
+
+      const loanBrokerObject: LoanBroker =
+        loanBrokerObjects.result.account_objects.find(
+          (obj) => obj.index === loanBrokerObjectId,
+        ) as LoanBroker
+
+      assert.equal(loanBrokerObject.index, loanBrokerObjectId)
+      assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
+
+      // Broker initiates the Loan.
+      let loanSetTx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        PrincipalRequested: '5000000',
+        Counterparty: borrowerWallet.address,
+        PaymentTotal: 1,
+      }
+      loanSetTx = await testContext.client.autofill(loanSetTx)
+      const { tx_blob } = loanBrokerWallet.sign(loanSetTx)
+
+      assert.isTrue(verifySignature(tx_blob))
+
+      const { tx: borrowerSignedTx } = signLoanSetByCounterparty(
+        borrowerWallet,
+        tx_blob,
+      )
+
+      await testTransaction(
+        testContext.client,
+        borrowerSignedTx,
+        loanBrokerWallet,
+      )
+
+      const loanObjectId = hashLoan(
+        loanBrokerObjectId,
+        loanBrokerObject.LoanSequence,
+      )
+      const loanObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+
+      const loanObject: Loan = loanObjects.result.account_objects.find(
+        (obj) => obj.index === loanObjectId,
+      ) as Loan
+
+      assert.equal(loanObject.index, loanObjectId)
+      assert.equal(
+        loanObject.PrincipalOutstanding,
+        loanSetTx.PrincipalRequested,
+      )
+      assert.equal(loanObject.LoanBrokerID, loanBrokerObject.index)
+      assert.equal(loanObject.Borrower, borrowerWallet.address)
+      assert.equal(loanObject.PaymentRemaining, loanSetTx.PaymentTotal)
+    },
+    TIMEOUT,
+  )
 
   it(
     'Lending protocol integration test with multi-signing',
@@ -186,7 +309,7 @@ describe('Lending Protocol IT', () => {
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '100000',
-        InterestRate: 0.1,
+        InterestRate: 0,
         Counterparty: borrowerWallet.address,
         PaymentTotal: 1,
       }
@@ -203,45 +326,34 @@ describe('Lending Protocol IT', () => {
       // Loan broker signs the transaction and sends it to the borrower
       loanSetTx = await testContext.client.autofill(loanSetTx)
       const { tx_blob } = loanBrokerWallet.sign(loanSetTx)
-      loanSetTx = decode(tx_blob) as LoanSet
 
       // Borrower first verifies the TxnSignature for to make sure that it came from the loan broker.
-      assert.isTrue(verifySignature(loanSetTx, loanSetTx.SigningPubKey))
+      assert.isTrue(verifySignature(tx_blob))
 
       // Borrower signs the transaction and fills in the CounterpartySignature to confirm the
       // loan terms.
-      const sign1 = sign(
-        encodeForMultiSigning(loanSetTx, signer1.address),
-        signer1.privateKey,
-      )
-      const sign2 = sign(
-        encodeForMultiSigning(loanSetTx, signer2.address),
-        signer2.privateKey,
+      const { tx: signer1SignedTx } = signLoanSetByCounterparty(
+        signer1,
+        tx_blob,
+        { multisign: true },
       )
 
-      loanSetTx.CounterpartySignature = {}
-      loanSetTx.CounterpartySignature.Signers = []
-      const signers = [
-        {
-          Signer: {
-            Account: signer1.address,
-            SigningPubKey: signer1.publicKey,
-            TxnSignature: sign1,
-          },
-        },
-        {
-          Signer: {
-            Account: signer2.address,
-            SigningPubKey: signer2.publicKey,
-            TxnSignature: sign2,
-          },
-        },
-      ]
+      const { tx: signer2SignedTx } = signLoanSetByCounterparty(
+        signer2,
+        tx_blob,
+        { multisign: true },
+      )
 
-      signers.sort((s1, s2) => compareSigners(s1.Signer, s2.Signer))
-      loanSetTx.CounterpartySignature.Signers = signers
+      const { tx: combinedSignedTx } = combineLoanSetCounterpartySigners([
+        signer1SignedTx,
+        signer2SignedTx,
+      ])
 
-      await testTransaction(testContext.client, loanSetTx, borrowerWallet)
+      await testTransaction(
+        testContext.client,
+        combinedSignedTx,
+        borrowerWallet,
+      )
 
       // Assert Loan object exists in objects tracked by Borrower.
       const loanObjectId = hashLoan(

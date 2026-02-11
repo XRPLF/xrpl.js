@@ -1,4 +1,4 @@
-import { UInt8, UInt64, Int32 } from '../src/types'
+import { UInt8, UInt16, UInt32, UInt64, Int32 } from '../src/types'
 import { encode, decode } from '../src'
 
 const binary =
@@ -202,4 +202,110 @@ it('UInt64 is parsed as base 10 for MPT amounts', () => {
   const decodedToken = decode(mptokenEntryBinary)
   expect(typeof decodedToken.MPTAmount).toBe('string')
   expect(decodedToken.MPTAmount).toBe('100')
+})
+
+describe('UInt decimal validation', () => {
+  describe('UInt8', () => {
+    it('should throw error when passed a decimal number', () => {
+      expect(() => UInt8.from(1.5)).toThrow(
+        new Error('Cannot construct UInt8 from given value'),
+      )
+    })
+
+    it('should throw error when passed a negative decimal', () => {
+      expect(() => UInt8.from(-1.5)).toThrow(
+        new Error('Cannot construct UInt8 from given value'),
+      )
+    })
+
+    it('should throw error when passed a small decimal', () => {
+      expect(() => UInt8.from(0.1)).toThrow(
+        new Error('Cannot construct UInt8 from given value'),
+      )
+    })
+
+    it('should accept valid integer values', () => {
+      expect(() => UInt8.from(0)).not.toThrow()
+      expect(() => UInt8.from(1)).not.toThrow()
+      expect(() => UInt8.from(255)).not.toThrow()
+    })
+  })
+
+  describe('UInt16', () => {
+    it('should throw error when passed a decimal number', () => {
+      expect(() => UInt16.from(100.5)).toThrow(
+        new Error('Cannot construct UInt16 from given value'),
+      )
+    })
+
+    it('should throw error when passed a negative decimal', () => {
+      expect(() => UInt16.from(-100.5)).toThrow(
+        new Error('Cannot construct UInt16 from given value'),
+      )
+    })
+
+    it('should throw error when passed a small decimal', () => {
+      expect(() => UInt16.from(0.001)).toThrow(
+        new Error('Cannot construct UInt16 from given value'),
+      )
+    })
+
+    it('should accept valid integer values', () => {
+      expect(() => UInt16.from(0)).not.toThrow()
+      expect(() => UInt16.from(1000)).not.toThrow()
+      expect(() => UInt16.from(65535)).not.toThrow()
+    })
+  })
+
+  describe('UInt32', () => {
+    it('should throw error when passed a decimal number', () => {
+      expect(() => UInt32.from(1000.5)).toThrow(
+        new Error('Cannot construct UInt32 from given value'),
+      )
+    })
+
+    it('should throw error when passed a negative decimal', () => {
+      expect(() => UInt32.from(-1000.5)).toThrow(
+        new Error('Cannot construct UInt32 from given value'),
+      )
+    })
+
+    it('should throw error when passed a small decimal', () => {
+      expect(() => UInt32.from(0.0001)).toThrow(
+        new Error('Cannot construct UInt32 from given value'),
+      )
+    })
+
+    it('should accept valid integer values', () => {
+      expect(() => UInt32.from(0)).not.toThrow()
+      expect(() => UInt32.from(100000)).not.toThrow()
+      expect(() => UInt32.from(4294967295)).not.toThrow()
+    })
+  })
+
+  describe('UInt64', () => {
+    it('should throw error when passed a decimal number', () => {
+      expect(() => UInt64.from(10000.5)).toThrow(
+        new Error('Cannot construct UInt64 from given value'),
+      )
+    })
+
+    it('should throw error when passed a negative decimal', () => {
+      expect(() => UInt64.from(-10000.5)).toThrow(
+        new Error('Cannot construct UInt64 from given value'),
+      )
+    })
+
+    it('should throw error when passed a small decimal', () => {
+      expect(() => UInt64.from(0.00001)).toThrow(
+        new Error('Cannot construct UInt64 from given value'),
+      )
+    })
+
+    it('should accept valid integer values', () => {
+      expect(() => UInt64.from(0)).not.toThrow()
+      expect(() => UInt64.from(1000000)).not.toThrow()
+      expect(() => UInt64.from(BigInt('9223372036854775807'))).not.toThrow()
+    })
+  })
 })
