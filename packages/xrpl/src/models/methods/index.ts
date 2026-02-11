@@ -1,5 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
+/* eslint-disable max-len -- Deeply nested ternary types require long lines */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -383,8 +384,9 @@ export type RequestResponseMap<
                           // }
                           //
                           // The type with the most parameters set should be listed first. In this
-                          // case LedgerRequestExpandedTransactionsBinary has the most parameters (`expand`, `transactions`, and `binary`)
-                          // set, so it is listed first. When TypeScript tries to match the type of
+                          // case LedgerRequestExpandedTransactionsBinary has the most parameters
+                          // (`expand`, `transactions`, and `binary`)set, so it is listed first.
+                          // When TypeScript tries to match the type of
                           // a request to a response, it will try to match the request type to the
                           // response type in the order they are listed. So, if we have a request
                           // with the following parameters:

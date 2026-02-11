@@ -95,4 +95,3 @@ export interface AccountSponsoringResponse extends BaseResponse {
     validated?: boolean
   }
 }
-

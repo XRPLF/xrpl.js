@@ -78,4 +78,3 @@ export default interface Sponsorship extends BaseLedgerEntry, HasPreviousTxnID {
    */
   SponseeNode: string
 }
-
