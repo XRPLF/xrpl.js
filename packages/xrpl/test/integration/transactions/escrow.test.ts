@@ -354,7 +354,6 @@ describe('Escrow', function () {
         })
       ).result.account_objects
 
-      console.log(accountObjects)
       assert.equal(accountObjects.length, 1)
 
       const sequence = (
