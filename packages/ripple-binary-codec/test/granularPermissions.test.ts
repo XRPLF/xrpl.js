@@ -131,9 +131,10 @@ describe('Granular Permissions', function () {
       const definitions = new XrplDefinitions(normalDefinitionsJson)
 
       // Accessing an undefined permission should return undefined
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expect(
-        (definitions.granularPermissions as any).NonExistentPermission,
+        (definitions.granularPermissions as Record<string, number>)[
+          'NonExistentPermission'
+        ],
       ).toBeUndefined()
     })
   })
