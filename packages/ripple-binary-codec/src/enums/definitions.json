@@ -3707,6 +3707,7 @@
     "temREDUNDANT": -275,
     "temRIPPLE_EMPTY": -274,
     "temSEQ_AND_TICKET": -263,
+    "temTEMP_DISABLED": -248,
     "temUNCERTAIN": -265,
     "temUNKNOWN": -264,
     "temXCHAIN_BAD_PROOF": -259,
