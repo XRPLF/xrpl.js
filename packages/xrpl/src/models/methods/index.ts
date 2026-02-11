@@ -1,6 +1,5 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
-/* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -38,16 +37,16 @@ import {
   AccountObjectType,
 } from './accountObjects'
 import {
+  AccountOffer,
+  AccountOffersRequest,
+  AccountOffersResponse,
+} from './accountOffers'
+import {
   AccountSponsoringObjectType,
   AccountSponsoringRequest,
   AccountSponsoringResponse,
   SponsoredObject,
 } from './accountSponsoring'
-import {
-  AccountOffer,
-  AccountOffersRequest,
-  AccountOffersResponse,
-} from './accountOffers'
 import {
   AccountTxRequest,
   AccountTxResponse,

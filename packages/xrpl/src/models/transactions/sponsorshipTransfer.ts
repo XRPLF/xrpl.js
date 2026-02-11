@@ -57,13 +57,10 @@ export interface SponsorshipTransfer extends BaseTransaction {
  * @param tx - A SponsorshipTransfer Transaction.
  * @throws When the SponsorshipTransfer is malformed.
  */
-export function validateSponsorshipTransfer(
-  tx: Record<string, unknown>,
-): void {
+export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateOptionalField(tx, 'ObjectID', isString)
   validateOptionalField(tx, 'Sponsor', isAccount)
   validateOptionalField(tx, 'SponsorFlags', isNumber)
 }
-

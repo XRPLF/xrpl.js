@@ -721,9 +721,12 @@ export function validateBaseTransaction(
 
   // Validate SponsorFlags has valid values
   if (hasSponsorFlags) {
-    const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
-    const flags = common.SponsorFlags as number
-    if ((flags & ~validFlags) !== 0 || flags === 0) {
+    const flags = Number(common.SponsorFlags)
+    const isValidFlag =
+      flags === SponsorFlags.tfSponsorFee ||
+      flags === SponsorFlags.tfSponsorReserve ||
+      flags === SponsorFlags.tfSponsorFee + SponsorFlags.tfSponsorReserve
+    if (!isValidFlag) {
       throw new ValidationError(
         'BaseTransaction: invalid SponsorFlags - must include tfSponsorFee and/or tfSponsorReserve',
       )

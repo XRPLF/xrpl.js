@@ -148,12 +148,10 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'ReserveCount', isNumber)
 
   // Validate flag combinations with tfDeleteObject
-  const flags =
-    typeof tx.Flags === 'number' ? tx.Flags : 0
-
+  const flags = typeof tx.Flags === 'number' ? tx.Flags : 0
   const tfDeleteObject = SponsorshipSetFlags.tfDeleteObject
 
-  if ((flags & tfDeleteObject) !== 0) {
+  if (flags === tfDeleteObject) {
     // When deleting, cannot specify FeeAmount, MaxFee, or ReserveCount
     if (tx.FeeAmount !== undefined) {
       throw new ValidationError(
@@ -172,4 +170,3 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
   }
 }
-
