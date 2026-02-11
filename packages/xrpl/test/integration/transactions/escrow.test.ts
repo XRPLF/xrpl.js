@@ -31,11 +31,11 @@ describe('Escrow', function () {
   let testContext: XrplIntegrationTestContext
   let wallet1: Wallet
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     testContext = await setupClient(serverUrl)
     wallet1 = await generateFundedWallet(testContext.client)
   })
-  afterAll(async () => teardownClient(testContext))
+  afterEach(async () => teardownClient(testContext))
 
   async function closeLedgers(count: number): Promise<void> {
     for (let _i = 0; _i < count; _i++) {
@@ -178,80 +178,6 @@ describe('Escrow', function () {
   )
 
   it(
-    'finish function',
-    async () => {
-      const FINISH_FUNCTION =
-        '0061736d010000000108026000017f60000002160103656e760e6765745f6c65646765725f' +
-        '73716e000003030201000503010002063e0a7f004180080b7f004180080b7f004180100b7f' +
-        '004180100b7f00418090040b7f004180080b7f00418090040b7f00418080080b7f0041000b' +
-        '7f0041010b07b0010d066d656d6f72790200115f5f7761736d5f63616c6c5f63746f727300' +
-        '010666696e69736800020362756603000c5f5f64736f5f68616e646c6503010a5f5f646174' +
-        '615f656e6403020b5f5f737461636b5f6c6f7703030c5f5f737461636b5f6869676803040d' +
-        '5f5f676c6f62616c5f6261736503050b5f5f686561705f6261736503060a5f5f686561705f' +
-        '656e6403070d5f5f6d656d6f72795f6261736503080c5f5f7461626c655f6261736503090a' +
-        '150202000b1001017f100022004100200041044b1b0b007f0970726f647563657273010c70' +
-        '726f6365737365642d62790105636c616e675f31392e312e352d776173692d73646b202868' +
-        '747470733a2f2f6769746875622e636f6d2f6c6c766d2f6c6c766d2d70726f6a6563742061' +
-        '62346235613264623538323935386166316565333038613739306366646234326264323437' +
-        '32302900490f7461726765745f6665617475726573042b0f6d757461626c652d676c6f6261' +
-        '6c732b087369676e2d6578742b0f7265666572656e63652d74797065732b0a6d756c746976' +
-        '616c7565'
-
-      // get the most recent close_time from the standalone container for cancel & finish after.
-      const CLOSE_TIME = await getLedgerCloseTime(testContext.client)
-
-      const AMOUNT = 10000
-
-      const createTx: EscrowCreate = {
-        Account: testContext.wallet.classicAddress,
-        TransactionType: 'EscrowCreate',
-        Amount: AMOUNT.toString(),
-        Destination: wallet1.classicAddress,
-        FinishFunction: FINISH_FUNCTION,
-        CancelAfter: CLOSE_TIME + 200,
-      }
-
-      await testTransaction(testContext.client, createTx, testContext.wallet)
-
-      const initialBalance = await getXRPBalance(testContext.client, wallet1)
-
-      // check that the object was actually created
-      const accountObjects = (
-        await testContext.client.request({
-          command: 'account_objects',
-          account: testContext.wallet.classicAddress,
-        })
-      ).result.account_objects
-
-      assert.equal(accountObjects.length, 1)
-
-      const sequence = (
-        await testContext.client.request({
-          command: 'tx',
-          transaction: accountObjects[0].PreviousTxnID,
-        })
-      ).result.tx_json.Sequence
-
-      const finishTx: EscrowFinish = {
-        TransactionType: 'EscrowFinish',
-        Account: testContext.wallet.classicAddress,
-        Owner: testContext.wallet.classicAddress,
-        OfferSequence: sequence!,
-        ComputationAllowance: 20000,
-      }
-
-      await testTransaction(testContext.client, finishTx, testContext.wallet)
-
-      const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))
-      assert.equal(
-        await getXRPBalance(testContext.client, wallet1),
-        expectedBalance,
-      )
-    },
-    TIMEOUT,
-  )
-
-  it(
     'escrow with IOU -- validate EscrowCancel transaction (Identical to previous test, except for Step 7-8)',
     async () => {
       const escrowSourceWallet = await generateFundedWallet(testContext.client)
@@ -383,6 +309,76 @@ describe('Escrow', function () {
         type: 'escrow',
       })
       assert.equal(escrowObjectsSourceWallet.result.account_objects.length, 0)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'finish function',
+    async () => {
+      const FINISH_FUNCTION =
+        '0061736d01000000010e0360027f7f017f6000006000017f02160103656e760e6765745f6c65646765725f73716e0000030302010205030100' +
+        '02063f0a7f01418088040b7f004180080b7f004180080b7f004180080b7f00418088040b7f004180080b7f00418088040b7f00418080080b7f' +
+        '0041000b7f0041010b07aa010c066d656d6f72790200115f5f7761736d5f63616c6c5f63746f727300010666696e69736800020c5f5f64736f' +
+        '5f68616e646c6503010a5f5f646174615f656e6403020b5f5f737461636b5f6c6f7703030c5f5f737461636b5f6869676803040d5f5f676c6f' +
+        '62616c5f6261736503050b5f5f686561705f6261736503060a5f5f686561705f656e6403070d5f5f6d656d6f72795f6261736503080c5f5f74' +
+        '61626c655f6261736503090a3d0202000b3801037f230041106b220024002000410c6a410410002101200028020c2102200041106a24002001' +
+        '41054100200241054f1b20014100481b0b007f0970726f647563657273010c70726f6365737365642d62790105636c616e675f31392e312e35' +
+        '2d776173692d73646b202868747470733a2f2f6769746875622e636f6d2f6c6c766d2f6c6c766d2d70726f6a65637420616234623561326462' +
+        '353832393538616631656533303861373930636664623432626432343732302900490f7461726765745f6665617475726573042b0f6d757461' +
+        '626c652d676c6f62616c732b087369676e2d6578742b0f7265666572656e63652d74797065732b0a6d756c746976616c7565'
+
+      // get the most recent close_time from the standalone container for cancel & finish after.
+      const CLOSE_TIME = await getLedgerCloseTime(testContext.client)
+
+      const AMOUNT = 10000
+
+      const createTx: EscrowCreate = {
+        Account: testContext.wallet.classicAddress,
+        TransactionType: 'EscrowCreate',
+        Amount: AMOUNT.toString(),
+        Destination: wallet1.classicAddress,
+        FinishFunction: FINISH_FUNCTION,
+        CancelAfter: CLOSE_TIME + 200,
+      }
+
+      await testTransaction(testContext.client, createTx, testContext.wallet)
+
+      const initialBalance = await getXRPBalance(testContext.client, wallet1)
+
+      // check that the object was actually created
+      const accountObjects = (
+        await testContext.client.request({
+          command: 'account_objects',
+          account: testContext.wallet.classicAddress,
+        })
+      ).result.account_objects
+
+      console.log(accountObjects)
+      assert.equal(accountObjects.length, 1)
+
+      const sequence = (
+        await testContext.client.request({
+          command: 'tx',
+          transaction: accountObjects[0].PreviousTxnID,
+        })
+      ).result.tx_json.Sequence
+
+      const finishTx: EscrowFinish = {
+        TransactionType: 'EscrowFinish',
+        Account: testContext.wallet.classicAddress,
+        Owner: testContext.wallet.classicAddress,
+        OfferSequence: sequence!,
+        ComputationAllowance: 20000,
+      }
+
+      await testTransaction(testContext.client, finishTx, testContext.wallet)
+
+      const expectedBalance = String(Number(initialBalance) + Number(AMOUNT))
+      assert.equal(
+        await getXRPBalance(testContext.client, wallet1),
+        expectedBalance,
+      )
     },
     TIMEOUT,
   )
