@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+* Support for `Sponsored Fees and Reserves` (XLS-68d):
+  * Add `SponsorFee` granular permission for fee sponsorship delegation
+  * Add `SponsorReserve` granular permission for reserve sponsorship delegation
+
 ### Fixed
 * Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
 * Error if a decimal is passed into a `UInt`-typed field.
