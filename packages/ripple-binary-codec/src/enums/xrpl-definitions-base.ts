@@ -94,6 +94,8 @@ class XrplDefinitionsBase {
       PaymentBurn: 65546,
       MPTokenIssuanceLock: 65547,
       MPTokenIssuanceUnlock: 65548,
+      SponsorFee: 65549,
+      SponsorReserve: 65550,
     }
 
     const incrementedTransactionTypes = Object.fromEntries(

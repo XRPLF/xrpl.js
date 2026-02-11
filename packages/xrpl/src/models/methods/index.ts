@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
-/* eslint-disable prettier/prettier -- Required here to keep formatting in line */
+/* eslint-disable max-len -- Deeply nested ternary types require long lines */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -42,6 +42,12 @@ import {
   AccountOffersRequest,
   AccountOffersResponse,
 } from './accountOffers'
+import {
+  AccountSponsoringObjectType,
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
+  SponsoredObject,
+} from './accountSponsoring'
 import {
   AccountTxRequest,
   AccountTxResponse,
@@ -242,6 +248,7 @@ type Request =
   | NFTBuyOffersRequest
   | NFTSellOffersRequest
   // clio only methods
+  | AccountSponsoringRequest
   | NFTInfoRequest
   | NFTHistoryRequest
   | NFTsByIssuerRequest
@@ -303,6 +310,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | NFTBuyOffersResponse
   | NFTSellOffersResponse
   // clio only methods
+  | AccountSponsoringResponse
   | NFTInfoResponse
   | NFTHistoryResponse
   | NFTsByIssuerResponse
@@ -319,160 +327,163 @@ export type RequestResponseMap<
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountCurrenciesRequest
-  ? AccountCurrenciesResponse
-  : T extends AccountInfoRequest
-  ? AccountInfoVersionResponseMap<Version>
-  : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountNFTsRequest
-  ? AccountNFTsResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxVersionResponseMap<Version>
-  : T extends AMMInfoRequest
-  ? AMMInfoResponse
-  : T extends GatewayBalancesRequest
-  ? GatewayBalancesResponse
-  : T extends GetAggregatePriceRequest
-  ? GetAggregatePriceResponse
-  : T extends NoRippleCheckRequest
-  ? NoRippleCheckResponse
-  : // NOTE: The order of these LedgerRequest types is important
-  // to get the proper type matching overrides based on parameters set
-  // in the request. For example LedgerRequestExpandedTransactionsBinary
-  // should match LedgerRequestExpandedTransactionsOnly, but not
-  // LedgerRequestExpandedAccountsOnly. This is because the
-  // LedgerRequestExpandedTransactionsBinary type is a superset of
-  // LedgerRequestExpandedTransactionsOnly, but not of the other.
-  // This is why LedgerRequestExpandedTransactionsBinary is listed
-  // first in the type list.
-  //
-  // Here is an example using real data:
-  // LedgerRequestExpandedTransactionsBinary = {
-  //   command: 'ledger',
-  //   ledger_index: 'validated',
-  //   expand: true,
-  //   transactions: true,
-  //   binary: true,
-  // }
-  // LedgerRequestExpandedTransactionsOnly = {
-  //   command: 'ledger',
-  //   ledger_index: 'validated',
-  //   expand: true,
-  //   transactions: true,
-  // }
-  // LedgerRequestExpandedAccountsOnly = {
-  //   command: 'ledger',
-  //   ledger_index: 'validated',
-  //   accounts: true,
-  //   expand: true,
-  // }
-  // LedgerRequest = {
-  //   command: 'ledger',
-  //   ledger_index: 'validated',
-  // }
-  //
-  // The type with the most parameters set should be listed first. In this
-  // case LedgerRequestExpandedTransactionsBinary has the most parameters (`expand`, `transactions`, and `binary`)
-  // set, so it is listed first. When TypeScript tries to match the type of
-  // a request to a response, it will try to match the request type to the
-  // response type in the order they are listed. So, if we have a request
-  // with the following parameters:
-  // {
-  //   command: 'ledger',
-  //   ledger_index: 'validated',
-  //   expand: true,
-  //   transactions: true,
-  //   binary: true,
-  // }
-  // TypeScript will first try to match the request type to
-  // LedgerRequestExpandedTransactionsBinary, which will succeed. It will
-  // then try to match the response type to LedgerResponseExpanded, which
-  // will also succeed. If we had listed LedgerRequestExpandedTransactionsOnly
-  // first, TypeScript would have tried to match the request type to
-  // LedgerRequestExpandedTransactionsOnly, which would have succeeded, but
-  // then we'd get the wrong response type, LedgerResponse, instead of
-  // LedgerResponseExpanded.
-  T extends LedgerRequestExpandedTransactionsBinary
-  ? LedgerVersionResponseMap<Version>
-  : T extends LedgerRequestExpandedAccountsAndTransactions
-  ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequestExpandedTransactionsOnly
-  ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequestExpandedAccountsOnly
-  ? LedgerResponseExpanded<Version>
-  : T extends LedgerRequest
-  ? LedgerVersionResponseMap<Version>
-  : T extends LedgerClosedRequest
-  ? LedgerClosedResponse
-  : T extends LedgerCurrentRequest
-  ? LedgerCurrentResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : T extends LedgerEntryRequest
-  ? LedgerEntryResponse
-  : T extends SimulateBinaryRequest
-  ? SimulateBinaryResponse
-  : T extends SimulateJsonRequest
-  ? SimulateJsonResponse
-  : T extends SimulateRequest
-  ? SimulateJsonResponse
-  : T extends SubmitRequest
-  ? SubmitResponse
-  : T extends SubmitMultisignedRequest
-  ? SubmitMultisignedVersionResponseMap<Version>
-  : T extends TransactionEntryRequest
-  ? TransactionEntryResponse
-  : T extends TxRequest
-  ? TxVersionResponseMap<Version>
-  : T extends BookOffersRequest
-  ? BookOffersResponse
-  : T extends DepositAuthorizedRequest
-  ? DepositAuthorizedResponse
-  : T extends PathFindRequest
-  ? PathFindResponse
-  : T extends RipplePathFindRequest
-  ? RipplePathFindResponse
-  : T extends ChannelVerifyRequest
-  ? ChannelVerifyResponse
-  : T extends SubscribeRequest
-  ? SubscribeResponse
-  : T extends UnsubscribeRequest
-  ? UnsubscribeResponse
-  : T extends FeeRequest
-  ? FeeResponse
-  : T extends ManifestRequest
-  ? ManifestResponse
-  : T extends ServerInfoRequest
-  ? ServerInfoResponse
-  : T extends ServerStateRequest
-  ? ServerStateResponse
-  : T extends ServerDefinitionsRequest
-  ? ServerDefinitionsResponse
-  : T extends FeatureAllRequest
-  ? FeatureAllResponse
-  : T extends FeatureOneRequest
-  ? FeatureOneResponse
-  : T extends PingRequest
-  ? PingResponse
-  : T extends RandomRequest
-  ? RandomResponse
-  : T extends NFTBuyOffersRequest
-  ? NFTBuyOffersResponse
-  : T extends NFTSellOffersRequest
-  ? NFTSellOffersResponse
-  : T extends NFTInfoRequest
-  ? NFTInfoResponse
-  : T extends NFTsByIssuerRequest
-  ? NFTsByIssuerResponse
-  : T extends NFTHistoryRequest
-  ? NFTHistoryResponse
-  : T extends VaultInfoRequest
-  ? VaultInfoResponse
-  : Response<Version>
+    ? AccountCurrenciesResponse
+    : T extends AccountInfoRequest
+      ? AccountInfoVersionResponseMap<Version>
+      : T extends AccountLinesRequest
+        ? AccountLinesResponse
+        : T extends AccountNFTsRequest
+          ? AccountNFTsResponse
+          : T extends AccountObjectsRequest
+            ? AccountObjectsResponse
+            : T extends AccountOffersRequest
+              ? AccountOffersResponse
+              : T extends AccountTxRequest
+                ? AccountTxVersionResponseMap<Version>
+                : T extends AMMInfoRequest
+                  ? AMMInfoResponse
+                  : T extends GatewayBalancesRequest
+                    ? GatewayBalancesResponse
+                    : T extends GetAggregatePriceRequest
+                      ? GetAggregatePriceResponse
+                      : T extends NoRippleCheckRequest
+                        ? NoRippleCheckResponse
+                        : // NOTE: The order of these LedgerRequest types is important
+                          // to get the proper type matching overrides based on parameters set
+                          // in the request. For example LedgerRequestExpandedTransactionsBinary
+                          // should match LedgerRequestExpandedTransactionsOnly, but not
+                          // LedgerRequestExpandedAccountsOnly. This is because the
+                          // LedgerRequestExpandedTransactionsBinary type is a superset of
+                          // LedgerRequestExpandedTransactionsOnly, but not of the other.
+                          // This is why LedgerRequestExpandedTransactionsBinary is listed
+                          // first in the type list.
+                          //
+                          // Here is an example using real data:
+                          // LedgerRequestExpandedTransactionsBinary = {
+                          //   command: 'ledger',
+                          //   ledger_index: 'validated',
+                          //   expand: true,
+                          //   transactions: true,
+                          //   binary: true,
+                          // }
+                          // LedgerRequestExpandedTransactionsOnly = {
+                          //   command: 'ledger',
+                          //   ledger_index: 'validated',
+                          //   expand: true,
+                          //   transactions: true,
+                          // }
+                          // LedgerRequestExpandedAccountsOnly = {
+                          //   command: 'ledger',
+                          //   ledger_index: 'validated',
+                          //   accounts: true,
+                          //   expand: true,
+                          // }
+                          // LedgerRequest = {
+                          //   command: 'ledger',
+                          //   ledger_index: 'validated',
+                          // }
+                          //
+                          // The type with the most parameters set should be listed first. In this
+                          // case LedgerRequestExpandedTransactionsBinary has the most parameters
+                          // (`expand`, `transactions`, and `binary`)set, so it is listed first.
+                          // When TypeScript tries to match the type of
+                          // a request to a response, it will try to match the request type to the
+                          // response type in the order they are listed. So, if we have a request
+                          // with the following parameters:
+                          // {
+                          //   command: 'ledger',
+                          //   ledger_index: 'validated',
+                          //   expand: true,
+                          //   transactions: true,
+                          //   binary: true,
+                          // }
+                          // TypeScript will first try to match the request type to
+                          // LedgerRequestExpandedTransactionsBinary, which will succeed. It will
+                          // then try to match the response type to LedgerResponseExpanded, which
+                          // will also succeed. If we had listed LedgerRequestExpandedTransactionsOnly
+                          // first, TypeScript would have tried to match the request type to
+                          // LedgerRequestExpandedTransactionsOnly, which would have succeeded, but
+                          // then we'd get the wrong response type, LedgerResponse, instead of
+                          // LedgerResponseExpanded.
+                          T extends LedgerRequestExpandedTransactionsBinary
+                          ? LedgerVersionResponseMap<Version>
+                          : T extends LedgerRequestExpandedAccountsAndTransactions
+                            ? LedgerResponseExpanded<Version>
+                            : T extends LedgerRequestExpandedTransactionsOnly
+                              ? LedgerResponseExpanded<Version>
+                              : T extends LedgerRequestExpandedAccountsOnly
+                                ? LedgerResponseExpanded<Version>
+                                : T extends LedgerRequest
+                                  ? LedgerVersionResponseMap<Version>
+                                  : T extends LedgerClosedRequest
+                                    ? LedgerClosedResponse
+                                    : T extends LedgerCurrentRequest
+                                      ? LedgerCurrentResponse
+                                      : T extends LedgerDataRequest
+                                        ? LedgerDataResponse
+                                        : T extends LedgerEntryRequest
+                                          ? LedgerEntryResponse
+                                          : T extends SimulateBinaryRequest
+                                            ? SimulateBinaryResponse
+                                            : T extends SimulateJsonRequest
+                                              ? SimulateJsonResponse
+                                              : T extends SimulateRequest
+                                                ? SimulateJsonResponse
+                                                : T extends SubmitRequest
+                                                  ? SubmitResponse
+                                                  : T extends SubmitMultisignedRequest
+                                                    ? SubmitMultisignedVersionResponseMap<Version>
+                                                    : T extends TransactionEntryRequest
+                                                      ? TransactionEntryResponse
+                                                      : T extends TxRequest
+                                                        ? TxVersionResponseMap<Version>
+                                                        : T extends BookOffersRequest
+                                                          ? BookOffersResponse
+                                                          : T extends DepositAuthorizedRequest
+                                                            ? DepositAuthorizedResponse
+                                                            : T extends PathFindRequest
+                                                              ? PathFindResponse
+                                                              : T extends RipplePathFindRequest
+                                                                ? RipplePathFindResponse
+                                                                : T extends ChannelVerifyRequest
+                                                                  ? ChannelVerifyResponse
+                                                                  : T extends SubscribeRequest
+                                                                    ? SubscribeResponse
+                                                                    : T extends UnsubscribeRequest
+                                                                      ? UnsubscribeResponse
+                                                                      : T extends FeeRequest
+                                                                        ? FeeResponse
+                                                                        : T extends ManifestRequest
+                                                                          ? ManifestResponse
+                                                                          : T extends ServerInfoRequest
+                                                                            ? ServerInfoResponse
+                                                                            : T extends ServerStateRequest
+                                                                              ? ServerStateResponse
+                                                                              : T extends ServerDefinitionsRequest
+                                                                                ? ServerDefinitionsResponse
+                                                                                : T extends FeatureAllRequest
+                                                                                  ? FeatureAllResponse
+                                                                                  : T extends FeatureOneRequest
+                                                                                    ? FeatureOneResponse
+                                                                                    : T extends PingRequest
+                                                                                      ? PingResponse
+                                                                                      : T extends RandomRequest
+                                                                                        ? RandomResponse
+                                                                                        : T extends NFTBuyOffersRequest
+                                                                                          ? NFTBuyOffersResponse
+                                                                                          : T extends NFTSellOffersRequest
+                                                                                            ? NFTSellOffersResponse
+                                                                                            : T extends NFTInfoRequest
+                                                                                              ? NFTInfoResponse
+                                                                                              : T extends NFTsByIssuerRequest
+                                                                                                ? NFTsByIssuerResponse
+                                                                                                : T extends NFTHistoryRequest
+                                                                                                  ? NFTHistoryResponse
+                                                                                                  : T extends VaultInfoRequest
+                                                                                                    ? VaultInfoResponse
+                                                                                                    : T extends AccountSponsoringRequest
+                                                                                                      ? AccountSponsoringResponse
+                                                                                                      : Response<Version>
 
 export type MarkerRequest = Request & {
   limit?: number
@@ -493,18 +504,18 @@ export type RequestAllResponseMap<
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxVersionResponseMap<Version>
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : T extends BookOffersRequest
-  ? BookOffersResponse
-  : MarkerResponse<Version>
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest
+          ? AccountTxVersionResponseMap<Version>
+          : T extends LedgerDataRequest
+            ? LedgerDataResponse
+            : T extends BookOffersRequest
+              ? BookOffersResponse
+              : MarkerResponse<Version>
 
 export {
   // Allow users to define their own requests and responses.  This is useful for releasing experimental versions
@@ -647,6 +658,10 @@ export {
   NFTSellOffersRequest,
   NFTSellOffersResponse,
   // clio only methods
+  AccountSponsoringObjectType,
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
+  SponsoredObject,
   NFTInfoRequest,
   NFTInfoResponse,
   NFTHistoryRequest,

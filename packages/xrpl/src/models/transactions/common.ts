@@ -457,6 +457,45 @@ export interface GlobalFlagsInterface {
 }
 
 /**
+ * Enum representing sponsor flags for transaction sponsorship.
+ * These flags indicate what type of sponsorship is being applied to a transaction.
+ *
+ * @category Transaction Flags
+ */
+export enum SponsorFlags {
+  /**
+   * Indicates that the sponsor is paying the transaction fee.
+   */
+  tfSponsorFee = 0x00000001,
+  /**
+   * Indicates that the sponsor is paying for the reserve of any objects
+   * created in the transaction.
+   */
+  tfSponsorReserve = 0x00000002,
+}
+
+/**
+ * The SponsorSignature object contains signing information for sponsored
+ * transactions. It holds the sponsor's signature to authorize the sponsorship.
+ */
+export interface SponsorSignature {
+  /**
+   * The public key for the sponsor's account, if single-signing.
+   */
+  SigningPubKey?: string
+  /**
+   * A signature from the sponsor to indicate their approval of the transaction,
+   * if single-signing.
+   */
+  TxnSignature?: string
+  /**
+   * An array of signatures from the sponsor's signers to indicate their approval
+   * of the transaction, if the sponsor is multi-signing.
+   */
+  Signers?: Signer[]
+}
+
+/**
  * Every transaction has the same set of common fields.
  */
 export interface BaseTransaction extends Record<string, unknown> {
@@ -534,6 +573,23 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The account ID of the sponsor for this transaction. If this field is
+   * included, the sponsor is co-signing the transaction to pay for the fee
+   * and/or reserve on behalf of the transaction sender.
+   */
+  Sponsor?: Account
+  /**
+   * Flags indicating what type of sponsorship this is. Must be included if
+   * Sponsor is included. Valid values are tfSponsorFee (1) and/or
+   * tfSponsorReserve (2).
+   */
+  SponsorFlags?: number
+  /**
+   * An object containing the sponsor's signature information to authorize
+   * the sponsorship. Must be included if Sponsor is included.
+   */
+  SponsorSignature?: SponsorSignature
 }
 
 /**
@@ -609,6 +665,72 @@ export function validateBaseTransaction(
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
+  }
+
+  // Sponsor fields validation
+  validateOptionalField(common, 'Sponsor', isAccount)
+  validateOptionalField(common, 'SponsorFlags', isNumber)
+
+  // Validate SponsorSignature if present
+  if (common.SponsorSignature !== undefined) {
+    if (!isRecord(common.SponsorSignature)) {
+      throw new ValidationError('BaseTransaction: invalid SponsorSignature')
+    }
+    const sponsorSig = common.SponsorSignature
+    if (
+      sponsorSig.SigningPubKey !== undefined &&
+      !isString(sponsorSig.SigningPubKey)
+    ) {
+      throw new ValidationError(
+        'BaseTransaction: invalid SponsorSignature.SigningPubKey',
+      )
+    }
+    if (
+      sponsorSig.TxnSignature !== undefined &&
+      !isString(sponsorSig.TxnSignature)
+    ) {
+      throw new ValidationError(
+        'BaseTransaction: invalid SponsorSignature.TxnSignature',
+      )
+    }
+    if (
+      sponsorSig.Signers !== undefined &&
+      (!isArray(sponsorSig.Signers) ||
+        sponsorSig.Signers.length === 0 ||
+        !sponsorSig.Signers.every(isSigner))
+    ) {
+      throw new ValidationError(
+        'BaseTransaction: invalid SponsorSignature.Signers',
+      )
+    }
+  }
+
+  // Validate that Sponsor, SponsorFlags, and SponsorSignature are all present or all absent
+  const hasSponsor = common.Sponsor !== undefined
+  const hasSponsorFlags = common.SponsorFlags !== undefined
+  const hasSponsorSignature = common.SponsorSignature !== undefined
+
+  if (hasSponsor || hasSponsorFlags || hasSponsorSignature) {
+    if (!hasSponsor || !hasSponsorFlags) {
+      throw new ValidationError(
+        'BaseTransaction: Sponsor and SponsorFlags must both be included if either is present',
+      )
+    }
+    // SponsorSignature may be omitted if using pre-funded sponsorship without signature requirement
+  }
+
+  // Validate SponsorFlags has valid values
+  if (hasSponsorFlags) {
+    const flags = Number(common.SponsorFlags)
+    const isValidFlag =
+      flags === SponsorFlags.tfSponsorFee ||
+      flags === SponsorFlags.tfSponsorReserve ||
+      flags === SponsorFlags.tfSponsorFee + SponsorFlags.tfSponsorReserve
+    if (!isValidFlag) {
+      throw new ValidationError(
+        'BaseTransaction: invalid SponsorFlags - must include tfSponsorFee and/or tfSponsorReserve',
+      )
+    }
   }
 }
 

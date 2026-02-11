@@ -1,5 +1,16 @@
 export interface BaseLedgerEntry {
   index: string
+  /**
+   * The address of the account sponsoring the reserve for this ledger object.
+   * Only present if the object's reserve is being sponsored by another account.
+   * This field is added when sponsorship is established and removed when
+   * sponsorship is dissolved.
+   *
+   * Note: For RippleState objects, use HighSponsor and LowSponsor instead.
+   * This field must not appear on DirectoryNode, Amendments, FeeSettings,
+   * or NegativeUNL objects.
+   */
+  Sponsor?: string
 }
 
 export interface HasPreviousTxnID {
