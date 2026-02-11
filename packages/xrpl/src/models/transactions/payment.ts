@@ -43,6 +43,13 @@ export enum PaymentFlags {
    * details.
    */
   tfLimitQuality = 0x00040000,
+  /**
+   * If the Payment is used to create an account, the created account will be
+   * sponsored by the transaction sender (Account). When this flag is enabled,
+   * the XRP amount does not need to be greater than or equal to the account
+   * reserve requirement.
+   */
+  tfSponsorCreatedAccount = 0x00080000,
 }
 
 /**
@@ -105,6 +112,13 @@ export interface PaymentFlagsInterface extends GlobalFlagsInterface {
    * details.
    */
   tfLimitQuality?: boolean
+  /**
+   * If the Payment is used to create an account, the created account will be
+   * sponsored by the transaction sender (Account). When this flag is enabled,
+   * the XRP amount does not need to be greater than or equal to the account
+   * reserve requirement.
+   */
+  tfSponsorCreatedAccount?: boolean
 }
 
 /**

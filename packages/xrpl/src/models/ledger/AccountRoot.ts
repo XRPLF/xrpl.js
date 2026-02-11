@@ -78,6 +78,28 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
   MintedNFTokens?: number
   /** Another account that can mint NFTokens on behalf of this account. */
   NFTokenMinter?: string
+  /**
+   * The address of the account sponsoring this account's reserve. Only present
+   * if this account was created via a sponsored Payment transaction.
+   */
+  Sponsor?: string
+  /**
+   * The number of ledger objects whose reserves are being sponsored by other
+   * accounts on behalf of this account. This count does not contribute to the
+   * owner reserve.
+   */
+  SponsoredOwnerCount?: number
+  /**
+   * The number of ledger objects for which this account is sponsoring reserves
+   * on behalf of other accounts.
+   */
+  SponsoringOwnerCount?: number
+  /**
+   * The number of accounts for which this account is sponsoring the account
+   * reserve (i.e., accounts created via sponsored Payment transactions where
+   * this account was the sponsor).
+   */
+  SponsoringAccountCount?: number
 }
 
 /**
