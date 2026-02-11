@@ -132,9 +132,7 @@ describe('Granular Permissions', function () {
 
       // Accessing an undefined permission should return undefined
       expect(
-        (definitions.granularPermissions as Record<string, number>)[
-          'NonExistentPermission'
-        ],
+        definitions.granularPermissions['NonExistentPermission'],
       ).toBeUndefined()
     })
   })
