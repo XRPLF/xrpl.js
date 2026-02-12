@@ -166,6 +166,22 @@ export interface VaultInfoResponse extends BaseResponse {
       WithdrawalPolicy?: number
 
       /**
+       * The maximum asset amount that can be held in the vault. Zero value indicates there is no cap.
+       */
+      AssetsMaximum?: string
+
+      /**
+       * Arbitrary metadata about the Vault. Limited to 256 bytes.
+       */
+      Data?: string
+
+      /**
+       * The scaling factor for vault shares. Only applicable for IOU assets.
+       * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
+       */
+      Scale?: number
+
+      /**
        * Flags
        */
       Flags?: number
