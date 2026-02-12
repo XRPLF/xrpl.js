@@ -191,7 +191,6 @@ describe('VaultCreate', function () {
         currency: 'USD',
         issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       }
-      // @ts-expect-error for test
       tx.Scale = 'invalid'
       assertInvalid(tx, 'VaultCreate: invalid field Scale')
     })
