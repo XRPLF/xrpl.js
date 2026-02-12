@@ -63,7 +63,7 @@ abstract class Int extends Comparable<Int | number> {
   ): void {
     if (val < min || val > max) {
       throw new Error(
-        `Invalid ${this.constructor.name}: ${val} must be >= ${min} and <= ${max}`,
+        `Invalid ${this.name}: ${val} must be >= ${min} and <= ${max}`,
       )
     }
   }

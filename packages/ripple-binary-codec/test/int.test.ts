@@ -48,25 +48,33 @@ describe('Int32', () => {
   describe('range validation', () => {
     it('should throw error when value exceeds MAX_VALUE', () => {
       expect(() => Int32.from(2147483648)).toThrow(
-        '2147483648 must be >= -2147483648 and <= 2147483647',
+        new Error(
+          'Invalid Int32: 2147483648 must be >= -2147483648 and <= 2147483647',
+        ),
       )
     })
 
     it('should throw error when value is below MIN_VALUE', () => {
       expect(() => Int32.from(-2147483649)).toThrow(
-        '-2147483649 must be >= -2147483648 and <= 2147483647',
+        new Error(
+          'Invalid Int32: -2147483649 must be >= -2147483648 and <= 2147483647',
+        ),
       )
     })
 
     it('should throw error for string exceeding MAX_VALUE', () => {
       expect(() => Int32.from('2147483648')).toThrow(
-        '2147483648 must be >= -2147483648 and <= 2147483647',
+        new Error(
+          'Invalid Int32: 2147483648 must be >= -2147483648 and <= 2147483647',
+        ),
       )
     })
 
     it('should throw error for string below MIN_VALUE', () => {
       expect(() => Int32.from('-2147483649')).toThrow(
-        '-2147483649 must be >= -2147483648 and <= 2147483647',
+        new Error(
+          'Invalid Int32: -2147483649 must be >= -2147483648 and <= 2147483647',
+        ),
       )
     })
   })
@@ -74,25 +82,25 @@ describe('Int32', () => {
   describe('decimal validation', () => {
     it('should throw error when passed a decimal number', () => {
       expect(() => Int32.from(100.5)).toThrow(
-        'Cannot construct Int32 from given value',
+        new Error('Cannot construct Int32 from given value'),
       )
     })
 
     it('should throw error when passed a negative decimal', () => {
       expect(() => Int32.from(-100.5)).toThrow(
-        'Cannot construct Int32 from given value',
+        new Error('Cannot construct Int32 from given value'),
       )
     })
 
     it('should throw error when passed a small decimal', () => {
       expect(() => Int32.from(0.001)).toThrow(
-        'Cannot construct Int32 from given value',
+        new Error('Cannot construct Int32 from given value'),
       )
     })
 
     it('should throw error for non-numeric string', () => {
       expect(() => Int32.from('abc')).toThrow(
-        'Cannot construct Int32 from string: abc',
+        new Error('Cannot construct Int32 from string: abc'),
       )
     })
   })
@@ -176,7 +184,6 @@ describe('Int32', () => {
     it('can encode and decode Loan with negative LoanScale', () => {
       const encoded = encode(loanWithScale)
       const decoded = decode(encoded)
-      console.log(decoded)
       expect(decoded).toEqual(loanWithScale)
     })
 
