@@ -174,11 +174,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
     // For IOU assets, Scale must be between 0 and 18 inclusive
     if (isIOU) {
-      if (
-        typeof tx.Scale !== 'number' ||
-        tx.Scale < 0 ||
-        tx.Scale > MAX_SCALE
-      ) {
+      if (!Number.isInteger(tx.Scale) || tx.Scale < 0 || tx.Scale > MAX_SCALE) {
         throw new ValidationError(
           `VaultCreate: Scale must be a number between 0 and ${MAX_SCALE} inclusive for IOU assets`,
         )
