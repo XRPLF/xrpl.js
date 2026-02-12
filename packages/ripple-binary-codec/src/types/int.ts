@@ -51,19 +51,21 @@ abstract class Int extends Comparable<Int | number> {
   /**
    * Validate that a number is within the specified signed integer range
    *
+   * @param typeName The name of the type (for error messages)
    * @param val The number to validate
    * @param min The minimum allowed value
    * @param max The maximum allowed value
    * @throws Error if the value is out of range
    */
   static checkIntRange(
+    typeName: string,
     val: number | bigint,
     min: number | bigint,
     max: number | bigint,
   ): void {
     if (val < min || val > max) {
       throw new Error(
-        `Invalid ${this.name}: ${val} must be >= ${min} and <= ${max}`,
+        `Invalid ${typeName}: ${val} must be >= ${min} and <= ${max}`,
       )
     }
   }

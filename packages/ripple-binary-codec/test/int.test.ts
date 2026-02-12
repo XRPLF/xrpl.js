@@ -98,6 +98,12 @@ describe('Int32', () => {
       )
     })
 
+    it('should throw error for decimal string', () => {
+      expect(() => Int32.from('1.23')).toThrow(
+        new Error('Cannot construct Int32 from string: 1.23'),
+      )
+    })
+
     it('should throw error for non-numeric string', () => {
       expect(() => Int32.from('abc')).toThrow(
         new Error('Cannot construct Int32 from string: abc'),

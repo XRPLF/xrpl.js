@@ -41,17 +41,17 @@ class Int32 extends Int {
     const buf = new Uint8Array(Int32.width)
 
     if (typeof val === 'string') {
-      const num = Number.parseInt(val, 10)
-      if (!Number.isInteger(num)) {
+      const num = Number(val)
+      if (!Number.isFinite(num) || !Number.isInteger(num)) {
         throw new Error(`Cannot construct Int32 from string: ${val}`)
       }
-      Int32.checkIntRange(num, Int32.MIN_VALUE, Int32.MAX_VALUE)
+      Int32.checkIntRange('Int32', num, Int32.MIN_VALUE, Int32.MAX_VALUE)
       writeInt32BE(buf, num, 0)
       return new Int32(buf)
     }
 
     if (typeof val === 'number' && Number.isInteger(val)) {
-      Int32.checkIntRange(val, Int32.MIN_VALUE, Int32.MAX_VALUE)
+      Int32.checkIntRange('Int32', val, Int32.MIN_VALUE, Int32.MAX_VALUE)
       writeInt32BE(buf, val, 0)
       return new Int32(buf)
     }
