@@ -1,4 +1,5 @@
 import { Int32 } from '../src/types'
+import { encode, decode } from '../src'
 
 describe('Int32', () => {
   describe('from()', () => {
@@ -150,6 +151,40 @@ describe('Int32', () => {
     it('should handle negative values in bitwise operations', () => {
       const val = Int32.from(-1)
       expect(val.valueOf() & 0xff).toBe(255)
+    })
+  })
+
+  describe('encode/decode with Loan ledger entry', () => {
+    // Loan object from Devnet with LoanScale field
+    const loanWithScale = {
+      Borrower: 'rs5fUokF7Y5bxNkstM4p4JYHgqzYkFamCg',
+      GracePeriod: 60,
+      LoanBrokerID:
+        '18F91BD8009DAF09B5E4663BE7A395F5F193D0657B12F8D1E781EB3D449E8151',
+      LoanScale: -11,
+      LoanSequence: 1,
+      NextPaymentDueDate: 822779431,
+      PaymentInterval: 400,
+      PaymentRemaining: 1,
+      PeriodicPayment: '10000',
+      PrincipalOutstanding: '10000',
+      StartDate: 822779031,
+      TotalValueOutstanding: '10000',
+      LedgerEntryType: 'Loan',
+    }
+
+    it('can encode and decode Loan with negative LoanScale', () => {
+      const encoded = encode(loanWithScale)
+      const decoded = decode(encoded)
+      console.log(decoded)
+      expect(decoded).toEqual(loanWithScale)
+    })
+
+    it('can encode and decode Loan with positive LoanScale', () => {
+      const loan = { ...loanWithScale, LoanScale: 5 }
+      const encoded = encode(loan)
+      const decoded = decode(encoded)
+      expect(decoded).toEqual(loan)
     })
   })
 })
