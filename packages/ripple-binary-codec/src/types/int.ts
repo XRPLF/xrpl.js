@@ -57,6 +57,7 @@ abstract class Int extends Comparable<Int | number> {
    * @param max The maximum allowed value
    * @throws Error if the value is out of range
    */
+  // eslint-disable-next-line max-params -- for error clarity in browsers
   static checkIntRange(
     typeName: string,
     val: number | bigint,
