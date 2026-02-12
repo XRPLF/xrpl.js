@@ -110,6 +110,7 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '9999900000000000000000000',
+        Scale: 2,
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)
@@ -136,6 +137,7 @@ describe('Single Asset Vault', function () {
       )
       assert.equal(vault.Data, tx.Data)
       assert.equal(assetsMaximum, '99999e20')
+      assert.equal(vault.Scale, 2)
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data
@@ -206,6 +208,8 @@ describe('Single Asset Vault', function () {
           issuer: issuerWallet.classicAddress,
           value: withdrawAmount,
         },
+        Destination: holderWallet.classicAddress,
+        DestinationTag: 10,
         Fee: '5000000',
       }
 
