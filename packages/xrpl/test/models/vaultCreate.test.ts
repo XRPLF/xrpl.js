@@ -192,7 +192,10 @@ describe('VaultCreate', function () {
         issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       }
       tx.Scale = 'invalid'
-      assertInvalid(tx, 'VaultCreate: invalid field Scale')
+      assertInvalid(
+        tx,
+        'VaultCreate: invalid field Scale, expected a valid number',
+      )
     })
 
     it('allows no Scale for IOU asset', function () {
