@@ -21,6 +21,12 @@ export function createResponse(
       )}`,
     )
   }
+  if (response.type === 'error' && 'value' in response) {
+    const value = JSON.parse(response.value as string)
+    value.id = request.id
+    response.value = JSON.stringify(value)
+    return JSON.stringify(response)
+  }
   return JSON.stringify({ ...response, id: request.id })
 }
 
