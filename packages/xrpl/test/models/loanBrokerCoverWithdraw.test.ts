@@ -44,7 +44,10 @@ describe('unit test LoanBrokerCoverWithdraw', () => {
       mpt_issuanceId: '0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47',
       value: '1000000',
     }
-    assertInvalid(tx, 'LoanBrokerCoverWithdraw: invalid field Amount')
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: invalid field Amount, expected a valid Amount',
+    )
 
     delete tx.Amount
     assertInvalid(tx, 'LoanBrokerCoverWithdraw: missing field Amount')

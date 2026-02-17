@@ -80,7 +80,10 @@ describe('DepositPreauth', function () {
 
   it('throws when Authorize is not a string', function () {
     depositPreauth.Authorize = 1234
-    assertInvalid(depositPreauth, 'DepositPreauth: Authorize must be a string')
+    assertInvalid(
+      depositPreauth,
+      'DepositPreauth: invalid field Authorize, expected a valid account address',
+    )
   })
 
   it('throws when an Account attempts to preauthorize its own address', function () {
@@ -95,7 +98,7 @@ describe('DepositPreauth', function () {
     depositPreauth.Unauthorize = 1234
     assertInvalid(
       depositPreauth,
-      'DepositPreauth: Unauthorize must be a string',
+      'DepositPreauth: invalid field Unauthorize, expected a valid account address',
     )
   })
 
@@ -108,14 +111,16 @@ describe('DepositPreauth', function () {
   })
 
   it('throws when AuthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials must be an array'
+    const errorMessage =
+      'DepositPreauth: invalid field CredentialIDs, expected a valid array'
     depositPreauth.AuthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)
   })
 
   it('throws when UnauthorizeCredentials is not an array', function () {
-    const errorMessage = 'DepositPreauth: Credentials must be an array'
+    const errorMessage =
+      'DepositPreauth: invalid field CredentialIDs, expected a valid array'
     depositPreauth.UnauthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)
