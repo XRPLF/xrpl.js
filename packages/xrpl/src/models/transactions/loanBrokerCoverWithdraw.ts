@@ -11,6 +11,7 @@ import {
   Account,
   validateOptionalField,
   isAccount,
+  isNumber,
 } from './common'
 
 /**
@@ -35,6 +36,11 @@ export interface LoanBrokerCoverWithdraw extends BaseTransaction {
    * An account to receive the assets. It must be able to receive the asset.
    */
   Destination?: Account
+
+  /**
+   * Arbitrary tag identifying the reason for the withdrawal to the destination.
+   */
+  DestinationTag?: number
 }
 
 /**
@@ -51,6 +57,7 @@ export function validateLoanBrokerCoverWithdraw(
   validateRequiredField(tx, 'LoanBrokerID', isString)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

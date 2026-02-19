@@ -61,7 +61,7 @@ describe('Lending Protocol IT', () => {
   }, TIMEOUT)
 
   it(
-    'LoanSet: with single signing',
+    'Lending protocol integration test with single signing',
     async () => {
       const vaultOwnerWallet = await generateFundedWallet(testContext.client)
       const depositorWallet = await generateFundedWallet(testContext.client)
@@ -70,6 +70,8 @@ describe('Lending Protocol IT', () => {
       // The Vault Owner and Loan Broker must be on the same account.
       const loanBrokerWallet = vaultOwnerWallet
 
+      // ========== STEP 1: Create Vault ==========
+      // The vault is the pool of funds that the loan broker will lend from
       const vaultCreateTx: VaultCreate = {
         TransactionType: 'VaultCreate',
         Asset: {
@@ -90,7 +92,8 @@ describe('Lending Protocol IT', () => {
         vaultCreateResp.result.tx_json.Sequence as number,
       )
 
-      // Depositor deposits 10 XRP into the vault
+      // ========== STEP 2: Deposit Funds into Vault ==========
+      // The depositor funds the vault with 10 XRP that will be lent to borrowers
       const vaultDepositTx: VaultDeposit = {
         TransactionType: 'VaultDeposit',
         Account: depositorWallet.address,
@@ -100,12 +103,14 @@ describe('Lending Protocol IT', () => {
 
       await testTransaction(testContext.client, vaultDepositTx, depositorWallet)
 
-      // Create LoanBroker ledger object to capture attributes of the Lending Protocol
+      // ========== STEP 3: Create Loan Broker ==========
+      // The loan broker manages the lending protocol and sets debt limits
       const loanBrokerSetTx: LoanBrokerSet = {
         TransactionType: 'LoanBrokerSet',
         Account: loanBrokerWallet.address,
         VaultID: vaultObjectId,
         DebtMaximum: '25000000',
+        ManagementFeeRate: 10000,
       }
 
       const loanBrokerTxResp = await testTransaction(
@@ -119,7 +124,7 @@ describe('Lending Protocol IT', () => {
         loanBrokerTxResp.result.tx_json.Sequence as number,
       )
 
-      // Assert LoanBroker object exists in objects tracked by Lender.
+      // Verify LoanBroker object was created
       const loanBrokerObjects = await testContext.client.request({
         command: 'account_objects',
         account: loanBrokerWallet.address,
@@ -134,14 +139,17 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
-      // Broker initiates the Loan.
+      // ========== STEP 4: Create Loan ==========
+      // The loan broker initiates a loan for the borrower
+      // This requires dual signatures: broker and borrower
       let loanSetTx: LoanSet = {
         TransactionType: 'LoanSet',
         Account: loanBrokerWallet.address,
         LoanBrokerID: loanBrokerObjectId,
         PrincipalRequested: '5000000',
         Counterparty: borrowerWallet.address,
-        PaymentTotal: 1,
+        PaymentTotal: 3,
+        Data: '010203',
       }
       loanSetTx = await testContext.client.autofill(loanSetTx)
       const { tx_blob } = loanBrokerWallet.sign(loanSetTx)
@@ -173,6 +181,7 @@ describe('Lending Protocol IT', () => {
         (obj) => obj.index === loanObjectId,
       ) as Loan
 
+      // Verify Loan object was created with correct fields
       assert.equal(loanObject.index, loanObjectId)
       assert.equal(
         loanObject.PrincipalOutstanding,
@@ -181,6 +190,88 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanObject.LoanBrokerID, loanBrokerObject.index)
       assert.equal(loanObject.Borrower, borrowerWallet.address)
       assert.equal(loanObject.PaymentRemaining, loanSetTx.PaymentTotal)
+
+      // ========== STEP 5: Make Loan Payment ==========
+      // Borrower makes a periodic payment on the loan
+      const paymentAmount = '2500000'
+      const loanPayTx: LoanPay = {
+        TransactionType: 'LoanPay',
+        Account: borrowerWallet.address,
+        LoanID: loanObjectId,
+        Amount: paymentAmount,
+      }
+
+      await testTransaction(testContext.client, loanPayTx, borrowerWallet)
+
+      // Verify loan state after payment
+      const updatedLoanObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+
+      const paidLoan: Loan = updatedLoanObjects.result.account_objects.find(
+        (obj) => obj.index === loanObjectId,
+      ) as Loan
+
+      // After payment, the principal outstanding should be reduced
+      assert.isTrue(
+        parseInt(paidLoan.PrincipalOutstanding, 10) <
+          parseInt(loanObject.PrincipalOutstanding, 10),
+        'Principal should decrease after payment',
+      )
+      // Payment remaining should be decremented
+      assert.equal(
+        paidLoan.PaymentRemaining,
+        loanObject.PaymentRemaining - 1,
+        'Payment remaining should decrease by 1',
+      )
+
+      // assert principal outstanding is not zero
+      assert.isTrue(
+        parseInt(paidLoan.PrincipalOutstanding, 10) > 0,
+        'Principal should not be zero',
+      )
+
+      assert.equal(
+        paidLoan.PrincipalOutstanding,
+        paidLoan.TotalValueOutstanding,
+        'Principal should equal TotalValueOutstanding',
+      )
+
+      // ManagementFeeOutstanding = (TotalValueOutstanding - PrincipalOutstanding) * ManagementFeeRate
+      // In this case, ManagementFeeOutstanding should be zero, thus unspecified
+      assert.isUndefined(paidLoan.ManagementFeeOutstanding)
+
+      // ========== STEP 5B: Make Second Payment with tfLoanFullPayment Flag ==========
+      // Borrower makes the final payment with tfLoanFullPayment flag
+      // This flag indicates the borrower is making a full early repayment
+      const finalPaymentAmount = paidLoan.PrincipalOutstanding
+      const fullPaymentTx: LoanPay = {
+        TransactionType: 'LoanPay',
+        Account: borrowerWallet.address,
+        LoanID: loanObjectId,
+        Amount: finalPaymentAmount,
+        Flags: {
+          tfLoanFullPayment: true,
+        },
+      }
+
+      await testTransaction(testContext.client, fullPaymentTx, borrowerWallet)
+
+      // Verify loan state after full payment
+      const finalLoanObjects = await testContext.client.request({
+        command: 'account_objects',
+        account: borrowerWallet.address,
+        type: 'loan',
+      })
+
+      const finalLoan: Loan = finalLoanObjects.result.account_objects.find(
+        (obj) => obj.index === loanObjectId,
+      ) as Loan
+
+      assert.isUndefined(finalLoan.PrincipalOutstanding)
+      assert.isUndefined(finalLoan.PaymentRemaining)
     },
     TIMEOUT,
   )
@@ -416,6 +507,8 @@ describe('Lending Protocol IT', () => {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '25000',
         },
+        Destination: loanBrokerWallet.address,
+        DestinationTag: 10,
       }
       await testTransaction(
         testContext.client,

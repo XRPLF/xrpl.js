@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.7.0 (2026-02-12)
+
+### Added
+* Add `Int32` serialized type.
+
 ### Fixed
 * Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
 * Error if a decimal is passed into a `UInt`-typed field.
