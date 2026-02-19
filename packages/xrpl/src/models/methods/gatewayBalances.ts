@@ -20,8 +20,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface GatewayBalancesRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'gateway_balances'
   /** The Address to check. This should be the issuing address. */
   account: string
