@@ -144,8 +144,8 @@ export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedAccountsAndTransactions
-  extends LedgerRequest {
+// eslint-disable-next-line max-len -- Disable for interface declaration.
+export interface LedgerRequestExpandedAccountsAndTransactions extends LedgerRequest {
   expand: true
   accounts: true
   transactions: true
@@ -202,14 +202,18 @@ export interface LedgerQueueData {
   max_spend_drops?: string
 }
 
-export interface LedgerBinary
-  extends Omit<Ledger, 'transactions' | 'accountState'> {
+export interface LedgerBinary extends Omit<
+  Ledger,
+  'transactions' | 'accountState'
+> {
   accountState?: string[]
   transactions?: string[]
 }
 
-export interface LedgerBinaryV1
-  extends Omit<LedgerV1, 'transactions' | 'accountState'> {
+export interface LedgerBinaryV1 extends Omit<
+  LedgerV1,
+  'transactions' | 'accountState'
+> {
   accountState?: string[]
   transactions?: string[]
 }
