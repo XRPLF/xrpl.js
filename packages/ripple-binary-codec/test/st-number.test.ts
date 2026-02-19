@@ -4,21 +4,58 @@ import { coreTypes } from '../src/types'
 const { Number: STNumber } = coreTypes
 
 describe('STNumber', () => {
-  it('should encode and decode integers', () => {
-    const value = '9876543210'
+  it('+ve normal value', () => {
+    const value = '99'
     const sn = STNumber.from(value)
     expect(sn.toJSON()).toEqual(value)
   })
-  it('roundtrip integer', () => {
-    const value = '123456789'
-    const num = STNumber.from(value)
-    expect(num.toJSON()).toEqual('123456789')
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve very large value', () => {
+    const value = '100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e11')
   })
 
-  it('roundtrip negative integer', () => {
-    const value = '-987654321'
-    const num = STNumber.from(value)
-    expect(num.toJSON()).toEqual('-987654321')
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve large value', () => {
+    const value = '10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('10000000000')
+  })
+
+  it('-ve normal value', () => {
+    const value = '-123'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual(value)
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve very large value', () => {
+    const value = '-100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-1e11')
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve large value', () => {
+    const value = '-10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-10000000000')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve very small value', () => {
+    const value = '0.00000000001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e-11')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve small value', () => {
+    const value = '0.0001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0001')
   })
 
   it('roundtrip zero', () => {
@@ -36,26 +73,27 @@ describe('STNumber', () => {
   it('roundtrip scientific notation positive', () => {
     const value = '1.23e5'
     const num = STNumber.from(value)
-    // NOTE: The codec always outputs the normalized value as a decimal string,
-    // not necessarily in scientific notation. Only exponents < -25 or > -5
-    // will use scientific notation. So "1.23e5" becomes "123000".
+    // scientific notation triggers in when abs(value) >= 10^11
     expect(num.toJSON()).toEqual('123000')
   })
 
   it('roundtrip scientific notation negative', () => {
     const value = '-4.56e-7'
     const num = STNumber.from(value)
-    // NOTE: The output is the normalized decimal form of the value.
-    // "-4.56e-7" becomes "-0.000000456" as per XRPL codec behavior.
+    // scientific notation triggers in when abs(value) < 10^-10
     expect(num.toJSON()).toEqual('-0.000000456')
   })
 
-  it('roundtrip large exponent', () => {
-    const value = '7.89e+20'
-    const num = STNumber.from(value)
-    // NOTE: The XRPL codec will output this in normalized scientific form,
-    // as mantissa=7890000000000000, exponent=5, so the output is '7890000000000000e5'.
-    expect(num.toJSON()).toEqual('7890000000000000e5')
+  it('-ve medium value', () => {
+    const value = '-987654321'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-987654321')
+  })
+
+  it('+ve medium value', () => {
+    const value = '987654321'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('987654321')
   })
 
   it('roundtrip via parser', () => {
@@ -96,6 +134,71 @@ describe('STNumber', () => {
     const value = '-1.2e2'
     const num = STNumber.from(value)
     expect(num.toJSON()).toEqual('-120')
+  })
+
+  it('decimal without exponent', () => {
+    const value = '0.5'
+    const num = STNumber.from(value)
+    const parser = new BinaryParser(num.toHex())
+    const parsedNum = STNumber.fromParser(parser)
+    expect(parsedNum.toJSON()).toEqual('0.5')
+  })
+
+  it('rounds up mantissa', () => {
+    const value = '9223372036854775895'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9223372036854775900')
+  })
+
+  it('rounds down mantissa', () => {
+    const value = '9323372036854775804'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9323372036854775800')
+  })
+
+  it('small value with trailing zeros', () => {
+    const value = '0.002500'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0025')
+  })
+
+  it('large value with trailing zeros', () => {
+    const value = '9900000000000000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e20')
+  })
+
+  it('small value with leading zeros', () => {
+    const value = '0.0000000000000000000099'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e-22')
+  })
+
+  it('mantissa > MAX_MANTISSA', () => {
+    const value = '9999999999999999999999'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e22')
+  })
+
+  it('mantissa > MAX_INT64', () => {
+    const value = '92233720368547758079'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('922337203685477581e2')
+  })
+
+  it('throws on exponent overflow (value too large)', () => {
+    // 1e40000 has exponent 40000, after normalization exponent = 40000 - 18 = 39982
+    // which exceeds MAX_EXPONENT (32768)
+    expect(() => {
+      STNumber.from('1e40000')
+    }).toThrow(new Error('Exponent overflow: value too large to represent'))
+  })
+
+  it('underflow returns zero (value too small)', () => {
+    // 1e-40000 has exponent -40000, which is less than MIN_EXPONENT (-32768)
+    expect(() => {
+      STNumber.from('1e-40000')
+    }).toThrow(new Error('Underflow: value too small to represent'))
   })
 
   it('throws with invalid input (non-number string)', () => {

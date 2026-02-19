@@ -56,6 +56,17 @@ export default interface LoanBroker extends BaseLedgerEntry, HasPreviousTxnID {
   OwnerCount?: number
 
   /**
+   * Arbitrary metadata in hex format. The field is limited to 256 bytes.
+   */
+  Data?: string
+
+  /**
+   * The 1/10th basis point fee charged by the Lending Protocol. Valid values are between 0 and 10000 inclusive.
+   * A value of 1 is equivalent to 1/10 bps or 0.001%
+   */
+  ManagementFeeRate?: number
+
+  /**
    * The total asset amount the protocol owes the Vault, including interest.
    */
   DebtTotal?: XRPLNumber

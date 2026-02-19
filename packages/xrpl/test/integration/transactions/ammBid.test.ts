@@ -58,7 +58,7 @@ describe('AMMBid', function () {
 
     const afterPriceValue = parseFloat(auction_slot.price.value)
     const beforePriceValue = parseFloat(preAuctionSlot.price.value)
-    const diffPriceValue = 0.00268319257224121
+    const diffPriceValue = 0.002683192572241211
     const expectedPriceValue = beforePriceValue + diffPriceValue
 
     const afterLPTokenValue = parseFloat(lp_token.value)
