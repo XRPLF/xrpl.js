@@ -3,6 +3,7 @@ import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType, JsonObject } from './serialized-type'
 import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
+import { Issue, MPT_WIDTH } from './issue'
 
 /**
  * Constants for separating Paths in a PathSet
@@ -16,14 +17,16 @@ const PATH_SEPARATOR_BYTE = 0xff
 const TYPE_ACCOUNT = 0x01
 const TYPE_CURRENCY = 0x10
 const TYPE_ISSUER = 0x20
+const TYPE_MPT = 0x40
 
 /**
- * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency
+ * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency. Alternatively, this could also contain an MPTIssuanceID
  */
 interface HopObject extends JsonObject {
   issuer?: string
   account?: string
   currency?: string
+  mpt_issuance_id?: string
 }
 
 /**
@@ -31,9 +34,9 @@ interface HopObject extends JsonObject {
  */
 function isHopObject(arg): arg is HopObject {
   return (
-    arg.issuer !== undefined ||
+    (arg.issuer !== undefined ||
     arg.account !== undefined ||
-    arg.currency !== undefined
+    arg.currency !== undefined) || arg.mpt_issuance_id !== undefined
   )
 }
 
@@ -47,6 +50,8 @@ function isPathSet(arg): arg is Array<Array<HopObject>> {
     (Array.isArray(arg) && Array.isArray(arg[0]) && isHopObject(arg[0][0]))
   )
 }
+
+// Keshava TODO: Add unit tests for validating the behavior of Hop class, over and above the integ tests
 
 /**
  * Serialize and Deserialize a Hop
@@ -73,6 +78,9 @@ class Hop extends SerializedType {
     if (value.currency) {
       bytes.push(Currency.from(value.currency).toBytes())
       bytes[0][0] |= TYPE_CURRENCY
+    } else if (value.mpt_issuance_id) {
+      bytes.push(Issue.from({mpt_issuance_id: value.mpt_issuance_id}).toBytes())
+      bytes[0][0] |= TYPE_MPT
     }
 
     if (value.issuer) {
@@ -99,6 +107,8 @@ class Hop extends SerializedType {
 
     if (type & TYPE_CURRENCY) {
       bytes.push(parser.read(Currency.width))
+    } else if (type & TYPE_MPT) {
+      bytes.push(parser.read(MPT_WIDTH))
     }
 
     if (type & TYPE_ISSUER) {
@@ -117,13 +127,17 @@ class Hop extends SerializedType {
     const hopParser = new BinaryParser(bytesToHex(this.bytes))
     const type = hopParser.readUInt8()
 
-    let account, currency, issuer
+    let account, currency, issuer, mpt_issuance_id
     if (type & TYPE_ACCOUNT) {
       account = (AccountID.fromParser(hopParser) as AccountID).toJSON()
     }
 
     if (type & TYPE_CURRENCY) {
       currency = (Currency.fromParser(hopParser) as Currency).toJSON()
+    }
+
+    if (type & TYPE_MPT) {
+      mpt_issuance_id = Issue.fromParser(hopParser).toJSON()
     }
 
     if (type & TYPE_ISSUER) {
@@ -141,6 +155,10 @@ class Hop extends SerializedType {
 
     if (currency) {
       result.currency = currency
+    }
+
+    if (mpt_issuance_id) {
+      result.mpt_issuance_id = mpt_issuance_id
     }
 
     return result
