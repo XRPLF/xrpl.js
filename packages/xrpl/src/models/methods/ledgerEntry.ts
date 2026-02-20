@@ -45,10 +45,14 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
     asset: {
       currency: string
       issuer?: string
+    } | {
+      mpt_issuance_id: string
     }
     asset2: {
       currency: string
       issuer?: string
+    } | {
+      mpt_issuance_id: string
     }
   }
   /**

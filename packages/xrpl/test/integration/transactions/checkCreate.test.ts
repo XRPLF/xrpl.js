@@ -66,7 +66,6 @@ describe('CheckCreate', function () {
         TransactionType: 'CheckCreate',
         Account: testContext.wallet.classicAddress,
         Destination: checkDestinationWallet.classicAddress,
-        // @ts-expect-error -- MPTAmount support will be added to CheckCreate.SendMax
         SendMax: {
           mpt_issuance_id: mptIssuanceId,
           value: '50',

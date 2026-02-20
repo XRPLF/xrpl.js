@@ -76,7 +76,6 @@ describe('ripple_path_find', function () {
         subcommand: 'create',
         source_account: issuerWallet.classicAddress,
         destination_account: paymentDestinationWallet.classicAddress,
-        // @ts-expect-error -- MPTAmount support will be added to RipplePathFindRequest.destination_amount
         destination_amount: {
           mpt_issuance_id: mptIssuanceId,
           value: '100',

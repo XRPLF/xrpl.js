@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { LedgerEntryRequest, LedgerEntryResponse } from '../../../src'
+import type AMM from '../../../src/models/ledger/AMM'
 import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
@@ -65,7 +66,6 @@ describe('ledger_entry', function () {
 
       const ledgerEntryResponse = await testContext.client.request({
         command: 'ledger_entry',
-        // @ts-expect-error -- AMM field with MPTCurrency support will be added to LedgerEntryRequest
         amm: {
           asset,
           asset2,
@@ -74,22 +74,16 @@ describe('ledger_entry', function () {
 
       assert.equal(ledgerEntryResponse.type, 'response')
 
-      const node = ledgerEntryResponse.result.node
-      // @ts-expect-error -- node type will be updated
+      const node = ledgerEntryResponse.result.node as unknown as AMM
       assert.equal(node.LedgerEntryType, 'AMM')
-      // @ts-expect-error -- node type will be updated
       assert.deepEqual(node.Asset, {
         mpt_issuance_id: asset.mpt_issuance_id,
       })
-      // @ts-expect-error -- node type will be updated
       assert.deepEqual(node.Asset2, {
         mpt_issuance_id: asset2.mpt_issuance_id,
       })
-      // @ts-expect-error -- node type will be updated
       assert.equal(node.TradingFee, 12)
-      // @ts-expect-error -- node type will be updated
       assert.ok(node.LPTokenBalance)
-      // @ts-expect-error -- node type will be updated
       assert.ok(node.Account)
     },
     TIMEOUT,

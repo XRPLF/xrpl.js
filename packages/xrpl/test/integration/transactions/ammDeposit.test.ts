@@ -314,7 +314,6 @@ describe('AMMDeposit', function () {
       Account: lpWallet.classicAddress,
       Asset: asset,
       Asset2: asset2,
-      // @ts-expect-error -- MPTAmount support will be added to AMMDeposit.Amount
       Amount: {
         mpt_issuance_id: asset.mpt_issuance_id,
         value: '100',

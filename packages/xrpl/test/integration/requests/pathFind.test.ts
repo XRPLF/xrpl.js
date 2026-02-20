@@ -141,7 +141,6 @@ describe('path_find', function () {
         subcommand: 'create',
         source_account: issuerWallet.classicAddress,
         destination_account: paymentDestinationWallet.classicAddress,
-        // @ts-expect-error -- MPTAmount support will be added to PathFindRequest.destination_amount
         destination_amount: {
           mpt_issuance_id: mptIssuanceId,
           value: '100',

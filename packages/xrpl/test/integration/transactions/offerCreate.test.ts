@@ -132,7 +132,6 @@ describe('OfferCreate', function () {
       const tx: OfferCreate = {
         TransactionType: 'OfferCreate',
         Account: sourceWallet.classicAddress,
-        // @ts-expect-error -- MPTAmount support will be added to OfferCreate.TakerGets
         TakerGets: {
           mpt_issuance_id: mptIssuanceId,
           value: '10',
