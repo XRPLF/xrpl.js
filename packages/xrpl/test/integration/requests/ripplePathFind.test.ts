@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { RipplePathFindRequest, RipplePathFindResponse } from '../../../src'
+import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -52,6 +53,48 @@ describe('ripple_path_find', function () {
       }
 
       assert.deepEqual(response, expectedResponse)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'ripple_path_find with MPT',
+    async () => {
+      const issuerWallet = await generateFundedWallet(testContext.client)
+      const paymentDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuerWallet,
+        paymentDestinationWallet,
+      )
+
+      const ripplePathFind: RipplePathFindRequest = {
+        command: 'ripple_path_find',
+        subcommand: 'create',
+        source_account: issuerWallet.classicAddress,
+        destination_account: paymentDestinationWallet.classicAddress,
+        // @ts-expect-error -- MPTAmount support will be added to RipplePathFindRequest.destination_amount
+        destination_amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '100',
+        },
+      }
+
+      const response = await testContext.client.request(ripplePathFind)
+
+      assert.equal(response.type, 'response')
+      assert.deepEqual(response.result.destination_amount, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '100',
+      })
+      assert.isAtLeast(
+        response.result.alternatives.length,
+        1,
+        'Should find at least one alternative path',
+      )
     },
     TIMEOUT,
   )
