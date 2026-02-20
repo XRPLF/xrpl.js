@@ -4,9 +4,12 @@ import {
   Payment,
   Wallet,
   MPTokenIssuanceCreate,
+  MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
+  AMMCreate,
   TransactionMetadata,
 } from '../../../src'
+import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -198,5 +201,106 @@ describe('Payment', function () {
       )
     },
     TIMEOUT,
+  )
+
+  it(
+    'Payment with MPT PathSet',
+    async () => {
+      const issuer1 = await generateFundedWallet(testContext.client)
+      const issuer2 = await generateFundedWallet(testContext.client)
+      const lpWallet = await generateFundedWallet(testContext.client)
+      const destination = await generateFundedWallet(testContext.client)
+
+      const mptFlags =
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+        MPTokenIssuanceCreateFlags.tfMPTCanTransfer
+
+      // Create MPT_A (issuer1) and authorize + fund LP
+      const mptIdA = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuer1,
+        lpWallet,
+        mptFlags,
+        '10000',
+      )
+
+      // Create MPT_B (issuer2) and authorize + fund LP
+      const mptIdB = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuer2,
+        lpWallet,
+        mptFlags,
+        '10000',
+      )
+
+      // Authorize destination to hold MPT_B
+      const authTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: destination.classicAddress,
+        MPTokenIssuanceID: mptIdB,
+      }
+      await testTransaction(testContext.client, authTx, destination)
+
+      // Create AMM pool: XRP / MPT_A
+      const ammCreate1: AMMCreate = {
+        TransactionType: 'AMMCreate',
+        Account: lpWallet.classicAddress,
+        Amount: '1000000',
+        Amount2: {
+          mpt_issuance_id: mptIdA,
+          value: '1000',
+        },
+        TradingFee: 12,
+      }
+      await testTransaction(testContext.client, ammCreate1, lpWallet)
+
+      // Create AMM pool: MPT_A / MPT_B
+      const ammCreate2: AMMCreate = {
+        TransactionType: 'AMMCreate',
+        Account: lpWallet.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptIdA,
+          value: '1000',
+        },
+        Amount2: {
+          mpt_issuance_id: mptIdB,
+          value: '1000',
+        },
+        TradingFee: 12,
+      }
+      await testTransaction(testContext.client, ammCreate2, lpWallet)
+
+      // Create AMM pool: XRP / MPT_B
+      const ammCreate3: AMMCreate = {
+        TransactionType: 'AMMCreate',
+        Account: lpWallet.classicAddress,
+        Amount: '1000000',
+        Amount2: {
+          mpt_issuance_id: mptIdB,
+          value: '1000',
+        },
+        TradingFee: 12,
+      }
+      await testTransaction(testContext.client, ammCreate3, lpWallet)
+
+      // Cross-currency payment: XRP → MPT_B with two alternative paths
+      // Path 1: XRP → MPT_A → MPT_B (via XRP/MPT_A and MPT_A/MPT_B pools)
+      // Path 2: XRP → MPT_B (via XRP/MPT_B pool)
+      const payTx: Payment = {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptIdB,
+          value: '5',
+        },
+        SendMax: '500000',
+        // @ts-expect-error -- mpt_issuance_id not yet in PathStep type
+        Paths: [[{ mpt_issuance_id: mptIdA }], [{ mpt_issuance_id: mptIdB }]],
+      }
+
+      await testTransaction(testContext.client, payTx, testContext.wallet)
+    },
+    60000,
   )
 })
