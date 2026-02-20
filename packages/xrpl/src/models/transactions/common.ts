@@ -84,6 +84,9 @@ const ISSUE_CURRENCY_SIZE = 2
 const MPT_CURRENCY_AMOUNT_SIZE = 2
 const ISSUED_CURRENCY_AMOUNT_SIZE = 3
 
+// MPT Issuance ID length (Hash192 = 24 bytes = 48 hex chars)
+const MPT_ISSUANCE_ID_LENGTH = 48
+
 const XCHAIN_BRIDGE_SIZE = 4
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
@@ -234,6 +237,16 @@ export function isAuthorizeCredential(
 }
 
 /**
+ * Verify that a string is a valid MPT Issuance ID (48 hex characters).
+ *
+ * @param id - The string to validate.
+ * @returns Whether the string is a properly formed MPT Issuance ID.
+ */
+function isValidMPTIssuanceId(id: string): boolean {
+  return id.length === MPT_ISSUANCE_ID_LENGTH && HEX_REGEX.test(id)
+}
+
+/**
  * Verify the form and type of an MPT at runtime.
  *
  * @param input - The input to check the form and type of.
@@ -244,7 +257,8 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
     isRecord(input) &&
     Object.keys(input).length === MPT_CURRENCY_AMOUNT_SIZE &&
     typeof input.value === 'string' &&
-    typeof input.mpt_issuance_id === 'string'
+    typeof input.mpt_issuance_id === 'string' &&
+    isValidMPTIssuanceId(input.mpt_issuance_id as string)
   )
 }
 

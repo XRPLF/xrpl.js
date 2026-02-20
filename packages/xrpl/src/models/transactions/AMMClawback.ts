@@ -1,13 +1,19 @@
 import { ValidationError } from '../../errors'
-import { Currency, IssuedCurrency, IssuedCurrencyAmount } from '../common'
+import {
+  Currency,
+  IssuedCurrencyAmount,
+  MPTAmount,
+} from '../common'
 
 import {
   Account,
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isCurrency,
   isIssuedCurrency,
   isIssuedCurrencyAmount,
+  isMPTAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -52,22 +58,24 @@ export interface AMMClawback extends BaseTransaction {
 
   /**
    * Specifies the asset that the issuer wants to claw back from the AMM pool.
-   * In JSON, this is an object with currency and issuer fields. The issuer field must match with Account.
+   * In JSON, this is an object with currency and issuer fields (or mpt_issuance_id for MPT).
+   * For issued currencies, the issuer field must match with Account.
    */
-  Asset: IssuedCurrency
+  Asset: Currency
 
   /**
    * Specifies the other asset in the AMM's pool. In JSON, this is an object with currency and
-   * issuer fields (omit issuer for XRP).
+   * issuer fields (omit issuer for XRP), or mpt_issuance_id for MPT.
    */
   Asset2: Currency
 
   /**
-   * The maximum amount to claw back from the AMM account. The currency and issuer subfields should match
-   * the Asset subfields. If this field isn't specified, or the value subfield exceeds the holder's available
+   * The maximum amount to claw back from the AMM account. For issued currencies, the currency and
+   * issuer subfields should match the Asset subfields. For MPT, the mpt_issuance_id should match.
+   * If this field isn't specified, or the value subfield exceeds the holder's available
    * tokens in the AMM, all of the holder's tokens will be clawed back.
    */
-  Amount?: IssuedCurrencyAmount
+  Amount?: IssuedCurrencyAmount | MPTAmount
 }
 
 /**
@@ -76,32 +84,44 @@ export interface AMMClawback extends BaseTransaction {
  * @param tx - An AMMClawback Transaction.
  * @throws {ValidationError} When the transaction is malformed.
  */
+function isClawbackAmountValid(
+  input: unknown,
+): input is IssuedCurrencyAmount | MPTAmount {
+  return isIssuedCurrencyAmount(input) || isMPTAmount(input)
+}
+
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Holder', isAccount)
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isCurrency)
 
   const asset = tx.Asset
 
-  if (tx.Holder === asset.issuer) {
-    throw new ValidationError(
-      'AMMClawback: Holder and Asset.issuer must be distinct',
-    )
+  if (isIssuedCurrency(asset)) {
+    if (tx.Holder === asset.issuer) {
+      throw new ValidationError(
+        'AMMClawback: Holder and Asset.issuer must be distinct',
+      )
+    }
+
+    if (tx.Account !== asset.issuer) {
+      throw new ValidationError(
+        'AMMClawback: Account must be the same as Asset.issuer',
+      )
+    }
   }
 
-  if (tx.Account !== asset.issuer) {
-    throw new ValidationError(
-      'AMMClawback: Account must be the same as Asset.issuer',
-    )
-  }
+  validateRequiredField(tx, 'Asset2', isCurrency)
 
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateOptionalField(tx, 'Amount', isClawbackAmountValid)
 
-  validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount)
-
-  if (tx.Amount != null) {
+  if (
+    tx.Amount != null &&
+    isIssuedCurrencyAmount(tx.Amount) &&
+    isIssuedCurrency(asset)
+  ) {
     if (tx.Amount.currency !== asset.currency) {
       throw new ValidationError(
         'AMMClawback: Amount.currency must match Asset.currency',

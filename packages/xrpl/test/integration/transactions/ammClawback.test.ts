@@ -78,10 +78,8 @@ describe('AMMClawback', function () {
       TransactionType: 'AMMClawback',
       Account: issuerWallet1.classicAddress,
       Holder: lpWallet.classicAddress,
-      // @ts-expect-error -- MPTCurrency support will be added to AMMClawback.Asset
       Asset: asset,
       Asset2: asset2,
-      // @ts-expect-error -- MPTAmount support will be added to AMMClawback.Amount
       Amount: {
         mpt_issuance_id: asset.mpt_issuance_id,
         value: '10',
