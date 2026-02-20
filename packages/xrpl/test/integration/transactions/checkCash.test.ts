@@ -1,6 +1,7 @@
 import { assert } from 'chai'
 
 import { CheckCreate, CheckCash } from '../../../src'
+import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -66,6 +67,75 @@ describe('CheckCash', function () {
       })
       assert.lengthOf(
         accountOffersResponse.result.account_objects,
+        0,
+        'Should be no checks on the ledger',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'CheckCash with MPT',
+    async () => {
+      const checkDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        testContext.wallet,
+        checkDestinationWallet,
+      )
+
+      // Create a check with MPT
+      const setupTx: CheckCreate = {
+        TransactionType: 'CheckCreate',
+        Account: testContext.wallet.classicAddress,
+        Destination: checkDestinationWallet.classicAddress,
+        // @ts-expect-error -- MPTAmount support will be added to CheckCreate.SendMax
+        SendMax: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '50',
+        },
+      }
+
+      await testTransaction(testContext.client, setupTx, testContext.wallet)
+
+      // Get check ID
+      const response1 = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'check',
+      })
+      assert.lengthOf(
+        response1.result.account_objects,
+        1,
+        'Should be exactly one check on the ledger',
+      )
+      const checkId = response1.result.account_objects[0].index
+
+      // Cash the check with MPT
+      const tx: CheckCash = {
+        TransactionType: 'CheckCash',
+        Account: checkDestinationWallet.classicAddress,
+        CheckID: checkId,
+        // @ts-expect-error -- MPTAmount support will be added to CheckCash.Amount
+        Amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '50',
+        },
+      }
+
+      await testTransaction(testContext.client, tx, checkDestinationWallet)
+
+      // Confirm the check no longer exists
+      const accountObjectsResponse = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'check',
+      })
+      assert.lengthOf(
+        accountObjectsResponse.result.account_objects,
         0,
         'Should be no checks on the ledger',
       )

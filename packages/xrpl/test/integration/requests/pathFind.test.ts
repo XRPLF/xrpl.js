@@ -7,6 +7,7 @@ import {
   Client,
   PathFindStream,
 } from '../../../src'
+import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -117,6 +118,50 @@ describe('path_find', function () {
       await ledgerAccept(testContext.client)
 
       await pathFindPromise
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'path_find with MPT',
+    async () => {
+      const issuerWallet = await generateFundedWallet(testContext.client)
+      const paymentDestinationWallet = await generateFundedWallet(
+        testContext.client,
+      )
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuerWallet,
+        paymentDestinationWallet,
+      )
+
+      const pathFind: PathFindRequest = {
+        command: 'path_find',
+        subcommand: 'create',
+        source_account: issuerWallet.classicAddress,
+        destination_account: paymentDestinationWallet.classicAddress,
+        // @ts-expect-error -- MPTAmount support will be added to PathFindRequest.destination_amount
+        destination_amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '100',
+        },
+      }
+
+      const response = await testContext.client.request(pathFind)
+
+      assert.equal(response.type, 'response')
+      assert.deepEqual(response.result.destination_amount, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '100',
+      })
+
+      // Close the path_find
+      const closeResponse = await testContext.client.request({
+        command: 'path_find',
+        subcommand: 'close',
+      })
+      assert.equal(closeResponse.type, 'response')
     },
     TIMEOUT,
   )

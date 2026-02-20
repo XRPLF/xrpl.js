@@ -9,6 +9,7 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { createAMMPool } from '../utils'
+import { createAMMPoolWithMPT } from '../mptUtils'
 
 describe('AMMCreate', function () {
   let testContext: XrplIntegrationTestContext
@@ -37,6 +38,29 @@ describe('AMMCreate', function () {
     assert.deepEqual(amm.amount2, {
       currency: asset2.currency,
       issuer: asset2.issuer,
+      value: '250',
+    })
+    assert.equal(amm.trading_fee, 12)
+  })
+
+  it('creates AMM pool with two MPT assets', async function () {
+    const ammPool = await createAMMPoolWithMPT(testContext.client)
+    const { asset, asset2 } = ammPool
+
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm } = ammInfoRes.result
+
+    assert.isTrue(isValidClassicAddress(amm.account))
+    assert.deepEqual(amm.amount, {
+      mpt_issuance_id: asset.mpt_issuance_id,
+      value: '250',
+    })
+    assert.deepEqual(amm.amount2, {
+      mpt_issuance_id: asset2.mpt_issuance_id,
       value: '250',
     })
     assert.equal(amm.trading_fee, 12)
