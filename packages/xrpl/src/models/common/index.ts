@@ -69,6 +69,7 @@ export interface PathStep {
   account?: string
   currency?: string
   issuer?: string
+  mpt_issuance_id?: string
 }
 
 export type Path = PathStep[]

@@ -295,7 +295,6 @@ describe('Payment', function () {
           value: '5',
         },
         SendMax: '500000',
-        // @ts-expect-error -- mpt_issuance_id not yet in PathStep type
         Paths: [[{ mpt_issuance_id: mptIdA }], [{ mpt_issuance_id: mptIdB }]],
       }
 
