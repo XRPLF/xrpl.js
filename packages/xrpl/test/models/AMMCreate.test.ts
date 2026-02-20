@@ -1,5 +1,9 @@
 import { validateAMMCreate } from '../../src/models/transactions/AMMCreate'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMCreate)
 const assertInvalid = (tx: any, message: string): void =>
@@ -77,6 +81,63 @@ describe('AMMCreate', function () {
   it(`throws when TradingFee is a negative number`, function () {
     ammCreate.TradingFee = -1
     const errorMessage = 'AMMCreate: TradingFee must be between 0 and 1000'
+    assertInvalid(ammCreate, errorMessage)
+  })
+
+  // MPT-related tests
+  it(`verifies valid AMMCreate with two MPT assets`, function () {
+    ammCreate.Amount = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '250',
+    }
+    ammCreate.Amount2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '250',
+    }
+    assertValid(ammCreate)
+  })
+
+  it(`throws w/ Amount mpt_issuance_id contains non-hex characters`, function () {
+    ammCreate.Amount = {
+      mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+      value: '250',
+    }
+    ammCreate.Amount2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '250',
+    }
+    const errorMessage = 'AMMCreate: Amount must be an Amount'
+    assertInvalid(ammCreate, errorMessage)
+  })
+
+  it(`throws w/ Amount mpt_issuance_id too short`, function () {
+    ammCreate.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+      value: '250',
+    }
+    ammCreate.Amount2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '250',
+    }
+    const errorMessage = 'AMMCreate: Amount must be an Amount'
+    assertInvalid(ammCreate, errorMessage)
+  })
+
+  it(`throws w/ Amount mpt_issuance_id too long`, function () {
+    ammCreate.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+      value: '250',
+    }
+    ammCreate.Amount2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '250',
+    }
+    const errorMessage = 'AMMCreate: Amount must be an Amount'
     assertInvalid(ammCreate, errorMessage)
   })
 })

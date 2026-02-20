@@ -2,7 +2,11 @@ import {
   AMMClawbackFlags,
   validateAMMClawback,
 } from '../../src/models/transactions/AMMClawback'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMClawback)
 const assertInvalid = (tx: any, message: string): void =>
@@ -116,5 +120,116 @@ describe('AMMClawback', function () {
     ammClawback.Amount.issuer = 'rnYgaEtpqpNRt3wxE39demVpDAA817rQEY'
     const errorMessage = 'AMMClawback: Amount.issuer must match Amount.issuer'
     assertInvalid(ammClawback, errorMessage)
+  })
+
+  // MPT-related tests
+  it(`verifies valid AMMClawback with MPT`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Asset2: {
+        mpt_issuance_id:
+          '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Amount: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        value: '10',
+      },
+      Sequence: 1337,
+    }
+    assertValid(mptClawback)
+  })
+
+  it(`verifies valid AMMClawback with MPT without Amount`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Asset2: {
+        mpt_issuance_id:
+          '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Sequence: 1337,
+    }
+    assertValid(mptClawback)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Asset2: {
+        mpt_issuance_id:
+          '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Amount: {
+        mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+        value: '10',
+      },
+      Sequence: 1337,
+    }
+    const errorMessage = 'AMMClawback: invalid field Amount'
+    assertInvalid(mptClawback, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Asset2: {
+        mpt_issuance_id:
+          '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Amount: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+        value: '10',
+      },
+      Sequence: 1337,
+    }
+    const errorMessage = 'AMMClawback: invalid field Amount'
+    assertInvalid(mptClawback, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id:
+          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Asset2: {
+        mpt_issuance_id:
+          '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      },
+      Amount: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+        value: '10',
+      },
+      Sequence: 1337,
+    }
+    const errorMessage = 'AMMClawback: invalid field Amount'
+    assertInvalid(mptClawback, errorMessage)
   })
 })

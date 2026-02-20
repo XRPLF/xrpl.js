@@ -2,7 +2,11 @@
 
 import { AMMWithdrawFlags } from '../../src'
 import { validateAMMWithdraw } from '../../src/models/transactions/AMMWithdraw'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMWithdraw)
 const assertInvalid = (tx: any, message: string): void =>
@@ -149,6 +153,79 @@ describe('AMMWithdraw', function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = 1234
     const errorMessage = 'AMMWithdraw: EPrice must be an Amount'
+    assertInvalid(withdraw, errorMessage)
+  })
+
+  // MPT-related tests
+  it(`verifies valid AMMWithdraw with single MPT asset`, function () {
+    withdraw.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Amount = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '50',
+    }
+    withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
+    assertValid(withdraw)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
+    withdraw.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Amount = {
+      mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+      value: '50',
+    }
+    withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
+    const errorMessage = 'AMMWithdraw: Amount must be an Amount'
+    assertInvalid(withdraw, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
+    withdraw.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+      value: '50',
+    }
+    withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
+    const errorMessage = 'AMMWithdraw: Amount must be an Amount'
+    assertInvalid(withdraw, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
+    withdraw.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    withdraw.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+      value: '50',
+    }
+    withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
+    const errorMessage = 'AMMWithdraw: Amount must be an Amount'
     assertInvalid(withdraw, errorMessage)
   })
 })

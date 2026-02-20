@@ -2,7 +2,11 @@
 
 import { AMMDepositFlags } from '../../src'
 import { validateAMMDeposit } from '../../src/models/transactions/AMMDeposit'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMDeposit)
 const assertInvalid = (tx: any, message: string): void =>
@@ -143,6 +147,79 @@ describe('AMMDeposit', function () {
     deposit.Amount = '1000'
     deposit.EPrice = 1234
     const errorMessage = 'AMMDeposit: EPrice must be an Amount'
+    assertInvalid(deposit, errorMessage)
+  })
+
+  // MPT-related tests
+  it(`verifies valid AMMDeposit with single MPT asset`, function () {
+    deposit.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Amount = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      value: '100',
+    }
+    deposit.Flags |= AMMDepositFlags.tfSingleAsset
+    assertValid(deposit)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
+    deposit.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Amount = {
+      mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+      value: '100',
+    }
+    deposit.Flags |= AMMDepositFlags.tfSingleAsset
+    const errorMessage = 'AMMDeposit: Amount must be an Amount'
+    assertInvalid(deposit, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
+    deposit.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+      value: '100',
+    }
+    deposit.Flags |= AMMDepositFlags.tfSingleAsset
+    const errorMessage = 'AMMDeposit: Amount must be an Amount'
+    assertInvalid(deposit, errorMessage)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
+    deposit.Asset = {
+      mpt_issuance_id:
+        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Asset2 = {
+      mpt_issuance_id:
+        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+    }
+    deposit.Amount = {
+      mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+      value: '100',
+    }
+    deposit.Flags |= AMMDepositFlags.tfSingleAsset
+    const errorMessage = 'AMMDeposit: Amount must be an Amount'
     assertInvalid(deposit, errorMessage)
   })
 })

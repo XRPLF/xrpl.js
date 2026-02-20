@@ -15,6 +15,11 @@ import {
 import addresses from './fixtures/addresses.json'
 
 /**
+ * The expected hex character length of an MPT Issuance ID (Hash192 = 24 bytes = 48 hex chars).
+ */
+export const MPTID_LENGTH = 48
+
+/**
  * Setup to run tests on both classic addresses and X-addresses.
  */
 export const addressTests = [
