@@ -10,8 +10,11 @@ import { decode, encode } from 'ripple-binary-codec'
 import { ValidationError, XrplError } from '../../errors'
 import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
-import { LedgerVersionMap } from '../../models/ledger/Ledger'
-import { Transaction, TransactionMetadata } from '../../models/transactions'
+import {
+  LedgerVersionMap,
+  LedgerTransactionExpanded,
+} from '../../models/ledger/Ledger'
+import { Transaction } from '../../models/transactions'
 import { GlobalFlags } from '../../models/transactions/common'
 import { hasFlag } from '../../models/utils'
 
@@ -131,7 +134,7 @@ export function hashLedgerHeader(
  * @category Utilities
  */
 export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
+  transactions: LedgerTransactionExpanded[],
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
@@ -177,7 +180,9 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTree(ledger.transactions)
+  const transactionHash = hashTxTree(
+    ledger.transactions as LedgerTransactionExpanded[],
+  )
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(
