@@ -11,6 +11,8 @@ describe('LedgerTransactionExpanded types', function () {
   it('Ledger (v2) transactions use flat format with metaData', function () {
     const tx: LedgerTransactionExpanded = {
       Account: 'rPrioTXJgZJF8bpdXq2X73PcVPfvYqjVKd',
+      Amount: '1000000',
+      Destination: 'rsRy14FvipgqudiGmptJBhr1RtpsgfzKMM',
       TransactionType: 'Payment',
       Fee: '11',
       Sequence: 1,
@@ -31,14 +33,31 @@ describe('LedgerTransactionExpanded types', function () {
     }
 
     assert.isArray(ledgerV2.transactions)
-    assert.strictEqual(ledgerV2.transactions![0].hash, tx.hash)
-    assert.isDefined(ledgerV2.transactions![0].metaData)
+    const firstTx = ledgerV2.transactions![0]
+    assert.notEqual(typeof firstTx, 'string')
+    if (typeof firstTx !== 'string') {
+      assert.strictEqual(firstTx.hash, tx.hash)
+      assert.isDefined(firstTx.metaData)
+    }
+  })
+
+  it('Ledger transactions can also be hash strings', function () {
+    const ledgerV2: Pick<Ledger, 'transactions'> = {
+      transactions: [
+        '044314FE34236A262DA692789CE5B48CA1A3CEC078B1A4ECCD65F4B61A9EB0A7',
+      ],
+    }
+
+    assert.isArray(ledgerV2.transactions)
+    assert.strictEqual(typeof ledgerV2.transactions![0], 'string')
   })
 
   it('LedgerV1 transactions use wrapped format with tx_json and meta', function () {
     const tx: LedgerTransactionExpandedV1 = {
       tx_json: {
         Account: 'rPrioTXJgZJF8bpdXq2X73PcVPfvYqjVKd',
+        Amount: '1000000',
+        Destination: 'rsRy14FvipgqudiGmptJBhr1RtpsgfzKMM',
         TransactionType: 'Payment',
         Fee: '11',
         Sequence: 1,
@@ -65,8 +84,12 @@ describe('LedgerTransactionExpanded types', function () {
     }
 
     assert.isArray(ledgerV1.transactions)
-    assert.strictEqual(ledgerV1.transactions![0].hash, tx.hash)
-    assert.isDefined(ledgerV1.transactions![0].tx_json)
-    assert.isDefined(ledgerV1.transactions![0].meta)
+    const firstTx = ledgerV1.transactions![0]
+    assert.notEqual(typeof firstTx, 'string')
+    if (typeof firstTx !== 'string') {
+      assert.strictEqual(firstTx.hash, tx.hash)
+      assert.isDefined(firstTx.tx_json)
+      assert.isDefined(firstTx.meta)
+    }
   })
 })

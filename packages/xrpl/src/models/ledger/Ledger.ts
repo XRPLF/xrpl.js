@@ -96,7 +96,7 @@ export interface Ledger extends BaseLedger {
    * full representations of the transactions as flat objects with the
    * transaction fields directly on the object, plus `hash` and `metaData`.
    */
-  transactions?: Array<LedgerTransactionExpanded>
+  transactions?: Array<string | LedgerTransactionExpanded>
 }
 
 /**
@@ -117,7 +117,7 @@ export interface LedgerV1 extends BaseLedger {
    * full representations of the transactions wrapped in objects with
    * `tx_json` and `meta` fields.
    */
-  transactions?: Array<LedgerTransactionExpandedV1>
+  transactions?: Array<string | LedgerTransactionExpandedV1>
 }
 
 /**
