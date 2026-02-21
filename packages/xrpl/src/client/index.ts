@@ -263,7 +263,7 @@ class Client extends EventEmitter<EventTypes> {
     })
 
     this.connection.on('reconnect', () => {
-      this.connection.on('connected', () => this.emit('connected'))
+      this.connection.once('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {

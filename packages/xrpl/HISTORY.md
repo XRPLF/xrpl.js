@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. Changed `.on()` to `.once()` in the Client constructor's reconnect handler to prevent listener accumulation.
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
