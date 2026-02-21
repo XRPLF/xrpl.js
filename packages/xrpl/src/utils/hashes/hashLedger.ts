@@ -10,8 +10,12 @@ import { decode, encode } from 'ripple-binary-codec'
 import { ValidationError, XrplError } from '../../errors'
 import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
-import { LedgerVersionMap } from '../../models/ledger/Ledger'
-import { Transaction, TransactionMetadata } from '../../models/transactions'
+import {
+  LedgerVersionMap,
+  LedgerTransactionExpanded,
+  LedgerTransactionExpandedV1,
+} from '../../models/ledger/Ledger'
+import { Transaction } from '../../models/transactions'
 import { GlobalFlags } from '../../models/transactions/common'
 import { hasFlag } from '../../models/utils'
 
@@ -131,7 +135,7 @@ export function hashLedgerHeader(
  * @category Utilities
  */
 export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
+  transactions: LedgerTransactionExpanded[],
 ): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
@@ -177,7 +181,32 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTree(ledger.transactions)
+    // Normalize transactions to the v2 flat format expected by hashTxTree.
+  // V1 expanded transactions wrap data in { tx_json, meta }, while v2 has
+  // the transaction fields directly on the object with metaData.
+  const normalizedTransactions = (
+    ledger.transactions as Array<
+      string | LedgerTransactionExpanded | LedgerTransactionExpandedV1
+    >
+  )
+    .filter(
+      (
+        tx,
+      ): tx is LedgerTransactionExpanded | LedgerTransactionExpandedV1 =>
+        typeof tx !== 'string',
+    )
+    .map((tx) => {
+      if ('tx_json' in tx) {
+        // V1 wrapped format — normalize to v2 flat format
+        return Object.assign({}, tx.tx_json, {
+          hash: tx.hash,
+          metaData: tx.meta,
+        }) as LedgerTransactionExpanded
+      }
+      return tx
+    })
+
+  const transactionHash = hashTxTree(normalizedTransactions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(

@@ -150,4 +150,5 @@ describe('hashLedger', function () {
       'transactionHash in header does not match computed hash of transactions',
     )
   })
+
 })
