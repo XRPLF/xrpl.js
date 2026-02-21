@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. The fix cleans up stale listeners from previous reconnect attempts to prevent duplicate event emissions on flaky connections with multiple sequential reconnect attempts.
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
