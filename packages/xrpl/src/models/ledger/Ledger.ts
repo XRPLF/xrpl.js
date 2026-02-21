@@ -92,11 +92,9 @@ export interface Ledger extends BaseLedger {
    */
   ledger_index: number
   /**
-   * Transactions applied in this ledger version. By default, members are the
-   * transactions' identifying Hash strings. If the request specified expand as
-   * true, members are full representations of the transactions instead, in
-   * either JSON or binary depending on whether the request specified binary
-   * as true.
+   * Transactions applied in this ledger version. When expanded, members are
+   * full representations of the transactions as flat objects with the
+   * transaction fields directly on the object, plus `hash` and `metaData`.
    */
   transactions?: Array<LedgerTransactionExpanded>
 }
@@ -115,10 +113,9 @@ export interface LedgerV1 extends BaseLedger {
    */
   ledger_index: string
   /**
-   * Transactions applied in this ledger version. By default, members are the
-   * transactions' identifying Hash strings. If the request specified expand as
-   * true, members are full representations of the transactions instead,
-   * wrapped in objects with `tx_json` and `meta` fields.
+   * Transactions applied in this ledger version. When expanded, members are
+   * full representations of the transactions wrapped in objects with
+   * `tx_json` and `meta` fields.
    */
   transactions?: Array<LedgerTransactionExpandedV1>
 }
