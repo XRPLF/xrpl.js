@@ -373,6 +373,39 @@ export function validateHexMetadata(
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
+ * Infer expected type name from validator function for better error messages
+ *
+ * @param checkValidity - The validator function
+ * @returns Human-readable type name for error messages
+ */
+function inferTypeName(checkValidity: (inp: unknown) => boolean): string {
+  const fnName = checkValidity.name
+  
+  // Map common validator function names to type descriptions
+  const typeMap: Record<string, string> = {
+    isString: 'a string',
+    isNumber: 'a number',
+    isAccount: 'a valid account address',
+    isAmount: 'a valid amount',
+    isRecord: 'an object',
+    isArray: 'an array',
+    isMemo: 'a valid Memo',
+    isSigner: 'a valid Signer',
+    isCurrency: 'a valid Currency',
+    isIssuedCurrency: 'a valid IssuedCurrency',
+    isIssuedCurrencyAmount: 'a valid IssuedCurrencyAmount',
+    isMPTAmount: 'a valid MPTAmount',
+    isXChainBridge: 'a valid XChainBridge',
+    isAuthorizeCredential: 'a valid AuthorizeCredential',
+    isLedgerEntryId: 'a valid ledger entry ID',
+    isXRPLNumber: 'a valid XRPL number string',
+    isDomainID: 'a valid domain ID',
+  }
+  
+  return typeMap[fnName] || 'valid'
+}
+
+/**
  * Verify the form and type of a required type for a transaction at runtime.
  *
  * @param tx - The object input to check the form and type of.
@@ -406,8 +439,10 @@ export function validateRequiredField<
   }
 
   if (!checkValidity(tx[param])) {
+    const expectedType = inferTypeName(checkValidity)
+    const actualType = typeof tx[param]
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      `${txType}: ${String(paramNameStr)} must be ${expectedType}, received ${actualType}`,
     )
   }
 }
@@ -440,8 +475,10 @@ export function validateOptionalField<
   const paramNameStr = errorOpts.paramName ?? param
   const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] !== undefined && !checkValidity(tx[param])) {
+    const expectedType = inferTypeName(checkValidity)
+    const actualType = typeof tx[param]
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      `${txType}: ${String(paramNameStr)} must be ${expectedType}, received ${actualType}`,
     )
   }
 }
