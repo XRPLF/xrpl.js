@@ -153,16 +153,13 @@ describe('AMMDeposit', function () {
   // MPT-related tests
   it(`verifies valid AMMDeposit with single MPT asset`, function () {
     deposit.Asset = {
-      mpt_issuance_id:
-        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Asset2 = {
-      mpt_issuance_id:
-        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Amount = {
-      mpt_issuance_id:
-        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
       value: '100',
     }
     deposit.Flags |= AMMDepositFlags.tfSingleAsset
@@ -171,12 +168,10 @@ describe('AMMDeposit', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
     deposit.Asset = {
-      mpt_issuance_id:
-        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Asset2 = {
-      mpt_issuance_id:
-        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Amount = {
       mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
@@ -189,12 +184,10 @@ describe('AMMDeposit', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
     deposit.Asset = {
-      mpt_issuance_id:
-        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Asset2 = {
-      mpt_issuance_id:
-        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Amount = {
       mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
@@ -207,12 +200,10 @@ describe('AMMDeposit', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
     deposit.Asset = {
-      mpt_issuance_id:
-        '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Asset2 = {
-      mpt_issuance_id:
-        '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
     }
     deposit.Amount = {
       mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),

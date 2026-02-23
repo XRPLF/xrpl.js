@@ -1,9 +1,5 @@
 import { ValidationError } from '../../errors'
-import {
-  Currency,
-  IssuedCurrencyAmount,
-  MPTAmount,
-} from '../common'
+import { Currency, IssuedCurrencyAmount, MPTAmount } from '../common'
 
 import {
   Account,
@@ -79,10 +75,10 @@ export interface AMMClawback extends BaseTransaction {
 }
 
 /**
- * Verify the form and type of an AMMClawback at runtime.
+ * Verify the form and type of Clawback Amount at runtime.
  *
- * @param tx - An AMMClawback Transaction.
- * @throws {ValidationError} When the transaction is malformed.
+ * @param input - The amount expected to be Clawed back.
+ * @returns True if the input is an IssuedCurrencyAmount or MPTAmount.
  */
 function isClawbackAmountValid(
   input: unknown,
@@ -90,6 +86,12 @@ function isClawbackAmountValid(
   return isIssuedCurrencyAmount(input) || isMPTAmount(input)
 }
 
+/**
+ * Validates an AMMClawback transaction.
+ *
+ * @param tx - The AMMClawback transaction to validate.
+ * @throws {ValidationError} When the transaction fields are invalid.
+ */
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 

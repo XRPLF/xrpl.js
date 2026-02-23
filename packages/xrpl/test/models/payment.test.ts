@@ -263,9 +263,7 @@ describe('Payment', function () {
   })
 
   it(`verifies valid Payment with MPT PathStep`, function () {
-    payment.Paths = [
-      [{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH) }],
-    ]
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH) }]]
     assertValid(payment)
   })
 
@@ -278,23 +276,17 @@ describe('Payment', function () {
   })
 
   it(`throws when Paths has MPT PathStep with non-hex mpt_issuance_id`, function () {
-    payment.Paths = [
-      [{ mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }],
-    ]
+    payment.Paths = [[{ mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }]]
     assertInvalid(payment, 'PaymentTransaction: invalid Paths')
   })
 
   it(`throws when Paths has MPT PathStep with too-short mpt_issuance_id`, function () {
-    payment.Paths = [
-      [{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }],
-    ]
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }]]
     assertInvalid(payment, 'PaymentTransaction: invalid Paths')
   })
 
   it(`throws when Paths has MPT PathStep with too-long mpt_issuance_id`, function () {
-    payment.Paths = [
-      [{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1) }],
-    ]
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1) }]]
     assertInvalid(payment, 'PaymentTransaction: invalid Paths')
   })
 })

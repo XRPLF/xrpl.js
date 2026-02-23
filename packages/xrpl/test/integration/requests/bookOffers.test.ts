@@ -67,7 +67,7 @@ describe('book_offers', function () {
         testContext.client,
         issuerWallet,
         sourceWallet,
-        // eslint-disable-next-line no-bitwise -- combining MPT issuance flags
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
         MPTokenIssuanceCreateFlags.tfMPTCanTrade |
           MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
       )
