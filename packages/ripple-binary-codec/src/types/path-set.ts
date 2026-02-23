@@ -3,7 +3,7 @@ import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType, JsonObject } from './serialized-type'
 import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
-import { Issue, MPT_WIDTH } from './issue'
+import { Hash192 } from './hash-192'
 
 /**
  * Constants for separating Paths in a PathSet
@@ -77,13 +77,17 @@ class Hop extends SerializedType {
       bytes[0][0] |= TYPE_ACCOUNT
     }
 
+    if (value.currency && value.mpt_issuance_id) {
+      throw new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop',
+      )
+    }
+
     if (value.currency) {
       bytes.push(Currency.from(value.currency).toBytes())
       bytes[0][0] |= TYPE_CURRENCY
     } else if (value.mpt_issuance_id) {
-      bytes.push(
-        Issue.from({ mpt_issuance_id: value.mpt_issuance_id }).toBytes(),
-      )
+      bytes.push(Hash192.from(value.mpt_issuance_id).toBytes())
       bytes[0][0] |= TYPE_MPT
     }
 
@@ -105,6 +109,12 @@ class Hop extends SerializedType {
     const type = parser.readUInt8()
     const bytes: Array<Uint8Array> = [Uint8Array.from([type])]
 
+    if (type & TYPE_CURRENCY && type & TYPE_MPT) {
+      throw new Error(
+        'Invalid binary input: Currency and mpt_issuance_id are mutually exclusive in a path hop',
+      )
+    }
+
     if (type & TYPE_ACCOUNT) {
       bytes.push(parser.read(AccountID.width))
     }
@@ -112,7 +122,7 @@ class Hop extends SerializedType {
     if (type & TYPE_CURRENCY) {
       bytes.push(parser.read(Currency.width))
     } else if (type & TYPE_MPT) {
-      bytes.push(parser.read(MPT_WIDTH))
+      bytes.push(parser.read(Hash192.width))
     }
 
     if (type & TYPE_ISSUER) {
@@ -141,7 +151,7 @@ class Hop extends SerializedType {
     }
 
     if (type & TYPE_MPT) {
-      mpt_issuance_id = Issue.fromParser(hopParser).toJSON()
+      mpt_issuance_id = (Hash192.fromParser(hopParser) as Hash192).toHex()
     }
 
     if (type & TYPE_ISSUER) {
