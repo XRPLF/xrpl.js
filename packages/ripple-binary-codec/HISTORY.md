@@ -12,6 +12,7 @@
 
 ### Added
 * Add `Int32` serialized type.
+* Introduce unit tests for the `PathSet` rippled type
 
 ### Fixed
 * Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].

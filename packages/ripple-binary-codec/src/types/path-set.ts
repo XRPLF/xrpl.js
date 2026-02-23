@@ -20,7 +20,8 @@ const TYPE_ISSUER = 0x20
 const TYPE_MPT = 0x40
 
 /**
- * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency. Alternatively, this could also contain an MPTIssuanceID
+ * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency.
+ * Alternatively, this could also contain an MPTIssuanceID
  */
 interface HopObject extends JsonObject {
   issuer?: string
@@ -34,9 +35,10 @@ interface HopObject extends JsonObject {
  */
 function isHopObject(arg): arg is HopObject {
   return (
-    (arg.issuer !== undefined ||
+    arg.issuer !== undefined ||
     arg.account !== undefined ||
-    arg.currency !== undefined) || arg.mpt_issuance_id !== undefined
+    arg.currency !== undefined ||
+    arg.mpt_issuance_id !== undefined
   )
 }
 
@@ -79,7 +81,9 @@ class Hop extends SerializedType {
       bytes.push(Currency.from(value.currency).toBytes())
       bytes[0][0] |= TYPE_CURRENCY
     } else if (value.mpt_issuance_id) {
-      bytes.push(Issue.from({mpt_issuance_id: value.mpt_issuance_id}).toBytes())
+      bytes.push(
+        Issue.from({ mpt_issuance_id: value.mpt_issuance_id }).toBytes(),
+      )
       bytes[0][0] |= TYPE_MPT
     }
 
@@ -305,4 +309,4 @@ class PathSet extends SerializedType {
   }
 }
 
-export { PathSet }
+export { PathSet, HopObject }
