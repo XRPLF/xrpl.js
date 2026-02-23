@@ -4,10 +4,7 @@ import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
 import type { MPTAmount } from '../../../src/models/common'
-import {
-  createAMMPoolWithMPT,
-  type TestMPTAMMPool,
-} from '../mptUtils'
+import { createAMMPoolWithMPT, type TestMPTAMMPool } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,

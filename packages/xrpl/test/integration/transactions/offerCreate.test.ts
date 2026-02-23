@@ -124,6 +124,7 @@ describe('OfferCreate', function () {
         testContext.client,
         issuerWallet,
         sourceWallet,
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
         MPTokenIssuanceCreateFlags.tfMPTCanTrade |
           MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
       )

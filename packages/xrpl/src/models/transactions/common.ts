@@ -258,7 +258,7 @@ export function isMPTAmount(input: unknown): input is MPTAmount {
     Object.keys(input).length === MPT_CURRENCY_AMOUNT_SIZE &&
     typeof input.value === 'string' &&
     typeof input.mpt_issuance_id === 'string' &&
-    isValidMPTIssuanceId(input.mpt_issuance_id as string)
+    isValidMPTIssuanceId(input.mpt_issuance_id)
   )
 }
 

@@ -120,8 +120,7 @@ describe('CheckCreate', function () {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       SendMax: {
-        mpt_issuance_id:
-          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
         value: '50',
       },
       Fee: '12',
@@ -136,8 +135,7 @@ describe('CheckCreate', function () {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       SendMax: {
-        mpt_issuance_id:
-          '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
         value: '50',
       },
       DestinationTag: 1,

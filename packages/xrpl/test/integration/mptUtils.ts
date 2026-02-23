@@ -28,7 +28,7 @@ export async function createMPTIssuance(
   const createTx: MPTokenIssuanceCreate = {
     TransactionType: 'MPTokenIssuanceCreate',
     Account: issuerWallet.classicAddress,
-    ...(flags != null ? { Flags: flags } : {}),
+    Flags: flags ?? 0,
   }
 
   const mptCreateRes = await testTransaction(client, createTx, issuerWallet)
@@ -61,10 +61,12 @@ export async function createMPTIssuance(
  * @param fundAmount - Amount of MPT to send to the holder (defaults to '100000').
  * @returns The mpt_issuance_id of the newly created issuance.
  */
+// eslint-disable-next-line max-params -- all params are distinct and necessary
 export async function createMPTIssuanceAndAuthorize(
   client: Client,
   issuerWallet: Wallet,
   holderWallet: Wallet,
+  // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
   flags: number = MPTokenIssuanceCreateFlags.tfMPTCanTrade |
     MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
   fundAmount = '100000',
@@ -116,10 +118,12 @@ export async function createAMMPoolWithMPT(
   const issuerWallet2 = await generateFundedWallet(client)
   const lpWallet = await generateFundedWallet(client)
 
+  /* eslint-disable no-bitwise -- combining flags requires bitwise OR */
   const mptFlags =
     MPTokenIssuanceCreateFlags.tfMPTCanTransfer |
     MPTokenIssuanceCreateFlags.tfMPTCanTrade |
     MPTokenIssuanceCreateFlags.tfMPTCanClawback
+  /* eslint-enable no-bitwise */
 
   const mptIssuanceId1 = await createMPTIssuanceAndAuthorize(
     client,

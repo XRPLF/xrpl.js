@@ -279,11 +279,13 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
     return true
   }
   if (pathStep.mpt_issuance_id !== undefined) {
-    if (typeof pathStep.mpt_issuance_id !== 'string')
+    if (typeof pathStep.mpt_issuance_id !== 'string') {
       return false
+    }
 
-    if(! /^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id))
+    if (!/^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id)) {
       return false
+    }
 
     return true
   }

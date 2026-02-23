@@ -300,8 +300,7 @@ describe('OfferCreate', function () {
         value: '43.11584856965009',
       },
       TakerPays: {
-        mpt_issuance_id:
-          '000004C463C52827307480341125DA0577DEFC38405BABCD',
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405BABCD',
         value: '30',
       },
       TransactionType: 'OfferCreate',
@@ -314,8 +313,7 @@ describe('OfferCreate', function () {
     const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       TakerGets: {
-        mpt_issuance_id:
-          '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
         value: '100',
       },
       TakerPays: '12928290425',
@@ -329,13 +327,11 @@ describe('OfferCreate', function () {
     const offerTx = {
       Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
       TakerGets: {
-        mpt_issuance_id:
-          '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
         value: '100',
       },
       TakerPays: {
-        mpt_issuance_id:
-          '000004C463C52827307480341125DA0577DEFC38405BABCD',
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405BABCD',
         value: '30',
       },
       TransactionType: 'OfferCreate',

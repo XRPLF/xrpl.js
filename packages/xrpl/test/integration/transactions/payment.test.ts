@@ -210,9 +210,11 @@ describe('Payment', function () {
       const lpWallet = await generateFundedWallet(testContext.client)
       const destination = await generateFundedWallet(testContext.client)
 
+      /* eslint-disable no-bitwise -- combining flags requires bitwise OR */
       const mptFlags =
         MPTokenIssuanceCreateFlags.tfMPTCanTrade |
         MPTokenIssuanceCreateFlags.tfMPTCanTransfer
+      /* eslint-enable no-bitwise */
 
       // Create MPT_B (issuer2) and authorize + fund LP
       const mptIdB = await createMPTIssuanceAndAuthorize(
@@ -249,7 +251,11 @@ describe('Payment', function () {
         Account: testContext.wallet.classicAddress,
         MPTokenIssuanceID: mptIdB,
       }
-      await testTransaction(testContext.client, authSenderMptB, testContext.wallet)
+      await testTransaction(
+        testContext.client,
+        authSenderMptB,
+        testContext.wallet,
+      )
 
       // Cross-currency payment: XRP → MPT_B with two alternative paths
       // Path 1: XRP → MPT_A → MPT_B (via XRP/MPT_A and MPT_A/MPT_B pools)
@@ -263,9 +269,7 @@ describe('Payment', function () {
           value: '5',
         },
         SendMax: '500000',
-        Paths: [
-          [{ mpt_issuance_id: mptIdB }]
-        ],
+        Paths: [[{ mpt_issuance_id: mptIdB }]],
       }
 
       await testTransaction(testContext.client, payTx, testContext.wallet)

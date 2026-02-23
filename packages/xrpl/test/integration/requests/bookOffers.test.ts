@@ -67,6 +67,7 @@ describe('book_offers', function () {
         testContext.client,
         issuerWallet,
         sourceWallet,
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
         MPTokenIssuanceCreateFlags.tfMPTCanTrade |
           MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
       )
@@ -99,11 +100,11 @@ describe('book_offers', function () {
         (offer) => offer.Account === sourceWallet.classicAddress,
       )
       assert.ok(matchingOffer, 'Should find an offer from the source wallet')
-      assert.deepEqual(matchingOffer!.TakerGets, {
+      assert.deepEqual(matchingOffer.TakerGets, {
         mpt_issuance_id: mptIssuanceId,
         value: '10',
       })
-      assert.equal(matchingOffer!.TakerPays, '100000')
+      assert.equal(matchingOffer.TakerPays, '100000')
     },
     TIMEOUT,
   )

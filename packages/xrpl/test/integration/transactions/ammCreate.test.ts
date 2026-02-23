@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { isValidClassicAddress } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
+import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -9,7 +10,6 @@ import {
   type XrplIntegrationTestContext,
 } from '../setup'
 import { createAMMPool } from '../utils'
-import { createAMMPoolWithMPT } from '../mptUtils'
 
 describe('AMMCreate', function () {
   let testContext: XrplIntegrationTestContext
