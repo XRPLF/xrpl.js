@@ -272,13 +272,13 @@ jobs:
                   '{channel: $channel, text: $text}')"
 
       - name: Install cyclonedx-npm
-        run: npm install -g @cyclonedx/cyclonedx-npm@4.0.2
+        run: npm install -g @cyclonedx/cyclonedx-npm@4.1.2
 
       - name: Generate CycloneDX SBOM
         run: cyclonedx-npm --output-format json --output-file sbom.json
 
       - name: Scan SBOM for vulnerabilities using Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.0
         with:
           scan-type: sbom
           scan-ref: sbom.json
