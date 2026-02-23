@@ -10,8 +10,12 @@ import { decode, encode } from 'ripple-binary-codec'
 import { ValidationError, XrplError } from '../../errors'
 import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
-import { LedgerVersionMap } from '../../models/ledger/Ledger'
-import { Transaction, TransactionMetadata } from '../../models/transactions'
+import {
+  LedgerVersionMap,
+  LedgerTransactionExpanded,
+  LedgerTransactionExpandedV1,
+} from '../../models/ledger/Ledger'
+import { Transaction } from '../../models/transactions'
 import { GlobalFlags } from '../../models/transactions/common'
 import { hasFlag } from '../../models/utils'
 
@@ -130,9 +134,7 @@ export function hashLedgerHeader(
  * @returns The root hash of the SHAMap.
  * @category Utilities
  */
-export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
-): string {
+export function hashTxTree(transactions: LedgerTransactionExpanded[]): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
     const txBlobHex = encode(txJSON)
@@ -163,6 +165,18 @@ export function hashStateTree(entries: LedgerEntry[]): string {
   return shamap.hash
 }
 
+/**
+ * Normalize a v1 wrapped transaction to v2 flat format.
+ */
+function normalizeToV2(
+  tx: LedgerTransactionExpanded | LedgerTransactionExpandedV1,
+): LedgerTransactionExpanded {
+  if ('tx_json' in tx) {
+    return { ...tx.tx_json, hash: tx.hash, metaData: tx.meta }
+  }
+  return tx
+}
+
 function computeTransactionHash(
   ledger: LedgerVersionMap<APIVersion>,
   options: HashLedgerHeaderOptions,
@@ -177,7 +191,19 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTree(ledger.transactions)
+  // Normalize transactions to the v2 flat format expected by hashTxTree.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger is a version union
+  const txs = ledger.transactions as Array<
+    string | LedgerTransactionExpanded | LedgerTransactionExpandedV1
+  >
+  const normalizedTransactions = txs
+    .filter(
+      (tx): tx is LedgerTransactionExpanded | LedgerTransactionExpandedV1 =>
+        typeof tx !== 'string',
+    )
+    .map(normalizeToV2)
+
+  const transactionHash = hashTxTree(normalizedTransactions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(
