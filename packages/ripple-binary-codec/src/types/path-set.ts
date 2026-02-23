@@ -53,8 +53,6 @@ function isPathSet(arg): arg is Array<Array<HopObject>> {
   )
 }
 
-// Keshava TODO: Add unit tests for validating the behavior of Hop class, over and above the integ tests
-
 /**
  * Serialize and Deserialize a Hop
  */
