@@ -5,6 +5,8 @@ import { validateAMMWithdraw } from '../../src/models/transactions/AMMWithdraw'
 import {
   assertTxIsValid,
   assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
+  MPT_ISSUANCE_ID_2,
   MPTID_LENGTH,
 } from '../testUtils'
 
@@ -159,13 +161,13 @@ describe('AMMWithdraw', function () {
   // MPT-related tests
   it(`verifies valid AMMWithdraw with single MPT asset`, function () {
     withdraw.Asset = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
     }
     withdraw.Asset2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
     }
     withdraw.Amount = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
       value: '50',
     }
     withdraw.Flags |= AMMWithdrawFlags.tfSingleAsset
@@ -174,10 +176,10 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
     withdraw.Asset = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
     }
     withdraw.Asset2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
     }
     withdraw.Amount = {
       mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
@@ -190,10 +192,10 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
     withdraw.Asset = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
     }
     withdraw.Asset2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
     }
     withdraw.Amount = {
       mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
@@ -206,10 +208,10 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
     withdraw.Asset = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
     }
     withdraw.Asset2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
     }
     withdraw.Amount = {
       mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),

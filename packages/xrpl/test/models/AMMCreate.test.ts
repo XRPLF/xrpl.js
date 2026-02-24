@@ -2,6 +2,8 @@ import { validateAMMCreate } from '../../src/models/transactions/AMMCreate'
 import {
   assertTxIsValid,
   assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
+  MPT_ISSUANCE_ID_2,
   MPTID_LENGTH,
 } from '../testUtils'
 
@@ -87,11 +89,11 @@ describe('AMMCreate', function () {
   // MPT-related tests
   it(`verifies valid AMMCreate with two MPT assets`, function () {
     ammCreate.Amount = {
-      mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
       value: '250',
     }
     ammCreate.Amount2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
       value: '250',
     }
     assertValid(ammCreate)
@@ -103,7 +105,7 @@ describe('AMMCreate', function () {
       value: '250',
     }
     ammCreate.Amount2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
       value: '250',
     }
     const errorMessage = 'AMMCreate: Amount must be an Amount'
@@ -116,7 +118,7 @@ describe('AMMCreate', function () {
       value: '250',
     }
     ammCreate.Amount2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
       value: '250',
     }
     const errorMessage = 'AMMCreate: Amount must be an Amount'
@@ -129,7 +131,7 @@ describe('AMMCreate', function () {
       value: '250',
     }
     ammCreate.Amount2 = {
-      mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+      mpt_issuance_id: MPT_ISSUANCE_ID_2,
       value: '250',
     }
     const errorMessage = 'AMMCreate: Amount must be an Amount'
