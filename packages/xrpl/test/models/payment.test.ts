@@ -5,6 +5,7 @@ import { validatePayment } from '../../src/models/transactions/payment'
 import {
   assertTxIsValid,
   assertTxValidationError,
+  MPT_ISSUANCE_ID_3,
   MPTID_LENGTH,
 } from '../testUtils'
 
@@ -201,7 +202,7 @@ describe('Payment', function () {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: {
-        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        mpt_issuance_id: MPT_ISSUANCE_ID_3,
         value: '10',
       },
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',

@@ -5,6 +5,8 @@ import {
 import {
   assertTxIsValid,
   assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
+  MPT_ISSUANCE_ID_2,
   MPTID_LENGTH,
 } from '../testUtils'
 
@@ -129,13 +131,13 @@ describe('AMMClawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
       Asset: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       },
       Asset2: {
-        mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
       },
       Amount: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
         value: '10',
       },
       Sequence: 1337,
@@ -149,10 +151,10 @@ describe('AMMClawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
       Asset: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       },
       Asset2: {
-        mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
       },
       Sequence: 1337,
     }
@@ -165,10 +167,10 @@ describe('AMMClawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
       Asset: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       },
       Asset2: {
-        mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
       },
       Amount: {
         mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
@@ -186,10 +188,10 @@ describe('AMMClawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
       Asset: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       },
       Asset2: {
-        mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
       },
       Amount: {
         mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
@@ -207,10 +209,10 @@ describe('AMMClawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
       Asset: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       },
       Asset2: {
-        mpt_issuance_id: '00000002A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
       },
       Amount: {
         mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),

@@ -2,6 +2,7 @@ import { validateCheckCash } from '../../src/models/transactions/checkCash'
 import {
   assertTxIsValid,
   assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
   MPTID_LENGTH,
 } from '../testUtils'
 
@@ -85,7 +86,7 @@ describe('CheckCash', function () {
       Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       TransactionType: 'CheckCash',
       Amount: {
-        mpt_issuance_id: '00000001A407AF5856CECE4281FED12B7B179B49A4AEF506',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
         value: '50',
       },
       CheckID:
