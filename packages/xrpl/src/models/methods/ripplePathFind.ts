@@ -15,8 +15,7 @@ export interface SourceCurrencyAmount {
  * @category Requests
  */
 export interface RipplePathFindRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'ripple_path_find'
   /** Unique address of the account that would send funds in a transaction. */
   source_account: string
