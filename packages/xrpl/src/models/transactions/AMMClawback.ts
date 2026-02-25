@@ -1,5 +1,11 @@
 import { ValidationError } from '../../errors'
-import { Currency, IssuedCurrencyAmount, MPTAmount } from '../common'
+import {
+  Currency,
+  IssuedCurrency,
+  IssuedCurrencyAmount,
+  MPTAmount,
+  MPTCurrency,
+} from '../common'
 
 import {
   Account,
@@ -57,7 +63,7 @@ export interface AMMClawback extends BaseTransaction {
    * In JSON, this is an object with currency and issuer fields (or mpt_issuance_id for MPT).
    * For issued currencies, the issuer field must match with Account.
    */
-  Asset: Currency
+  Asset: IssuedCurrency | MPTCurrency
 
   /**
    * Specifies the other asset in the AMM's pool. In JSON, this is an object with currency and
