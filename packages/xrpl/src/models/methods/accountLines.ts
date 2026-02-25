@@ -73,8 +73,7 @@ export interface AccountLinesTrustline {
  * @category Requests
  */
 export interface AccountLinesRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_lines'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string
