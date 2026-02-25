@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Better error handling in the `Client` for edge case errors
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
@@ -11,14 +14,12 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` helper functions to sign and combine LoanSet transactions signed by the counterparty.
 * Add newly added fields to `Loan`, `LoanBroker` and `Vault` ledger objects and lending protocol related transaction types.
 
-### Fixed
-* Better error handling in the `Client` for edge case errors
-
 ## 4.5.0 (2025-12-16)
 
 ### Added
 * Support for `Lending Protocol` (XLS-66d).
-* Export signing and binary codec utilities.
+* Export signing and binary co
+* dec utilities.
 
 ### Fixed
 * Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
