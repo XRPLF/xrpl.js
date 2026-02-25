@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Better error handling in the `Client` for edge case errors
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
@@ -15,7 +18,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Support for `Lending Protocol` (XLS-66d).
-* Export signing and binary codec utilities.
+* Export signing and binary co
+* dec utilities.
 
 ### Fixed
 * Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
