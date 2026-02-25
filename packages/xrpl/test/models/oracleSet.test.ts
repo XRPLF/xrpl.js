@@ -48,8 +48,9 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid OracleDocumentID`, function () {
-    tx.OracleDocumentID = '1234'
-    const errorMessage = 'OracleSet: invalid field OracleDocumentID'
+    tx.OracleDocumentID = 'abcd'
+    const errorMessage =
+      'OracleSet: invalid field OracleDocumentID, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 
@@ -60,26 +61,30 @@ describe('OracleSet', function () {
   })
 
   it(`throws w/ invalid LastUpdateTime`, function () {
-    tx.LastUpdateTime = '768062172'
-    const errorMessage = 'OracleSet: invalid field LastUpdateTime'
+    tx.LastUpdateTime = 'abcd'
+    const errorMessage =
+      'OracleSet: invalid field LastUpdateTime, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid Provider`, function () {
     tx.Provider = 1234
-    const errorMessage = 'OracleSet: invalid field Provider'
+    const errorMessage =
+      'OracleSet: invalid field Provider, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid URI`, function () {
     tx.URI = 1234
-    const errorMessage = 'OracleSet: invalid field URI'
+    const errorMessage =
+      'OracleSet: invalid field URI, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid AssetClass`, function () {
     tx.AssetClass = 1234
-    const errorMessage = 'OracleSet: invalid field AssetClass'
+    const errorMessage =
+      'OracleSet: invalid field AssetClass, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 
@@ -126,15 +131,14 @@ describe('OracleSet', function () {
 
   it(`throws w/ missing BaseAsset of PriceDataSeries`, function () {
     delete tx.PriceDataSeries[0].PriceData.BaseAsset
-    const errorMessage =
-      'OracleSet: PriceDataSeries must have a `BaseAsset` string'
+    const errorMessage = 'OracleSet: missing field PriceDataSeries[0].BaseAsset'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing QuoteAsset of PriceDataSeries`, function () {
     delete tx.PriceDataSeries[0].PriceData.QuoteAsset
     const errorMessage =
-      'OracleSet: PriceDataSeries must have a `QuoteAsset` string'
+      'OracleSet: missing field PriceDataSeries[0].QuoteAsset'
     assertInvalid(tx, errorMessage)
   })
 
@@ -156,7 +160,7 @@ describe('OracleSet', function () {
     // value cannot be parsed as hexadecimal number
     tx.PriceDataSeries[0].PriceData.AssetPrice = 'ghij'
     const errorMessage =
-      'OracleSet: Field AssetPrice must be a valid hex string'
+      'OracleSet: invalid field PriceDataSeries[0].AssetPrice'
     assertInvalid(tx, errorMessage)
   })
 
@@ -169,25 +173,28 @@ describe('OracleSet', function () {
   it(`throws w/ invalid AssetPrice type in PriceDataSeries`, function () {
     tx.PriceDataSeries[0].PriceData.AssetPrice = ['sample', 'invalid', 'type']
     const errorMessage =
-      'OracleSet: Field AssetPrice must be a string or a number'
+      'OracleSet: invalid field PriceDataSeries[0].AssetPrice'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ invalid Scale of PriceDataSeries`, function () {
-    tx.PriceDataSeries[0].PriceData.Scale = '1234'
-    const errorMessage = 'OracleSet: invalid field Scale'
+    tx.PriceDataSeries[0].PriceData.Scale = 'abcd'
+    const errorMessage =
+      'OracleSet: invalid field PriceDataSeries[0].Scale, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Scale must be in range 0-10 when above max`, function () {
     tx.PriceDataSeries[0].PriceData.Scale = 11
-    const errorMessage = 'OracleSet: Scale must be in range 0-10'
+    const errorMessage =
+      'OracleSet: invalid field PriceDataSeries[0].Scale, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ Scale must be in range 0-10 when below min`, function () {
     tx.PriceDataSeries[0].PriceData.Scale = -1
-    const errorMessage = 'OracleSet: Scale must be in range 0-10'
+    const errorMessage =
+      'OracleSet: invalid field PriceDataSeries[0].Scale, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 })

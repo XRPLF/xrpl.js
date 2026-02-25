@@ -49,7 +49,10 @@ describe('XChainClaim', function () {
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assertInvalid(tx, 'XChainClaim: invalid field XChainBridge')
+    assertInvalid(
+      tx,
+      'XChainClaim: invalid field XChainBridge, expected a valid XChainBridge object',
+    )
   })
 
   it('throws w/ missing XChainClaimID', function () {
@@ -61,7 +64,10 @@ describe('XChainClaim', function () {
   it('throws w/ invalid XChainClaimID', function () {
     tx.XChainClaimID = { currency: 'ETH' }
 
-    assertInvalid(tx, 'XChainClaim: invalid field XChainClaimID')
+    assertInvalid(
+      tx,
+      'XChainClaim: invalid field XChainClaimID, expected a valid number or hex string',
+    )
   })
 
   it('throws w/ missing Destination', function () {
@@ -73,13 +79,19 @@ describe('XChainClaim', function () {
   it('throws w/ invalid Destination', function () {
     tx.Destination = 123
 
-    assertInvalid(tx, 'XChainClaim: invalid field Destination')
+    assertInvalid(
+      tx,
+      'XChainClaim: invalid field Destination, expected a valid account address',
+    )
   })
 
   it('throws w/ invalid DestinationTag', function () {
     tx.DestinationTag = 'number'
 
-    assertInvalid(tx, 'XChainClaim: invalid field DestinationTag')
+    assertInvalid(
+      tx,
+      'XChainClaim: invalid field DestinationTag, expected a valid number',
+    )
   })
 
   it('throws w/ missing Amount', function () {
@@ -91,6 +103,9 @@ describe('XChainClaim', function () {
   it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
-    assertInvalid(tx, 'XChainClaim: invalid field Amount')
+    assertInvalid(
+      tx,
+      'XChainClaim: invalid field Amount, expected a valid Amount',
+    )
   })
 })

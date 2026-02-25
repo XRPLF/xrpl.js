@@ -2,12 +2,16 @@ import { ValidationError } from '../../errors'
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
+  Account,
   BaseTransaction,
+  isAccount,
   isAmount,
   isArray,
-  isIssuedCurrency,
+  isCurrency,
   isRecord,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
@@ -63,29 +67,10 @@ export interface AMMBid extends BaseTransaction {
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMBid: missing field Asset')
-  }
-
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMBid: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMBid: missing field Asset2')
-  }
-
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMBid: Asset2 must be a Currency')
-  }
-
-  if (tx.BidMin != null && !isAmount(tx.BidMin)) {
-    throw new ValidationError('AMMBid: BidMin must be an Amount')
-  }
-
-  if (tx.BidMax != null && !isAmount(tx.BidMax)) {
-    throw new ValidationError('AMMBid: BidMax must be an Amount')
-  }
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
+  validateOptionalField(tx, 'BidMin', isAmount)
+  validateOptionalField(tx, 'BidMax', isAmount)
 
   if (tx.AuthAccounts != null) {
     if (!isArray(tx.AuthAccounts)) {
@@ -103,28 +88,32 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
 }
 
 function validateAuthAccounts(
-  senderAddress: string,
+  senderAddress: Account,
   authAccounts: unknown[],
 ): boolean {
-  for (const authAccount of authAccounts) {
+  authAccounts.forEach((authAccount, index) => {
     if (!isRecord(authAccount)) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(
+        `AMMBid: invalid field AuthAccounts[0], expected a valid Record`,
+      )
     }
+    const paramName = `AuthAccounts[${index}].AuthAccount`
     if (!isRecord(authAccount.AuthAccount)) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
+      throw new ValidationError(
+        `AMMBid: invalid field ${paramName}, expected a valid Record`,
+      )
     }
-    if (authAccount.AuthAccount.Account == null) {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
-    }
-    if (typeof authAccount.AuthAccount.Account !== 'string') {
-      throw new ValidationError(`AMMBid: invalid AuthAccounts`)
-    }
+    const authAccountInner = authAccount.AuthAccount
+    validateRequiredField(authAccountInner, 'Account', isAccount, {
+      paramName,
+      txType: 'AMMBid',
+    })
     if (authAccount.AuthAccount.Account === senderAddress) {
       throw new ValidationError(
         `AMMBid: AuthAccounts must not include sender's address`,
       )
     }
-  }
+  })
 
   return true
 }

@@ -82,7 +82,8 @@ describe('AMMDeposit', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     deposit.Asset = 1234
-    const errorMessage = 'AMMDeposit: Asset must be a Currency'
+    const errorMessage =
+      'AMMDeposit: invalid field Asset, expected a valid Currency'
     assertInvalid(deposit, errorMessage)
   })
 
@@ -94,7 +95,8 @@ describe('AMMDeposit', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     deposit.Asset2 = 1234
-    const errorMessage = 'AMMDeposit: Asset2 must be a Currency'
+    const errorMessage =
+      'AMMDeposit: invalid field Asset2, expected a valid Currency'
     assertInvalid(deposit, errorMessage)
   })
 
@@ -122,27 +124,30 @@ describe('AMMDeposit', function () {
   it(`throws w/ LPTokenOut must be an IssuedCurrencyAmount`, function () {
     deposit.LPTokenOut = 1234
     const errorMessage =
-      'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount'
+      'AMMDeposit: invalid field LPTokenOut, expected a valid IOU Amount'
     assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Amount must be an Amount`, function () {
     deposit.Amount = 1234
-    const errorMessage = 'AMMDeposit: Amount must be an Amount'
+    const errorMessage =
+      'AMMDeposit: invalid field Amount, expected a valid Amount'
     assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     deposit.Amount = '1000'
     deposit.Amount2 = 1234
-    const errorMessage = 'AMMDeposit: Amount2 must be an Amount'
+    const errorMessage =
+      'AMMDeposit: invalid field Amount2, expected a valid Amount'
     assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
     deposit.Amount = '1000'
     deposit.EPrice = 1234
-    const errorMessage = 'AMMDeposit: EPrice must be an Amount'
+    const errorMessage =
+      'AMMDeposit: invalid field EPrice, expected a valid Amount'
     assertInvalid(deposit, errorMessage)
   })
 })

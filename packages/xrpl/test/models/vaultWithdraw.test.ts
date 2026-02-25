@@ -1,7 +1,3 @@
-import { assert } from 'chai'
-
-import { validate } from '../../src'
-import { VaultWithdraw } from '../../src/models/transactions'
 import { validateVaultWithdraw } from '../../src/models/transactions/vaultWithdraw'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -16,7 +12,7 @@ const assertInvalid = (tx: any, message: string): void =>
  * Provides runtime verification testing for VaultWithdraw transaction type.
  */
 describe('VaultWithdraw', function () {
-  let tx: VaultWithdraw
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -32,39 +28,41 @@ describe('VaultWithdraw', function () {
   })
 
   it('throws w/ missing VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = undefined
     assertInvalid(tx, 'VaultWithdraw: missing field VaultID')
   })
 
   it('throws w/ invalid VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field VaultID')
+    assertInvalid(
+      tx,
+      'VaultWithdraw: invalid field VaultID, expected a valid hex string',
+    )
   })
 
   it('throws w/ missing Amount', function () {
-    // @ts-expect-error for test
     tx.Amount = undefined
     assertInvalid(tx, 'VaultWithdraw: missing field Amount')
   })
 
   it('throws w/ non-string Amount', function () {
-    // @ts-expect-error for test
     tx.Amount = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field Amount')
+    assertInvalid(
+      tx,
+      'VaultWithdraw: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it('verifies valid VaultWithdraw with Destination', function () {
     tx.Destination = 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8'
-    assert.doesNotThrow(() => validateVaultWithdraw(tx))
-    assert.doesNotThrow(() => validate(tx))
     assertValid(tx)
   })
 
   it('throws w/ invalid Destination', function () {
-    // @ts-expect-error for test
     tx.Destination = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field Destination')
+    assertInvalid(
+      tx,
+      'VaultWithdraw: invalid field Destination, expected a valid account address',
+    )
   })
 })

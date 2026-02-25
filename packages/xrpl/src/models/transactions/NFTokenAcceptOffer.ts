@@ -3,8 +3,11 @@ import { Amount } from '../common'
 
 import {
   BaseTransaction,
+  isAmount,
+  isHexString,
   parseAmountValue,
   validateBaseTransaction,
+  validateOptionalField,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -73,7 +76,10 @@ export interface NFTokenAcceptOfferMetadata extends TransactionMetadataBase {
 function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
   const value = parseAmountValue(tx.NFTokenBrokerFee)
   if (Number.isNaN(value)) {
-    throw new ValidationError('NFTokenAcceptOffer: invalid NFTokenBrokerFee')
+    // already checked, additional sanity check
+    throw new ValidationError(
+      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee, expected a valid Amount',
+    )
   }
 
   if (value <= 0) {
@@ -97,6 +103,10 @@ function validateNFTokenBrokerFee(tx: Record<string, unknown>): void {
  */
 export function validateNFTokenAcceptOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  validateOptionalField(tx, 'NFTokenSellOffer', isHexString)
+  validateOptionalField(tx, 'NFTokenBuyOffer', isHexString)
+  validateOptionalField(tx, 'NFTokenBrokerFee', isAmount)
 
   if (tx.NFTokenBrokerFee != null) {
     validateNFTokenBrokerFee(tx)

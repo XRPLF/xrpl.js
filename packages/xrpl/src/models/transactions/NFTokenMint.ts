@@ -1,18 +1,22 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
-import { isHex } from '../utils'
 
 import {
   Account,
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
-  isAmount,
   isNumber,
+  isHexString,
+  isAmount,
   validateBaseTransaction,
   validateOptionalField,
+  validateRequiredField,
+  isNumberWithBounds,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
+
+const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -146,24 +150,23 @@ export interface NFTokenMintMetadata extends TransactionMetadataBase {
 export function validateNFTokenMint(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'NFTokenTaxon', isNumber)
+  validateOptionalField(tx, 'Issuer', isAccount)
+  validateOptionalField(
+    tx,
+    'TransferFee',
+    isNumberWithBounds(0, MAX_TRANSFER_FEE),
+  )
+  validateOptionalField(tx, 'URI', isHexString)
+
   if (tx.Account === tx.Issuer) {
     throw new ValidationError(
       'NFTokenMint: Issuer must not be equal to Account',
     )
   }
 
-  validateOptionalField(tx, 'Issuer', isAccount)
-
   if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')
-  }
-
-  if (typeof tx.URI === 'string' && !isHex(tx.URI)) {
-    throw new ValidationError('NFTokenMint: URI must be in hex format')
-  }
-
-  if (tx.NFTokenTaxon == null) {
-    throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
   }
 
   if (tx.Amount == null) {

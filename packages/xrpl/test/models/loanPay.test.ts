@@ -81,6 +81,6 @@ describe('unit test LoanPay', () => {
 
   test('invalid Amount', () => {
     tx.Amount = 123
-    assertInvalid(tx, 'LoanPay: invalid field Amount')
+    assertInvalid(tx, 'LoanPay: invalid field Amount, expected a valid Amount')
   })
 })

@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateOptionalField,
@@ -97,14 +97,15 @@ export function validateXChainAddClaimAttestation(
 
   validateRequiredField(tx, 'OtherChainSource', isAccount)
 
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
 
-  validateRequiredField(tx, 'Signature', isString)
+  validateRequiredField(tx, 'Signature', isHexString)
 
   validateRequiredField(
     tx,
     'WasLockingChainSend',
     (inp: unknown): inp is 0 | 1 => inp === 0 || inp === 1,
+    { invalidMessage: 'expected 0 or 1' },
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)
@@ -112,6 +113,7 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isHexString(inp),
+    { invalidMessage: 'expected a valid number or hex string' },
   )
 }

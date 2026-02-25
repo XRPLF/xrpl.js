@@ -1,14 +1,13 @@
 import { ValidationError } from '../../errors'
-import { isHex } from '../utils'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
   isAccount,
-  isString,
   validateOptionalField,
   Account,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 /**
@@ -52,16 +51,13 @@ export interface NFTokenModify extends BaseTransaction {
 export function validateNFTokenModify(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateOptionalField(tx, 'Owner', isAccount)
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
   if (tx.URI !== undefined && typeof tx.URI === 'string') {
     if (tx.URI === '') {
       throw new ValidationError('NFTokenModify: URI must not be empty string')
-    }
-    if (!isHex(tx.URI)) {
-      throw new ValidationError('NFTokenModify: URI must be in hex format')
     }
   }
 }

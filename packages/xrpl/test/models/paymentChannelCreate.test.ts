@@ -44,7 +44,7 @@ describe('PaymentChannelCreate', function () {
   it(`missing Amount`, function () {
     delete channel.Amount
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing Amount')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field Amount')
   })
 
   it(`missing Destination`, function () {
@@ -56,48 +56,66 @@ describe('PaymentChannelCreate', function () {
   it(`missing SettleDelay`, function () {
     delete channel.SettleDelay
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing SettleDelay')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field SettleDelay')
   })
 
   it(`missing PublicKey`, function () {
     delete channel.PublicKey
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing PublicKey')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field PublicKey')
   })
 
   it(`invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelCreate: Amount must be a string')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field Amount, expected a valid XRP Amount',
+    )
   })
 
   it(`invalid Destination`, function () {
     channel.Destination = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field Destination')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`invalid SettleDelay`, function () {
-    channel.SettleDelay = '10'
+    channel.SettleDelay = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: SettleDelay must be a number')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field SettleDelay, expected a valid number',
+    )
   })
 
   it(`invalid PublicKey`, function () {
     channel.PublicKey = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: PublicKey must be a string')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field PublicKey, expected a valid hex string',
+    )
   })
 
   it(`invalid DestinationTag`, function () {
-    channel.DestinationTag = '10'
+    channel.DestinationTag = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field DestinationTag')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field DestinationTag, expected a valid number',
+    )
   })
 
   it(`invalid CancelAfter`, function () {
-    channel.CancelAfter = '100'
+    channel.CancelAfter = 'abcd'
 
-    assertInvalid(channel, 'PaymentChannelCreate: CancelAfter must be a number')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field CancelAfter, expected a valid number',
+    )
   })
 })

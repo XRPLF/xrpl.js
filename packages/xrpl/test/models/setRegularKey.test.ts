@@ -36,6 +36,9 @@ describe('SetRegularKey', function () {
   it(`throws w/ invalid RegularKey`, function () {
     tx.RegularKey = 12369846963
 
-    assertInvalid(tx, 'SetRegularKey: RegularKey must be a string')
+    assertInvalid(
+      tx,
+      'SetRegularKey: invalid field RegularKey, expected a valid account address',
+    )
   })
 })

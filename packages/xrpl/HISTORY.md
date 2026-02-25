@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Better error handling and cleaner error messages in model validation
+
 ## 4.6.0 (2026-02-12)
 
 ### Added

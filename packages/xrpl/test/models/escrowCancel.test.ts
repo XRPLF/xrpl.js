@@ -41,18 +41,24 @@ describe('EscrowCancel', function () {
   it(`Invalid EscrowCancel missing offerSequence`, function () {
     delete cancel.OfferSequence
 
-    assertInvalid(cancel, 'EscrowCancel: missing OfferSequence')
+    assertInvalid(cancel, 'EscrowCancel: missing field OfferSequence')
   })
 
   it(`Invalid Owner`, function () {
     cancel.Owner = 10
 
-    assertInvalid(cancel, 'EscrowCancel: invalid field Owner')
+    assertInvalid(
+      cancel,
+      'EscrowCancel: invalid field Owner, expected a valid account address',
+    )
   })
 
   it(`Invalid OfferSequence`, function () {
     cancel.OfferSequence = 'random'
 
-    assertInvalid(cancel, 'EscrowCancel: OfferSequence must be a number')
+    assertInvalid(
+      cancel,
+      'EscrowCancel: invalid field OfferSequence, expected a valid number',
+    )
   })
 })

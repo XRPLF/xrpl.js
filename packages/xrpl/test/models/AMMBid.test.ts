@@ -72,7 +72,8 @@ describe('AMMBid', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     bid.Asset = 1234
-    const errorMessage = 'AMMBid: Asset must be a Currency'
+    const errorMessage =
+      'AMMBid: invalid field Asset, expected a valid Currency'
     assertInvalid(bid, errorMessage)
   })
 
@@ -84,19 +85,20 @@ describe('AMMBid', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     bid.Asset2 = 1234
-    const errorMessage = 'AMMBid: Asset2 must be a Currency'
+    const errorMessage =
+      'AMMBid: invalid field Asset2, expected a valid Currency'
     assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ BidMin must be an Amount`, function () {
     bid.BidMin = 5
-    const errorMessage = 'AMMBid: BidMin must be an Amount'
+    const errorMessage = 'AMMBid: invalid field BidMin, expected a valid Amount'
     assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ BidMax must be an Amount`, function () {
     bid.BidMax = 10
-    const errorMessage = 'AMMBid: BidMax must be an Amount'
+    const errorMessage = 'AMMBid: invalid field BidMax, expected a valid Amount'
     assertInvalid(bid, errorMessage)
   })
 
@@ -121,7 +123,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: null,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -129,7 +132,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: undefined,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -137,7 +141,8 @@ describe('AMMBid', function () {
     bid.AuthAccounts[0] = {
       AuthAccount: 1234,
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid Record'
     assertInvalid(bid, errorMessage)
   })
 
@@ -147,7 +152,8 @@ describe('AMMBid', function () {
         Account: 1234,
       },
     }
-    const errorMessage = 'AMMBid: invalid AuthAccounts'
+    const errorMessage =
+      'AMMBid: invalid field AuthAccounts[0].AuthAccount, expected a valid account address'
     assertInvalid(bid, errorMessage)
   })
 

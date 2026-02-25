@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
-  isString,
   isXChainBridge,
   validateBaseTransaction,
   validateOptionalField,
@@ -68,7 +68,8 @@ export function validateXChainClaim(tx: Record<string, unknown>): void {
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isHexString(inp),
+    { invalidMessage: 'expected a valid number or hex string' },
   )
 
   validateRequiredField(tx, 'Destination', isAccount)

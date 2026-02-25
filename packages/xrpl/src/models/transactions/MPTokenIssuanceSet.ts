@@ -3,13 +3,14 @@ import { isFlagEnabled } from '../utils'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  isHexString,
+  isNumber,
 } from './common'
 
 /**
@@ -65,20 +66,18 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-  const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
-  const isTfMPTLock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : (flags.tfMPTLock ?? false)
+  const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
+  const isTfMPTLock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
+    : flags.tfMPTLock === true
 
-  const isTfMPTUnlock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : (flags.tfMPTUnlock ?? false)
+  const isTfMPTUnlock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
+    : flags.tfMPTUnlock === true
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
