@@ -73,7 +73,8 @@ export interface AccountLinesTrustline {
  * @category Requests
  */
 export interface AccountLinesRequest
-  extends BaseRequest, LookupByLedgerRequest {
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_lines'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string
@@ -82,6 +83,11 @@ export interface AccountLinesRequest
    * connecting the two accounts.
    */
   peer?: string
+  /**
+   * If true, filter out trust lines with balances at their default values.
+   * The default is false.
+   */
+  ignore_default?: boolean
   /**
    * Limit the number of trust lines to retrieve. The server is not required to
    * honor this value. Must be within the inclusive range 10 to 400.
@@ -132,5 +138,9 @@ export interface AccountLinesResponse extends BaseResponse {
      * No additional pages after this one.
      */
     marker?: unknown
+    /**
+     * The limit value used in the request.
+     */
+    limit?: number
   }
 }
