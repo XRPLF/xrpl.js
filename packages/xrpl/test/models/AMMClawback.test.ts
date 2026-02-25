@@ -161,6 +161,53 @@ describe('AMMClawback', function () {
     assertValid(mptClawback)
   })
 
+  it(`throws w/ MPT Asset but IssuedCurrencyAmount Amount`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
+      },
+      Asset2: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
+      },
+      Amount: {
+        currency: 'ETH',
+        issuer: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        value: '100',
+      },
+      Sequence: 1337,
+    }
+    assertInvalid(
+      mptClawback,
+      'AMMClawback: Amount must be an MPTAmount when Asset is an MPTCurrency',
+    )
+  })
+
+  it(`throws w/ MPT Asset and Amount with mismatched mpt_issuance_id`, function () {
+    const mptClawback = {
+      TransactionType: 'AMMClawback',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rPyfep3gcLzkosKC9XiE77Y8DZWG6iWDT9',
+      Asset: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
+      },
+      Asset2: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
+      },
+      Amount: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_2,
+        value: '10',
+      },
+      Sequence: 1337,
+    }
+    assertInvalid(
+      mptClawback,
+      'AMMClawback: Amount.mpt_issuance_id must match Asset.mpt_issuance_id',
+    )
+  })
+
   it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
     const mptClawback = {
       TransactionType: 'AMMClawback',

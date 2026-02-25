@@ -16,6 +16,7 @@ import {
   isIssuedCurrency,
   isIssuedCurrencyAmount,
   isMPTAmount,
+  isMPTCurrency,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -92,6 +93,7 @@ function isClawbackAmountValid(
   return isIssuedCurrencyAmount(input) || isMPTAmount(input)
 }
 
+/* eslint-disable max-lines-per-function -- this method needs to validate many nested field structures */
 /**
  * Validates an AMMClawback transaction.
  *
@@ -142,4 +144,19 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
       )
     }
   }
+
+  if (isMPTCurrency(asset) && tx.Amount != null) {
+    if (!isMPTAmount(tx.Amount)) {
+      throw new ValidationError(
+        'AMMClawback: Amount must be an MPTAmount when Asset is an MPTCurrency',
+      )
+    }
+
+    if (tx.Amount.mpt_issuance_id !== asset.mpt_issuance_id) {
+      throw new ValidationError(
+        'AMMClawback: Amount.mpt_issuance_id must match Asset.mpt_issuance_id',
+      )
+    }
+  }
 }
+/* eslint-enable max-lines-per-function */

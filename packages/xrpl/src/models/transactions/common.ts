@@ -12,6 +12,7 @@ import {
   IssuedCurrency,
   IssuedCurrencyAmount,
   MPTAmount,
+  MPTCurrency,
   Memo,
   Signer,
   XChainBridge,
@@ -197,6 +198,20 @@ export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
       isString(input.currency)) ||
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
         input.currency === 'XRP'))
+  )
+}
+
+/**
+ * Verify the form and type of an MPTCurrency at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the MPTCurrency is properly formed.
+ */
+export function isMPTCurrency(input: unknown): input is MPTCurrency {
+  return (
+    isRecord(input) &&
+    Object.keys(input).length === MPT_CURRENCY_SIZE &&
+    isString(input.mpt_issuance_id)
   )
 }
 
