@@ -290,4 +290,28 @@ describe('Payment', function () {
     payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1) }]]
     assertInvalid(payment, 'PaymentTransaction: invalid Paths')
   })
+
+  it(`throws when PathStep has both account and mpt_issuance_id`, function () {
+    payment.Paths = [
+      [
+        {
+          account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+          mpt_issuance_id: 'A'.repeat(MPTID_LENGTH),
+        },
+      ],
+    ]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
+
+  it(`throws when PathStep has both currency and mpt_issuance_id`, function () {
+    payment.Paths = [
+      [
+        {
+          currency: 'USD',
+          mpt_issuance_id: 'A'.repeat(MPTID_LENGTH),
+        },
+      ],
+    ]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
 })
