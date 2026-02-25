@@ -236,6 +236,7 @@ jobs:
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
           echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
+      # NOTE: Keep Node.js and npm versions in sync with vulnerability-scan.yml for consistent SBOM generation
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -271,6 +272,7 @@ jobs:
                   --arg text "${MESSAGE}" \
                   '{channel: $channel, text: $text}')"
 
+      # NOTE: Keep cyclonedx-npm and trivy-action versions in sync with vulnerability-scan.yml
       - name: Install cyclonedx-npm
         run: npm install -g @cyclonedx/cyclonedx-npm@4.1.2
 
