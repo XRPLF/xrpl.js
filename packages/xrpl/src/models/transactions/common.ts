@@ -775,7 +775,7 @@ export function validateCredentialType<
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @param maxCredentials The maximum length of the credentials array.
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
- * @param fieldName
+ * @param fieldName The name of the field being validated. Defaults to 'CredentialIDs'.
  * @throws Validation Error if the formatting is incorrect
  */
 // eslint-disable-next-line max-params, max-lines-per-function -- separating logic further will add unnecessary complexity
