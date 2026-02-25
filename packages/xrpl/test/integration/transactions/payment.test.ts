@@ -258,7 +258,6 @@ describe('Payment', function () {
       )
 
       // Cross-currency payment: XRP → MPT_B with two alternative paths
-      // Path 1: XRP → MPT_A → MPT_B (via XRP/MPT_A and MPT_A/MPT_B pools)
       // Path 2: XRP → MPT_B (via XRP/MPT_B pool)
       const payTx: Payment = {
         TransactionType: 'Payment',
