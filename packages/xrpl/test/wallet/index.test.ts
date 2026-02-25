@@ -310,6 +310,26 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
       assert.equal(wallet.classicAddress, masterAddress)
     })
+
+    it('derive a wallet using the default signing algorithm (ed25519) with RFC1751 mnemonic', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
+        publicKey:
+          'EDAAC3F98BB94F451804EF5993C847DAAA4E6154F455635659D88AA5C80F156303',
+        privateKey:
+          'ED93D09224D09221B8845E7A9772E0D6259CD01029C557CD95978CC674E0192B25',
+      }
+
+      const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
+        masterAddress,
+        mnemonicEncoding: 'rfc1751',
+      })
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
+    })
   })
 
   describe('fromSecretNumbers', function () {
