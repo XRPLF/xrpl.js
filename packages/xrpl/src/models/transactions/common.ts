@@ -775,6 +775,7 @@ export function validateCredentialType<
  * @param isStringID Toggle for if array contains IDs instead of AuthorizeCredential objects
  * @param maxCredentials The maximum length of the credentials array.
  *        PermissionedDomainSet transaction uses 10, other transactions use 8.
+ * @param fieldName
  * @throws Validation Error if the formatting is incorrect
  */
 // eslint-disable-next-line max-params, max-lines-per-function -- separating logic further will add unnecessary complexity
@@ -783,41 +784,42 @@ export function validateCredentialsList(
   transactionType: string,
   isStringID: boolean,
   maxCredentials: number,
+  fieldName = 'CredentialIDs',
 ): void {
   if (credentials == null) {
     return
   }
   if (!isArray(credentials)) {
     throw new ValidationError(
-      `${transactionType}: invalid field CredentialIDs, expected a valid array`,
+      `${transactionType}: invalid field ${fieldName}, expected a valid array`,
     )
   }
   if (credentials.length > maxCredentials) {
     throw new ValidationError(
-      `${transactionType}: Credentials length cannot exceed ${maxCredentials} elements`,
+      `${transactionType}: ${fieldName} length cannot exceed ${maxCredentials} elements`,
     )
   } else if (credentials.length === 0) {
     throw new ValidationError(
-      `${transactionType}: Credentials cannot be an empty array`,
+      `${transactionType}: ${fieldName} cannot be an empty array`,
     )
   }
   credentials.forEach((credential) => {
     if (isStringID) {
       if (!isString(credential)) {
         throw new ValidationError(
-          `${transactionType}: Invalid Credentials ID list format`,
+          `${transactionType}: Invalid ${fieldName} list format`,
         )
       }
     } else if (!isAuthorizeCredential(credential)) {
       throw new ValidationError(
-        `${transactionType}: Invalid Credentials format`,
+        `${transactionType}: Invalid ${fieldName} format`,
       )
     }
   })
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked above
   if (containsDuplicates(credentials as string[] | AuthorizeCredential[])) {
     throw new ValidationError(
-      `${transactionType}: Credentials cannot contain duplicate elements`,
+      `${transactionType}: ${fieldName} cannot contain duplicate elements`,
     )
   }
 }

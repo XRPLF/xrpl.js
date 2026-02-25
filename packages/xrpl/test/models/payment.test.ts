@@ -255,14 +255,15 @@ describe('Payment', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'Payment: Credentials length cannot exceed 8 elements'
+    const errorMessage =
+      'Payment: CredentialIDs length cannot exceed 8 elements'
     assertInvalid(payment, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
     payment.CredentialIDs = []
 
-    const errorMessage = 'Payment: Credentials cannot be an empty array'
+    const errorMessage = 'Payment: CredentialIDs cannot be an empty array'
     assertInvalid(payment, errorMessage)
   })
 
@@ -272,7 +273,7 @@ describe('Payment', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'Payment: Invalid Credentials ID list format'
+    const errorMessage = 'Payment: Invalid CredentialIDs list format'
     assertInvalid(payment, errorMessage)
   })
 
@@ -283,7 +284,7 @@ describe('Payment', function () {
     ]
 
     const errorMessage =
-      'Payment: Credentials cannot contain duplicate elements'
+      'Payment: CredentialIDs cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
   })
 })

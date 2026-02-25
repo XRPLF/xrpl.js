@@ -46,5 +46,6 @@ export function validatePermissionedDomainSet(
     false,
     // PermissionedDomainSet uses at most 10 accepted credentials. This is different from Credential-feature transactions.
     MAX_ACCEPTED_CREDENTIALS,
+    'AcceptedCredentials',
   )
 }

@@ -70,6 +70,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
+      'AuthorizeCredentials',
     )
   } else if (tx.UnauthorizeCredentials !== undefined) {
     validateCredentialsList(
@@ -77,6 +78,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
+      'UnauthorizeCredentials',
     )
   }
 }

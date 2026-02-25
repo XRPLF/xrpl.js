@@ -112,7 +112,7 @@ describe('DepositPreauth', function () {
 
   it('throws when AuthorizeCredentials is not an array', function () {
     const errorMessage =
-      'DepositPreauth: invalid field CredentialIDs, expected a valid array'
+      'DepositPreauth: invalid field AuthorizeCredentials, expected a valid array'
     depositPreauth.AuthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)
@@ -120,21 +120,23 @@ describe('DepositPreauth', function () {
 
   it('throws when UnauthorizeCredentials is not an array', function () {
     const errorMessage =
-      'DepositPreauth: invalid field CredentialIDs, expected a valid array'
+      'DepositPreauth: invalid field UnauthorizeCredentials, expected a valid array'
     depositPreauth.UnauthorizeCredentials = validCredential
 
     assertInvalid(depositPreauth, errorMessage)
   })
 
   it('throws when AuthorizeCredentials is empty array', function () {
-    const errorMessage = 'DepositPreauth: Credentials cannot be an empty array'
+    const errorMessage =
+      'DepositPreauth: AuthorizeCredentials cannot be an empty array'
     depositPreauth.AuthorizeCredentials = []
 
     assertInvalid(depositPreauth, errorMessage)
   })
 
   it('throws when UnauthorizeCredentials is empty array', function () {
-    const errorMessage = 'DepositPreauth: Credentials cannot be an empty array'
+    const errorMessage =
+      'DepositPreauth: UnauthorizeCredentials cannot be an empty array'
     depositPreauth.UnauthorizeCredentials = []
 
     assertInvalid(depositPreauth, errorMessage)
@@ -143,7 +145,7 @@ describe('DepositPreauth', function () {
   it('throws when AuthorizeCredentials is too long', function () {
     const sampleCredentials: AuthorizeCredential[] = []
     const errorMessage =
-      'DepositPreauth: Credentials length cannot exceed 8 elements'
+      'DepositPreauth: AuthorizeCredentials length cannot exceed 8 elements'
     for (let index = 0; index < 9; index++) {
       sampleCredentials.push({
         Credential: {
@@ -159,7 +161,7 @@ describe('DepositPreauth', function () {
   it('throws when UnauthorizeCredentials is too long', function () {
     const sampleCredentials: AuthorizeCredential[] = []
     const errorMessage =
-      'DepositPreauth: Credentials length cannot exceed 8 elements'
+      'DepositPreauth: UnauthorizeCredentials length cannot exceed 8 elements'
     for (let index = 0; index < 9; index++) {
       sampleCredentials.push({
         Credential: {
@@ -177,7 +179,7 @@ describe('DepositPreauth', function () {
       { Credential: 'Invalid Shape' },
       { Credential: 'Another Invalid Shape' },
     ]
-    const errorMessage = 'DepositPreauth: Invalid Credentials format'
+    const errorMessage = 'DepositPreauth: Invalid AuthorizeCredentials format'
 
     depositPreauth.AuthorizeCredentials = invalidCredentials
     assertInvalid(depositPreauth, errorMessage)
@@ -188,7 +190,7 @@ describe('DepositPreauth', function () {
       { Credential: 'Invalid Shape' },
       { Credential: 'Another Invalid Shape' },
     ]
-    const errorMessage = 'DepositPreauth: Invalid Credentials format'
+    const errorMessage = 'DepositPreauth: Invalid UnauthorizeCredentials format'
 
     depositPreauth.UnauthorizeCredentials = invalidCredentials
     assertInvalid(depositPreauth, errorMessage)
@@ -197,7 +199,7 @@ describe('DepositPreauth', function () {
   it('throws when AuthorizeCredentials has duplicates', function () {
     const invalidCredentials = [validCredential, validCredential]
     const errorMessage =
-      'DepositPreauth: Credentials cannot contain duplicate elements'
+      'DepositPreauth: AuthorizeCredentials cannot contain duplicate elements'
 
     depositPreauth.AuthorizeCredentials = invalidCredentials
     assertInvalid(depositPreauth, errorMessage)
@@ -206,7 +208,7 @@ describe('DepositPreauth', function () {
   it('throws when UnauthorizeCredentials has duplicates', function () {
     const invalidCredentials = [validCredential, validCredential]
     const errorMessage =
-      'DepositPreauth: Credentials cannot contain duplicate elements'
+      'DepositPreauth: UnauthorizeCredentials cannot contain duplicate elements'
 
     depositPreauth.UnauthorizeCredentials = invalidCredentials
     assertInvalid(depositPreauth, errorMessage)
