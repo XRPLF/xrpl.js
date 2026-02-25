@@ -159,7 +159,7 @@ function validateAccountAddress(
   const val: unknown = tx[accountField]
 
   if (typeof val !== 'string') {
-    throw new Error(`${accountField} must be a string`)
+    throw new ValidationError(`${accountField} must be a string`)
   }
   // if X-address is given, convert it to classic address
   const { classicAccount, tag } = getClassicAccountAndTag(val)
