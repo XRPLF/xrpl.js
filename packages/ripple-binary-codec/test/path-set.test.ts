@@ -82,7 +82,7 @@ describe('Path-Set binary-codec unit tests', () => {
     )
   })
 
-  it(`PathSet: Two hops inside a Path`, () => {
+  it(`PathSet: Two paths inside a PathSet`, () => {
     const issuerAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
     const currencyCode = 'ABC'
     const path = [
