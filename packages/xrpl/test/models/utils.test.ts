@@ -1,6 +1,6 @@
 /* eslint-disable import/no-deprecated -- using deprecated setTransactionFlagsToNumbers to ensure no breaking changes */
 /* eslint-disable no-bitwise -- flags require bitwise operations */
-import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {

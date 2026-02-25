@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
 import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
