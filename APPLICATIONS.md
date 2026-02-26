@@ -82,9 +82,9 @@ Warning: Use at your own risk.
 
   Users can use the GemWallet (non-custodial) web extension to interact with the XRPL from their browser. The documentation is available at [https://gemwallet.app/](https://gemwallet.app/docs/user-guide/introduction).
 
-- **[XUMM](https://xumm.app/)**
+- **[XAMAN](https://xaman.app/)**
 
-  Users can use the xumm application to track their accounts, balances and transactions. The true power of xumm is the platform available for developers.
+  Users can use the xamana application to track their accounts, balances and transactions. The true power of xaman is the platform available for developers.
 
 - **[Xpring Wallet](https://xpring.io)** (uses `ripple-keypairs`)
 
