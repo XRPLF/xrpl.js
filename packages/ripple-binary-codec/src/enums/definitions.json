@@ -851,6 +851,16 @@
       }
     ],
     [
+      "ConfidentialBalanceVersion",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 69,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1137,6 +1147,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 31,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "ConfidentialOutstandingAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 32,
         "type": "UInt64"
       }
     ],
@@ -2097,6 +2117,166 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 31,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ConfidentialBalanceInbox",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 32,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ConfidentialBalanceSpending",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 33,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerEncryptedBalance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 34,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerElGamalPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 35,
+        "type": "Blob"
+      }
+    ],
+    [
+      "HolderElGamalPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 36,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ZKProof",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 37,
+        "type": "Blob"
+      }
+    ],
+    [
+      "HolderEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 38,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 39,
+        "type": "Blob"
+      }
+    ],
+    [
+      "SenderEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 40,
+        "type": "Blob"
+      }
+    ],
+    [
+      "DestinationEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 41,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorEncryptedBalance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 42,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 43,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorElGamalPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 44,
+        "type": "Blob"
+      }
+    ],
+    [
+      "BlindingFactor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 45,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AmountCommitment",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 46,
+        "type": "Blob"
+      }
+    ],
+    [
+      "BalanceCommitment",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 47,
         "type": "Blob"
       }
     ],
@@ -3675,6 +3855,11 @@
     "CheckCash": 17,
     "CheckCreate": 16,
     "Clawback": 30,
+    "ConfidentialMPTClawback": 89,
+    "ConfidentialMPTConvert": 85,
+    "ConfidentialMPTConvertBack": 87,
+    "ConfidentialMPTMergeInbox": 86,
+    "ConfidentialMPTSend": 88,
     "CredentialAccept": 59,
     "CredentialCreate": 58,
     "CredentialDelete": 60,

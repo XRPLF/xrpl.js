@@ -23,6 +23,26 @@ import {
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
+import {
+  ConfidentialMPTClawback,
+  validateConfidentialMPTClawback,
+} from './ConfidentialMPTClawback'
+import {
+  ConfidentialMPTConvert,
+  validateConfidentialMPTConvert,
+} from './ConfidentialMPTConvert'
+import {
+  ConfidentialMPTConvertBack,
+  validateConfidentialMPTConvertBack,
+} from './ConfidentialMPTConvertBack'
+import {
+  ConfidentialMPTMergeInbox,
+  validateConfidentialMPTMergeInbox,
+} from './ConfidentialMPTMergeInbox'
+import {
+  ConfidentialMPTSend,
+  validateConfidentialMPTSend,
+} from './ConfidentialMPTSend'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -165,6 +185,11 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | ConfidentialMPTClawback
+  | ConfidentialMPTConvert
+  | ConfidentialMPTConvertBack
+  | ConfidentialMPTMergeInbox
+  | ConfidentialMPTSend
   | CredentialAccept
   | CredentialCreate
   | CredentialDelete
@@ -344,6 +369,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Clawback':
       validateClawback(tx)
+      break
+
+    case 'ConfidentialMPTClawback':
+      validateConfidentialMPTClawback(tx)
+      break
+
+    case 'ConfidentialMPTConvert':
+      validateConfidentialMPTConvert(tx)
+      break
+
+    case 'ConfidentialMPTConvertBack':
+      validateConfidentialMPTConvertBack(tx)
+      break
+
+    case 'ConfidentialMPTMergeInbox':
+      validateConfidentialMPTMergeInbox(tx)
+      break
+
+    case 'ConfidentialMPTSend':
+      validateConfidentialMPTSend(tx)
       break
 
     case 'CredentialAccept':

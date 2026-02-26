@@ -55,6 +55,11 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+  /**
+   * If set, indicates that confidential (privacy-preserving) transfers are enabled.
+   * This allows holders to send/receive tokens without revealing amounts publicly.
+   */
+  tfMPTCanPrivacy = 0x00000080,
 }
 
 /**
@@ -64,13 +69,15 @@ export enum MPTokenIssuanceCreateFlags {
  * @category Transaction Flags
  */
 // eslint-disable-next-line max-len -- Disable for interface declaration.
-export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterface {
+export interface MPTokenIssuanceCreateFlagsInterface
+  extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
   tfMPTRequireAuth?: boolean
   tfMPTCanEscrow?: boolean
   tfMPTCanTrade?: boolean
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
+  tfMPTCanPrivacy?: boolean
 }
 
 /**
@@ -120,6 +127,18 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
    */
   MPTokenMetadata?: string
 
+  /**
+   * The permissioned domain ID to associate with this issuance.
+   * This restricts usage to accounts in the specified permissioned domain.
+   */
+  DomainID?: string
+
+  /**
+   * Flags controlling which settings can be changed after issuance.
+   * See MutableFlags in the ledger entry for possible values.
+   */
+  MutableFlags?: number
+
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 }
 
@@ -142,6 +161,8 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
