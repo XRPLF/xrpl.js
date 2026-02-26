@@ -4,6 +4,7 @@ import { isFlagEnabled } from '../utils'
 import {
   BaseTransaction,
   isString,
+  isNumber,
   validateBaseTransaction,
   validateRequiredField,
   Account,
@@ -41,7 +42,7 @@ export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
 
 /**
  * The MPTokenIssuanceSet transaction is used to globally lock/unlock a MPTokenIssuance,
- * or lock/unlock an individual's MPToken.
+ * lock/unlock an individual's MPToken, or update mutable issuance settings.
  */
 export interface MPTokenIssuanceSet extends BaseTransaction {
   TransactionType: 'MPTokenIssuanceSet'
@@ -54,6 +55,35 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    * If omitted, this transaction will apply to all any accounts holding MPTs.
    */
   Holder?: Account
+  /**
+   * The permissioned domain ID to associate with this issuance.
+   */
+  DomainID?: string
+  /**
+   * Updated metadata for the issuance. Can only be changed if the issuance
+   * was created with the appropriate mutable flag.
+   */
+  MPTokenMetadata?: string
+  /**
+   * Updated transfer fee. Can only be changed if the issuance was created
+   * with the appropriate mutable flag.
+   */
+  TransferFee?: number
+  /**
+   * Updated mutable flags for the issuance.
+   */
+  MutableFlags?: number
+  /**
+   * The issuer's ElGamal public key for confidential transfers.
+   * Required to enable confidential transfers on this issuance.
+   */
+  IssuerElGamalPublicKey?: string
+  /**
+   * The auditor's ElGamal public key for confidential transfers.
+   * Optional; allows an auditor to decrypt confidential balances.
+   */
+  AuditorElGamalPublicKey?: string
+
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 }
 
@@ -67,6 +97,12 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'TransferFee', isNumber)
+  validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'IssuerElGamalPublicKey', isString)
+  validateOptionalField(tx, 'AuditorElGamalPublicKey', isString)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface

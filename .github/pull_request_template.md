@@ -31,10 +31,20 @@ Please check relevant options, delete irrelevant ones.
 - [ ] Documentation Updates
 - [ ] Release
 
-### Did you update HISTORY.md?
+### Change Checklist
 
-- [ ] Yes
-- [ ] No, this change does not impact library users
+Review all items below and check those impacted by this change.
+If an item is not impacted, briefly explain why.
+
+- [ ] Transaction models
+- [ ] Ledger entry models
+- [ ] Request/RPC method models
+- [ ] Binary codec (`definitions.json`, types, etc.)
+- [ ] Utility functions
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Amendment(s) enabled in CI config (`.ci-config/rippled.cfg`)
+- [ ] HISTORY.md if changes impact library users
 
 ## Test Plan
 
