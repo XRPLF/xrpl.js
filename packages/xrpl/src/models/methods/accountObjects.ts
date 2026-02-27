@@ -16,8 +16,7 @@ export type AccountObjectType = Exclude<
  * @category Requests
  */
 export interface AccountObjectsRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_objects'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
