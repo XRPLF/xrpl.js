@@ -162,4 +162,53 @@ describe('OfferCreate', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'OfferCreate with MPT on TakerPays side',
+    async () => {
+      const issuerWallet = await generateFundedWallet(testContext.client)
+      const sourceWallet = await generateFundedWallet(testContext.client)
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuerWallet,
+        sourceWallet,
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      )
+
+      // Create an offer: sell 100000 XRP drops for 10 MPT
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: sourceWallet.classicAddress,
+        TakerGets: '100000',
+        TakerPays: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '10',
+        },
+      }
+
+      await testTransaction(testContext.client, tx, sourceWallet)
+
+      // Confirm the offer exists on the ledger
+      const accountOffersResponse = await testContext.client.request({
+        command: 'account_offers',
+        account: sourceWallet.classicAddress,
+      })
+      assert.lengthOf(
+        accountOffersResponse.result.offers!,
+        1,
+        'Should be exactly one offer on the ledger',
+      )
+
+      const offer = accountOffersResponse.result.offers![0]
+      assert.equal(offer.taker_gets, '100000')
+      assert.deepEqual(offer.taker_pays, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '10',
+      })
+    },
+    TIMEOUT,
+  )
 })

@@ -216,6 +216,41 @@ describe('Path-Set binary-codec unit tests', () => {
     )
   })
 
+  it(`Path with MPT → Currency → MPT hops`, () => {
+    const mptIssuanceId1 = '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8'
+    const currencyCode = 'ABC'
+    const mptIssuanceId2 = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
+    const path = [
+      [
+        { mpt_issuance_id: mptIssuanceId1 } as HopObject,
+        { currency: currencyCode } as HopObject,
+        { mpt_issuance_id: mptIssuanceId2 } as HopObject,
+      ],
+    ]
+    const serializedHexRepr = coreTypes.PathSet.from(path).toHex().toUpperCase()
+
+    expect(serializedHexRepr).toEqual(
+      '40' /* MPT type code */ +
+        mptIssuanceId1.toUpperCase() /* first 24-byte MPTID */ +
+        '10' /* Currency type code */ +
+        Currency.from(currencyCode)
+          .toHex()
+          .toUpperCase() /* 20-byte currency */ +
+        '40' /* MPT type code */ +
+        mptIssuanceId2.toUpperCase() /* second 24-byte MPTID */ +
+        '00' /* PathSet terminator */,
+    )
+
+    // test the round-trip equivalence
+    expect(coreTypes.PathSet.from(path).toJSON()).toEqual(path)
+
+    // validate the de-serialization via the BinaryParser
+    const parser = new BinaryParser(serializedHexRepr)
+    expect(coreTypes.PathSet.fromParser(parser)).toEqual(
+      coreTypes.PathSet.from(path),
+    )
+  })
+
   it(`PathSet: Currency and MPT are mutually exclusive in a hop`, () => {
     const currencyCode = 'ABC'
     const mptIssuanceId = '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8'
@@ -244,7 +279,24 @@ describe('Path-Set binary-codec unit tests', () => {
 
     const parser = new BinaryParser(invalidHex)
     expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
-      'Currency and mpt_issuance_id are mutually exclusive',
+      'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+    )
+  })
+
+  it(`PathSet: Deserialization rejects type byte 0x51 (Account + Currency + MPT)`, () => {
+    // Type byte 0x51 = TYPE_ACCOUNT (0x01) | TYPE_CURRENCY (0x10) | TYPE_MPT (0x40)
+    const invalidHex =
+      '51' +
+      AccountID.from('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+        .toHex()
+        .toUpperCase() +
+      Currency.from('ABC').toHex().toUpperCase() +
+      '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8' +
+      '00'
+
+    const parser = new BinaryParser(invalidHex)
+    expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
+      'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
     )
   })
 })

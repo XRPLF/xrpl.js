@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { CheckCreate, CheckCash } from '../../../src'
+import { CheckCreate, CheckCash, LedgerEntry } from '../../../src'
 import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
@@ -111,7 +111,21 @@ describe('CheckCash', function () {
         1,
         'Should be exactly one check on the ledger',
       )
-      const checkId = response1.result.account_objects[0].index
+
+      const checkObject = response1.result
+        .account_objects[0] as LedgerEntry.Check
+      const checkId = checkObject.index
+
+      // Verify the check ledger object contents
+      assert.equal(checkObject.Account, testContext.wallet.classicAddress)
+      assert.equal(
+        checkObject.Destination,
+        checkDestinationWallet.classicAddress,
+      )
+      assert.deepEqual(checkObject.SendMax, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '50',
+      })
 
       // Cash the check with MPT
       const tx: CheckCash = {
