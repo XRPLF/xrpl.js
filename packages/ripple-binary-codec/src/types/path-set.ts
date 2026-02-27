@@ -109,7 +109,7 @@ class Hop extends SerializedType {
 
     if (type & TYPE_CURRENCY && type & TYPE_MPT) {
       throw new Error(
-        'Invalid binary input: Currency and mpt_issuance_id are mutually exclusive in a path hop',
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
       )
     }
 

@@ -67,8 +67,8 @@ export interface AMMClawback extends BaseTransaction {
   Asset: IssuedCurrency | MPTCurrency
 
   /**
-   * Specifies the other asset in the AMM's pool. In JSON, this is an object with currency and
-   * issuer fields (omit issuer for XRP), or mpt_issuance_id for MPT.
+   * Specifies the other asset in the AMM's pool. In JSON, this can be XRP (no issuer),
+   * an issued currency (with issuer), or an MPT (with mpt_issuance_id).
    */
   Asset2: Currency
 

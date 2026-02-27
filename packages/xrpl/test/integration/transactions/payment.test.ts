@@ -6,8 +6,11 @@ import {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
+  AccountSet,
+  AccountSetAsfFlags,
   AMMCreate,
   TransactionMetadata,
+  TrustSet,
 } from '../../../src'
 import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
@@ -269,6 +272,92 @@ describe('Payment', function () {
         },
         SendMax: '500000',
         Paths: [[{ mpt_issuance_id: mptIdB }]],
+      }
+
+      await testTransaction(testContext.client, payTx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Payment with currency PathStep (no account)',
+    async () => {
+      const issuer = await generateFundedWallet(testContext.client)
+      const lpWallet = await generateFundedWallet(testContext.client)
+      const destination = await generateFundedWallet(testContext.client)
+
+      const currencyCode = 'USD'
+
+      // Enable default rippling on the issuer so payments can ripple through
+      const enableRipplingTx: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: issuer.classicAddress,
+        SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+      }
+      await testTransaction(testContext.client, enableRipplingTx, issuer)
+
+      // LP sets up a trust line for USD and receives funds from the issuer
+      const trustTx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: lpWallet.classicAddress,
+        LimitAmount: {
+          currency: currencyCode,
+          issuer: issuer.classicAddress,
+          value: '100000',
+        },
+      }
+      await testTransaction(testContext.client, trustTx, lpWallet)
+
+      const fundLpTx: Payment = {
+        TransactionType: 'Payment',
+        Account: issuer.classicAddress,
+        Destination: lpWallet.classicAddress,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuer.classicAddress,
+          value: '50000',
+        },
+      }
+      await testTransaction(testContext.client, fundLpTx, issuer)
+
+      // Destination sets up a trust line for USD
+      const destTrustTx: TrustSet = {
+        TransactionType: 'TrustSet',
+        Account: destination.classicAddress,
+        LimitAmount: {
+          currency: currencyCode,
+          issuer: issuer.classicAddress,
+          value: '100000',
+        },
+      }
+      await testTransaction(testContext.client, destTrustTx, destination)
+
+      // Create AMM pool: XRP / USD
+      const ammCreateTx: AMMCreate = {
+        TransactionType: 'AMMCreate',
+        Account: lpWallet.classicAddress,
+        Amount: '1000000',
+        Amount2: {
+          currency: currencyCode,
+          issuer: issuer.classicAddress,
+          value: '1000',
+        },
+        TradingFee: 12,
+      }
+      await testTransaction(testContext.client, ammCreateTx, lpWallet)
+
+      // Cross-currency payment: XRP → USD via AMM with a currency-only path step
+      const payTx: Payment = {
+        TransactionType: 'Payment',
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        Amount: {
+          currency: currencyCode,
+          issuer: issuer.classicAddress,
+          value: '5',
+        },
+        SendMax: '500000',
+        Paths: [[{ currency: currencyCode, issuer: issuer.classicAddress }]],
       }
 
       await testTransaction(testContext.client, payTx, testContext.wallet)
