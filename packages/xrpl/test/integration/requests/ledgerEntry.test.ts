@@ -1,6 +1,8 @@
 import { assert } from 'chai'
 
 import { LedgerEntryRequest, LedgerEntryResponse } from '../../../src'
+import type AMM from '../../../src/models/ledger/AMM'
+import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -52,6 +54,37 @@ describe('ledger_entry', function () {
 
       assert.equal(ledgerEntryResponse.type, 'response')
       assert.deepEqual(ledgerEntryResponse, expectedResponse)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'ledger_entry for AMM with MPT assets',
+    async () => {
+      const mptPool = await createAMMPoolWithMPT(testContext.client)
+      const { asset, asset2 } = mptPool
+
+      const ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        amm: {
+          asset,
+          asset2,
+        },
+      })
+
+      assert.equal(ledgerEntryResponse.type, 'response')
+
+      const node = ledgerEntryResponse.result.node as unknown as AMM
+      assert.equal(node.LedgerEntryType, 'AMM')
+      assert.deepEqual(node.Asset, {
+        mpt_issuance_id: asset.mpt_issuance_id,
+      })
+      assert.deepEqual(node.Asset2, {
+        mpt_issuance_id: asset2.mpt_issuance_id,
+      })
+      assert.equal(node.TradingFee, 12)
+      assert.ok(node.LPTokenBalance)
+      assert.ok(node.Account)
     },
     TIMEOUT,
   )

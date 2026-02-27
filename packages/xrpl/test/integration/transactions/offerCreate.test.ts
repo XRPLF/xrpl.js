@@ -1,6 +1,12 @@
 import { assert } from 'chai'
 
-import { OfferCreate, TrustSet, Wallet } from '../../../src'
+import {
+  MPTokenIssuanceCreateFlags,
+  OfferCreate,
+  TrustSet,
+  Wallet,
+} from '../../../src'
+import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -104,6 +110,104 @@ describe('OfferCreate', function () {
       })
 
       assert.equal(response.result.engine_result, 'tecFROZEN')
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'OfferCreate with MPT',
+    async () => {
+      const issuerWallet = await generateFundedWallet(testContext.client)
+      const sourceWallet = await generateFundedWallet(testContext.client)
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuerWallet,
+        sourceWallet,
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      )
+
+      // Create an offer: sell 10 MPT for 100000 XRP drops
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: sourceWallet.classicAddress,
+        TakerGets: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '10',
+        },
+        TakerPays: '100000',
+      }
+
+      await testTransaction(testContext.client, tx, sourceWallet)
+
+      // Confirm the offer exists on the ledger
+      const accountOffersResponse = await testContext.client.request({
+        command: 'account_offers',
+        account: sourceWallet.classicAddress,
+      })
+      assert.lengthOf(
+        accountOffersResponse.result.offers!,
+        1,
+        'Should be exactly one offer on the ledger',
+      )
+
+      const offer = accountOffersResponse.result.offers![0]
+      assert.deepEqual(offer.taker_gets, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '10',
+      })
+      assert.equal(offer.taker_pays, '100000')
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'OfferCreate with MPT on TakerPays side',
+    async () => {
+      const issuerWallet = await generateFundedWallet(testContext.client)
+      const sourceWallet = await generateFundedWallet(testContext.client)
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        issuerWallet,
+        sourceWallet,
+        // eslint-disable-next-line no-bitwise -- combining flags requires bitwise OR
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      )
+
+      // Create an offer: sell 100000 XRP drops for 10 MPT
+      const tx: OfferCreate = {
+        TransactionType: 'OfferCreate',
+        Account: sourceWallet.classicAddress,
+        TakerGets: '100000',
+        TakerPays: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '10',
+        },
+      }
+
+      await testTransaction(testContext.client, tx, sourceWallet)
+
+      // Confirm the offer exists on the ledger
+      const accountOffersResponse = await testContext.client.request({
+        command: 'account_offers',
+        account: sourceWallet.classicAddress,
+      })
+      assert.lengthOf(
+        accountOffersResponse.result.offers!,
+        1,
+        'Should be exactly one offer on the ledger',
+      )
+
+      const offer = accountOffersResponse.result.offers![0]
+      assert.equal(offer.taker_gets, '100000')
+      assert.deepEqual(offer.taker_pays, {
+        mpt_issuance_id: mptIssuanceId,
+        value: '10',
+      })
     },
     TIMEOUT,
   )

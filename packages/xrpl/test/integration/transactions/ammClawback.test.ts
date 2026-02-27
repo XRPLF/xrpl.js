@@ -1,5 +1,9 @@
+import { assert } from 'chai'
 import { AMMClawback, AMMDeposit, AMMDepositFlags, XRP } from 'xrpl'
 
+import { AMMInfoResponse } from '../../../src'
+import type { MPTAmount } from '../../../src/models/common'
+import { createAMMPoolWithMPT, type TestMPTAMMPool } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -53,5 +57,48 @@ describe('AMMClawback', function () {
     }
 
     await testTransaction(testContext.client, ammClawback, issuerWallet)
+  })
+
+  it('clawback MPT from AMM pool', async function () {
+    const mptPool: TestMPTAMMPool = await createAMMPoolWithMPT(
+      testContext.client,
+    )
+    const { asset, asset2, issuerWallet1, lpWallet } = mptPool
+
+    // Record pre-clawback pool balance
+    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const preAmount = preAmmInfoRes.result.amm.amount as MPTAmount
+
+    // Issuer claws back MPT from the AMM holder
+    const ammClawbackMPT: AMMClawback = {
+      TransactionType: 'AMMClawback',
+      Account: issuerWallet1.classicAddress,
+      Holder: lpWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
+      Amount: {
+        mpt_issuance_id: asset.mpt_issuance_id,
+        value: '10',
+      },
+    }
+
+    await testTransaction(testContext.client, ammClawbackMPT, issuerWallet1)
+
+    // Verify pool balance decreased
+    const postAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const postAmount = postAmmInfoRes.result.amm.amount as MPTAmount
+
+    assert.isBelow(
+      parseInt(postAmount.value, 10),
+      parseInt(preAmount.value, 10),
+    )
   })
 })

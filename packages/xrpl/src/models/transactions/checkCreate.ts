@@ -4,7 +4,7 @@ import { Amount } from '../common'
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrencyAmount,
+  isAmount,
   isAccount,
   validateRequiredField,
   validateOptionalField,
@@ -64,7 +64,7 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (typeof tx.SendMax !== 'string' && !isIssuedCurrencyAmount(tx.SendMax)) {
+  if (!isAmount(tx.SendMax)) {
     throw new ValidationError('CheckCreate: invalid SendMax')
   }
 

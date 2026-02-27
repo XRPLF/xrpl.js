@@ -268,6 +268,24 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
   if (pathStep.issuer !== undefined && typeof pathStep.issuer !== 'string') {
     return false
   }
+
+  // mpt_issuance_id is mutually exclusive with account and currency
+  if (pathStep.mpt_issuance_id !== undefined) {
+    if (pathStep.account !== undefined || pathStep.currency !== undefined) {
+      return false
+    }
+
+    if (typeof pathStep.mpt_issuance_id !== 'string') {
+      return false
+    }
+
+    if (!/^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id)) {
+      return false
+    }
+
+    return true
+  }
+
   if (
     pathStep.account !== undefined &&
     pathStep.currency === undefined &&

@@ -1,5 +1,10 @@
 import { validateCheckCash } from '../../src/models/transactions/checkCash'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateCheckCash)
 const assertInvalid = (tx: any, message: string): void =>
@@ -73,5 +78,70 @@ describe('CheckCash', function () {
     } as any
 
     assertInvalid(invalidDeliverMin, 'CheckCash: invalid DeliverMin')
+  })
+
+  // MPT-related tests
+  it(`verifies valid CheckCash with MPT Amount`, function () {
+    const validCheckCash = {
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
+        value: '50',
+      },
+      CheckID:
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      Fee: '12',
+    } as any
+
+    assertValid(validCheckCash)
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id contains non-hex characters`, function () {
+    const invalidCheckCash = {
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: {
+        mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+        value: '50',
+      },
+      CheckID:
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      Fee: '12',
+    } as any
+
+    assertInvalid(invalidCheckCash, 'CheckCash: invalid Amount')
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too short`, function () {
+    const invalidCheckCash = {
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+        value: '50',
+      },
+      CheckID:
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      Fee: '12',
+    } as any
+
+    assertInvalid(invalidCheckCash, 'CheckCash: invalid Amount')
+  })
+
+  it(`throws w/ MPT Amount mpt_issuance_id too long`, function () {
+    const invalidCheckCash = {
+      Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      TransactionType: 'CheckCash',
+      Amount: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+        value: '50',
+      },
+      CheckID:
+        '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      Fee: '12',
+    } as any
+
+    assertInvalid(invalidCheckCash, 'CheckCash: invalid Amount')
   })
 })

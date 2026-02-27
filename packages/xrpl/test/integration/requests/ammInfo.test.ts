@@ -2,6 +2,7 @@ import { assert } from 'chai'
 import { isValidClassicAddress } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
+import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,
@@ -41,5 +42,29 @@ describe('AMMInfo', function () {
       value: '250',
     })
     assert.equal(amm.trading_fee, 12)
+  })
+
+  it('amm_info with MPT assets', async function () {
+    const mptPool = await createAMMPoolWithMPT(testContext.client)
+    const { asset, asset2 } = mptPool
+
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm } = ammInfoRes.result
+
+    assert.isTrue(isValidClassicAddress(amm.account))
+    assert.deepEqual(amm.amount, {
+      mpt_issuance_id: asset.mpt_issuance_id,
+      value: '250',
+    })
+    assert.deepEqual(amm.amount2, {
+      mpt_issuance_id: asset2.mpt_issuance_id,
+      value: '250',
+    })
+    assert.equal(amm.trading_fee, 12)
+    assert.ok(amm.lp_token)
   })
 })
