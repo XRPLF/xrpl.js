@@ -5213,6 +5213,33 @@
           "issuer": "rfVe1DnuC7nuvGWTAFzBxaTxroEiD8XZ3w"
         }
       }
+    },
+    {
+      "binary": "201C0000000020490000197CA2FFFFFF00F8E511006125002C6B905563F4B97FFBA6D65B7C507DD24E157ADF1BED3AFF2B8EC73741B8E1BEE9F1A0A55698DC3588FBDB6A91CCF5DB14E8523E8DB7E4574C92818E87A2236A5906C71021E624002C6B8F624000000005F5E100E1E7220000000024002C6B902D00000000624000000005E69EB48114F69B176FEEA1193FE503C3D229BCBA1126916B02E1E1F10310C7",
+      "json": {
+        "AffectedNodes": [
+          {
+            "ModifiedNode": {
+              "FinalFields": {
+                "Account": "rP7Ap93CjnFxzcGXPszoD9CQHniSJYCboN",
+                "Balance": "98999988",
+                "Flags": 0,
+                "OwnerCount": 0,
+                "Sequence": 2911120
+              },
+              "LedgerEntryType": "AccountRoot",
+              "LedgerIndex": "98DC3588FBDB6A91CCF5DB14E8523E8DB7E4574C92818E87A2236A5906C71021",
+              "PreviousFields": { "Balance": "100000000", "Sequence": 2911119 },
+              "PreviousTxnID": "63F4B97FFBA6D65B7C507DD24E157ADF1BED3AFF2B8EC73741B8E1BEE9F1A0A5",
+              "PreviousTxnLgrSeq": 2911120
+            }
+          }
+        ],
+        "GasUsed": 6524,
+        "TransactionIndex": 0,
+        "TransactionResult": "tecWASM_REJECTED",
+        "WasmReturnCode": -256
+      }
     }
   ],
   "ledgerData": [

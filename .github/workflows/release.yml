@@ -10,7 +10,7 @@ on:
         description: "Package folder (Name of the package directory under packages/ folder. e.g., xrpl, ripple-address-codec)"
         required: true
       release_branch_name:
-        description: 'Name of the release branch to be used'
+        description: "Name of the release branch to be used"
         required: true
       npmjs_dist_tag:
         description: "npm distribution tag(Read more https://docs.npmjs.com/adding-dist-tags-to-packages)"
@@ -123,7 +123,6 @@ jobs:
             echo "is_beta=$IS_BETA"
             echo "dist_tag=$NPM_DIST_TAG"
           } >> "$GITHUB_OUTPUT"
-
 
       - name: Get package version from package.json
         id: get_version
@@ -497,14 +496,14 @@ jobs:
         if: always()
         shell: bash
         env:
-          SLACK_TOKEN:    ${{ secrets.SLACK_TOKEN }}
-          CHANNEL:        "#xrpl-js"
-          EXECUTOR:       ${{ github.triggering_actor || github.actor }}
-          RUN_URL:        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          REPO:           ${{ github.repository }}
-          RUN_ID:         ${{ github.run_id }}
-          DEV_REVIEWERS:  ${{ steps.get_reviewers.outputs.reviewers_dev }}
-          PR_URL:         ${{ needs.pre_release.outputs.release_pr_url }}
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          CHANNEL: "#xrpl-js"
+          EXECUTOR: ${{ github.triggering_actor || github.actor }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          DEV_REVIEWERS: ${{ steps.get_reviewers.outputs.reviewers_dev }}
+          PR_URL: ${{ needs.pre_release.outputs.release_pr_url }}
         run: |
           set -euo pipefail
           RUN_URL="https://github.com/${REPO}/actions/runs/${RUN_ID}"
@@ -531,7 +530,7 @@ jobs:
         run_faucet_test,
         run_tests,
         pre_release,
-        ask_for_dev_team_review
+        ask_for_dev_team_review,
       ]
     name: First approval (dev team)
     environment:
@@ -551,7 +550,7 @@ jobs:
         run_tests,
         pre_release,
         ask_for_dev_team_review,
-        first_review
+        first_review,
       ]
     name: Invite sec team to review
     steps:
@@ -592,7 +591,7 @@ jobs:
         pre_release,
         ask_for_dev_team_review,
         first_review,
-        ask_for_sec_team_review
+        ask_for_sec_team_review,
       ]
 
     name: Release for ${{ needs.get_version.outputs.package_version }}
@@ -614,7 +613,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: 'https://registry.npmjs.org/'
+          registry-url: "https://registry.npmjs.org/"
       - name: Checkout release branch
         uses: actions/checkout@v4
         with:
@@ -732,7 +731,7 @@ jobs:
         first_review,
         ask_for_sec_team_review,
         release,
-        generate-documentation
+        generate-documentation,
       ]
     if: >-
       ${{ always() && (
