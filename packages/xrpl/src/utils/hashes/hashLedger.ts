@@ -172,7 +172,11 @@ function normalizeToV2(
   tx: LedgerTransactionExpanded | LedgerTransactionExpandedV1,
 ): LedgerTransactionExpanded {
   if ('tx_json' in tx) {
-    return { ...tx.tx_json, hash: tx.hash, metaData: tx.meta }
+    return {
+      ...(tx.tx_json as Record<string, unknown>),
+      hash: tx.hash,
+      metaData: tx.meta,
+    } as LedgerTransactionExpanded
   }
   return tx
 }
