@@ -127,7 +127,7 @@ describe('Path-Set binary-codec unit tests', () => {
     )
   })
 
-  it(`Two paths with mpt_issaunce_id hops`, () => {
+  it(`Two paths with mpt_issuance_id hops`, () => {
     const mptIssuanceId1 = '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8'
     const mptIssuanceId2 = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
     const path = [
