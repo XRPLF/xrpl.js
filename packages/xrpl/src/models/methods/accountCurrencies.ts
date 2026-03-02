@@ -8,7 +8,8 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface AccountCurrenciesRequest
-  extends BaseRequest, LookupByLedgerRequest {
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_currencies'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string

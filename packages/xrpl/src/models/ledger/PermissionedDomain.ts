@@ -3,7 +3,8 @@ import { AuthorizeCredential } from '../common'
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export default interface PermissionedDomain
-  extends BaseLedgerEntry, HasPreviousTxnID {
+  extends BaseLedgerEntry,
+    HasPreviousTxnID {
   /* The ledger object's type (PermissionedDomain). */
   LedgerEntryType: 'PermissionedDomain'
 

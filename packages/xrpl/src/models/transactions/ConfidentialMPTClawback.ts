@@ -60,4 +60,3 @@ export function validateConfidentialMPTClawback(
   validateRequiredField(tx, 'MPTAmount', isString)
   validateRequiredField(tx, 'ZKProof', isString)
 }
-

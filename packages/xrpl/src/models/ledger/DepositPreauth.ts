@@ -9,7 +9,8 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface DepositPreauth
-  extends BaseLedgerEntry, HasPreviousTxnID {
+  extends BaseLedgerEntry,
+    HasPreviousTxnID {
   LedgerEntryType: 'DepositPreauth'
   /** The account that granted the preauthorization. */
   Account: string

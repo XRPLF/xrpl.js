@@ -86,4 +86,3 @@ export function validateConfidentialMPTConvertBack(
 
   validateOptionalField(tx, 'AuditorEncryptedAmount', isString)
 }
-

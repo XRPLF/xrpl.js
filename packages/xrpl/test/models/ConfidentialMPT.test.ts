@@ -1,15 +1,18 @@
-import { validateConfidentialMPTConvert } from '../../src/models/transactions/ConfidentialMPTConvert'
-import { validateConfidentialMPTMergeInbox } from '../../src/models/transactions/ConfidentialMPTMergeInbox'
-import { validateConfidentialMPTConvertBack } from '../../src/models/transactions/ConfidentialMPTConvertBack'
-import { validateConfidentialMPTSend } from '../../src/models/transactions/ConfidentialMPTSend'
 import { validateConfidentialMPTClawback } from '../../src/models/transactions/ConfidentialMPTClawback'
+import { validateConfidentialMPTConvert } from '../../src/models/transactions/ConfidentialMPTConvert'
+import { validateConfidentialMPTConvertBack } from '../../src/models/transactions/ConfidentialMPTConvertBack'
+import { validateConfidentialMPTMergeInbox } from '../../src/models/transactions/ConfidentialMPTMergeInbox'
+import { validateConfidentialMPTSend } from '../../src/models/transactions/ConfidentialMPTSend'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const MPT_ISSUANCE_ID =
   '0000000000000000000000000000000000000000000000000000000000000001'
-const SAMPLE_HEX_66_BYTES = 'A'.repeat(132) // 66 bytes = 132 hex chars
-const SAMPLE_ZK_PROOF = 'B'.repeat(200) // Sample ZK proof
-const SAMPLE_COMMITMENT = 'C'.repeat(66) // Sample commitment
+// 66 bytes = 132 hex chars
+const SAMPLE_HEX_66_BYTES = 'A'.repeat(132)
+// Sample ZK proof
+const SAMPLE_ZK_PROOF = 'B'.repeat(200)
+// Sample commitment
+const SAMPLE_COMMITMENT = 'C'.repeat(66)
 
 /**
  * ConfidentialMPTConvert Transaction Verification Testing.

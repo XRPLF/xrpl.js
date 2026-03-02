@@ -10,7 +10,8 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface AccountOffersRequest
-  extends BaseRequest, LookupByLedgerRequest {
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'account_offers'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string

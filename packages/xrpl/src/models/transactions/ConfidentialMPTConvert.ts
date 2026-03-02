@@ -89,4 +89,3 @@ export function validateConfidentialMPTConvert(
   validateOptionalField(tx, 'AuditorEncryptedAmount', isString)
   validateOptionalField(tx, 'ZKProof', isString)
 }
-

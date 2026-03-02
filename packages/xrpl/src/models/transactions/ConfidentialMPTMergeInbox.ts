@@ -38,4 +38,3 @@ export function validateConfidentialMPTMergeInbox(
 
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
 }
-

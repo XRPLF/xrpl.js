@@ -11,7 +11,8 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface TransactionEntryRequest
-  extends BaseRequest, LookupByLedgerRequest {
+  extends BaseRequest,
+    LookupByLedgerRequest {
   command: 'transaction_entry'
 
   /** Unique hash of the transaction you are looking up. */
