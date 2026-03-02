@@ -2,6 +2,7 @@ import { assert } from 'chai'
 
 import {
   Payment,
+  PaymentFlags,
   Wallet,
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
@@ -12,6 +13,7 @@ import {
   TransactionMetadata,
   TrustSet,
 } from '../../../src'
+import type { PaymentMetadata } from '../../../src/models/transactions/payment'
 import { createMPTIssuanceAndAuthorize } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
@@ -361,6 +363,174 @@ describe('Payment', function () {
       }
 
       await testTransaction(testContext.client, payTx, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'delivered_amount is populated with MPT for a direct MPT payment',
+    async () => {
+      const holder = await generateFundedWallet(testContext.client)
+
+      /* eslint-disable no-bitwise -- combining flags requires bitwise OR */
+      const mptFlags =
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+        MPTokenIssuanceCreateFlags.tfMPTCanTransfer
+      /* eslint-enable no-bitwise */
+
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        testContext.wallet,
+        holder,
+        mptFlags,
+        '10000',
+      )
+
+      // Send MPT from holder back to a new authorized recipient
+      const recipient = await generateFundedWallet(testContext.client)
+      const authTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: recipient.classicAddress,
+        MPTokenIssuanceID: mptIssuanceId,
+      }
+      await testTransaction(testContext.client, authTx, recipient)
+
+      const payTx: Payment = {
+        TransactionType: 'Payment',
+        Account: holder.classicAddress,
+        Destination: recipient.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '500',
+        },
+      }
+
+      const payResponse = await testTransaction(
+        testContext.client,
+        payTx,
+        holder,
+      )
+
+      const txHash = payResponse.result.tx_json.hash
+      const txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result.meta as PaymentMetadata
+
+      assert.exists(
+        meta.delivered_amount,
+        'delivered_amount should exist in metadata',
+      )
+      assert.isObject(
+        meta.delivered_amount,
+        'delivered_amount should be an MPT object',
+      )
+
+      const deliveredAmount = meta.delivered_amount as {
+        mpt_issuance_id: string
+        value: string
+      }
+
+      assert.equal(
+        deliveredAmount.mpt_issuance_id,
+        mptIssuanceId,
+        'delivered_amount mpt_issuance_id should match',
+      )
+      assert.equal(
+        deliveredAmount.value,
+        '500',
+        'delivered_amount value should match the payment amount',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'delivered_amount reflects actual amount for partial MPT payment',
+    async () => {
+      const holder = await generateFundedWallet(testContext.client)
+
+      /* eslint-disable no-bitwise -- combining flags requires bitwise OR */
+      const mptFlags =
+        MPTokenIssuanceCreateFlags.tfMPTCanTrade |
+        MPTokenIssuanceCreateFlags.tfMPTCanTransfer
+      /* eslint-enable no-bitwise */
+
+      // Fund holder with only 500 MPT
+      const mptIssuanceId = await createMPTIssuanceAndAuthorize(
+        testContext.client,
+        testContext.wallet,
+        holder,
+        mptFlags,
+        '500',
+      )
+
+      const recipient = await generateFundedWallet(testContext.client)
+      const authTx: MPTokenAuthorize = {
+        TransactionType: 'MPTokenAuthorize',
+        Account: recipient.classicAddress,
+        MPTokenIssuanceID: mptIssuanceId,
+      }
+      await testTransaction(testContext.client, authTx, recipient)
+
+      // Send partial payment: request 1000 but holder only has 500
+      const payTx: Payment = {
+        TransactionType: 'Payment',
+        Account: holder.classicAddress,
+        Destination: recipient.classicAddress,
+        Amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '1000',
+        },
+        SendMax: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '500',
+        },
+        Flags: PaymentFlags.tfPartialPayment,
+      }
+
+      const payResponse = await testTransaction(
+        testContext.client,
+        payTx,
+        holder,
+      )
+
+      const txHash = payResponse.result.tx_json.hash
+      const txResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: txHash,
+      })
+
+      const meta = txResponse.result.meta as PaymentMetadata
+
+      assert.exists(
+        meta.delivered_amount,
+        'delivered_amount should exist for partial payment',
+      )
+      assert.isObject(
+        meta.delivered_amount,
+        'delivered_amount should be an MPT object',
+      )
+
+      const deliveredAmount = meta.delivered_amount as {
+        mpt_issuance_id: string
+        value: string
+      }
+
+      assert.equal(
+        deliveredAmount.mpt_issuance_id,
+        mptIssuanceId,
+        'delivered_amount mpt_issuance_id should match',
+      )
+      // The delivered amount should be <= SendMax (500),
+      // and less than the requested Amount (1000)
+      assert.equal(
+        deliveredAmount.value,
+        '500',
+        'delivered_amount should reflect actual delivered amount, not requested',
+      )
     },
     TIMEOUT,
   )
