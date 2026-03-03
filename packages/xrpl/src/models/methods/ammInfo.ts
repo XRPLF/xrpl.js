@@ -27,9 +27,7 @@ export interface AMMInfoRequest extends BaseRequest {
   asset2?: Currency
 
   /**
-   * The address of another account which holds LP Tokens for the requested AMM.
-   * If specified, the response includes a field for the amount of the specified
-   * account's LP Tokens.
+   * Show only LP Tokens held by this liquidity provider.
    */
   account?: string
 }

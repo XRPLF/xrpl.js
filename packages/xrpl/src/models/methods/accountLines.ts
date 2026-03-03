@@ -73,8 +73,7 @@ export interface AccountLinesTrustline {
  * @category Requests
  */
 export interface AccountLinesRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_lines'
   /** A unique identifier for the account, most commonly the account's Address. */
   account: string
@@ -139,7 +138,9 @@ export interface AccountLinesResponse extends BaseResponse {
      */
     marker?: unknown
     /**
-     * The limit value used in the request.
+     * The maximum number of trust lines retrieved. The server may return fewer
+     * than the specified limit, even if more results are available. If no limit
+     * was specified in the request, use a default limit of 200.
      */
     limit?: number
   }
