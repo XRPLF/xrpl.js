@@ -64,8 +64,6 @@ dist/
 # Ignore perf test cache
 scripts/cache
 
-.eslintrc
-
 # nyc (istanbul)
 .nyc_output
 

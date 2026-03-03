@@ -35,6 +35,7 @@ class LeafNode extends Node {
    * @throws If node is of unknown type.
    */
   public get hash(): string {
+    // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check -- TODO: https://github.com/XRPLF/xrpl.js/issues/3060
     switch (this.type) {
       case NodeType.ACCOUNT_STATE: {
         const leafPrefix = HashPrefix.LEAF_NODE.toString(HEX)

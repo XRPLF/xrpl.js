@@ -8,8 +8,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface DepositAuthorizedRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'deposit_authorized'
   /** The sender of a possible payment. */
   source_account: string

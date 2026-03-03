@@ -130,18 +130,18 @@ describe('server_state', function () {
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting
-      Object.keys(response.result.state.state_accounting).forEach(function (
-        key,
-      ) {
-        assert.equal(
-          typeof response.result.state.state_accounting[key].duration_us,
-          'string',
-        )
-        assert.equal(
-          typeof response.result.state.state_accounting[key].transitions,
-          'string',
-        )
-      })
+      Object.keys(response.result.state.state_accounting).forEach(
+        function (key) {
+          assert.equal(
+            typeof response.result.state.state_accounting[key].duration_us,
+            'string',
+          )
+          assert.equal(
+            typeof response.result.state.state_accounting[key].transitions,
+            'string',
+          )
+        },
+      )
 
       // validated_ledger
       assert.equal(

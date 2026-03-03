@@ -132,16 +132,16 @@ type RequestNextPageType =
 type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : never
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest
+          ? AccountTxResponse
+          : T extends LedgerDataRequest
+            ? LedgerDataResponse
+            : never
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -476,7 +476,7 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number = request.limit ?? Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []
@@ -673,9 +673,7 @@ class Client extends EventEmitter<EventTypes> {
     tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
-    if (tx.NetworkID == null) {
-      tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
+    tx.NetworkID ??= txNeedsNetworkID(this) ? this.networkID : undefined
     if (tx.Sequence == null) {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
@@ -884,6 +882,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
@@ -1151,7 +1150,7 @@ class Client extends EventEmitter<EventTypes> {
    * const newWallet = Wallet.generate()
    * const { balance, wallet  } = await client.fundWallet(newWallet, {
    *       amount: '10',
-   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetHost: 'custom-faucet.example.com',
    *       faucetPath: '/accounts'
    *     })
    *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
@@ -1161,6 +1160,20 @@ class Client extends EventEmitter<EventTypes> {
    * }
    * ```
    *
+   * Example 3: Fund wallet using a local faucet server
+   *
+   * To interact with a faucet server running on http://, use the faucetProtocol option:
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'localhost:8000',
+   *       faucetPath: '/accounts',
+   *       faucetProtocol: 'http'
+   *     })
+   * ```
+   *
    * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
    * @param options - See below.
    * @param options.faucetHost - A custom host for a faucet server. On devnet,
@@ -1168,6 +1181,8 @@ class Client extends EventEmitter<EventTypes> {
    * attempt to determine the correct server automatically. In other environments,
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,

@@ -222,7 +222,6 @@ export function ignoreWebSocketDisconnect(error: Error): void {
  * for example, an Escrow could successfully finish at a real-world time that is up to about 10 seconds later than the time-based
  * expiration specified in the Escrow object.
  *
- *
  * @param closeTime - ledger close time in ripple time
  * @returns The difference between last ledger close time and current time in seconds
  */

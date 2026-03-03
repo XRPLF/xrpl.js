@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "4.4.0",
+  "version": "4.6.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -29,8 +29,9 @@
     "bignumber.js": "^9.0.0",
     "eventemitter3": "^5.0.1",
     "ripple-address-codec": "^5.0.0",
-    "ripple-binary-codec": "^2.5.0",
-    "ripple-keypairs": "^2.0.0"
+    "ripple-binary-codec": "^2.7.0",
+    "ripple-keypairs": "^2.0.0",
+    "fast-json-stable-stringify": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
@@ -43,7 +44,7 @@
     "lodash": "^4.17.4",
     "react": "^19.0.0",
     "run-s": "^0.0.0",
-    "typedoc": "0.28.5",
+    "typedoc": "0.28.15",
     "ws": "^8.14.2"
   },
   "scripts": {
@@ -63,7 +64,7 @@
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "test:watch": "jest --watch --config=jest.config.unit.js --verbose false --silent=false",
     "format": "prettier --write '{src,test}/**/*.ts'",
-    "lint": "eslint . --ext .ts --max-warnings 0",
+    "lint": "eslint . --max-warnings 0",
     "perf": "./scripts/perf_test.sh"
   },
   "prettier": "@xrplf/prettier-config",

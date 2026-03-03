@@ -66,9 +66,8 @@ describe('PermissionedDomainSet', function () {
         // fetch the PD `index` from the previous account_objects RPC response
         index: pd.index,
       }
-      const ledgerEntryResult = await testContext.client.request(
-        ledgerEntryRequest,
-      )
+      const ledgerEntryResult =
+        await testContext.client.request(ledgerEntryRequest)
       assert.deepEqual(pd, ledgerEntryResult.result.node)
 
       // Step-3: Test the PDDelete transaction

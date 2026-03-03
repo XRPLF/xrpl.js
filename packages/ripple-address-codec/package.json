@@ -29,7 +29,7 @@
     "build": "tsc --build tsconfig.build.json",
     "test": "jest --verbose false --silent=false ./test/*.test.ts",
     "test:browser": "npm run build && karma start ./karma.config.js",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint . --max-warnings 0",
     "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo"
   },
   "prettier": "@xrplf/prettier-config",

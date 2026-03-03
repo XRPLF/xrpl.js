@@ -26,9 +26,8 @@ describe('ledger_current', function () {
         command: 'ledger_current',
       }
 
-      const ledgerCurrentResponse = await testContext.client.request(
-        ledgerCurrentRequest,
-      )
+      const ledgerCurrentResponse =
+        await testContext.client.request(ledgerCurrentRequest)
 
       const expectedResponse: LedgerCurrentResponse = {
         id: ledgerCurrentResponse.id,

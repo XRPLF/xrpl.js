@@ -4,9 +4,22 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      git_ref:
+        description: 'Git ref to checkout (branch, tag, or commit SHA)'
+        required: true
+        type: string
+      run_faucet_tests:
+        description: 'Run faucet tests job'
+        required: false
+        type: boolean
+        default: true
+
 
 jobs:
   faucet-test:
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_faucet_tests != false }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -17,6 +30,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref || github.ref }}
+          fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:

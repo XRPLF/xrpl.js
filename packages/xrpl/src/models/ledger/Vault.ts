@@ -19,7 +19,7 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * A bit-map of boolean flags.
    */
-  Flags: 0
+  Flags: number
 
   /**
    * The transaction sequence number that created the vault.
@@ -49,22 +49,22 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The total value of the vault.
    */
-  AssetsTotal: string
+  AssetsTotal?: string
 
   /**
    * The asset amount that is available in the vault.
    */
-  AssetsAvailable: string
+  AssetsAvailable?: string
 
   /**
    * The potential loss amount that is not yet realized expressed as the vaults asset.
    */
-  LossUnrealized: string
+  LossUnrealized?: string
 
   /**
    * The identifier of the share MPTokenIssuance object.
    */
-  MPTokenIssuanceID: string
+  ShareMPTID: string
 
   /**
    * Indicates the withdrawal strategy used by the Vault.
@@ -80,4 +80,17 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
    * Arbitrary metadata about the Vault. Limited to 256 bytes.
    */
   Data?: string
+
+  /**
+   * The scaling factor for vault shares. Only applicable for IOU assets.
+   * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
+   */
+  Scale?: number
+}
+
+export enum VaultFlags {
+  /**
+   * If set, indicates that the vault is private.
+   */
+  lsfVaultPrivate = 0x00010000,
 }

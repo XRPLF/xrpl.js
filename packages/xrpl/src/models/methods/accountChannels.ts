@@ -88,8 +88,7 @@ export interface Channel {
  * @category Requests
  */
 export interface AccountChannelsRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_channels'
   /**
    * The unique identifier of an account, typically the account's address. The

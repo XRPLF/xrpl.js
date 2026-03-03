@@ -1,0 +1,298 @@
+[
+  {
+    "testName": "valid long MPTokenMetadata",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "expectedLongForm": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "hex": "7B226163223A22727761222C226169223A7B226375736970223A22393132373936525830222C22696E7465726573745F72617465223A22352E303025222C22696E7465726573745F74797065223A227661726961626C65222C226D617475726974795F64617465223A22323034352D30362D3330222C227969656C645F736F75726365223A22552E532E2054726561737572792042696C6C73227D2C226173223A227472656173757279222C2264223A2241207969656C642D62656172696E6720737461626C65636F696E206261636B65642062792073686F72742D7465726D20552E532E205472656173757269657320616E64206D6F6E6579206D61726B657420696E737472756D656E74732E222C2269223A2268747470733A2F2F6578616D706C652E6F72672F7462696C6C2D69636F6E2E706E67222C22696E223A224578616D706C65205969656C6420436F2E222C226E223A22542D42696C6C205969656C6420546F6B656E222C2274223A225442494C4C222C227573223A5B7B2263223A2277656273697465222C2274223A2250726F647563742050616765222C2275223A2268747470733A2F2F6578616D706C657969656C642E636F2F7462696C6C227D2C7B2263223A22646F6373222C2274223A225969656C6420546F6B656E20446F6373222C2275223A2268747470733A2F2F6578616D706C657969656C642E636F2F646F6373227D5D7D"
+  },
+  {
+    "testName": "valid MPTokenMetadata with all short field names",
+    "mptMetadata": {
+      "t": "TBILL",
+      "n": "T-Bill Yield Token",
+      "d": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "i": "https://example.org/tbill-icon.png",
+      "ac": "rwa",
+      "as": "treasury",
+      "in": "Example Yield Co.",
+      "us": [
+        {
+          "u": "https://exampleyield.co/tbill",
+          "c": "website",
+          "t": "Product Page"
+        },
+        {
+          "u": "https://exampleyield.co/docs",
+          "c": "docs",
+          "t": "Yield Token Docs"
+        }
+      ],
+      "ai": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "expectedLongForm": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "hex": "7B226163223A22727761222C226169223A7B226375736970223A22393132373936525830222C22696E7465726573745F72617465223A22352E303025222C22696E7465726573745F74797065223A227661726961626C65222C226D617475726974795F64617465223A22323034352D30362D3330222C227969656C645F736F75726365223A22552E532E2054726561737572792042696C6C73227D2C226173223A227472656173757279222C2264223A2241207969656C642D62656172696E6720737461626C65636F696E206261636B65642062792073686F72742D7465726D20552E532E205472656173757269657320616E64206D6F6E6579206D61726B657420696E737472756D656E74732E222C2269223A2268747470733A2F2F6578616D706C652E6F72672F7462696C6C2D69636F6E2E706E67222C22696E223A224578616D706C65205969656C6420436F2E222C226E223A22542D42696C6C205969656C6420546F6B656E222C2274223A225442494C4C222C227573223A5B7B2263223A2277656273697465222C2274223A2250726F647563742050616765222C2275223A2268747470733A2F2F6578616D706C657969656C642E636F2F7462696C6C227D2C7B2263223A22646F6373222C2274223A225969656C6420546F6B656E20446F6373222C2275223A2268747470733A2F2F6578616D706C657969656C642E636F2F646F6373227D5D7D"
+  },
+  {
+    "testName": "valid MPTokenMetadata with mixed short and long field names",
+    "mptMetadata": {
+      "ticker": "CRYPTO",
+      "n": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "d": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "as": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "c": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "t": "Main Website"
+        }
+      ],
+      "ai": "Gaming ecosystem token"
+    },
+    "expectedLongForm": {
+      "ticker": "CRYPTO",
+      "name": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "desc": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "asset_subclass": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ],
+      "additional_info": "Gaming ecosystem token"
+    },
+    "hex": "7B226163223A2267616D696E67222C226169223A2247616D696E672065636F73797374656D20746F6B656E222C226173223A22657175697479222C2264223A22412067616D696E6720746F6B656E20666F72207669727475616C20776F726C64732E222C2269223A2268747470733A2F2F6578616D706C652E6F72672F63727970746F2D69636F6E2E706E67222C22696E223A2247616D696E672053747564696F7320496E632E222C226E223A2243727970746F20546F6B656E222C2274223A2243525950544F222C227573223A5B7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D2C7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D5D7D"
+  },
+  {
+    "testName": "with extra fields",
+    "mptMetadata": {
+      "ticker": "CRYPTO",
+      "n": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "d": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "as": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "c": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "t": "Main Website"
+        }
+      ],
+      "ai": "Gaming ecosystem token",
+      "extra": {
+        "extra": "extra"
+      }
+    },
+    "expectedLongForm": {
+      "ticker": "CRYPTO",
+      "name": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "desc": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "asset_subclass": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ],
+      "additional_info": "Gaming ecosystem token",
+      "extra": {
+        "extra": "extra"
+      }
+    },
+    "hex": "7B226163223A2267616D696E67222C226169223A2247616D696E672065636F73797374656D20746F6B656E222C226173223A22657175697479222C2264223A22412067616D696E6720746F6B656E20666F72207669727475616C20776F726C64732E222C226578747261223A7B226578747261223A226578747261227D2C2269223A2268747470733A2F2F6578616D706C652E6F72672F63727970746F2D69636F6E2E706E67222C22696E223A2247616D696E672053747564696F7320496E632E222C226E223A2243727970746F20546F6B656E222C2274223A2243525950544F222C227573223A5B7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D2C7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D5D7D"
+  },
+  {
+    "testName": "with unkown null fields",
+    "mptMetadata": {
+      "t": "CRYPTO",
+      "extra": null
+    },
+    "expectedLongForm": {
+      "ticker": "CRYPTO",
+      "extra": null
+    },
+    "hex": "7B226578747261223A6E756C6C2C2274223A2243525950544F227D"
+  },
+  {
+    "testName": "multiple uris and us",
+    "mptMetadata": {
+      "t": "CRYPTO",
+      "uris": [
+        {
+          "u": "https://gamingstudios.com",
+          "c": "website",
+          "t": "Main Website"
+        }
+      ],
+      "us": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ]
+    },
+    "expectedLongForm": {
+      "ticker": "CRYPTO",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ],
+      "us": [
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "title": "Main Website"
+        }
+      ]
+    },
+    "hex": "7B2274223A2243525950544F222C2275726973223A5B7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D5D2C227573223A5B7B2263223A2277656273697465222C2274223A224D61696E2057656273697465222C2275223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D5D7D"
+  },
+  {
+    "testName": "multiple keys in uri",
+    "mptMetadata": {
+      "us": [
+        {
+          "uri": "https://gamingstudios.com",
+          "u": "website",
+          "category": "Main Website",
+          "c": "Main Website"
+        }
+      ]
+    },
+    "expectedLongForm": {
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "u": "website",
+          "category": "Main Website",
+          "c": "Main Website"
+        }
+      ]
+    },
+    "hex": "7B227573223A5B7B2263223A224D61696E2057656273697465222C2263617465676F7279223A224D61696E2057656273697465222C2275223A2277656273697465222C22757269223A2268747470733A2F2F67616D696E6773747564696F732E636F6D227D5D7D"
+  }
+]

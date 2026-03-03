@@ -73,12 +73,12 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   const isTfMPTLock =
     typeof flags === 'number'
       ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : flags.tfMPTLock ?? false
+      : (flags.tfMPTLock ?? false)
 
   const isTfMPTUnlock =
     typeof flags === 'number'
       ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : flags.tfMPTUnlock ?? false
+      : (flags.tfMPTUnlock ?? false)
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')

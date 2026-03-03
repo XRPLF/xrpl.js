@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'mkdir -p /var/lib/rippled/db/ && rippled -a'
 npm run build
 npm run test:integration
 ```
@@ -241,7 +241,6 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
    - [ ] Update the version number and release date, and ensure it lists the changes since the previous release.
 
-4. Run `npm run docgen` if the docs were modified in this release to update them (skip this step for a beta).
 5. Run `npm run clean` to delete previously generated artifacts.
 6. Run `npm run build` to triple check the build still works
 7. Run `npx lerna version --no-git-tag-version` - This bumps the package versions.
@@ -265,6 +264,7 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 
 13. Run `git tag <tagname> -m <tagname>`, where `<tagname>` is the new package and version (e.g. `xrpl@2.1.1`), for each version released.
 14. Run `git push --follow-tags`, to push the tags to Github.
+
 15. On GitHub, click the "Releases" link on the right-hand side of the page.
 
 16. Repeat for each release:

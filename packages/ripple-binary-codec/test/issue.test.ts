@@ -70,7 +70,7 @@ describe('Issue type conversion functions', () => {
     }
     const mptIssue = Issue.from(mptJson)
     const parser = new BinaryParser(mptIssue.toHex())
-    const parserIssue = Issue.fromParser(parser, 24)
+    const parserIssue = Issue.fromParser(parser)
     expect(parserIssue.toJSON()).toEqual(mptJson)
   })
 
@@ -79,6 +79,6 @@ describe('Issue type conversion functions', () => {
     expect(() => {
       // @ts-expect-error -- need to test error message
       Issue.from(invalidJson)
-    }).toThrow(new Error('Invalid type to construct an Amount'))
+    }).toThrow(new Error('Invalid type to construct an Issue'))
   })
 })
