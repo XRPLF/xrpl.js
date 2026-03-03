@@ -84,6 +84,13 @@ export class Wallet {
   public readonly seed?: string
 
   /**
+   * The algorithm used to generate this wallet's keypair.
+   * Derived from the public key prefix when not explicitly provided:
+   * keys starting with "ED" use ed25519, all others use secp256k1.
+   */
+  public readonly algorithm: ECDSA
+
+  /**
    * Creates a new Wallet.
    *
    * @param publicKey - The public key for the account.
@@ -91,6 +98,8 @@ export class Wallet {
    * @param opts - (Optional) Options to initialize a Wallet.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @param opts.seed - The seed used to derive the account keys.
+   * @param opts.algorithm - The digital signature algorithm used to derive this keypair.
+   *                         If not provided, it is inferred from the public key prefix.
    */
   public constructor(
     publicKey: string,
@@ -98,6 +107,7 @@ export class Wallet {
     opts: {
       masterAddress?: string
       seed?: string
+      algorithm?: ECDSA
     } = {},
   ) {
     this.publicKey = publicKey
@@ -106,6 +116,9 @@ export class Wallet {
       ? ensureClassicAddress(opts.masterAddress)
       : deriveAddress(publicKey)
     this.seed = opts.seed
+    this.algorithm =
+      opts.algorithm ??
+      (publicKey.startsWith('ED') ? ECDSA.ed25519 : ECDSA.secp256k1)
   }
 
   /**
@@ -251,6 +264,7 @@ export class Wallet {
     const privateKey = bytesToHex(node.privateKey)
     return new Wallet(publicKey, `00${privateKey}`, {
       masterAddress: opts.masterAddress,
+      algorithm: ECDSA.secp256k1,
     })
   }
 
@@ -295,12 +309,14 @@ export class Wallet {
     seed: string,
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
+    const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
     const { publicKey, privateKey } = deriveKeypair(seed, {
-      algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
+      algorithm,
     })
     return new Wallet(publicKey, privateKey, {
       seed,
       masterAddress: opts.masterAddress,
+      algorithm,
     })
   }
 

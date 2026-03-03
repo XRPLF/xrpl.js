@@ -51,6 +51,23 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
       assert.equal(wallet.classicAddress, masterAddress)
     })
+
+    it('infers ed25519 algorithm from public key prefix', function () {
+      const wallet = new Wallet(publicKeyED25519, privateKeyED25519)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
+    })
+
+    it('infers secp256k1 algorithm from public key prefix', function () {
+      const wallet = new Wallet(publicKeySecp256k1, privateKeySecp256k1)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
+    })
+
+    it('uses explicitly provided algorithm over inference', function () {
+      const wallet = new Wallet(publicKeySecp256k1, privateKeySecp256k1, {
+        algorithm: ECDSA.secp256k1,
+      })
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
+    })
   })
 
   describe('generate', function () {
@@ -70,6 +87,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('generates a new wallet using an invalid/unknown algorithm', function () {
@@ -93,6 +111,7 @@ describe('Wallet', function () {
       assert.isString(wallet.seed)
       assert.isTrue(wallet.privateKey.startsWith(secp256k1PrivateKeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('generates a new wallet using algorithm ed25519', function () {
@@ -108,6 +127,7 @@ describe('Wallet', function () {
       assert.isTrue(wallet.publicKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.privateKey.startsWith(ed25519KeyPrefix))
       assert.isTrue(wallet.classicAddress.startsWith(classicAddressPrefix))
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
   })
 
@@ -117,6 +137,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -125,6 +146,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, publicKeySecp256k1)
       assert.equal(wallet.privateKey, privateKeySecp256k1)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('derives a wallet using algorithm ed25519', function () {
@@ -133,6 +155,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, publicKeyED25519)
       assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('derives a wallet using rfc1751 mnemonic with secp256k1 key', function () {
@@ -146,6 +169,7 @@ describe('Wallet', function () {
       })
 
       assert.equal(wallet.seed, expectedSeed)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('derives a wallet using rfc1751 mnemonic with ed25519 key', function () {
@@ -159,6 +183,7 @@ describe('Wallet', function () {
       })
 
       assert.equal(wallet.seed, expectedSeed)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('throws an error when using an RFC1751 mnemonic for bip39', function () {
@@ -277,6 +302,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('derives a wallet using an input derivation path', function () {
@@ -407,6 +433,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, entropyPublicKeyED25519)
       assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -415,6 +442,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, entropyPublicKeySecp256k1)
       assert.equal(wallet.privateKey, entropyPrivateKeySecp256k1)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('derives a wallet using algorithm ed25519', function () {
@@ -423,6 +451,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, entropyPublicKeyED25519)
       assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
+      assert.equal(wallet.algorithm, ECDSA.ed25519)
     })
 
     it('derives a wallet using a regular key pair', function () {
