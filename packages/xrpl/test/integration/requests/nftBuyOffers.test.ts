@@ -118,7 +118,6 @@ describe('nft_buy_offers', function () {
       assert.equal(response.type, 'response')
       // If there are more results, marker should be present
       if (response.result.marker !== undefined) {
-        assert.isDefined(response.result.marker)
         // Test pagination with marker
         const nextRequest: NFTBuyOffersRequest = {
           command: 'nft_buy_offers',

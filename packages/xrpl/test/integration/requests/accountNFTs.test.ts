@@ -148,7 +148,6 @@ describe('account_nfts', function () {
       assert.equal(response.type, 'response')
       // If there are more results, marker should be present
       if (response.result.marker !== undefined) {
-        assert.isDefined(response.result.marker)
         // Test pagination with marker
         const nextRequest: AccountNFTsRequest = {
           command: 'account_nfts',
