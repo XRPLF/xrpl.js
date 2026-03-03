@@ -9,7 +9,6 @@ import {
   NFTSellOffersRequest,
   TransactionMetadata,
   xrpToDrops,
-  unixTimeToRippleTime,
 } from '../../../src'
 import { hashSignedTx } from '../../../src/utils/hashes'
 import serverUrl from '../serverUrl'
@@ -36,8 +35,6 @@ describe('nft_sell_offers', function () {
       Account: testContext.wallet.address,
       URI: convertStringToHex('https://example.com/nft'),
       NFTokenTaxon: 0,
-      Amount: xrpToDrops(1),
-      Expiration: unixTimeToRippleTime(Date.now() + 1000 * 60 * 60 * 24),
     }
     const mintResponse = await testTransaction(
       testContext.client,
@@ -109,7 +106,6 @@ describe('nft_sell_offers', function () {
       assert.equal(response.type, 'response')
       // If there are more results, marker should be present
       if (response.result.marker !== undefined) {
-        assert.isDefined(response.result.marker)
         // Test pagination with marker
         const nextRequest: NFTSellOffersRequest = {
           command: 'nft_sell_offers',
