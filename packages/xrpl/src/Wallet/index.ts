@@ -121,7 +121,9 @@ export class Wallet {
     this.seed = opts.seed
     this.algorithm =
       opts.algorithm ??
-      (publicKey.startsWith('ED') ? ECDSA.ed25519 : ECDSA.secp256k1)
+      (publicKey.toUpperCase().startsWith('ED')
+        ? ECDSA.ed25519
+        : ECDSA.secp256k1)
   }
 
   /**
@@ -252,6 +254,12 @@ export class Wallet {
     if (!validateMnemonic(mnemonic, wordlist)) {
       throw new ValidationError(
         'Unable to parse the given mnemonic using bip39 encoding',
+      )
+    }
+
+    if (opts.algorithm != null && opts.algorithm !== ECDSA.secp256k1) {
+      throw new ValidationError(
+        'BIP39 mnemonics only derive secp256k1 keypairs; the algorithm option is not supported for BIP39',
       )
     }
 

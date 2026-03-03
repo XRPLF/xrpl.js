@@ -63,7 +63,8 @@ describe('Wallet', function () {
     })
 
     it('uses explicitly provided algorithm over inference', function () {
-      const wallet = new Wallet(publicKeySecp256k1, privateKeySecp256k1, {
+      // ed25519 key would normally infer ed25519, but explicit secp256k1 wins
+      const wallet = new Wallet(publicKeyED25519, privateKeyED25519, {
         algorithm: ECDSA.secp256k1,
       })
       assert.equal(wallet.algorithm, ECDSA.secp256k1)
@@ -323,6 +324,12 @@ describe('Wallet', function () {
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
       assert.equal(wallet.algorithm, ECDSA.secp256k1)
+    })
+
+    it('throws when bip39 mnemonic is used with ed25519 algorithm', function () {
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, { algorithm: ECDSA.ed25519 })
+      }, /BIP39 mnemonics only derive secp256k1 keypairs/u)
     })
 
     it('derives a wallet using an input derivation path', function () {
