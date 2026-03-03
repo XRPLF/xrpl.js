@@ -48,10 +48,13 @@ describe('nft_buy_offers', function () {
       transaction: hashSignedTx(mintResponse.result.tx_blob),
     })
 
-    nftokenID =
-      getNFTokenID(
-        txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-      ) ?? 'undefined'
+    const extractedNFTokenID = getNFTokenID(
+      txResponse.result.meta as TransactionMetadata<NFTokenMint>,
+    )
+    if (!extractedNFTokenID) {
+      throw new Error('Failed to extract NFTokenID from mint transaction')
+    }
+    nftokenID = extractedNFTokenID
 
     // Create a buy offer for the NFT
     const buyerWallet = await generateFundedWallet(testContext.client)
