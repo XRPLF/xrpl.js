@@ -113,6 +113,17 @@ describe('nft_buy_offers', function () {
   it(
     'with marker field for pagination',
     async () => {
+      // Create an additional buy offer to ensure pagination is exercised
+      const buyerWallet2 = await generateFundedWallet(testContext.client)
+      const secondBuyOfferTx: NFTokenCreateOffer = {
+        TransactionType: 'NFTokenCreateOffer',
+        Account: buyerWallet2.address,
+        NFTokenID: nftokenID,
+        Amount: xrpToDrops(11),
+        Owner: testContext.wallet.address,
+      }
+      await testTransaction(testContext.client, secondBuyOfferTx, buyerWallet2)
+
       const request: NFTBuyOffersRequest = {
         command: 'nft_buy_offers',
         nft_id: nftokenID,
@@ -121,17 +132,19 @@ describe('nft_buy_offers', function () {
       const response = await testContext.client.request(request)
 
       assert.equal(response.type, 'response')
-      // If there are more results, marker should be present
-      if (response.result.marker !== undefined) {
-        // Test pagination with marker
-        const nextRequest: NFTBuyOffersRequest = {
-          command: 'nft_buy_offers',
-          nft_id: nftokenID,
-          marker: response.result.marker,
-        }
-        const nextResponse = await testContext.client.request(nextRequest)
-        assert.equal(nextResponse.type, 'response')
+      assert.isDefined(
+        response.result.marker,
+        'marker should be present when limit < total offers',
+      )
+
+      // Test pagination with marker
+      const nextRequest: NFTBuyOffersRequest = {
+        command: 'nft_buy_offers',
+        nft_id: nftokenID,
+        marker: response.result.marker,
       }
+      const nextResponse = await testContext.client.request(nextRequest)
+      assert.equal(nextResponse.type, 'response')
     },
     TIMEOUT,
   )
