@@ -84,10 +84,12 @@ describe('account_lines', function () {
       const response = await testContext.client.request(request)
       assert.equal(response.type, 'response')
       // The limit field should be present in the response
-      if (response.result.limit !== undefined) {
-        assert.isNumber(response.result.limit)
-        assert.isAtMost(response.result.limit, 10)
-      }
+      assert.isDefined(
+        response.result.limit,
+        'limit value must be present in the response',
+      )
+      assert.isNumber(response.result.limit)
+      assert.isAtMost(response.result.limit, 10)
     },
     TIMEOUT,
   )

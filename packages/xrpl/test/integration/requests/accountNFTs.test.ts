@@ -22,14 +22,18 @@ describe('account_nfts', function () {
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
 
-    // Mint an NFT for testing
-    const mintTx: NFTokenMint = {
-      TransactionType: 'NFTokenMint',
-      Account: testContext.wallet.address,
-      URI: convertStringToHex('https://example.com/nft'),
-      NFTokenTaxon: 0,
+    // Mint multiple NFTs for testing pagination
+    const uris = ['https://example.com/nft/1', 'https://example.com/nft/2']
+    for (const uri of uris) {
+      const mintTx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: testContext.wallet.address,
+        URI: convertStringToHex(uri),
+        NFTokenTaxon: 0,
+      }
+      // eslint-disable-next-line no-await-in-loop -- Sequential minting required for test setup
+      await testTransaction(testContext.client, mintTx, testContext.wallet)
     }
-    await testTransaction(testContext.client, mintTx, testContext.wallet)
   })
 
   afterEach(async () => teardownClient(testContext))
@@ -130,17 +134,19 @@ describe('account_nfts', function () {
       const response = await testContext.client.request(request)
 
       assert.equal(response.type, 'response')
-      // If there are more results, marker should be present
-      if (response.result.marker !== undefined) {
-        // Test pagination with marker
-        const nextRequest: AccountNFTsRequest = {
-          command: 'account_nfts',
-          account: testContext.wallet.address,
-          marker: response.result.marker,
-        }
-        const nextResponse = await testContext.client.request(nextRequest)
-        assert.equal(nextResponse.type, 'response')
+      assert.isDefined(
+        response.result.marker,
+        'marker should be present when limit < total NFTs',
+      )
+
+      // Test pagination with marker
+      const nextRequest: AccountNFTsRequest = {
+        command: 'account_nfts',
+        account: testContext.wallet.address,
+        marker: response.result.marker,
       }
+      const nextResponse = await testContext.client.request(nextRequest)
+      assert.equal(nextResponse.type, 'response')
     },
     TIMEOUT,
   )
