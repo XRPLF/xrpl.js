@@ -4,6 +4,17 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support for `Confidential Transfer for MPT` (XLS-0096):
+  - New transaction types: `ConfidentialMPTConvert`, `ConfidentialMPTMergeInbox`, `ConfidentialMPTConvertBack`, `ConfidentialMPTSend`, `ConfidentialMPTClawback`
+  - New fields added to `MPToken` ledger entry: `HolderElGamalPublicKey`, `IssuerEncryptedBalance`, `AuditorEncryptedBalance`, `ConfidentialBalanceInbox`, `ConfidentialBalanceSpending`, `ConfidentialBalanceVersion`
+  - New fields added to `MPTokenIssuance` ledger entry: `IssuerElGamalPublicKey`, `AuditorElGamalPublicKey`, `ConfidentialOutstandingAmount`, `DomainID`, `MutableFlags`
+  - New flag `tfMPTCanPrivacy` added to `MPTokenIssuanceCreate`
+  - New fields added to `MPTokenIssuanceCreate`: `DomainID`, `MutableFlags`
+  - New fields added to `MPTokenIssuanceSet`: `DomainID`, `MPTokenMetadata`, `TransferFee`, `MutableFlags`, `IssuerElGamalPublicKey`, `AuditorElGamalPublicKey`
+  - New ledger entry flags: `MPTokenFlags`, `MPTokenIssuanceFlags`
+  - Binary codec support for confidential transfer fields
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
