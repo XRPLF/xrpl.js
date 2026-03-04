@@ -29,7 +29,7 @@ describe('nft_sell_offers', function () {
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
 
-    // Mint an NFT with a sell offer
+    // Mint an NFT
     const mintTx: NFTokenMint = {
       TransactionType: 'NFTokenMint',
       Account: testContext.wallet.address,
@@ -54,6 +54,20 @@ describe('nft_sell_offers', function () {
       throw new Error('Failed to extract NFTokenID from mint transaction')
     }
     nftokenID = extractedNFTokenID
+
+    // Create an initial sell offer so tests have fixture data
+    const initialSellOfferTx: NFTokenCreateOffer = {
+      TransactionType: 'NFTokenCreateOffer',
+      Account: testContext.wallet.address,
+      NFTokenID: nftokenID,
+      Amount: xrpToDrops(1),
+      Flags: NFTokenCreateOfferFlags.tfSellNFToken,
+    }
+    await testTransaction(
+      testContext.client,
+      initialSellOfferTx,
+      testContext.wallet,
+    )
   })
 
   afterEach(async () => teardownClient(testContext))
@@ -99,6 +113,20 @@ describe('nft_sell_offers', function () {
   it(
     'with marker field for pagination',
     async () => {
+      // Create an additional sell offer to ensure pagination is exercised
+      const extraSellOfferTx: NFTokenCreateOffer = {
+        TransactionType: 'NFTokenCreateOffer',
+        Account: testContext.wallet.address,
+        NFTokenID: nftokenID,
+        Amount: xrpToDrops(2),
+        Flags: NFTokenCreateOfferFlags.tfSellNFToken,
+      }
+      await testTransaction(
+        testContext.client,
+        extraSellOfferTx,
+        testContext.wallet,
+      )
+
       const request: NFTSellOffersRequest = {
         command: 'nft_sell_offers',
         nft_id: nftokenID,
@@ -107,17 +135,19 @@ describe('nft_sell_offers', function () {
       const response = await testContext.client.request(request)
 
       assert.equal(response.type, 'response')
-      // If there are more results, marker should be present
-      if (response.result.marker !== undefined) {
-        // Test pagination with marker
-        const nextRequest: NFTSellOffersRequest = {
-          command: 'nft_sell_offers',
-          nft_id: nftokenID,
-          marker: response.result.marker,
-        }
-        const nextResponse = await testContext.client.request(nextRequest)
-        assert.equal(nextResponse.type, 'response')
+      assert.isDefined(
+        response.result.marker,
+        'marker should be present when limit < total offers',
+      )
+
+      // Test pagination with marker
+      const nextRequest: NFTSellOffersRequest = {
+        command: 'nft_sell_offers',
+        nft_id: nftokenID,
+        marker: response.result.marker,
       }
+      const nextResponse = await testContext.client.request(nextRequest)
+      assert.equal(nextResponse.type, 'response')
     },
     TIMEOUT,
   )
