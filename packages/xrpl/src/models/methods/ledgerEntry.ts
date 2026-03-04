@@ -42,14 +42,22 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
    * This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.
    */
   amm?: {
-    asset: {
-      currency: string
-      issuer?: string
-    }
-    asset2: {
-      currency: string
-      issuer?: string
-    }
+    asset:
+      | {
+          currency: string
+          issuer?: string
+        }
+      | {
+          mpt_issuance_id: string
+        }
+    asset2:
+      | {
+          currency: string
+          issuer?: string
+        }
+      | {
+          mpt_issuance_id: string
+        }
   }
   /**
    * (Optional) If set to true and the queried object has been deleted,

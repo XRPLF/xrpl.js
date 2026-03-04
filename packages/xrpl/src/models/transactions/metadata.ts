@@ -1,4 +1,4 @@
-import { Amount, MPTAmount } from '../common'
+import { Amount } from '../common'
 
 import { BaseTransaction } from './common'
 import {
@@ -83,9 +83,9 @@ export function isDeletedNode(node: Node): node is DeletedNode {
 
 export interface TransactionMetadataBase {
   AffectedNodes: Node[]
-  DeliveredAmount?: Amount | MPTAmount
+  DeliveredAmount?: Amount
   // "unavailable" possible for transactions before 2014-01-20
-  delivered_amount?: Amount | MPTAmount | 'unavailable'
+  delivered_amount?: Amount | 'unavailable'
   TransactionIndex: number
   TransactionResult: string
 

@@ -36,7 +36,7 @@ function isIssueObject(arg): arg is IssueObject {
   return isXRP || isIOU || isMPT
 }
 
-const MPT_WIDTH = 44
+export const MPT_WIDTH = 44
 const NO_ACCOUNT = AccountID.from('0000000000000000000000000000000000000001')
 
 /**

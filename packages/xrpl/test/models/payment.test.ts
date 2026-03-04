@@ -2,7 +2,12 @@
 
 import { PaymentFlags } from '../../src'
 import { validatePayment } from '../../src/models/transactions/payment'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPT_ISSUANCE_ID_3,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validatePayment)
 const assertInvalid = (tx: any, message: string): void =>
@@ -197,7 +202,7 @@ describe('Payment', function () {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Amount: {
-        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        mpt_issuance_id: MPT_ISSUANCE_ID_3,
         value: '10',
       },
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
@@ -256,5 +261,57 @@ describe('Payment', function () {
     const errorMessage =
       'Payment: Credentials cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
+  })
+
+  it(`verifies valid Payment with MPT PathStep`, function () {
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH) }]]
+    assertValid(payment)
+  })
+
+  it(`verifies valid Payment with two MPT Paths`, function () {
+    payment.Paths = [
+      [{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH) }],
+      [{ mpt_issuance_id: 'B'.repeat(MPTID_LENGTH) }],
+    ]
+    assertValid(payment)
+  })
+
+  it(`throws when Paths has MPT PathStep with non-hex mpt_issuance_id`, function () {
+    payment.Paths = [[{ mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }]]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
+
+  it(`throws when Paths has MPT PathStep with too-short mpt_issuance_id`, function () {
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }]]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
+
+  it(`throws when Paths has MPT PathStep with too-long mpt_issuance_id`, function () {
+    payment.Paths = [[{ mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1) }]]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
+
+  it(`throws when PathStep has both account and mpt_issuance_id`, function () {
+    payment.Paths = [
+      [
+        {
+          account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+          mpt_issuance_id: 'A'.repeat(MPTID_LENGTH),
+        },
+      ],
+    ]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+  })
+
+  it(`throws when PathStep has both currency and mpt_issuance_id`, function () {
+    payment.Paths = [
+      [
+        {
+          currency: 'USD',
+          mpt_issuance_id: 'A'.repeat(MPTID_LENGTH),
+        },
+      ],
+    ]
+    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
   })
 })

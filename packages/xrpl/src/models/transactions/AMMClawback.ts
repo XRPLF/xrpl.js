@@ -1,13 +1,22 @@
 import { ValidationError } from '../../errors'
-import { Currency, IssuedCurrency, IssuedCurrencyAmount } from '../common'
+import {
+  Currency,
+  IssuedCurrency,
+  IssuedCurrencyAmount,
+  MPTAmount,
+  MPTCurrency,
+} from '../common'
 
 import {
   Account,
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isCurrency,
   isIssuedCurrency,
   isIssuedCurrencyAmount,
+  isMPTAmount,
+  isMPTCurrency,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -52,56 +61,77 @@ export interface AMMClawback extends BaseTransaction {
 
   /**
    * Specifies the asset that the issuer wants to claw back from the AMM pool.
-   * In JSON, this is an object with currency and issuer fields. The issuer field must match with Account.
+   * In JSON, this is an object with currency and issuer fields (or mpt_issuance_id for MPT).
+   * For issued currencies, the issuer field must match with Account.
    */
-  Asset: IssuedCurrency
+  Asset: IssuedCurrency | MPTCurrency
 
   /**
-   * Specifies the other asset in the AMM's pool. In JSON, this is an object with currency and
-   * issuer fields (omit issuer for XRP).
+   * Specifies the other asset in the AMM's pool. In JSON, this can be XRP (no issuer),
+   * an issued currency (with issuer), or an MPT (with mpt_issuance_id).
    */
   Asset2: Currency
 
   /**
-   * The maximum amount to claw back from the AMM account. The currency and issuer subfields should match
-   * the Asset subfields. If this field isn't specified, or the value subfield exceeds the holder's available
+   * The maximum amount to claw back from the AMM account. For issued currencies, the currency and
+   * issuer subfields should match the Asset subfields. For MPT, the mpt_issuance_id should match.
+   * If this field isn't specified, or the value subfield exceeds the holder's available
    * tokens in the AMM, all of the holder's tokens will be clawed back.
    */
-  Amount?: IssuedCurrencyAmount
+  Amount?: IssuedCurrencyAmount | MPTAmount
 }
 
 /**
- * Verify the form and type of an AMMClawback at runtime.
+ * Verify the form and type of Clawback Amount at runtime.
  *
- * @param tx - An AMMClawback Transaction.
- * @throws {ValidationError} When the transaction is malformed.
+ * @param input - The amount expected to be Clawed back.
+ * @returns True if the input is an IssuedCurrencyAmount or MPTAmount.
+ */
+function isClawbackAmountValid(
+  input: unknown,
+): input is IssuedCurrencyAmount | MPTAmount {
+  return isIssuedCurrencyAmount(input) || isMPTAmount(input)
+}
+
+/* eslint-disable max-lines-per-function -- this method needs to validate many nested field structures */
+/**
+ * Validates an AMMClawback transaction.
+ *
+ * @param tx - The AMMClawback transaction to validate.
+ * @throws {ValidationError} When the transaction fields are invalid.
  */
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Holder', isAccount)
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isCurrency)
 
   const asset = tx.Asset
 
-  if (tx.Holder === asset.issuer) {
-    throw new ValidationError(
-      'AMMClawback: Holder and Asset.issuer must be distinct',
-    )
+  if (isIssuedCurrency(asset)) {
+    if (tx.Holder === asset.issuer) {
+      throw new ValidationError(
+        'AMMClawback: Holder and Asset.issuer must be distinct',
+      )
+    }
+
+    if (tx.Account !== asset.issuer) {
+      throw new ValidationError(
+        'AMMClawback: Account must be the same as Asset.issuer',
+      )
+    }
   }
 
-  if (tx.Account !== asset.issuer) {
-    throw new ValidationError(
-      'AMMClawback: Account must be the same as Asset.issuer',
-    )
-  }
+  validateRequiredField(tx, 'Asset2', isCurrency)
 
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateOptionalField(tx, 'Amount', isClawbackAmountValid)
 
-  validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount)
-
-  if (tx.Amount != null) {
+  if (
+    tx.Amount != null &&
+    isIssuedCurrencyAmount(tx.Amount) &&
+    isIssuedCurrency(asset)
+  ) {
     if (tx.Amount.currency !== asset.currency) {
       throw new ValidationError(
         'AMMClawback: Amount.currency must match Asset.currency',
@@ -114,4 +144,19 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
       )
     }
   }
+
+  if (isMPTCurrency(asset) && tx.Amount != null) {
+    if (!isMPTAmount(tx.Amount)) {
+      throw new ValidationError(
+        'AMMClawback: Amount must be an MPTAmount when Asset is an MPTCurrency',
+      )
+    }
+
+    if (tx.Amount.mpt_issuance_id !== asset.mpt_issuance_id) {
+      throw new ValidationError(
+        'AMMClawback: Amount.mpt_issuance_id must match Asset.mpt_issuance_id',
+      )
+    }
+  }
 }
+/* eslint-enable max-lines-per-function */

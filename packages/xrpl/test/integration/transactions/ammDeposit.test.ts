@@ -3,6 +3,8 @@ import { assert } from 'chai'
 import { AMMDeposit, AMMDepositFlags } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
+import type { MPTAmount } from '../../../src/models/common'
+import { createAMMPoolWithMPT, type TestMPTAMMPool } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,
@@ -285,5 +287,59 @@ describe('AMMDeposit', function () {
     assert.equal(afterAmountDrops, expectedAmountDrops)
     assert.equal(afterAmount2Value, expectedAmount2Value)
     assert.equal(afterLPTokenValue, expectedLPTokenValue)
+  })
+
+  it('deposit single MPT asset', async function () {
+    const mptPool: TestMPTAMMPool = await createAMMPoolWithMPT(
+      testContext.client,
+    )
+    const { asset, asset2, lpWallet } = mptPool
+
+    // Get pre-deposit state
+    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm: preAmm } = preAmmInfoRes.result
+    const preAmount = preAmm.amount as MPTAmount
+    const preAmount2 = preAmm.amount2 as MPTAmount
+
+    // Deposit single MPT asset from the LP wallet
+    const ammDepositTx: AMMDeposit = {
+      TransactionType: 'AMMDeposit',
+      Account: lpWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
+      Amount: {
+        mpt_issuance_id: asset.mpt_issuance_id,
+        value: '100',
+      },
+      Flags: AMMDepositFlags.tfSingleAsset,
+    }
+
+    await testTransaction(testContext.client, ammDepositTx, lpWallet)
+
+    // Get post-deposit state
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm } = ammInfoRes.result
+    const postAmount = amm.amount as MPTAmount
+    const postAmount2 = amm.amount2 as MPTAmount
+
+    // Pool balance of deposited asset should increase by 100
+    assert.equal(
+      parseInt(postAmount.value, 10),
+      parseInt(preAmount.value, 10) + 100,
+    )
+    // Other asset should remain unchanged
+    assert.equal(postAmount2.value, preAmount2.value)
+    // LP token supply should increase
+    const postLPTokenValue = parseInt(amm.lp_token.value, 10)
+    const preLPTokenValue = parseInt(preAmm.lp_token.value, 10)
+    assert.isAbove(postLPTokenValue, preLPTokenValue)
   })
 })

@@ -29,8 +29,7 @@ export interface MPTAmount {
   value: string
 }
 
-// TODO: add MPTAmount to Amount once MPTv2 is released
-export type Amount = IssuedCurrencyAmount | string
+export type Amount = IssuedCurrencyAmount | string | MPTAmount
 
 export type ClawbackAmount = IssuedCurrencyAmount | MPTAmount
 
@@ -70,6 +69,7 @@ export interface PathStep {
   account?: string
   currency?: string
   issuer?: string
+  mpt_issuance_id?: string
 }
 
 export type Path = PathStep[]

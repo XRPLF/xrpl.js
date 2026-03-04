@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Support XLS-82D MPT-DEX amendment in the xrpl.js client library. This work also involves associated updates to `PathSet` type in the ripple-binary-codec package.
+
 ## 4.6.0 (2026-02-12)
 
 ### Added

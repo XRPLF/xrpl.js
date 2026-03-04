@@ -3,6 +3,7 @@ import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
 import { SerializedType, JsonObject } from './serialized-type'
 import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
+import { Hash192 } from './hash-192'
 
 /**
  * Constants for separating Paths in a PathSet
@@ -16,14 +17,17 @@ const PATH_SEPARATOR_BYTE = 0xff
 const TYPE_ACCOUNT = 0x01
 const TYPE_CURRENCY = 0x10
 const TYPE_ISSUER = 0x20
+const TYPE_MPT = 0x40
 
 /**
- * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency
+ * The object representation of a Hop, an issuer AccountID, an account AccountID, and a Currency.
+ * Alternatively, this could also contain an MPTIssuanceID
  */
 interface HopObject extends JsonObject {
   issuer?: string
   account?: string
   currency?: string
+  mpt_issuance_id?: string
 }
 
 /**
@@ -33,7 +37,8 @@ function isHopObject(arg): arg is HopObject {
   return (
     arg.issuer !== undefined ||
     arg.account !== undefined ||
-    arg.currency !== undefined
+    arg.currency !== undefined ||
+    arg.mpt_issuance_id !== undefined
   )
 }
 
@@ -70,9 +75,18 @@ class Hop extends SerializedType {
       bytes[0][0] |= TYPE_ACCOUNT
     }
 
+    if (value.currency && value.mpt_issuance_id) {
+      throw new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop',
+      )
+    }
+
     if (value.currency) {
       bytes.push(Currency.from(value.currency).toBytes())
       bytes[0][0] |= TYPE_CURRENCY
+    } else if (value.mpt_issuance_id) {
+      bytes.push(Hash192.from(value.mpt_issuance_id).toBytes())
+      bytes[0][0] |= TYPE_MPT
     }
 
     if (value.issuer) {
@@ -93,12 +107,20 @@ class Hop extends SerializedType {
     const type = parser.readUInt8()
     const bytes: Array<Uint8Array> = [Uint8Array.from([type])]
 
+    if (type & TYPE_CURRENCY && type & TYPE_MPT) {
+      throw new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      )
+    }
+
     if (type & TYPE_ACCOUNT) {
       bytes.push(parser.read(AccountID.width))
     }
 
     if (type & TYPE_CURRENCY) {
       bytes.push(parser.read(Currency.width))
+    } else if (type & TYPE_MPT) {
+      bytes.push(parser.read(Hash192.width))
     }
 
     if (type & TYPE_ISSUER) {
@@ -117,13 +139,17 @@ class Hop extends SerializedType {
     const hopParser = new BinaryParser(bytesToHex(this.bytes))
     const type = hopParser.readUInt8()
 
-    let account, currency, issuer
+    let account, currency, issuer, mpt_issuance_id
     if (type & TYPE_ACCOUNT) {
       account = (AccountID.fromParser(hopParser) as AccountID).toJSON()
     }
 
     if (type & TYPE_CURRENCY) {
       currency = (Currency.fromParser(hopParser) as Currency).toJSON()
+    }
+
+    if (type & TYPE_MPT) {
+      mpt_issuance_id = (Hash192.fromParser(hopParser) as Hash192).toHex()
     }
 
     if (type & TYPE_ISSUER) {
@@ -141,6 +167,10 @@ class Hop extends SerializedType {
 
     if (currency) {
       result.currency = currency
+    }
+
+    if (mpt_issuance_id) {
+      result.mpt_issuance_id = mpt_issuance_id
     }
 
     return result
@@ -287,4 +317,4 @@ class PathSet extends SerializedType {
   }
 }
 
-export { PathSet }
+export { PathSet, HopObject }

@@ -3,6 +3,8 @@ import { assert } from 'chai'
 import { AMMWithdraw, AMMWithdrawFlags } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
+import type { MPTAmount } from '../../../src/models/common'
+import { createAMMPoolWithMPT, type TestMPTAMMPool } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,
@@ -293,5 +295,90 @@ describe('AMMWithdraw', function () {
     assert.equal(afterAmountDrops, expectedAmountDrops)
     assert.equal(afterAmount2Value, expectedAmount2Value)
     assert.equal(afterLPTokenValue, expectedLPTokenValue)
+  })
+
+  it('withdraw single MPT asset', async function () {
+    const mptPool: TestMPTAMMPool = await createAMMPoolWithMPT(
+      testContext.client,
+    )
+    const { asset, asset2, lpWallet } = mptPool
+
+    // Get pre-withdraw state
+    const preAmmInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm: preAmm } = preAmmInfoRes.result
+    const preAmount = preAmm.amount as MPTAmount
+    const preAmount2 = preAmm.amount2 as MPTAmount
+
+    // Withdraw single MPT asset
+    const ammWithdrawTx: AMMWithdraw = {
+      TransactionType: 'AMMWithdraw',
+      Account: lpWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
+      Amount: {
+        mpt_issuance_id: asset.mpt_issuance_id,
+        value: '50',
+      },
+      Flags: AMMWithdrawFlags.tfSingleAsset,
+    }
+
+    await testTransaction(testContext.client, ammWithdrawTx, lpWallet)
+
+    // Get post-withdraw state
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
+    const { amm } = ammInfoRes.result
+    const postAmount = amm.amount as MPTAmount
+    const postAmount2 = amm.amount2 as MPTAmount
+
+    // Pool balance of withdrawn asset should decrease by 50
+    assert.equal(
+      parseInt(postAmount.value, 10),
+      parseInt(preAmount.value, 10) - 50,
+    )
+    // Other asset should remain unchanged
+    assert.equal(postAmount2.value, preAmount2.value)
+    // LP token supply should decrease
+    const postLPTokenValue = parseInt(amm.lp_token.value, 10)
+    const preLPTokenValue = parseInt(preAmm.lp_token.value, 10)
+    assert.isBelow(postLPTokenValue, preLPTokenValue)
+  })
+
+  it('withdraw all MPT (AMM delete)', async function () {
+    const mptPool: TestMPTAMMPool = await createAMMPoolWithMPT(
+      testContext.client,
+    )
+    const { asset, asset2, lpWallet } = mptPool
+
+    // Withdraw all to delete the AMM
+    const ammWithdrawTx: AMMWithdraw = {
+      TransactionType: 'AMMWithdraw',
+      Account: lpWallet.classicAddress,
+      Asset: asset,
+      Asset2: asset2,
+      Flags: AMMWithdrawFlags.tfWithdrawAll,
+    }
+
+    await testTransaction(testContext.client, ammWithdrawTx, lpWallet)
+
+    // Verify the AMM no longer exists
+    try {
+      await testContext.client.request({
+        command: 'amm_info',
+        asset,
+        asset2,
+      })
+      assert.fail('Expected amm_info to fail for deleted AMM')
+    } catch (error: unknown) {
+      const err = error as { data?: { error?: string } }
+      assert.equal(err.data?.error, 'actNotFound')
+    }
   })
 })

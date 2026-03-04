@@ -6,6 +6,8 @@
 
 ### Added
 * Add `Int32` serialized type.
+* Introduce unit tests for the `PathSet` rippled type
+* Update the serialization of `PathSet` rippled type to accommodate `mpt_issuance_id` PathElement. This update is a part of the XLS-82d MPT-DEX amendment.
 
 ### Fixed
 * Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].

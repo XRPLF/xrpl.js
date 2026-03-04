@@ -9,7 +9,7 @@ import { Hash256 } from './hash-256'
 import { Int32 } from './int-32'
 import { Issue } from './issue'
 import { STNumber } from './st-number'
-import { PathSet } from './path-set'
+import { PathSet, HopObject } from './path-set'
 import { STArray } from './st-array'
 import { STObject } from './st-object'
 import { UInt16 } from './uint-16'
@@ -68,4 +68,5 @@ export {
   UInt32,
   UInt64,
   Vector256,
+  HopObject,
 }

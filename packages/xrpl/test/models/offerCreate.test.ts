@@ -2,7 +2,13 @@ import {
   OfferCreateFlags,
   validateOfferCreate,
 } from '../../src/models/transactions/offerCreate'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPT_ISSUANCE_ID_3,
+  MPT_ISSUANCE_ID_4,
+  MPTID_LENGTH,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateOfferCreate)
 const assertInvalid = (tx: any, message: string): void =>
@@ -281,6 +287,98 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
       TxnSignature:
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
+  })
+
+  // MPT-related tests
+  it(`verifies valid OfferCreate with MPT TakerPays`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        currency: 'DSH',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '43.11584856965009',
+      },
+      TakerPays: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_4,
+        value: '30',
+      },
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertValid(offerTx)
+  })
+
+  it(`verifies valid OfferCreate with MPT TakerGets`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_3,
+        value: '100',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertValid(offerTx)
+  })
+
+  it(`verifies valid OfferCreate with MPT on both sides`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_3,
+        value: '100',
+      },
+      TakerPays: {
+        mpt_issuance_id: MPT_ISSUANCE_ID_4,
+        value: '30',
+      },
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertValid(offerTx)
+  })
+
+  it(`throws w/ MPT TakerGets mpt_issuance_id contains non-hex characters`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH),
+        value: '100',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
+  })
+
+  it(`throws w/ MPT TakerGets mpt_issuance_id too short`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1),
+        value: '100',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
+    } as any
+
+    assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
+  })
+
+  it(`throws w/ MPT TakerGets mpt_issuance_id too long`, function () {
+    const offerTx = {
+      Account: 'r3rhWeE31Jt5sWmi4QiGLMZnY3ENgqw96W',
+      TakerGets: {
+        mpt_issuance_id: 'A'.repeat(MPTID_LENGTH + 1),
+        value: '100',
+      },
+      TakerPays: '12928290425',
+      TransactionType: 'OfferCreate',
     } as any
 
     assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
