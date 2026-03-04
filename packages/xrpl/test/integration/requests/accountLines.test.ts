@@ -63,6 +63,7 @@ describe('account_lines', function () {
       }
       const response = await testContext.client.request(request)
       assert.equal(response.type, 'response')
+      assert.equal(response.result.status, 'success')
       assert.equal(typeof response.result.ledger_hash, 'string')
       assert.equal(typeof response.result.ledger_index, 'number')
       assert.equal(response.result.account, testContext.wallet.classicAddress)
