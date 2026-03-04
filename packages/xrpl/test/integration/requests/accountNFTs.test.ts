@@ -52,7 +52,7 @@ describe('account_nfts', function () {
   )
 
   it(
-    'with ledger_hash field',
+    'with ledger_hash and ledger_index fields',
     async () => {
       const request: AccountNFTsRequest = {
         command: 'account_nfts',
@@ -68,22 +68,6 @@ describe('account_nfts', function () {
         assert.isString(response.result.ledger_hash)
         assert.match(response.result.ledger_hash, /^[A-F0-9]{64}$/iu)
       }
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'with ledger_index field',
-    async () => {
-      const request: AccountNFTsRequest = {
-        command: 'account_nfts',
-        account: testContext.wallet.address,
-        ledger_index: 'validated',
-      }
-      const response = await testContext.client.request(request)
-
-      assert.equal(response.type, 'response')
-      assert.equal(response.result.account, testContext.wallet.address)
       // ledger_index should be present when using validated ledger
       if (response.result.ledger_index !== undefined) {
         assert.isNumber(response.result.ledger_index)
