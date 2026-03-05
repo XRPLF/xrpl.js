@@ -5,7 +5,7 @@ import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { classicAddressToXAddress, encodeSeed } from 'ripple-address-codec'
 import { encode } from 'ripple-binary-codec'
-import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
+import { deriveAddress, deriveKeypair, derivePublicKey, generateSeed } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
