@@ -62,6 +62,7 @@ import {
 } from './quality'
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import { convertHexToString, convertStringToHex } from './stringConversion'
+import { stringToHex, hexToString } from '@xrplf/isomorphic/utils'
 import {
   rippleTimeToISOTime,
   isoTimeToRippleTime,
@@ -224,6 +225,8 @@ export {
   verifyPaymentChannelClaim,
   convertStringToHex,
   convertHexToString,
+  stringToHex,
+  hexToString,
   classicAddressToXAddress,
   xAddressToClassicAddress,
   isValidXAddress,

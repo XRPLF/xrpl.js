@@ -8,7 +8,7 @@ import {
   TxResponse,
   TxV1Response,
 } from '../../../src'
-import { convertStringToHex } from '../../../src/utils'
+import { stringToHex } from '../../../src/utils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -35,7 +35,7 @@ describe('tx', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: account,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       const response: SubmitResponse = await testContext.client.submit(
@@ -82,7 +82,7 @@ describe('tx', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: account,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       const response: SubmitResponse = await testContext.client.submit(
