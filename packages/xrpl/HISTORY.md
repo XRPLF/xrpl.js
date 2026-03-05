@@ -4,6 +4,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 4.7.0 (2026-03-06)
+
+### Added
+* Add `fromPrivateKey` method to `wallet` class. Expands support for deriving a wallet class from an arbitrary private key.
+
 ## 4.6.0 (2026-02-12)
 
 ### Added

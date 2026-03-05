@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.0.1 (2026-03-06)
+
+### Non-Breaking Changes
+* Add `derivePublicKey` method to derive the keypair from an arbitrary private key
+
 ## 2.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
@@ -18,6 +23,7 @@
 ### Non-Breaking Changes
 * Remove `brorand` as a dependency and use `@xrplf/isomorphic` instead.
 * Eliminates 4 runtime dependencies: `base-x`, `base64-js`, `buffer`, and `ieee754`.
+* Add `derivePublicKey` method to derive the keypair from an arbitrary private key
 
 ## 1.3.1 (2023-09-27)
 ### Fixed

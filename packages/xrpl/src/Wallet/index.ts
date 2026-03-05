@@ -5,7 +5,7 @@ import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { classicAddressToXAddress, encodeSeed } from 'ripple-address-codec'
 import { encode } from 'ripple-binary-codec'
-import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
+import { deriveAddress, deriveKeypair, derivePublicKey, generateSeed } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
@@ -158,6 +158,21 @@ export class Wallet {
       algorithm: opts.algorithm,
       masterAddress: opts.masterAddress,
     })
+  }
+
+  /**
+   * Derives a wallet from a private key.
+   *
+   * @param privateKey - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
+   * @returns A Wallet derived from a private key.
+   *
+   *  @throws ValidationError if private key is not a valid string
+   */
+  public static fromPrivateKey(privateKey: string): Wallet {
+    if (!privateKey || typeof privateKey !== 'string') {
+      throw new ValidationError('privateKey must be a non-empty string')
+    }
+    return new Wallet(derivePublicKey(privateKey), privateKey)
   }
 
   /**
