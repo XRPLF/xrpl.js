@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+## 2.7.0 (2026-02-12)
+
+### Added
+* Add `Int32` serialized type.
+
+### Fixed
+* Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
+* Error if a decimal is passed into a `UInt`-typed field.
+
+## 2.6.0 (2025-12-16)
+
+### Added
+* Allow `encodeForMultisigning` to work with transactions that have non-empty `SigningPubKey`. Required to encode `LoanSet` transaction by counterparty signers for signing.
+
+## 2.5.1 (2025-10-29)
+
+### Fixed
+* Fix serialization/deserialization issues in `Issue` serialized type for MPTIssue.
+
 ## 2.5.0 (2025-07-29)
 
 ### Added

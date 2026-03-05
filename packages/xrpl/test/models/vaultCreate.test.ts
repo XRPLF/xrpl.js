@@ -6,8 +6,8 @@ import {
   VaultCreateFlags,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
-import { MPT_META_WARNING_HEADER } from '../../src/models/transactions/common'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
+import { MPT_META_WARNING_HEADER } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)
@@ -32,6 +32,20 @@ describe('VaultCreate', function () {
   })
 
   it('verifies valid VaultCreate', function () {
+    assertValid(tx)
+  })
+
+  it('verifies MPT/IOU Currency as Asset', function () {
+    tx.Asset = {
+      mpt_issuance_id:
+        '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+    }
+    assertValid(tx)
+
+    tx.Asset = {
+      currency: 'USD',
+      issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+    }
     assertValid(tx)
   })
 
@@ -93,6 +107,98 @@ describe('VaultCreate', function () {
       'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.',
     )
   })
+
+  describe('Scale field validation', function () {
+    it('throws w/ Scale provided for XRP asset', function () {
+      tx.Asset = { currency: 'XRP' }
+      tx.Scale = 5
+      assertInvalid(
+        tx,
+        'VaultCreate: Scale parameter must not be provided for XRP or MPT assets',
+      )
+    })
+
+    it('throws w/ Scale provided for MPT asset', function () {
+      tx.Asset = {
+        mpt_issuance_id:
+          '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+      }
+      tx.Scale = 5
+      assertInvalid(
+        tx,
+        'VaultCreate: Scale parameter must not be provided for XRP or MPT assets',
+      )
+    })
+
+    it('allows Scale for IOU asset with valid value (0)', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      tx.Scale = 0
+      assertValid(tx)
+    })
+
+    it('allows Scale for IOU asset with valid value (18)', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      tx.Scale = 18
+      assertValid(tx)
+    })
+
+    it('allows Scale for IOU asset with valid value (10)', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      tx.Scale = 10
+      assertValid(tx)
+    })
+
+    it('throws w/ Scale less than 0 for IOU asset', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      tx.Scale = -1
+      assertInvalid(
+        tx,
+        'VaultCreate: Scale must be a number between 0 and 18 inclusive for IOU assets',
+      )
+    })
+
+    it('throws w/ Scale greater than 18 for IOU asset', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      tx.Scale = 19
+      assertInvalid(
+        tx,
+        'VaultCreate: Scale must be a number between 0 and 18 inclusive for IOU assets',
+      )
+    })
+
+    it('throws w/ non-number Scale for IOU asset', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      // @ts-expect-error for test
+      tx.Scale = 'invalid'
+      assertInvalid(tx, 'VaultCreate: invalid field Scale')
+    })
+
+    it('allows no Scale for IOU asset', function () {
+      tx.Asset = {
+        currency: 'USD',
+        issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      }
+      assertValid(tx)
+    })
+  })
 })
 
 /**
@@ -112,11 +218,10 @@ describe('MPTokenMetadata warnings', function () {
     const mptMetaData: MPTokenMetadata = {
       ticker: 'TBILL',
       name: 'T-Bill Token',
-      icon: 'http://example.com/icon.png',
       asset_class: 'rwa',
       asset_subclass: 'treasury',
       issuer_name: 'Issuer',
-    }
+    } as MPTokenMetadata
     const tx = {
       TransactionType: 'VaultCreate',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
@@ -129,7 +234,7 @@ describe('MPTokenMetadata warnings', function () {
 
     const expectedMessage = [
       MPT_META_WARNING_HEADER,
-      '- icon should be a valid https url.',
+      '- icon/i: should be a non-empty string.',
     ].join('\n')
 
     expect(console.warn).toHaveBeenCalledWith(

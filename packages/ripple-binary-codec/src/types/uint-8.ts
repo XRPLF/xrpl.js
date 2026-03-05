@@ -28,7 +28,7 @@ class UInt8 extends UInt {
       return val
     }
 
-    if (typeof val === 'number') {
+    if (typeof val === 'number' && Number.isInteger(val)) {
       UInt8.checkUintRange(val, 0, 0xff)
 
       const buf = new Uint8Array(UInt8.width)

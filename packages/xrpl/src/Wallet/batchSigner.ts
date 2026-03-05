@@ -8,7 +8,7 @@ import { hashSignedTx } from '../utils/hashes'
 
 import { compareSigners, getDecodedTransaction } from './utils'
 
-import { Wallet } from '.'
+import type { Wallet } from './index'
 
 // eslint-disable-next-line max-params -- okay for helper function
 function constructBatchSignerObject(

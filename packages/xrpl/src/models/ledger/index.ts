@@ -20,6 +20,8 @@ import FeeSettings, {
 import { Ledger, LedgerV1 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
+import Loan, { LoanFlags } from './Loan'
+import LoanBroker from './LoanBroker'
 import { MPToken } from './MPToken'
 import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
@@ -31,7 +33,7 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Ticket from './Ticket'
-import Vault from './Vault'
+import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -59,6 +61,9 @@ export {
   LedgerEntryFilter,
   LedgerEntry,
   LedgerHashes,
+  Loan,
+  LoanFlags,
+  LoanBroker,
   Majority,
   NEGATIVE_UNL_ID,
   NegativeUNL,
@@ -77,6 +82,7 @@ export {
   SignerListFlags,
   Ticket,
   Vault,
+  VaultFlags,
   VoteSlot,
   XChainOwnedClaimID,
   XChainOwnedCreateAccountClaimID,

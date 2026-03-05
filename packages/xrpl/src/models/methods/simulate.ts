@@ -64,8 +64,9 @@ export interface SimulateBinaryResponse extends BaseResponse {
   }
 }
 
-export interface SimulateJsonResponse<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
+export interface SimulateJsonResponse<
+  T extends BaseTransaction = Transaction,
+> extends BaseResponse {
   result: {
     applied: false
 

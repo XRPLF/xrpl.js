@@ -151,13 +151,7 @@ class STObject extends SerializedType {
             ? STArray.from(xAddressDecoded[field.name], definitions)
             : field.type.name === 'UInt64'
               ? UInt64.from(xAddressDecoded[field.name], field.name)
-              : field.associatedType?.from
-                ? field.associatedType.from(xAddressDecoded[field.name])
-                : (() => {
-                    throw new Error(
-                      `Type ${field.type.name} for field ${field.name} is missing associatedType.from`,
-                    )
-                  })()
+              : field.associatedType.from(xAddressDecoded[field.name])
 
       if (associatedValue == undefined) {
         throw new TypeError(

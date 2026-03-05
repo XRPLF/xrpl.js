@@ -34,6 +34,24 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import {
+  LoanBrokerCoverClawback,
+  validateLoanBrokerCoverClawback,
+} from './loanBrokerCoverClawback'
+import {
+  LoanBrokerCoverDeposit,
+  validateLoanBrokerCoverDeposit,
+} from './loanBrokerCoverDeposit'
+import {
+  LoanBrokerCoverWithdraw,
+  validateLoanBrokerCoverWithdraw,
+} from './loanBrokerCoverWithdraw'
+import { LoanBrokerDelete, validateLoanBrokerDelete } from './loanBrokerDelete'
+import { LoanBrokerSet, validateLoanBrokerSet } from './loanBrokerSet'
+import { LoanDelete, validateLoanDelete } from './loanDelete'
+import { LoanManage, validateLoanManage } from './loanManage'
+import { LoanPay, validateLoanPay } from './loanPay'
+import { LoanSet, validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -157,6 +175,15 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LoanBrokerSet
+  | LoanBrokerCoverClawback
+  | LoanBrokerCoverDeposit
+  | LoanBrokerCoverWithdraw
+  | LoanBrokerDelete
+  | LoanSet
+  | LoanDelete
+  | LoanManage
+  | LoanPay
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
@@ -357,6 +384,42 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerCoverClawback':
+      validateLoanBrokerCoverClawback(tx)
+      break
+
+    case 'LoanBrokerCoverDeposit':
+      validateLoanBrokerCoverDeposit(tx)
+      break
+
+    case 'LoanBrokerCoverWithdraw':
+      validateLoanBrokerCoverWithdraw(tx)
+      break
+
+    case 'LoanBrokerDelete':
+      validateLoanBrokerDelete(tx)
+      break
+
+    case 'LoanBrokerSet':
+      validateLoanBrokerSet(tx)
+      break
+
+    case 'LoanSet':
+      validateLoanSet(tx)
+      break
+
+    case 'LoanManage':
+      validateLoanManage(tx)
+      break
+
+    case 'LoanDelete':
+      validateLoanDelete(tx)
+      break
+
+    case 'LoanPay':
+      validateLoanPay(tx)
       break
 
     case 'MPTokenAuthorize':

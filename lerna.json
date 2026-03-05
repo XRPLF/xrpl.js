@@ -1,5 +1,13 @@
 {
   "version": "independent",
-  "useWorkspaces": true,
-  "npmClient": "npm"
+  "packages": [
+    "packages/xrpl",
+    "packages/ripple-binary-codec",
+    "packages/ripple-keypairs",
+    "packages/ripple-address-codec",
+    "packages/isomorphic",
+    "packages/secret-numbers"
+  ],
+  "npmClient": "npm",
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }
