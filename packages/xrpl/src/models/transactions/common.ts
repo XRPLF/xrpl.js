@@ -373,6 +373,39 @@ export function validateHexMetadata(
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
+ * Get a human-readable description for a validation function.
+ * This maps common validation functions to their expected types.
+ *
+ * @param checkValidity - The validation function to describe.
+ * @returns A human-readable description of the expected type.
+ */
+function getValidationDescription(
+  checkValidity: (inp: unknown) => boolean,
+): string {
+  // Map common validation functions to their expected types
+  const validationMap = new Map([
+    [isString, 'a string'],
+    [isNumber, 'a number'],
+    [isAccount, 'a valid account address'],
+    [isAmount, 'a valid amount'],
+    [isArray, 'an array'],
+    [isRecord, 'an object'],
+    [isIssuedCurrencyAmount, 'a valid issued currency amount'],
+    [isMPTAmount, 'a valid MPT amount'],
+    [isClawbackAmount, 'a valid clawback amount'],
+    [isCurrency, 'a valid currency'],
+    [isIssuedCurrency, 'a valid issued currency'],
+    [isXChainBridge, 'a valid XChain bridge'],
+    [isAuthorizeCredential, 'a valid authorize credential'],
+    [isLedgerEntryId, 'a valid ledger entry ID'],
+    [isXRPLNumber, 'a valid XRPL number'],
+    [isDomainID, 'a valid domain ID'],
+  ])
+
+  return validationMap.get(checkValidity) ?? 'a valid value'
+}
+
+/**
  * Verify the form and type of a required type for a transaction at runtime.
  *
  * @param tx - The object input to check the form and type of.
@@ -406,8 +439,9 @@ export function validateRequiredField<
   }
 
   if (!checkValidity(tx[param])) {
+    const expectedType = getValidationDescription(checkValidity)
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      `${txType}: ${String(paramNameStr)} must be ${expectedType}`,
     )
   }
 }
@@ -440,8 +474,9 @@ export function validateOptionalField<
   const paramNameStr = errorOpts.paramName ?? param
   const txType = errorOpts.txType ?? tx.TransactionType
   if (tx[param] !== undefined && !checkValidity(tx[param])) {
+    const expectedType = getValidationDescription(checkValidity)
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      `${txType}: ${String(paramNameStr)} must be ${expectedType}`,
     )
   }
 }
