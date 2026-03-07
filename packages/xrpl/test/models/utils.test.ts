@@ -393,6 +393,82 @@ describe('Models Utils', function () {
       const flagsMap = parseTransactionFlags(tx)
       assert.deepEqual(flagsMap, expected)
     })
+
+    it('parseTransactionFlags with transaction type string and numeric flags', function () {
+      const flagsMap = parseTransactionFlags(
+        'PaymentChannelClaim',
+        PaymentChannelClaimFlags.tfRenew,
+      )
+      assert.deepEqual(flagsMap, { tfRenew: true })
+    })
+
+    it('parseTransactionFlags with type string and combined numeric flags', function () {
+      const flagsMap = parseTransactionFlags(
+        'OfferCreate',
+        OfferCreateFlags.tfSell | OfferCreateFlags.tfImmediateOrCancel,
+      )
+      assert.deepEqual(flagsMap, {
+        tfSell: true,
+        tfImmediateOrCancel: true,
+      })
+    })
+
+    it('parseTransactionFlags with type string and zero flags', function () {
+      const flagsMap = parseTransactionFlags('Payment', 0)
+      assert.deepEqual(flagsMap, {})
+    })
+
+    it('parseTransactionFlags with type string, numeric flags, and includeAll', function () {
+      const flagsMap = parseTransactionFlags(
+        'Payment',
+        PaymentFlags.tfPartialPayment,
+        { includeAll: true },
+      )
+      assert.deepEqual(flagsMap, {
+        tfNoRippleDirect: false,
+        tfPartialPayment: true,
+        tfLimitQuality: false,
+        tfInnerBatchTxn: false,
+      })
+    })
+
+    it('parseTransactionFlags with Transaction object and includeAll', function () {
+      const tx: PaymentChannelClaim = {
+        Account: 'r...',
+        TransactionType: 'PaymentChannelClaim',
+        Channel:
+          'C1AE6DDDEEC05CF2978C0BAD6FE302948E9533691DC749DCDD3B9E5992CA6198',
+        Flags: PaymentChannelClaimFlags.tfRenew,
+      }
+
+      const flagsMap = parseTransactionFlags(tx, undefined, {
+        includeAll: true,
+      })
+      assert.deepEqual(flagsMap, {
+        tfRenew: true,
+        tfClose: false,
+        tfInnerBatchTxn: false,
+      })
+    })
+
+    it('parseTransactionFlags with unknown transaction type and global flags only', function () {
+      const flagsMap = parseTransactionFlags(
+        'SetRegularKey',
+        GlobalFlags.tfInnerBatchTxn,
+      )
+      assert.deepEqual(flagsMap, { tfInnerBatchTxn: true })
+    })
+
+    it('parseTransactionFlags with type string including global flag', function () {
+      const flagsMap = parseTransactionFlags(
+        'PaymentChannelClaim',
+        PaymentChannelClaimFlags.tfRenew | GlobalFlags.tfInnerBatchTxn,
+      )
+      assert.deepEqual(flagsMap, {
+        tfRenew: true,
+        tfInnerBatchTxn: true,
+      })
+    })
   })
 
   describe('convertTxFlagsToNumber', function () {
