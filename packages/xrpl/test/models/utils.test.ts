@@ -441,7 +441,7 @@ describe('Models Utils', function () {
         Flags: PaymentChannelClaimFlags.tfRenew,
       }
 
-      const flagsMap = parseTransactionFlags(tx, undefined, {
+      const flagsMap = parseTransactionFlags(tx, {
         includeAll: true,
       })
       assert.deepEqual(flagsMap, {
