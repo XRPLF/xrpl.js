@@ -57,16 +57,9 @@ export interface CheckCreate extends BaseTransaction {
 export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SendMax === undefined) {
-    throw new ValidationError('CheckCreate: missing field SendMax')
-  }
-
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
-  if (tx.SendMax !== undefined && !isAmount(tx.SendMax)) {
-    throw new ValidationError('CheckCreate: invalid SendMax')
-  }
+  validateRequiredField(tx, 'SendMax', isAmount)
 
   if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
     throw new ValidationError('CheckCreate: invalid Expiration')
