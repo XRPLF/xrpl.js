@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 
 import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
 
@@ -22,13 +22,13 @@ export interface CheckCash extends BaseTransaction {
    * match that of the SendMax of the corresponding CheckCreate transaction. You.
    * must provide either this field or DeliverMin.
    */
-  Amount?: Amount
+  Amount?: Amount | MPTAmount
   /**
    * Redeem the Check for at least this amount and for as much as possible. The
    * currency must match that of the SendMax of the corresponding CheckCreate.
    * transaction. You must provide either this field or Amount.
    */
-  DeliverMin?: Amount
+  DeliverMin?: Amount | MPTAmount
 }
 
 /**

@@ -1,10 +1,10 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrencyAmount,
+  isAmount,
   isAccount,
   validateRequiredField,
   validateOptionalField,
@@ -30,7 +30,7 @@ export interface CheckCreate extends BaseTransaction {
    * non-XRP currencies). For non-XRP amounts, the nested field names MUST be.
    * lower-case.
    */
-  SendMax: Amount
+  SendMax: Amount | MPTAmount
   /**
    * Arbitrary tag that identifies the reason for the Check, or a hosted.
    * recipient to pay.
@@ -64,7 +64,7 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (typeof tx.SendMax !== 'string' && !isIssuedCurrencyAmount(tx.SendMax)) {
+  if (tx.SendMax !== undefined && !isAmount(tx.SendMax)) {
     throw new ValidationError('CheckCreate: invalid SendMax')
   }
 
