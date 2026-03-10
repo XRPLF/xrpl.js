@@ -45,6 +45,27 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         TRANSACTION_TYPES: Record<string, number>
 
         TYPES: Record<string, number>
+
+        /** Account set flags (added in newer rippled versions) */
+        ACCOUNT_SET_FLAGS?: Record<string, number>
+
+        /** Ledger entry flags (added in newer rippled versions) */
+        LEDGER_ENTRY_FLAGS?: Record<string, Record<string, number>>
+
+        /** Ledger entry formats (added in newer rippled versions) */
+        LEDGER_ENTRY_FORMATS?: Record<
+          string,
+          Array<{ name: string; required: boolean }>
+        >
+
+        /** Transaction flags (added in newer rippled versions) */
+        TRANSACTION_FLAGS?: Record<string, Record<string, number>>
+
+        /** Transaction formats (added in newer rippled versions) */
+        TRANSACTION_FORMATS?: Record<
+          string,
+          Array<{ name: string; required: boolean }>
+        >
       }
     | {
         FIELDS?: never
@@ -56,6 +77,16 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         TRANSACTION_TYPES?: never
 
         TYPES?: never
+
+        ACCOUNT_SET_FLAGS?: never
+
+        LEDGER_ENTRY_FLAGS?: never
+
+        LEDGER_ENTRY_FORMATS?: never
+
+        TRANSACTION_FLAGS?: never
+
+        TRANSACTION_FORMATS?: never
       }
   )
 }
