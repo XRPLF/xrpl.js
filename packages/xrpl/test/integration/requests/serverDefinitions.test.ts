@@ -30,7 +30,8 @@ describe('server_definitions', function () {
       assert.exists(response.result)
 
       const result = response.result
-      assert.hasAllKeys(result, [
+      // Use containsAllKeys to allow for additional fields in newer rippled versions
+      assert.containsAllKeys(result, [
         'hash',
         'FIELDS',
         'LEDGER_ENTRY_TYPES',
@@ -81,6 +82,47 @@ describe('server_definitions', function () {
         assert.typeOf(key, 'string')
         assert.typeOf(value, 'number')
       })
+
+      // Validate new optional fields if present (added in newer rippled versions)
+      if (result.ACCOUNT_SET_FLAGS) {
+        assert.typeOf(result.ACCOUNT_SET_FLAGS, 'object')
+        Object.entries(result.ACCOUNT_SET_FLAGS).forEach(([key, value]) => {
+          assert.typeOf(key, 'string')
+          assert.typeOf(value, 'number')
+        })
+      }
+
+      if (result.LEDGER_ENTRY_FLAGS) {
+        assert.typeOf(result.LEDGER_ENTRY_FLAGS, 'object')
+        Object.entries(result.LEDGER_ENTRY_FLAGS).forEach(([key, value]) => {
+          assert.typeOf(key, 'string')
+          assert.typeOf(value, 'object')
+        })
+      }
+
+      if (result.LEDGER_ENTRY_FORMATS) {
+        assert.typeOf(result.LEDGER_ENTRY_FORMATS, 'object')
+        Object.entries(result.LEDGER_ENTRY_FORMATS).forEach(([key, value]) => {
+          assert.typeOf(key, 'string')
+          assert.typeOf(value, 'array')
+        })
+      }
+
+      if (result.TRANSACTION_FLAGS) {
+        assert.typeOf(result.TRANSACTION_FLAGS, 'object')
+        Object.entries(result.TRANSACTION_FLAGS).forEach(([key, value]) => {
+          assert.typeOf(key, 'string')
+          assert.typeOf(value, 'object')
+        })
+      }
+
+      if (result.TRANSACTION_FORMATS) {
+        assert.typeOf(result.TRANSACTION_FORMATS, 'object')
+        Object.entries(result.TRANSACTION_FORMATS).forEach(([key, value]) => {
+          assert.typeOf(key, 'string')
+          assert.typeOf(value, 'array')
+        })
+      }
     },
     TIMEOUT,
   )
@@ -109,6 +151,11 @@ describe('server_definitions', function () {
         'TRANSACTION_RESULTS',
         'TRANSACTION_TYPES',
         'TYPES',
+        'ACCOUNT_SET_FLAGS',
+        'LEDGER_ENTRY_FLAGS',
+        'LEDGER_ENTRY_FORMATS',
+        'TRANSACTION_FLAGS',
+        'TRANSACTION_FORMATS',
       ])
 
       assert.equal(result.hash, hash)

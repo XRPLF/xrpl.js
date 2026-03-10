@@ -57,9 +57,19 @@ export interface AccountNFTsResponse extends BaseResponse {
      * The ledger index of the current open ledger, which was used when
      * retrieving this information.
      */
-    ledger_current_index: number
-    /** If true, this data comes from a validated ledger. */
-    validated: boolean
+    ledger_current_index?: number
+    /**
+     * The identifying hash of the ledger that was used to generate this response.
+     */
+    ledger_hash?: string
+    /**
+     * The ledger index of the ledger that was used to generate this response.
+     */
+    ledger_index?: number
+    /**
+     * If true, this data comes from a validated ledger.
+     */
+    validated?: boolean
     /**
      * Server-defined value indicating the response is paginated. Pass this to
      * the next call to resume where this call left off. Omitted when there are
