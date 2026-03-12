@@ -1,9 +1,8 @@
-import { ValidationError } from '../../errors'
-
 import {
   Account,
   BaseTransaction,
   isAccount,
+  isNumber,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -34,16 +33,5 @@ export function validateEscrowCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Owner', isAccount)
-
-  if (tx.OfferSequence == null) {
-    throw new ValidationError('EscrowCancel: missing OfferSequence')
-  }
-
-  if (
-    (typeof tx.OfferSequence !== 'number' &&
-      typeof tx.OfferSequence !== 'string') ||
-    Number.isNaN(Number(tx.OfferSequence))
-  ) {
-    throw new ValidationError('EscrowCancel: OfferSequence must be a number')
-  }
+  validateRequiredField(tx, 'OfferSequence', isNumber)
 }

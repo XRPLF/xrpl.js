@@ -126,8 +126,8 @@ interface ClassicAccountAndTag {
  */
 export function setValidAddresses(tx: Transaction): void {
   validateAccountAddress(tx, 'Account', 'SourceTag')
-  // eslint-disable-next-line @typescript-eslint/dot-notation -- Destination can exist on Transaction
-  if (tx['Destination'] != null) {
+
+  if ('Destination' in tx) {
     validateAccountAddress(tx, 'Destination', 'DestinationTag')
   }
 
@@ -153,15 +153,21 @@ function validateAccountAddress(
   accountField: string,
   tagField: string,
 ): void {
+  if (!(accountField in tx)) {
+    throw new ValidationError(`Missing field: ${accountField}`)
+  }
+  const val: unknown = tx[accountField]
+
+  if (typeof val !== 'string') {
+    throw new ValidationError(`${accountField} must be a string`)
+  }
   // if X-address is given, convert it to classic address
-  const { classicAccount, tag } = getClassicAccountAndTag(
-    tx[accountField] as string,
-  )
+  const { classicAccount, tag } = getClassicAccountAndTag(val)
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx[accountField] = classicAccount
 
   if (tag != null && tag !== false) {
-    if (tx[tagField] && tx[tagField] !== tag) {
+    if (tagField in tx && tx[tagField] !== tag) {
       throw new ValidationError(
         `The ${tagField}, if present, must match the tag of the ${accountField} X-address`,
       )

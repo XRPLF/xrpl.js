@@ -1,10 +1,10 @@
-import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
 import {
   BaseTransaction,
-  isIssuedCurrency,
+  isCurrency,
   validateBaseTransaction,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -41,19 +41,6 @@ export interface AMMDelete extends BaseTransaction {
 export function validateAMMDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMDelete: missing field Asset')
-  }
-
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMDelete: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMDelete: missing field Asset2')
-  }
-
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMDelete: Asset2 must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
 }

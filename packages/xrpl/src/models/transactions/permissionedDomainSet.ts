@@ -2,11 +2,11 @@ import { AuthorizeCredential } from '../common'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
   validateCredentialsList,
+  isHexString,
   isArray,
 } from './common'
 
@@ -36,7 +36,7 @@ export function validatePermissionedDomainSet(
 ): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
   validateRequiredField(tx, 'AcceptedCredentials', isArray)
 
   validateCredentialsList(
@@ -46,5 +46,6 @@ export function validatePermissionedDomainSet(
     false,
     // PermissionedDomainSet uses at most 10 accepted credentials. This is different from Credential-feature transactions.
     MAX_ACCEPTED_CREDENTIALS,
+    'AcceptedCredentials',
   )
 }
