@@ -254,9 +254,9 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 10. Checkout `main` and `git pull` (you can skip this step for a beta since you already have the latest version of the beta branch).
 11. Actually publish the packages with one of the following:
 
-    - Stable release: Run `npx lerna publish from-package --yes`
-    - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes`
-      Notice this allows developers to install the package with `npm add xrpl@beta`
+    - Stable release: Run `npx lerna publish from-package --yes --registry=https://registry.npmjs.org`
+    - Beta release: Run `npx lerna publish from-package --dist-tag beta --yes --registry=https://registry.npmjs.org`
+      Notice this allows developers to install the package with `npm add xrpl@beta`. Custom tags are also supported and are recommended for amendment betas.
 
 12. If requested, enter your [npmjs.com](https://npmjs.com) OTP (one-time password) to complete publication.
 
