@@ -52,7 +52,10 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         /** Maps ledger entry type names to their flags and flag values. */
         LEDGER_ENTRY_FLAGS: Record<string, Record<string, number>>
 
-        /** Describes the fields and their optionality for each ledger entry type, including common fields shared across all ledger entries. */
+        /**
+         * Describes the fields and their optionality for each ledger entry type,
+         * including common fields shared across all ledger entries.
+         */
         LEDGER_ENTRY_FORMATS: Record<
           string,
           Array<{ name: string; optionality: number }>
@@ -61,7 +64,10 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         /** Maps transaction type names to their supported flags and flag values. */
         TRANSACTION_FLAGS: Record<string, Record<string, number>>
 
-        /** Describes the fields and their optionality for each transaction type, including common fields shared across all transactions. */
+        /**
+         * Describes the fields and their optionality for each transaction type,
+         * including common fields shared across all transactions.
+         */
         TRANSACTION_FORMATS: Record<
           string,
           Array<{ name: string; optionality: number }>
