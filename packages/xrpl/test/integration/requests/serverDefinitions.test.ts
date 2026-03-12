@@ -37,6 +37,11 @@ describe('server_definitions', function () {
         'TRANSACTION_RESULTS',
         'TRANSACTION_TYPES',
         'TYPES',
+        'ACCOUNT_SET_FLAGS',
+        'LEDGER_ENTRY_FLAGS',
+        'LEDGER_ENTRY_FORMATS',
+        'TRANSACTION_FLAGS',
+        'TRANSACTION_FORMATS',
       ])
 
       assert.typeOf(result.hash, 'string')
@@ -80,6 +85,52 @@ describe('server_definitions', function () {
       Object.entries(result.TYPES!).forEach(([key, value]) => {
         assert.typeOf(key, 'string')
         assert.typeOf(value, 'number')
+      })
+
+      assert.typeOf(result.ACCOUNT_SET_FLAGS, 'object')
+      Object.entries(result.ACCOUNT_SET_FLAGS!).forEach(([name, value]) => {
+        assert.typeOf(name, 'string')
+        assert.typeOf(value, 'number')
+      })
+
+      assert.typeOf(result.LEDGER_ENTRY_FLAGS, 'object')
+      Object.entries(result.LEDGER_ENTRY_FLAGS!).forEach(([name, flags]) => {
+        assert.typeOf(name, 'string')
+        assert.typeOf(flags, 'object')
+        Object.entries(flags).forEach(([flagName, flagValue]) => {
+          assert.typeOf(flagName, 'string')
+          assert.typeOf(flagValue, 'number')
+        })
+      })
+
+      assert.typeOf(result.LEDGER_ENTRY_FORMATS, 'object')
+      Object.entries(result.LEDGER_ENTRY_FORMATS!).forEach(([name, fields]) => {
+        assert.typeOf(name, 'string')
+        assert.isArray(fields)
+        for (const field of fields) {
+          assert.typeOf(field.name, 'string')
+          assert.typeOf(field.optionality, 'number')
+        }
+      })
+
+      assert.typeOf(result.TRANSACTION_FLAGS, 'object')
+      Object.entries(result.TRANSACTION_FLAGS!).forEach(([name, flags]) => {
+        assert.typeOf(name, 'string')
+        assert.typeOf(flags, 'object')
+        Object.entries(flags).forEach(([flagName, flagValue]) => {
+          assert.typeOf(flagName, 'string')
+          assert.typeOf(flagValue, 'number')
+        })
+      })
+
+      assert.typeOf(result.TRANSACTION_FORMATS, 'object')
+      Object.entries(result.TRANSACTION_FORMATS!).forEach(([name, fields]) => {
+        assert.typeOf(name, 'string')
+        assert.isArray(fields)
+        for (const field of fields) {
+          assert.typeOf(field.name, 'string')
+          assert.typeOf(field.optionality, 'number')
+        }
       })
     },
     TIMEOUT,
