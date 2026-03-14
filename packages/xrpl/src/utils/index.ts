@@ -60,6 +60,8 @@ import {
   decimalToQuality,
   qualityToDecimal,
 } from './quality'
+import { stringToHex, hexToString } from '@xrplf/isomorphic/utils'
+
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import { convertHexToString, convertStringToHex } from './stringConversion'
 import {
@@ -224,6 +226,8 @@ export {
   verifyPaymentChannelClaim,
   convertStringToHex,
   convertHexToString,
+  stringToHex,
+  hexToString,
   classicAddressToXAddress,
   xAddressToClassicAddress,
   isValidXAddress,

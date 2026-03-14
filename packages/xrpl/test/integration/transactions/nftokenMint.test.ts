@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import {
   AccountInfoRequest,
-  convertStringToHex,
+  stringToHex,
   getNFTokenID,
   NFTokenMint,
   TransactionMetadata,
@@ -39,7 +39,7 @@ describe('NFTokenMint', function () {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: testContext.wallet.address,
-        URI: convertStringToHex('https://www.google.com'),
+        URI: stringToHex('https://www.google.com'),
         NFTokenTaxon: 0,
       }
       const response = await testTransaction(
@@ -125,7 +125,7 @@ describe('NFTokenMint', function () {
       const tx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: testContext.wallet.address,
-        URI: convertStringToHex('https://www.google.com'),
+        URI: stringToHex('https://www.google.com'),
         NFTokenTaxon: 0,
         Amount: xrpToDrops(1),
         Expiration: unixTimeToRippleTime(Date.now() + 1000 * 60 * 60 * 24),
