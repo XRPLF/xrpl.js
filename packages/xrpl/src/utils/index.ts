@@ -63,6 +63,12 @@ import {
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import { convertHexToString, convertStringToHex } from './stringConversion'
 import {
+  currencyNameToCode,
+  currencyCodeToName,
+  isStandardCurrencyCode,
+  isHexCurrencyCode,
+} from './currencyConversion'
+import {
   rippleTimeToISOTime,
   isoTimeToRippleTime,
   rippleTimeToUnixTime,
@@ -247,4 +253,8 @@ export {
   getNFTokenID,
   parseNFTokenID,
   getXChainClaimID,
+  currencyNameToCode,
+  currencyCodeToName,
+  isStandardCurrencyCode,
+  isHexCurrencyCode,
 }
