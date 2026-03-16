@@ -83,7 +83,6 @@ describe('API: XRPL Secret Numbers', () => {
       '071783',
     ]
     it('Should throw an Checksum Error', () => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Jest type inference issue with error throwing functions
       expect(() => {
         // eslint-disable-next-line no-new -- Don't want unused variable
         new Account(secret)
