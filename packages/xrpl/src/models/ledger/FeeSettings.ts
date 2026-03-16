@@ -27,8 +27,7 @@ export interface FeeSettingsPostAmendmentFields {
 }
 
 export interface FeeSettingsBase
-  extends BaseLedgerEntry,
-    HasOptionalPreviousTxnID {
+  extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'FeeSettings'
   /**
    * A bit-map of boolean flags for this object. No flags are defined for this type.
