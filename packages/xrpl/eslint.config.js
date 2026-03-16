@@ -78,6 +78,8 @@ module.exports = [
       'n/no-unsupported-features/node-builtins': 'off',
       'import/no-named-as-default': 'off',
       'n/no-unpublished-import': 'off',
+      // Required for ESM imports with .js extension (e.g., @scure/bip39 v2)
+      'import/extensions': 'off',
     },
   },
   {
