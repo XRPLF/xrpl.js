@@ -259,7 +259,7 @@ it(`Invalid X-address (64-bit tag) throws`, () => {
 it(`Invalid Account ID throws`, () => {
   expect(() => {
     encodeXAddress(hexToBytes('00'.repeat(19)), false, false)
-  }).toThrowError('Account ID must be 20 bytes')
+  }).toThrow(new Error('Account ID must be 20 bytes'))
 })
 
 it(`isValidXAddress returns false for invalid X-address`, () => {
