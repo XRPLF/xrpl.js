@@ -257,6 +257,7 @@ it(`Invalid X-address (64-bit tag) throws`, () => {
 })
 
 it(`Invalid Account ID throws`, () => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Jest type inference issue with error throwing functions
   expect(() => {
     encodeXAddress(hexToBytes('00'.repeat(19)), false, false)
   }).toThrowError('Account ID must be 20 bytes')
