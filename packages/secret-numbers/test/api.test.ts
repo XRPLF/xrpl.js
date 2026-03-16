@@ -87,7 +87,7 @@ describe('API: XRPL Secret Numbers', () => {
       expect(() => {
         // eslint-disable-next-line no-new -- Don't want unused variable
         new Account(secret)
-      }).toThrow('Invalid secret part: checksum invalid')
+      }).toThrow(new Error('Invalid secret part: checksum invalid'))
     })
   })
 })
