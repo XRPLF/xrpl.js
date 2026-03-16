@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils'
+import { concatBytes } from '@noble/hashes/utils.js'
 
 export const HEX_REGEX = /^[A-F0-9]*$/iu
 

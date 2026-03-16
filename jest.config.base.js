@@ -5,10 +5,9 @@ module.exports = {
   transform: {
     "^.+\\.ts$": "ts-jest",
     "node_modules/chai/.+\\.js$": "ts-jest",
+    "node_modules/@noble/.+\\.js$": "ts-jest",
   },
-  transformIgnorePatterns: [
-    "/node_modules/(?!(chai)/)",
-  ],
+  transformIgnorePatterns: ["/node_modules/(?!(chai|@noble)/)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   verbose: true,
