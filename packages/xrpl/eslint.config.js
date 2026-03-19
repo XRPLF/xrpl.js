@@ -1,5 +1,5 @@
 const globals = require('globals')
-const eslintConfig = require('@xrplf/eslint-config/base')
+const eslintConfig = require('@xrplf/eslint-config/base').default
 const tseslint = require('typescript-eslint')
 
 module.exports = [
@@ -78,6 +78,8 @@ module.exports = [
       'n/no-unsupported-features/node-builtins': 'off',
       'import/no-named-as-default': 'off',
       'n/no-unpublished-import': 'off',
+      // Required for ESM imports with .js extension (e.g., @scure/bip39 v2)
+      'import/extensions': 'off',
     },
   },
   {

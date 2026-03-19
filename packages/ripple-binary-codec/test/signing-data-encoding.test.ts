@@ -228,7 +228,7 @@ describe('Signing data', function () {
         'B32A0D322D38281C81D4F49DCCDC260A81879B57',
         // PrincipalRequested
         '9E',
-        '00038D7EA4C68000FFFFFFF6',
+        '0DE0B6B3A7640000FFFFFFF3',
         // signingAccount suffix
         'BF9B4C3302798C111649BFA38DB60525C6E1021C',
       ].join(''),
