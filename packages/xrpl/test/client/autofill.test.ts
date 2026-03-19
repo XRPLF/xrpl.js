@@ -7,6 +7,7 @@ import {
   Payment,
   Transaction,
   Batch,
+  type LoanSet,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -517,5 +518,77 @@ describe('client.autofill', function () {
     const txResult = await testContext.client.autofill(tx)
     assert.strictEqual(txResult.RawTransactions[0].RawTransaction.Sequence, 24)
     assert.strictEqual(txResult.RawTransactions[1].RawTransaction.Sequence, 23)
+  })
+
+  it('should autofill LoanSet transaction', async function () {
+    const tx: LoanSet = {
+      TransactionType: 'LoanSet',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      LoanBrokerID:
+        'E9A08C918E26407493CC4ADD381BA979CFEB7E440D0863B01FB31C231D167E42',
+      PrincipalRequested: '100000',
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+        signer_lists: [
+          {
+            SignerEntries: [
+              {
+                SignerEntry: {
+                  Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+                },
+              },
+              {
+                SignerEntry: {
+                  Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+                },
+              },
+              {
+                SignerEntry: {
+                  Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+                },
+              },
+            ],
+          },
+        ],
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', {
+      status: 'success',
+      type: 'response',
+      result: {
+        ledger_index: 9038214,
+      },
+    })
+    testContext.mockRippled!.addResponse('server_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        info: {
+          validated_ledger: {
+            base_fee_xrp: 0.00001,
+          },
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger_entry', {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'LoanBroker',
+          Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        },
+      },
+    })
+
+    const txResult = await testContext.client.autofill(tx)
+    // base_fee + 3 * base_fee
+    assert.strictEqual(txResult.Fee, '48')
   })
 })

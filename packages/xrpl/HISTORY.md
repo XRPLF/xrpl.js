@@ -4,8 +4,37 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
+
+## 4.6.0 (2026-02-12)
+
+### Added
+* Add `faucetProtocol` (http or https) option to `fundWallet` method. Makes `fundWallet` work with locally running faucet servers.
+* Add `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` helper functions to sign and combine LoanSet transactions signed by the counterparty.
+* Add newly added fields to `Loan`, `LoanBroker` and `Vault` ledger objects and lending protocol related transaction types.
+
+## 4.5.0 (2025-12-16)
+
+### Added
+* Support for `Lending Protocol` (XLS-66d).
+* Export signing and binary codec utilities.
+
+### Fixed
+* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
+* Better faucet error handling
+* Mark the `AssetsAvailable`, `AssetsTotal`, and `LossUnrealized` fields of the Vault object as optional.
+
+## 4.4.3 (2025-11-07)
+
+### Added
+* Export `Batch` (XLS-56) transaction types and utilities
+* Add `encodeMPTokenMetadata` and `decodeMPTokenMetadata` helper functions to encode and decode MPTokenMetadata as per XLS-89 standard.
+
 ### Fixed
 * Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
+* [Breaking change] Fix `MPTokenMetadata` type to adhere to the XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `MPTokenMetadata` in your code, please verify that it adheres to the updated type definition.
+* [Breaking change] Fix `validateMPTokenMetadata` to correctly validate MPTokenMetadata as per XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `validateMPTokenMetadata` in your code, expect it to change as per the XLS-89 standard.
 
 ## 4.4.2 (2025-09-25)
 

@@ -1,6 +1,11 @@
 import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 import { hasFlag, isHex } from '../utils'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -14,10 +19,9 @@ import {
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-  validateMPTokenMetadata,
 } from './common'
+
+const MAX_SCALE = 18
 
 /**
  * Enum representing withdrawal strategies for a Vault.
@@ -71,10 +75,9 @@ export interface VaultCreate extends BaseTransaction {
   AssetsMaximum?: XRPLNumber
 
   /**
-   * Arbitrary metadata about the share MPT, in hex format, limited to 1024 bytes.
-   *
-   * The decoded value must be a UTF-8 encoded JSON object that adheres to the
-   * XLS-89d MPTokenMetadata standard.
+   * Should follow {@link https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0089-multi-purpose-token-metadata-schema | XLS-89} standard.
+   * Use {@link encodeMPTokenMetadata} utility function to convert to convert {@link MPTokenMetadata} to a blob.
+   * Use {@link decodeMPTokenMetadata} utility function to convert from a blob to {@link MPTokenMetadata}.
    *
    * While adherence to the XLS-89d format is not mandatory, non-compliant metadata
    * may not be discoverable by ecosystem tools such as explorers and indexers.
@@ -90,6 +93,12 @@ export interface VaultCreate extends BaseTransaction {
    * The PermissionedDomain object ID associated with the shares of this Vault.
    */
   DomainID?: string
+
+  /**
+   * The scaling factor for vault shares. Only applicable for IOU assets.
+   * Valid values are between 0 and 18 inclusive. For XRP and MPT, this must not be provided.
+   */
+  Scale?: number
 }
 
 /* eslint-disable max-lines-per-function -- Not needed to reduce function */
@@ -109,6 +118,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
   validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'Scale', isNumber)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
@@ -146,6 +156,30 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'VaultCreate: Cannot set DomainID unless tfVaultPrivate flag is set.',
     )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required to check asset type
+  const asset = tx.Asset as unknown as Record<string, unknown>
+  const isXRP = asset.currency === 'XRP'
+  const isMPT = 'mpt_issuance_id' in asset
+  const isIOU = !isXRP && !isMPT
+
+  if (tx.Scale !== undefined) {
+    // Scale must not be provided for XRP or MPT assets
+    if (isXRP || isMPT) {
+      throw new ValidationError(
+        'VaultCreate: Scale parameter must not be provided for XRP or MPT assets',
+      )
+    }
+
+    // For IOU assets, Scale must be between 0 and 18 inclusive
+    if (isIOU) {
+      if (!Number.isInteger(tx.Scale) || tx.Scale < 0 || tx.Scale > MAX_SCALE) {
+        throw new ValidationError(
+          `VaultCreate: Scale must be a number between 0 and ${MAX_SCALE} inclusive for IOU assets`,
+        )
+      }
+    }
   }
 
   if (tx.MPTokenMetadata != null) {

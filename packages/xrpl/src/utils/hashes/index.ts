@@ -185,4 +185,52 @@ export function hashPaymentChannel(
   )
 }
 
+/**
+ * Compute the hash of a Vault.
+ *
+ * @param address - Account of the Vault Owner (Account submitting VaultCreate transaction).
+ * @param sequence - Sequence number of the Transaction that created the Vault object.
+ * @returns The computed hash of the Vault object.
+ * @category Utilities
+ */
+export function hashVault(address: string, sequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('vault') +
+      addressToHex(address) +
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of a LoanBroker.
+ *
+ * @param address - Account of the Lender (Account submitting LoanBrokerSet transaction, i.e. Lender).
+ * @param sequence - Sequence number of the Transaction that created the LoanBroker object.
+ * @returns The computed hash of the LoanBroker object.
+ * @category Utilities
+ */
+export function hashLoanBroker(address: string, sequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('loanBroker') +
+      addressToHex(address) +
+      sequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
+/**
+ * Compute the hash of a Loan.
+ *
+ * @param loanBrokerId - The LoanBrokerID of the associated LoanBroker object.
+ * @param loanSequence - The sequence number of the Loan.
+ * @returns The computed hash of the Loan object.
+ * @category Utilities
+ */
+export function hashLoan(loanBrokerId: string, loanSequence: number): string {
+  return sha512Half(
+    ledgerSpaceHex('loan') +
+      loanBrokerId +
+      loanSequence.toString(HEX).padStart(BYTE_LENGTH * 2, '0'),
+  )
+}
+
 export { hashLedgerHeader, hashSignedTx, hashLedger, hashStateTree, hashTxTree }
