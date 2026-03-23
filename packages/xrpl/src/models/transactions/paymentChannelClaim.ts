@@ -1,6 +1,12 @@
 import { ValidationError } from '../../errors'
 
-import { BaseTransaction, GlobalFlags, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  GlobalFlagsInterface,
+  validateBaseTransaction,
+  validateCredentialsList,
+  MAX_AUTHORIZED_CREDENTIALS,
+} from './common'
 
 /**
  * Enum representing values for PaymentChannelClaim transaction flags.
@@ -67,7 +73,8 @@ export enum PaymentChannelClaimFlags {
  * // }
  * ```
  */
-export interface PaymentChannelClaimFlagsInterface extends GlobalFlags {
+export interface PaymentChannelClaimFlagsInterface
+  extends GlobalFlagsInterface {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
    * channel's immutable CancelAfter time.) Only the source address of the
@@ -127,6 +134,11 @@ export interface PaymentChannelClaim extends BaseTransaction {
    * field is omitted.
    */
   PublicKey?: string
+  /**
+   * Credentials associated with the sender of this transaction.
+   * The credentials included must not be expired.
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -137,6 +149,13 @@ export interface PaymentChannelClaim extends BaseTransaction {
  */
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    tx.TransactionType,
+    true,
+    MAX_AUTHORIZED_CREDENTIALS,
+  )
 
   if (tx.Channel === undefined) {
     throw new ValidationError('PaymentChannelClaim: missing Channel')

@@ -51,6 +51,7 @@ export interface ServerStateResponse extends BaseResponse {
       load_factor_fee_queue?: number
       load_factor_fee_reference?: number
       load_factor_server?: number
+      network_id: number
       peer_disconnects?: string
       peer_disconnects_resources?: string
       peers: number

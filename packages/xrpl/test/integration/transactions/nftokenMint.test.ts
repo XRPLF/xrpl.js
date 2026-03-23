@@ -1,11 +1,15 @@
 import { assert } from 'chai'
 
 import {
+  AccountInfoRequest,
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
   TransactionMetadata,
   TxRequest,
+  unixTimeToRippleTime,
+  Wallet,
+  xrpToDrops,
 } from '../../../src'
 import { hashSignedTx } from '../../../src/utils/hashes'
 import serverUrl from '../serverUrl'
@@ -14,16 +18,18 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { testTransaction } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
 
 describe('NFTokenMint', function () {
   let testContext: XrplIntegrationTestContext
+  let destinationWallet: Wallet
 
   beforeEach(async () => {
     testContext = await setupClient(serverUrl)
+    destinationWallet = await generateFundedWallet(testContext.client)
   })
   afterEach(async () => teardownClient(testContext))
 
@@ -42,6 +48,8 @@ describe('NFTokenMint', function () {
         testContext.wallet,
       )
       assert.equal(response.type, 'response')
+
+      const mintTransactionSeq = response.result.tx_json.Sequence
 
       const txRequest: TxRequest = {
         command: 'tx',
@@ -87,6 +95,84 @@ describe('NFTokenMint', function () {
         nftokenID,
         getNFTokenID(binaryTxResponse.result.meta_blob) ?? 'undefined',
         `getNFTokenID produced a different outcome when decoding the metadata in binary format.`,
+      )
+
+      // Check if AccountRoot ledger object reflects minted token
+      const accountInfoRequest: AccountInfoRequest = {
+        command: 'account_info',
+        account: testContext.wallet.address,
+        ledger_index: 'validated',
+      }
+      const accountInfoResponse =
+        await testContext.client.request(accountInfoRequest)
+      assert.equal(
+        accountInfoResponse.result.account_data.FirstNFTokenSequence,
+        mintTransactionSeq,
+        `FirstNFTokenSequence is not same as NFTokenMint's transaction sequence.`,
+      )
+      assert.equal(
+        accountInfoResponse.result.account_data.MintedNFTokens,
+        1,
+        `MintedNFTokens is not 1.`,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'test with Amount',
+    async function () {
+      const tx: NFTokenMint = {
+        TransactionType: 'NFTokenMint',
+        Account: testContext.wallet.address,
+        URI: convertStringToHex('https://www.google.com'),
+        NFTokenTaxon: 0,
+        Amount: xrpToDrops(1),
+        Expiration: unixTimeToRippleTime(Date.now() + 1000 * 60 * 60 * 24),
+        Destination: destinationWallet.address,
+      }
+      const response = await testTransaction(
+        testContext.client,
+        tx,
+        testContext.wallet,
+      )
+      assert.equal(response.type, 'response')
+
+      const txRequest: TxRequest = {
+        command: 'tx',
+        transaction: hashSignedTx(response.result.tx_blob),
+      }
+      const txResponse = await testContext.client.request(txRequest)
+
+      assert.equal(
+        (txResponse.result.meta as TransactionMetadata).TransactionResult,
+        'tesSUCCESS',
+      )
+
+      const nftokenID =
+        getNFTokenID(
+          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
+        ) ?? 'undefined'
+
+      const nftokenOfferID = (
+        txResponse.result.meta as TransactionMetadata<NFTokenMint>
+      ).offer_id
+
+      const sellOffers = await testContext.client.request({
+        command: 'nft_sell_offers',
+        nft_id: nftokenID,
+      })
+
+      const existsOffer = sellOffers.result.offers.some(
+        (value) => value.nft_offer_index === nftokenOfferID,
+      )
+
+      assert.isTrue(
+        existsOffer,
+        `Expected to exist an offer for NFT with NFTokenID ${nftokenID} but did not find it.
+      \n\nHere's what was returned from 'nft_sell_offers': ${JSON.stringify(
+        sellOffers,
+      )}`,
       )
     },
     TIMEOUT,

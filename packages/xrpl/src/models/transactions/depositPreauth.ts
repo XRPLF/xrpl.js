@@ -1,6 +1,12 @@
 import { ValidationError } from '../../errors'
+import { AuthorizeCredential } from '../common'
 
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  validateCredentialsList,
+  MAX_AUTHORIZED_CREDENTIALS,
+} from './common'
 
 /**
  * A DepositPreauth transaction gives another account pre-approval to deliver
@@ -18,6 +24,16 @@ export interface DepositPreauth extends BaseTransaction {
    * revoked.
    */
   Unauthorize?: string
+
+  /**
+   * The credential(s) to preauthorize.
+   */
+  AuthorizeCredentials?: AuthorizeCredential[]
+
+  /**
+   * The credential(s) whose preauthorization should be revoked.
+   */
+  UnauthorizeCredentials?: AuthorizeCredential[]
 }
 
 /**
@@ -29,17 +45,7 @@ export interface DepositPreauth extends BaseTransaction {
 export function validateDepositPreauth(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Authorize !== undefined && tx.Unauthorize !== undefined) {
-    throw new ValidationError(
-      "DepositPreauth: can't provide both Authorize and Unauthorize fields",
-    )
-  }
-
-  if (tx.Authorize === undefined && tx.Unauthorize === undefined) {
-    throw new ValidationError(
-      'DepositPreauth: must provide either Authorize or Unauthorize field',
-    )
-  }
+  validateSingleAuthorizationFieldProvided(tx)
 
   if (tx.Authorize !== undefined) {
     if (typeof tx.Authorize !== 'string') {
@@ -51,9 +57,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't preauthorize its own address",
       )
     }
-  }
-
-  if (tx.Unauthorize !== undefined) {
+  } else if (tx.Unauthorize !== undefined) {
     if (typeof tx.Unauthorize !== 'string') {
       throw new ValidationError('DepositPreauth: Unauthorize must be a string')
     }
@@ -63,5 +67,38 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
         "DepositPreauth: Account can't unauthorize its own address",
       )
     }
+  } else if (tx.AuthorizeCredentials !== undefined) {
+    validateCredentialsList(
+      tx.AuthorizeCredentials,
+      tx.TransactionType,
+      false,
+      MAX_AUTHORIZED_CREDENTIALS,
+    )
+  } else if (tx.UnauthorizeCredentials !== undefined) {
+    validateCredentialsList(
+      tx.UnauthorizeCredentials,
+      tx.TransactionType,
+      false,
+      MAX_AUTHORIZED_CREDENTIALS,
+    )
+  }
+}
+
+// Boolean logic to ensure exactly one of 4 inputs was provided
+function validateSingleAuthorizationFieldProvided(
+  tx: Record<string, unknown>,
+): void {
+  const fields = [
+    'Authorize',
+    'Unauthorize',
+    'AuthorizeCredentials',
+    'UnauthorizeCredentials',
+  ]
+  const countProvided = fields.filter((key) => tx[key] !== undefined).length
+
+  if (countProvided !== 1) {
+    throw new ValidationError(
+      'DepositPreauth: Requires exactly one field of the following: Authorize, Unauthorize, AuthorizeCredentials, UnauthorizeCredentials.',
+    )
   }
 }

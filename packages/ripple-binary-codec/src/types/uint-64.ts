@@ -2,9 +2,22 @@ import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
 import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
 import { readUInt32BE, writeUInt32BE } from '../utils'
+import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
 
 const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
+const BASE10_REGEX = /^[0-9]{1,20}$/
 const mask = BigInt(0x00000000ffffffff)
+
+const BASE10_AMOUNT_FIELDS = new Set([
+  'MaximumAmount',
+  'OutstandingAmount',
+  'MPTAmount',
+  'LockedAmount',
+])
+
+function isBase10(fieldName: string): boolean {
+  return BASE10_AMOUNT_FIELDS.has(fieldName)
+}
 
 /**
  * Derived UInt class for serializing/deserializing 64 bit UInt
@@ -29,7 +42,11 @@ class UInt64 extends UInt {
    * @param val A UInt64, hex-string, bigInt, or number
    * @returns A UInt64 object
    */
-  static from<T extends UInt64 | string | bigint | number>(val: T): UInt64 {
+  // eslint-disable-next-line complexity
+  static from<T extends UInt64 | string | bigint | number>(
+    val: T,
+    fieldName = '',
+  ): UInt64 {
     if (val instanceof UInt64) {
       return val
     }
@@ -51,11 +68,18 @@ class UInt64 extends UInt {
     }
 
     if (typeof val === 'string') {
-      if (!HEX_REGEX.test(val)) {
+      if (isBase10(fieldName)) {
+        if (!BASE10_REGEX.test(val)) {
+          throw new Error(`${fieldName} ${val} is not a valid base 10 string`)
+        }
+        val = BigInt(val).toString(16) as T
+      }
+
+      if (typeof val === 'string' && !HEX_REGEX.test(val)) {
         throw new Error(`${val} is not a valid hex-string`)
       }
 
-      const strBuf = val.padStart(16, '0')
+      const strBuf = (val as string).padStart(16, '0')
       buf = hexToBytes(strBuf)
       return new UInt64(buf)
     }
@@ -76,8 +100,16 @@ class UInt64 extends UInt {
    *
    * @returns a hex-string
    */
-  toJSON(): string {
-    return bytesToHex(this.bytes)
+  toJSON(
+    _definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
+    fieldName = '',
+  ): string {
+    const hexString = bytesToHex(this.bytes)
+    if (isBase10(fieldName)) {
+      return BigInt('0x' + hexString).toString(10)
+    }
+
+    return hexString
   }
 
   /**

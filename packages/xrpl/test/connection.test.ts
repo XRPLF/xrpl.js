@@ -81,10 +81,13 @@ async function createServer(): Promise<net.Server> {
 
 describe('Connection', function () {
   let clientContext: XrplTestContext
+  const CONNECTION_TIMEOUT = 1000
 
   beforeEach(async () => {
     // console.log(`before: `, expect.getState().currentTestName)
-    clientContext = await setupClient()
+    clientContext = await setupClient({
+      clientOptions: { connectionTimeout: CONNECTION_TIMEOUT },
+    })
   })
   afterEach(async () => {
     // console.log(`after: `, expect.getState().currentTestName)
@@ -425,7 +428,7 @@ describe('Connection', function () {
       } catch (error) {
         // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
-          "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
+          `Error: connect() timed out after ${CONNECTION_TIMEOUT} ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         )
         expect(spy).toHaveBeenCalled()
         // @ts-expect-error -- Promise throws timeout error after test is done
@@ -636,7 +639,7 @@ describe('Connection', function () {
           reject(new XrplError(`should not throw error, got ${String(error)}`))
         })
 
-        setTimeout(resolve, 5000)
+        setTimeout(resolve, 500)
       })
 
       const disconnectedPromise = new Promise<void>((resolve) => {
@@ -915,7 +918,7 @@ describe('Connection', function () {
         reject(new XrplError('Should not emit error.'))
       })
 
-      setTimeout(resolve, 5000)
+      setTimeout(resolve, 500)
     })
 
     let disconnectedCount = 0
@@ -976,6 +979,52 @@ describe('Connection', function () {
         XrplError,
         "Response with id 'test' is already pending",
       )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Delayed websocket error callback on send',
+    async () => {
+      const traceMessages: string[] = []
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.trace = (
+        id: string,
+        message: string,
+      ): void => {
+        traceMessages.push(`${id}: ${message}`)
+      }
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // server_info request will timeout in 0.5s, but we send an error after 1s
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, 1000)
+      }
+
+      await clientContext.client.connection
+        .request({ command: 'server_info' }, 500)
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+          assert.include(error.message, 'Timeout for request')
+        })
+
+      // wait to ensure that XrplError is not thrown after test is done
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1500)
+      })
+
+      assert.includeMembers(traceMessages, [
+        'send: send errored after connection was closed: [XrplError(No existing promise with id 1, ' +
+          '{"type":"reject","error":{"name":"DisconnectedError","data":{"message":"some error"}}})]',
+      ])
     },
     TIMEOUT,
   )

@@ -4,27 +4,32 @@
 import { XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, Memo } from '../common'
-import { isHex } from '../utils'
-import { setTransactionFlagsToNumber } from '../utils/flags'
+import { convertTxFlagsToNumber } from '../utils/flags'
 
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMClawback, validateAMMClawback } from './AMMClawback'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
 import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { Batch, validateBatch } from './batch'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
-  isIssuedCurrency,
   validateTxAgainstCustomDefinitions,
+  isIssuedCurrencyAmount,
+  validateBaseTransaction,
 } from './common'
+import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
+import { DelegateSet, validateDelegateSet } from './delegateSet'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'
 import { DIDSet, validateDIDSet } from './DIDSet'
@@ -32,7 +37,38 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import {
+  LoanBrokerCoverClawback,
+  validateLoanBrokerCoverClawback,
+} from './loanBrokerCoverClawback'
+import {
+  LoanBrokerCoverDeposit,
+  validateLoanBrokerCoverDeposit,
+} from './loanBrokerCoverDeposit'
+import {
+  LoanBrokerCoverWithdraw,
+  validateLoanBrokerCoverWithdraw,
+} from './loanBrokerCoverWithdraw'
+import { LoanBrokerDelete, validateLoanBrokerDelete } from './loanBrokerDelete'
+import { LoanBrokerSet, validateLoanBrokerSet } from './loanBrokerSet'
+import { LoanDelete, validateLoanDelete } from './loanDelete'
+import { LoanManage, validateLoanManage } from './loanManage'
+import { LoanPay, validateLoanPay } from './loanPay'
+import { LoanSet, validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
+import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
+import {
+  MPTokenIssuanceCreate,
+  validateMPTokenIssuanceCreate,
+} from './MPTokenIssuanceCreate'
+import {
+  MPTokenIssuanceDestroy,
+  validateMPTokenIssuanceDestroy,
+} from './MPTokenIssuanceDestroy'
+import {
+  MPTokenIssuanceSet,
+  validateMPTokenIssuanceSet,
+} from './MPTokenIssuanceSet'
 import {
   NFTokenAcceptOffer,
   validateNFTokenAcceptOffer,
@@ -47,6 +83,7 @@ import {
   validateNFTokenCreateOffer,
 } from './NFTokenCreateOffer'
 import { NFTokenMint, validateNFTokenMint } from './NFTokenMint'
+import { NFTokenModify, validateNFTokenModify } from './NFTokenModify'
 import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
@@ -64,12 +101,26 @@ import {
   PaymentChannelFund,
   validatePaymentChannelFund,
 } from './paymentChannelFund'
+import {
+  PermissionedDomainDelete,
+  validatePermissionedDomainDelete,
+} from './permissionedDomainDelete'
+import {
+  PermissionedDomainSet,
+  validatePermissionedDomainSet,
+} from './permissionedDomainSet'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
+import { VaultClawback, validateVaultClawback } from './vaultClawback'
+import { VaultCreate, validateVaultCreate } from './vaultCreate'
+import { VaultDelete, validateVaultDelete } from './vaultDelete'
+import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
+import { VaultSet, validateVaultSet } from './vaultSet'
+import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -104,6 +155,7 @@ import {
  */
 export type SubmittableTransaction =
   | AMMBid
+  | AMMClawback
   | AMMCreate
   | AMMDelete
   | AMMDeposit
@@ -111,21 +163,40 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | Batch
   | CheckCancel
   | CheckCash
   | CheckCreate
   | Clawback
+  | CredentialAccept
+  | CredentialCreate
+  | CredentialDelete
   | DIDDelete
   | DIDSet
+  | DelegateSet
   | DepositPreauth
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LoanBrokerSet
+  | LoanBrokerCoverClawback
+  | LoanBrokerCoverDeposit
+  | LoanBrokerCoverWithdraw
+  | LoanBrokerDelete
+  | LoanSet
+  | LoanDelete
+  | LoanManage
+  | LoanPay
+  | MPTokenAuthorize
+  | MPTokenIssuanceCreate
+  | MPTokenIssuanceDestroy
+  | MPTokenIssuanceSet
   | NFTokenAcceptOffer
   | NFTokenBurn
   | NFTokenCancelOffer
   | NFTokenCreateOffer
   | NFTokenMint
+  | NFTokenModify
   | OfferCancel
   | OfferCreate
   | OracleDelete
@@ -134,10 +205,18 @@ export type SubmittableTransaction =
   | PaymentChannelClaim
   | PaymentChannelCreate
   | PaymentChannelFund
+  | PermissionedDomainSet
+  | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
   | TicketCreate
   | TrustSet
+  | VaultClawback
+  | VaultCreate
+  | VaultDelete
+  | VaultDeposit
+  | VaultSet
+  | VaultWithdraw
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -185,50 +264,15 @@ export function validate(
   customDefinitions?: XrplDefinitionsBase,
 ): void {
   const tx = { ...transaction }
-  if (tx.TransactionType == null) {
-    throw new ValidationError('Object does not have a `TransactionType`')
-  }
-  if (typeof tx.TransactionType !== 'string') {
-    throw new ValidationError("Object's `TransactionType` is not a string")
-  }
 
-  /*
-   * - Memos have exclusively hex data.
-   */
-  if (tx.Memos != null && typeof tx.Memos !== 'object') {
-    throw new ValidationError('Memo must be array')
-  }
-  if (tx.Memos != null) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed here
-    ;(tx.Memos as Array<Memo | null>).forEach((memo) => {
-      if (memo?.Memo == null) {
-        throw new ValidationError('Memo data must be in a `Memo` field')
-      }
-      if (memo.Memo.MemoData) {
-        if (!isHex(memo.Memo.MemoData)) {
-          throw new ValidationError('MemoData field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoType) {
-        if (!isHex(memo.Memo.MemoType)) {
-          throw new ValidationError('MemoType field must be a hex value')
-        }
-      }
-
-      if (memo.Memo.MemoFormat) {
-        if (!isHex(memo.Memo.MemoFormat)) {
-          throw new ValidationError('MemoFormat field must be a hex value')
-        }
-      }
-    })
-  }
+  // should already be done in the tx-specific validation, but doesn't hurt to check again
+  validateBaseTransaction(tx)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
-    if (tx[key] && isIssuedCurrency(tx[key])) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      const txCurrency = (tx[key] as IssuedCurrencyAmount).currency
+    const value = tx[key]
+    if (value && isIssuedCurrencyAmount(value)) {
+      const txCurrency = value.currency
 
       if (
         txCurrency.length === standard_currency_code_len &&
@@ -242,10 +286,14 @@ export function validate(
   })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- okay here
-  setTransactionFlagsToNumber(tx as unknown as Transaction)
+  tx.Flags = convertTxFlagsToNumber(tx as unknown as Transaction)
   switch (tx.TransactionType) {
     case 'AMMBid':
       validateAMMBid(tx)
+      break
+
+    case 'AMMClawback':
+      validateAMMClawback(tx)
       break
 
     case 'AMMCreate':
@@ -276,6 +324,19 @@ export function validate(
       validateAccountSet(tx)
       break
 
+    case 'Batch':
+      validateBatch(tx)
+      // This is done here to avoid issues with dependency cycles
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- okay here
+      // @ts-expect-error -- already checked
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
+      tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+        validate(innerTx.RawTransaction as Record<string, unknown>)
+      })
+      break
+
     case 'CheckCancel':
       validateCheckCancel(tx)
       break
@@ -292,12 +353,28 @@ export function validate(
       validateClawback(tx)
       break
 
+    case 'CredentialAccept':
+      validateCredentialAccept(tx)
+      break
+
+    case 'CredentialCreate':
+      validateCredentialCreate(tx)
+      break
+
+    case 'CredentialDelete':
+      validateCredentialDelete(tx)
+      break
+
     case 'DIDDelete':
       validateDIDDelete(tx)
       break
 
     case 'DIDSet':
       validateDIDSet(tx)
+      break
+
+    case 'DelegateSet':
+      validateDelegateSet(tx)
       break
 
     case 'DepositPreauth':
@@ -314,6 +391,58 @@ export function validate(
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerCoverClawback':
+      validateLoanBrokerCoverClawback(tx)
+      break
+
+    case 'LoanBrokerCoverDeposit':
+      validateLoanBrokerCoverDeposit(tx)
+      break
+
+    case 'LoanBrokerCoverWithdraw':
+      validateLoanBrokerCoverWithdraw(tx)
+      break
+
+    case 'LoanBrokerDelete':
+      validateLoanBrokerDelete(tx)
+      break
+
+    case 'LoanBrokerSet':
+      validateLoanBrokerSet(tx)
+      break
+
+    case 'LoanSet':
+      validateLoanSet(tx)
+      break
+
+    case 'LoanManage':
+      validateLoanManage(tx)
+      break
+
+    case 'LoanDelete':
+      validateLoanDelete(tx)
+      break
+
+    case 'LoanPay':
+      validateLoanPay(tx)
+      break
+
+    case 'MPTokenAuthorize':
+      validateMPTokenAuthorize(tx)
+      break
+
+    case 'MPTokenIssuanceCreate':
+      validateMPTokenIssuanceCreate(tx)
+      break
+
+    case 'MPTokenIssuanceDestroy':
+      validateMPTokenIssuanceDestroy(tx)
+      break
+
+    case 'MPTokenIssuanceSet':
+      validateMPTokenIssuanceSet(tx)
       break
 
     case 'NFTokenAcceptOffer':
@@ -334,6 +463,10 @@ export function validate(
 
     case 'NFTokenMint':
       validateNFTokenMint(tx)
+      break
+
+    case 'NFTokenModify':
+      validateNFTokenModify(tx)
       break
 
     case 'OfferCancel':
@@ -368,6 +501,14 @@ export function validate(
       validatePaymentChannelFund(tx)
       break
 
+    case 'PermissionedDomainSet':
+      validatePermissionedDomainSet(tx)
+      break
+
+    case 'PermissionedDomainDelete':
+      validatePermissionedDomainDelete(tx)
+      break
+
     case 'SetRegularKey':
       validateSetRegularKey(tx)
       break
@@ -382,6 +523,30 @@ export function validate(
 
     case 'TrustSet':
       validateTrustSet(tx)
+      break
+
+    case 'VaultClawback':
+      validateVaultClawback(tx)
+      break
+
+    case 'VaultCreate':
+      validateVaultCreate(tx)
+      break
+
+    case 'VaultDelete':
+      validateVaultDelete(tx)
+      break
+
+    case 'VaultDeposit':
+      validateVaultDeposit(tx)
+      break
+
+    case 'VaultSet':
+      validateVaultSet(tx)
+      break
+
+    case 'VaultWithdraw':
+      validateVaultWithdraw(tx)
       break
 
     case 'XChainAccountCreateCommit':

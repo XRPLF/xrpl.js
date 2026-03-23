@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BookOffersRequest, type Request } from '../../src'
+import { BookOffersRequest, BookOffer, type Request } from '../../src'
 import { ValidationError, XrplError } from '../../src/errors'
 import { OfferFlags } from '../../src/models/ledger'
 import requests from '../fixtures/requests'
@@ -14,16 +14,18 @@ import {
 } from '../setupClient'
 import { assertResultMatch, assertRejects } from '../testUtils'
 
-function checkSortingOfOrders(orders): void {
+function checkSortingOfOrders(orders: BookOffer[]): void {
   let previousRate = '0'
   for (const order of orders) {
     assert(
-      new BigNumber(order.quality).isGreaterThanOrEqualTo(previousRate),
+      new BigNumber(order.quality as string).isGreaterThanOrEqualTo(
+        previousRate,
+      ),
       `Rates must be sorted from least to greatest: ${
-        order.quality as number
+        order.quality as string
       } should be >= ${previousRate}`,
     )
-    previousRate = order.quality
+    previousRate = order.quality as string
   }
 }
 
@@ -46,13 +48,17 @@ function normalRippledResponse(request: Request): Record<string, unknown> {
     isBTC((request as BookOffersRequest).taker_gets.currency) &&
     isUSD((request as BookOffersRequest).taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersBidsResponse(request)
+    return rippled.book_offers.fabric.requestBookOffersBidsResponse(
+      request,
+    ) as Record<string, unknown>
   }
   if (
     isUSD((request as BookOffersRequest).taker_gets.currency) &&
     isBTC((request as BookOffersRequest).taker_pays.currency)
   ) {
-    return rippled.book_offers.fabric.requestBookOffersAsksResponse(request)
+    return rippled.book_offers.fabric.requestBookOffersAsksResponse(
+      request,
+    ) as Record<string, unknown>
   }
   throw new XrplError('unexpected end')
 }

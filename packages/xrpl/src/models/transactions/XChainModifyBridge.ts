@@ -2,7 +2,7 @@ import { Amount, XChainBridge } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
   isXChainBridge,
   validateBaseTransaction,
@@ -26,7 +26,7 @@ export enum XChainModifyBridgeFlags {
  *
  * @category Transaction Flags
  */
-export interface XChainModifyBridgeFlagsInterface extends GlobalFlags {
+export interface XChainModifyBridgeFlagsInterface extends GlobalFlagsInterface {
   /** Clears the MinAccountCreateAmount of the bridge. */
   tfClearAccountCreateAmount?: boolean
 }

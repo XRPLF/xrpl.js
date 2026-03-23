@@ -5,7 +5,12 @@ import net from 'net'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 
-import { rippleTimeToUnixTime, unixTimeToRippleTime } from '../src'
+import {
+  rippleTimeToUnixTime,
+  unixTimeToRippleTime,
+  validate,
+  ValidationError,
+} from '../src'
 
 import addresses from './fixtures/addresses.json'
 
@@ -50,6 +55,33 @@ export function assertResultMatch(
     omit(response, ['txJSON', 'tx_json']),
     omit(expected, ['txJSON', 'tx_json']),
   )
+}
+
+/**
+ * Check that a transaction error validation fails properly.
+ *
+ * @param tx The transaction that should fail validation.
+ * @param validateTx The transaction-specific validation function (e.g. `validatePayment`).
+ */
+export function assertTxIsValid(tx: any, validateTx: (tx: any) => void): void {
+  assert.doesNotThrow(() => validateTx(tx))
+  assert.doesNotThrow(() => validate(tx))
+}
+
+/**
+ * Check that a transaction error validation fails properly.
+ *
+ * @param tx The transaction that should fail validation.
+ * @param validateTx The transaction-specific validation function (e.g. `validatePayment`).
+ * @param errorMessage The error message that should be included in the error.
+ */
+export function assertTxValidationError(
+  tx: any,
+  validateTx: (tx: any) => void,
+  errorMessage: string,
+): void {
+  assert.throws(() => validateTx(tx), ValidationError, errorMessage)
+  assert.throws(() => validate(tx), ValidationError, errorMessage)
 }
 
 /**
@@ -189,7 +221,6 @@ export function ignoreWebSocketDisconnect(error: Error): void {
  * ledger. (The close time of a ledger is not yet known when executing transactions to go into that ledger.) This means that,
  * for example, an Escrow could successfully finish at a real-world time that is up to about 10 seconds later than the time-based
  * expiration specified in the Escrow object.
- *
  *
  * @param closeTime - ledger close time in ripple time
  * @returns The difference between last ledger close time and current time in seconds

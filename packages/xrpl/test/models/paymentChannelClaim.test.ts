@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validatePaymentChannelClaim } from '../../src/models/transactions/paymentChannelClaim'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validatePaymentChannelClaim)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validatePaymentChannelClaim, message)
 
 /**
  * PaymentChannelClaim Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validatePaymentChannelClaim } from '../../src/models/transactions/payme
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('PaymentChannelClaim', function () {
-  let channel
+  let channel: any
 
   beforeEach(function () {
     channel = {
@@ -27,8 +30,7 @@ describe('PaymentChannelClaim', function () {
   })
 
   it(`verifies valid PaymentChannelClaim`, function () {
-    assert.doesNotThrow(() => validatePaymentChannelClaim(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`verifies valid PaymentChannelClaim w/o optional`, function () {
@@ -37,97 +39,42 @@ describe('PaymentChannelClaim', function () {
     delete channel.Signature
     delete channel.PublicKey
 
-    assert.doesNotThrow(() => validatePaymentChannelClaim(channel))
-    assert.doesNotThrow(() => validate(channel))
+    assertValid(channel)
   })
 
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: missing Channel',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: missing Channel',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: missing Channel')
   })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 100
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: Channel must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: Channel must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: Channel must be a string')
   })
 
   it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: Balance must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: Balance must be a string')
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: Amount must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: Amount must be a string')
   })
 
   it(`throws w/ invalid Signature`, function () {
     channel.Signature = 1000
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: Signature must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: Signature must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: Signature must be a string')
   })
 
   it(`throws w/ invalid PublicKey`, function () {
     channel.PublicKey = ['100000']
 
-    assert.throws(
-      () => validatePaymentChannelClaim(channel),
-      ValidationError,
-      'PaymentChannelClaim: PublicKey must be a string',
-    )
-    assert.throws(
-      () => validate(channel),
-      ValidationError,
-      'PaymentChannelClaim: PublicKey must be a string',
-    )
+    assertInvalid(channel, 'PaymentChannelClaim: PublicKey must be a string')
   })
 })

@@ -19,7 +19,10 @@ abstract class ShaMapNode {
  * Class describing a Leaf of SHAMap
  */
 class ShaMapLeaf extends ShaMapNode {
-  constructor(public index: Hash256, public item?: ShaMapNode) {
+  constructor(
+    public index: Hash256,
+    public item?: ShaMapNode,
+  ) {
     super()
   }
 
@@ -76,7 +79,7 @@ class ShaMapInner extends ShaMapNode {
   private slotBits = 0
   private branches: Array<ShaMapNode> = Array(16)
 
-  constructor(private depth: number = 0) {
+  constructor(private depth = 0) {
     super()
   }
 

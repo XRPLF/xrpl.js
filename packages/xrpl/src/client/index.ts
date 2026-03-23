@@ -41,14 +41,19 @@ import type {
   MarkerRequest,
   MarkerResponse,
   SubmitResponse,
+  SimulateRequest,
 } from '../models/methods'
 import type { BookOffer, BookOfferCurrency } from '../models/methods/bookOffers'
+import {
+  SimulateBinaryResponse,
+  SimulateJsonResponse,
+} from '../models/methods/simulate'
 import type {
   EventTypes,
   OnEventToListenerMap,
 } from '../models/methods/subscribe'
 import type { SubmittableTransaction } from '../models/transactions'
-import { setTransactionFlagsToNumber } from '../models/utils/flags'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 import {
   ensureClassicAddress,
   submitRequest,
@@ -59,10 +64,12 @@ import {
 import {
   setValidAddresses,
   setNextValidSequenceNumber,
-  calculateFeePerTransactionType,
   setLatestValidatedLedgerSequence,
   checkAccountDeleteBlockers,
   txNeedsNetworkID,
+  autofillBatchTxn,
+  handleDeliverMax,
+  getTransactionFee,
 } from '../sugar/autofill'
 import { formatBalances } from '../sugar/balances'
 import {
@@ -126,16 +133,16 @@ type RequestNextPageType =
 type RequestNextPageReturnMap<T> = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest
-  ? AccountTxResponse
-  : T extends LedgerDataRequest
-  ? LedgerDataResponse
-  : never
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest
+          ? AccountTxResponse
+          : T extends LedgerDataRequest
+            ? LedgerDataResponse
+            : never
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -476,7 +483,7 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number = request.limit ?? Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []
@@ -663,8 +670,6 @@ class Client extends EventEmitter<EventTypes> {
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
-
-  // eslint-disable-next-line complexity -- handling Payment transaction API v2 requires more logic
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -672,17 +677,15 @@ class Client extends EventEmitter<EventTypes> {
     const tx = { ...transaction }
 
     setValidAddresses(tx)
-    setTransactionFlagsToNumber(tx)
+    tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
-    if (tx.NetworkID == null) {
-      tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
+    tx.NetworkID ??= txNeedsNetworkID(this) ? this.networkID : undefined
     if (tx.Sequence == null) {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(calculateFeePerTransactionType(this, tx, signersCount))
+      promises.push(getTransactionFee(this, tx, signersCount))
     }
     if (tx.LastLedgerSequence == null) {
       promises.push(setLatestValidatedLedgerSequence(this, tx))
@@ -690,36 +693,49 @@ class Client extends EventEmitter<EventTypes> {
     if (tx.TransactionType === 'AccountDelete') {
       promises.push(checkAccountDeleteBlockers(this, tx))
     }
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-    // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
+    if (tx.TransactionType === 'Batch') {
+      promises.push(autofillBatchTxn(this, tx))
+    }
     if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
-      if (tx.Amount == null) {
-        // If only DeliverMax is provided, use it to populate the Amount field
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-        // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- DeliverMax is a known RPC-level property
-        tx.Amount = tx.DeliverMax
-      }
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- This is a valid null check for Amount
-      if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
-        return Promise.reject(
-          new ValidationError(
-            'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
-          ),
-        )
-      }
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- ignore type-assertions on the DeliverMax property
-      // @ts-expect-error -- DeliverMax property exists only at the RPC level, not at the protocol level
-      delete tx.DeliverMax
+      handleDeliverMax(tx)
     }
 
     return Promise.all(promises).then(() => tx)
+  }
+
+  /**
+   * Simulates an unsigned transaction.
+   * Steps performed on a transaction:
+   *    1. Autofill.
+   *    2. Sign & Encode.
+   *    3. Submit.
+   *
+   * @category Core
+   *
+   * @param transaction - A transaction to autofill, sign & encode, and submit.
+   * @param opts - (Optional) Options used to sign and submit a transaction.
+   * @param opts.binary - If true, return the metadata in a binary encoding.
+   *
+   * @returns A promise that contains SimulateResponse.
+   * @throws RippledError if the simulate request fails.
+   */
+
+  public async simulate<Binary extends boolean = false>(
+    transaction: SubmittableTransaction | string,
+    opts?: {
+      // If true, return the binary-encoded representation of the results.
+      binary?: Binary
+    },
+  ): Promise<
+    Binary extends true ? SimulateBinaryResponse : SimulateJsonResponse
+  > {
+    // send request
+    const binary = opts?.binary ?? false
+    const request: SimulateRequest =
+      typeof transaction === 'string'
+        ? { command: 'simulate', tx_blob: transaction, binary }
+        : { command: 'simulate', tx_json: transaction, binary }
+    return this.request(request)
   }
 
   /**
@@ -814,7 +830,7 @@ class Client extends EventEmitter<EventTypes> {
    * Under the hood, `submit` will call `client.autofill` by default, and because we've passed in a `Wallet` it
    * Will also sign the transaction for us before submitting the signed transaction binary blob to the ledger.
    *
-   * This is similar to `submitAndWait` which does all of the above, but also waits to see if the transaction has been validated.
+   * This is similar to `submit`, which does all of the above, but also waits to see if the transaction has been validated.
    * @param transaction - A transaction to autofill, sign & encode, and submit.
    * @param opts - (Optional) Options used to sign and submit a transaction.
    * @param opts.autofill - If true, autofill a transaction.
@@ -858,6 +874,12 @@ class Client extends EventEmitter<EventTypes> {
 
     const response = await submitRequest(this, signedTx, opts?.failHard)
 
+    if (response.result.engine_result.startsWith('tem')) {
+      throw new XrplError(
+        `Transaction failed, ${response.result.engine_result}: ${response.result.engine_result_message}`,
+      )
+    }
+
     const txHash = hashes.hashSignedTx(signedTx)
     return waitForFinalTransactionOutcome(
       this,
@@ -873,6 +895,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
@@ -1140,7 +1163,7 @@ class Client extends EventEmitter<EventTypes> {
    * const newWallet = Wallet.generate()
    * const { balance, wallet  } = await client.fundWallet(newWallet, {
    *       amount: '10',
-   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetHost: 'custom-faucet.example.com',
    *       faucetPath: '/accounts'
    *     })
    *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
@@ -1150,6 +1173,20 @@ class Client extends EventEmitter<EventTypes> {
    * }
    * ```
    *
+   * Example 3: Fund wallet using a local faucet server
+   *
+   * To interact with a faucet server running on http://, use the faucetProtocol option:
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'localhost:8000',
+   *       faucetPath: '/accounts',
+   *       faucetProtocol: 'http'
+   *     })
+   * ```
+   *
    * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
    * @param options - See below.
    * @param options.faucetHost - A custom host for a faucet server. On devnet,
@@ -1157,6 +1194,8 @@ class Client extends EventEmitter<EventTypes> {
    * attempt to determine the correct server automatically. In other environments,
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,

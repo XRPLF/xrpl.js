@@ -35,10 +35,8 @@ export default async function getFeeXrp(
   }
 
   const baseFeeXrp = new BigNumber(baseFee)
-  if (serverInfo.load_factor == null) {
-    // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
-    serverInfo.load_factor = 1
-  }
+  // https://github.com/ripple/rippled/issues/3812#issuecomment-816871100
+  serverInfo.load_factor ??= 1
   let fee = baseFeeXrp.times(serverInfo.load_factor).times(feeCushion)
 
   // Cap fee to `client.maxFeeXRP`

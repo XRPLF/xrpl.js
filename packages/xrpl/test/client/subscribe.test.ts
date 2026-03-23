@@ -13,7 +13,7 @@ async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
     assert(true)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- should be type error
   } catch (err: any) {
-    assert.fail(err.message || err)
+    assert.fail(err.message ?? err)
   }
 }
 

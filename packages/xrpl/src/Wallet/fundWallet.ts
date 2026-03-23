@@ -3,11 +3,7 @@ import { isValidClassicAddress } from 'ripple-address-codec'
 import type { Client } from '../client'
 import { XRPLFaucetError } from '../errors'
 
-import {
-  FaucetWallet,
-  getFaucetHost,
-  getDefaultFaucetPath,
-} from './defaultFaucets'
+import { FaucetWallet, getFaucetHost, getFaucetPath } from './defaultFaucets'
 
 import { Wallet } from '.'
 
@@ -37,6 +33,11 @@ export interface FundingOptions {
    * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
    */
   faucetPath?: string
+  /**
+   * The protocol to use for the faucet server. Defaults to 'https'. Use 'http' to interact with a local faucet server
+   * running on http://
+   */
+  faucetProtocol?: 'http' | 'https'
   /**
    * An optional field to indicate the use case context of the faucet transaction
    * Ex: integration test, code snippets.
@@ -105,6 +106,7 @@ export interface FundWalletOptions {
   faucetHost?: string
   faucetPath?: string
   amount?: string
+  faucetProtocol?: 'http' | 'https'
   usageContext?: string
 }
 
@@ -125,6 +127,8 @@ export interface FundWalletOptions {
  * you should provide the path using this option.
  * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
  * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+ * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+ * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @param client - A connection to the XRPL to send requests and transactions.
  * @param startingBalance - The amount of XRP in the given walletToFund on ledger already.
@@ -148,8 +152,9 @@ export async function requestFunding(
   if (!hostname) {
     throw new XRPLFaucetError('No faucet hostname could be derived')
   }
-  const pathname = options.faucetPath ?? getDefaultFaucetPath(hostname)
-  const response = await fetch(`https://${hostname}${pathname}`, {
+  const pathname = options.faucetPath ?? getFaucetPath(hostname)
+  const protocol = options.faucetProtocol ?? 'https'
+  const response = await fetch(`${protocol}://${hostname}${pathname}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -157,12 +162,11 @@ export async function requestFunding(
     body: JSON.stringify(postBody),
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- it can be anything
-  const body = await response.json()
   if (
     response.ok &&
     response.headers.get('Content-Type')?.startsWith('application/json')
   ) {
+    const body: unknown = await response.json()
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
     const classicAddress = (body as FaucetWallet).account.classicAddress
     return processSuccessfulResponse(
@@ -172,7 +176,7 @@ export async function requestFunding(
       startingBalance,
     )
   }
-  return processError(response, body)
+  return processError(response)
 }
 
 // eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
@@ -190,43 +194,46 @@ async function processSuccessfulResponse(
       new XRPLFaucetError(`The faucet account is undefined`),
     )
   }
-  try {
-    // Check at regular interval if the address is enabled on the XRPL and funded
-    const updatedBalance = await getUpdatedBalance(
-      client,
-      classicAddress,
-      startingBalance,
-    )
+  // Check at regular interval if the address is enabled on the XRPL and funded
+  const updatedBalance = await getUpdatedBalance(
+    client,
+    classicAddress,
+    startingBalance,
+  )
 
-    if (updatedBalance > startingBalance) {
-      return {
-        wallet: walletToFund,
-        balance: updatedBalance,
-      }
+  if (updatedBalance > startingBalance) {
+    return {
+      wallet: walletToFund,
+      balance: updatedBalance,
     }
-    throw new XRPLFaucetError(
-      `Unable to fund address with faucet after waiting ${
-        INTERVAL_SECONDS * MAX_ATTEMPTS
-      } seconds`,
-    )
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new XRPLFaucetError(err.message)
-    }
-    throw err
   }
+  throw new XRPLFaucetError(
+    `Unable to fund address with faucet after waiting ${
+      INTERVAL_SECONDS * MAX_ATTEMPTS
+    } seconds`,
+  )
 }
 
-async function processError(response: Response, body): Promise<never> {
+interface ErrorData {
+  body?: unknown
+  contentType?: string
+  statusCode: number
+}
+
+async function processError(response: Response): Promise<never> {
+  const errorData: ErrorData = {
+    contentType: response.headers.get('Content-Type') ?? undefined,
+    statusCode: response.status,
+  }
+  const clone = response.clone()
+  try {
+    const body: unknown = await response.json()
+    errorData.body = body
+  } catch {
+    errorData.body = await clone.text()
+  }
   return Promise.reject(
-    new XRPLFaucetError(
-      `Request failed: ${JSON.stringify({
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- json response could be anything
-        body: body || {},
-        contentType: response.headers.get('Content-Type'),
-        statusCode: response.status,
-      })}`,
-    ),
+    new XRPLFaucetError(`Request failed: ${JSON.stringify(errorData)}`),
   )
 }
 

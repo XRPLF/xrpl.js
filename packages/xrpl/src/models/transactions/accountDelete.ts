@@ -4,8 +4,10 @@ import {
   isAccount,
   isNumber,
   validateBaseTransaction,
+  validateCredentialsList,
   validateOptionalField,
   validateRequiredField,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -28,6 +30,12 @@ export interface AccountDelete extends BaseTransaction {
    * information for the recipient of the deleted account's leftover XRP.
    */
   DestinationTag?: number
+  /**
+   * Credentials associated with sender of this transaction. The credentials included
+   * must not be expired. The list must not be empty when specified and cannot contain
+   * more than 8 credentials.
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -41,4 +49,11 @@ export function validateAccountDelete(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    tx.TransactionType,
+    true,
+    MAX_AUTHORIZED_CREDENTIALS,
+  )
 }

@@ -1,6 +1,0 @@
-dist
-node_modules
-.github
-.vscode
-karma.config.js
-karma-setup.js

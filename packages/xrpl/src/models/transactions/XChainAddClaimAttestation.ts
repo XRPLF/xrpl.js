@@ -104,7 +104,7 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'WasLockingChainSend',
-    (inp) => inp === 0 || inp === 1,
+    (inp: unknown): inp is 0 | 1 => inp === 0 || inp === 1,
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)
@@ -112,6 +112,6 @@ export function validateXChainAddClaimAttestation(
   validateRequiredField(
     tx,
     'XChainClaimID',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
   )
 }

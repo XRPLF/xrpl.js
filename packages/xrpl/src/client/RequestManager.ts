@@ -175,6 +175,7 @@ export default class RequestManager {
    * @param response - The response to handle.
    * @throws ResponseFormatError if the response format is invalid, RippledError if rippled returns an error.
    */
+  // eslint-disable-next-line complexity -- handling a response is complex
   public handleResponse(
     response: Partial<Response<APIVersion> | ErrorResponse>,
   ): void {
@@ -195,7 +196,9 @@ export default class RequestManager {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We know this must be true
       const errorResponse = response as Partial<ErrorResponse>
       const error = new RippledError(
-        errorResponse.error_message ?? errorResponse.error,
+        errorResponse.error_message ??
+          errorResponse.error_exception ??
+          errorResponse.error,
         errorResponse,
       )
       this.reject(response.id, error)

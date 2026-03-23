@@ -5,7 +5,9 @@ import {
   BaseTransaction,
   isAccount,
   validateBaseTransaction,
+  validateCredentialsList,
   validateRequiredField,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -32,6 +34,10 @@ export interface EscrowFinish extends BaseTransaction {
    * the held payment's Condition.
    */
   Fulfillment?: string
+  /** Credentials associated with the sender of this transaction.
+   * The credentials included must not be expired.
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -44,6 +50,13 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Owner', isAccount)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    tx.TransactionType,
+    true,
+    MAX_AUTHORIZED_CREDENTIALS,
+  )
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowFinish: missing field OfferSequence')

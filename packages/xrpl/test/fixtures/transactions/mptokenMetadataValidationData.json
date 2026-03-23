@@ -1,0 +1,562 @@
+[
+  {
+    "testName": "valid MPTokenMetadata",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": []
+  },
+  {
+    "testName": "valid MPTokenMetadata with all short field names",
+    "mptMetadata": {
+      "t": "TBILL",
+      "n": "T-Bill Yield Token",
+      "d": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "i": "https://example.org/tbill-icon.png",
+      "ac": "rwa",
+      "as": "treasury",
+      "in": "Example Yield Co.",
+      "us": [
+        {
+          "u": "https://exampleyield.co/tbill",
+          "c": "website",
+          "t": "Product Page"
+        },
+        {
+          "u": "https://exampleyield.co/docs",
+          "c": "docs",
+          "t": "Yield Token Docs"
+        }
+      ],
+      "ai": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": []
+  },
+  {
+    "testName": "valid MPTokenMetadata with mixed short and long field names",
+    "mptMetadata": {
+      "ticker": "CRYPTO",
+      "n": "Crypto Token",
+      "icon": "https://example.org/crypto-icon.png",
+      "asset_class": "gaming",
+      "d": "A gaming token for virtual worlds.",
+      "issuer_name": "Gaming Studios Inc.",
+      "as": "equity",
+      "uris": [
+        {
+          "uri": "https://gamingstudios.com",
+          "c": "website",
+          "title": "Main Website"
+        },
+        {
+          "uri": "https://gamingstudios.com",
+          "category": "website",
+          "t": "Main Website"
+        }
+      ],
+      "ai": "Gaming ecosystem token"
+    },
+    "validationMessages": []
+  },
+  {
+    "testName": "conflicting short and long fields - ticker and t",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "t": "BILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "ticker/t: both long and compact forms present. expected only one."
+    ]
+  },
+  {
+    "testName": "missing ticker",
+    "mptMetadata": {
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
+    ]
+  },
+  {
+    "testName": "ticker has lowercase letters",
+    "mptMetadata": {
+      "ticker": "tbill",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended."
+    ]
+  },
+  {
+    "testName": "icon not present",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": null,
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "icon/i: should be a non-empty string."
+    ]
+  },
+  {
+    "testName": "invalid asset_class",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "invalid",
+      "asset_subclass": "treasury",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other."
+    ]
+  },
+  {
+    "testName": "invalid asset_subclass",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "junk",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other."
+    ]
+  },
+  {
+    "testName": "missing asset_subclass for rwa",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "rwa",
+      "issuer_name": "Issuer"
+    },
+    "validationMessages": [
+      "asset_subclass/as: required when asset_class is rwa."
+    ]
+  },
+  {
+    "testName": "uris empty",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "defi",
+      "issuer_name": "Issuer",
+      "asset_subclass": "stablecoin",
+      "uris": []
+    },
+    "validationMessages": [
+      "uris/us: should be a non-empty array."
+    ]
+  },
+  {
+    "testName": "additional_info is invalid type - array",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "defi",
+      "issuer_name": "Issuer",
+      "additional_info": [
+        "not",
+        "valid"
+      ]
+    },
+    "validationMessages": [
+      "additional_info/ai: should be a string or JSON object."
+    ]
+  },
+  {
+    "testName": "additional_info is invalid type - number",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Token",
+      "icon": "https://example.com/icon.png",
+      "asset_class": "defi",
+      "issuer_name": "Issuer",
+      "additional_info": 123
+    },
+    "validationMessages": [
+      "additional_info/ai: should be a string or JSON object."
+    ]
+  },
+  {
+    "testName": "multiple warnings",
+    "mptMetadata": {
+      "ticker": "TBILLLLLLL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https/example.org/tbill-icon.png",
+      "asset_class": "rwamemes",
+      "asset_subclass": "treasurymemes",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "http://notsecure.com",
+          "type": "website",
+          "title": "Homepage"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
+    ]
+  },
+  {
+    "testName": "null mptMetadata",
+    "mptMetadata": null,
+    "validationMessages": [
+      "MPTokenMetadata is not properly formatted JSON object as per XLS-89."
+    ]
+  },
+  {
+    "testName": "empty mptMetadata",
+    "mptMetadata": {},
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "name/n: should be a non-empty string.",
+      "icon/i: should be a non-empty string.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "issuer_name/in: should be a non-empty string."
+    ]
+  },
+  {
+    "testName": "incorrect JSON",
+    "mptMetadata": "not a json",
+    "validationMessages": [
+      "MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'o', \"not a json\" is not valid JSON"
+    ]
+  },
+  {
+    "testName": "more than 9 fields",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "issuer_address": "123 Example Yield Co.",
+      "issuer_account": "321 Example Yield Co.",
+      "uris": [
+        {
+          "uri": "http://notsecure.com",
+          "category": "website",
+          "title": "Homepage"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "MPTokenMetadata must not contain more than 9 top-level fields (found 11)."
+    ]
+  },
+  {
+    "testName": "more than 3 uri fields",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://notsecure.com",
+          "category": "website",
+          "title": "Homepage",
+          "footer": "footer"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
+    ]
+  },
+  {
+    "testName": "invalid uris structure",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": "uris",
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "uris/us: should be a non-empty array."
+    ]
+  },
+  {
+    "testName": "invalid uri inner structure",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        1,
+        2
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
+    ]
+  },
+  {
+    "testName": "conflicting uri long and compact forms",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "u": "website",
+          "title": "Product Page"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "uris/us: should not have both uri and u fields.",
+      "uris/us: should be an array of objects each with uri/u, category/c, and title/t properties."
+    ]
+  },
+  {
+    "testName": "exceeds 1024 bytes",
+    "mptMetadata": {
+      "ticker": "TBILL",
+      "name": "T-Bill Yield Token",
+      "desc": "A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.",
+      "icon": "https://example.org/tbill-icon.png",
+      "asset_class": "rwa",
+      "asset_subclass": "treasury",
+      "issuer_name": "Example Yield Co.",
+      "uris": [
+        {
+          "uri": "https://exampleyield.co/tbill",
+          "category": "website",
+          "title": "Product Page"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        },
+        {
+          "uri": "https://exampleyield.co/docs",
+          "category": "docs",
+          "title": "Yield Token Docs"
+        }
+      ],
+      "additional_info": {
+        "interest_rate": "5.00%",
+        "interest_type": "variable",
+        "yield_source": "U.S. Treasury Bills",
+        "maturity_date": "2045-06-30",
+        "cusip": "912796RX0"
+      }
+    },
+    "validationMessages": [
+      "MPTokenMetadata must be max 1024 bytes."
+    ]
+  },
+  {
+    "testName": "null values",
+    "mptMetadata": {
+      "ticker": null,
+      "name": null,
+      "desc": null,
+      "icon": null,
+      "asset_class": null,
+      "asset_subclass": null,
+      "issuer_name": null,
+      "uris": null,
+      "additional_info": null
+    },
+    "validationMessages": [
+      "ticker/t: should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.",
+      "name/n: should be a non-empty string.",
+      "icon/i: should be a non-empty string.",
+      "asset_class/ac: should be one of rwa, memes, wrapped, gaming, defi, other.",
+      "issuer_name/in: should be a non-empty string.",
+      "desc/d: should be a non-empty string.",
+      "asset_subclass/as: should be one of stablecoin, commodity, real_estate, private_credit, equity, treasury, other.",
+      "uris/us: should be a non-empty array.",
+      "additional_info/ai: should be a string or JSON object."
+    ]
+  }
+]

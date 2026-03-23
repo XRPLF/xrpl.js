@@ -1,7 +1,9 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 import omit from 'lodash/omit'
 
-import { FeeRequest } from '../../../src'
+import { FeeRequest, xrpToDrops } from '../../../src'
+import getFeeXrp from '../../../src/sugar/getFeeXrp'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -26,6 +28,8 @@ describe('fee', function () {
       const request: FeeRequest = {
         command: 'fee',
       }
+      const referenceFee = xrpToDrops(await getFeeXrp(testContext.client, 1))
+      const MEDIAN_FEE_MULTIPLIER = 500
       const response = await testContext.client.request(request)
       const expected = {
         id: 0,
@@ -33,10 +37,12 @@ describe('fee', function () {
           current_ledger_size: '0',
           current_queue_size: '0',
           drops: {
-            base_fee: '10',
-            median_fee: '5000',
-            minimum_fee: '10',
-            open_ledger_fee: '10',
+            base_fee: referenceFee,
+            median_fee: new BigNumber(referenceFee)
+              .times(MEDIAN_FEE_MULTIPLIER)
+              .toString(),
+            minimum_fee: referenceFee,
+            open_ledger_fee: referenceFee,
           },
           expected_ledger_size: '1000',
           ledger_current_index: 2925,

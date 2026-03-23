@@ -40,7 +40,6 @@ function deriveScalar(bytes: Uint8Array, discrim?: number): bigint {
  * @param [opts.validator=false] - Generate root key-pair,
  *                                              as used by validators.
  * @returns {bigint} 256 bit scalar value.
- *
  */
 export function derivePrivateKey(
   seed: Uint8Array,

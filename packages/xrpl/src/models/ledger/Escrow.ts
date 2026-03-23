@@ -19,7 +19,8 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * successful.
    */
   Destination: string
-  /** The amount of XRP, in drops, to be delivered by the held payment. */
+  /** The amount to be delivered by the held payment. Can represent XRP, an IOU token, or an MPT.
+   * Must always be a positive value. */
   Amount: string
   /**
    * A PREIMAGE-SHA-256 crypto-condition, as hexadecimal. If present, the
@@ -61,4 +62,16 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
+
+  /**
+   * The transfer rate or fee at which the funds are escrowed, stored at creation
+   *  and used during settlement. Applicable to both IOUs and MPTs.
+   */
+  TransferRate?: number
+
+  /**
+   * The ledger index of the issuer's directory node associated with the Escrow.
+   * Used when the issuer is neither the source nor destination account.
+   */
+  IssuerNode?: number
 }
