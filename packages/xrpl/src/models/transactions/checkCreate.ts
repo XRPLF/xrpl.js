@@ -4,7 +4,7 @@ import { Amount } from '../common'
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrency,
+  isIssuedCurrencyAmount,
   isAccount,
   validateRequiredField,
   validateOptionalField,
@@ -64,11 +64,7 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (
-    typeof tx.SendMax !== 'string' &&
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
-    !isIssuedCurrency(tx.SendMax as Record<string, unknown>)
-  ) {
+  if (typeof tx.SendMax !== 'string' && !isIssuedCurrencyAmount(tx.SendMax)) {
     throw new ValidationError('CheckCreate: invalid SendMax')
   }
 

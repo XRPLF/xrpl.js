@@ -17,7 +17,7 @@ function sortOffers(offers: BookOffer[]): BookOffer[] {
     const qualityA = offerA.quality ?? 0
     const qualityB = offerB.quality ?? 0
 
-    return new BigNumber(qualityA).comparedTo(qualityB)
+    return new BigNumber(qualityA).comparedTo(qualityB) ?? 0
   })
 }
 
@@ -127,7 +127,7 @@ export function createBookOffersRequest(
     ledger_index: options.ledger_index ?? 'validated',
     ledger_hash: options.ledger_hash === null ? undefined : options.ledger_hash,
     limit: options.limit ?? DEFAULT_LIMIT,
-    taker: options.taker ? options.taker : undefined,
+    taker: options.taker ?? undefined,
   }
 
   return request

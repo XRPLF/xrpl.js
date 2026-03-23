@@ -3,10 +3,10 @@ import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
-  GlobalFlags,
+  GlobalFlagsInterface,
   isAmount,
-  isCurrency,
   isIssuedCurrency,
+  isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
 
@@ -24,7 +24,7 @@ export enum AMMDepositFlags {
   tfTwoAssetIfEmpty = 0x00800000,
 }
 
-export interface AMMDepositFlagsInterface extends GlobalFlags {
+export interface AMMDepositFlagsInterface extends GlobalFlagsInterface {
   tfLPToken?: boolean
   tfSingleAsset?: boolean
   tfTwoAsset?: boolean
@@ -89,7 +89,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDeposit: missing field Asset')
   }
 
-  if (!isCurrency(tx.Asset)) {
+  if (!isIssuedCurrency(tx.Asset)) {
     throw new ValidationError('AMMDeposit: Asset must be a Currency')
   }
 
@@ -97,7 +97,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMDeposit: missing field Asset2')
   }
 
-  if (!isCurrency(tx.Asset2)) {
+  if (!isIssuedCurrency(tx.Asset2)) {
     throw new ValidationError('AMMDeposit: Asset2 must be a Currency')
   }
 
@@ -111,7 +111,7 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.LPTokenOut != null && !isIssuedCurrency(tx.LPTokenOut)) {
+  if (tx.LPTokenOut != null && !isIssuedCurrencyAmount(tx.LPTokenOut)) {
     throw new ValidationError(
       'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount',
     )

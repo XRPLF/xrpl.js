@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateAMMBid } from '../../src/models/transactions/AMMBid'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMBid)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateAMMBid, message)
 
 /**
  * AMMBid Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateAMMBid } from '../../src/models/transactions/AMMBid'
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('AMMBid', function () {
-  let bid
+  let bid: any
 
   beforeEach(function () {
     bid = {
@@ -55,54 +57,47 @@ describe('AMMBid', function () {
         },
       ],
       Sequence: 1337,
-    } as any
+    }
   })
 
   it(`verifies valid AMMBid`, function () {
-    assert.doesNotThrow(() => validateAMMBid(bid))
-    assert.doesNotThrow(() => validate(bid))
+    assertValid(bid)
   })
 
   it(`throws w/ missing field Asset`, function () {
     delete bid.Asset
     const errorMessage = 'AMMBid: missing field Asset'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ Asset must be a Currency`, function () {
     bid.Asset = 1234
     const errorMessage = 'AMMBid: Asset must be a Currency'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ missing field Asset2`, function () {
     delete bid.Asset2
     const errorMessage = 'AMMBid: missing field Asset2'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     bid.Asset2 = 1234
     const errorMessage = 'AMMBid: Asset2 must be a Currency'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ BidMin must be an Amount`, function () {
     bid.BidMin = 5
     const errorMessage = 'AMMBid: BidMin must be an Amount'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ BidMax must be an Amount`, function () {
     bid.BidMax = 10
     const errorMessage = 'AMMBid: BidMax must be an Amount'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ AuthAccounts length must not be greater than 4`, function () {
@@ -113,15 +108,13 @@ describe('AMMBid', function () {
     })
     const errorMessage =
       'AMMBid: AuthAccounts length must not be greater than 4'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ AuthAccounts must be an AuthAccount array`, function () {
     bid.AuthAccounts = 1234
     const errorMessage = 'AMMBid: AuthAccounts must be an AuthAccount array'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ invalid AuthAccounts when AuthAccount is null`, function () {
@@ -129,8 +122,7 @@ describe('AMMBid', function () {
       AuthAccount: null,
     }
     const errorMessage = 'AMMBid: invalid AuthAccounts'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ invalid AuthAccounts when AuthAccount is undefined`, function () {
@@ -138,8 +130,7 @@ describe('AMMBid', function () {
       AuthAccount: undefined,
     }
     const errorMessage = 'AMMBid: invalid AuthAccounts'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ invalid AuthAccounts when AuthAccount is not an object`, function () {
@@ -147,8 +138,7 @@ describe('AMMBid', function () {
       AuthAccount: 1234,
     }
     const errorMessage = 'AMMBid: invalid AuthAccounts'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ invalid AuthAccounts when AuthAccount.Account is not a string`, function () {
@@ -158,8 +148,7 @@ describe('AMMBid', function () {
       },
     }
     const errorMessage = 'AMMBid: invalid AuthAccounts'
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 
   it(`throws w/ AuthAccounts must not include sender's address`, function () {
@@ -170,7 +159,6 @@ describe('AMMBid', function () {
     }
     const errorMessage =
       "AMMBid: AuthAccounts must not include sender's address"
-    assert.throws(() => validateAMMBid(bid), ValidationError, errorMessage)
-    assert.throws(() => validate(bid), ValidationError, errorMessage)
+    assertInvalid(bid, errorMessage)
   })
 })

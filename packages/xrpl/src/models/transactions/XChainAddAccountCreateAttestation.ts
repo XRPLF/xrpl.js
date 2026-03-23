@@ -110,13 +110,13 @@ export function validateXChainAddAccountCreateAttestation(
   validateRequiredField(
     tx,
     'WasLockingChainSend',
-    (inp) => inp === 0 || inp === 1,
+    (inp: unknown): inp is 0 | 1 => inp === 0 || inp === 1,
   )
 
   validateRequiredField(
     tx,
     'XChainAccountCreateCount',
-    (inp) => isNumber(inp) || isString(inp),
+    (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
   )
 
   validateRequiredField(tx, 'XChainBridge', isXChainBridge)

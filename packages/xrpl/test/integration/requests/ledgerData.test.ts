@@ -29,9 +29,8 @@ describe('ledger_data', function () {
         binary: true,
       }
 
-      const ledgerDataResponse = await testContext.client.request(
-        ledgerDataRequest,
-      )
+      const ledgerDataResponse =
+        await testContext.client.request(ledgerDataRequest)
 
       const expected = {
         id: 0,

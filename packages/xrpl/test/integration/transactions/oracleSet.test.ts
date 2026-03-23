@@ -25,17 +25,35 @@ describe('OracleSet', function () {
   it(
     'base',
     async () => {
+      const closeTime: string = (
+        await testContext.client.request({
+          command: 'ledger',
+          ledger_index: 'validated',
+        })
+      ).result.ledger.close_time_iso
+
       const tx: OracleSet = {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: Math.floor(Date.now() / 1000),
+        LastUpdateTime: Math.floor(new Date(closeTime).getTime() / 1000) + 20,
         PriceDataSeries: [
           {
             PriceData: {
               BaseAsset: 'XRP',
               QuoteAsset: 'USD',
               AssetPrice: 740,
+              Scale: 3,
+            },
+          },
+          {
+            PriceData: {
+              BaseAsset: 'XRP',
+              QuoteAsset: 'INR',
+              // Upper bound admissible value for AssetPrice field
+              // large numeric values necessarily have to use str type in Javascript
+              // number type uses double-precision floating point representation, hence represents a smaller range of values
+              AssetPrice: 'ffffffffffffffff',
               Scale: 3,
             },
           },
@@ -62,12 +80,18 @@ describe('OracleSet', function () {
       assert.equal(oracle.Owner, testContext.wallet.classicAddress)
       assert.equal(oracle.AssetClass, tx.AssetClass)
       assert.equal(oracle.Provider, tx.Provider)
-      assert.equal(oracle.PriceDataSeries.length, 1)
+      assert.equal(oracle.PriceDataSeries.length, 2)
       assert.equal(oracle.PriceDataSeries[0].PriceData.BaseAsset, 'XRP')
       assert.equal(oracle.PriceDataSeries[0].PriceData.QuoteAsset, 'USD')
       assert.equal(oracle.PriceDataSeries[0].PriceData.AssetPrice, '2e4')
       assert.equal(oracle.PriceDataSeries[0].PriceData.Scale, 3)
       assert.equal(oracle.Flags, 0)
+
+      // validate the serialization of large AssetPrice values
+      assert.equal(
+        oracle.PriceDataSeries[1].PriceData.AssetPrice,
+        'ffffffffffffffff',
+      )
     },
     TIMEOUT,
   )

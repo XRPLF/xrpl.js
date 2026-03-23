@@ -37,7 +37,6 @@ describe('AMMInfo', function () {
     assert.equal(amm.amount, '1250')
     assert.deepEqual(amm.amount2, {
       currency: asset2.currency,
-      // @ts-expect-error: asset2.issuer should be defined at this point
       issuer: asset2.issuer,
       value: '250',
     })

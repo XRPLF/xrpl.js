@@ -1,6 +1,4 @@
-import { Amount } from 'ripple-binary-codec/dist/types'
-
-import { XChainBridge } from '../common'
+import { Amount, XChainBridge } from '../common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 

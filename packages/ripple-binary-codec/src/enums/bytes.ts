@@ -34,7 +34,10 @@ export class Bytes {
  * @brief: Collection of Bytes objects, mapping bidirectionally
  */
 export class BytesLookup {
-  constructor(types: Record<string, number>, readonly ordinalWidth: number) {
+  constructor(
+    types: Record<string, number>,
+    readonly ordinalWidth: number,
+  ) {
     Object.entries(types).forEach(([k, v]) => {
       this.add(k, v)
     })

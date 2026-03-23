@@ -7,6 +7,7 @@ module.exports = {
   testMatch: ['<rootDir>/test/**/*.test.ts'],
   testPathIgnorePatterns: [
     '<rootDir>/test/integration',
+    '<rootDir>/test/faucet',
     '<rootDir>/test/fixtures',
   ],
   displayName: 'xrpl.js',

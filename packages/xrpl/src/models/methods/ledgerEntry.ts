@@ -21,6 +21,22 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  */
 export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
+
+  /**
+   * Retrieve a MPTokenIssuance object from the ledger.
+   */
+  mpt_issuance?: string
+
+  /**
+   * Retrieve a MPToken object from the ledger.
+   */
+  mptoken?:
+    | {
+        mpt_issuance_id: string
+        account: string
+      }
+    | string
+
   /**
    * Retrieve an Automated Market Maker (AMM) object from the ledger.
    * This is similar to amm_info method, but the ledger_entry version returns only the ledger entry as stored.
@@ -35,7 +51,14 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
       issuer?: string
     }
   }
-
+  /**
+   * (Optional) If set to true and the queried object has been deleted,
+   * return its complete data prior to its deletion.
+   * If set to false or not provided and the queried object has been deleted,
+   * return objectNotFound (current behavior).
+   * This parameter is supported only by Clio servers
+   */
+  include_deleted?: boolean
   /**
    * If true, return the requested ledger object's contents as a hex string in
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
@@ -59,6 +82,23 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
 
   /** The object ID of a Check object to retrieve. */
   check?: string
+
+  /* Specify the Credential to retrieve. If a string, must be the ledger entry ID of
+   * the entry, as hexadecimal. If an object, requires subject, issuer, and
+   * credential_type sub-fields.
+   */
+  credential?:
+    | {
+        /** The account that is the subject of the credential. */
+        subject: string
+
+        /** The account that issued the credential. */
+        issuer: string
+
+        /** The type of the credential, as issued. */
+        credentialType: string
+      }
+    | string
 
   /**
    * Specify a DepositPreauth object to retrieve. If a string, must be the
@@ -183,6 +223,11 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
         xchain_owned_create_account_claim_id: string | number
       }
     | string
+
+  delegate?: {
+    account: string
+    authorize: string
+  }
 }
 
 /**
@@ -204,5 +249,9 @@ export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
     validated?: boolean
+    /**
+     * (Optional) Indicates the ledger index at which the object was deleted.
+     */
+    deleted_ledger_index?: number
   }
 }

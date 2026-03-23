@@ -38,6 +38,11 @@ export interface RipplePathFindRequest
    * and optional issuer field, like how currency amounts are specified.
    */
   source_currencies?: SourceCurrencyAmount[]
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then only valid paths for this domain will be returned.
+   */
+  domain?: string
 }
 
 export interface RipplePathFindPathOption {

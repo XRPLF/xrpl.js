@@ -9,6 +9,7 @@ import {
   XChainCreateClaimID,
   xrpToDrops,
 } from '../../../src'
+import getFeeXrp from '../../../src/sugar/getFeeXrp'
 import serverUrl from '../serverUrl'
 import {
   setupBridge,
@@ -39,6 +40,7 @@ describe('XChainCreateBridge', function () {
       const destination = await generateFundedWallet(testContext.client)
       const otherChainSource = Wallet.generate()
       const amount = xrpToDrops(10)
+      const netFee = xrpToDrops(await getFeeXrp(testContext.client))
 
       const claimIdTx: XChainCreateClaimID = {
         TransactionType: 'XChainCreateClaimID',
@@ -103,7 +105,10 @@ describe('XChainCreateBridge', function () {
       )
       assert.equal(
         finalBalance,
-        initialBalance + Number(amount) - Number(signatureReward) - 12,
+        initialBalance +
+          Number(amount) -
+          Number(signatureReward) -
+          Number(netFee),
         "The destination's balance should not change yet",
       )
     },

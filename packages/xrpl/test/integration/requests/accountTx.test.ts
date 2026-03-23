@@ -100,7 +100,6 @@ describe('account_tx', function () {
           responseTx.Flags,
           responseTx.TransactionType,
           responseTx.Account,
-          // @ts-expect-error -- DeliverMax is a valid field on Payment response
           responseTx.DeliverMax,
           responseTx.Destination,
         ],

@@ -1,6 +1,6 @@
 "use strict";
 const { merge } = require("webpack-merge");
-const { webpackForTest } = require("../../../weback.test.config");
+const { webpackForTest } = require("../../../webpack.test.config");
 const baseConfig = require("../webpack.base.config");
 
 module.exports = merge(

@@ -53,6 +53,7 @@ describe('server_info (rippled)', function () {
               threads: 1,
             },
             load_factor: 1,
+            network_id: 0,
             peer_disconnects: '0',
             peer_disconnects_resources: '0',
             peers: 0,
@@ -125,6 +126,7 @@ describe('server_info (rippled)', function () {
         'build_version',
         'node_size',
         'initial_sync_duration_us',
+        'git',
       ]
       assert.deepEqual(
         omit(response.result.info, removeKeys),
@@ -137,18 +139,18 @@ describe('server_info (rippled)', function () {
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting
-      Object.keys(response.result.info.state_accounting).forEach(function (
-        key,
-      ) {
-        assert.equal(
-          typeof response.result.info.state_accounting[key].duration_us,
-          'string',
-        )
-        assert.equal(
-          typeof response.result.info.state_accounting[key].transitions,
-          'string',
-        )
-      })
+      Object.keys(response.result.info.state_accounting).forEach(
+        function (key) {
+          assert.equal(
+            typeof response.result.info.state_accounting[key].duration_us,
+            'string',
+          )
+          assert.equal(
+            typeof response.result.info.state_accounting[key].transitions,
+            'string',
+          )
+        },
+      )
 
       // validated_ledger
       assert.equal(typeof response.result.info.validated_ledger?.hash, 'string')

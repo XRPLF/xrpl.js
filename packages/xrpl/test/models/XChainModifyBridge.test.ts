@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateXChainModifyBridge } from '../../src/models/transactions/XChainModifyBridge'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateXChainModifyBridge)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateXChainModifyBridge, message)
 
 /**
  * XChainModifyBridge Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateXChainModifyBridge } from '../../src/models/transactions/XChain
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('XChainModifyBridge', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -34,66 +37,32 @@ describe('XChainModifyBridge', function () {
   })
 
   it('verifies valid XChainModifyBridge', function () {
-    assert.doesNotThrow(() => validateXChainModifyBridge(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
-    assert.throws(
-      () => validateXChainModifyBridge(tx),
-      ValidationError,
-      'XChainModifyBridge: missing field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainModifyBridge: missing field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainModifyBridge: missing field XChainBridge')
   })
 
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assert.throws(
-      () => validateXChainModifyBridge(tx),
-      ValidationError,
-      'XChainModifyBridge: invalid field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainModifyBridge: invalid field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainModifyBridge: invalid field XChainBridge')
   })
 
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainModifyBridge(tx),
-      ValidationError,
-      'XChainModifyBridge: invalid field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainModifyBridge: invalid field SignatureReward',
-    )
+    assertInvalid(tx, 'XChainModifyBridge: invalid field SignatureReward')
   })
 
   it('throws w/ invalid MinAccountCreateAmount', function () {
     tx.MinAccountCreateAmount = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainModifyBridge(tx),
-      ValidationError,
-      'XChainModifyBridge: invalid field MinAccountCreateAmount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainModifyBridge: invalid field MinAccountCreateAmount',
     )
   })

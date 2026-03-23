@@ -60,6 +60,7 @@ describe('server_state', function () {
             load_factor_fee_queue: 256,
             load_factor_fee_reference: 256,
             load_factor_server: 256,
+            network_id: 0,
             peer_disconnects: '0',
             peer_disconnects_resources: '0',
             peers: 0,
@@ -116,6 +117,7 @@ describe('server_state', function () {
         'node_size',
         'initial_sync_duration_us',
         'ports',
+        'git',
       ]
       assert.deepEqual(
         omit(response.result.state, removeKeys),
@@ -128,18 +130,18 @@ describe('server_state', function () {
         assert.equal(typeof obj.job_type, 'string')
       }
       // state_accounting
-      Object.keys(response.result.state.state_accounting).forEach(function (
-        key,
-      ) {
-        assert.equal(
-          typeof response.result.state.state_accounting[key].duration_us,
-          'string',
-        )
-        assert.equal(
-          typeof response.result.state.state_accounting[key].transitions,
-          'string',
-        )
-      })
+      Object.keys(response.result.state.state_accounting).forEach(
+        function (key) {
+          assert.equal(
+            typeof response.result.state.state_accounting[key].duration_us,
+            'string',
+          )
+          assert.equal(
+            typeof response.result.state.state_accounting[key].transitions,
+            'string',
+          )
+        },
+      )
 
       // validated_ledger
       assert.equal(

@@ -3,6 +3,7 @@ import { ValidationError } from '../../errors'
 import {
   Account,
   BaseTransaction,
+  GlobalFlagsInterface,
   isAccount,
   validateBaseTransaction,
   validateOptionalField,
@@ -60,6 +61,8 @@ export enum AccountSetAsfFlags {
   asfDisallowIncomingTrustline = 15,
   /** Permanently gain the ability to claw back issued IOUs */
   asfAllowTrustLineClawback = 16,
+  /** Issuers allow their IOUs to be used as escrow amounts */
+  asfAllowTrustLineLocking = 17,
 }
 
 /**
@@ -112,7 +115,7 @@ export enum AccountSetTfFlags {
  * // }
  * ```
  */
-export interface AccountSetFlagsInterface {
+export interface AccountSetFlagsInterface extends GlobalFlagsInterface {
   tfRequireDestTag?: boolean
   tfOptionalDestTag?: boolean
   tfRequireAuth?: boolean

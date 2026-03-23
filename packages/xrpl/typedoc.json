@@ -16,5 +16,5 @@
   ],
   "categorizeByGroup": false,
   "readme": "../../README.md",
-  "plugin": ["./dist/docs/typedoc.js"]
+  "plugin": ["./dist/docs/typedoc.mjs"]
 }

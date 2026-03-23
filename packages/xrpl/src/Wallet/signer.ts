@@ -1,12 +1,11 @@
-import { bytesToHex } from '@xrplf/isomorphic/utils'
-import { BigNumber } from 'bignumber.js'
-import { decodeAccountID } from 'ripple-address-codec'
-import { decode, encode, encodeForSigning } from 'ripple-binary-codec'
+import { encode, encodeForSigning } from 'ripple-binary-codec'
 import { verify } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Signer } from '../models/common'
 import { Transaction, validate } from '../models/transactions'
+
+import { compareSigners, getDecodedTransaction } from './utils'
 
 /**
  * Takes several transactions with Signer fields (in object or blob form) and creates a
@@ -121,43 +120,9 @@ function getTransactionWithAllSigners(
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: Signer[] = transactions
     .flatMap((tx) => tx.Signers ?? [])
-    .sort(compareSigners)
+    .sort((signer1, signer2) => compareSigners(signer1.Signer, signer2.Signer))
 
   return { ...transactions[0], Signers: sortedSigners }
-}
-
-/**
- * If presented in binary form, the Signers array must be sorted based on
- * the numeric value of the signer addresses, with the lowest value first.
- * (If submitted as JSON, the submit_multisigned method handles this automatically.)
- * https://xrpl.org/multi-signing.html.
- *
- * @param left - A Signer to compare with.
- * @param right - A second Signer to compare with.
- * @returns 1 if left \> right, 0 if left = right, -1 if left \< right, and null if left or right are NaN.
- */
-function compareSigners(left: Signer, right: Signer): number {
-  return addressToBigNumber(left.Signer.Account).comparedTo(
-    addressToBigNumber(right.Signer.Account),
-  )
-}
-
-const NUM_BITS_IN_HEX = 16
-
-function addressToBigNumber(address: string): BigNumber {
-  const hex = bytesToHex(decodeAccountID(address))
-  return new BigNumber(hex, NUM_BITS_IN_HEX)
-}
-
-function getDecodedTransaction(txOrBlob: Transaction | string): Transaction {
-  if (typeof txOrBlob === 'object') {
-    // We need this to handle X-addresses in multisigning
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob)) as unknown as Transaction
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob) as unknown as Transaction
 }
 
 export { verifySignature, multisign }

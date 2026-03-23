@@ -30,6 +30,11 @@ export interface PathFindCreateRequest extends BasePathFindRequest {
    * about, or to check the overall cost to make a payment along a certain path.
    */
   paths?: Path[]
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then only valid paths for this domain will be returned.
+   */
+  domain?: string
 }
 
 /** Stop sending pathfinding information. */
@@ -97,6 +102,11 @@ export interface PathFindResponse extends BaseResponse {
      * Continues to send updates each time a new ledger closes.
      */
     full_reply: boolean
+    /**
+     * The object ID of a PermissionedDomain object, if the orderbook shown is
+     * for a specific domain.
+     */
+    domain?: string
     /**
      * The ID provided in the WebSocket request is included again at this
      * level.

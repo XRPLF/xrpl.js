@@ -1,7 +1,14 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateXChainAddAccountCreateAttestation } from '../../src/models/transactions/XChainAddAccountCreateAttestation'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateXChainAddAccountCreateAttestation)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(
+    tx,
+    validateXChainAddAccountCreateAttestation,
+    message,
+  )
 
 /**
  * XChainAddAccountCreateAttestation Transaction Verification Testing.
@@ -9,7 +16,7 @@ import { validateXChainAddAccountCreateAttestation } from '../../src/models/tran
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('XChainAddAccountCreateAttestation', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -45,51 +52,26 @@ describe('XChainAddAccountCreateAttestation', function () {
   })
 
   it('verifies valid XChainAddAccountCreateAttestation', function () {
-    assert.doesNotThrow(() => validateXChainAddAccountCreateAttestation(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing Amount', function () {
     delete tx.Amount
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field Amount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field Amount',
-    )
+    assertInvalid(tx, 'XChainAddAccountCreateAttestation: missing field Amount')
   })
 
   it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field Amount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field Amount',
-    )
+    assertInvalid(tx, 'XChainAddAccountCreateAttestation: invalid field Amount')
   })
 
   it('throws w/ missing AttestationRewardAccount', function () {
     delete tx.AttestationRewardAccount
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field AttestationRewardAccount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field AttestationRewardAccount',
     )
   })
@@ -97,14 +79,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid AttestationRewardAccount', function () {
     tx.AttestationRewardAccount = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field AttestationRewardAccount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field AttestationRewardAccount',
     )
   })
@@ -112,14 +88,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing AttestationSignerAccount', function () {
     delete tx.AttestationSignerAccount
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field AttestationSignerAccount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field AttestationSignerAccount',
     )
   })
@@ -127,14 +97,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid AttestationSignerAccount', function () {
     tx.AttestationSignerAccount = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field AttestationSignerAccount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field AttestationSignerAccount',
     )
   })
@@ -142,14 +106,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing Destination', function () {
     delete tx.Destination
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field Destination',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field Destination',
     )
   })
@@ -157,14 +115,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid Destination', function () {
     tx.Destination = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field Destination',
     )
   })
@@ -172,14 +124,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing OtherChainSource', function () {
     delete tx.OtherChainSource
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field OtherChainSource',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field OtherChainSource',
     )
   })
@@ -187,14 +133,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid OtherChainSource', function () {
     tx.OtherChainSource = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field OtherChainSource',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field OtherChainSource',
     )
   })
@@ -202,14 +142,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing PublicKey', function () {
     delete tx.PublicKey
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field PublicKey',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field PublicKey',
     )
   })
@@ -217,14 +151,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid PublicKey', function () {
     tx.PublicKey = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field PublicKey',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field PublicKey',
     )
   })
@@ -232,14 +160,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing Signature', function () {
     delete tx.Signature
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field Signature',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field Signature',
     )
   })
@@ -247,14 +169,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid Signature', function () {
     tx.Signature = 123
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field Signature',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field Signature',
     )
   })
@@ -262,14 +178,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing SignatureReward', function () {
     delete tx.SignatureReward
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field SignatureReward',
     )
   })
@@ -277,14 +187,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field SignatureReward',
     )
   })
@@ -292,14 +196,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing WasLockingChainSend', function () {
     delete tx.WasLockingChainSend
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field WasLockingChainSend',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field WasLockingChainSend',
     )
   })
@@ -307,14 +205,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid WasLockingChainSend', function () {
     tx.WasLockingChainSend = 2
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend',
     )
   })
@@ -322,14 +214,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing XChainAccountCreateCount', function () {
     delete tx.XChainAccountCreateCount
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field XChainAccountCreateCount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field XChainAccountCreateCount',
     )
   })
@@ -337,14 +223,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid XChainAccountCreateCount', function () {
     tx.XChainAccountCreateCount = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
     )
   })
@@ -352,14 +232,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: missing field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: missing field XChainBridge',
     )
   })
@@ -367,14 +241,8 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assert.throws(
-      () => validateXChainAddAccountCreateAttestation(tx),
-      ValidationError,
-      'XChainAddAccountCreateAttestation: invalid field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAddAccountCreateAttestation: invalid field XChainBridge',
     )
   })

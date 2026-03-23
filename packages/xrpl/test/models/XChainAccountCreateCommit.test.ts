@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateXChainAccountCreateCommit } from '../../src/models/transactions/XChainAccountCreateCommit'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateXChainAccountCreateCommit)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateXChainAccountCreateCommit, message)
 
 /**
  * XChainAccountCreateCommit Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateXChainAccountCreateCommit } from '../../src/models/transactions
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('XChainAccountCreateCommit', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -35,51 +38,26 @@ describe('XChainAccountCreateCommit', function () {
   })
 
   it('verifies valid XChainAccountCreateCommit', function () {
-    assert.doesNotThrow(() => validateXChainAccountCreateCommit(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: missing field XChainBridge')
   })
 
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: invalid field XChainBridge')
   })
 
   it('throws w/ missing SignatureReward', function () {
     delete tx.SignatureReward
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAccountCreateCommit: missing field SignatureReward',
     )
   })
@@ -87,14 +65,8 @@ describe('XChainAccountCreateCommit', function () {
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
+    assertInvalid(
+      tx,
       'XChainAccountCreateCommit: invalid field SignatureReward',
     )
   })
@@ -102,60 +74,24 @@ describe('XChainAccountCreateCommit', function () {
   it('throws w/ missing Destination', function () {
     delete tx.Destination
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field Destination',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field Destination',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: missing field Destination')
   })
 
   it('throws w/ invalid Destination', function () {
     tx.Destination = 123
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field Destination',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field Destination',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: invalid field Destination')
   })
 
   it('throws w/ missing Amount', function () {
     delete tx.Amount
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field Amount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: missing field Amount',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: missing field Amount')
   })
 
   it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainAccountCreateCommit(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field Amount',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainAccountCreateCommit: invalid field Amount',
-    )
+    assertInvalid(tx, 'XChainAccountCreateCommit: invalid field Amount')
   })
 })

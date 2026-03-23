@@ -15,6 +15,12 @@ export interface DepositAuthorizedRequest
   source_account: string
   /** The recipient of a possible payment. */
   destination_account: string
+  /**
+   * The object IDs of Credential objects. If this field is included, then the
+   * credential will be taken into account when analyzing whether the sender can send
+   * funds to the destination.
+   */
+  credentials?: string[]
 }
 
 /**
@@ -52,5 +58,9 @@ export interface DepositAuthorizedResponse extends BaseResponse {
     source_account: string
     /** If true, the information comes from a validated ledger version. */
     validated?: boolean
+    /** The object IDs of `Credential` objects. If this field is included,
+     * then the credential will be taken into account when analyzing whether
+     * the sender can send funds to the destination. */
+    credentials?: string[]
   }
 }

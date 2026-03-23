@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/secret-numbers",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Generate XRPL Accounts with a number-based secret: 8 chunks of 6 digits",
   "main": "dist/index.js",
   "unpkg": "build/xrplf-secret-numbers-latest-min.js",
@@ -8,14 +8,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepublish": "npm run clean && npm run lint && npm run test && npm run test:browser && npm run build",
-    "clean": "rm -rf ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
+    "clean": "rm -rf ./build ./dist ./coverage ./test/testCompiledForWeb tsconfig.build.tsbuildinfo",
     "test": "jest --verbose",
     "test:browser": "npm run build && npm run build:browserTests && karma start ./karma.config.js",
     "build": "run-s build:lib build:web",
     "build:lib": "tsc --build tsconfig.build.json",
     "build:web": "webpack",
     "build:browserTests": "webpack --config ./test/webpack.config.js",
-    "lint": "eslint . --ext .ts --ext .test.ts --fix",
+    "lint": "eslint . --max-warnings 0",
     "analyze": "webpack --analyze"
   },
   "files": [
@@ -29,7 +29,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.0",
+    "@xrplf/isomorphic": "^1.0.1",
     "ripple-keypairs": "^2.0.0"
   },
   "prettier": "@xrplf/prettier-config",

@@ -24,6 +24,7 @@ import peerStatusStream from './streams/peerStatusChange.json'
 import transactionStream from './streams/transaction.json'
 import validationStream from './streams/validation.json'
 import successSubmit from './submit.json'
+import temErrorSubmit from './submitTemError.json'
 import successSubscribe from './subscribe.json'
 import errorSubscribe from './subscribeError.json'
 import transaction_entry from './transactionEntry.json'
@@ -37,6 +38,7 @@ import unsubscribe from './unsubscribe.json'
 
 const submit = {
   success: successSubmit,
+  temError: temErrorSubmit,
 }
 
 const ledger = {
