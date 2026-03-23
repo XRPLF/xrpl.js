@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js'
 import { classicAddressToXAddress, encodeSeed } from 'ripple-address-codec'
 import { encode, XrplDefinitionsBase } from 'ripple-binary-codec'
 import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
+
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'

@@ -62,6 +62,7 @@ export function addressToBigNumber(address: string): BigNumber {
  * Decodes a transaction or transaction blob into a Transaction object.
  *
  * @param txOrBlob - A Transaction object or a hex string representing a transaction blob.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Transaction object.
  * @throws If the input is not a valid Transaction or transaction blob.
  */
@@ -72,7 +73,10 @@ export function getDecodedTransaction(
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob, definitions), definitions) as unknown as Transaction
+    return decode(
+      encode(txOrBlob, definitions),
+      definitions,
+    ) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
@@ -89,6 +93,7 @@ export function getDecodedTransaction(
  * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A signed transaction in the proper format.
  */
+// eslint-disable-next-line max-params -- Needs 4 params
 export function computeSignature(
   tx: Transaction,
   privateKey: string,
@@ -100,7 +105,10 @@ export function computeSignature(
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encodeForMultisigning(tx, classicAddress, definitions), privateKey)
+    return sign(
+      encodeForMultisigning(tx, classicAddress, definitions),
+      privateKey,
+    )
   }
   return sign(encodeForSigning(tx, definitions), privateKey)
 }
