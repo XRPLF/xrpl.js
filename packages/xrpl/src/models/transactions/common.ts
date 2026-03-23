@@ -1,7 +1,7 @@
 /* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX } from '@xrplf/isomorphic/utils'
 import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
-import { TRANSACTION_TYPES, XrplDefinitionsBase } from 'ripple-binary-codec'
+import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import {
@@ -542,11 +542,13 @@ export interface BaseTransaction extends Record<string, unknown> {
  * any time a transaction will be verified.
  *
  * @param common - An interface w/ common transaction fields.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @throws When the common param is malformed.
  */
 // eslint-disable-next-line max-statements, max-lines-per-function -- lines required for validation
 export function validateBaseTransaction(
   common: unknown,
+  definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
 ): asserts common is BaseTransaction {
   if (!isRecord(common)) {
     throw new ValidationError(
@@ -562,7 +564,7 @@ export function validateBaseTransaction(
     throw new ValidationError('BaseTransaction: TransactionType not string')
   }
 
-  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
+  if (!definitions.transactionNames.includes(common.TransactionType)) {
     throw new ValidationError(
       `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
     )
@@ -609,30 +611,6 @@ export function validateBaseTransaction(
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
-  }
-}
-
-/**
- * Validate that the passed transaction is a valid type against the types provided by the custom definitions.
- *
- * @param tx - A Transaction.
- * @param definitions - Custom definitions
- * @throws When the passed transaction type is not found in the definitions.
- */
-export function validateTxAgainstCustomDefinitions(
-  tx: Record<string, unknown>,
-  definitions: XrplDefinitionsBase,
-): void {
-  // Validate just transaction type for now, leaving it open for further validations against the custom definition spec.
-  const txType = tx.TransactionType
-  if (typeof txType !== 'string') {
-    throw new ValidationError(
-      'TransactionType field is not specified or not a string',
-    )
-  }
-
-  if (!definitions.transactionType[txType]) {
-    throw new ValidationError(`Invalid transaction type: ${txType}`)
   }
 }
 

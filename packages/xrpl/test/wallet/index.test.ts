@@ -1256,7 +1256,7 @@ describe('Wallet', function () {
       assert.throws(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for unknown transaction
         wallet.sign(tx as any, false, customDefinition)
-      }, /^Invalid transaction type: SomeUnknown$/u)
+      }, /^BaseTransaction: Unknown TransactionType SomeUnknown$/u)
     })
 
     it('multisign succeeds when a custom definition is passed', async function () {

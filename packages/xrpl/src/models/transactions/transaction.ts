@@ -22,7 +22,6 @@ import { CheckCreate, validateCheckCreate } from './checkCreate'
 import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
-  validateTxAgainstCustomDefinitions,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
@@ -266,7 +265,7 @@ export function validate(
   const tx = { ...transaction }
 
   // should already be done in the tx-specific validation, but doesn't hurt to check again
-  validateBaseTransaction(tx)
+  validateBaseTransaction(tx, customDefinitions)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
@@ -582,9 +581,7 @@ export function validate(
       break
 
     default:
-      if (customDefinitions) {
-        validateTxAgainstCustomDefinitions(tx, customDefinitions)
-      } else {
+      if (!customDefinitions?.transactionNames.includes(tx.TransactionType)) {
         throw new ValidationError(
           `Invalid field TransactionType: ${tx.TransactionType}`,
         )
