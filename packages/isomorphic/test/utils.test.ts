@@ -12,19 +12,19 @@ describe('utils', function () {
   })
 
   it('hexToBytes - empty', () => {
-    expect(hexToBytes('')).toEqual(new Uint8Array([]))
+    expect(Array.from(hexToBytes(''))).toEqual([])
   })
 
   it('hexToBytes - zero', () => {
-    expect(hexToBytes('000000')).toEqual(new Uint8Array([0, 0, 0]))
+    expect(Array.from(hexToBytes('000000'))).toEqual([0, 0, 0])
   })
 
   it('hexToBytes - DEADBEEF', () => {
-    expect(hexToBytes('DEADBEEF')).toEqual(new Uint8Array([222, 173, 190, 239]))
+    expect(Array.from(hexToBytes('DEADBEEF'))).toEqual([222, 173, 190, 239])
   })
 
   it('hexToBytes - DEADBEEF', () => {
-    expect(hexToBytes('DEADBEEF')).toEqual(new Uint8Array([222, 173, 190, 239]))
+    expect(Array.from(hexToBytes('DEADBEEF'))).toEqual([222, 173, 190, 239])
   })
 
   it('bytesToHex - DEADBEEF', () => {

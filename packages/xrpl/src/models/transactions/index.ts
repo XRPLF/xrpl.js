@@ -66,7 +66,7 @@ export {
   LoanManageFlags,
   LoanManageFlagsInterface,
 } from './loanManage'
-export { LoanPay } from './loanPay'
+export { LoanPay, LoanPayFlags, LoanPayFlagsInterface } from './loanPay'
 export {
   MPTokenAuthorize,
   MPTokenAuthorizeFlags,

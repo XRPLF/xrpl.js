@@ -45,6 +45,33 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         TRANSACTION_TYPES: Record<string, number>
 
         TYPES: Record<string, number>
+
+        /** Maps AccountSet flag names (asf flags) to their numeric values. */
+        ACCOUNT_SET_FLAGS: Record<string, number>
+
+        /** Maps ledger entry type names to their flags and flag values. */
+        LEDGER_ENTRY_FLAGS: Record<string, Record<string, number>>
+
+        /**
+         * Describes the fields and their optionality for each ledger entry type,
+         * including common fields shared across all ledger entries.
+         */
+        LEDGER_ENTRY_FORMATS: Record<
+          string,
+          Array<{ name: string; optionality: number }>
+        >
+
+        /** Maps transaction type names to their supported flags and flag values. */
+        TRANSACTION_FLAGS: Record<string, Record<string, number>>
+
+        /**
+         * Describes the fields and their optionality for each transaction type,
+         * including common fields shared across all transactions.
+         */
+        TRANSACTION_FORMATS: Record<
+          string,
+          Array<{ name: string; optionality: number }>
+        >
       }
     | {
         FIELDS?: never
@@ -56,6 +83,16 @@ export interface ServerDefinitionsResponse extends BaseResponse {
         TRANSACTION_TYPES?: never
 
         TYPES?: never
+
+        ACCOUNT_SET_FLAGS?: never
+
+        LEDGER_ENTRY_FLAGS?: never
+
+        LEDGER_ENTRY_FORMATS?: never
+
+        TRANSACTION_FLAGS?: never
+
+        TRANSACTION_FORMATS?: never
       }
   )
 }
