@@ -9,6 +9,7 @@ import {
   Account,
   validateOptionalField,
   isAccount,
+  isNumber,
 } from './common'
 
 /**
@@ -34,6 +35,11 @@ export interface VaultWithdraw extends BaseTransaction {
    * An account to receive the assets. It must be able to receive the asset.
    */
   Destination?: Account
+
+  /**
+   * Arbitrary tag identifying the reason for the withdrawal to the destination.
+   */
+  DestinationTag?: number
 }
 
 /**
@@ -48,4 +54,5 @@ export function validateVaultWithdraw(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'VaultID', isString)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
 }

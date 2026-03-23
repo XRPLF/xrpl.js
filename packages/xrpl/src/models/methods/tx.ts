@@ -93,8 +93,9 @@ interface BaseTxResult<
  *
  * @category Responses
  */
-export interface TxResponse<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
+export interface TxResponse<
+  T extends BaseTransaction = Transaction,
+> extends BaseResponse {
   result: BaseTxResult<typeof RIPPLED_API_V2, T> & { tx_json: T }
   /**
    * If true, the server was able to search all of the specified ledger
@@ -110,8 +111,9 @@ export interface TxResponse<T extends BaseTransaction = Transaction>
  *
  * @category ResponsesV1
  */
-export interface TxV1Response<T extends BaseTransaction = Transaction>
-  extends BaseResponse {
+export interface TxV1Response<
+  T extends BaseTransaction = Transaction,
+> extends BaseResponse {
   result: BaseTxResult<typeof RIPPLED_API_V1, T> & T
   /**
    * If true, the server was able to search all of the specified ledger

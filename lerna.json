@@ -8,5 +8,6 @@
     "packages/isomorphic",
     "packages/secret-numbers"
   ],
-  "npmClient": "npm"
+  "npmClient": "npm",
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

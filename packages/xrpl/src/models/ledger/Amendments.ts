@@ -25,8 +25,7 @@ export interface Majority {
  * @category Ledger Entries
  */
 export default interface Amendments
-  extends BaseLedgerEntry,
-    HasOptionalPreviousTxnID {
+  extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'Amendments'
   /**
    * Array of 256-bit amendment IDs for all currently-enabled amendments. If

@@ -1,7 +1,18 @@
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
-import { decodeAccountID } from 'ripple-address-codec'
-import { decode, encode } from 'ripple-binary-codec'
+import {
+  decodeAccountID,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
+import {
+  decode,
+  encode,
+  encodeForMultisigning,
+  encodeForSigning,
+  XrplDefinitionsBase,
+} from 'ripple-binary-codec'
+import { sign } from 'ripple-keypairs'
 
 import { Transaction } from '../models'
 
@@ -56,13 +67,40 @@ export function addressToBigNumber(address: string): BigNumber {
  */
 export function getDecodedTransaction(
   txOrBlob: Transaction | string,
+  definitions?: XrplDefinitionsBase,
 ): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob)) as unknown as Transaction
+    return decode(encode(txOrBlob, definitions), definitions) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob) as unknown as Transaction
+  return decode(txOrBlob, definitions) as unknown as Transaction
+}
+
+/**
+ * Signs a transaction with the proper signing encoding.
+ *
+ * @param tx - A transaction to sign.
+ * @param privateKey - A key to sign the transaction with.
+ * @param signAs - Multisign only. An account address to include in the Signer field.
+ * Can be either a classic address or an XAddress.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns A signed transaction in the proper format.
+ */
+export function computeSignature(
+  tx: Transaction,
+  privateKey: string,
+  signAs?: string,
+  definitions?: XrplDefinitionsBase,
+): string {
+  if (signAs) {
+    const classicAddress = isValidXAddress(signAs)
+      ? xAddressToClassicAddress(signAs).classicAddress
+      : signAs
+
+    return sign(encodeForMultisigning(tx, classicAddress, definitions), privateKey)
+  }
+  return sign(encodeForSigning(tx, definitions), privateKey)
 }

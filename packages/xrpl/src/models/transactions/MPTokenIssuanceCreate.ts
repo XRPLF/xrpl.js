@@ -63,8 +63,8 @@ export enum MPTokenIssuanceCreateFlags {
  *
  * @category Transaction Flags
  */
-export interface MPTokenIssuanceCreateFlagsInterface
-  extends GlobalFlagsInterface {
+// eslint-disable-next-line max-len -- Disable for interface declaration.
+export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
   tfMPTRequireAuth?: boolean
   tfMPTCanEscrow?: boolean

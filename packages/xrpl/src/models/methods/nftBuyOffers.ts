@@ -9,8 +9,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface NFTBuyOffersRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'nft_buy_offers'
   /**
    * The unique identifier of an NFToken. The request returns buy offers for this NFToken.
