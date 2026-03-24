@@ -171,7 +171,7 @@ describe('Clawback', function () {
 
       assert.equal(
         // @ts-expect-error: Known issue with unknown object type
-        ledgerEntryResponse.result.node.MPTAmount,
+        ledgerEntryResponse.result.node.MPTAmount.value,
         '9223372036854775807',
       )
 
@@ -197,7 +197,7 @@ describe('Clawback', function () {
 
       assert.equal(
         // @ts-expect-error: Known issue with unknown object type
-        ledgerEntryResponse.result.node.MPTAmount,
+        ledgerEntryResponse.result.node.MPTAmount.value,
         '9223372036854775307',
       )
     },
