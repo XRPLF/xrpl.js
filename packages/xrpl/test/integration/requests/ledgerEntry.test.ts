@@ -1,10 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  LedgerEntryJsonResponse,
-  LedgerEntryRequest,
-  LedgerEntryResponse,
-} from '../../../src'
+import { LedgerEntryJsonResponse, LedgerEntryRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
