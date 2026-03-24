@@ -1,6 +1,10 @@
 import { assert } from 'chai'
 
-import { LedgerEntryRequest, LedgerEntryResponse } from '../../../src'
+import {
+  LedgerEntryJsonResponse,
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -38,7 +42,7 @@ describe('ledger_entry', function () {
       const ledgerEntryResponse =
         await testContext.client.request(ledgerEntryRequest)
 
-      const expectedResponse: LedgerEntryResponse = {
+      const expectedResponse: LedgerEntryJsonResponse = {
         api_version: 2,
         id: ledgerEntryResponse.id,
         type: 'response',
