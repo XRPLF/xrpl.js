@@ -232,7 +232,7 @@ describe('PermissionedDEX', function () {
             seq: offerCreateTxResponse.result.tx_json.Sequence as number,
           },
         })
-      ).result.node as Offer
+      ).result.node!
 
       assert.equal(offerLedgerObject.LedgerEntryType, 'Offer')
       assert.equal(offerLedgerObject.DomainID, permDomainLedgerObject.index)
@@ -259,7 +259,7 @@ describe('PermissionedDEX', function () {
       })
 
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).index,
+        ledgerEntryResponse.result.node?.index,
         offerLedgerObject.BookDirectory,
       )
       assert.equal(

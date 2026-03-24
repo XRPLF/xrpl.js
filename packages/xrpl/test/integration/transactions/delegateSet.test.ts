@@ -51,15 +51,14 @@ describe('DelegateSet', function () {
       await testTransaction(testContext.client, delegateTx, alice)
 
       // Verify Delegate ledger entry
-      const ledgerEntryRes: LedgerEntryResponse =
-        await testContext.client.request({
-          command: 'ledger_entry',
-          delegate: {
-            account: alice.address,
-            authorize: bob.address,
-          },
-        })
-      const delegateLedgerEntry = ledgerEntryRes.result.node as Delegate
+      const ledgerEntryRes = await testContext.client.request({
+        command: 'ledger_entry',
+        delegate: {
+          account: alice.address,
+          authorize: bob.address,
+        },
+      })
+      const delegateLedgerEntry = ledgerEntryRes.result.node!
       assert.equal(delegateLedgerEntry.LedgerEntryType, 'Delegate')
       assert.equal(delegateLedgerEntry.Account, alice.address)
       assert.equal(delegateLedgerEntry.Authorize, bob.address)

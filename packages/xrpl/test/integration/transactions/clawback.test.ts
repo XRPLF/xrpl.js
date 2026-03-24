@@ -162,14 +162,13 @@ describe('Clawback', function () {
 
       await testTransaction(testContext.client, paymentTx, testContext.wallet)
 
-      let ledgerEntryResponse: LedgerEntryResponse =
-        await testContext.client.request({
-          command: 'ledger_entry',
-          mptoken: {
-            mpt_issuance_id: mptID!,
-            account: wallet2.classicAddress,
-          },
-        })
+      let ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        mptoken: {
+          mpt_issuance_id: mptID!,
+          account: wallet2.classicAddress,
+        },
+      })
 
       assert.equal(
         // @ts-expect-error: Known issue with unknown object type

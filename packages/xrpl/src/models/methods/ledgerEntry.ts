@@ -230,6 +230,88 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   }
 }
 
+export interface LedgerEntryAccountRootRequest extends LedgerEntryRequest {
+  account_root: Required<LedgerEntryRequest>['account_root']
+}
+
+export interface LedgerEntryAMMRequest extends LedgerEntryRequest {
+  amm: Required<LedgerEntryRequest>['amm']
+}
+
+export interface LedgerEntryBridgeAccountRequest extends LedgerEntryRequest {
+  bridge_account: Required<LedgerEntryRequest>['bridge_account']
+}
+
+export interface LedgerEntryBridgeRequest extends LedgerEntryRequest {
+  bridge: Required<LedgerEntryRequest>['bridge']
+}
+
+export interface LedgerEntryCheckRequest extends LedgerEntryRequest {
+  check: Required<LedgerEntryRequest>['check']
+}
+
+export interface LedgerEntryCredentialRequest extends LedgerEntryRequest {
+  credential: Required<LedgerEntryRequest>['credential']
+}
+
+export interface LedgerEntryDelegateRequest extends LedgerEntryRequest {
+  delegate: Required<LedgerEntryRequest>['delegate']
+}
+
+export interface LedgerEntryDepositPreauthRequest extends LedgerEntryRequest {
+  deposit_preauth: Required<LedgerEntryRequest>['deposit_preauth']
+}
+
+export interface LedgerEntryDIDRequest extends LedgerEntryRequest {
+  did: Required<LedgerEntryRequest>['did']
+}
+
+export interface LedgerEntryDirectoryRequest extends LedgerEntryRequest {
+  directory: Required<LedgerEntryRequest>['directory']
+}
+
+export interface LedgerEntryEscrowRequest extends LedgerEntryRequest {
+  escrow: Required<LedgerEntryRequest>['escrow']
+}
+
+export interface LedgerEntryMPTokenIssuanceRequest extends LedgerEntryRequest {
+  mpt_issuance: Required<LedgerEntryRequest>['mpt_issuance']
+}
+
+export interface LedgerEntryMPTokenRequest extends LedgerEntryRequest {
+  mptoken: Required<LedgerEntryRequest>['mptoken']
+}
+
+export interface LedgerEntryNFTokenPageRequest extends LedgerEntryRequest {
+  nft_page: Required<LedgerEntryRequest>['nft_page']
+}
+
+export interface LedgerEntryOfferRequest extends LedgerEntryRequest {
+  offer: Required<LedgerEntryRequest>['offer']
+}
+
+export interface LedgerEntryPayChannelRequest extends LedgerEntryRequest {
+  payment_channel: Required<LedgerEntryRequest>['payment_channel']
+}
+
+export interface LedgerEntryRippleStateRequest extends LedgerEntryRequest {
+  ripple_state: Required<LedgerEntryRequest>['ripple_state']
+}
+
+export interface LedgerEntryTicketRequest extends LedgerEntryRequest {
+  ticket: Required<LedgerEntryRequest>['ticket']
+}
+
+// eslint-disable-next-line max-len -- Disable for interface declaration.
+export interface LedgerEntryXChainOwnedClaimIDRequest extends LedgerEntryRequest {
+  xchain_owned_claim_id: Required<LedgerEntryRequest>['xchain_owned_claim_id']
+}
+
+// eslint-disable-next-line max-len -- Disable for interface declaration.
+export interface LedgerEntryXChainOwnedCreateAccountClaimIDRequest extends LedgerEntryRequest {
+  xchain_owned_create_account_claim_id: Required<LedgerEntryRequest>['xchain_owned_create_account_claim_id']
+}
+
 /**
  * Response expected from a {@link LedgerEntryRequest}.
  *

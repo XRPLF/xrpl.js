@@ -6,6 +6,7 @@ import Check from './Check'
 import Credential from './Credential'
 import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
+import DID from './DID'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
@@ -33,6 +34,7 @@ type LedgerEntry =
   | Credential
   | Delegate
   | DepositPreauth
+  | DID
   | DirectoryNode
   | Escrow
   | FeeSettings

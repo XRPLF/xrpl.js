@@ -2,6 +2,27 @@
 /* eslint-disable max-lines -- There is a lot to export */
 /* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
+import type {
+  AccountRoot,
+  AMM,
+  Bridge,
+  Check,
+  Credential,
+  Delegate,
+  DepositPreauth,
+  DID,
+  DirectoryNode,
+  Escrow,
+  MPToken,
+  MPTokenIssuance,
+  NFTokenPage,
+  Offer,
+  PayChannel,
+  RippleState,
+  Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
+} from '../ledger'
 
 import {
   AccountChannelsRequest,
@@ -108,7 +129,30 @@ import {
   LedgerDataRequest,
   LedgerDataResponse,
 } from './ledgerData'
-import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
+import {
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+  LedgerEntryAccountRootRequest,
+  LedgerEntryAMMRequest,
+  LedgerEntryBridgeAccountRequest,
+  LedgerEntryBridgeRequest,
+  LedgerEntryCheckRequest,
+  LedgerEntryCredentialRequest,
+  LedgerEntryDelegateRequest,
+  LedgerEntryDepositPreauthRequest,
+  LedgerEntryDIDRequest,
+  LedgerEntryDirectoryRequest,
+  LedgerEntryEscrowRequest,
+  LedgerEntryMPTokenIssuanceRequest,
+  LedgerEntryMPTokenRequest,
+  LedgerEntryNFTokenPageRequest,
+  LedgerEntryOfferRequest,
+  LedgerEntryPayChannelRequest,
+  LedgerEntryRippleStateRequest,
+  LedgerEntryTicketRequest,
+  LedgerEntryXChainOwnedClaimIDRequest,
+  LedgerEntryXChainOwnedCreateAccountClaimIDRequest,
+} from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
 import {
@@ -412,6 +456,46 @@ export type RequestResponseMap<
   ? LedgerCurrentResponse
   : T extends LedgerDataRequest
   ? LedgerDataResponse
+  : T extends LedgerEntryAccountRootRequest
+  ? LedgerEntryResponse<AccountRoot>
+  : T extends LedgerEntryAMMRequest
+  ? LedgerEntryResponse<AMM>
+  : T extends LedgerEntryBridgeAccountRequest
+  ? LedgerEntryResponse<Bridge>
+  : T extends LedgerEntryBridgeRequest
+  ? LedgerEntryResponse<Bridge>
+  : T extends LedgerEntryCheckRequest
+  ? LedgerEntryResponse<Check>
+  : T extends LedgerEntryCredentialRequest
+  ? LedgerEntryResponse<Credential>
+  : T extends LedgerEntryDelegateRequest
+  ? LedgerEntryResponse<Delegate>
+  : T extends LedgerEntryDepositPreauthRequest
+  ? LedgerEntryResponse<DepositPreauth>
+  : T extends LedgerEntryDIDRequest
+  ? LedgerEntryResponse<DID>
+  : T extends LedgerEntryDirectoryRequest
+  ? LedgerEntryResponse<DirectoryNode>
+  : T extends LedgerEntryEscrowRequest
+  ? LedgerEntryResponse<Escrow>
+  : T extends LedgerEntryMPTokenIssuanceRequest
+  ? LedgerEntryResponse<MPTokenIssuance>
+  : T extends LedgerEntryMPTokenRequest
+  ? LedgerEntryResponse<MPToken>
+  : T extends LedgerEntryNFTokenPageRequest
+  ? LedgerEntryResponse<NFTokenPage>
+  : T extends LedgerEntryOfferRequest
+  ? LedgerEntryResponse<Offer>
+  : T extends LedgerEntryPayChannelRequest
+  ? LedgerEntryResponse<PayChannel>
+  : T extends LedgerEntryRippleStateRequest
+  ? LedgerEntryResponse<RippleState>
+  : T extends LedgerEntryTicketRequest
+  ? LedgerEntryResponse<Ticket>
+  : T extends LedgerEntryXChainOwnedClaimIDRequest
+  ? LedgerEntryResponse<XChainOwnedClaimID>
+  : T extends LedgerEntryXChainOwnedCreateAccountClaimIDRequest
+  ? LedgerEntryResponse<XChainOwnedCreateAccountClaimID>
   : T extends LedgerEntryRequest
   ? LedgerEntryResponse
   : T extends SimulateBinaryRequest
@@ -567,6 +651,25 @@ export {
   LedgerDataLedgerState,
   LedgerEntryRequest,
   LedgerEntryResponse,
+  LedgerEntryAccountRootRequest,
+  LedgerEntryAMMRequest,
+  LedgerEntryBridgeRequest,
+  LedgerEntryCheckRequest,
+  LedgerEntryCredentialRequest,
+  LedgerEntryDelegateRequest,
+  LedgerEntryDepositPreauthRequest,
+  LedgerEntryDIDRequest,
+  LedgerEntryDirectoryRequest,
+  LedgerEntryEscrowRequest,
+  LedgerEntryMPTokenIssuanceRequest,
+  LedgerEntryMPTokenRequest,
+  LedgerEntryNFTokenPageRequest,
+  LedgerEntryOfferRequest,
+  LedgerEntryPayChannelRequest,
+  LedgerEntryRippleStateRequest,
+  LedgerEntryTicketRequest,
+  LedgerEntryXChainOwnedClaimIDRequest,
+  LedgerEntryXChainOwnedCreateAccountClaimIDRequest,
   // transaction methods with types
   SimulateRequest,
   SimulateResponse,
