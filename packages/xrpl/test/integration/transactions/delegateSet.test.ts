@@ -3,12 +3,10 @@ import { assert } from 'chai'
 import {
   AccountSet,
   DelegateSet,
-  LedgerEntryResponse,
   Payment,
   Wallet,
   xrpToDrops,
 } from '../../../src'
-import { Delegate } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupClient,

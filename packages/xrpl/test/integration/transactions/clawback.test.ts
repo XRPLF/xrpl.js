@@ -10,7 +10,6 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
   TransactionMetadata,
-  LedgerEntryResponse,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
