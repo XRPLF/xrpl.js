@@ -1,11 +1,11 @@
-import { secp256k1 } from '@noble/curves/secp256k1'
+import { secp256k1 } from '@noble/curves/secp256k1.js'
 
 import Sha512 from '../../utils/Sha512'
 
 const ZERO = BigInt(0)
 
 function deriveScalar(bytes: Uint8Array, discrim?: number): bigint {
-  const order = secp256k1.CURVE.n
+  const order = secp256k1.Point.CURVE().n
   for (let i = 0; i <= 0xffff_ffff; i++) {
     // We hash the bytes to find a 256-bit number, looping until we are sure it
     // is less than the order of the curve.
@@ -49,7 +49,7 @@ export function derivePrivateKey(
   } = {},
 ): bigint {
   const root = opts.validator
-  const order = secp256k1.CURVE.n
+  const order = secp256k1.Point.CURVE().n
 
   // This private generator represents the `root` private key, and is what's
   // used by validators for signing when a keypair is generated from a seed.
@@ -58,8 +58,7 @@ export function derivePrivateKey(
     // As returned by validation_create for a given seed
     return privateGen
   }
-  const publicGen =
-    secp256k1.ProjectivePoint.BASE.multiply(privateGen).toRawBytes(true)
+  const publicGen = secp256k1.Point.BASE.multiply(privateGen).toBytes(true)
   // A seed can generate many keypairs as a function of the seed and a uint32.
   // Almost everyone just uses the first account, `0`.
   const accountIndex = opts.accountIndex || 0
@@ -67,9 +66,9 @@ export function derivePrivateKey(
 }
 
 export function accountPublicFromPublicGenerator(publicGenBytes: Uint8Array) {
-  const rootPubPoint = secp256k1.ProjectivePoint.fromHex(publicGenBytes)
+  const rootPubPoint = secp256k1.Point.fromBytes(publicGenBytes)
   const scalar = deriveScalar(publicGenBytes, 0)
-  const point = secp256k1.ProjectivePoint.BASE.multiply(scalar)
+  const point = secp256k1.Point.BASE.multiply(scalar)
   const offset = rootPubPoint.add(point)
-  return offset.toRawBytes(true)
+  return offset.toBytes(true)
 }
