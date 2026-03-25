@@ -3,11 +3,26 @@ const { TextDecoder, TextEncoder } = require("util");
 module.exports = {
   roots: ["<rootDir>/src"],
   transform: {
-    "^.+\\.ts$": "ts-jest",
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          target: "es2020",
+        },
+      },
+    ],
     "node_modules/chai/.+\\.js$": "ts-jest",
-    "node_modules/@noble/.+\\.js$": "ts-jest",
+    "node_modules/(@scure|@noble)/.+\\.js$": [
+      "ts-jest",
+      {
+        tsconfig: {
+          target: "es2020",
+          allowJs: true,
+        },
+      },
+    ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!(chai|@noble)/)"],
+  transformIgnorePatterns: ["/node_modules/(?!(chai|@scure|@noble)/)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   verbose: true,
