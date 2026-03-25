@@ -1,3 +1,5 @@
+import { utf8ToBytes } from '@noble/hashes/utils.js'
+
 import { Input } from './types'
 
 /**
@@ -11,7 +13,7 @@ export default function normalizeInput(input: Input): Uint8Array {
     return new Uint8Array(input)
   }
   if (typeof input === 'string') {
-    return new TextEncoder().encode(input)
+    return utf8ToBytes(input)
   }
   return input
 }
