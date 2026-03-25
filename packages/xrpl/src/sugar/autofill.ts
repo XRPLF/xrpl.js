@@ -309,6 +309,67 @@ async function fetchCounterPartySignersCount(
 }
 
 /**
+ * Fetches the total number of signers for the sponsor of a transaction.
+ *
+ * @param client - The client object used to make the request.
+ * @param sponsor - The sponsor account address.
+ * @returns A Promise that resolves to the number of signers for the sponsor.
+ */
+async function fetchSponsorSignersCount(
+  client: Client,
+  sponsor: string,
+): Promise<number> {
+  // Fetch the signer list for the sponsor.
+  const signerListRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account: sponsor,
+    ledger_index: 'validated',
+    signer_lists: true,
+  }
+
+  const signerListResponse = await client.request(signerListRequest)
+  const signerList = signerListResponse.result.signer_lists?.[0]
+  return signerList?.SignerEntries.length ?? 1
+}
+
+/**
+ * Calculates additional fees for sponsor signatures.
+ *
+ * @param client - The client object.
+ * @param tx - The transaction object.
+ * @param netFeeDrops - The network fee in drops.
+ * @returns A Promise that resolves to the additional sponsor fee.
+ */
+async function calculateSponsorFee(
+  client: Client,
+  tx: Transaction,
+  netFeeDrops: string,
+): Promise<BigNumber> {
+  // Transactions with sponsor signatures have additional fees based on the number of sponsor signers.
+  if (tx.SponsorSignature != null) {
+    const sponsorSignersCount = tx.SponsorSignature.Signers?.length ?? 1
+    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+    console.warn(
+      `Transaction with SponsorSignature: the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+    )
+    return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
+  }
+  if (tx.Sponsor != null) {
+    // If Sponsor field is present but SponsorSignature is not yet added, fetch the sponsor's signer count
+    const sponsorSignersCount = await fetchSponsorSignersCount(
+      client,
+      tx.Sponsor,
+    )
+    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+    console.warn(
+      `Transaction with Sponsor field: the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+    )
+    return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
+  }
+  return new BigNumber(0)
+}
+
+/**
  * Calculates the fee per transaction type.
  *
  * @param client - The client object.
@@ -380,6 +441,10 @@ async function calculateFeePerTransactionType(
       `For LoanSet transaction the auto calculated Fee accounts for total number of signers the counterparty has to avoid transaction failure.`,
     )
   }
+
+  // Add sponsor signature fees if applicable
+  const sponsorFee = await calculateSponsorFee(client, tx, netFeeDrops)
+  baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
   const totalFee = isSpecialTxCost

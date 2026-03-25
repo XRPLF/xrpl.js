@@ -32,6 +32,7 @@ import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
+import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
@@ -80,6 +81,7 @@ export {
   RippleStateFlags,
   SignerList,
   SignerListFlags,
+  Sponsorship,
   Ticket,
   Vault,
   VaultFlags,

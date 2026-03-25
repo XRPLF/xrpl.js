@@ -19,6 +19,7 @@ import PayChannel from './PayChannel'
 import PermissionedDomain from './PermissionedDomain'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
+import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
 import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
@@ -46,6 +47,7 @@ type LedgerEntry =
   | PermissionedDomain
   | RippleState
   | SignerList
+  | Sponsorship
   | Ticket
   | Vault
   | XChainOwnedClaimID
@@ -76,6 +78,7 @@ type LedgerEntryFilter =
   | 'payment_channel'
   | 'permissioned_domain'
   | 'signer_list'
+  | 'sponsorship'
   | 'state'
   | 'ticket'
   | 'vault'

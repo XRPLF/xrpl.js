@@ -14,6 +14,7 @@ import {
   MPTAmount,
   Memo,
   Signer,
+  SponsorSignature,
   XChainBridge,
 } from '../common'
 import { isHex, onlyHasFields } from '../utils'
@@ -26,6 +27,14 @@ const SHA_512_HALF_LENGTH = 64
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
+
+// Extended transaction types to include XLS-68 Sponsored Fees transactions
+// These are not yet in ripple-binary-codec but are part of the XLS-68 amendment
+const EXTENDED_TRANSACTION_TYPES = [
+  ...TRANSACTION_TYPES,
+  'SponsorshipSet',
+  'SponsorshipTransfer',
+]
 
 function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
@@ -73,6 +82,54 @@ function isSigner(obj: unknown): obj is Signer {
     isString(signer.TxnSignature) &&
     isString(signer.SigningPubKey)
   )
+}
+
+/**
+ * Verify the form and type of a SponsorSignature at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @returns Whether the SponsorSignature is properly formed.
+ */
+function isSponsorSignature(obj: unknown): obj is SponsorSignature {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  const hasSigningPubKey = obj.SigningPubKey !== undefined
+  const hasTxnSignature = obj.TxnSignature !== undefined
+  const hasSigners = obj.Signers !== undefined
+
+  /*
+   * Must have either (SigningPubKey + TxnSignature) OR Signers, but not both
+   */
+  const hasSingleSig = hasSigningPubKey && hasTxnSignature
+  const hasMultiSig = hasSigners
+
+  if (hasSingleSig && hasMultiSig) {
+    /* Cannot have both single-sig and multi-sig */
+    return false
+  }
+
+  if (!hasSingleSig && !hasMultiSig) {
+    /* Must have at least one signing method */
+    return false
+  }
+
+  // Validate single-sig fields
+  if (hasSingleSig) {
+    if (!isString(obj.SigningPubKey) || !isString(obj.TxnSignature)) {
+      return false
+    }
+  }
+
+  // Validate multi-sig fields
+  if (hasMultiSig) {
+    if (!isArray(obj.Signers) || !obj.Signers.every(isSigner)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 // Currency object sizes
@@ -457,6 +514,17 @@ export interface GlobalFlagsInterface {
 }
 
 /**
+ * Sponsor flags for transaction common fields.
+ * These flags indicate what type of sponsorship is being used in a transaction.
+ */
+export enum SponsorFlags {
+  /** Sponsor is paying the transaction fee */
+  tfSponsorFee = 0x00000001,
+  /** Sponsor is paying reserves for objects created in the transaction */
+  tfSponsorReserve = 0x00000002,
+}
+
+/**
  * Every transaction has the same set of common fields.
  */
 export interface BaseTransaction extends Record<string, unknown> {
@@ -534,6 +602,101 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The account sponsoring this transaction (paying fees and/or reserves).
+   */
+  Sponsor?: string
+  /**
+   * Flags indicating sponsorship type (fee and/or reserve).
+   * Must be included if Sponsor field is present.
+   */
+  SponsorFlags?: number
+  /**
+   * Sponsor's signature information.
+   * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
+   */
+  SponsorSignature?: SponsorSignature
+}
+
+/**
+ * Validate that SponsorFlags contains only valid flag values.
+ *
+ * @param sponsorFlags - The SponsorFlags value to validate.
+ * @throws ValidationError if flags are invalid.
+ */
+function validateSponsorFlagsValue(sponsorFlags: number): void {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+  const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+  if ((sponsorFlags & ~validFlags) !== 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags contains invalid flags',
+    )
+  }
+  /* eslint-enable no-bitwise */
+
+  if (sponsorFlags === 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags must have at least one flag set',
+    )
+  }
+}
+
+/**
+ * Validate sponsor-related fields in a transaction.
+ * This is a helper function for validateBaseTransaction.
+ *
+ * @param tx - The transaction to validate sponsor fields for.
+ * @throws ValidationError if sponsor fields are invalid.
+ */
+export function validateSponsorFields(tx: Record<string, unknown>): void {
+  const sponsor = tx.Sponsor
+  const sponsorFlags = tx.SponsorFlags
+  const sponsorSignature = tx.SponsorSignature
+
+  const hasSponsor = sponsor !== undefined
+  const hasSponsorFlags = sponsorFlags !== undefined
+  const hasSponsorSignature = sponsorSignature !== undefined
+
+  /* If any sponsor field is present, Sponsor and SponsorFlags must be present */
+  if (hasSponsor || hasSponsorFlags || hasSponsorSignature) {
+    if (!hasSponsor || !hasSponsorFlags) {
+      throw new ValidationError(
+        'Transaction: Sponsor and SponsorFlags must both be present for sponsored transactions',
+      )
+    }
+  }
+
+  /* Validate Sponsor field */
+  if (hasSponsor) {
+    if (!isString(sponsor)) {
+      throw new ValidationError('Transaction: Sponsor must be a string')
+    }
+    if (!isAccount(sponsor)) {
+      throw new ValidationError(
+        'Transaction: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  /* Validate SponsorFlags field */
+  if (hasSponsorFlags) {
+    if (!isNumber(sponsorFlags)) {
+      throw new ValidationError('Transaction: SponsorFlags must be a number')
+    }
+    validateSponsorFlagsValue(sponsorFlags)
+  }
+
+  /* Validate SponsorSignature field */
+  if (hasSponsorSignature && !isSponsorSignature(sponsorSignature)) {
+    throw new ValidationError('Transaction: invalid SponsorSignature')
+  }
+
+  /* Validate no self-sponsorship */
+  if (hasSponsor && sponsor === tx.Account) {
+    throw new ValidationError(
+      'Transaction: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
+    )
+  }
 }
 
 /**
@@ -562,7 +725,7 @@ export function validateBaseTransaction(
     throw new ValidationError('BaseTransaction: TransactionType not string')
   }
 
-  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
+  if (!EXTENDED_TRANSACTION_TYPES.includes(common.TransactionType)) {
     throw new ValidationError(
       `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
     )
@@ -610,6 +773,9 @@ export function validateBaseTransaction(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   }
+
+  // Validate sponsor fields using helper function
+  validateSponsorFields(common)
 }
 
 /**

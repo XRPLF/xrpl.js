@@ -486,3 +486,5 @@ export {
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
 } from './counterpartySigner'
+
+export { signAsSponsor, combineSponsorSigners } from './sponsorSigner'

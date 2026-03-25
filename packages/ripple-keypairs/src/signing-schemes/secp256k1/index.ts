@@ -52,7 +52,7 @@ const secp256k1: SigningScheme = {
         // We pass a pre-hashed message (Sha512Half), so disable secp256k1's
         // default SHA-256 prehashing (added as default in @noble/curves 2.0.0)
         prehash: false,
-      }),
+      }) as unknown as Uint8Array,
     ).toUpperCase()
   },
 

@@ -118,6 +118,12 @@ export { PermissionedDomainDelete } from './permissionedDomainDelete'
 export { SetFee, SetFeePreAmendment, SetFeePostAmendment } from './setFee'
 export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
+export {
+  SponsorshipSet,
+  SponsorshipSetFlags,
+  SponsorshipSetFlagsInterface,
+} from './sponsorshipSet'
+export { SponsorshipTransfer } from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'

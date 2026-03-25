@@ -48,6 +48,19 @@ export interface Signer {
   }
 }
 
+/**
+ * SponsorSignature object containing sponsor's signing information.
+ * Used in transactions to provide sponsor authorization for fee and/or reserve sponsorship.
+ */
+export interface SponsorSignature {
+  /** The sponsor's public key (for single-signing) */
+  SigningPubKey?: string
+  /** The sponsor's signature (for single-signing) */
+  TxnSignature?: string
+  /** Array of sponsor signatures (for multi-signing) */
+  Signers?: Signer[]
+}
+
 export interface Memo {
   Memo: {
     MemoData?: string
