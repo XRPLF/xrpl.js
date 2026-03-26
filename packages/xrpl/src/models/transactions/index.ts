@@ -3,6 +3,7 @@ export {
   GlobalFlags,
   GlobalFlagsInterface,
   isMPTAmount,
+  SponsorFlags,
 } from './common'
 export {
   validate,

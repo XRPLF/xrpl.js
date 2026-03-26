@@ -43,6 +43,11 @@ import {
   AccountOffersResponse,
 } from './accountOffers'
 import {
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
+  SponsoredAccount,
+} from './accountSponsoring'
+import {
   AccountTxRequest,
   AccountTxResponse,
   AccountTxV1Response,
@@ -203,6 +208,7 @@ type Request =
   | AccountNFTsRequest
   | AccountObjectsRequest
   | AccountOffersRequest
+  | AccountSponsoringRequest
   | AccountTxRequest
   | GatewayBalancesRequest
   | NoRippleCheckRequest
@@ -264,6 +270,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | AccountNFTsResponse
   | AccountObjectsResponse
   | AccountOffersResponse
+  | AccountSponsoringResponse
   | AccountTxVersionResponseMap<Version>
   | GatewayBalancesResponse
   | NoRippleCheckResponse
@@ -538,6 +545,9 @@ export {
   AccountOffer,
   AccountOffersRequest,
   AccountOffersResponse,
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
+  SponsoredAccount,
   AccountTxRequest,
   AccountTxResponse,
   AccountTxV1Response,

@@ -43,6 +43,11 @@ export enum PaymentFlags {
    * details.
    */
   tfLimitQuality = 0x00040000,
+  /**
+   * Indicates that the payment is creating a new account and the account's
+   * reserve is being sponsored. Used in conjunction with XLS-68 sponsorship.
+   */
+  tfSponsorCreatedAccount = 0x00080000,
 }
 
 /**
@@ -105,6 +110,11 @@ export interface PaymentFlagsInterface extends GlobalFlagsInterface {
    * details.
    */
   tfLimitQuality?: boolean
+  /**
+   * Indicates that the payment is creating a new account and the account's
+   * reserve is being sponsored. Used in conjunction with XLS-68 sponsorship.
+   */
+  tfSponsorCreatedAccount?: boolean
 }
 
 /**

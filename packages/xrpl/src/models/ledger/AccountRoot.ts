@@ -22,6 +22,21 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
   /** The sequence number of the next valid transaction for this account. */
   Sequence: number
   /**
+   * (Optional) The number of ledger objects owned by this account that are
+   * sponsored by other accounts. Used in reserve calculations for XLS-68.
+   */
+  SponsoredOwnerCount?: number
+  /**
+   * (Optional) The number of ledger objects this account is sponsoring for
+   * other accounts. Used in reserve calculations for XLS-68.
+   */
+  SponsoringOwnerCount?: number
+  /**
+   * (Optional) The number of accounts for which this account is providing
+   * account-level sponsorship. Used in reserve calculations for XLS-68.
+   */
+  SponsoringAccountCount?: number
+  /**
    * The identifying hash of the transaction most recently sent by this
    * account. This field must be enabled to use the AccountTxnID transaction
    * field. To enable it, send an AccountSet transaction with the.

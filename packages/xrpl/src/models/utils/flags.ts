@@ -21,6 +21,7 @@ import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import { SponsorshipSetFlags } from '../transactions/sponsorshipSet'
+import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { VaultCreateFlags } from '../transactions/vaultCreate'
@@ -69,6 +70,7 @@ const txToFlag = {
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,
   SponsorshipSet: SponsorshipSetFlags,
+  SponsorshipTransfer: SponsorshipTransferFlags,
   TrustSet: TrustSetFlags,
   VaultCreate: VaultCreateFlags,
   XChainModifyBridge: XChainModifyBridgeFlags,

@@ -138,6 +138,8 @@ export function setValidAddresses(tx: Transaction): void {
   convertToClassicAddress(tx, 'Owner')
   // SetRegularKey:
   convertToClassicAddress(tx, 'RegularKey')
+  // XLS-68 Sponsorship:
+  convertToClassicAddress(tx, 'Sponsor')
 }
 
 /**
@@ -350,7 +352,7 @@ async function calculateSponsorFee(
     const sponsorSignersCount = tx.SponsorSignature.Signers?.length ?? 1
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.warn(
-      `Transaction with SponsorSignature: the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+      `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
     )
     return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
   }
@@ -362,7 +364,7 @@ async function calculateSponsorFee(
     )
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.warn(
-      `Transaction with Sponsor field: the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+      `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
     )
     return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
   }
@@ -447,6 +449,9 @@ async function calculateFeePerTransactionType(
   baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
+  // For special transactions (AccountDelete, AMMCreate, VaultCreate), the fee cap is bypassed.
+  // This means sponsor fees are also not subject to the cap for these transactions.
+  // For normal transactions, the total fee (base + sponsor) is capped at maxFeeXRP.
   const totalFee = isSpecialTxCost
     ? baseFee
     : BigNumber.min(baseFee, maxFeeDrops)
@@ -522,7 +527,7 @@ export async function checkAccountDeleteBlockers(
     if (response.result.account_objects.length > 0) {
       reject(
         new XrplError(
-          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
+          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, Checks, or Sponsorships associated with the account.`,
           response.result.account_objects,
         ),
       )

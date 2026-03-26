@@ -59,6 +59,26 @@ export function signAsSponsor(
     )
   }
 
+  // Validate that SponsorFlags is present on the transaction
+  if (tx.SponsorFlags === undefined) {
+    throw new ValidationError(
+      'Transaction must have SponsorFlags field set before sponsor can sign.',
+    )
+  }
+
+  // Validate that the Sponsor field matches the wallet signing
+  if (tx.Sponsor === undefined) {
+    throw new ValidationError(
+      'Transaction must have Sponsor field set before sponsor can sign.',
+    )
+  }
+
+  if (tx.Sponsor !== wallet.classicAddress) {
+    throw new ValidationError(
+      `Transaction Sponsor field (${tx.Sponsor}) does not match the signing wallet address (${wallet.classicAddress}).`,
+    )
+  }
+
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
   validate(tx as unknown as Record<string, unknown>)
 
@@ -107,7 +127,7 @@ export function signAsSponsor(
  * @returns An object containing:
  *   - `tx`: The combined transaction object
  *   - `tx_blob`: The serialized transaction blob (hex string) ready to submit to the ledger
- * @throws ValidationError if:
+ * @throws {ValidationError} If:
  *   - There are no transactions to combine
  *   - Any of the transactions do not have Signers in SponsorSignature
  *   - Any of the transactions do not have an account signature
@@ -149,7 +169,7 @@ export function combineSponsorSigners(
     }
   })
 
-  validateTransactionEquivalence(decodedTransactions)
+  validateSponsorTransactionEquivalence(decodedTransactions)
 
   const tx = getTransactionWithAllSponsorSigners(decodedTransactions)
 
@@ -159,7 +179,9 @@ export function combineSponsorSigners(
   }
 }
 
-function validateTransactionEquivalence(transactions: Transaction[]): void {
+function validateSponsorTransactionEquivalence(
+  transactions: Transaction[],
+): void {
   const exampleTransaction = stringify({
     ...transactions[0],
     SponsorSignature: {
@@ -180,7 +202,7 @@ function validateTransactionEquivalence(transactions: Transaction[]): void {
         }) !== exampleTransaction,
     )
   ) {
-    throw new ValidationError('Transactions are not the same.')
+    throw new ValidationError('Sponsor transactions are not the same.')
   }
 }
 

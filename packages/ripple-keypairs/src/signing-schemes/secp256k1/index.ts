@@ -43,16 +43,17 @@ const secp256k1: SigningScheme = {
     const normedPrivateKey =
       privateKey.length === 66 ? privateKey.slice(2) : privateKey
     return bytesToHex(
-      nobleSecp256k1.sign(Sha512.half(message), hexToBytes(normedPrivateKey), {
-        // "Canonical" signatures
-        lowS: true,
-        // Would fail tests if signatures aren't deterministic
-        extraEntropy: undefined,
-        format: 'der',
-        // We pass a pre-hashed message (Sha512Half), so disable secp256k1's
-        // default SHA-256 prehashing (added as default in @noble/curves 2.0.0)
-        prehash: false,
-      }) as unknown as Uint8Array,
+      nobleSecp256k1
+        .sign(Sha512.half(message), hexToBytes(normedPrivateKey), {
+          // "Canonical" signatures
+          lowS: true,
+          // Would fail tests if signatures aren't deterministic
+          extraEntropy: undefined,
+          // We pass a pre-hashed message (Sha512Half), so disable secp256k1's
+          // default SHA-256 prehashing (added as default in @noble/curves 2.0.0)
+          prehash: false,
+        })
+        .toBytes('der'),
     ).toUpperCase()
   },
 
