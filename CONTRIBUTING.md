@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'mkdir -p /var/lib/rippled/db/ && rippled -a'
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
 npm run build
 npm run test:integration
 ```
@@ -289,7 +289,3 @@ We have a low-traffic mailing list for announcements of new `xrpl.js` releases. 
 If you're using the XRP Ledger in production, you should run a [rippled server](https://github.com/ripple/rippled) and subscribe to the ripple-server mailing list as well.
 
 - [Subscribe to ripple-server](https://groups.google.com/g/ripple-server)
-
-## Troubleshooting steps
-
-If you encounter errors related to dependencies in the `npm run build` step, execute: `npm install`. If the error persists despite a successful execution of `npm i`, execute `npm run clean && npm install`.
