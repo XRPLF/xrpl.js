@@ -1,7 +1,12 @@
 # ripple-keypairs Release History
 
 ## Unreleased
-- Update the default signing algorithm in `generateSeed` function to ed25519. This brings compatibility with the `fromSeed` function
+
+### BREAKING CHANGES
+- Update the default signing algorithm in `generateSeed` function to `ed25519`. This brings compatibility with the `fromSeed` function. Users can retrieve the cryptographic material used in the prior versions of the package by explicitly specifying `ecdsa-secp256k1` in the `generateSeed` function parameter.
+
+### Added
+- Export the Algorithm type in the public interface. This helps other packages consume the supported cryptographic signing algorithms (ex: secret-numbers)
 
 ## 2.0.0 (2024-02-01)
 

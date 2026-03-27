@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES:
+* `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+
 ### Added
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
 

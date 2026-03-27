@@ -36,12 +36,14 @@ export class Account {
     },
   }
 
-  private readonly _algorithm: _Algorithm = 'ed25519'
+  private readonly _algorithm: _Algorithm
 
   constructor(
     secretNumbers?: string[] | string | Uint8Array,
-    algorithm?: _Algorithm,
+    algorithm: _Algorithm = 'ed25519',
   ) {
+    this._algorithm = algorithm
+
     if (typeof secretNumbers === 'string') {
       this._secret = parseSecretString(secretNumbers)
     } else if (Array.isArray(secretNumbers)) {
@@ -50,10 +52,6 @@ export class Account {
       this._secret = entropyToSecret(secretNumbers)
     } else {
       this._secret = randomSecret()
-    }
-
-    if (algorithm) {
-      this._algorithm = algorithm
     }
 
     validateLengths(this._secret)
