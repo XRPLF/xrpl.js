@@ -39,6 +39,13 @@ export interface BookOffersRequest extends BaseRequest, LookupByLedgerRequest {
    * currency amounts.
    */
   taker_pays: BookOfferCurrency
+  /**
+   * The object ID of a PermissionedDomain object. If this field is provided,
+   * the response will include only valid domain offers associated with that
+   * specific domain. If omitted, the response will include only hybrid and open
+   * offers for the trading pair, excluding all domain-specific offers.
+   */
+  domain?: string
 }
 
 export interface BookOffer extends Offer {

@@ -1,5 +1,3 @@
-import { decode, encode } from 'ripple-binary-codec'
-
 import type {
   Client,
   SubmitRequest,
@@ -12,6 +10,7 @@ import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
 import { BaseTransaction } from '../models/transactions/common'
+import { decode, encode } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
 const LEDGER_CLOSE_TIME = 1000
@@ -52,7 +51,7 @@ export async function submitRequest(
   failHard = false,
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction)) {
-    throw new ValidationError('Transaction must be signed')
+    throw new ValidationError('Transaction must be signed.')
   }
 
   const signedTxEncoded =
@@ -176,7 +175,6 @@ function isSigned(transaction: SubmittableTransaction | string): boolean {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- we know that tx.Signers is an array of Signers
     const signers = tx.Signers as Signer[]
     for (const signer of signers) {
-      // eslint-disable-next-line max-depth -- necessary for checking if signer is signed
       if (
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- necessary check
         signer.Signer.SigningPubKey == null ||
@@ -284,7 +282,7 @@ export function getLastLedgerSequence(
   transaction: Transaction | string,
 ): number | null {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgSeq to number if present.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- converts LastLedgerSeq to number if present.
   return tx.LastLedgerSequence as number | null
 }
 

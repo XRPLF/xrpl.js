@@ -7,8 +7,7 @@ import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface DirectoryNode
-  extends BaseLedgerEntry,
-    HasOptionalPreviousTxnID {
+  extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'DirectoryNode'
   /**
    * A bit-map of boolean flags enabled for this directory. Currently, the
@@ -45,4 +44,7 @@ export default interface DirectoryNode
   TakerGetsCurrency?: string
   /** The issuer of the TakerGets amount from the offers in this directory. */
   TakerGetsIssuer?: string
+
+  /** The domain that the offer directory is a part of. */
+  DomainID?: string
 }

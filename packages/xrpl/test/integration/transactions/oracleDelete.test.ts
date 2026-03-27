@@ -24,11 +24,18 @@ describe('OracleDelete', function () {
   it(
     'base',
     async () => {
+      const closeTime: string = (
+        await testContext.client.request({
+          command: 'ledger',
+          ledger_index: 'validated',
+        })
+      ).result.ledger.close_time_iso
+
       const setTx: OracleSet = {
         TransactionType: 'OracleSet',
         Account: testContext.wallet.classicAddress,
         OracleDocumentID: 1234,
-        LastUpdateTime: Math.floor(Date.now() / 1000),
+        LastUpdateTime: Math.floor(new Date(closeTime).getTime() / 1000) + 20,
         PriceDataSeries: [
           {
             PriceData: {

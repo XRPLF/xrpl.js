@@ -116,14 +116,25 @@ class STObject extends SerializedType {
       return Object.assign(acc, handled ?? { [key]: val })
     }, {})
 
-    let sorted = Object.keys(xAddressDecoded)
-      .map((f: string): FieldInstance => definitions.field[f] as FieldInstance)
-      .filter(
-        (f: FieldInstance): boolean =>
-          f !== undefined &&
-          xAddressDecoded[f.name] !== undefined &&
-          f.isSerialized,
+    function isValidFieldInstance(
+      f: FieldInstance | undefined,
+    ): f is FieldInstance {
+      return (
+        f !== undefined &&
+        xAddressDecoded[f.name] !== undefined &&
+        f.isSerialized
       )
+    }
+
+    let sorted = Object.keys(xAddressDecoded)
+      .map((f: string): FieldInstance | undefined => {
+        if (!(f in definitions.field)) {
+          if (f[0] === f[0].toLowerCase()) return undefined
+          throw new Error(`Field ${f} is not defined in the definitions`)
+        }
+        return definitions.field[f] as FieldInstance
+      })
+      .filter(isValidFieldInstance)
       .sort((a, b) => {
         return a.ordinal - b.ordinal
       })
@@ -137,10 +148,10 @@ class STObject extends SerializedType {
         field.type.name === ST_OBJECT
           ? this.from(xAddressDecoded[field.name], undefined, definitions)
           : field.type.name === 'STArray'
-          ? STArray.from(xAddressDecoded[field.name], definitions)
-          : field.type.name === 'UInt64'
-          ? UInt64.from(xAddressDecoded[field.name], field.name)
-          : field.associatedType.from(xAddressDecoded[field.name])
+            ? STArray.from(xAddressDecoded[field.name], definitions)
+            : field.type.name === 'UInt64'
+              ? UInt64.from(xAddressDecoded[field.name], field.name)
+              : field.associatedType.from(xAddressDecoded[field.name])
 
       if (associatedValue == undefined) {
         throw new TypeError(

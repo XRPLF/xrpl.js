@@ -1,6 +1,4 @@
-import { Amount } from 'ripple-binary-codec/dist/types'
-
-import { XChainBridge } from '../common'
+import { Amount, XChainBridge } from '../common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
@@ -12,8 +10,7 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface XChainOwnedClaimID
-  extends BaseLedgerEntry,
-    HasPreviousTxnID {
+  extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'XChainOwnedClaimID'
 
   /** The account that checked out this unique claim ID value. */

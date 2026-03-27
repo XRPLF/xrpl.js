@@ -8,4 +8,5 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   MPTAmount?: MPTAmount
   Flags: number
   OwnerNode?: string
+  LockedAmount?: string
 }

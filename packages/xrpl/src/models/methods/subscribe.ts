@@ -39,6 +39,12 @@ export interface SubscribeBook {
   snapshot?: boolean
   /** If true, return both sides of the order book. The default is false. */
   both?: boolean
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then the offers will be filtered to only show the valid domain offers for
+   * that domain.
+   */
+  domain?: string
 }
 
 /**
@@ -136,6 +142,11 @@ export interface LedgerStream extends BaseStream {
    * connected but has not yet obtained a ledger from the network.
    */
   validated_ledgers?: string
+
+  /**
+   * The network from which the ledger stream is received.
+   */
+  network_id?: number
 }
 
 /**
@@ -175,6 +186,11 @@ export interface LedgerStreamResponse {
    * connected but has not yet obtained a ledger from the network.
    */
   validated_ledgers?: string
+
+  /**
+   * The network from which the ledger stream is received.
+   */
+  network_id?: number
 }
 
 /**
@@ -259,6 +275,11 @@ export interface ValidationStream extends BaseStream {
    * validator is using a token, this is an ephemeral public key.
    */
   validation_public_key: string
+
+  /**
+   * The network from which the validations stream is received.
+   */
+  network_id?: number
 }
 
 /**
@@ -275,13 +296,17 @@ interface TransactionStreamBase<
    * The approximate time this ledger was closed, in date time string format.
    * Always uses the UTC time zone.
    */
-  close_time_iso: string
+  close_time_iso: Version extends typeof RIPPLED_API_V2 ? string : never
   /** String Transaction result code. */
   engine_result: string
   /** Numeric transaction response code, if applicable. */
   engine_result_code: number
   /** Human-readable explanation for the transaction response. */
   engine_result_message: string
+  /**
+   * The unique hash identifier of the transaction.
+   */
+  hash?: Version extends typeof RIPPLED_API_V2 ? string : never
   /**
    * The ledger index of the current in-progress ledger version for which this
    * transaction is currently proposed.
@@ -481,22 +506,22 @@ export type EventTypes =
 export type OnEventToListenerMap<T extends EventTypes> = T extends 'connected'
   ? () => void
   : T extends 'disconnected'
-  ? (code: number) => void
-  : T extends 'ledgerClosed'
-  ? (ledger: LedgerStream) => void
-  : T extends 'validationReceived'
-  ? (validation: ValidationStream) => void
-  : T extends 'transaction'
-  ? (transaction: TransactionStream) => void
-  : T extends 'peerStatusChange'
-  ? (peerStatus: PeerStatusStream) => void
-  : T extends 'consensusPhase'
-  ? (consensus: ConsensusStream) => void
-  : T extends 'manifestReceived'
-  ? (manifest: ManifestRequest) => void
-  : T extends 'path_find'
-  ? (path: PathFindStream) => void
-  : T extends 'error'
-  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
-    (...err: any[]) => void
-  : (...args: never[]) => void
+    ? (code: number) => void
+    : T extends 'ledgerClosed'
+      ? (ledger: LedgerStream) => void
+      : T extends 'validationReceived'
+        ? (validation: ValidationStream) => void
+        : T extends 'transaction'
+          ? (transaction: TransactionStream) => void
+          : T extends 'peerStatusChange'
+            ? (peerStatus: PeerStatusStream) => void
+            : T extends 'consensusPhase'
+              ? (consensus: ConsensusStream) => void
+              : T extends 'manifestReceived'
+                ? (manifest: ManifestRequest) => void
+                : T extends 'path_find'
+                  ? (path: PathFindStream) => void
+                  : T extends 'error'
+                    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any -- needs to be any for overload
+                      (...err: any[]) => void
+                    : (...args: never[]) => void

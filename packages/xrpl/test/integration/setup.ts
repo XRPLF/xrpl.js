@@ -4,11 +4,12 @@ import {
   AMMDeposit,
   AMMDepositFlags,
   Client,
-  Currency,
+  IssuedCurrency,
   SignerListSet,
   Wallet,
   XChainBridge,
   XChainCreateBridge,
+  XRP,
 } from '../../src'
 
 import serverUrl from './serverUrl'
@@ -24,8 +25,8 @@ export interface TestAMMPool {
   issuerWallet: Wallet
   lpWallet: Wallet
   testWallet: Wallet
-  asset: Currency
-  asset2: Currency
+  asset: XRP
+  asset2: IssuedCurrency
 }
 
 interface TestBridge {

@@ -1,0 +1,217 @@
+import { BinaryParser } from '../src/binary'
+import { coreTypes } from '../src/types'
+
+const { Number: STNumber } = coreTypes
+
+describe('STNumber', () => {
+  it('+ve normal value', () => {
+    const value = '99'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual(value)
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve very large value', () => {
+    const value = '100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e11')
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('+ve large value', () => {
+    const value = '10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('10000000000')
+  })
+
+  it('-ve normal value', () => {
+    const value = '-123'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual(value)
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve very large value', () => {
+    const value = '-100000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-1e11')
+  })
+
+  // scientific notation triggers in when abs(value) >= 10^11
+  it('-ve large value', () => {
+    const value = '-10000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-10000000000')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve very small value', () => {
+    const value = '0.00000000001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e-11')
+  })
+
+  // scientific notation triggers in when abs(value) < 10^-10
+  it('+ve small value', () => {
+    const value = '0.0001'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0001')
+  })
+
+  it('roundtrip zero', () => {
+    const value = '0'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('0')
+  })
+
+  it('roundtrip decimal', () => {
+    const value = '123.456'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('123.456')
+  })
+
+  it('roundtrip scientific notation positive', () => {
+    const value = '1.23e5'
+    const num = STNumber.from(value)
+    // scientific notation triggers in when abs(value) >= 10^11
+    expect(num.toJSON()).toEqual('123000')
+  })
+
+  it('roundtrip scientific notation negative', () => {
+    const value = '-4.56e-7'
+    const num = STNumber.from(value)
+    // scientific notation triggers in when abs(value) < 10^-10
+    expect(num.toJSON()).toEqual('-0.000000456')
+  })
+
+  it('-ve medium value', () => {
+    const value = '-987654321'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('-987654321')
+  })
+
+  it('+ve medium value', () => {
+    const value = '987654321'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('987654321')
+  })
+
+  it('roundtrip via parser', () => {
+    const value = '123456.789'
+    const num = STNumber.from(value)
+    const parser = new BinaryParser(num.toHex())
+    const parsedNum = STNumber.fromParser(parser)
+    expect(parsedNum.toJSON()).toEqual(num.toJSON())
+  })
+
+  it('zero via parser', () => {
+    const value = '0'
+    const num = STNumber.from(value)
+    const parser = new BinaryParser(num.toHex())
+    const parsedNum = STNumber.fromParser(parser)
+    expect(parsedNum.toJSON()).toEqual('0')
+  })
+
+  it('normalization with trailing zeros', () => {
+    const value = '123.45000'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('123.45')
+  })
+
+  it('normalization with leading zeros', () => {
+    const value = '0000123.45'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('123.45')
+  })
+
+  it('integer with exponent', () => {
+    const value = '123e2'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('12300')
+  })
+
+  it('negative decimal with exponent', () => {
+    const value = '-1.2e2'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('-120')
+  })
+
+  it('decimal without exponent', () => {
+    const value = '0.5'
+    const num = STNumber.from(value)
+    const parser = new BinaryParser(num.toHex())
+    const parsedNum = STNumber.fromParser(parser)
+    expect(parsedNum.toJSON()).toEqual('0.5')
+  })
+
+  it('rounds up mantissa', () => {
+    const value = '9223372036854775895'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9223372036854775900')
+  })
+
+  it('rounds down mantissa', () => {
+    const value = '9323372036854775804'
+    const num = STNumber.from(value)
+    expect(num.toJSON()).toEqual('9323372036854775800')
+  })
+
+  it('small value with trailing zeros', () => {
+    const value = '0.002500'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('0.0025')
+  })
+
+  it('large value with trailing zeros', () => {
+    const value = '9900000000000000000000'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e20')
+  })
+
+  it('small value with leading zeros', () => {
+    const value = '0.0000000000000000000099'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('99e-22')
+  })
+
+  it('mantissa > MAX_MANTISSA', () => {
+    const value = '9999999999999999999999'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('1e22')
+  })
+
+  it('mantissa > MAX_INT64', () => {
+    const value = '92233720368547758079'
+    const sn = STNumber.from(value)
+    expect(sn.toJSON()).toEqual('922337203685477581e2')
+  })
+
+  it('throws on exponent overflow (value too large)', () => {
+    // 1e40000 has exponent 40000, after normalization exponent = 40000 - 18 = 39982
+    // which exceeds MAX_EXPONENT (32768)
+    expect(() => {
+      STNumber.from('1e40000')
+    }).toThrow(new Error('Exponent overflow: value too large to represent'))
+  })
+
+  it('underflow returns zero (value too small)', () => {
+    // 1e-40000 has exponent -40000, which is less than MIN_EXPONENT (-32768)
+    expect(() => {
+      STNumber.from('1e-40000')
+    }).toThrow(new Error('Underflow: value too small to represent'))
+  })
+
+  it('throws with invalid input (non-number string)', () => {
+    expect(() => {
+      STNumber.from('abc123')
+    }).toThrow(new Error('Unable to parse number from string: abc123'))
+  })
+
+  it('throws with invalid input (object)', () => {
+    expect(() => {
+      STNumber.from({ foo: 'bar' })
+    }).toThrow(
+      new Error('STNumber.from: Only string or STNumber instance is supported'),
+    )
+  })
+})

@@ -1,6 +1,10 @@
-import { assert } from 'chai'
+import { validateNFTokenCancelOffer } from '../../src/models/transactions/NFTokenCancelOffer'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
-import { validate, ValidationError } from '../../src'
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateNFTokenCancelOffer)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateNFTokenCancelOffer, message)
 
 const BUY_OFFER =
   'AED08CC1F50DD5F23A1948AF86153A3F3B7593E5EC77D65A02BB1B29E05AB6AF'
@@ -21,7 +25,7 @@ describe('NFTokenCancelOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.doesNotThrow(() => validate(validNFTokenCancelOffer))
+    assertValid(validNFTokenCancelOffer)
   })
 
   it(`throws w/ missing NFTokenOffers`, function () {
@@ -33,11 +37,7 @@ describe('NFTokenCancelOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenCancelOffer: missing field NFTokenOffers',
-    )
+    assertInvalid(invalid, 'NFTokenCancelOffer: missing field NFTokenOffers')
   })
 
   it(`throws w/ empty NFTokenOffers`, function () {
@@ -50,10 +50,6 @@ describe('NFTokenCancelOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'NFTokenCancelOffer: empty field NFTokenOffers',
-    )
+    assertInvalid(invalid, 'NFTokenCancelOffer: empty field NFTokenOffers')
   })
 })

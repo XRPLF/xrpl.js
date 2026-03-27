@@ -6,7 +6,7 @@
  *
  * Each namespace is just a single character prefix.
  *
- * See [LedgerNameSpace enum](https://github.com/ripple/rippled/blob/master/src/ripple/protocol/LedgerFormats.h#L100).
+ * See [LedgerNameSpace enum](https://github.com/XRPLF/rippled/blob/master/src/libxrpl/protocol/Indexes.cpp#L66).
  */
 const ledgerSpaces = {
   account: 'a',
@@ -29,6 +29,9 @@ const ledgerSpaces = {
   paychan: 'x',
   check: 'C',
   depositPreauth: 'p',
+  vault: 'V',
+  loanBroker: 'l',
+  loan: 'L',
 }
 
 export default ledgerSpaces

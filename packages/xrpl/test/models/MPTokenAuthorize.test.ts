@@ -1,6 +1,11 @@
-import { assert } from 'chai'
+import { MPTokenAuthorizeFlags } from '../../src'
+import { validateMPTokenAuthorize } from '../../src/models/transactions/MPTokenAuthorize'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
-import { validate, ValidationError, MPTokenAuthorizeFlags } from '../../src'
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenAuthorize)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenAuthorize, message)
 
 const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 
@@ -17,7 +22,7 @@ describe('MPTokenAuthorize', function () {
       MPTokenIssuanceID: TOKEN_ID,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenAuthorize))
+    assertValid(validMPTokenAuthorize)
 
     validMPTokenAuthorize = {
       TransactionType: 'MPTokenAuthorize',
@@ -26,7 +31,7 @@ describe('MPTokenAuthorize', function () {
       MPTokenIssuanceID: TOKEN_ID,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenAuthorize))
+    assertValid(validMPTokenAuthorize)
 
     validMPTokenAuthorize = {
       TransactionType: 'MPTokenAuthorize',
@@ -35,7 +40,7 @@ describe('MPTokenAuthorize', function () {
       Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenAuthorize))
+    assertValid(validMPTokenAuthorize)
 
     validMPTokenAuthorize = {
       TransactionType: 'MPTokenAuthorize',
@@ -45,7 +50,7 @@ describe('MPTokenAuthorize', function () {
       Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenAuthorize))
+    assertValid(validMPTokenAuthorize)
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {
@@ -54,10 +59,6 @@ describe('MPTokenAuthorize', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenAuthorize: missing field MPTokenIssuanceID',
-    )
+    assertInvalid(invalid, 'MPTokenAuthorize: missing field MPTokenIssuanceID')
   })
 })

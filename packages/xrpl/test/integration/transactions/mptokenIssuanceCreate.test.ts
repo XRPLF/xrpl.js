@@ -1,6 +1,11 @@
 import { assert } from 'chai'
 
-import { MPTokenIssuanceCreate } from '../../../src'
+import {
+  decodeMPTokenMetadata,
+  encodeMPTokenMetadata,
+  MPTokenIssuanceCreate,
+  MPTokenMetadata,
+} from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -23,12 +28,41 @@ describe('MPTokenIssuanceCreate', function () {
   it(
     'base',
     async () => {
+      const metadata: MPTokenMetadata = {
+        ticker: 'TBILL',
+        name: 'T-Bill Yield Token',
+        desc: 'A yield-bearing stablecoin backed by short-term U.S. Treasuries and money market instruments.',
+        icon: 'example.org/tbill-icon.png',
+        asset_class: 'rwa',
+        asset_subclass: 'treasury',
+        issuer_name: 'Example Yield Co.',
+        uris: [
+          {
+            uri: 'exampleyield.co/tbill',
+            category: 'website',
+            title: 'Product Page',
+          },
+          {
+            uri: 'exampleyield.co/docs',
+            category: 'docs',
+            title: 'Yield Token Docs',
+          },
+        ],
+        additional_info: {
+          interest_rate: '5.00%',
+          interest_type: 'variable',
+          yield_source: 'U.S. Treasury Bills',
+          maturity_date: '2045-06-30',
+          cusip: '912796RX0',
+        },
+      }
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
         // 0x7fffffffffffffff
         MaximumAmount: '9223372036854775807',
         AssetScale: 2,
+        MPTokenMetadata: encodeMPTokenMetadata(metadata),
       }
 
       await testTransaction(testContext.client, tx, testContext.wallet)
@@ -47,6 +81,14 @@ describe('MPTokenIssuanceCreate', function () {
         // @ts-expect-error: Known issue with unknown object type
         accountObjectsResponse.result.account_objects[0].MaximumAmount,
         `9223372036854775807`,
+      )
+
+      assert.deepStrictEqual(
+        decodeMPTokenMetadata(
+          // @ts-expect-error: Known issue with unknown object type
+          accountObjectsResponse.result.account_objects[0].MPTokenMetadata,
+        ),
+        metadata,
       )
     },
     TIMEOUT,

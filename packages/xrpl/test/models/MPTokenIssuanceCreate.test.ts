@@ -1,11 +1,17 @@
-import { assert } from 'chai'
+import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
+import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
+import { validateMPTokenIssuanceCreate } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
-  convertStringToHex,
-  validate,
-  ValidationError,
-  MPTokenIssuanceCreateFlags,
-} from '../../src'
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+} from '../../src/models/utils/mptokenMetadata'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateMPTokenIssuanceCreate)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateMPTokenIssuanceCreate, message)
 
 /**
  * MPTokenIssuanceCreate Transaction Verification Testing.
@@ -22,10 +28,17 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MPTokenMetadata: convertStringToHex('http://xrpl.org'),
+      MPTokenMetadata: stringToHex(`{
+        "ticker": "TBILL",
+        "name": "T-Bill Yield Token",
+        "icon": "https://example.org/tbill-icon.png",
+        "asset_class": "rwa",
+        "asset_subclass": "treasury",
+        "issuer_name": "Example Yield Co."
+      }`),
     } as any
 
-    assert.doesNotThrow(() => validate(validMPTokenIssuanceCreate))
+    assertValid(validMPTokenIssuanceCreate)
   })
 
   it(`throws w/ MPTokenMetadata being an empty string`, function () {
@@ -36,10 +49,9 @@ describe('MPTokenIssuanceCreate', function () {
       MPTokenMetadata: '',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   })
 
@@ -51,10 +63,9 @@ describe('MPTokenIssuanceCreate', function () {
       MPTokenMetadata: 'http://xrpl.org',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: MPTokenMetadata must be in hex format',
+    assertInvalid(
+      invalid,
+      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
   })
 
@@ -65,11 +76,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '9223372036854775808',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: MaximumAmount out of range',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: MaximumAmount out of range')
 
     invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
@@ -77,11 +84,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '-1',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: Invalid MaximumAmount',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MaximumAmount')
 
     invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
@@ -89,11 +92,7 @@ describe('MPTokenIssuanceCreate', function () {
       MaximumAmount: '0x12',
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
-      'MPTokenIssuanceCreate: Invalid MaximumAmount',
-    )
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MaximumAmount')
   })
 
   it(`throws w/ Invalid TransferFee`, function () {
@@ -103,9 +102,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: -1,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
@@ -115,9 +113,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: 50001,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee must be between 0 and 50000',
     )
 
@@ -127,9 +124,8 @@ describe('MPTokenIssuanceCreate', function () {
       TransferFee: 100,
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
 
@@ -140,10 +136,52 @@ describe('MPTokenIssuanceCreate', function () {
       Flags: { tfMPTCanClawback: true },
     } as any
 
-    assert.throws(
-      () => validate(invalid),
-      ValidationError,
+    assertInvalid(
+      invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
     )
   })
 })
+
+/**
+ * Test console warning is logged while validating MPTokenIssuanceCreate for MPTokenMetadata field.
+ */
+/* eslint-disable no-console -- Require to test console warnings  */
+describe('MPTokenMetadata warnings', function () {
+  beforeEach(() => {
+    jest.spyOn(console, 'warn')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it(`logs console warning`, function () {
+    const mptMetaData: MPTokenMetadata = {
+      ticker: 'TBILL',
+      name: 'T-Bill Token',
+      icon: 'http://example.com/icon.png',
+      asset_class: 'rwa',
+      asset_subclass: 'treasury',
+      issuer_name: 'Issuer',
+      uris: ['apple'],
+    } as unknown as MPTokenMetadata
+    const tx = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenMetadata: stringToHex(JSON.stringify(mptMetaData)),
+    }
+
+    assertValid(tx)
+
+    const expectedMessage = [
+      MPT_META_WARNING_HEADER,
+      '- uris/us: should be an array of objects each with uri/u, category/c, and title/t properties.',
+    ].join('\n')
+
+    expect(console.warn).toHaveBeenCalledWith(
+      expect.stringContaining(expectedMessage),
+    )
+  })
+})
+/* eslint-enable no-console  */

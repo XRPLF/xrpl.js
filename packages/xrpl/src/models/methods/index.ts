@@ -1,5 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
+/* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -148,6 +149,14 @@ import {
   StateAccountingFinal,
 } from './serverInfo'
 import { ServerStateRequest, ServerStateResponse } from './serverState'
+import {
+  SimulateBinaryRequest,
+  SimulateBinaryResponse,
+  SimulateJsonRequest,
+  SimulateJsonResponse,
+  SimulateRequest,
+  SimulateResponse,
+} from './simulate'
 import { SubmitRequest, SubmitResponse } from './submit'
 import {
   SubmitMultisignedRequest,
@@ -181,6 +190,7 @@ import {
   UnsubscribeRequest,
   UnsubscribeResponse,
 } from './unsubscribe'
+import { VaultInfoRequest, VaultInfoResponse } from './vaultInfo'
 /**
  * @category Requests
  */
@@ -203,6 +213,7 @@ type Request =
   | LedgerDataRequest
   | LedgerEntryRequest
   // transaction methods
+  | SimulateRequest
   | SubmitRequest
   | SubmitMultisignedRequest
   | TransactionEntryRequest
@@ -238,6 +249,8 @@ type Request =
   | AMMInfoRequest
   // Price Oracle methods
   | GetAggregatePriceRequest
+  // Vault methods
+  | VaultInfoRequest
 
 /**
  * @category Responses
@@ -261,6 +274,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | LedgerDataResponse
   | LedgerEntryResponse
   // transaction methods
+  | SimulateResponse
   | SubmitResponse
   | SubmitMultisignedVersionResponseMap<Version>
   | TransactionEntryResponse
@@ -296,6 +310,8 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | AMMInfoResponse
   // Price Oracle methods
   | GetAggregatePriceResponse
+  // Vault methods
+  | VaultInfoResponse
 
 export type RequestResponseMap<
   T,
@@ -398,6 +414,12 @@ export type RequestResponseMap<
   ? LedgerDataResponse
   : T extends LedgerEntryRequest
   ? LedgerEntryResponse
+  : T extends SimulateBinaryRequest
+  ? SimulateBinaryResponse
+  : T extends SimulateJsonRequest
+  ? SimulateJsonResponse
+  : T extends SimulateRequest
+  ? SimulateJsonResponse
   : T extends SubmitRequest
   ? SubmitResponse
   : T extends SubmitMultisignedRequest
@@ -448,6 +470,8 @@ export type RequestResponseMap<
   ? NFTsByIssuerResponse
   : T extends NFTHistoryRequest
   ? NFTHistoryResponse
+  : T extends VaultInfoRequest
+  ? VaultInfoResponse
   : Response<Version>
 
 export type MarkerRequest = Request & {
@@ -544,6 +568,8 @@ export {
   LedgerEntryRequest,
   LedgerEntryResponse,
   // transaction methods with types
+  SimulateRequest,
+  SimulateResponse,
   SubmitRequest,
   SubmitResponse,
   SubmitMultisignedRequest,
@@ -631,4 +657,7 @@ export {
   // AMM methods
   AMMInfoRequest,
   AMMInfoResponse,
+  // Vault methods
+  VaultInfoRequest,
+  VaultInfoResponse,
 }

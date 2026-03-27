@@ -56,26 +56,3 @@ import './polyfills'
 ### Using xrpl.js with Vite React
 
 Starting in 3.0 xrpl and all the packages in this repo no longer require custom configurations (ex. polyfills) to run.
-
-### Using xrpl.js with Deno
-
-Until official support for [Deno](https://deno.land) is added, you can use the following work-around to use `xrpl.js` with Deno:
-
-> [!NOTE]
-> The following is currently broken due to https://github.com/denoland/deno/issues/20516.
-> Once that is fixed there could be other issues as well.
-
-```javascript
-import xrpl from 'https://dev.jspm.io/npm:xrpl';
-
-(async () => {
-  const api = new (xrpl as any).Client('wss://s.altnet.rippletest.net:51233');
-  const address = 'rH8NxV12EuV...khfJ5uw9kT';
-
-  api.connect().then(() => {
-    api.getBalances(address).then((balances: any) => {
-      console.log(JSON.stringify(balances, null, 2));
-    });
-  });
-})();
-```

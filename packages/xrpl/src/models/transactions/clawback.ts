@@ -1,13 +1,15 @@
 import { ValidationError } from '../../errors'
-import { IssuedCurrencyAmount, MPTAmount } from '../common'
+import { ClawbackAmount } from '../common'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrency,
+  isIssuedCurrencyAmount,
   isMPTAmount,
   isAccount,
   validateOptionalField,
+  isClawbackAmount,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -26,7 +28,7 @@ export interface Clawback extends BaseTransaction {
    * names MUST be lower-case. If the amount is IOU, the `issuer` field MUST be the holder's address,
    * whom to be clawed back.
    */
-  Amount: IssuedCurrencyAmount | MPTAmount
+  Amount: ClawbackAmount
   /**
    * Indicates the AccountID that the issuer wants to clawback. This field is only valid for clawing back
    * MPTs.
@@ -42,17 +44,14 @@ export interface Clawback extends BaseTransaction {
  */
 export function validateClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateRequiredField(tx, 'Amount', isClawbackAmount)
   validateOptionalField(tx, 'Holder', isAccount)
 
-  if (tx.Amount == null) {
-    throw new ValidationError('Clawback: missing field Amount')
-  }
-
-  if (!isIssuedCurrency(tx.Amount) && !isMPTAmount(tx.Amount)) {
+  if (!isIssuedCurrencyAmount(tx.Amount) && !isMPTAmount(tx.Amount)) {
     throw new ValidationError('Clawback: invalid Amount')
   }
 
-  if (isIssuedCurrency(tx.Amount) && tx.Account === tx.Amount.issuer) {
+  if (isIssuedCurrencyAmount(tx.Amount) && tx.Account === tx.Amount.issuer) {
     throw new ValidationError('Clawback: invalid holder Account')
   }
 
@@ -60,7 +59,7 @@ export function validateClawback(tx: Record<string, unknown>): void {
     throw new ValidationError('Clawback: invalid holder Account')
   }
 
-  if (isIssuedCurrency(tx.Amount) && tx.Holder) {
+  if (isIssuedCurrencyAmount(tx.Amount) && tx.Holder) {
     throw new ValidationError('Clawback: cannot have Holder for currency')
   }
 

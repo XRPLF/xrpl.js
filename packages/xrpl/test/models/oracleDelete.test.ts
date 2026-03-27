@@ -1,7 +1,9 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateOracleDelete } from '../../src/models/transactions/oracleDelete'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateOracleDelete)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateOracleDelete, message)
 
 /**
  * OracleDelete Transaction Verification Testing.
@@ -9,7 +11,7 @@ import { validateOracleDelete } from '../../src/models/transactions/oracleDelete
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('OracleDelete', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -20,21 +22,18 @@ describe('OracleDelete', function () {
   })
 
   it('verifies valid OracleDelete', function () {
-    assert.doesNotThrow(() => validateOracleDelete(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it(`throws w/ missing field OracleDocumentID`, function () {
     delete tx.OracleDocumentID
     const errorMessage = 'OracleDelete: missing field OracleDocumentID'
-    assert.throws(() => validateOracleDelete(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ invalid OracleDocumentID`, function () {
     tx.OracleDocumentID = '1234'
     const errorMessage = 'OracleDelete: invalid field OracleDocumentID'
-    assert.throws(() => validateOracleDelete(tx), ValidationError, errorMessage)
-    assert.throws(() => validate(tx), ValidationError, errorMessage)
+    assertInvalid(tx, errorMessage)
   })
 })

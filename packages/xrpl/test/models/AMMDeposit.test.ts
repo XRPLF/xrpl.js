@@ -1,8 +1,12 @@
 /* eslint-disable no-bitwise -- bitwise necessary for enabling flags */
-import { assert } from 'chai'
 
-import { AMMDepositFlags, validate, ValidationError } from '../../src'
+import { AMMDepositFlags } from '../../src'
 import { validateAMMDeposit } from '../../src/models/transactions/AMMDeposit'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void => assertTxIsValid(tx, validateAMMDeposit)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateAMMDeposit, message)
 
 /**
  * AMMDeposit Transaction Verification Testing.
@@ -15,7 +19,7 @@ describe('AMMDeposit', function () {
     issuer: 'rH438jEAzTs5PYtV6CHZqpDpwCKQmPW9Cg',
     value: '1000',
   }
-  let deposit
+  let deposit: any
 
   beforeEach(function () {
     deposit = {
@@ -36,15 +40,13 @@ describe('AMMDeposit', function () {
   it(`verifies valid AMMDeposit with LPTokenOut`, function () {
     deposit.LPTokenOut = LPTokenOut
     deposit.Flags |= AMMDepositFlags.tfLPToken
-    assert.doesNotThrow(() => validateAMMDeposit(deposit))
-    assert.doesNotThrow(() => validate(deposit))
+    assertValid(deposit)
   })
 
   it(`verifies valid AMMDeposit with Amount`, function () {
     deposit.Amount = '1000'
     deposit.Flags |= AMMDepositFlags.tfSingleAsset
-    assert.doesNotThrow(() => validateAMMDeposit(deposit))
-    assert.doesNotThrow(() => validate(deposit))
+    assertValid(deposit)
   })
 
   it(`verifies valid AMMDeposit with Amount and Amount2`, function () {
@@ -55,78 +57,50 @@ describe('AMMDeposit', function () {
       value: '2.5',
     }
     deposit.Flags |= AMMDepositFlags.tfTwoAsset
-    assert.doesNotThrow(() => validateAMMDeposit(deposit))
-    assert.doesNotThrow(() => validate(deposit))
+    assertValid(deposit)
   })
 
   it(`verifies valid AMMDeposit with Amount and LPTokenOut`, function () {
     deposit.Amount = '1000'
     deposit.LPTokenOut = LPTokenOut
     deposit.Flags |= AMMDepositFlags.tfOneAssetLPToken
-    assert.doesNotThrow(() => validateAMMDeposit(deposit))
-    assert.doesNotThrow(() => validate(deposit))
+    assertValid(deposit)
   })
 
   it(`verifies valid AMMDeposit with Amount and EPrice`, function () {
     deposit.Amount = '1000'
     deposit.EPrice = '25'
     deposit.Flags |= AMMDepositFlags.tfLimitLPToken
-    assert.doesNotThrow(() => validateAMMDeposit(deposit))
-    assert.doesNotThrow(() => validate(deposit))
+    assertValid(deposit)
   })
 
   it(`throws w/ missing field Asset`, function () {
     delete deposit.Asset
     const errorMessage = 'AMMDeposit: missing field Asset'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Asset must be a Currency`, function () {
     deposit.Asset = 1234
     const errorMessage = 'AMMDeposit: Asset must be a Currency'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ missing field Asset2`, function () {
     delete deposit.Asset2
     const errorMessage = 'AMMDeposit: missing field Asset2'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     deposit.Asset2 = 1234
     const errorMessage = 'AMMDeposit: Asset2 must be a Currency'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ must set at least LPTokenOut or Amount`, function () {
     const errorMessage = 'AMMDeposit: must set at least LPTokenOut or Amount'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ must set Amount with Amount2`, function () {
@@ -136,69 +110,39 @@ describe('AMMDeposit', function () {
       value: '2.5',
     }
     const errorMessage = 'AMMDeposit: must set Amount with Amount2'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ must set Amount with EPrice`, function () {
     deposit.EPrice = '25'
     const errorMessage = 'AMMDeposit: must set Amount with EPrice'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ LPTokenOut must be an IssuedCurrencyAmount`, function () {
     deposit.LPTokenOut = 1234
     const errorMessage =
       'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Amount must be an Amount`, function () {
     deposit.Amount = 1234
     const errorMessage = 'AMMDeposit: Amount must be an Amount'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     deposit.Amount = '1000'
     deposit.Amount2 = 1234
     const errorMessage = 'AMMDeposit: Amount2 must be an Amount'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
     deposit.Amount = '1000'
     deposit.EPrice = 1234
     const errorMessage = 'AMMDeposit: EPrice must be an Amount'
-    assert.throws(
-      () => validateAMMDeposit(deposit),
-      ValidationError,
-      errorMessage,
-    )
-    assert.throws(() => validate(deposit), ValidationError, errorMessage)
+    assertInvalid(deposit, errorMessage)
   })
 })

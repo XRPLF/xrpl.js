@@ -1,7 +1,10 @@
-import { assert } from 'chai'
-
-import { validate, ValidationError } from '../../src'
 import { validateXChainCreateClaimID } from '../../src/models/transactions/XChainCreateClaimID'
+import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+
+const assertValid = (tx: any): void =>
+  assertTxIsValid(tx, validateXChainCreateClaimID)
+const assertInvalid = (tx: any, message: string): void =>
+  assertTxValidationError(tx, validateXChainCreateClaimID, message)
 
 /**
  * XChainCreateClaimID Transaction Verification Testing.
@@ -9,7 +12,7 @@ import { validateXChainCreateClaimID } from '../../src/models/transactions/XChai
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('XChainCreateClaimID', function () {
-  let tx
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -34,97 +37,42 @@ describe('XChainCreateClaimID', function () {
   })
 
   it('verifies valid XChainCreateClaimID', function () {
-    assert.doesNotThrow(() => validateXChainCreateClaimID(tx))
-    assert.doesNotThrow(() => validate(tx))
+    assertValid(tx)
   })
 
   it('throws w/ missing XChainBridge', function () {
     delete tx.XChainBridge
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: missing field XChainBridge')
   })
 
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field XChainBridge',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field XChainBridge',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: invalid field XChainBridge')
   })
 
   it('throws w/ missing SignatureReward', function () {
     delete tx.SignatureReward
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field SignatureReward',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: missing field SignatureReward')
   })
 
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field SignatureReward',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field SignatureReward',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: invalid field SignatureReward')
   })
 
   it('throws w/ missing OtherChainSource', function () {
     delete tx.OtherChainSource
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field OtherChainSource',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: missing field OtherChainSource',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: missing field OtherChainSource')
   })
 
   it('throws w/ invalid OtherChainSource', function () {
     tx.OtherChainSource = 123
 
-    assert.throws(
-      () => validateXChainCreateClaimID(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field OtherChainSource',
-    )
-    assert.throws(
-      () => validate(tx),
-      ValidationError,
-      'XChainCreateClaimID: invalid field OtherChainSource',
-    )
+    assertInvalid(tx, 'XChainCreateClaimID: invalid field OtherChainSource')
   })
 })

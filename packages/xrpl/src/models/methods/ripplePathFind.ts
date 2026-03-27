@@ -15,8 +15,7 @@ export interface SourceCurrencyAmount {
  * @category Requests
  */
 export interface RipplePathFindRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'ripple_path_find'
   /** Unique address of the account that would send funds in a transaction. */
   source_account: string
@@ -38,6 +37,11 @@ export interface RipplePathFindRequest
    * and optional issuer field, like how currency amounts are specified.
    */
   source_currencies?: SourceCurrencyAmount[]
+  /**
+   * The object ID of a PermissionedDomain object. If this field is included,
+   * then only valid paths for this domain will be returned.
+   */
+  domain?: string
 }
 
 export interface RipplePathFindPathOption {
