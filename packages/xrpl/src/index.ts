@@ -4,6 +4,8 @@ export * from './models'
 
 export * from './utils'
 
+export * from './sugar'
+
 export { default as ECDSA } from './ECDSA'
 
 export * from './errors'

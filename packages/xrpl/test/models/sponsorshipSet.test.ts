@@ -35,13 +35,13 @@ describe('SponsorshipSet', function () {
     assertValid(sponsorshipSetTx)
   })
 
-  it('verifies valid SponsorshipSet with tfDelete flag', function () {
-    sponsorshipSetTx.Flags = SponsorshipSetFlags.tfDelete
+  it('verifies valid SponsorshipSet with tfDeleteObject flag', function () {
+    sponsorshipSetTx.Flags = SponsorshipSetFlags.tfDeleteObject
     assertValid(sponsorshipSetTx)
   })
 
-  it('verifies valid SponsorshipSet with boolean tfDelete flag', function () {
-    sponsorshipSetTx.Flags = { tfDelete: true }
+  it('verifies valid SponsorshipSet with boolean tfDeleteObject flag', function () {
+    sponsorshipSetTx.Flags = { tfDeleteObject: true }
     assertValid(sponsorshipSetTx)
   })
 
@@ -49,16 +49,13 @@ describe('SponsorshipSet', function () {
     delete sponsorshipSetTx.Sponsee
     assertInvalid(
       sponsorshipSetTx,
-      'SponsorshipSet: missing field Sponsee',
+      'SponsorshipSet: must have either Sponsee or CounterpartySponsor',
     )
   })
 
   it('throws when Sponsee is not a string', function () {
     sponsorshipSetTx.Sponsee = 123
-    assertInvalid(
-      sponsorshipSetTx,
-      'SponsorshipSet: Sponsee must be a string',
-    )
+    assertInvalid(sponsorshipSetTx, 'SponsorshipSet: Sponsee must be a string')
   })
 
   it('throws when Sponsee is not a valid account address', function () {
@@ -79,10 +76,7 @@ describe('SponsorshipSet', function () {
 
   it('throws when MaxFee is not a string', function () {
     sponsorshipSetTx.MaxFee = 1000
-    assertInvalid(
-      sponsorshipSetTx,
-      'SponsorshipSet: MaxFee must be a string',
-    )
+    assertInvalid(sponsorshipSetTx, 'SponsorshipSet: MaxFee must be a string')
   })
 
   it('throws when MaxFee is negative', function () {
@@ -133,7 +127,7 @@ describe('SponsorshipSet', function () {
 
   it('verifies valid SponsorshipSet with all optional fields', function () {
     sponsorshipSetTx.MaxFee = '5000'
-    sponsorshipSetTx.Flags = SponsorshipSetFlags.tfDelete
+    sponsorshipSetTx.Flags = SponsorshipSetFlags.tfDeleteObject
     sponsorshipSetTx.Memos = [
       {
         Memo: {
@@ -144,4 +138,3 @@ describe('SponsorshipSet', function () {
     assertValid(sponsorshipSetTx)
   })
 })
-

@@ -33,15 +33,9 @@ export function compareSigners<T extends { Account: string }>(
   if (!left.Account || !right.Account) {
     throw new Error('compareSigners: Account cannot be null or undefined')
   }
-  const result = addressToBigNumber(left.Account).comparedTo(
+  return addressToBigNumber(left.Account).comparedTo(
     addressToBigNumber(right.Account),
   )
-  if (result === null) {
-    throw new Error(
-      'compareSigners: Invalid account address comparison resulted in NaN',
-    )
-  }
-  return result
 }
 
 export const NUM_BITS_IN_HEX = 16

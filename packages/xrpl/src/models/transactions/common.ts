@@ -28,14 +28,6 @@ const SHA_512_HALF_LENGTH = 64
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
 
-// Extended transaction types to include XLS-68 Sponsored Fees transactions
-// These are not yet in ripple-binary-codec but are part of the XLS-68 amendment
-const EXTENDED_TRANSACTION_TYPES = [
-  ...TRANSACTION_TYPES,
-  'SponsorshipSet',
-  'SponsorshipTransfer',
-]
-
 function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
     return false
@@ -619,12 +611,40 @@ export interface BaseTransaction extends Record<string, unknown> {
 }
 
 /**
+ * Transaction types that can create ledger objects and thus support reserve sponsorship.
+ * These transactions can use the tfSponsorReserve flag.
+ */
+const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
+  'CheckCreate',
+  'DepositPreauth',
+  'EscrowCreate',
+  'NFTokenCreateOffer',
+  'OfferCreate',
+  'PaymentChannelCreate',
+  'SignerListSet',
+  'TicketCreate',
+  'TrustSet',
+  'AMMCreate',
+  'CredentialCreate',
+  'DIDSet',
+  'MPTokenIssuanceCreate',
+  'OracleSet',
+  'VaultCreate',
+  'LoanBrokerSet',
+  'PermissionedDomainSet',
+])
+
+/**
  * Validate that SponsorFlags contains only valid flag values.
  *
  * @param sponsorFlags - The SponsorFlags value to validate.
+ * @param transactionType - The transaction type to validate flags against.
  * @throws ValidationError if flags are invalid.
  */
-function validateSponsorFlagsValue(sponsorFlags: number): void {
+function validateSponsorFlagsValue(
+  sponsorFlags: number,
+  transactionType?: string,
+): void {
   /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
   const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
   if ((sponsorFlags & ~validFlags) !== 0) {
@@ -632,13 +652,25 @@ function validateSponsorFlagsValue(sponsorFlags: number): void {
       'Transaction: SponsorFlags contains invalid flags',
     )
   }
-  /* eslint-enable no-bitwise */
 
   if (sponsorFlags === 0) {
     throw new ValidationError(
       'Transaction: SponsorFlags must have at least one flag set',
     )
   }
+
+  // Validate that reserve sponsorship is only used for transactions that create objects
+  const hasReserveFlag = (sponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+  if (
+    hasReserveFlag &&
+    transactionType &&
+    !RESERVE_SPONSORABLE_TRANSACTIONS.has(transactionType)
+  ) {
+    throw new ValidationError(
+      `Transaction: ${transactionType} cannot use tfSponsorReserve flag (does not create ledger objects)`,
+    )
+  }
+  /* eslint-enable no-bitwise */
 }
 
 /**
@@ -648,7 +680,17 @@ function validateSponsorFlagsValue(sponsorFlags: number): void {
  * @param tx - The transaction to validate sponsor fields for.
  * @throws ValidationError if sponsor fields are invalid.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary for validation
 export function validateSponsorFields(tx: Record<string, unknown>): void {
+  // Skip sponsor field validation for SponsorshipTransfer which uses the Sponsor field
+  // for a different purpose (the new reserve-payer, not fee sponsorship).
+  // SponsorshipSet does NOT use the Sponsor field for its own purposes, so it should
+  // still be validated for fee sponsorship fields.
+  const transactionType = String(tx.TransactionType)
+  if (transactionType === 'SponsorshipTransfer') {
+    return
+  }
+
   const sponsor = tx.Sponsor
   const sponsorFlags = tx.SponsorFlags
   const sponsorSignature = tx.SponsorSignature
@@ -683,7 +725,7 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
     if (!isNumber(sponsorFlags)) {
       throw new ValidationError('Transaction: SponsorFlags must be a number')
     }
-    validateSponsorFlagsValue(sponsorFlags)
+    validateSponsorFlagsValue(sponsorFlags, transactionType)
   }
 
   /* Validate SponsorSignature field */
@@ -725,7 +767,7 @@ export function validateBaseTransaction(
     throw new ValidationError('BaseTransaction: TransactionType not string')
   }
 
-  if (!EXTENDED_TRANSACTION_TYPES.includes(common.TransactionType)) {
+  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
     throw new ValidationError(
       `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
     )

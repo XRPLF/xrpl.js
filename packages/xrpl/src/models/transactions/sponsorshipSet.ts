@@ -6,8 +6,6 @@ import {
   isAccount,
   isString,
   validateBaseTransaction,
-  validateOptionalField,
-  validateRequiredField,
 } from './common'
 
 /**
@@ -118,6 +116,7 @@ export interface SponsorshipSet extends BaseTransaction {
  * @param tx - A SponsorshipSet Transaction.
  * @throws Malformed.
  */
+// eslint-disable-next-line max-lines-per-function, max-statements -- necessary for validation
 export function validateSponsorshipSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -216,6 +215,14 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     if (tx.ReserveCount < 0 || !Number.isInteger(tx.ReserveCount)) {
       throw new ValidationError(
         'SponsorshipSet: ReserveCount must be a non-negative integer',
+      )
+    }
+
+    // Prevent overflow - UInt32 max value
+    const MAX_UINT32 = 4294967295
+    if (tx.ReserveCount > MAX_UINT32) {
+      throw new ValidationError(
+        `SponsorshipSet: ReserveCount cannot exceed ${MAX_UINT32}`,
       )
     }
   }

@@ -3,6 +3,7 @@ import { encode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../errors'
 import { Signer, Transaction, validate } from '../models'
+import { SponsorFlags } from '../models/transactions/common'
 import { hashSignedTx } from '../utils/hashes'
 
 import {
@@ -38,7 +39,7 @@ import type { Wallet } from '.'
  *   - The transaction has not been signed by the account yet
  *   - The transaction fails validation
  */
-// eslint-disable-next-line max-lines-per-function -- for extensive validations
+// eslint-disable-next-line max-lines-per-function, complexity -- for extensive validations
 export function signAsSponsor(
   wallet: Wallet,
   transaction: Transaction | string,
@@ -66,21 +67,12 @@ export function signAsSponsor(
     )
   }
 
-  // Validate that the Sponsor field matches the wallet signing
+  // Validate that the Sponsor field is present
   if (tx.Sponsor === undefined) {
     throw new ValidationError(
       'Transaction must have Sponsor field set before sponsor can sign.',
     )
   }
-
-  if (tx.Sponsor !== wallet.classicAddress) {
-    throw new ValidationError(
-      `Transaction Sponsor field (${tx.Sponsor}) does not match the signing wallet address (${wallet.classicAddress}).`,
-    )
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-  validate(tx as unknown as Record<string, unknown>)
 
   let multisignAddress: boolean | string = false
   if (typeof opts.multisign === 'string') {
@@ -88,6 +80,23 @@ export function signAsSponsor(
   } else if (opts.multisign) {
     multisignAddress = wallet.classicAddress
   }
+
+  // For single-signing, validate that the Sponsor field matches the wallet
+  if (!multisignAddress && tx.Sponsor !== wallet.classicAddress) {
+    throw new ValidationError(
+      `Transaction Sponsor field (${tx.Sponsor}) does not match the signing wallet address (${wallet.classicAddress}).`,
+    )
+  }
+
+  // Prevent self-sponsorship - the sponsor cannot be the same as the account
+  if (tx.Account === wallet.classicAddress) {
+    throw new ValidationError(
+      'signAsSponsor: Sponsor cannot be the same as the transaction Account (self-sponsorship not allowed).',
+    )
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
+  validate(tx as unknown as Record<string, unknown>)
 
   if (multisignAddress) {
     tx.SponsorSignature = {
@@ -217,5 +226,73 @@ function getTransactionWithAllSponsorSigners(
   return {
     ...transactions[0],
     SponsorSignature: { Signers: sortedSigners },
+  }
+}
+
+/**
+ * Adds sponsor fields to a transaction for use with pre-funded sponsorships.
+ *
+ * This function is used when a Sponsorship ledger object already exists on-ledger
+ * with sufficient balance to cover the transaction. In this case, no sponsor
+ * signature is required - only the Sponsor and SponsorFlags fields are needed.
+ *
+ * @param transaction - The transaction to add sponsor fields to.
+ * @param sponsorAddress - The address of the sponsor account (must match an
+ *                         existing Sponsorship object on the ledger).
+ * @param sponsorFlags - Flags indicating what the sponsor is paying for
+ *                       (tfSponsorFee = 0x00000001, tfSponsorReserve = 0x00000002).
+ * @returns A new transaction object with Sponsor and SponsorFlags fields added.
+ *
+ * @throws {ValidationError} If:
+ *   - Sponsor and Account are the same (self-sponsorship not allowed)
+ *   - SponsorFlags is missing or invalid
+ *
+ * @example
+ * ```typescript
+ * import { SponsorFlags } from 'xrpl'
+ *
+ * const sponsoredTx = addPreFundedSponsor(
+ *   payment,
+ *   'rSponsorAddress123...',
+ *   SponsorFlags.tfSponsorFee
+ * )
+ * ```
+ */
+export function addPreFundedSponsor(
+  transaction: Transaction,
+  sponsorAddress: string,
+  sponsorFlags: number,
+): Transaction {
+  if (transaction.Account === sponsorAddress) {
+    throw new ValidationError(
+      'addPreFundedSponsor: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
+    )
+  }
+
+  if (typeof sponsorFlags !== 'number') {
+    throw new ValidationError(
+      'addPreFundedSponsor: SponsorFlags must be a valid number',
+    )
+  }
+
+  /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+  const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+  if ((sponsorFlags & ~validFlags) !== 0) {
+    throw new ValidationError(
+      'addPreFundedSponsor: SponsorFlags contains invalid flags',
+    )
+  }
+
+  if (sponsorFlags === 0) {
+    throw new ValidationError(
+      'addPreFundedSponsor: SponsorFlags must have at least one flag set',
+    )
+  }
+  /* eslint-enable no-bitwise */
+
+  return {
+    ...transaction,
+    Sponsor: sponsorAddress,
+    SponsorFlags: sponsorFlags,
   }
 }

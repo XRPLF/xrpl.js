@@ -124,7 +124,11 @@ export {
   SponsorshipSetFlags,
   SponsorshipSetFlagsInterface,
 } from './sponsorshipSet'
-export { SponsorshipTransfer } from './sponsorshipTransfer'
+export {
+  SponsorshipTransfer,
+  SponsorshipTransferFlags,
+  SponsorshipTransferFlagsInterface,
+} from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'

@@ -66,7 +66,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 260,
+        "nth": 32,
         "type": "Amount"
       }
     ],
@@ -76,7 +76,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 261,
+        "nth": 33,
         "type": "Amount"
       }
     ],
@@ -876,7 +876,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 69,
+        "nth": 73,
         "type": "UInt32"
       }
     ],
@@ -886,7 +886,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 70,
+        "nth": 69,
         "type": "UInt32"
       }
     ],
@@ -896,7 +896,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 71,
+        "nth": 70,
         "type": "UInt32"
       }
     ],
@@ -906,7 +906,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 72,
+        "nth": 71,
         "type": "UInt32"
       }
     ],
@@ -916,7 +916,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 73,
+        "nth": 72,
         "type": "UInt32"
       }
     ],
@@ -1587,6 +1587,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 38,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ObjectID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 39,
         "type": "Hash256"
       }
     ],
@@ -2401,7 +2411,7 @@
       }
     ],
     [
-      "Sponsee",
+      "HighSponsor",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -2411,7 +2421,7 @@
       }
     ],
     [
-      "CounterpartySponsor",
+      "LowSponsor",
       {
         "isSerialized": true,
         "isSigningField": true,
@@ -2421,12 +2431,22 @@
       }
     ],
     [
-      "NewSponsor",
+      "CounterpartySponsor",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 30,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Sponsee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 31,
         "type": "AccountID"
       }
     ],

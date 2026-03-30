@@ -487,4 +487,8 @@ export {
   combineLoanSetCounterpartySigners,
 } from './counterpartySigner'
 
-export { signAsSponsor, combineSponsorSigners } from './sponsorSigner'
+export {
+  signAsSponsor,
+  combineSponsorSigners,
+  addPreFundedSponsor,
+} from './sponsorSigner'

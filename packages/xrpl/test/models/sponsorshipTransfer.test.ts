@@ -1,4 +1,7 @@
-import { validateSponsorshipTransfer } from '../../src/models/transactions/sponsorshipTransfer'
+import {
+  SponsorshipTransferFlags,
+  validateSponsorshipTransfer,
+} from '../../src/models/transactions/sponsorshipTransfer'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -21,84 +24,90 @@ describe('SponsorshipTransfer', function () {
     sponsorshipTransferTx = {
       TransactionType: 'SponsorshipTransfer',
       Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
-      LedgerIndex: LEDGER_INDEX,
+      ObjectID: LEDGER_INDEX,
+      // Default to End scenario
+      Flags: SponsorshipTransferFlags.tfSponsorshipEnd,
       Fee: '12',
     } as any
   })
 
-  it('verifies valid SponsorshipTransfer', function () {
+  it('verifies valid SponsorshipTransfer with tfSponsorshipEnd', function () {
     assertValid(sponsorshipTransferTx)
   })
 
-  it('verifies valid SponsorshipTransfer with NewSponsor', function () {
-    sponsorshipTransferTx.NewSponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+  it('verifies valid SponsorshipTransfer with tfSponsorshipCreate and Sponsor', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
     assertValid(sponsorshipTransferTx)
   })
 
-  it('verifies valid SponsorshipTransfer without NewSponsor (removes sponsorship)', function () {
-    // NewSponsor is optional - omitting it removes sponsorship
+  it('verifies valid SponsorshipTransfer with tfSponsorshipReassign and Sponsor', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipReassign
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
     assertValid(sponsorshipTransferTx)
   })
 
-  it('throws when LedgerIndex is missing', function () {
-    delete sponsorshipTransferTx.LedgerIndex
+  it('verifies valid SponsorshipTransfer without ObjectID (account-level sponsorship)', function () {
+    delete sponsorshipTransferTx.ObjectID
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipEnd
+    assertValid(sponsorshipTransferTx)
+  })
+
+  it('throws when ObjectID is not a string', function () {
+    sponsorshipTransferTx.ObjectID = 123
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: missing field LedgerIndex',
+      'SponsorshipTransfer: ObjectID must be a string',
     )
   })
 
-  it('throws when LedgerIndex is not a string', function () {
-    sponsorshipTransferTx.LedgerIndex = 123
+  it('throws when ObjectID is not 64 hex characters', function () {
+    sponsorshipTransferTx.ObjectID = 'ABCD1234'
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: LedgerIndex must be a string',
+      'SponsorshipTransfer: ObjectID must be a 64-character hexadecimal string',
     )
   })
 
-  it('throws when LedgerIndex is not 64 hex characters', function () {
-    sponsorshipTransferTx.LedgerIndex = 'ABCD1234'
-    assertInvalid(
-      sponsorshipTransferTx,
-      'SponsorshipTransfer: LedgerIndex must be a 64-character hexadecimal string',
-    )
-  })
-
-  it('throws when LedgerIndex contains non-hex characters', function () {
-    sponsorshipTransferTx.LedgerIndex =
+  it('throws when ObjectID contains non-hex characters', function () {
+    sponsorshipTransferTx.ObjectID =
       'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: LedgerIndex must be a 64-character hexadecimal string',
+      'SponsorshipTransfer: ObjectID must be a 64-character hexadecimal string',
     )
   })
 
-  it('throws when NewSponsor is not a string', function () {
-    sponsorshipTransferTx.NewSponsor = 123
+  it('throws when Sponsor is not a string', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 123
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: NewSponsor must be a string',
+      'SponsorshipTransfer: Sponsor must be a string',
     )
   })
 
-  it('throws when NewSponsor is not a valid account address', function () {
-    sponsorshipTransferTx.NewSponsor = 'invalid_address'
+  it('throws when Sponsor is not a valid account address', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'invalid_address'
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: NewSponsor must be a valid account address',
+      'SponsorshipTransfer: Sponsor must be a valid account address',
     )
   })
 
-  it('throws when Account and NewSponsor are the same', function () {
-    sponsorshipTransferTx.NewSponsor = sponsorshipTransferTx.Account
+  it('throws when Account and Sponsor are the same', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = sponsorshipTransferTx.Account
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: Account and NewSponsor cannot be the same',
+      'SponsorshipTransfer: Account and Sponsor cannot be the same',
     )
   })
 
-  it('verifies valid SponsorshipTransfer with X-Address for NewSponsor', function () {
-    sponsorshipTransferTx.NewSponsor =
+  it('verifies valid SponsorshipTransfer with X-Address for Sponsor', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor =
       'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi'
     assertValid(sponsorshipTransferTx)
   })
@@ -109,30 +118,31 @@ describe('SponsorshipTransfer', function () {
     assertValid(sponsorshipTransferTx)
   })
 
-  it('throws when both Account and NewSponsor are the same X-Address', function () {
+  it('throws when both Account and Sponsor are the same X-Address', function () {
     const xAddress = 'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi'
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Account = xAddress
-    sponsorshipTransferTx.NewSponsor = xAddress
+    sponsorshipTransferTx.Sponsor = xAddress
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: Account and NewSponsor cannot be the same',
+      'SponsorshipTransfer: Account and Sponsor cannot be the same',
     )
   })
 
-  it('verifies valid SponsorshipTransfer with lowercase hex LedgerIndex', function () {
-    sponsorshipTransferTx.LedgerIndex =
+  it('verifies valid SponsorshipTransfer with lowercase hex ObjectID', function () {
+    sponsorshipTransferTx.ObjectID =
       'aed08cc1f50dd5f23a1948af86153a3f3b7593e5ec77d65a02bb1b29e05ab6af'
     assertValid(sponsorshipTransferTx)
   })
 
-  it('verifies valid SponsorshipTransfer with mixed case hex LedgerIndex', function () {
-    sponsorshipTransferTx.LedgerIndex =
+  it('verifies valid SponsorshipTransfer with mixed case hex ObjectID', function () {
+    sponsorshipTransferTx.ObjectID =
       'AeD08Cc1F50dD5f23A1948aF86153a3F3b7593E5eC77d65A02bB1b29E05aB6aF'
     assertValid(sponsorshipTransferTx)
   })
 
   it('verifies valid SponsorshipTransfer with all optional fields', function () {
-    sponsorshipTransferTx.NewSponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipEnd
     sponsorshipTransferTx.Memos = [
       {
         Memo: {
@@ -142,5 +152,129 @@ describe('SponsorshipTransfer', function () {
     ]
     assertValid(sponsorshipTransferTx)
   })
-})
 
+  // Scenario Flag Tests
+  describe('Scenario Flag Validation', function () {
+    it('throws when no scenario flag is set', function () {
+      // Remove the Flags field to test the validator
+      delete sponsorshipTransferTx.Flags
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: must specify exactly one scenario flag (tfSponsorshipEnd, tfSponsorshipCreate, or tfSponsorshipReassign)',
+      )
+    })
+
+    it('verifies valid SponsorshipTransfer with tfSponsorshipEnd flag', function () {
+      sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipEnd
+      // tfSponsorshipEnd should NOT have Sponsor field
+      assertValid(sponsorshipTransferTx)
+    })
+
+    it('verifies valid SponsorshipTransfer with tfSponsorshipCreate flag and Sponsor', function () {
+      sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+      sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      assertValid(sponsorshipTransferTx)
+    })
+
+    it('verifies valid SponsorshipTransfer with tfSponsorshipReassign flag and Sponsor', function () {
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipReassign
+      sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      assertValid(sponsorshipTransferTx)
+    })
+
+    it('throws when tfSponsorshipEnd has Sponsor field present', function () {
+      sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipEnd
+      sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: Sponsor field must not be present for tfSponsorshipEnd scenario',
+      )
+    })
+
+    it('throws when tfSponsorshipCreate missing Sponsor field', function () {
+      sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+      // No Sponsor field
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: Sponsor field is required for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+      )
+    })
+
+    it('throws when tfSponsorshipReassign missing Sponsor field', function () {
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipReassign
+      // No Sponsor field
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: Sponsor field is required for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+      )
+    })
+
+    it('throws when multiple scenario flags are set (tfSponsorshipEnd + tfSponsorshipCreate)', function () {
+      /* eslint-disable no-bitwise -- Testing bitwise flag combinations */
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipEnd |
+        SponsorshipTransferFlags.tfSponsorshipCreate
+      /* eslint-enable no-bitwise */
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: cannot specify multiple scenario flags (tfSponsorshipEnd, tfSponsorshipCreate, tfSponsorshipReassign are mutually exclusive)',
+      )
+    })
+
+    it('throws when multiple scenario flags are set (tfSponsorshipCreate + tfSponsorshipReassign)', function () {
+      /* eslint-disable no-bitwise -- Testing bitwise flag combinations */
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipCreate |
+        SponsorshipTransferFlags.tfSponsorshipReassign
+      /* eslint-enable no-bitwise */
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: cannot specify multiple scenario flags (tfSponsorshipEnd, tfSponsorshipCreate, tfSponsorshipReassign are mutually exclusive)',
+      )
+    })
+
+    it('throws when multiple scenario flags are set (tfSponsorshipEnd + tfSponsorshipReassign)', function () {
+      /* eslint-disable no-bitwise -- Testing bitwise flag combinations */
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipEnd |
+        SponsorshipTransferFlags.tfSponsorshipReassign
+      /* eslint-enable no-bitwise */
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: cannot specify multiple scenario flags (tfSponsorshipEnd, tfSponsorshipCreate, tfSponsorshipReassign are mutually exclusive)',
+      )
+    })
+
+    it('throws when all three scenario flags are set', function () {
+      /* eslint-disable no-bitwise -- Testing bitwise flag combinations */
+      sponsorshipTransferTx.Flags =
+        SponsorshipTransferFlags.tfSponsorshipEnd |
+        SponsorshipTransferFlags.tfSponsorshipCreate |
+        SponsorshipTransferFlags.tfSponsorshipReassign
+      /* eslint-enable no-bitwise */
+      assertInvalid(
+        sponsorshipTransferTx,
+        'SponsorshipTransfer: cannot specify multiple scenario flags (tfSponsorshipEnd, tfSponsorshipCreate, tfSponsorshipReassign are mutually exclusive)',
+      )
+    })
+
+    it('verifies valid SponsorshipTransfer with boolean tfSponsorshipEnd flag', function () {
+      sponsorshipTransferTx.Flags = { tfSponsorshipEnd: true }
+      assertValid(sponsorshipTransferTx)
+    })
+
+    it('verifies valid SponsorshipTransfer with boolean tfSponsorshipCreate flag', function () {
+      sponsorshipTransferTx.Flags = { tfSponsorshipCreate: true }
+      sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      assertValid(sponsorshipTransferTx)
+    })
+
+    it('verifies valid SponsorshipTransfer with boolean tfSponsorshipReassign flag', function () {
+      sponsorshipTransferTx.Flags = { tfSponsorshipReassign: true }
+      sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      assertValid(sponsorshipTransferTx)
+    })
+  })
+})

@@ -140,6 +140,8 @@ export function setValidAddresses(tx: Transaction): void {
   convertToClassicAddress(tx, 'RegularKey')
   // XLS-68 Sponsorship:
   convertToClassicAddress(tx, 'Sponsor')
+  convertToClassicAddress(tx, 'Sponsee')
+  convertToClassicAddress(tx, 'CounterpartySponsor')
 }
 
 /**
