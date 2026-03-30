@@ -6,6 +6,7 @@ import {
   isAccount,
   isString,
   validateBaseTransaction,
+  areAddressesEqual,
 } from './common'
 
 /**
@@ -174,7 +175,7 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
     }
 
     // Check identity before validating address format
-    if (tx.Account === tx.Sponsor) {
+    if (isString(tx.Account) && areAddressesEqual(tx.Account, tx.Sponsor)) {
       throw new ValidationError(
         'SponsorshipTransfer: Account and Sponsor cannot be the same',
       )

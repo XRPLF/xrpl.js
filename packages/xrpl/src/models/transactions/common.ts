@@ -1,6 +1,10 @@
 /* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import {
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -335,6 +339,39 @@ export function isAccount(account: unknown): account is Account {
     typeof account === 'string' &&
     (isValidClassicAddress(account) || isValidXAddress(account))
   )
+}
+
+/**
+ * Normalizes an address to its classic format.
+ * If the address is an X-address, converts it to a classic address.
+ * If the address is already a classic address, returns it as-is.
+ *
+ * @param address - The address to normalize (classic or X-address format).
+ * @returns The classic address format.
+ */
+function toClassicAddress(address: string): string {
+  if (isValidXAddress(address)) {
+    return xAddressToClassicAddress(address).classicAddress
+  }
+  return address
+}
+
+/**
+ * Compares two addresses for equality, normalizing both to classic address format.
+ * This handles the case where one address might be an X-address and the other
+ * a classic address, but they refer to the same account.
+ *
+ * @param address1 - The first address to compare.
+ * @param address2 - The second address to compare.
+ * @returns True if the addresses refer to the same account, false otherwise.
+ */
+export function areAddressesEqual(address1: string, address2: string): boolean {
+  try {
+    return toClassicAddress(address1) === toClassicAddress(address2)
+  } catch {
+    // If conversion fails for any reason, fall back to direct comparison
+    return address1 === address2
+  }
 }
 
 /**
@@ -734,7 +771,12 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
   }
 
   /* Validate no self-sponsorship */
-  if (hasSponsor && sponsor === tx.Account) {
+  if (
+    hasSponsor &&
+    isString(sponsor) &&
+    isString(tx.Account) &&
+    areAddressesEqual(sponsor, tx.Account)
+  ) {
     throw new ValidationError(
       'Transaction: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
     )
@@ -810,7 +852,12 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'Delegate', isAccount)
 
   const delegate = common.Delegate
-  if (delegate != null && delegate === common.Account) {
+  if (
+    delegate != null &&
+    isString(delegate) &&
+    isString(common.Account) &&
+    areAddressesEqual(delegate, common.Account)
+  ) {
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )

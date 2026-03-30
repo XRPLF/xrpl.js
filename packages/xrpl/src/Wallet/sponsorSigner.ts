@@ -3,7 +3,7 @@ import { encode } from 'ripple-binary-codec'
 
 import { ValidationError } from '../errors'
 import { Signer, Transaction, validate } from '../models'
-import { SponsorFlags } from '../models/transactions/common'
+import { areAddressesEqual, SponsorFlags } from '../models/transactions/common'
 import { hashSignedTx } from '../utils/hashes'
 
 import {
@@ -88,15 +88,14 @@ export function signAsSponsor(
     )
   }
 
-  // Prevent self-sponsorship - the sponsor cannot be the same as the account
-  if (tx.Account === wallet.classicAddress) {
+  // Prevent self-sponsorship - the sponsor cannot be the same as the account.
+  // Use tx.Sponsor (not wallet.classicAddress) and areAddressesEqual to handle
+  // X-address vs classic address equivalence.
+  if (areAddressesEqual(tx.Account, tx.Sponsor)) {
     throw new ValidationError(
       'signAsSponsor: Sponsor cannot be the same as the transaction Account (self-sponsorship not allowed).',
     )
   }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-  validate(tx as unknown as Record<string, unknown>)
 
   if (multisignAddress) {
     tx.SponsorSignature = {
@@ -120,6 +119,10 @@ export function signAsSponsor(
       TxnSignature: computeSignature(tx, wallet.privateKey),
     }
   }
+
+  // Validate the final signed transaction (after SponsorSignature is attached)
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
+  validate(tx as unknown as Record<string, unknown>)
 
   const serialized = encode(tx)
   return {
@@ -223,9 +226,20 @@ function getTransactionWithAllSponsorSigners(
     .flatMap((tx) => tx.SponsorSignature?.Signers ?? [])
     .sort((signer1, signer2) => compareSigners(signer1.Signer, signer2.Signer))
 
+  // Deduplicate signers by Account (keeping the first occurrence after sorting).
+  // Duplicate Signer.Account entries are not allowed by rippled and will be rejected.
+  const seenAccounts = new Set<string>()
+  const uniqueSigners: Signer[] = []
+  for (const signer of sortedSigners) {
+    if (!seenAccounts.has(signer.Signer.Account)) {
+      seenAccounts.add(signer.Signer.Account)
+      uniqueSigners.push(signer)
+    }
+  }
+
   return {
     ...transactions[0],
-    SponsorSignature: { Signers: sortedSigners },
+    SponsorSignature: { Signers: uniqueSigners },
   }
 }
 
@@ -269,9 +283,9 @@ export function addPreFundedSponsor(
     )
   }
 
-  if (typeof sponsorFlags !== 'number') {
+  if (!Number.isInteger(sponsorFlags)) {
     throw new ValidationError(
-      'addPreFundedSponsor: SponsorFlags must be a valid number',
+      'addPreFundedSponsor: SponsorFlags must be a valid integer',
     )
   }
 

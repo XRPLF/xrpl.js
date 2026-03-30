@@ -1,4 +1,5 @@
 import { ValidationError } from '../../errors'
+import { INTEGER_SANITY_CHECK } from '../utils'
 
 import {
   BaseTransaction,
@@ -6,6 +7,7 @@ import {
   isAccount,
   isString,
   validateBaseTransaction,
+  areAddressesEqual,
 } from './common'
 
 /**
@@ -143,7 +145,7 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
 
     // Check identity before validating address format
-    if (tx.Account === tx.Sponsee) {
+    if (isString(tx.Account) && areAddressesEqual(tx.Account, tx.Sponsee)) {
       throw new ValidationError(
         'SponsorshipSet: Account and Sponsee cannot be the same',
       )
@@ -165,7 +167,10 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
 
     // Check identity before validating address format
-    if (tx.Account === tx.CounterpartySponsor) {
+    if (
+      isString(tx.Account) &&
+      areAddressesEqual(tx.Account, tx.CounterpartySponsor)
+    ) {
       throw new ValidationError(
         'SponsorshipSet: Account and CounterpartySponsor cannot be the same',
       )
@@ -184,8 +189,8 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
       throw new ValidationError('SponsorshipSet: FeeAmount must be a string')
     }
 
-    const feeAmountNum = Number(tx.FeeAmount)
-    if (Number.isNaN(feeAmountNum) || feeAmountNum < 0) {
+    // Use strict regex to reject non-canonical strings (whitespace, scientific notation, decimals, etc.)
+    if (!INTEGER_SANITY_CHECK.exec(tx.FeeAmount)) {
       throw new ValidationError(
         'SponsorshipSet: FeeAmount must be a non-negative numeric string',
       )
@@ -198,8 +203,8 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
       throw new ValidationError('SponsorshipSet: MaxFee must be a string')
     }
 
-    const maxFeeNum = Number(tx.MaxFee)
-    if (Number.isNaN(maxFeeNum) || maxFeeNum < 0) {
+    // Use strict regex to reject non-canonical strings (whitespace, scientific notation, decimals, etc.)
+    if (!INTEGER_SANITY_CHECK.exec(tx.MaxFee)) {
       throw new ValidationError(
         'SponsorshipSet: MaxFee must be a non-negative numeric string',
       )

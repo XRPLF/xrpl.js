@@ -667,7 +667,10 @@ describe('client.autofill', function () {
   })
 
   describe('Sponsorship autofill', function () {
-    it('calculates fee for sponsored transaction with single sponsor signature', async function () {
+    it('does not add sponsor fees for pre-funded sponsorship (Sponsor without SponsorSignature)', async function () {
+      // Pre-funded sponsorship: Sponsor field is present but no SponsorSignature.
+      // The sponsor uses a pre-existing Sponsorship ledger object, so no additional
+      // sponsor signature is required and no extra fees should be added.
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -688,55 +691,13 @@ describe('client.autofill', function () {
 
       const txResult = await testContext.client.autofill(tx)
 
-      // Fee should include base fee (12) + sponsor signature fee (12) = 24
-      assert.strictEqual(txResult.Fee, '24')
+      // Fee should be base fee only (12) - no sponsor signature fees for pre-funded sponsorship
+      assert.strictEqual(txResult.Fee, '12')
     })
 
-    it('calculates fee for sponsored transaction with multi-sig sponsor', async function () {
-      const tx: Payment = {
-        TransactionType: 'Payment',
-        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
-        Amount: '1234',
-        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
-        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
-        SponsorFlags: 1,
-      }
-
-      testContext.mockRippled!.addResponse(
-        'account_info',
-        rippled.account_info.normal,
-      )
-      testContext.mockRippled!.addResponse('account_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          account_data: {
-            Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
-          },
-          signer_lists: [
-            {
-              SignerEntries: [
-                { SignerEntry: { Account: 'rSigner1' } },
-                { SignerEntry: { Account: 'rSigner2' } },
-                { SignerEntry: { Account: 'rSigner3' } },
-              ],
-            },
-          ],
-        },
-      })
-      testContext.mockRippled!.addResponse(
-        'server_info',
-        rippled.server_info.normal,
-      )
-      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
-
-      const txResult = await testContext.client.autofill(tx)
-
-      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48
-      assert.strictEqual(txResult.Fee, '48')
-    })
-
-    it('does not recalculate fee when SponsorSignature already present', async function () {
+    it('calculates fee for co-signed sponsorship with single sponsor signature', async function () {
+      // Co-signed sponsorship: SponsorSignature is present, so the sponsor is
+      // actively signing the transaction and fees should include the signature.
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -763,8 +724,60 @@ describe('client.autofill', function () {
 
       const txResult = await testContext.client.autofill(tx)
 
-      // Fee should include sponsor signature already present (no fetching needed)
+      // Fee should include base fee (12) + sponsor signature fee (12) = 24
       assert.strictEqual(txResult.Fee, '24')
+    })
+
+    it('calculates fee for co-signed sponsorship with multi-sig sponsor', async function () {
+      // Co-signed sponsorship with multiple sponsor signers.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+        SponsorSignature: {
+          Signers: [
+            {
+              Signer: {
+                Account: 'rSigner1',
+                SigningPubKey: '02AAAA...',
+                TxnSignature: '3045...',
+              },
+            },
+            {
+              Signer: {
+                Account: 'rSigner2',
+                SigningPubKey: '02BBBB...',
+                TxnSignature: '3045...',
+              },
+            },
+            {
+              Signer: {
+                Account: 'rSigner3',
+                SigningPubKey: '02CCCC...',
+                TxnSignature: '3045...',
+              },
+            },
+          ],
+        },
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(tx)
+
+      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48
+      assert.strictEqual(txResult.Fee, '48')
     })
   })
 })

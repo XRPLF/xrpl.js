@@ -6,6 +6,7 @@ import {
   validateBaseTransaction,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  areAddressesEqual,
 } from './common'
 
 /**
@@ -52,7 +53,10 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       throw new ValidationError('DepositPreauth: Authorize must be a string')
     }
 
-    if (tx.Account === tx.Authorize) {
+    if (
+      typeof tx.Account === 'string' &&
+      areAddressesEqual(tx.Account, tx.Authorize)
+    ) {
       throw new ValidationError(
         "DepositPreauth: Account can't preauthorize its own address",
       )
@@ -62,7 +66,10 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       throw new ValidationError('DepositPreauth: Unauthorize must be a string')
     }
 
-    if (tx.Account === tx.Unauthorize) {
+    if (
+      typeof tx.Account === 'string' &&
+      areAddressesEqual(tx.Account, tx.Unauthorize)
+    ) {
       throw new ValidationError(
         "DepositPreauth: Account can't unauthorize its own address",
       )

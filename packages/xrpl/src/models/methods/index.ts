@@ -337,6 +337,8 @@ export type RequestResponseMap<
   ? AccountObjectsResponse
   : T extends AccountOffersRequest
   ? AccountOffersResponse
+  : T extends AccountSponsoringRequest
+  ? AccountSponsoringResponse
   : T extends AccountTxRequest
   ? AccountTxVersionResponseMap<Version>
   : T extends AMMInfoRequest

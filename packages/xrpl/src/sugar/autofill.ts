@@ -313,43 +313,21 @@ async function fetchCounterPartySignersCount(
 }
 
 /**
- * Fetches the total number of signers for the sponsor of a transaction.
- *
- * @param client - The client object used to make the request.
- * @param sponsor - The sponsor account address.
- * @returns A Promise that resolves to the number of signers for the sponsor.
- */
-async function fetchSponsorSignersCount(
-  client: Client,
-  sponsor: string,
-): Promise<number> {
-  // Fetch the signer list for the sponsor.
-  const signerListRequest: AccountInfoRequest = {
-    command: 'account_info',
-    account: sponsor,
-    ledger_index: 'validated',
-    signer_lists: true,
-  }
-
-  const signerListResponse = await client.request(signerListRequest)
-  const signerList = signerListResponse.result.signer_lists?.[0]
-  return signerList?.SignerEntries.length ?? 1
-}
-
-/**
  * Calculates additional fees for sponsor signatures.
  *
- * @param client - The client object.
+ * Only adds sponsor signer fees when a SponsorSignature is present on the transaction.
+ * Pre-funded sponsorships (which only have Sponsor and SponsorFlags without SponsorSignature)
+ * do not require the sponsor to sign, so no additional signer fees are needed.
+ *
  * @param tx - The transaction object.
  * @param netFeeDrops - The network fee in drops.
- * @returns A Promise that resolves to the additional sponsor fee.
+ * @returns The additional sponsor fee as a BigNumber.
  */
-async function calculateSponsorFee(
-  client: Client,
-  tx: Transaction,
-  netFeeDrops: string,
-): Promise<BigNumber> {
-  // Transactions with sponsor signatures have additional fees based on the number of sponsor signers.
+function calculateSponsorFee(tx: Transaction, netFeeDrops: string): BigNumber {
+  // Only add sponsor signer fees when SponsorSignature is present.
+  // Pre-funded sponsorships (tx.Sponsor without SponsorSignature) use an existing
+  // Sponsorship ledger object and don't require additional sponsor signatures,
+  // so they should not incur extra signer fees.
   if (tx.SponsorSignature != null) {
     const sponsorSignersCount = tx.SponsorSignature.Signers?.length ?? 1
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
@@ -358,18 +336,8 @@ async function calculateSponsorFee(
     )
     return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
   }
-  if (tx.Sponsor != null) {
-    // If Sponsor field is present but SponsorSignature is not yet added, fetch the sponsor's signer count
-    const sponsorSignersCount = await fetchSponsorSignersCount(
-      client,
-      tx.Sponsor,
-    )
-    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
-    console.warn(
-      `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
-    )
-    return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
-  }
+  // Note: tx.Sponsor without SponsorSignature indicates a pre-funded sponsorship flow.
+  // No additional sponsor fees are charged since the sponsor is not signing.
   return new BigNumber(0)
 }
 
@@ -447,7 +415,7 @@ async function calculateFeePerTransactionType(
   }
 
   // Add sponsor signature fees if applicable
-  const sponsorFee = await calculateSponsorFee(client, tx, netFeeDrops)
+  const sponsorFee = calculateSponsorFee(tx, netFeeDrops)
   baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
