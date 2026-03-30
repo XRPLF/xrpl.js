@@ -1,7 +1,7 @@
 import {
   bytesToHex as nobleBytesToHex,
   randomBytes as nobleRandomBytes,
-} from '@noble/hashes/utils'
+} from '@noble/hashes/utils.js'
 import type {
   BytesToHexFn,
   HexToBytesFn,
