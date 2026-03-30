@@ -189,9 +189,9 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   ticket?:
     | {
         /** The owner of the Ticket object. */
-        owner: string
+        account: string
         /** The Ticket Sequence number of the Ticket entry to retrieve. */
-        ticket_sequence: number
+        ticket_seq: number
       }
     | string
 
