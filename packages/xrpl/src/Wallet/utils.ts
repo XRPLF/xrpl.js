@@ -33,8 +33,11 @@ export function compareSigners<T extends { Account: string }>(
   if (!left.Account || !right.Account) {
     throw new Error('compareSigners: Account cannot be null or undefined')
   }
-  return addressToBigNumber(left.Account).comparedTo(
-    addressToBigNumber(right.Account),
+  // comparedTo returns null when comparing with NaN; treat as equal (0)
+  return (
+    addressToBigNumber(left.Account).comparedTo(
+      addressToBigNumber(right.Account),
+    ) ?? 0
   )
 }
 
