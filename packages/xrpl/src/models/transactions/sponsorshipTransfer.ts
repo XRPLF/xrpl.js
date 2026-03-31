@@ -35,8 +35,8 @@ export enum SponsorshipTransferFlags {
  *
  * @category Transaction Flags
  */
-export interface SponsorshipTransferFlagsInterface
-  extends GlobalFlagsInterface {
+// eslint-disable-next-line max-len -- interface name is descriptive
+export interface SponsorshipTransferFlagsInterface extends GlobalFlagsInterface {
   /**
    * End an existing sponsorship relationship for the specified object.
    */

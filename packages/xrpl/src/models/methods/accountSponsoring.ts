@@ -29,8 +29,7 @@ export interface SponsoredAccount {
  * @category Requests
  */
 export interface AccountSponsoringRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_sponsoring'
   /**
    * A unique identifier for the account, most commonly the account's address.
@@ -95,4 +94,3 @@ export interface AccountSponsoringResponse extends BaseResponse {
     validated?: boolean
   }
 }
-
