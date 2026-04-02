@@ -262,19 +262,13 @@ class Client extends EventEmitter<EventTypes> {
       this.emit('error', errorCode, errorMessage, data)
     })
 
-    let connectedListener: (() => void) | undefined
     this.connection.on('reconnect', () => {
-      // Clean up any stale listener from previous reconnect attempt
-      // This prevents duplicate event emissions when multiple reconnect attempts
-      // occur before a successful connection (e.g., on flaky networks)
-      if (connectedListener !== undefined) {
-        this.connection.off('connected', connectedListener)
-      }
+      // Remove any stale 'connected' listeners from previous reconnect attempts
+      // to prevent duplicate event emissions (N+1 listener accumulation)
+      this.connection.removeAllListeners('connected')
 
-      connectedListener = (): boolean => this.emit('connected')
       // Use .once() so the listener auto-removes after firing
-      // This prevents listener accumulation across reconnections
-      this.connection.once('connected', connectedListener)
+      this.connection.once('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {

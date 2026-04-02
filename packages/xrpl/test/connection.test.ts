@@ -676,6 +676,26 @@ describe('Connection', function () {
   )
 
   it(
+    'should not accumulate connected listeners after multiple reconnects',
+    async () => {
+      // Simulate multiple reconnect events
+      for (let iter = 0; iter < 5; iter++) {
+        clientContext.client.connection.emit('reconnect')
+      }
+
+      // There should be at most 1 'connected' listener on the connection,
+      // not 5 (which would indicate listener accumulation / leak)
+      const count = clientContext.client.connection.listenerCount('connected')
+      assert.strictEqual(
+        count,
+        1,
+        `Expected exactly 1 'connected' listener but found ${count}`,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'Multiply connect calls',
     async () => {
       await clientContext.client.connect()
