@@ -654,6 +654,7 @@ export {
   LedgerEntryAccountRootRequest,
   LedgerEntryAMMRequest,
   LedgerEntryBridgeRequest,
+  LedgerEntryBridgeAccountRequest,
   LedgerEntryCheckRequest,
   LedgerEntryCredentialRequest,
   LedgerEntryDelegateRequest,
