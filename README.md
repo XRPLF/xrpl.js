@@ -78,7 +78,6 @@ If you're using xrpl.js with React or Deno, you'll need to do a couple extra ste
 - [Using xrpl.js with `create-react-app`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-create-react-app)
 - [Using xrpl.js with `React Native`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-react-native)
 - [Using xrpl.js with `Vite React`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)
-- [Using xrpl.js with `Deno`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-deno)
 
 ## Documentation
 
