@@ -463,7 +463,7 @@ describe('Connection', function () {
     'reconnect on unexpected close',
     async () => {
       const connectedPromise = new Promise<void>((resolve) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           resolve()
         })
       })
@@ -509,7 +509,7 @@ describe('Connection', function () {
       const num = 3
 
       const connectedPromise = new Promise<void>((resolve, reject) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           connectsCount += 1
           if (connectsCount < num) {
             breakConnection()
