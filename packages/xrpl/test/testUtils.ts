@@ -125,16 +125,18 @@ const socketMap: {
 
 export async function destroyServer(port: number): Promise<void> {
   // loop through all sockets and destroy them
-  if (socketMap[port]) {
-    Object.keys(socketMap[port]!.sockets).forEach(function (socketKey) {
-      socketMap[port]!.sockets[socketKey].destroy()
+  const socketEntry = socketMap[port]
+  if (socketEntry) {
+    Object.keys(socketEntry.sockets).forEach(function (socketKey) {
+      socketEntry.sockets[socketKey].destroy()
     })
   }
 
   return new Promise((resolve, reject) => {
-    if (socketMap[port]) {
+    const entry = socketMap[port]
+    if (entry) {
       // after all the sockets are destroyed, we may close the server!
-      socketMap[port]!.server.close((error) => {
+      entry.server.close((error) => {
         if (error) {
           reject(error)
           return

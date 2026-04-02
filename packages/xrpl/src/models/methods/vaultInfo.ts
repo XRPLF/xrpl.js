@@ -200,6 +200,12 @@ export interface VaultInfoResponse extends BaseResponse {
     ledger_index?: number
 
     /**
+     * The ledger index of the current in-progress ledger, which was used when
+     * retrieving this information. May be omitted.
+     */
+    ledger_current_index?: number
+
+    /**
      * If included and set to true, the information in this response comes from
      * a validated ledger version. Otherwise, the information is subject to
      * change.
