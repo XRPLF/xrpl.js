@@ -1,10 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  LedgerEntryBinaryRequest,
-  LedgerEntryJsonResponse,
-  LedgerEntryRequest,
-} from '../../../src'
+import { LedgerEntryRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -89,9 +85,9 @@ describe('ledger_entry', function () {
         binary: false,
       })
 
-      assert.isUndefined(ledgerEntryResponse.result.node)
+      assert.isDefined(ledgerEntryResponse.result.node)
       // @ts-expect-error - node_binary is not present in the response
-      assert.isDefined(ledgerEntryResponse.result.node_binary)
+      assert.isUndefined(ledgerEntryResponse.result.node_binary)
     },
     TIMEOUT,
   )
