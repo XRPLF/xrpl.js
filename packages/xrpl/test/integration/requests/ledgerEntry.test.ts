@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { LedgerEntryRequest } from '../../../src'
+import type { LedgerEntryRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
