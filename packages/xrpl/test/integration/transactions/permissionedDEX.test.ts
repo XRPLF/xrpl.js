@@ -8,7 +8,6 @@ import {
   IssuedCurrencyAmount,
   AccountSetAsfFlags,
 } from '../../../src'
-import DirectoryNode from '../../../src/models/ledger/DirectoryNode'
 import Offer from '../../../src/models/ledger/Offer'
 import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
 import {
