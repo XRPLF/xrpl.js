@@ -258,16 +258,17 @@ describe('PermissionedDEX', function () {
         directory: offerLedgerObject.BookDirectory,
       })
 
+      assert.ok(ledgerEntryResponse.result.node, 'node should be present')
       assert.equal(
-        ledgerEntryResponse.result.node?.index,
+        ledgerEntryResponse.result.node.index,
         offerLedgerObject.BookDirectory,
       )
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).LedgerEntryType,
+        ledgerEntryResponse.result.node.LedgerEntryType,
         'DirectoryNode',
       )
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).DomainID,
+        ledgerEntryResponse.result.node.DomainID,
         permDomainLedgerObject.index,
       )
 
