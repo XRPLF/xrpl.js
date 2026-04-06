@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Handle malformed UTF-8 in WebSocket text messages by enabling `skipUTF8Validation` and converting `Buffer` payloads to strings
+
 ## 4.6.0 (2026-02-12)
 
 ### Added
