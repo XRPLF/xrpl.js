@@ -64,6 +64,7 @@ function createWebSocket(
 ): WebSocket | null {
   const options: ClientOptions = {
     agent: config.agent,
+    skipUTF8Validation: true,
   }
   if (config.headers) {
     options.headers = config.headers
@@ -335,7 +336,10 @@ export class Connection extends EventEmitter {
    *
    * @param message - The message received from the server.
    */
-  private onMessage(message): void {
+  private onMessage(rawMessage: string | Buffer): void {
+    const message =
+      typeof rawMessage === 'string' ? rawMessage : rawMessage.toString('utf8')
+
     this.trace('receive', message)
     let data: Record<string, unknown>
     try {
@@ -388,7 +392,7 @@ export class Connection extends EventEmitter {
     this.ws.removeAllListeners()
     clearTimeout(connectionTimeoutID)
     // Add new, long-term connected listeners for messages and errors
-    this.ws.on('message', (message: string) => this.onMessage(message))
+    this.ws.on('message', (message: string | Buffer) => this.onMessage(message))
     this.ws.on('error', (error) =>
       this.emit('error', 'websocket', error.message, error),
     )

@@ -834,6 +834,32 @@ describe('Connection', function () {
   )
 
   it(
+    'handles malformed UTF-8 text websocket messages',
+    async () => {
+      clientContext.mockRippled!.addResponse('server_info', (request) => ({
+        payload: Buffer.from([
+          ...Buffer.from(
+            `{"type":"response","status":"success","id":${JSON.stringify(request.id)},"result":{"message":"`,
+          ),
+          0xff,
+          ...Buffer.from('"}}'),
+        ]),
+        binary: false,
+      }))
+
+      const response = await clientContext.client.request({
+        command: 'server_info',
+      })
+
+      assert.strictEqual(
+        (response.result as unknown as { message: string }).message,
+        '�',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'propagates RippledError data',
     async () => {
       const request: SubscribeRequest = {
