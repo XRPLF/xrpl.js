@@ -86,11 +86,7 @@ describe('API: XRPL Secret Numbers', () => {
       expect(() => {
         // eslint-disable-next-line no-new -- Don't want unused variable
         new Account(secret)
-      })
-        // TODO: Remove if jest is removed.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Jest and Jasmine have two different signatures.
-        // @ts-expect-error
-        .toThrowError(Error, 'Invalid secret part: checksum invalid')
+      }).toThrow(new Error('Invalid secret part: checksum invalid'))
     })
   })
 })

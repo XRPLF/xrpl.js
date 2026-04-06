@@ -11,8 +11,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface NFTsByIssuerRequest
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'nfts_by_issuer'
   /**
    * A unique identifier for the account, most commonly the account's address
