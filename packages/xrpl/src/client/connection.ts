@@ -334,7 +334,7 @@ export class Connection extends EventEmitter {
   /**
    * Handler for when messages are received from the server.
    *
-   * @param message - The message received from the server.
+   * @param rawMessage - The message received from the server.
    */
   private onMessage(rawMessage: string | Buffer): void {
     const message =

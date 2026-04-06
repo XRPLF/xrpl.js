@@ -121,7 +121,7 @@ describe('Client subscription', function () {
   it('Emits path_find from a non-Unicode mock websocket payload', async function () {
     await new Promise<void>((resolve) => {
       testContext.client.on('path_find', (path) => {
-        assert(path.type === 'path_find')
+        assert.strictEqual(path.type, 'path_find')
         assert.strictEqual(
           (path as unknown as { message: string }).message,
           '�',
