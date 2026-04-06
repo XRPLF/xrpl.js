@@ -66,6 +66,9 @@
   "workspaces": [
     "./packages/*"
   ],
+  "overrides": {
+    "handlebars": ">=4.7.9"
+  },
   "engines": {
     "node": ">=20.19.0",
     "npm": ">=7.10.0"
