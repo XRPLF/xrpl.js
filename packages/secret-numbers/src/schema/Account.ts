@@ -1,7 +1,7 @@
 import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 // Use an import alias to avoid name-conflict with the Algorithm type
 // defined in extensions/node_modules/typescript/lib/lib.dom.d.ts
-import type { Algorithm as _Algorithm } from 'ripple-keypairs'
+import type { Algorithm as SignAlgorithm } from 'ripple-keypairs'
 
 import {
   entropyToSecret,
@@ -36,11 +36,11 @@ export class Account {
     },
   }
 
-  private readonly _algorithm: _Algorithm
+  private readonly _algorithm: SignAlgorithm
 
   constructor(
     secretNumbers?: string[] | string | Uint8Array,
-    algorithm: _Algorithm = 'ed25519',
+    algorithm: SignAlgorithm = 'ed25519',
   ) {
     this._algorithm = algorithm
 
