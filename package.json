@@ -61,7 +61,7 @@
     "typescript": "^5.1.6",
     "webpack": "^5.81.0",
     "webpack-bundle-analyzer": "^5.1.1",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^7.0.2"
   },
   "workspaces": [
     "./packages/*"
