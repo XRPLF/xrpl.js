@@ -183,7 +183,7 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
 
   /**
    * The Ticket object to retrieve. If a string, must be the object ID of the
-   * Ticket, as hexadecimal. If an object, the `owner` and `ticket_sequence`
+   * Ticket, as hexadecimal. If an object, the `account` and `ticket_seq`
    * sub-fields are required to uniquely specify the Ticket entry.
    */
   ticket?:
