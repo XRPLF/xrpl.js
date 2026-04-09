@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+* Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
+* Fix: Validate the input of non-numeric values for `Amount` field.
+* Fix: Add validation checks for negative inputs to `read`, `peek` and `skip` methods in the binary-codec.
+
 ## 2.7.0 (2026-02-12)
 
 ### Added

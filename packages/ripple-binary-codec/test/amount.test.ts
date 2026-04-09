@@ -80,5 +80,13 @@ describe('Amount', function () {
       })
     }
   })
+  it('rejects non-numeric MPT amount values with a validation error', function () {
+    const mpt = {
+      value: 'abc',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    expect(() => Amount.from(mpt)).toThrow('illegal amount')
+  })
+
   amountErrorTests()
 })
