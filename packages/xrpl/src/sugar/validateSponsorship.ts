@@ -41,7 +41,7 @@ export interface SponsorshipValidationResult {
  * }
  * ```
  */
-// eslint-disable-next-line max-lines-per-function, complexity -- necessary for validation
+// eslint-disable-next-line max-lines-per-function, complexity, max-statements -- necessary for validation
 export async function validatePreFundedSponsorship(
   client: Client,
   tx: Transaction,
@@ -89,6 +89,17 @@ export async function validatePreFundedSponsorship(
       // Only reserve sponsorship, no fee validation needed
       return {
         valid: true,
+        sponsorship,
+        estimatedFee: fee,
+      }
+    }
+
+    // When sponsoring fee, FeeAmount must be present
+    if (sponsorship.FeeAmount == null) {
+      return {
+        valid: false,
+        error:
+          'Sponsorship FeeAmount is required when tfSponsorFee flag is set',
         sponsorship,
         estimatedFee: fee,
       }

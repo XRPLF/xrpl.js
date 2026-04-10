@@ -324,12 +324,15 @@ describe('sponsorSigner', function () {
       }
 
       const sponsorAddress = 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un'
-      // SponsorFlags.tfSponsorFee (1) + SponsorFlags.tfSponsorReserve (2) = 3
-      const sponsorFlags = 3
+      /* eslint-disable no-bitwise -- combining sponsor flags */
+      const sponsorFlags =
+        SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+      /* eslint-enable no-bitwise */
 
       const result = addPreFundedSponsor(payment, sponsorAddress, sponsorFlags)
 
       assert.equal(result.SponsorFlags, sponsorFlags)
+      // Combined flags: tfSponsorFee (1) + tfSponsorReserve (2) = 3
       assert.equal(result.SponsorFlags, 3)
     })
 

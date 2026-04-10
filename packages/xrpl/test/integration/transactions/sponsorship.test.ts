@@ -776,8 +776,10 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           SendMax: '1000000',
           Sponsor: sponsorWallet.classicAddress,
-          // SponsorFlags: fee (1) + reserve (2) = 3
-          SponsorFlags: 3,
+          /* eslint-disable no-bitwise -- combining sponsor flags */
+          SponsorFlags:
+            SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve,
+          /* eslint-enable no-bitwise */
         }
 
         const prepared = await testContext.client.autofill(checkTx)
