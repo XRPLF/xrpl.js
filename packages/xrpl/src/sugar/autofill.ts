@@ -329,7 +329,7 @@ function calculateSponsorFee(tx: Transaction, netFeeDrops: string): BigNumber {
   // Sponsorship ledger object and don't require additional sponsor signatures,
   // so they should not incur extra signer fees.
   if (tx.SponsorSignature != null) {
-    const sponsorSignersCount = tx.SponsorSignature.Signers?.length ?? 1
+    const sponsorSignersCount = tx.SponsorSignature.Signers?.length || 1
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.warn(
       `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,

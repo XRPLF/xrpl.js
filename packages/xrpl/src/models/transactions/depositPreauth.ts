@@ -7,6 +7,7 @@ import {
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
   areAddressesEqual,
+  isString,
 } from './common'
 
 /**
@@ -42,10 +43,10 @@ function validateAuthorizationField(
   field: 'Authorize' | 'Unauthorize',
 ): void {
   const value = tx[field]
-  if (typeof value !== 'string') {
+  if (!isString(value)) {
     throw new ValidationError(`DepositPreauth: ${field} must be a string`)
   }
-  if (typeof tx.Account === 'string' && areAddressesEqual(tx.Account, value)) {
+  if (isString(tx.Account) && areAddressesEqual(tx.Account, value)) {
     const action = field === 'Authorize' ? 'preauthorize' : 'unauthorize'
     throw new ValidationError(
       `DepositPreauth: Account can't ${action} its own address`,
