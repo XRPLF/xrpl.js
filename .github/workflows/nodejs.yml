@@ -4,7 +4,7 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:077e03ff
   GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
