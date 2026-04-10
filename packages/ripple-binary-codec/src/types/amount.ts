@@ -92,7 +92,7 @@ class Amount extends SerializedType {
       return value
     }
 
-    let amount = new Uint8Array(8)
+    let amount: Uint8Array = new Uint8Array(8)
     if (typeof value === 'string') {
       Amount.assertXrpIsValid(value)
 
