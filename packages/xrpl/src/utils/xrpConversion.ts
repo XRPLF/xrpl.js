@@ -26,7 +26,7 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
     drops = new BigNumber(dropsToConvert).toString(BASE_TEN)
   } catch (_err) {
     throw new ValidationError(
-      `dropsToXrp: invalid value '${dropsToConvert}', should be a BigNumber or string-encoded number.`,
+      `dropsToXrp: invalid value '${typeof dropsToConvert === 'string' ? dropsToConvert : JSON.stringify(dropsToConvert)}', should be a BigNumber or string-encoded number.`,
     )
   }
 
@@ -68,7 +68,7 @@ export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
     xrp = new BigNumber(xrpToConvert).toString(BASE_TEN)
   } catch (_err) {
     throw new ValidationError(
-      `xrpToDrops: invalid value '${xrpToConvert}', should be a BigNumber or string-encoded number.`,
+      `xrpToDrops: invalid value '${typeof xrpToConvert === 'string' ? xrpToConvert : JSON.stringify(xrpToConvert)}', should be a BigNumber or string-encoded number.`,
     )
   }
 
