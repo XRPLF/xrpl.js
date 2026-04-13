@@ -68,6 +68,18 @@ describe('Wallet', function () {
       })
       assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
+
+    it('can recreate the same wallet using the algorithm property', function () {
+      const original = Wallet.fromSeed(knownSecret, {
+        algorithm: ECDSA.secp256k1,
+      })
+      const recreated = Wallet.fromSeed(original.seed!, {
+        algorithm: original.algorithm,
+      })
+      assert.equal(recreated.classicAddress, original.classicAddress)
+      assert.equal(recreated.publicKey, original.publicKey)
+      assert.equal(recreated.algorithm, original.algorithm)
+    })
   })
 
   describe('generate', function () {
@@ -305,6 +317,14 @@ describe('Wallet', function () {
       assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
+    it('bip39 mnemonic always produces secp256k1 algorithm', function () {
+      const wallet = Wallet.fromMnemonic(mnemonic)
+
+      assert.equal(wallet.publicKey, publicKey)
+      assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
+    })
+
     it('derives a wallet using an input derivation path', function () {
       const derivationPath = "m/44'/144'/0'/0/0"
       const wallet = Wallet.fromMnemonic(mnemonic, {
@@ -362,6 +382,7 @@ describe('Wallet', function () {
 
       assert.equal(wallet.publicKey, publicKey)
       assert.equal(wallet.privateKey, privateKey)
+      assert.equal(wallet.algorithm, ECDSA.secp256k1)
     })
 
     it('derives a wallet from secret numbers as an array using default algorithm', function () {

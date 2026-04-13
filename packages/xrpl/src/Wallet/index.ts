@@ -84,9 +84,12 @@ export class Wallet {
   public readonly seed?: string
 
   /**
-   * The algorithm used to generate this wallet's keypair.
-   * Derived from the public key prefix when not explicitly provided:
-   * keys starting with "ED" use ed25519, all others use secp256k1.
+   * The digital signature algorithm used to derive this wallet's keypair.
+   * Either {@link ECDSA.ed25519} or {@link ECDSA.secp256k1}.
+   *
+   * When not explicitly provided to the constructor, it is inferred from
+   * the public key: keys starting with "ED" use ed25519, all others
+   * use secp256k1.
    */
   public readonly algorithm: ECDSA
 
@@ -262,6 +265,7 @@ export class Wallet {
 
     const publicKey = bytesToHex(node.publicKey)
     const privateKey = bytesToHex(node.privateKey)
+    // BIP39 HD derivation always produces secp256k1 keys (not configurable)
     return new Wallet(publicKey, `00${privateKey}`, {
       masterAddress: opts.masterAddress,
       algorithm: ECDSA.secp256k1,
