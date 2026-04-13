@@ -10,8 +10,10 @@ import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
+import { EnableAmendmentFlags } from '../transactions/enableAmendment'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
+import { LoanSetFlags } from '../transactions/loanSet'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
@@ -57,8 +59,10 @@ const txToFlag = {
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
   Batch: BatchFlags,
+  EnableAmendment: EnableAmendmentFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
+  LoanSet: LoanSetFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,
   MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
@@ -141,32 +145,72 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
 /**
  * Convert a Transaction flags property into a map for easy interpretation.
  *
- * @param tx - A transaction to parse flags for.
- * @returns A map with all flags as booleans.
+ * Can be called with a Transaction object or with a transaction type string
+ * and numeric flags value directly (useful when working with raw API responses).
+ *
+ * By default, only enabled (true) flags are included in the result.
+ * Pass `includeAll: true` in options to include all possible flags for the
+ * transaction type with their boolean values.
+ *
+ * @example
+ * ```typescript
+ * // With a Transaction object (existing behavior)
+ * parseTransactionFlags(tx)
+ * // => { tfSell: true }
+ *
+ * // With transaction type and numeric flags
+ * parseTransactionFlags('OfferCreate', 0x00080000)
+ * // => { tfSell: true }
+ *
+ * // Include all possible flags for the transaction type
+ * parseTransactionFlags('Payment', 0x00020000, { includeAll: true })
+ * // => { tfNoRippleDirect: false, tfPartialPayment: true, tfLimitQuality: false }
+ * ```
+ *
+ * @param txOrType - A transaction to parse flags for, or a transaction type string.
+ * @param flagsNum - The numeric flags value (required when txOrType is a string).
+ * @param options - Optional settings.
+ * @param options.includeAll - Set to `true` to include disabled flags.
+ * @returns A map of flag names to booleans.
  */
-export function parseTransactionFlags(tx: Transaction): object {
-  const flags = convertTxFlagsToNumber(tx)
-  if (flags === 0) {
-    return {}
+export function parseTransactionFlags(
+  txOrType: Transaction | string,
+  flagsNum?: number,
+  options?: { includeAll?: boolean },
+): Record<string, boolean> {
+  let flags: number
+  let transactionType: string
+
+  if (typeof txOrType === 'string') {
+    transactionType = txOrType
+    flags = flagsNum ?? 0
+  } else {
+    transactionType = txOrType.TransactionType
+    flags = convertTxFlagsToNumber(txOrType)
   }
 
-  const booleanFlagMap = {}
+  const includeAll = options?.includeAll ?? false
 
-  if (isTxToFlagKey(tx.TransactionType)) {
-    const transactionTypeFlags = txToFlag[tx.TransactionType]
+  const booleanFlagMap: Record<string, boolean> = {}
+
+  if (isTxToFlagKey(transactionType)) {
+    const transactionTypeFlags = txToFlag[transactionType]
     Object.values(transactionTypeFlags).forEach((flag) => {
-      if (
-        typeof flag === 'string' &&
-        isFlagEnabled(flags, transactionTypeFlags[flag])
-      ) {
-        booleanFlagMap[flag] = true
+      if (typeof flag === 'string') {
+        const enabled = isFlagEnabled(flags, transactionTypeFlags[flag])
+        if (enabled || includeAll) {
+          booleanFlagMap[flag] = enabled
+        }
       }
     })
   }
 
   Object.values(GlobalFlags).forEach((flag) => {
-    if (typeof flag === 'string' && isFlagEnabled(flags, GlobalFlags[flag])) {
-      booleanFlagMap[flag] = true
+    if (typeof flag === 'string') {
+      const enabled = isFlagEnabled(flags, GlobalFlags[flag])
+      if (enabled || includeAll) {
+        booleanFlagMap[flag] = enabled
+      }
     }
   })
 
