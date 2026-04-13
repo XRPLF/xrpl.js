@@ -22,6 +22,7 @@ import {
   LedgerV1,
   LedgerTransactionExpanded,
   LedgerTransactionExpandedV1,
+  LedgerTransactionExpandedV2,
 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
@@ -65,6 +66,7 @@ export {
   LedgerV1,
   LedgerTransactionExpanded,
   LedgerTransactionExpandedV1,
+  LedgerTransactionExpandedV2,
   LedgerEntryFilter,
   LedgerEntry,
   LedgerHashes,
