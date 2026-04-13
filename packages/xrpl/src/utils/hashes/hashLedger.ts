@@ -12,7 +12,6 @@ import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
 import {
   LedgerVersionMap,
-  LedgerTransactionExpanded,
   LedgerTransactionExpandedV1,
   LedgerTransactionExpandedV2,
 } from '../../models/ledger/Ledger'

@@ -5,7 +5,7 @@ import { hashes } from '../../src/utils'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
 
-const { hashLedger } = hashes
+const { hashLedger, hashTxTree } = hashes
 const { hashLedger: REQUEST_FIXTURES } = requests
 
 describe('hashLedger', function () {
@@ -148,6 +148,51 @@ describe('hashLedger', function () {
       () => hashLedger(header, { computeTreeHashes: true }),
       ValidationError,
       'transactionHash in header does not match computed hash of transactions',
+    )
+  })
+
+  it('hashLedger - normalizes v2 wrapped transactions to v1 for hashing', function () {
+    // Convert the v1 flat transactions to v2 wrapped format, then verify
+    // hashLedger still computes the correct transaction_hash by normalizing
+    // them back to v1 internally.
+    const v1Ledger = JSON.parse(JSON.stringify(ledger))
+    v1Ledger.parent_close_time = v1Ledger.close_time
+
+    // Wrap each v1 flat tx into v2 format: { tx_json, meta, hash, ... }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test conversion
+    const v2Transactions = v1Ledger.transactions.map((tx: any) => {
+      const { hash, metaData, ledger_index: _li, ...txFields } = tx
+      return {
+        tx_json: txFields,
+        meta: metaData,
+        hash,
+        validated: true,
+        ledger_index: v1Ledger.ledger_index,
+        close_time_iso: '2013-Jan-02 03:21:10.000000000 UTC',
+        ledger_hash: v1Ledger.ledger_hash,
+      }
+    })
+
+    const v2Ledger = {
+      ...v1Ledger,
+      transactions: v2Transactions,
+    }
+
+    // Should produce the same hash because normalizeToV1 converts v2 back
+    const hash = hashLedger(v2Ledger, { computeTreeHashes: true })
+    assert.strictEqual(
+      hash,
+      hashLedger(v1Ledger, { computeTreeHashes: true }),
+    )
+  })
+
+  it('hashLedger - hashTxTree matches expected transaction_hash', function () {
+    // Direct test of hashTxTree against the known transaction_hash from fixtures
+    const v1Ledger = JSON.parse(JSON.stringify(ledger))
+
+    assert.strictEqual(
+      hashTxTree(v1Ledger.transactions),
+      v1Ledger.transaction_hash,
     )
   })
 })
