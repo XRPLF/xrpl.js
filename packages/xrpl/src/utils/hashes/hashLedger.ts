@@ -167,13 +167,21 @@ export function hashStateTree(entries: LedgerEntry[]): string {
 
 /**
  * Normalize a v1 wrapped transaction to v2 flat format.
+ *
+ * @param tx - The transaction to normalize.
+ * @returns The normalized v2 transaction.
  */
 function normalizeToV2(
   tx: LedgerTransactionExpanded | LedgerTransactionExpandedV1,
 ): LedgerTransactionExpanded {
   if ('tx_json' in tx) {
+    // Transaction union type cannot be spread directly (TS2698), so we
+    // widen to a plain record first.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required to spread Transaction union
+    const txJson = tx.tx_json as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- narrowing back after merge
     return {
-      ...(tx.tx_json as Record<string, unknown>),
+      ...txJson,
       hash: tx.hash,
       metaData: tx.meta,
     } as LedgerTransactionExpanded
