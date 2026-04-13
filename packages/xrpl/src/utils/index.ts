@@ -23,6 +23,7 @@ import {
   encodeForSigningBatch as rbcEncodeForSigningBatch,
 } from 'ripple-binary-codec'
 import { verify as verifyKeypairSignature } from 'ripple-keypairs'
+import { stringToHex, hexToString } from '@xrplf/isomorphic/utils'
 
 import type { APIVersion } from '../models'
 import { LedgerEntry } from '../models/ledger'
@@ -60,6 +61,7 @@ import {
   decimalToQuality,
   qualityToDecimal,
 } from './quality'
+
 import signPaymentChannelClaim from './signPaymentChannelClaim'
 import { convertHexToString, convertStringToHex } from './stringConversion'
 import {
@@ -224,6 +226,8 @@ export {
   verifyPaymentChannelClaim,
   convertStringToHex,
   convertHexToString,
+  stringToHex,
+  hexToString,
   classicAddressToXAddress,
   xAddressToClassicAddress,
   isValidXAddress,

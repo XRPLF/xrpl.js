@@ -1,17 +1,17 @@
 import { assert } from 'chai'
 
-import { convertHexToString, convertStringToHex } from '../../src/utils'
+import { hexToString, stringToHex } from '../../src/utils'
 
-describe('convertHexToString and convertStringToHex', function () {
+describe('hexToString and stringToHex', function () {
   it('converts "example.com"', function () {
     const str = 'example.com'
-    const hex = convertStringToHex(str)
+    const hex = stringToHex(str)
     assert.strictEqual(
       hex,
       '6578616D706C652E636F6D',
       'should convert to hex equivalent',
     )
-    const result = convertHexToString(hex)
+    const result = hexToString(hex)
     assert.strictEqual(
       result,
       'example.com',
@@ -21,9 +21,9 @@ describe('convertHexToString and convertStringToHex', function () {
 
   it('converts "你好"', function () {
     const str = '你好'
-    const hex = convertStringToHex(str)
+    const hex = stringToHex(str)
     assert.strictEqual(hex, 'E4BDA0E5A5BD', 'should convert to hex equivalent')
-    const result = convertHexToString(hex)
+    const result = hexToString(hex)
     assert.strictEqual(result, '你好', 'should convert back to 你好')
   })
 })
