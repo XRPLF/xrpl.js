@@ -143,6 +143,14 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
 }
 
 /**
+ * Options for {@link parseTransactionFlags}.
+ */
+export interface ParseTransactionFlagsOptions {
+  /** Set to `true` to include disabled flags (as `false`) in the result. */
+  includeAll?: boolean
+}
+
+/**
  * Convert a Transaction flags property into a map for easy interpretation.
  *
  * Can be called with a Transaction object or with a transaction type string
@@ -174,19 +182,31 @@ export function convertTxFlagsToNumber(tx: Transaction): number {
  * @returns A map of flag names to booleans.
  */
 export function parseTransactionFlags(
+  tx: Transaction,
+  options?: ParseTransactionFlagsOptions,
+): Record<string, boolean>
+export function parseTransactionFlags(
+  txType: string,
+  flagsNum: number,
+  options?: ParseTransactionFlagsOptions,
+): Record<string, boolean>
+export function parseTransactionFlags(
   txOrType: Transaction | string,
-  flagsNum?: number,
-  options?: { includeAll?: boolean },
+  flagsNumOrOptions?: number | ParseTransactionFlagsOptions,
+  maybeOptions?: ParseTransactionFlagsOptions,
 ): Record<string, boolean> {
   let flags: number
   let transactionType: string
+  let options: ParseTransactionFlagsOptions | undefined
 
   if (typeof txOrType === 'string') {
     transactionType = txOrType
-    flags = flagsNum ?? 0
+    flags = (flagsNumOrOptions as number) ?? 0
+    options = maybeOptions
   } else {
     transactionType = txOrType.TransactionType
     flags = convertTxFlagsToNumber(txOrType)
+    options = flagsNumOrOptions as ParseTransactionFlagsOptions | undefined
   }
 
   const includeAll = options?.includeAll ?? false
