@@ -217,7 +217,7 @@ describe('Connection', function () {
       const server = await createServer()
       const port = (server.address() as net.AddressInfo).port
       const options = {
-        agent: new HttpsProxyAgent<string>(`ws://127.0.0.1:${port}`, {
+        agent: new HttpsProxyAgent(`ws://127.0.0.1:${port}`, {
           ca: ['path/to/pem'],
         }),
       }
