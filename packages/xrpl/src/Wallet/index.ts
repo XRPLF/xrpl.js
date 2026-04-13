@@ -119,11 +119,21 @@ export class Wallet {
       ? ensureClassicAddress(opts.masterAddress)
       : deriveAddress(publicKey)
     this.seed = opts.seed
-    this.algorithm =
-      opts.algorithm ??
-      (publicKey.toUpperCase().startsWith('ED')
-        ? ECDSA.ed25519
-        : ECDSA.secp256k1)
+
+    // Validate algorithm if provided
+    if (
+      opts.algorithm != null &&
+      !Object.values(ECDSA).includes(opts.algorithm)
+    ) {
+      throw new ValidationError('Invalid cryptographic signing algorithm')
+    }
+
+    // Infer from public key if not provided
+    const inferredAlgorithm = publicKey.toUpperCase().startsWith('ED')
+      ? ECDSA.ed25519
+      : ECDSA.secp256k1
+
+    this.algorithm = opts.algorithm ?? inferredAlgorithm
   }
 
   /**
@@ -321,14 +331,18 @@ export class Wallet {
     seed: string,
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
-    const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
-    const { publicKey, privateKey } = deriveKeypair(seed, {
-      algorithm,
-    })
+    // Only pass algorithm to deriveKeypair if explicitly provided
+    const deriveKeypairOpts: { algorithm?: ECDSA } = {}
+    if (opts.algorithm !== undefined) {
+      deriveKeypairOpts.algorithm = opts.algorithm
+    }
+
+    const { publicKey, privateKey } = deriveKeypair(seed, deriveKeypairOpts)
+
     return new Wallet(publicKey, privateKey, {
       seed,
       masterAddress: opts.masterAddress,
-      algorithm,
+      algorithm: opts.algorithm,
     })
   }
 
