@@ -64,7 +64,7 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'mkdir -p /var/lib/rippled/db/ && rippled -a'
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/xrpld/ --entrypoint bash rippleci/xrpld:develop -c 'xrpld --standalone'
 npm run build
 npm run test:integration
 ```
@@ -74,10 +74,10 @@ Breaking down the command:
  `--rm` tells docker to close the container after processes are done running.
 * `-it` allows you to interact with the container.
    `--name rippled_standalone` is an instance name for clarity
-* `--volume $PWD/.ci-config:/etc/opt/ripple/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
-* `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
-* `--entrypoint bash rippleci/rippled:develop` manually overrides the entrypoint (for the latest version of rippled on the `develop` branch)
-*  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
+* `--volume $PWD/.ci-config:/etc/opt/xrpld/` identifies the `xrpld.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
+* `rippleci/xrpld` is an image that is regularly updated with the latest `rippled` releases.
+* `--entrypoint bash rippleci/xrpld:develop` manually overrides the entrypoint (for the latest version of rippled on the `develop` branch)
+*  `-c 'xrpld -a'` provides the bash command to start `xrpld` in standalone mode from the manual entrypoint
 
 ### Faucet Tests
 
@@ -106,7 +106,7 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
+docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/xrpld/ --entrypoint bash rippleci/xrpld:develop -c 'xrpld --standalone'
 npm run test:browser
 ```
 
