@@ -39,9 +39,9 @@ If any PR can't be parsed from either title or body, flag it for manual review. 
 Run the full test suite in order:
 1. npm run build && npm run lint
 2. npm test
-3. Start rippled Docker container (based on CONTRIBUTING.md, with `--detach` instead of `-it` for automation):
-   docker run --detach --rm -p 6006:6006 --volume "$PWD/.ci-config/":/etc/opt/ripple/ --name rippled_standalone --entrypoint bash rippleci/rippled:develop -c "mkdir -p /var/lib/rippled/db/ && rippled -a"
-   Wait for healthy, then run: npm run test:integration && npm run test:browser
+3. Start xrpld Docker container (based on CONTRIBUTING.md, with `--detach` instead of `-it` for automation):
+   docker run --detach --rm -p 6006:6006 --volume "$PWD/.ci-config/":/etc/opt/xrpld/ --name rippled_standalone --entrypoint bash rippleci/xrpld:develop -c "xrpld --standalone"
+   Wait for container to be ready, then run: npm run test:integration && npm run test:browser
    Stop container: docker stop rippled_standalone
 4. npm run test:faucet
 
