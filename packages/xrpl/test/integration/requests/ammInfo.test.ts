@@ -42,4 +42,28 @@ describe('AMMInfo', function () {
     })
     assert.equal(amm.trading_fee, 12)
   })
+
+  it('with account field', async function () {
+    const { asset, asset2, lpWallet } = ammPool
+
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+      account: lpWallet.classicAddress,
+    })
+    const { amm } = ammInfoRes.result
+
+    assert.ok(asset2.issuer)
+
+    assert.isTrue(isValidClassicAddress(amm.account))
+    // When account field is provided, response should still include AMM info
+    assert.equal(amm.amount, '1250')
+    assert.deepEqual(amm.amount2, {
+      currency: asset2.currency,
+      issuer: asset2.issuer,
+      value: '250',
+    })
+    assert.equal(amm.trading_fee, 12)
+  })
 })

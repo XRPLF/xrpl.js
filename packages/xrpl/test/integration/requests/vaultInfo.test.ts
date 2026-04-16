@@ -64,6 +64,13 @@ describe('Single Asset Vault', function () {
       vault,
       'vault_info (vault_id) response should include a vault',
     )
+    // Test the ledger_current_index field
+    if (vaultInfoRes.result.ledger_current_index !== undefined) {
+      assert.isNumber(
+        vaultInfoRes.result.ledger_current_index,
+        'ledger_current_index should be a number when present',
+      )
+    }
     assert.isDefined(vault.Account)
     assert.equal(
       vault.Owner,
