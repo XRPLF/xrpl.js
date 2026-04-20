@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
 
 ### Fixed
+* Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. The fix cleans up stale listeners from previous reconnect attempts to prevent duplicate event emissions on flaky connections with multiple sequential reconnect attempts.
 * Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
 
 ## 4.6.0 (2026-02-12)
