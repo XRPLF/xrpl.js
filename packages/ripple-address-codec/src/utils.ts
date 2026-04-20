@@ -10,7 +10,12 @@ export function arrayEqual(arr1: ByteArray, arr2: ByteArray): boolean {
   if (arr1.length !== arr2.length) {
     return false
   }
-  return arr1.every((value, index) => value === arr2[index])
+  let result = 0
+  for (let i = 0; i < arr1.length; i++) {
+    // eslint-disable-next-line no-bitwise -- bitwise ops are required to avoid side-channel timing attacks
+    result |= arr1[i] ^ arr2[i]
+  }
+  return result === 0
 }
 
 /**
