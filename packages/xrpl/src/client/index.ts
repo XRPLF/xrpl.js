@@ -253,6 +253,16 @@ class Client extends EventEmitter<EventTypes> {
       )
     }
 
+    if (
+      options.authorization != null &&
+      !server.startsWith('wss://') &&
+      !server.startsWith('wss+unix://')
+    ) {
+      throw new ValidationError(
+        'Authorization Credentials cannot be sent over an unencrypted connection. Use wss:// or wss+unix:// instead.',
+      )
+    }
+
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
 
