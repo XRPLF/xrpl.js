@@ -23,26 +23,33 @@ If any PR can't be parsed from either title or body, flag it for manual review. 
 3. For each remaining Dependabot PR, determine if it's a direct dep (listed in a package.json) or transitive dep (only in package-lock.json):
    - Direct deps: update the version in the relevant package.json file(s)
    - Transitive deps: run `npm update <pkg>` to update within semver range
-4. Run `npx knip` to detect dependency issues:
-   - **Unused dependencies**: remove them from their package.json
-   - **Unlisted dependencies**: if any production code imports a package that isn't in any package.json (only available via transitive hoisting), add it as an explicit dependency in the relevant package.json to prevent hoisting breakage
-5. Run `npm install` to update package-lock.json. **Do NOT delete package-lock.json and regenerate from scratch** — this can change hoisted dependency resolution and break builds even when no versions changed.
-6. Diff package.json and package-lock.json against main to classify each Dependabot PR as:
+4. Run `npm install` to update package-lock.json. **Do NOT delete package-lock.json and regenerate from scratch** — this can change hoisted dependency resolution and break builds even when no versions changed.
+5. Diff package.json and package-lock.json against main to classify each Dependabot PR as:
    - Upgraded: version changed
    - No-op: version was already current or newer
-   - Removed: dependency was unused and removed
-7. If any upgrade changes the public API of a package (new errors, changed return types, removed functionality) and result in a breaking change, add an entry under `## Unreleased` in that package's `HISTORY.md`.
-8. Verify completeness: every PR from step 1 must have a status (Upgraded, No-op, Removed, or Skipped). If any PR is unaccounted for, stop and report it before proceeding.
+6. If any upgrade changes the public API of a package (new errors, changed return types, removed functionality) and result in a breaking change, add an entry under `## Unreleased` in that package's `HISTORY.md`.
+7. Verify completeness: every PR from step 1 must have a status (Upgraded, No-op, or Skipped). If any PR is unaccounted for, stop and report it before proceeding.
 
 ## Step 3: Validate
 
 Run the full test suite in order:
 1. npm run build && npm run lint
 2. npm test
-3. Start xrpld Docker container (based on CONTRIBUTING.md, with `--detach` instead of `-it` for automation):
-   docker run --detach --rm -p 6006:6006 --volume "$PWD/.ci-config/":/etc/opt/xrpld/ --name rippled_standalone --entrypoint bash rippleci/xrpld:develop -c "xrpld --standalone"
-   Wait for container to be ready, then run: npm run test:integration && npm run test:browser
-   Stop container: docker stop rippled_standalone
+3. Start xrpld Docker container (based on CONTRIBUTING.md):
+   - Pre-run cleanup (in case a previous run left a container behind): `docker rm -f xrpld-service 2>/dev/null || true`
+   - Start the container: `docker run --detach --rm --publish 6006:6006 --volume "$PWD/.ci-config:/etc/opt/xrpld/" --name xrpld-service rippleci/xrpld:develop --standalone`
+   - Wait for port 6006 with a bounded timeout and halt on failure:
+     ```
+     SECONDS=0
+     until nc -z localhost 6006 || [ $SECONDS -gt 120 ]; do sleep 2; done
+     if ! nc -z localhost 6006; then
+       echo "Error: xrpld did not start within 120s"
+       docker logs xrpld-service
+       exit 1
+     fi
+     ```
+   - Run: `npm run test:integration && npm run test:browser`
+   - Stop container: `docker stop xrpld-service` (auto-removed via `--rm`)
 4. npm run test:faucet
 
 If any step fails, **attempt to fix the breaking change with code modifications before rolling back**. Common patterns:
@@ -62,15 +69,15 @@ If a failure persists after investigation and you cannot identify a fix, roll ba
 
 Do NOT commit or create a PR. Instead, generate the following outputs for the human to use:
 
-1. **Code changes explanation** — write a markdown file (`.claude/skills/batch-deps-upgrade/code-changes.md`) documenting every non-package.json source code change, explaining what broke, why, and the minimal fix applied.
+1. **Code changes note** — write a markdown file (`.claude/skills/batch-deps-upgrade/code-changes.md`) documenting every non-package.json source code change, explaining what broke, why, and the minimal fix applied.
 
 2. **Commit message** — output a concise commit message the human can copy-paste into `git commit -m "..."`. Format: `chore(deps): quarterly batch dependency upgrade YYYY-QN` followed by a brief summary of upgrades, skips, and removals.
 
 3. **PR description** — write a markdown file (`.claude/skills/batch-deps-upgrade/pr-description.md`) following the repo's PR template (.github/pull_request_template.md):
    - For "Type of Change", determine dynamically:
-     - Check "Breaking change" if any production dependency has a major version bump
-     - Check "Refactor" if all upgrades are minor/patch or only affect devDependencies
-   - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, To, Status
-     - Status values: Upgraded, No-op (reason), Removed (unused per `knip`), Skipped (peer dep conflict / CI failure: error)
-   - Section listing any unused deps removed, with `knip` justification
+     - Check "Breaking change" ONLY if the upgrade visibly changes the library's public API (e.g., error messages, return types, removed functions). This aligns with whether a `HISTORY.md` entry was added in Step 2.6.
+     - Otherwise, do not check any Type of Change — dependency upgrades are maintenance and don't fit "Refactor" (which means restructuring code without behavior change). Note in the PR body that the upgrade is maintenance.
+   - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, To, Status, MajorVersionUpgrade
+     - Status values: Upgraded, No-op (reason), Skipped (peer dep conflict / CI failure: error)
+     - MajorVersionUpgrade: `No` if the major version number did not change. Otherwise `Yes` plus a link for each major version crossed. For example, 1.x → 3.x yields `Yes ([v2](url), [v3](url))`, and 7.x → 9.x yields `Yes ([v8](url), [v9](url))`. Each link should point to the package's release notes or changelog for that major version.
    - Closing instructions: "After merging, close the following PRs: #X, #Y, #Z"

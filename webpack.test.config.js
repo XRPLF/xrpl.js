@@ -34,6 +34,7 @@ function webpackForTest(testFileName, basePath) {
               loader: "ts-loader",
               options: {
                 compilerOptions: {
+                  target: "es2018",
                   lib: ["esnext", "dom"],
                   composite: false,
                   declaration: false,
