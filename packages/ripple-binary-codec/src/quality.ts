@@ -15,11 +15,11 @@ class quality {
   static encode(quality: string): Uint8Array {
     let decimal: BigNumber
     try {
-      decimal = BigNumber(quality)
+      decimal = new BigNumber(quality)
     } catch (_err) {
       throw new Error(`${quality} is not a valid quality`)
     }
-    const exponent = (decimal?.e || 0) - 15
+    const exponent = (decimal.e || 0) - 15
     const qualityString = decimal.times(`1e${-exponent}`).abs().toString()
     const bytes = coreTypes.UInt64.from(BigInt(qualityString)).toBytes()
     bytes[0] = exponent + 100
