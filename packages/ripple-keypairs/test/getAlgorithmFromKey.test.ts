@@ -46,18 +46,20 @@ describe('getAlgorithmFromKey', () => {
   it('should throw error for invalid private key format', () => {
     // Invalid tag and length
     const privateKey = `ff${hexData(60)}`
+    expect.assertions(2)
     try {
       getAlgorithmFromKey(privateKey, 'private')
     } catch (error: unknown) {
       if (error instanceof Error) {
+        expect(error.message).not.toContain(privateKey)
         expect(dedent(error.message)).toEqual(
           dedent(`invalid_key:
-  
+
         Type: private
-        Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        Prefix: 0xff 
+        Key: [redacted]
+        Prefix: 0xff
         Length: 31 bytes
-  
+
         Acceptable private formats are:
         ecdsa-secp256k1   - Prefix: None   Length: 32 bytes
         ecdsa-secp256k1   - Prefix: 0x00   Length: 33 bytes
@@ -80,7 +82,7 @@ describe('getAlgorithmFromKey', () => {
 
       Type: public
       Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      Prefix: 0xff 
+      Prefix: 0xff
       Length: 31 bytes
 
       Acceptable public formats are:
@@ -92,5 +94,20 @@ describe('getAlgorithmFromKey', () => {
         )
       }
     }
+  })
+
+  it('should redact private key material in error messages but not public keys', () => {
+    const invalidPrivateKey = `ff${hexData(60)}`
+    expect(() => getAlgorithmFromKey(invalidPrivateKey, 'private')).toThrow(
+      /Key: \[redacted\]/u,
+    )
+    expect(() => getAlgorithmFromKey(invalidPrivateKey, 'private')).not.toThrow(
+      new RegExp(invalidPrivateKey, 'u'),
+    )
+
+    const invalidPublicKey = `ff${hexData(60)}`
+    expect(() => getAlgorithmFromKey(invalidPublicKey, 'public')).toThrow(
+      new RegExp(`Key: ${invalidPublicKey}`, 'u'),
+    )
   })
 })
