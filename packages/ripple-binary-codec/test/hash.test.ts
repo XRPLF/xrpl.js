@@ -6,6 +6,7 @@ import {
   AccountID,
   Currency,
 } from '../src/types'
+import { compare } from '../src/utils'
 
 describe('Hash128', function () {
   it('has a static width member', function () {
@@ -23,6 +24,12 @@ describe('Hash128', function () {
     expect(h3.lt(h2)).toBe(true)
     expect(h2.gt(h1)).toBe(true)
     expect(h1.gt(h3)).toBe(true)
+  })
+  it('can be compared when only the last byte differs', function () {
+    const h1 = Hash128.from('00000000000000000000000000000001')
+    const h2 = Hash128.from('00000000000000000000000000000002')
+    expect(h1.lt(h2)).toBe(true)
+    expect(h1.eq(h2)).toBe(false)
   })
   it('throws when constructed from invalid hash length', () => {
     expect(() => Hash128.from('1000000000000000000000000000000')).toThrow(
@@ -124,10 +131,41 @@ describe('Hash256', function () {
     expect(h.nibblet(5)).toBe(0xd)
   })
 
+  it('can be compared when only the last byte differs', function () {
+    const h1 = Hash256.from(
+      '000000000000000000000000000000000000000000000000000000000000000A',
+    )
+    const h2 = Hash256.from(
+      '000000000000000000000000000000000000000000000000000000000000000F',
+    )
+    expect(h1.lt(h2)).toBe(true)
+    expect(h1.eq(h2)).toBe(false)
+  })
+
   it(`throws when constructed from non-hexadecimal string`, () => {
     expect(() => Hash256.from('Z'.repeat(64))).toThrow(
       new Error('Invalid hash string ' + 'Z'.repeat(64)),
     )
+  })
+})
+
+describe('compare()', function () {
+  it('detects differences in the last byte', function () {
+    const a = new Uint8Array([0x00, 0x00, 0x01])
+    const b = new Uint8Array([0x00, 0x00, 0x02])
+    expect(compare(a, b)).toBe(-1)
+  })
+
+  it('works with single-element arrays', function () {
+    const a = new Uint8Array([0x01])
+    const b = new Uint8Array([0xff])
+    expect(compare(a, b)).toBe(-1)
+  })
+
+  it('detects differences in non-last bytes', function () {
+    const a = new Uint8Array([0x00, 0x01, 0x00])
+    const b = new Uint8Array([0x00, 0x02, 0x00])
+    expect(compare(a, b)).toBe(-1)
   })
 })
 
