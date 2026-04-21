@@ -18,7 +18,7 @@ From the xrpl.js repo root, start a new Claude Code session and run:
 ## What it does
 
 1. Discovers all open Dependabot PRs via `gh pr list`
-2. Applies upgrades to package.json files, runs `knip` to detect unused/unlisted dependencies, runs `npm install`
+2. Applies upgrades to package.json files, runs `npm install`
 3. Validates with build, lint, unit tests, integration tests, browser tests and faucet tests
 4. Generates output files and a commit message for the human to use
 

@@ -39,7 +39,7 @@ Run the full test suite in order:
    - Pre-run cleanup (in case a previous run left a container behind): `docker rm -f xrpld-service 2>/dev/null || true`
    - Start the container: `docker run --detach --rm --publish 6006:6006 --volume "$PWD/.ci-config:/etc/opt/xrpld/" --name xrpld-service rippleci/xrpld:develop --standalone`
    - Wait for port 6006 with a bounded timeout and halt on failure:
-     ```
+     ```bash
      SECONDS=0
      until nc -z localhost 6006 || [ $SECONDS -gt 120 ]; do sleep 2; done
      if ! nc -z localhost 6006; then
@@ -79,5 +79,5 @@ Do NOT commit or create a PR. Instead, generate the following outputs for the hu
      - Otherwise, do not check any Type of Change — dependency upgrades are maintenance and don't fit "Refactor" (which means restructuring code without behavior change). Note in the PR body that the upgrade is maintenance.
    - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, To, Status, MajorVersionUpgrade
      - Status values: Upgraded, No-op (reason), Skipped (peer dep conflict / CI failure: error)
-     - MajorVersionUpgrade: `No` if the major version number did not change. Otherwise `Yes` plus a link for each major version crossed. For example, 1.x → 3.x yields `Yes ([v2](url), [v3](url))`, and 7.x → 9.x yields `Yes ([v8](url), [v9](url))`. Each link should point to the package's release notes or changelog for that major version.
+     - MajorVersionUpgrade: `No` if the major version number did not change. Otherwise `Yes` plus a link for each major version crossed. For example, 7.x → 9.x yields `Yes ([v8](url), [v9](url))`. Each link should point to the package's release notes or changelog for that major version. Verify each link returns HTTP 200 and has meaningful content (e.g., `curl -sL -o /dev/null -w "%{http_code}" <url>`); if a package doesn't publish per-version GitHub releases (e.g., TypeScript sometimes skips `x.0.0`/`x.0.1` tags, bignumber.js puts details in CHANGELOG.md), fall back to the CHANGELOG.md file or the closest valid release tag.
    - Closing instructions: "After merging, close the following PRs: #X, #Y, #Z"
