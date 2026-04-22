@@ -4,12 +4,16 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES:
+* `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+
 ### Added
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
 
 ### Fixed
 * Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. The fix cleans up stale listeners from previous reconnect attempts to prevent duplicate event emissions on flaky connections with multiple sequential reconnect attempts.
 * Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
+* Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
 
 ## 4.6.0 (2026-02-12)
 
