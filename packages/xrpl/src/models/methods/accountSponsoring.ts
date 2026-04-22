@@ -1,3 +1,4 @@
+import { AccountObjectType } from './accountObjects'
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
 
 /**
@@ -36,6 +37,16 @@ export interface AccountSponsoringRequest
    * This is the sponsor account whose sponsorships will be returned.
    */
   account: string
+  /**
+   * If true, the response only includes sponsored objects that would block the
+   * sponsored account from being deleted. The default is false.
+   */
+  deletion_blockers_only?: boolean
+  /**
+   * If included, filter results to include only sponsored objects of this
+   * ledger entry type.
+   */
+  type?: AccountObjectType
   /**
    * The maximum number of sponsored accounts to include in the results. Must be
    * within the inclusive range 10 to 400 on non-admin connections. The default

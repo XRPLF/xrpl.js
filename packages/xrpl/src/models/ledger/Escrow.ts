@@ -74,4 +74,11 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    * Used when the issuer is neither the source nor destination account.
    */
   IssuerNode?: number
+
+  /**
+   * The account sponsoring the reserve for this Escrow. If present, the
+   * sponsor is responsible for the reserve requirement of this object instead
+   * of the owner.
+   */
+  Sponsor?: string
 }

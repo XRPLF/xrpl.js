@@ -94,4 +94,10 @@ export default interface PayChannel extends BaseLedgerEntry, HasPreviousTxnID {
    * this object, in case the directory consists of multiple pages.
    */
   DestinationNode?: string
+  /**
+   * The account sponsoring the reserve for this PayChannel. If present, the
+   * sponsor is responsible for the reserve requirement of this object instead
+   * of the owner.
+   */
+  Sponsor?: string
 }
