@@ -51,10 +51,6 @@ export function decimalToTransferRate(decimal: string): number {
     return 0
   }
 
-  if (billionths === 'NaN') {
-    throw new ValidationError(`Value is not a number`)
-  }
-
   if (billionths.includes('.')) {
     throw new ValidationError(`Decimal exceeds maximum precision.`)
   }
@@ -94,10 +90,6 @@ export function decimalToQuality(decimal: string): number {
   }
 
   const billionths = rate.toString(BASE_TEN)
-
-  if (billionths === 'NaN') {
-    throw new ValidationError(`Value is not a number`)
-  }
 
   if (billionths.includes('-')) {
     throw new ValidationError('Cannot have negative Quality')
