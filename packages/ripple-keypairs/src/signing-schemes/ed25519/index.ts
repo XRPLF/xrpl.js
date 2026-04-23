@@ -1,5 +1,5 @@
-import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519'
-import { bytesToHex } from '@xrplf/isomorphic/utils'
+import { ed25519 as nobleEd25519 } from '@noble/curves/ed25519.js'
+import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
 
 import type { HexString, SigningScheme } from '../../types'
 import assert from '../../utils/assert'
@@ -25,7 +25,9 @@ const ed25519: SigningScheme = {
       privateKey.length === 66,
       'private key must be 33 bytes including prefix',
     )
-    return bytesToHex(nobleEd25519.sign(message, privateKey.slice(2)))
+    return bytesToHex(
+      nobleEd25519.sign(message, hexToBytes(privateKey.slice(2))),
+    )
   },
 
   verify(
@@ -39,10 +41,10 @@ const ed25519: SigningScheme = {
       'public key must be 33 bytes including prefix',
     )
     return nobleEd25519.verify(
-      signature,
+      hexToBytes(signature),
       message,
       // Remove the 0xED prefix
-      publicKey.slice(2),
+      hexToBytes(publicKey.slice(2)),
       // By default, set zip215 to false for compatibility reasons.
       // ZIP 215 is a stricter Ed25519 signature verification scheme.
       // However, setting it to false adheres to the more commonly used
