@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@xrplf/isomorphic": "^1.0.1",
-    "bignumber.js": "^10.0.2",
+    "bignumber.js": "^11.0.0",
     "ripple-address-codec": "^5.0.0"
   },
   "scripts": {
