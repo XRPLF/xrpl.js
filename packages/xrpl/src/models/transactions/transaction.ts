@@ -331,8 +331,11 @@ export function validate(
       // @ts-expect-error -- already checked
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
       tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
-        validate(innerTx.RawTransaction as Record<string, unknown>)
+        validate(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+          innerTx.RawTransaction as Record<string, unknown>,
+          customDefinitions,
+        )
       })
       break
 

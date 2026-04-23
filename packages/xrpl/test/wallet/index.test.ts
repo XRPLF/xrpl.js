@@ -1219,7 +1219,7 @@ describe('Wallet', function () {
       }, /URI must be in hex format/u)
     })
 
-    it('sign succeeds when a custom definition is passed', async function () {
+    it('sign non-batch tx succeeds when a custom definition is passed', async function () {
       const customDefinition = new XrplDefinitions(
         rippled.definitions.customDefinition,
       )
@@ -1248,6 +1248,46 @@ describe('Wallet', function () {
         tx_blob: RESPONSE_FIXTURES.signCustomDefinition.signedTransaction,
         hash: RESPONSE_FIXTURES.signCustomDefinition.id,
       })
+    })
+
+    it('sign batch tx succeeds when a custom definition is passed', async function () {
+      const customDefinition = new XrplDefinitions(
+        rippled.definitions.customDefinition,
+      )
+      const tx = {
+        Account: wallet.address,
+        TransactionType: 'Batch',
+        Flags: 0,
+        Sequence: 33626,
+        Fee: '10',
+        RawTransactions: [
+          {
+            RawTransaction: {
+              TransactionType: 'TokenSwapPropose',
+              Account: wallet.address,
+              Flags: 0x40000000,
+              Sequence: 33627,
+              Fee: '0',
+              AccountOther: 'rJyZ28c179hKg7Gwt4P2S8zgzUTmMUMmzs',
+              Expiration: 773819038,
+              Amount: {
+                currency: 'AAA',
+                issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+                value: '1',
+              },
+              AmountOther: {
+                currency: 'BBB',
+                issuer: 'rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT',
+                value: '1',
+              },
+            },
+          },
+        ],
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- for unknown transaction
+      const result = wallet.sign(tx as any, false, customDefinition)
+      assert.isDefined(result.hash)
+      assert.isDefined(result.tx_blob)
     })
 
     it('sign fails when a custom definition is passed and the transaction type is not included in it', async function () {
