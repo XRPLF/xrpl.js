@@ -79,6 +79,10 @@ jobs:
 
       - run: npm run build
       - run: npm run lint
+      - name: Validate definitions.json
+        run: npm run validateDefinitions --workspace ripple-binary-codec
+        env:
+          GH_TOKEN: ${{ github.token }}
 
   unit:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_unit_tests != false }}
