@@ -2,7 +2,8 @@
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'eventemitter3'
-import { XrplDefinitionsBase } from 'ripple-binary-codec'
+import { XrplDefinitions, XrplDefinitionsBase } from 'ripple-binary-codec'
+import type { DefinitionsData } from 'ripple-binary-codec/dist/enums/xrpl-definitions-base'
 
 import {
   RippledError,
@@ -637,6 +638,14 @@ class Client extends EventEmitter<EventTypes> {
    */
   public isConnected(): boolean {
     return this.connection.isConnected()
+  }
+
+  public async getDefinitions(): Promise<void> {
+    const response = await this.request({
+      command: 'server_definitions',
+    })
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- response.result is the DefinitionsData
+    this.definitions = new XrplDefinitions(response.result as DefinitionsData)
   }
 
   /**
