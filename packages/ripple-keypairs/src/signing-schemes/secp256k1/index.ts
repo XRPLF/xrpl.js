@@ -1,5 +1,5 @@
-import { numberToBytesBE } from '@noble/curves/abstract/utils'
-import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1'
+import { numberToBytesBE } from '@noble/curves/utils.js'
+import { secp256k1 as nobleSecp256k1 } from '@noble/curves/secp256k1.js'
 import { bytesToHex, hexToBytes } from '@xrplf/isomorphic/utils'
 
 import type {
@@ -26,7 +26,9 @@ const secp256k1: SigningScheme = {
     const privateKey =
       SECP256K1_PREFIX + bytesToHex(numberToBytesBE(derived, 32))
 
-    const publicKey = bytesToHex(nobleSecp256k1.getPublicKey(derived, true))
+    const publicKey = bytesToHex(
+      nobleSecp256k1.getPublicKey(numberToBytesBE(derived, 32), true),
+    )
     return { privateKey, publicKey }
   },
 
@@ -40,15 +42,18 @@ const secp256k1: SigningScheme = {
     )
     const normedPrivateKey =
       privateKey.length === 66 ? privateKey.slice(2) : privateKey
-    return nobleSecp256k1
-      .sign(Sha512.half(message), normedPrivateKey, {
+    return bytesToHex(
+      nobleSecp256k1.sign(Sha512.half(message), hexToBytes(normedPrivateKey), {
         // "Canonical" signatures
         lowS: true,
         // Would fail tests if signatures aren't deterministic
         extraEntropy: undefined,
-      })
-      .toDERHex()
-      .toUpperCase()
+        format: 'der',
+        // We pass a pre-hashed message (Sha512Half), so disable secp256k1's
+        // default SHA-256 prehashing (added as default in @noble/curves 2.0.0)
+        prehash: false,
+      }),
+    ).toUpperCase()
   },
 
   verify(
@@ -56,11 +61,12 @@ const secp256k1: SigningScheme = {
     signature: HexString,
     publicKey: HexString,
   ): boolean {
-    const decoded = nobleSecp256k1.Signature.fromDER(signature)
+    const decoded = nobleSecp256k1.Signature.fromHex(signature, 'der')
     return nobleSecp256k1.verify(
-      decoded.toCompactRawBytes(),
+      decoded.toBytes('compact'),
       Sha512.half(message),
       hexToBytes(publicKey),
+      { prehash: false },
     )
   },
 }

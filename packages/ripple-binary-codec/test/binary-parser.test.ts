@@ -45,6 +45,16 @@ function basicApiTests() {
     const parser = makeParser('FFFFFFFF')
     expect(parser.readUInt32()).toEqual(0xffffffff)
   })
+  it('rejects negative skip values', () => {
+    const parser = makeParser('00010203040506')
+    expect(() => parser.skip(-1)).toThrow(new Error('skip: negative length -1'))
+  })
+  it('rejects negative read values', () => {
+    const parser = makeParser('00010203040506')
+    // read(-1) should throw, not silently return slice(0, -1) which
+    // strips the last byte and corrupts parser state via skip(-1)
+    expect(() => parser.read(-1)).toThrow(new Error('read: negative length -1'))
+  })
 }
 
 function transactionParsingTests() {

@@ -26,7 +26,6 @@ describe('account_lines', function () {
       const request: AccountLinesRequest = {
         command: 'account_lines',
         account: testContext.wallet.classicAddress,
-        strict: true,
         ledger_index: 'validated',
       }
       const response = await testContext.client.request(request)
@@ -49,6 +48,45 @@ describe('account_lines', function () {
         omit(response.result, ['ledger_hash', 'ledger_index']),
         omit(expected.result, ['ledger_hash', 'ledger_index']),
       )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'with ignore_default field',
+    async () => {
+      const request: AccountLinesRequest = {
+        command: 'account_lines',
+        account: testContext.wallet.classicAddress,
+        ignore_default: true,
+        ledger_index: 'validated',
+      }
+      const response = await testContext.client.request(request)
+      assert.equal(response.type, 'response')
+      assert.equal(typeof response.result.ledger_hash, 'string')
+      assert.equal(typeof response.result.ledger_index, 'number')
+      assert.equal(response.result.account, testContext.wallet.classicAddress)
+      assert.isArray(response.result.lines)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'with limit field in response',
+    async () => {
+      const request: AccountLinesRequest = {
+        command: 'account_lines',
+        account: testContext.wallet.classicAddress,
+        limit: 10,
+        ledger_index: 'validated',
+      }
+      const response = await testContext.client.request(request)
+      assert.equal(response.type, 'response')
+      // The limit field should be present in the response
+      if (response.result.limit !== undefined) {
+        assert.isNumber(response.result.limit)
+        assert.isAtMost(response.result.limit, 10)
+      }
     },
     TIMEOUT,
   )

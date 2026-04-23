@@ -4,7 +4,7 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
+  XRPLD_DOCKER_IMAGE: rippleci/xrpld:develop
   GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
@@ -141,7 +141,12 @@ jobs:
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/ripple/" --name rippled-service --health-cmd="rippled server_info || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true --entrypoint bash ${{ env.RIPPLED_DOCKER_IMAGE }} -c "mkdir -p /var/lib/rippled/db/ && rippled -a"
+          docker run \
+            --detach \
+            --publish 6006:6006 \
+            --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/xrpld/" \
+            --name xrpld-service \
+            ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -177,7 +182,7 @@ jobs:
 
       - name: Stop docker container
         if: always()
-        run: docker stop rippled-service
+        run: docker logs xrpld-service && docker stop xrpld-service
 
   browser:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_browser_tests != false }}
@@ -201,7 +206,12 @@ jobs:
 
       - name: Run docker in background
         run: |
-          docker run --detach --rm -p 6006:6006 --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/ripple/" --name rippled-service --health-cmd="rippled server_info || exit 1" --health-interval=5s --health-retries=10 --health-timeout=2s --env GITHUB_ACTIONS=true --env CI=true --entrypoint bash ${{ env.RIPPLED_DOCKER_IMAGE }} -c "mkdir -p /var/lib/rippled/db/ && rippled -a"
+          docker run \
+            --detach \
+            --publish 6006:6006 \
+            --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/xrpld/" \
+            --name xrpld-service \
+            ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
 
       - name: Setup npm version 10
         run: |
@@ -232,4 +242,4 @@ jobs:
 
       - name: Stop docker container
         if: always()
-        run: docker stop rippled-service
+        run: docker logs xrpld-service && docker stop xrpld-service

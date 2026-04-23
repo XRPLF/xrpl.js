@@ -28,7 +28,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@noble/hashes": "^1.0.0",
+    "@noble/hashes": "^2.0.1",
     "eventemitter3": "5.0.1",
     "ws": "^8.17.1"
   },

@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES:
+* `ED25519` is the default signing-algorithm for the default construction of Accounts. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+
 ## 2.0.0 (2025-07-29)
 
 ### BREAKING CHANGES:

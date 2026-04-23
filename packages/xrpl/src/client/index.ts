@@ -260,6 +260,16 @@ class Client extends EventEmitter<EventTypes> {
       )
     }
 
+    if (
+      options.authorization != null &&
+      !server.startsWith('wss://') &&
+      !server.startsWith('wss+unix://')
+    ) {
+      throw new ValidationError(
+        'Authorization Credentials cannot be sent over an unencrypted connection. Use wss:// or wss+unix:// instead.',
+      )
+    }
+
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
 
@@ -270,7 +280,12 @@ class Client extends EventEmitter<EventTypes> {
     })
 
     this.connection.on('reconnect', () => {
-      this.connection.on('connected', () => this.emit('connected'))
+      // Remove any stale 'connected' listeners from previous reconnect attempts
+      // to prevent duplicate event emissions (N+1 listener accumulation)
+      this.connection.removeAllListeners('connected')
+
+      // Use .once() so the listener auto-removes after firing
+      this.connection.once('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {

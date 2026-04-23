@@ -463,7 +463,7 @@ describe('Connection', function () {
     'reconnect on unexpected close',
     async () => {
       const connectedPromise = new Promise<void>((resolve) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           resolve()
         })
       })
@@ -509,7 +509,7 @@ describe('Connection', function () {
       const num = 3
 
       const connectedPromise = new Promise<void>((resolve, reject) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           connectsCount += 1
           if (connectsCount < num) {
             breakConnection()
@@ -671,6 +671,26 @@ describe('Connection', function () {
       // @ts-expect-error -- Testing private member
       clientContext.client.connection.ws.close()
       await connectedPromise
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'should not accumulate connected listeners after multiple reconnects',
+    async () => {
+      // Simulate multiple reconnect events
+      for (let iter = 0; iter < 5; iter++) {
+        clientContext.client.connection.emit('reconnect')
+      }
+
+      // There should be at most 1 'connected' listener on the connection,
+      // not 5 (which would indicate listener accumulation / leak)
+      const count = clientContext.client.connection.listenerCount('connected')
+      assert.strictEqual(
+        count,
+        1,
+        `Expected exactly 1 'connected' listener but found ${count}`,
+      )
     },
     TIMEOUT,
   )

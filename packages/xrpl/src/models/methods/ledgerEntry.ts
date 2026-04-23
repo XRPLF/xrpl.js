@@ -230,17 +230,60 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   }
 }
 
+export type LedgerEntryBinaryRequest = LedgerEntryRequest & {
+  binary: true
+}
+
+export type LedgerEntryJsonRequest = LedgerEntryRequest & {
+  binary?: false
+}
+
+interface LedgerEntryResponseResultBase {
+  /** The unique ID of this ledger object. */
+  index: string
+  /** The ledger index of the ledger that was used when retrieving this data. */
+  ledger_current_index: number
+  validated?: boolean
+  /**
+   * (Optional) Indicates the ledger index at which the object was deleted.
+   */
+  deleted_ledger_index?: number
+}
+
+/**
+ * Response expected from a {@link LedgerEntryRequest} with binary: true.
+ *
+ * @category Responses
+ */
+export interface LedgerEntryBinaryResponse extends BaseResponse {
+  result: LedgerEntryResponseResultBase & {
+    /** The binary representation of the ledger object, as hexadecimal. */
+    node_binary: string
+  }
+}
+
+/**
+ * Response expected from a {@link LedgerEntryRequest} with binary: false or omitted.
+ *
+ * @category Responses
+ */
+export interface LedgerEntryJsonResponse<T = LedgerEntry> extends BaseResponse {
+  result: LedgerEntryResponseResultBase & {
+    /**
+     * Object containing the data of this ledger object, according to the
+     * ledger format.
+     */
+    node: T
+  }
+}
+
 /**
  * Response expected from a {@link LedgerEntryRequest}.
  *
  * @category Responses
  */
 export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
-  result: {
-    /** The unique ID of this ledger object. */
-    index: string
-    /** The ledger index of the ledger that was used when retrieving this data. */
-    ledger_current_index: number
+  result: LedgerEntryResponseResultBase & {
     /**
      * Object containing the data of this ledger object, according to the
      * ledger format.
@@ -248,10 +291,5 @@ export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
     node?: T
     /** The binary representation of the ledger object, as hexadecimal. */
     node_binary?: string
-    validated?: boolean
-    /**
-     * (Optional) Indicates the ledger index at which the object was deleted.
-     */
-    deleted_ledger_index?: number
   }
 }

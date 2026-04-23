@@ -1,4 +1,4 @@
-import { ripemd160 as nobleImpl } from '@noble/hashes/ripemd160'
+import { ripemd160 as nobleImpl } from '@noble/hashes/legacy.js'
 
 import wrapNoble from '../internal/wrapNoble'
 

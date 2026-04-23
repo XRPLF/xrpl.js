@@ -64,20 +64,25 @@ From the top-level xrpl.js folder (one level above `packages`), run the followin
 ```bash
 npm install
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'mkdir -p /var/lib/rippled/db/ && rippled -a'
+docker run \
+  --detach \
+  --publish 6006:6006 \
+  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --name xrpld-service \
+  rippleci/xrpld:develop --standalone
 npm run build
 npm run test:integration
 ```
 
 Breaking down the command:
-* `docker run -p 6006:6006` starts a Docker container with an open port for admin WebSocket requests.
- `--rm` tells docker to close the container after processes are done running.
-* `-it` allows you to interact with the container.
-   `--name rippled_standalone` is an instance name for clarity
-* `--volume $PWD/.ci-config:/etc/opt/ripple/` identifies the `rippled.cfg` and `validators.txt` to import. It must be an absolute path, so we use `$PWD` instead of `./`.
-* `rippleci/rippled` is an image that is regularly updated with the latest `rippled` releases
-* `--entrypoint bash rippleci/rippled:develop` manually overrides the entrypoint (for the latest version of rippled on the `develop` branch)
-*  `-c 'rippled -a'` provides the bash command to start `rippled` in standalone mode from the manual entrypoint
+* `--detach` runs the container in the background so the terminal stays free.
+* `--publish 6006:6006` exposes the admin WebSocket port on the host.
+* `--volume "$PWD/.ci-config:/etc/opt/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
+* `--name xrpld-service` names the container — this is the label shown by `docker ps` / `docker stats`.
+* `rippleci/xrpld:develop` is the image, regularly rebuilt from the `develop` branch of `rippled`. Omitting the tag resolves to `:latest`.
+* `--standalone` is passed to the image's entrypoint (`xrpld`) to start the node in standalone mode.
+
+Note to Contributors: When you're done, stop and remove the container with `docker stop xrpld-service && docker rm xrpld-service`.
 
 ### Faucet Tests
 
@@ -106,7 +111,13 @@ This should be run from the `xrpl.js` top level folder (one above the `packages`
 ```bash
 npm run build
 # sets up the rippled standalone Docker container - you can skip this step if you already have it set up
-docker run  -p 6006:6006 --rm -it --name rippled_standalone --volume $PWD/.ci-config:/etc/opt/ripple/ --entrypoint bash rippleci/rippled:develop -c 'rippled -a'
+# (see the Integration Tests section above for a breakdown of this command)
+docker run \
+  --detach \
+  --publish 6006:6006 \
+  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --name xrpld-service \
+  rippleci/xrpld:develop --standalone
 npm run test:browser
 ```
 
