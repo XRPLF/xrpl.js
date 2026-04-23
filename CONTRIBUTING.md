@@ -177,11 +177,12 @@ This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
 ## Updating `definitions.json`
 
-This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js) - if the output needs manual intervention afterwards, consider updating the script instead.
+This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js), which downloads `server_definitions.json` from [rippled](https://github.com/XRPLF/rippled) CI artifacts and saves it as `definitions.json`. Requires the [GitHub CLI (`gh`)](https://cli.github.com/) to be installed and authenticated.
 
-1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
-2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
-3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
+1. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js` (defaults to the `develop` branch).
+2. Verify that the changes make sense by inspection before submitting.
+
+Run with `--help` for additional options (e.g. specifying a branch or pull request number).
 
 ## Adding and removing packages
 

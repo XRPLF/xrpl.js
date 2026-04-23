@@ -1,413 +1,269 @@
-if (process.argv.length != 3 && process.argv.length != 4) {
-  console.error(
-    'Usage: ' +
-      process.argv[0] +
-      ' ' +
-      process.argv[1] +
-      ' path/to/rippled [path/to/pipe/to]',
+const { execSync } = require('child_process')
+const path = require('path')
+const fs = require('fs')
+const os = require('os')
+
+const UPSTREAM_REPO = 'XRPLF/rippled'
+const ARTIFACT_NAME = 'server-definitions'
+
+function usage() {
+  console.log(
+    `Usage: node ${path.basename(process.argv[1])} [options] [output_path]
+
+Downloads server_definitions.json from rippled CI artifacts and saves it as definitions.json.
+
+Requires the GitHub CLI (gh) to be installed and authenticated.
+  https://cli.github.com/
+
+Options:
+  --branch <name>   Branch name (default: develop)
+                    Use "owner:branch" for fork branches (e.g. "contributor:my-feature")
+  --pr <number>     Pull request number
+  -h, --help        Show this help message
+
+Examples:
+  node ${path.basename(process.argv[1])}
+  node ${path.basename(process.argv[1])} --branch develop
+  node ${path.basename(process.argv[1])} --pr 6858
+  node ${path.basename(process.argv[1])} --branch contributor:ct-extensive-tests-clean
+  node ${path.basename(process.argv[1])} --branch feature-branch ./custom-output.json`,
   )
-  process.exit(1)
+  process.exit(0)
 }
 
-////////////////////////////////////////////////////////////////////////
-//  Get all necessary files from rippled
-////////////////////////////////////////////////////////////////////////
-const path = require('path')
-const fs = require('fs/promises')
+function parseArgs() {
+  const args = process.argv.slice(2)
+  let branch = 'develop'
+  let prNumber = null
+  let outputFile = path.join(__dirname, '../src/enums/definitions.json')
 
-async function readFileFromGitHub(repo, filename) {
-  if (!repo.includes('tree')) {
-    repo += '/tree/HEAD'
-  }
-  let url = repo.replace('github.com', 'raw.githubusercontent.com')
-  url = url.replace('tree/', '')
-  url += '/' + filename
-
-  if (!url.startsWith('http')) {
-    url = 'https://' + url
-  }
-
-  try {
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`)
+  for (let i = 0; i < args.length; i++) {
+    switch (args[i]) {
+      case '--branch':
+        branch = args[++i]
+        if (!branch) {
+          console.error('Error: --branch requires a branch name')
+          process.exit(1)
+        }
+        break
+      case '--pr':
+        prNumber = args[++i]
+        if (!prNumber) {
+          console.error('Error: --pr requires a pull request number')
+          process.exit(1)
+        }
+        break
+      case '-h':
+      case '--help':
+        usage()
+        break
+      default:
+        outputFile = args[i]
     }
-    return await response.text()
-  } catch (e) {
-    console.error(`Error reading ${url}: ${e.message}`)
+  }
+
+  // Parse "owner:branch" format for fork branches
+  let forkOwner = null
+  if (!prNumber && branch.includes(':')) {
+    const colonIndex = branch.indexOf(':')
+    forkOwner = branch.substring(0, colonIndex)
+    branch = branch.substring(colonIndex + 1)
+  }
+
+  return { branch, forkOwner, prNumber, outputFile }
+}
+
+function exec(cmd) {
+  return execSync(cmd, { encoding: 'utf-8' }).trim()
+}
+
+function checkGhCli() {
+  try {
+    execSync('gh --version', { stdio: 'ignore' })
+  } catch {
+    console.error(
+      'Error: GitHub CLI (gh) is required but not found.\n' +
+        'Install from https://cli.github.com/',
+    )
     process.exit(1)
   }
 }
 
-async function readFile(folder, filename) {
-  const filePath = path.join(folder, filename)
+function getPRInfo(prNumber) {
   try {
-    return await fs.readFile(filePath, 'utf-8')
-  } catch (e) {
-    throw new Error(`File not found: ${filePath}, ${e.message}`)
+    return JSON.parse(
+      exec(
+        `gh pr view ${prNumber} --repo ${UPSTREAM_REPO} --json headRefName,headRefOid`,
+      ),
+    )
+  } catch {
+    console.error(`Error: Could not find PR #${prNumber} in ${UPSTREAM_REPO}`)
+    process.exit(1)
   }
 }
 
-const read = (() => {
+function findPRForForkBranch(forkOwner, branch) {
   try {
-    const url = new URL(process.argv[2])
-    return url.hostname === 'github.com' ? readFileFromGitHub : readFile
+    const result = exec(
+      `gh pr list --repo ${UPSTREAM_REPO} --head "${forkOwner}:${branch}" --json number,headRefOid --limit 1`,
+    )
+    const prs = JSON.parse(result)
+    if (prs.length > 0) {
+      return prs[0]
+    }
   } catch {
-    return readFile // Default to readFile if process.argv[2] is not a valid URL
+    // No PR found
   }
-})()
+  return null
+}
 
-async function main() {
-  const sfieldHeaderFile = await read(
-    process.argv[2],
-    'include/xrpl/protocol/SField.h',
-  )
-  const sfieldMacroFile = await read(
-    process.argv[2],
-    'include/xrpl/protocol/detail/sfields.macro',
-  )
-  const ledgerFormatsMacroFile = await read(
-    process.argv[2],
-    'include/xrpl/protocol/detail/ledger_entries.macro',
-  )
-  const terFile = await read(process.argv[2], 'include/xrpl/protocol/TER.h')
-  const transactionsMacroFile = await read(
-    process.argv[2],
-    'include/xrpl/protocol/detail/transactions.macro',
-  )
-
-  const capitalizationExceptions = {
-    XCHAIN: 'XChain',
-  }
-
-  // Translate from rippled string format to what the binary codecs expect
-  function translate(inp) {
+function findFirstRunWithArtifact(repo, runIds) {
+  for (const runId of runIds) {
     try {
-      if (inp.match(/^UINT/m))
-        if (
-          inp.match(/256/m) ||
-          inp.match(/160/m) ||
-          inp.match(/128/m) ||
-          inp.match(/192/m)
-        )
-          return inp.replace('UINT', 'Hash')
-        else return inp.replace('UINT', 'UInt')
-
-      const nonstandardRenames = {
-        OBJECT: 'STObject',
-        ARRAY: 'STArray',
-        AMM: 'AMM',
-        ACCOUNT: 'AccountID',
-        LEDGERENTRY: 'LedgerEntry',
-        NOTPRESENT: 'NotPresent',
-        PATHSET: 'PathSet',
-        VL: 'Blob',
-        DIR_NODE: 'DirectoryNode',
-        PAYCHAN: 'PayChannel',
+      const match = exec(
+        `gh api "repos/${repo}/actions/runs/${runId}/artifacts" --jq '.artifacts[] | select(.name == "${ARTIFACT_NAME}") | .name'`,
+      )
+      if (match === ARTIFACT_NAME) {
+        return runId
       }
-      if (nonstandardRenames[inp] != null) return nonstandardRenames[inp]
-
-      const parts = inp.split('_')
-      let result = ''
-      for (x in parts)
-        if (capitalizationExceptions[parts[x]] != null) {
-          result += capitalizationExceptions[parts[x]]
-        } else
-          result +=
-            parts[x].substr(0, 1).toUpperCase() +
-            parts[x].substr(1).toLowerCase()
-      return result
-    } catch (e) {
-      console.error(e, 'inp="' + inp + '"')
+    } catch {
+      // This run doesn't have the artifact, try the next one
     }
   }
+  return null
+}
 
-  let output = ''
-  function addLine(line) {
-    output += line + '\n'
-  }
-
-  function sorter(a, b) {
-    if (a < b) return -1
-    if (a > b) return 1
-    return 0
-  }
-
-  addLine('{')
-
-  // process STypes
-  let stypeHits = [
-    ...sfieldHeaderFile.matchAll(
-      /^ *STYPE\(STI_([^ ]*?)[ \n]*,[ \n]*([0-9-]+)[ \n]*\)[ \n]*\\?$/gm,
-    ),
-  ]
-  if (stypeHits.length === 0)
-    stypeHits = [
-      ...sfieldHeaderFile.matchAll(
-        /^ *STI_([^ ]*?)[ \n]*=[ \n]*([0-9-]+)[ \n]*,?$/gm,
-      ),
-    ]
-  const stypeMap = {}
-  stypeHits.forEach(([_, key, value]) => {
-    stypeMap[key] = value
-  })
-
-  ////////////////////////////////////////////////////////////////////////
-  //  SField processing
-  ////////////////////////////////////////////////////////////////////////
-  addLine('  "FIELDS": [')
-  // The ones that are harder to parse directly from SField.cpp
-  addLine(`    [
-      "Generic",
-      {
-        "isSerialized": false,
-        "isSigningField": false,
-        "isVLEncoded": false,
-        "nth": 0,
-        "type": "Unknown"
-      }
-    ],
-    [
-      "Invalid",
-      {
-        "isSerialized": false,
-        "isSigningField": false,
-        "isVLEncoded": false,
-        "nth": -1,
-        "type": "Unknown"
-      }
-    ],
-    [
-      "ObjectEndMarker",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 1,
-        "type": "STObject"
-      }
-    ],
-    [
-      "ArrayEndMarker",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 1,
-        "type": "STArray"
-      }
-    ],
-    [
-      "taker_gets_funded",
-      {
-        "isSerialized": false,
-        "isSigningField": false,
-        "isVLEncoded": false,
-        "nth": 258,
-        "type": "Amount"
-      }
-    ],
-    [
-      "taker_pays_funded",
-      {
-        "isSerialized": false,
-        "isSigningField": false,
-        "isVLEncoded": false,
-        "nth": 259,
-        "type": "Amount"
-      }
-    ],`)
-
-  const isVLEncoded = (t) => {
-    if (t == 'VL' || t == 'ACCOUNT' || t == 'VECTOR256') return 'true'
-    return 'false'
-  }
-
-  const isSerialized = (t, field) => {
-    if (
-      t == 'LEDGERENTRY' ||
-      t == 'TRANSACTION' ||
-      t == 'VALIDATION' ||
-      t == 'METADATA'
-    )
-      return 'false'
-    if (field == 'hash' || field == 'index') return 'false'
-    return 'true'
-  }
-
-  const isSigningField = (t, notSigningField) => {
-    if (notSigningField == 'notSigning') return 'false'
-    if (
-      t == 'LEDGERENTRY' ||
-      t == 'TRANSACTION' ||
-      t == 'VALIDATION' ||
-      t == 'METADATA'
-    )
-      return 'false'
-    return 'true'
-  }
-
-  // Parse SField.cpp for all the SFields and their serialization info
-  let sfieldHits = [
-    ...sfieldMacroFile.matchAll(
-      /^ *[A-Z]*TYPED_SFIELD[ \n]*\([ \n]*sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
-    ),
-  ]
-  sfieldHits.push(
-    ...[
-      ['', 'hash', 'UINT256', '257', '', 'notSigning'],
-      ['', 'index', 'UINT256', '258', '', 'notSigning'],
-    ],
-  )
-  sfieldHits.sort((a, b) => {
-    const aValue = parseInt(stypeMap[a[2]]) * 2 ** 16 + parseInt(a[3])
-    const bValue = parseInt(stypeMap[b[2]]) * 2 ** 16 + parseInt(b[3])
-    return aValue - bValue // Ascending order
-  })
-  for (let x = 0; x < sfieldHits.length; ++x) {
-    addLine('    [')
-    addLine('      "' + sfieldHits[x][1] + '",')
-    addLine('      {')
-    addLine(
-      '        "isSerialized": ' +
-        isSerialized(sfieldHits[x][2], sfieldHits[x][1]) +
-        ',',
-    )
-    addLine(
-      '        "isSigningField": ' +
-        isSigningField(sfieldHits[x][2], sfieldHits[x][5]) +
-        ',',
-    )
-    addLine('        "isVLEncoded": ' + isVLEncoded(sfieldHits[x][2]) + ',')
-    addLine('        "nth": ' + sfieldHits[x][3] + ',')
-    addLine('        "type": "' + translate(sfieldHits[x][2]) + '"')
-    addLine('      }')
-    addLine('    ]' + (x < sfieldHits.length - 1 ? ',' : ''))
-  }
-
-  addLine('  ],')
-
-  ////////////////////////////////////////////////////////////////////////
-  //  Ledger entry type processing
-  ////////////////////////////////////////////////////////////////////////
-  addLine('  "LEDGER_ENTRY_TYPES": {')
-
-  const unhex = (x) => {
-    x = ('' + x).trim()
-    if (x.substr(0, 2) == '0x') return '' + parseInt(x)
-    if (x.substr(0, 1) == "'" && x.length == 3) return x.charCodeAt(1)
-    return x
-  }
-  hits = [
-    ...ledgerFormatsMacroFile.matchAll(
-      /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+[ \n]*,[ \n]*([x0-9a-f]+)[ \n]*,[ \n]*([^,]+),[ \n]*([^,]+), \({$/gm,
-    ),
-  ]
-  hits.push(['', '-1', 'Invalid'])
-  hits.sort((a, b) => sorter(a[2], b[2]))
-  for (let x = 0; x < hits.length; ++x)
-    addLine(
-      '    "' +
-        hits[x][2] +
-        '": ' +
-        unhex(hits[x][1]) +
-        (x < hits.length - 1 ? ',' : ''),
-    )
-  addLine('  },')
-
-  ////////////////////////////////////////////////////////////////////////
-  //  TER code processing
-  ////////////////////////////////////////////////////////////////////////
-  addLine('  "TRANSACTION_RESULTS": {')
-  const cleanedTerFile = ('' + terFile).replace('[[maybe_unused]]', '')
-
-  let terHits = [
-    ...cleanedTerFile.matchAll(
-      /^ *((tel|tem|tef|ter|tes|tec)[A-Z_]+)([ \n]*=[ \n]*([0-9-]+))?[ \n]*,?[ \n]*(\/\/[^\n]*)?$/gm,
-    ),
-  ]
-  let upto = -1
-  const terCodes = []
-  for (let x = 0; x < terHits.length; ++x) {
-    if (terHits[x][4] !== undefined) upto = parseInt(terHits[x][4])
-    terCodes.push([terHits[x][1], upto])
-    upto++
-  }
-
-  terCodes.sort((a, b) => sorter(a[0], b[0]))
-  let currentType = ''
-  for (let x = 0; x < terCodes.length; ++x) {
-    if (currentType === '') {
-      currentType = terCodes[x][0].substr(0, 3)
-    } else if (currentType != terCodes[x][0].substr(0, 3)) {
-      addLine('')
-      currentType = terCodes[x][0].substr(0, 3)
-    }
-    addLine(
-      '    "' +
-        terCodes[x][0] +
-        '": ' +
-        terCodes[x][1] +
-        (x < terCodes.length - 1 ? ',' : ''),
-    )
-  }
-
-  addLine('  },')
-
-  ////////////////////////////////////////////////////////////////////////
-  //  Transaction type processing
-  ////////////////////////////////////////////////////////////////////////
-  addLine('  "TRANSACTION_TYPES": {')
-
-  let txHits = [
-    ...transactionsMacroFile.matchAll(
-      /^ *TRANSACTION\(tt[A-Z_]+[ \n]*,[ \n]*([0-9]+)[ \n]*,[ \n]*([A-Za-z]+).*$/gm,
-    ),
-  ]
-  txHits.push(['', '-1', 'Invalid'])
-  txHits.sort((a, b) => sorter(a[2], b[2]))
-  for (let x = 0; x < txHits.length; ++x) {
-    addLine(
-      '    "' +
-        txHits[x][2] +
-        '": ' +
-        txHits[x][1] +
-        (x < txHits.length - 1 ? ',' : ''),
-    )
-  }
-
-  addLine('  },')
-
-  ////////////////////////////////////////////////////////////////////////
-  //  Serialized type processing
-  ////////////////////////////////////////////////////////////////////////
-  addLine('  "TYPES": {')
-
-  stypeHits.push(['', 'DONE', -1])
-  stypeHits.sort((a, b) => sorter(translate(a[1]), translate(b[1])))
-  for (let x = 0; x < stypeHits.length; ++x) {
-    addLine(
-      '    "' +
-        translate(stypeHits[x][1]) +
-        '": ' +
-        stypeHits[x][2] +
-        (x < stypeHits.length - 1 ? ',' : ''),
-    )
-  }
-
-  addLine('  }')
-  addLine('}')
-
-  const outputFile =
-    process.argv.length == 4
-      ? process.argv[3]
-      : path.join(__dirname, '../src/enums/definitions.json')
+function findRunWithArtifactBySha(repo, sha) {
+  let runsJson
   try {
-    await fs.writeFile(outputFile, output, 'utf8')
-    console.log('File written successfully to', outputFile)
-  } catch (err) {
-    console.error('Error writing to file:', err)
+    runsJson = exec(
+      `gh api "repos/${repo}/actions/runs?head_sha=${sha}&status=success&per_page=20" --jq '.workflow_runs[].id'`,
+    )
+  } catch {
+    return null
   }
+
+  if (!runsJson) return null
+
+  const runIds = runsJson.split('\n').filter(Boolean)
+  return findFirstRunWithArtifact(repo, runIds)
+}
+
+function findRunWithArtifactByBranch(repo, branch) {
+  let runsJson
+  try {
+    runsJson = exec(
+      `gh api "repos/${repo}/actions/runs?branch=${encodeURIComponent(branch)}&status=success&per_page=20" --jq '.workflow_runs[].id'`,
+    )
+  } catch {
+    return null
+  }
+
+  if (!runsJson) return null
+
+  const runIds = runsJson.split('\n').filter(Boolean)
+  return findFirstRunWithArtifact(repo, runIds)
+}
+
+function downloadArtifact(repo, runId, outputFile) {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'server-definitions-'))
+
+  try {
+    exec(
+      `gh run download ${runId} --repo ${repo} --name ${ARTIFACT_NAME} --dir "${tmpDir}"`,
+    )
+
+    const serverDefsPath = path.join(tmpDir, 'server_definitions.json')
+    if (!fs.existsSync(serverDefsPath)) {
+      console.error(
+        'Error: server_definitions.json not found in downloaded artifact',
+      )
+      process.exit(1)
+    }
+
+    const serverDefs = JSON.parse(fs.readFileSync(serverDefsPath, 'utf-8'))
+    fs.writeFileSync(
+      outputFile,
+      JSON.stringify(serverDefs, null, 2) + '\n',
+      'utf-8',
+    )
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true })
+  }
+}
+
+function main() {
+  checkGhCli()
+
+  const { branch, forkOwner, prNumber, outputFile } = parseArgs()
+
+  let runId
+  let repo = UPSTREAM_REPO
+
+  if (prNumber) {
+    const prInfo = getPRInfo(prNumber)
+    console.log(
+      `Resolved PR #${prNumber} to branch "${prInfo.headRefName}" (${prInfo.headRefOid.substring(0, 7)})`,
+    )
+
+    // Try commit SHA first — this works for fork PRs where the branch name
+    // belongs to the fork repo and won't be found by branch-based search.
+    console.log('Searching by commit SHA...')
+    runId = findRunWithArtifactBySha(UPSTREAM_REPO, prInfo.headRefOid)
+
+    if (!runId) {
+      console.log(
+        `No artifact found by SHA, trying branch "${prInfo.headRefName}"...`,
+      )
+      runId = findRunWithArtifactByBranch(UPSTREAM_REPO, prInfo.headRefName)
+    }
+  } else if (forkOwner) {
+    const forkRepo = `${forkOwner}/rippled`
+    console.log(`Fork branch detected: "${forkOwner}:${branch}"`)
+
+    // Check if there's a PR in the upstream repo for this fork branch
+    console.log(`Checking for PR in ${UPSTREAM_REPO}...`)
+    const pr = findPRForForkBranch(forkOwner, branch)
+
+    if (pr) {
+      console.log(
+        `Found PR #${pr.number} (${pr.headRefOid.substring(0, 7)}), searching upstream CI...`,
+      )
+      runId = findRunWithArtifactBySha(UPSTREAM_REPO, pr.headRefOid)
+
+      if (!runId) {
+        runId = findRunWithArtifactByBranch(UPSTREAM_REPO, branch)
+      }
+    }
+
+    if (!runId) {
+      // No PR or no artifact in upstream — search the fork repo's CI
+      console.log(
+        `Searching fork repo ${forkRepo} for CI on branch "${branch}"...`,
+      )
+      repo = forkRepo
+      runId = findRunWithArtifactByBranch(forkRepo, branch)
+    }
+  } else {
+    console.log(
+      `Searching for "${ARTIFACT_NAME}" artifact on branch "${branch}"...`,
+    )
+    runId = findRunWithArtifactByBranch(UPSTREAM_REPO, branch)
+  }
+
+  if (!runId) {
+    console.error(
+      `Error: No CI runs with "${ARTIFACT_NAME}" artifact found.\n` +
+        'Make sure the branch has a successful CI run that produced the server-definitions artifact.',
+    )
+    process.exit(1)
+  }
+
+  console.log(`Found artifact in run ${runId}`)
+
+  console.log('Downloading artifact...')
+  downloadArtifact(repo, runId, outputFile)
+  console.log(`Definitions written to ${outputFile}`)
 }
 
 main()
