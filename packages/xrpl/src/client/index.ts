@@ -802,7 +802,7 @@ class Client extends EventEmitter<EventTypes> {
       ...opts,
       definitions: this.definitions,
     })
-    return submitRequest(this, signedTx, opts?.failHard)
+    return submitRequest(this, signedTx, opts?.failHard, this.definitions)
   }
 
   /**
