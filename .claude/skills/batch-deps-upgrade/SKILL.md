@@ -80,4 +80,6 @@ Do NOT commit or create a PR. Instead, generate the following outputs for the hu
    - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, To, Status, MajorVersionUpgrade
      - Status values: Upgraded, No-op (reason), Skipped (peer dep conflict / CI failure: error)
      - MajorVersionUpgrade: `No` if the major version number did not change. Otherwise `Yes` plus a link for each major version crossed. For example, 7.x → 9.x yields `Yes ([v8](url), [v9](url))`. Each link should point to the package's release notes or changelog for that major version. Verify each link returns HTTP 200 and has meaningful content (e.g., `curl -sL -o /dev/null -w "%{http_code}" <url>`); if a package doesn't publish per-version GitHub releases (e.g., TypeScript sometimes skips `x.0.0`/`x.0.1` tags, bignumber.js puts details in CHANGELOG.md), fall back to the CHANGELOG.md file or the closest valid release tag.
-   - Closing instructions: "After merging, close the following PRs: #X, #Y, #Z"
+   - Closing instructions with two paragraphs:
+     1. "After merging, close the following superseded PRs (Skipped ones remain open for future handling): #X, #Y, #Z" — list only Upgraded and No-op PRs.
+     2. "The following PRs were Skipped and should remain open: #A (package-a), #B (package-b), ..." — annotate each with the package name. These stay open so Dependabot keeps rebasing them.

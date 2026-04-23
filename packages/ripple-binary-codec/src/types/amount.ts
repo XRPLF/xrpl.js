@@ -221,9 +221,14 @@ class Amount extends SerializedType {
 
       mantissa[0] = 0
       mantissa[1] &= 0x3f
-      const value = new BigNumber(`${sign}0x${bytesToHex(mantissa)}`).times(
-        `1e${exponent}`,
-      )
+      let value: BigNumber
+      try {
+        value = new BigNumber(`${sign}0x${bytesToHex(mantissa)}`).times(
+          `1e${exponent}`,
+        )
+      } catch (_err) {
+        throw new Error(`${sign}0x${bytesToHex(mantissa)} is an illegal amount`)
+      }
       Amount.assertIouIsValid(value)
 
       return {
