@@ -9,7 +9,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
-* parseTransactionFlags as a utility function in the xrpl package to streamline transactions flags-to-map conversion
 * Adds support for Custom Definitions to `client.submit()` and `client.submitAndWait()`
 * Custom definitions support for `util.encode`, `util.decode`, `util.encodeForSigning` and `Wallet.sign`.
 
@@ -152,7 +151,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Add the missing `AMMDeposit` flag `tfTwoAssetIfEmpty`
 * Add missing `lsfAMMNode` flag to `RippleState` ledger object
 * Add `PreviousFields` to `DeletedNode` metadata type
-
 
 ## 3.0.0 (2024-02-01)
 
