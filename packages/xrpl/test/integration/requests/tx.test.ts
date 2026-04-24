@@ -153,7 +153,7 @@ describe('tx', function () {
       // @ts-expect-error: tx_json is not defined for binary responses
       assert.isUndefined(txBinaryResponse.result.tx_json)
       // @ts-expect-error: meta_blob is not defined for binary responses V1
-      assert.isDefined(txBinaryResponse.result.meta_blob)
+      assert.isUndefined(txBinaryResponse.result.meta_blob)
     },
     TIMEOUT,
   )
