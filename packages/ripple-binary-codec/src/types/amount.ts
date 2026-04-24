@@ -92,7 +92,7 @@ class Amount extends SerializedType {
       return value
     }
 
-    let amount = new Uint8Array(8)
+    let amount: Uint8Array = new Uint8Array(8)
     if (typeof value === 'string') {
       Amount.assertXrpIsValid(value)
 
@@ -110,7 +110,12 @@ class Amount extends SerializedType {
     }
 
     if (isAmountObjectIOU(value)) {
-      const number = new BigNumber(value.value)
+      let number: BigNumber
+      try {
+        number = new BigNumber(value.value)
+      } catch (_err) {
+        throw new Error(`${value.value} is an illegal amount`)
+      }
       Amount.assertIouIsValid(number)
 
       if (number.isZero()) {
@@ -261,7 +266,12 @@ class Amount extends SerializedType {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
 
-    const decimal = new BigNumber(amount)
+    let decimal: BigNumber
+    try {
+      decimal = new BigNumber(amount)
+    } catch (_err) {
+      throw new Error(`${amount.toString()} is an illegal amount`)
+    }
     if (!decimal.isZero()) {
       if (decimal.lt(MIN_XRP) || decimal.gt(MAX_DROPS)) {
         throw new Error(`${amount.toString()} is an illegal amount`)
@@ -301,8 +311,10 @@ class Amount extends SerializedType {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
 
-    const decimal = new BigNumber(amount)
-    if (decimal.isNaN()) {
+    let decimal: BigNumber
+    try {
+      decimal = new BigNumber(amount)
+    } catch (_err) {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
     if (!decimal.isZero()) {
