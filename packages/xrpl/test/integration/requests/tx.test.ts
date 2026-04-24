@@ -53,7 +53,7 @@ describe('tx', function () {
       assert.isDefined(txResponse.result.tx_json)
       // meta is undefined since not validated tx
       assert.isUndefined(txResponse.result.meta)
-      // @ts-expect-error: meta_blob is only defined for binary responses
+      // @ts-expect-error: tx_blob is only defined for binary responses
       assert.isUndefined(txResponse.result.tx_blob)
       // @ts-expect-error: meta_blob is only defined for binary responses
       assert.isUndefined(txResponse.result.meta_blob)
@@ -86,7 +86,8 @@ describe('tx', function () {
         binary: true,
       })
       assert.isDefined(txBinaryResponse.result.tx_blob)
-      assert.isDefined(txBinaryResponse.result.meta_blob)
+      // meta_blob is undefined since not validated tx
+      assert.isUndefined(txBinaryResponse.result.meta_blob)
       // @ts-expect-error: tx_json is not defined for binary responses
       assert.isUndefined(txBinaryResponse.result.tx_json)
       // @ts-expect-error: meta is not defined for binary responses

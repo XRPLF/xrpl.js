@@ -34,25 +34,21 @@ interface TxRequestBase extends BaseRequest {
    * the requested range.
    */
   max_ledger?: number
+  /**
+   * If true, return transaction data and metadata as binary serialized to
+   * hexadecimal strings. If false, return transaction data and metadata as
+   * JSON. The default is false.
+   */
+  binary?: boolean
 }
 
 export type TxRequest = TxJsonRequest | TxBinaryRequest
 
 export interface TxBinaryRequest extends TxRequestBase {
-  /**
-   * If true, return transaction data and metadata as binary serialized to
-   * hexadecimal strings. If false, return transaction data and metadata as.
-   * JSON. The default is false.
-   */
   binary: true
 }
 
 export interface TxJsonRequest extends TxRequestBase {
-  /**
-   * If true, return transaction data and metadata as binary serialized to
-   * hexadecimal strings. If false, return transaction data and metadata as.
-   * JSON. The default is false.
-   */
   binary?: false
 }
 
