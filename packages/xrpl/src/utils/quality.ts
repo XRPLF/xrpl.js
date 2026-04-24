@@ -17,7 +17,11 @@ function percentToDecimal(percent: string): string {
     throw new ValidationError(`Value ${percent} contains too many % signs`)
   }
 
-  return new BigNumber(split[0]).dividedBy('100').toString(BASE_TEN)
+  try {
+    return new BigNumber(split[0]).dividedBy('100').toString(BASE_TEN)
+  } catch (_err) {
+    throw new ValidationError(`Value is not a number`)
+  }
 }
 
 /**
@@ -30,7 +34,12 @@ function percentToDecimal(percent: string): string {
  * @category Utilities
  */
 export function decimalToTransferRate(decimal: string): number {
-  const rate = new BigNumber(decimal).times(ONE_BILLION).plus(ONE_BILLION)
+  let rate: BigNumber
+  try {
+    rate = new BigNumber(decimal).times(ONE_BILLION).plus(ONE_BILLION)
+  } catch (_err) {
+    throw new ValidationError(`Value is not a number`)
+  }
 
   if (rate.isLessThan(ONE_BILLION) || rate.isGreaterThan(TWO_BILLION)) {
     throw new ValidationError(`Decimal value must be between 0 and 1.00.`)
@@ -40,10 +49,6 @@ export function decimalToTransferRate(decimal: string): number {
 
   if (billionths === ONE_BILLION) {
     return 0
-  }
-
-  if (billionths === 'NaN') {
-    throw new ValidationError(`Value is not a number`)
   }
 
   if (billionths.includes('.')) {
@@ -77,13 +82,14 @@ export function percentToTransferRate(percent: string): number {
  * @category Utilities
  */
 export function decimalToQuality(decimal: string): number {
-  const rate = new BigNumber(decimal).times(ONE_BILLION)
-
-  const billionths = rate.toString(BASE_TEN)
-
-  if (billionths === 'NaN') {
+  let rate: BigNumber
+  try {
+    rate = new BigNumber(decimal).times(ONE_BILLION)
+  } catch (_err) {
     throw new ValidationError(`Value is not a number`)
   }
+
+  const billionths = rate.toString(BASE_TEN)
 
   if (billionths.includes('-')) {
     throw new ValidationError('Cannot have negative Quality')

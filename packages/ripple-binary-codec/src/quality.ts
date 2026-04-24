@@ -13,8 +13,13 @@ class quality {
    * @returns Serialized quality
    */
   static encode(quality: string): Uint8Array {
-    const decimal = BigNumber(quality)
-    const exponent = (decimal?.e || 0) - 15
+    let decimal: BigNumber
+    try {
+      decimal = new BigNumber(quality)
+    } catch (_err) {
+      throw new Error(`${quality} is not a valid quality`)
+    }
+    const exponent = (decimal.e || 0) - 15
     const qualityString = decimal.times(`1e${-exponent}`).abs().toString()
     const bytes = coreTypes.UInt64.from(BigInt(qualityString)).toBytes()
     bytes[0] = exponent + 100
@@ -30,7 +35,12 @@ class quality {
   static decode(quality: string): BigNumber {
     const bytes = hexToBytes(quality).slice(-8)
     const exponent = bytes[0] - 100
-    const mantissa = new BigNumber(`0x${bytesToHex(bytes.slice(1))}`)
+    let mantissa: BigNumber
+    try {
+      mantissa = new BigNumber(`0x${bytesToHex(bytes.slice(1))}`)
+    } catch (_err) {
+      throw new Error(`${quality} is not a valid quality`)
+    }
     return mantissa.times(`1e${exponent}`)
   }
 }

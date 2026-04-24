@@ -26,26 +26,26 @@
     "@scure/bip39": "^2.0.1",
     "@xrplf/isomorphic": "^1.0.1",
     "@xrplf/secret-numbers": "^2.0.0",
-    "bignumber.js": "^9.0.0",
+    "bignumber.js": "^10.0.2",
     "eventemitter3": "^5.0.1",
+    "fast-json-stable-stringify": "^2.1.0",
     "ripple-address-codec": "^5.0.0",
     "ripple-binary-codec": "^2.7.0",
-    "ripple-keypairs": "^2.0.0",
-    "fast-json-stable-stringify": "^2.1.0"
+    "ripple-keypairs": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
     "eventemitter3": "^5.0.1",
-    "https-proxy-agent": "^7.0.1",
+    "https-proxy-agent": "^9.0.0",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.1.0",
     "karma-webpack": "^5.0.0",
-    "lodash": "^4.17.4",
-    "react": "^19.0.0",
+    "lodash": "^4.18.1",
+    "react": "^19.2.4",
     "run-s": "^0.0.0",
-    "typedoc": "0.28.15",
-    "ws": "^8.14.2"
+    "typedoc": "0.28.18",
+    "ws": "^8.20.0"
   },
   "scripts": {
     "build": "run-s build:lib build:web",

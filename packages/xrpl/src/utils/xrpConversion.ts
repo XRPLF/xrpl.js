@@ -21,12 +21,12 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
    * decimal point followed by zeros, e.g. '1.00'.
    * Important: specify base BASE_10 to avoid exponential notation, e.g. '1e-7'.
    */
-  const drops = new BigNumber(dropsToConvert).toString(BASE_TEN)
-
-  // check that the value is valid and actually a number
-  if (typeof dropsToConvert === 'string' && drops === 'NaN') {
+  let drops: string
+  try {
+    drops = new BigNumber(dropsToConvert).toString(BASE_TEN)
+  } catch (_err) {
     throw new ValidationError(
-      `dropsToXrp: invalid value '${dropsToConvert}', should be a BigNumber or string-encoded number.`,
+      `dropsToXrp: invalid value '${typeof dropsToConvert === 'string' ? dropsToConvert : JSON.stringify(dropsToConvert)}', should be a BigNumber or string-encoded number.`,
     )
   }
 
@@ -63,12 +63,12 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
  */
 export function xrpToDrops(xrpToConvert: BigNumber.Value): string {
   // Important: specify base BASE_TEN to avoid exponential notation, e.g. '1e-7'.
-  const xrp = new BigNumber(xrpToConvert).toString(BASE_TEN)
-
-  // check that the value is valid and actually a number
-  if (typeof xrpToConvert === 'string' && xrp === 'NaN') {
+  let xrp: string
+  try {
+    xrp = new BigNumber(xrpToConvert).toString(BASE_TEN)
+  } catch (_err) {
     throw new ValidationError(
-      `xrpToDrops: invalid value '${xrpToConvert}', should be a BigNumber or string-encoded number.`,
+      `xrpToDrops: invalid value '${typeof xrpToConvert === 'string' ? xrpToConvert : JSON.stringify(xrpToConvert)}', should be a BigNumber or string-encoded number.`,
     )
   }
 
