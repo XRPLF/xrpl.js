@@ -56,7 +56,7 @@ describe('DelegateSet', function () {
           authorize: bob.address,
         },
       })
-      const delegateLedgerEntry = ledgerEntryRes.result.node!
+      const delegateLedgerEntry = ledgerEntryRes.result.node
       assert.equal(delegateLedgerEntry.LedgerEntryType, 'Delegate')
       assert.equal(delegateLedgerEntry.Account, alice.address)
       assert.equal(delegateLedgerEntry.Authorize, bob.address)

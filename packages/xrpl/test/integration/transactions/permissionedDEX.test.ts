@@ -231,7 +231,7 @@ describe('PermissionedDEX', function () {
             seq: offerCreateTxResponse.result.tx_json.Sequence as number,
           },
         })
-      ).result.node!
+      ).result.node
 
       assert.equal(offerLedgerObject.LedgerEntryType, 'Offer')
       assert.equal(offerLedgerObject.DomainID, permDomainLedgerObject.index)

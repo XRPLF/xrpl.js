@@ -170,8 +170,7 @@ describe('Clawback', function () {
       })
 
       assert.equal(
-        // @ts-expect-error: string type assertion to MPTAmount field
-        ledgerEntryResponse.result.node.MPTAmount as string,
+        ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775807',
       )
 
@@ -196,8 +195,7 @@ describe('Clawback', function () {
       })
 
       assert.equal(
-        // @ts-expect-error: string type assertion to MPTAmount field
-        ledgerEntryResponse.result.node.MPTAmount as string,
+        ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775307',
       )
     },
