@@ -130,7 +130,11 @@ import {
   LedgerDataResponse,
 } from './ledgerData'
 import {
+  LedgerEntryBinaryRequest,
+  LedgerEntryJsonRequest,
   LedgerEntryRequest,
+  LedgerEntryBinaryResponse,
+  LedgerEntryJsonResponse,
   LedgerEntryResponse,
   LedgerEntryAccountRootRequest,
   LedgerEntryAMMRequest,
@@ -496,8 +500,12 @@ export type RequestResponseMap<
   ? LedgerEntryResponse<XChainOwnedClaimID>
   : T extends LedgerEntryXChainOwnedCreateAccountClaimIDRequest
   ? LedgerEntryResponse<XChainOwnedCreateAccountClaimID>
+  : T extends LedgerEntryBinaryRequest
+  ? LedgerEntryBinaryResponse
+  : T extends LedgerEntryJsonRequest
+  ? LedgerEntryJsonResponse
   : T extends LedgerEntryRequest
-  ? LedgerEntryResponse
+  ? LedgerEntryJsonResponse
   : T extends SimulateBinaryRequest
   ? SimulateBinaryResponse
   : T extends SimulateJsonRequest
@@ -649,7 +657,11 @@ export {
   LedgerDataBinaryLedgerEntry,
   LedgerDataResponse,
   LedgerDataLedgerState,
+  LedgerEntryBinaryRequest,
+  LedgerEntryJsonRequest,
   LedgerEntryRequest,
+  LedgerEntryBinaryResponse,
+  LedgerEntryJsonResponse,
   LedgerEntryResponse,
   LedgerEntryAccountRootRequest,
   LedgerEntryAMMRequest,
