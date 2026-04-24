@@ -1,9 +1,4 @@
-import {
-  APIVersion,
-  DEFAULT_API_VERSION,
-  RIPPLED_API_V1,
-  RIPPLED_API_V2,
-} from '../common'
+import { APIVersion, DEFAULT_API_VERSION, RIPPLED_API_V1 } from '../common'
 import { Transaction, TransactionMetadata } from '../transactions'
 import { BaseTransaction } from '../transactions/common'
 
@@ -41,14 +36,7 @@ interface TxRequestBase extends BaseRequest {
   max_ledger?: number
 }
 
-export interface TxRequest extends TxRequestBase {
-  /**
-   * If true, return transaction data and metadata as binary serialized to
-   * hexadecimal strings. If false, return transaction data and metadata as.
-   * JSON. The default is false.
-   */
-  binary?: boolean
-}
+export type TxRequest = TxJsonRequest | TxBinaryRequest
 
 export interface TxBinaryRequest extends TxRequestBase {
   /**
