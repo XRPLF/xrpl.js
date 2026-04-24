@@ -239,6 +239,12 @@ import {
   UnsubscribeResponse,
 } from './unsubscribe'
 import { VaultInfoRequest, VaultInfoResponse } from './vaultInfo'
+
+type LedgerEntryLookupResponse<T, EntryType> =
+  T extends LedgerEntryJsonRequest
+    ? LedgerEntryJsonResponse<EntryType>
+    : LedgerEntryResponse<EntryType>
+
 /**
  * @category Requests
  */
@@ -259,6 +265,28 @@ type Request =
   | LedgerClosedRequest
   | LedgerCurrentRequest
   | LedgerDataRequest
+  | LedgerEntryBinaryRequest
+  | LedgerEntryJsonRequest
+  | LedgerEntryAccountRootRequest
+  | LedgerEntryAMMRequest
+  | LedgerEntryBridgeAccountRequest
+  | LedgerEntryBridgeRequest
+  | LedgerEntryCheckRequest
+  | LedgerEntryCredentialRequest
+  | LedgerEntryDelegateRequest
+  | LedgerEntryDepositPreauthRequest
+  | LedgerEntryDIDRequest
+  | LedgerEntryDirectoryRequest
+  | LedgerEntryEscrowRequest
+  | LedgerEntryMPTokenIssuanceRequest
+  | LedgerEntryMPTokenRequest
+  | LedgerEntryNFTokenPageRequest
+  | LedgerEntryOfferRequest
+  | LedgerEntryPayChannelRequest
+  | LedgerEntryRippleStateRequest
+  | LedgerEntryTicketRequest
+  | LedgerEntryXChainOwnedClaimIDRequest
+  | LedgerEntryXChainOwnedCreateAccountClaimIDRequest
   | LedgerEntryRequest
   // transaction methods
   | SimulateRequest
@@ -460,48 +488,48 @@ export type RequestResponseMap<
   ? LedgerCurrentResponse
   : T extends LedgerDataRequest
   ? LedgerDataResponse
-  : T extends LedgerEntryAccountRootRequest
-  ? LedgerEntryResponse<AccountRoot>
-  : T extends LedgerEntryAMMRequest
-  ? LedgerEntryResponse<AMM>
-  : T extends LedgerEntryBridgeAccountRequest
-  ? LedgerEntryResponse<Bridge>
-  : T extends LedgerEntryBridgeRequest
-  ? LedgerEntryResponse<Bridge>
-  : T extends LedgerEntryCheckRequest
-  ? LedgerEntryResponse<Check>
-  : T extends LedgerEntryCredentialRequest
-  ? LedgerEntryResponse<Credential>
-  : T extends LedgerEntryDelegateRequest
-  ? LedgerEntryResponse<Delegate>
-  : T extends LedgerEntryDepositPreauthRequest
-  ? LedgerEntryResponse<DepositPreauth>
-  : T extends LedgerEntryDIDRequest
-  ? LedgerEntryResponse<DID>
-  : T extends LedgerEntryDirectoryRequest
-  ? LedgerEntryResponse<DirectoryNode>
-  : T extends LedgerEntryEscrowRequest
-  ? LedgerEntryResponse<Escrow>
-  : T extends LedgerEntryMPTokenIssuanceRequest
-  ? LedgerEntryResponse<MPTokenIssuance>
-  : T extends LedgerEntryMPTokenRequest
-  ? LedgerEntryResponse<MPToken>
-  : T extends LedgerEntryNFTokenPageRequest
-  ? LedgerEntryResponse<NFTokenPage>
-  : T extends LedgerEntryOfferRequest
-  ? LedgerEntryResponse<Offer>
-  : T extends LedgerEntryPayChannelRequest
-  ? LedgerEntryResponse<PayChannel>
-  : T extends LedgerEntryRippleStateRequest
-  ? LedgerEntryResponse<RippleState>
-  : T extends LedgerEntryTicketRequest
-  ? LedgerEntryResponse<Ticket>
-  : T extends LedgerEntryXChainOwnedClaimIDRequest
-  ? LedgerEntryResponse<XChainOwnedClaimID>
-  : T extends LedgerEntryXChainOwnedCreateAccountClaimIDRequest
-  ? LedgerEntryResponse<XChainOwnedCreateAccountClaimID>
   : T extends LedgerEntryBinaryRequest
   ? LedgerEntryBinaryResponse
+  : T extends LedgerEntryAccountRootRequest
+  ? LedgerEntryLookupResponse<T, AccountRoot>
+  : T extends LedgerEntryAMMRequest
+  ? LedgerEntryLookupResponse<T, AMM>
+  : T extends LedgerEntryBridgeAccountRequest
+  ? LedgerEntryLookupResponse<T, Bridge>
+  : T extends LedgerEntryBridgeRequest
+  ? LedgerEntryLookupResponse<T, Bridge>
+  : T extends LedgerEntryCheckRequest
+  ? LedgerEntryLookupResponse<T, Check>
+  : T extends LedgerEntryCredentialRequest
+  ? LedgerEntryLookupResponse<T, Credential>
+  : T extends LedgerEntryDelegateRequest
+  ? LedgerEntryLookupResponse<T, Delegate>
+  : T extends LedgerEntryDepositPreauthRequest
+  ? LedgerEntryLookupResponse<T, DepositPreauth>
+  : T extends LedgerEntryDIDRequest
+  ? LedgerEntryLookupResponse<T, DID>
+  : T extends LedgerEntryDirectoryRequest
+  ? LedgerEntryLookupResponse<T, DirectoryNode>
+  : T extends LedgerEntryEscrowRequest
+  ? LedgerEntryLookupResponse<T, Escrow>
+  : T extends LedgerEntryMPTokenIssuanceRequest
+  ? LedgerEntryLookupResponse<T, MPTokenIssuance>
+  : T extends LedgerEntryMPTokenRequest
+  ? LedgerEntryLookupResponse<T, MPToken>
+  : T extends LedgerEntryNFTokenPageRequest
+  ? LedgerEntryLookupResponse<T, NFTokenPage>
+  : T extends LedgerEntryOfferRequest
+  ? LedgerEntryLookupResponse<T, Offer>
+  : T extends LedgerEntryPayChannelRequest
+  ? LedgerEntryLookupResponse<T, PayChannel>
+  : T extends LedgerEntryRippleStateRequest
+  ? LedgerEntryLookupResponse<T, RippleState>
+  : T extends LedgerEntryTicketRequest
+  ? LedgerEntryLookupResponse<T, Ticket>
+  : T extends LedgerEntryXChainOwnedClaimIDRequest
+  ? LedgerEntryLookupResponse<T, XChainOwnedClaimID>
+  : T extends LedgerEntryXChainOwnedCreateAccountClaimIDRequest
+  ? LedgerEntryLookupResponse<T, XChainOwnedCreateAccountClaimID>
   : T extends LedgerEntryJsonRequest
   ? LedgerEntryJsonResponse
   : T extends LedgerEntryRequest

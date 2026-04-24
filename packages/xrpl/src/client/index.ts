@@ -352,6 +352,17 @@ class Client extends EventEmitter<EventTypes> {
    * console.log(response)
    * ```
    */
+  // public async request<
+  //   R extends Request,
+  //   V extends APIVersion = typeof DEFAULT_API_VERSION,
+  // >(req: R): Promise<RequestResponseMap<R, V>>
+
+  // public async request<
+  //   R extends Request,
+  //   V extends APIVersion = typeof DEFAULT_API_VERSION,
+  //   T = RequestResponseMap<R, V>,
+  // >(req: R): Promise<T>
+
   public async request<
     R extends Request,
     V extends APIVersion = typeof DEFAULT_API_VERSION,
