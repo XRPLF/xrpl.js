@@ -123,14 +123,14 @@ interface TxBinaryResult extends BaseTxResult {
   tx_blob: string
   /** Unique hashed string Transaction metadata blob, which describes the results of the transaction.
    *  Can be undefined if a transaction has not been validated yet. */
-  meta_blob: string
+  meta_blob?: string
 }
 
 interface TxBinaryResultV1 extends BaseTxResult {
   tx_blob: string
   /** Unique hashed string Transaction metadata blob, which describes the results of the transaction.
    *  Can be undefined if a transaction has not been validated yet. */
-  meta: string
+  meta?: string
 }
 
 /**
