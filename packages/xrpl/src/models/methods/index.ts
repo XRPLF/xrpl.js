@@ -191,7 +191,7 @@ import {
   TransactionEntryRequest,
   TransactionEntryResponse,
 } from './transactionEntry'
-import { TxRequest, TxResponse, TxV1Response, TxVersionResponseMap } from './tx'
+import { TxBinaryRequest, TxJsonRequest, TxRequest, TxResponse, TxV1Response, TxVersionResponseMap } from './tx'
 import {
   UnsubscribeBook,
   UnsubscribeRequest,
@@ -437,7 +437,9 @@ export type RequestResponseMap<
   ? SubmitMultisignedVersionResponseMap<Version>
   : T extends TransactionEntryRequest
   ? TransactionEntryResponse
-  : T extends TxRequest
+  : T extends TxBinaryRequest
+  ? TxVersionResponseMap<Version, true>
+  : T extends TxJsonRequest
   ? TxVersionResponseMap<Version>
   : T extends BookOffersRequest
   ? BookOffersResponse
