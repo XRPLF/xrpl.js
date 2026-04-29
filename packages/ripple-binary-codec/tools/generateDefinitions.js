@@ -93,7 +93,7 @@ function getPRInfo(prNumber) {
   try {
     return JSON.parse(
       exec(
-        `gh pr view ${prNumber} --repo ${UPSTREAM_REPO} --json headRefName,headRefOid`,
+        `gh api "repos/${UPSTREAM_REPO}/pulls/${prNumber}" --jq '{headRefName: .head.ref, headRefOid: .head.sha}'`,
       ),
     )
   } catch {
@@ -105,11 +105,10 @@ function getPRInfo(prNumber) {
 function findPRForForkBranch(forkOwner, branch) {
   try {
     const result = exec(
-      `gh pr list --repo ${UPSTREAM_REPO} --head "${forkOwner}:${branch}" --json number,headRefOid --limit 1`,
+      `gh api "repos/${UPSTREAM_REPO}/pulls?head=${forkOwner}:${encodeURIComponent(branch)}&state=all&per_page=1" --jq '.[0] | {number, headRefOid: .head.sha}'`,
     )
-    const prs = JSON.parse(result)
-    if (prs.length > 0) {
-      return prs[0]
+    if (result && result !== 'null') {
+      return JSON.parse(result)
     }
   } catch {
     // No PR found
@@ -117,52 +116,28 @@ function findPRForForkBranch(forkOwner, branch) {
   return null
 }
 
-function findFirstRunWithArtifact(repo, runIds) {
-  for (const runId of runIds) {
-    try {
-      const match = exec(
-        `gh api "repos/${repo}/actions/runs/${runId}/artifacts" --jq '.artifacts[] | select(.name == "${ARTIFACT_NAME}") | .name'`,
-      )
-      if (match === ARTIFACT_NAME) {
-        return runId
-      }
-    } catch {
-      // This run doesn't have the artifact, try the next one
-    }
+function findRunWithArtifactBySha(repo, sha) {
+  try {
+    const runId = exec(
+      `gh api "repos/${repo}/actions/artifacts?name=${ARTIFACT_NAME}&per_page=50" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_sha == "${sha}")] | .[0].workflow_run.id'`,
+    )
+    if (runId && runId !== 'null') return runId
+  } catch {
+    // No artifact found
   }
   return null
 }
 
-function findRunWithArtifactBySha(repo, sha) {
-  let runsJson
-  try {
-    runsJson = exec(
-      `gh api "repos/${repo}/actions/runs?head_sha=${sha}&status=success&per_page=20" --jq '.workflow_runs[].id'`,
-    )
-  } catch {
-    return null
-  }
-
-  if (!runsJson) return null
-
-  const runIds = runsJson.split('\n').filter(Boolean)
-  return findFirstRunWithArtifact(repo, runIds)
-}
-
 function findRunWithArtifactByBranch(repo, branch) {
-  let runsJson
   try {
-    runsJson = exec(
-      `gh api "repos/${repo}/actions/runs?branch=${encodeURIComponent(branch)}&status=success&per_page=20" --jq '.workflow_runs[].id'`,
+    const runId = exec(
+      `gh api "repos/${repo}/actions/artifacts?name=${ARTIFACT_NAME}&per_page=50" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "${branch}")] | .[0].workflow_run.id'`,
     )
+    if (runId && runId !== 'null') return runId
   } catch {
-    return null
+    // No artifact found
   }
-
-  if (!runsJson) return null
-
-  const runIds = runsJson.split('\n').filter(Boolean)
-  return findFirstRunWithArtifact(repo, runIds)
+  return null
 }
 
 function downloadArtifact(repo, runId, outputFile) {

@@ -34,36 +34,16 @@ function checkGhCli() {
   }
 }
 
-function findFirstRunWithArtifact(repo, runIds) {
-  for (const runId of runIds) {
-    try {
-      const match = exec(
-        `gh api "repos/${repo}/actions/runs/${runId}/artifacts" --jq '.artifacts[] | select(.name == "${ARTIFACT_NAME}") | .name'`,
-      )
-      if (match === ARTIFACT_NAME) {
-        return runId
-      }
-    } catch {
-      // This run doesn't have the artifact, try the next one
-    }
+function findRunWithArtifactByBranch(repo, branch) {
+  try {
+    const runId = exec(
+      `gh api "repos/${repo}/actions/artifacts?name=${ARTIFACT_NAME}&per_page=50" --jq '[.artifacts[] | select(.expired == false and .workflow_run.head_branch == "${branch}")] | .[0].workflow_run.id'`,
+    )
+    if (runId && runId !== 'null') return runId
+  } catch {
+    // No artifact found
   }
   return null
-}
-
-function findRunWithArtifactByBranch(repo, branch) {
-  let runsJson
-  try {
-    runsJson = exec(
-      `gh api "repos/${repo}/actions/runs?branch=${encodeURIComponent(branch)}&status=success&per_page=20" --jq '.workflow_runs[].id'`,
-    )
-  } catch {
-    return null
-  }
-
-  if (!runsJson) return null
-
-  const runIds = runsJson.split('\n').filter(Boolean)
-  return findFirstRunWithArtifact(repo, runIds)
 }
 
 function downloadBenchmark() {
