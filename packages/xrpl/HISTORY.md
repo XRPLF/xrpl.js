@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### BREAKING CHANGES:
 * `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+* `Client.getServerInfo()` and `Client.connect()` now throw if the `server_info` request fails, or if the response succeeds but does not include a `network_id`. Previously, these failures were swallowed and only logged via `console.error`, leaving `client.networkID` undefined and causing `autofill()` to omit the `NetworkID` field — producing transactions valid on the wrong network. Servers running rippled <1.11 (which do not return `network_id`) will now fail to connect; upgrade to rippled 1.11+ or set `client.networkID` manually after construction.
 
 ### Added
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
@@ -14,6 +15,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. The fix cleans up stale listeners from previous reconnect attempts to prevent duplicate event emissions on flaky connections with multiple sequential reconnect attempts.
 * Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
 * Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
+* Fix `Client.getServerInfo()` swallowing errors from the underlying `server_info` request, which left `client.networkID` undefined and caused `autofill()` to silently omit the `NetworkID` field — producing signed transactions valid on the wrong network (cross-network replay risk). The method now throws on request failure or when the response is missing `network_id`. ([#3321](https://github.com/XRPLF/xrpl.js/issues/3321))
 
 ## 4.6.0 (2026-02-12)
 
