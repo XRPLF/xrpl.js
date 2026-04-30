@@ -99,5 +99,55 @@ describe('Amount', function () {
     expect(amt.toHex()).toEqual(hexBefore)
   })
 
+  it('toJSON() does not mutate internal buffer for IOU amounts', function () {
+    const amt = Amount.from({
+      value: '1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const hexBefore = amt.toHex()
+    const first = amt.toJSON()
+    const second = amt.toJSON()
+    expect(second).toEqual(first)
+    expect(amt.toHex()).toEqual(hexBefore)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative IOU amounts', function () {
+    const amt = Amount.from({
+      value: '-1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const hexBefore = amt.toHex()
+    const first = amt.toJSON()
+    const second = amt.toJSON()
+    expect(second).toEqual(first)
+    expect(amt.toHex()).toEqual(hexBefore)
+  })
+
+  it('toJSON() does not mutate internal buffer for MPT amounts', function () {
+    const amt = Amount.from({
+      value: '100',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    })
+    const hexBefore = amt.toHex()
+    const first = amt.toJSON()
+    const second = amt.toJSON()
+    expect(second).toEqual(first)
+    expect(amt.toHex()).toEqual(hexBefore)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative MPT amounts', function () {
+    const parser = makeParser(
+      '20000000000000006400002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    )
+    const amt = parser.readType(Amount)
+    const hexBefore = amt.toHex()
+    const first = amt.toJSON()
+    const second = amt.toJSON()
+    expect(second).toEqual(first)
+    expect(amt.toHex()).toEqual(hexBefore)
+  })
+
   amountErrorTests()
 })
