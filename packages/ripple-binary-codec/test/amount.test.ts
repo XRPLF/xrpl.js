@@ -90,5 +90,14 @@ describe('Amount', function () {
     )
   })
 
+  it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
+    const amt = Amount.from('1000000')
+    const hexBefore = amt.toHex()
+    const first = amt.toJSON()
+    const second = amt.toJSON()
+    expect(second).toEqual(first)
+    expect(amt.toHex()).toEqual(hexBefore)
+  })
+
   amountErrorTests()
 })
