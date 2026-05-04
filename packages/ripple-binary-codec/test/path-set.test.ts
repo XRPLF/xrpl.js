@@ -265,7 +265,9 @@ describe('Path-Set binary-codec unit tests', () => {
     ]
 
     expect(() => coreTypes.PathSet.from(path)).toThrow(
-      'Currency and mpt_issuance_id are mutually exclusive in a path hop',
+      new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop',
+      ),
     )
   })
 
@@ -279,7 +281,9 @@ describe('Path-Set binary-codec unit tests', () => {
 
     const parser = new BinaryParser(invalidHex)
     expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
-      'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      ),
     )
   })
 
@@ -296,7 +300,9 @@ describe('Path-Set binary-codec unit tests', () => {
 
     const parser = new BinaryParser(invalidHex)
     expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
-      'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      new Error(
+        'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      ),
     )
   })
 })
