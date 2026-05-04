@@ -211,7 +211,8 @@ export function isMPTCurrency(input: unknown): input is MPTCurrency {
   return (
     isRecord(input) &&
     Object.keys(input).length === MPT_CURRENCY_SIZE &&
-    isString(input.mpt_issuance_id)
+    typeof input.mpt_issuance_id === 'string' &&
+    isValidMPTIssuanceId(input.mpt_issuance_id)
   )
 }
 
