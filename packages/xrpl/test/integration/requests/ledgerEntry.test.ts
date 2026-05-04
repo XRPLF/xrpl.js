@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 
-import { LedgerEntryRequest, LedgerEntryResponse } from '../../../src'
+import { LedgerEntryRequest } from '../../../src'
 import type AMM from '../../../src/models/ledger/AMM'
 import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'

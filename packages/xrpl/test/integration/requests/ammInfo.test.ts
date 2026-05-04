@@ -47,6 +47,11 @@ describe('AMMInfo', function () {
   it('amm_info with MPT assets', async function () {
     const mptPool = await createAMMPoolWithMPT(testContext.client)
     const { asset, asset2 } = mptPool
+    const ammInfoRes: AMMInfoResponse = await testContext.client.request({
+      command: 'amm_info',
+      asset,
+      asset2,
+    })
     const { amm } = ammInfoRes.result
 
     assert.isTrue(isValidClassicAddress(amm.account))
