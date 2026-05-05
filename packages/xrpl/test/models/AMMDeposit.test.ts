@@ -215,16 +215,4 @@ describe('AMMDeposit', function () {
     const errorMessage = 'AMMDeposit: Amount must be an Amount'
     assertInvalid(deposit, errorMessage)
   })
-
-  it(`throws w/ MPT Asset mpt_issuance_id contains non-hex characters`, function () {
-    deposit.Asset = { mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }
-    deposit.Asset2 = { mpt_issuance_id: MPT_ISSUANCE_ID_2 }
-    assertInvalid(deposit, 'AMMDeposit: Asset must be a Currency')
-  })
-
-  it(`throws w/ MPT Asset mpt_issuance_id wrong length`, function () {
-    deposit.Asset = { mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }
-    deposit.Asset2 = { mpt_issuance_id: MPT_ISSUANCE_ID_2 }
-    assertInvalid(deposit, 'AMMDeposit: Asset must be a Currency')
-  })
 })

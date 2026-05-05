@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Amount serializes three currency variants (XRP, IOU, MPT) plus shared validators in one type. */
 import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
@@ -18,6 +19,20 @@ const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
 const mptMask = BigInt(0x8000000000000000)
+
+// Reject non-canonical MPT wire blobs: high-bit mantissa or negative-zero.
+function assertMptBytesAreCanonical(bytes: Uint8Array): void {
+  if ((bytes[1] & 0x80) !== 0) {
+    throw new Error(
+      'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
+    )
+  }
+  const isPositive = (bytes[0] & 0x40) !== 0
+  const mantissaIsZero = bytes.subarray(1, 9).every((b) => b === 0)
+  if (!isPositive && mantissaIsZero) {
+    throw new Error('non-canonical MPT amount: negative-zero encoding')
+  }
+}
 
 /**
  * BigNumber configuration for Amount IOUs
@@ -166,7 +181,7 @@ class Amount extends SerializedType {
 
       const mptIssuanceID = Hash192.from(value.mpt_issuance_id).toBytes()
       const mptBytes = concat([leadingByte, amount, mptIssuanceID])
-      Amount.assertMptBytesAreCanonical(mptBytes)
+      assertMptBytesAreCanonical(mptBytes)
       return new Amount(mptBytes)
     }
 
@@ -187,7 +202,7 @@ class Amount extends SerializedType {
     const isMPT = parser.peek() & 0x20
     if (isMPT) {
       const bytes = parser.read(33)
-      Amount.assertMptBytesAreCanonical(bytes)
+      assertMptBytesAreCanonical(bytes)
       return new Amount(bytes)
     }
     return new Amount(parser.read(8))
@@ -240,7 +255,7 @@ class Amount extends SerializedType {
     }
 
     if (this.isMPT()) {
-      Amount.assertMptBytesAreCanonical(this.bytes)
+      assertMptBytesAreCanonical(this.bytes)
       const parser = new BinaryParser(this.toString())
       const leadingByte = parser.read(1)
       const amount = parser.read(8)
@@ -331,36 +346,6 @@ class Amount extends SerializedType {
 
       if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
         throw new Error(`${amount.toString()} is an illegal amount`)
-      }
-    }
-  }
-
-  /**
-   * Validate the canonical form of an MPT amount on its 33-byte wire layout
-   * (leadingByte ‖ mantissa ‖ MPTID). Mirrors the bounds enforced on the JSON
-   * construction path so non-canonical blobs are rejected at deserialization.
-   *
-   * @param bytes 33-byte MPT amount blob
-   * @returns void, throws if the mantissa exceeds maxMPTokenAmount (high bit
-   *   set) or the value is encoded as negative zero.
-   */
-  private static assertMptBytesAreCanonical(bytes: Uint8Array): void {
-    const isPositive = (bytes[0] & 0x40) !== 0
-    if ((bytes[1] & 0x80) !== 0) {
-      throw new Error(
-        'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
-      )
-    }
-    if (!isPositive) {
-      let mantissaIsZero = true
-      for (let i = 1; i <= 8; i++) {
-        if (bytes[i] !== 0) {
-          mantissaIsZero = false
-          break
-        }
-      }
-      if (mantissaIsZero) {
-        throw new Error('non-canonical MPT amount: negative-zero encoding')
       }
     }
   }

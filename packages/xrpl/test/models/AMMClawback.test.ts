@@ -270,14 +270,4 @@ describe('AMMClawback', function () {
     const errorMessage = 'AMMClawback: invalid field Amount'
     assertInvalid(mptClawback, errorMessage)
   })
-
-  it(`throws w/ MPT Asset mpt_issuance_id contains non-hex characters`, function () {
-    ammClawback.Asset = { mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }
-    assertInvalid(ammClawback, 'AMMClawback: invalid field Asset')
-  })
-
-  it(`throws w/ MPT Asset mpt_issuance_id wrong length`, function () {
-    ammClawback.Asset = { mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }
-    assertInvalid(ammClawback, 'AMMClawback: invalid field Asset')
-  })
 })

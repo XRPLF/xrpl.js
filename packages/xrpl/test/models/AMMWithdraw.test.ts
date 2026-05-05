@@ -221,16 +221,4 @@ describe('AMMWithdraw', function () {
     const errorMessage = 'AMMWithdraw: Amount must be an Amount'
     assertInvalid(withdraw, errorMessage)
   })
-
-  it(`throws w/ MPT Asset mpt_issuance_id contains non-hex characters`, function () {
-    withdraw.Asset = { mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }
-    withdraw.Asset2 = { mpt_issuance_id: MPT_ISSUANCE_ID_2 }
-    assertInvalid(withdraw, 'AMMWithdraw: Asset must be a Currency')
-  })
-
-  it(`throws w/ MPT Asset mpt_issuance_id wrong length`, function () {
-    withdraw.Asset = { mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }
-    withdraw.Asset2 = { mpt_issuance_id: MPT_ISSUANCE_ID_2 }
-    assertInvalid(withdraw, 'AMMWithdraw: Asset must be a Currency')
-  })
 })

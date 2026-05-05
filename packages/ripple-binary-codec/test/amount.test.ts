@@ -88,7 +88,7 @@ describe('Amount', function () {
       '8000000000000001' +
       '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
     expect(() => Amount.fromParser(makeParser(blob))).toThrow(
-      'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
+      new Error('non-canonical MPT amount: mantissa exceeds maxMPTokenAmount'),
     )
   })
 
@@ -99,7 +99,7 @@ describe('Amount', function () {
       '0000000000000000' +
       '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
     expect(() => Amount.fromParser(makeParser(blob))).toThrow(
-      'non-canonical MPT amount: negative-zero encoding',
+      new Error('non-canonical MPT amount: negative-zero encoding'),
     )
   })
 

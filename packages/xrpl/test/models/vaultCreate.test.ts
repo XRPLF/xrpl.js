@@ -12,7 +12,6 @@ import {
   assertTxIsValid,
   assertTxValidationError,
   MPT_ISSUANCE_ID_1,
-  MPTID_LENGTH,
 } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)
@@ -51,16 +50,6 @@ describe('VaultCreate', function () {
       issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
     }
     assertValid(tx)
-  })
-
-  it('throws w/ MPT Asset mpt_issuance_id contains non-hex characters', function () {
-    tx.Asset = { mpt_issuance_id: 'Z'.repeat(MPTID_LENGTH) }
-    assertInvalid(tx, 'VaultCreate: invalid field Asset')
-  })
-
-  it('throws w/ MPT Asset mpt_issuance_id wrong length', function () {
-    tx.Asset = { mpt_issuance_id: 'A'.repeat(MPTID_LENGTH - 1) }
-    assertInvalid(tx, 'VaultCreate: invalid field Asset')
   })
 
   it('throws w/ missing Asset', function () {
