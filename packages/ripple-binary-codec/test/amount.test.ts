@@ -80,6 +80,29 @@ describe('Amount', function () {
       })
     }
   })
+  it('rejects MPT amount blob with mantissa above maxMPTokenAmount', function () {
+    // flag 0x60 (MPT, positive) ‖ mantissa 0x8000000000000001 (high bit set,
+    // i.e. one above maxMPTokenAmount) ‖ 24-byte MPTID
+    const blob =
+      '60' +
+      '8000000000000001' +
+      '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
+    expect(() => Amount.fromParser(makeParser(blob))).toThrow(
+      'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
+    )
+  })
+
+  it('rejects MPT amount blob with negative-zero encoding', function () {
+    // flag 0x20 (MPT, negative) ‖ mantissa 0 ‖ 24-byte MPTID
+    const blob =
+      '20' +
+      '0000000000000000' +
+      '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
+    expect(() => Amount.fromParser(makeParser(blob))).toThrow(
+      'non-canonical MPT amount: negative-zero encoding',
+    )
+  })
+
   it('rejects non-numeric MPT amount values with a validation error', function () {
     const mpt = {
       value: 'abc',

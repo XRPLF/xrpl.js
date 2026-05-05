@@ -165,7 +165,9 @@ class Amount extends SerializedType {
       amount = concat(intBuf)
 
       const mptIssuanceID = Hash192.from(value.mpt_issuance_id).toBytes()
-      return new Amount(concat([leadingByte, amount, mptIssuanceID]))
+      const mptBytes = concat([leadingByte, amount, mptIssuanceID])
+      Amount.assertMptBytesAreCanonical(mptBytes)
+      return new Amount(mptBytes)
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -183,8 +185,12 @@ class Amount extends SerializedType {
 
     // the amount can be either MPT or XRP at this point
     const isMPT = parser.peek() & 0x20
-    const numBytes = isMPT ? 33 : 8
-    return new Amount(parser.read(numBytes))
+    if (isMPT) {
+      const bytes = parser.read(33)
+      Amount.assertMptBytesAreCanonical(bytes)
+      return new Amount(bytes)
+    }
+    return new Amount(parser.read(8))
   }
 
   /**
@@ -234,6 +240,7 @@ class Amount extends SerializedType {
     }
 
     if (this.isMPT()) {
+      Amount.assertMptBytesAreCanonical(this.bytes)
       const parser = new BinaryParser(this.toString())
       const leadingByte = parser.read(1)
       const amount = parser.read(8)
@@ -324,6 +331,36 @@ class Amount extends SerializedType {
 
       if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
         throw new Error(`${amount.toString()} is an illegal amount`)
+      }
+    }
+  }
+
+  /**
+   * Validate the canonical form of an MPT amount on its 33-byte wire layout
+   * (leadingByte ‖ mantissa ‖ MPTID). Mirrors the bounds enforced on the JSON
+   * construction path so non-canonical blobs are rejected at deserialization.
+   *
+   * @param bytes 33-byte MPT amount blob
+   * @returns void, throws if the mantissa exceeds maxMPTokenAmount (high bit
+   *   set) or the value is encoded as negative zero.
+   */
+  private static assertMptBytesAreCanonical(bytes: Uint8Array): void {
+    const isPositive = (bytes[0] & 0x40) !== 0
+    if ((bytes[1] & 0x80) !== 0) {
+      throw new Error(
+        'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
+      )
+    }
+    if (!isPositive) {
+      let mantissaIsZero = true
+      for (let i = 1; i <= 8; i++) {
+        if (bytes[i] !== 0) {
+          mantissaIsZero = false
+          break
+        }
+      }
+      if (mantissaIsZero) {
+        throw new Error('non-canonical MPT amount: negative-zero encoding')
       }
     }
   }

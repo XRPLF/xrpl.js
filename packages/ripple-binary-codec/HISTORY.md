@@ -7,6 +7,7 @@
 * Fix: Validate the input of non-numeric values for `Amount` field.
 * Fix: Add validation checks for negative inputs to `read`, `peek` and `skip` methods in the binary-codec.
 * Fix: `Amount.toJSON()` no longer mutates the internal buffer for native XRP amounts; subsequent calls and re-serializations now return consistent values (#3319).
+* Fix: `Amount.fromParser` and `Amount.toJSON` now reject non-canonical MPT amounts (mantissa above `maxMPTokenAmount` and negative-zero encodings), matching the validation already enforced on the JSON construction path.
 
 ## 2.7.0 (2026-02-12)
 
