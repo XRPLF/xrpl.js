@@ -180,7 +180,8 @@ export function isCurrency(input: unknown): input is Currency {
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
         input.currency === 'XRP') ||
       (Object.keys(input).length === MPT_CURRENCY_SIZE &&
-        isString(input.mpt_issuance_id)))
+        isString(input.mpt_issuance_id) &&
+        isValidMPTIssuanceId(input.mpt_issuance_id)))
   )
 }
 
