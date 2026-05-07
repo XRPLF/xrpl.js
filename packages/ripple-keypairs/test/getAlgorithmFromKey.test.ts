@@ -58,7 +58,7 @@ describe('getAlgorithmFromKey', () => {
 
         Type: private
         Key: [redacted]
-        Prefix: 0xff
+        Prefix: [redacted]
         Length: 31 bytes
 
         Acceptable private formats are:

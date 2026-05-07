@@ -80,12 +80,13 @@ function keyError({
 }) {
   const validFormats = getValidFormatsTable(type)
   const keyRepr = type === 'private' ? '[redacted]' : key
+  const prefixRprMsg = type === 'private' ? '[redacted]' : prefixRepr(prefix)
 
   return `invalid_key:
 
 Type: ${type}
 Key: ${keyRepr}
-Prefix: ${prefixRepr(prefix)}
+Prefix: ${prefixRprMsg}
 Length: ${len} bytes
 
 Acceptable ${type} formats are:
