@@ -124,4 +124,28 @@ describe('getAlgorithmFromKey', () => {
     expect(publicThrown).toBeDefined()
     expect(publicThrown?.message).toContain(`Key: ${invalidPublicKey}`)
   })
+
+  it.each([
+    ['empty string', ''],
+    ['odd-length hex', `ff${hexData(61)}`],
+    ['oversized hex string', hexData(200)],
+  ])(
+    'should redact private key material for non-standard length: %s',
+    (_label, invalidPrivateKey) => {
+      let thrown: Error | undefined
+      try {
+        getAlgorithmFromKey(invalidPrivateKey, 'private')
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          thrown = error
+        }
+      }
+      expect(thrown).toBeDefined()
+      expect(thrown?.message).toContain('Key: [redacted]')
+      expect(thrown?.message).toContain('Prefix: [redacted]')
+      if (invalidPrivateKey.length > 0) {
+        expect(thrown?.message).not.toContain(invalidPrivateKey)
+      }
+    },
+  )
 })
