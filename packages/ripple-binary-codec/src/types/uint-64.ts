@@ -51,7 +51,7 @@ class UInt64 extends UInt {
       return val
     }
 
-    let buf = new Uint8Array(UInt64.width)
+    let buf: Uint8Array = new Uint8Array(UInt64.width)
 
     if (typeof val === 'number' && Number.isInteger(val)) {
       if (val < 0) {
