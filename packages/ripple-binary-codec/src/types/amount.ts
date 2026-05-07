@@ -2,7 +2,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { Currency } from './currency'
-import { JsonObject, SerializedType } from './serialized-type'
+import { JsonObject, SerializedType, SerializedTypeID } from './serialized-type'
 import BigNumber from 'bignumber.js'
 import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
 import { readUInt32BE, writeUInt32BE } from '../utils'
@@ -371,6 +371,10 @@ class Amount extends SerializedType {
    */
   private isIOU(): boolean {
     return (this.bytes[0] & 0x80) !== 0
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_AMOUNT
   }
 }
 

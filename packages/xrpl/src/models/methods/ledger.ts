@@ -144,7 +144,8 @@ export interface LedgerRequestExpandedAccountsOnly extends LedgerRequest {
  *
  * @category Requests
  */
-// eslint-disable-next-line max-len -- Disable for interface declaration.
+
+// eslint-disable-next-line max-len -- Interface name is descriptive and intentionally long
 export interface LedgerRequestExpandedAccountsAndTransactions extends LedgerRequest {
   expand: true
   accounts: true

@@ -90,6 +90,7 @@ export interface TransactionMetadataBase {
   TransactionResult: string
 
   ParentBatchID?: string
+  GasUsed?: number
 }
 
 export type TransactionMetadata<T extends BaseTransaction = Transaction> =

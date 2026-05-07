@@ -35,6 +35,12 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
    */
   AMMID?: string
   /**
+   * The ledger entry ID of the corresponding Contract ledger entry.
+   * Set during contract creation; cannot be modified.
+   * If present, indicates that this is a special Contract AccountRoot; always omitted on non-Contract accounts.
+   */
+  ContractID?: string
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */

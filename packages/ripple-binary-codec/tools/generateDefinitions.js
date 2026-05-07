@@ -104,6 +104,7 @@ async function main() {
         VL: 'Blob',
         DIR_NODE: 'DirectoryNode',
         PAYCHAN: 'PayChannel',
+        DATATYPE: 'DataType',
       }
       if (nonstandardRenames[inp] != null) return nonstandardRenames[inp]
 

@@ -43,6 +43,16 @@ export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
 export { Clawback } from './clawback'
+export { ContractCall } from './contractCall'
+export { ContractClawback } from './contractClawback'
+export {
+  ContractFlags,
+  ContractFlagsInterface,
+  ContractCreate,
+} from './contractCreate'
+export { ContractDelete } from './contractDelete'
+export { ContractModify } from './contractModify'
+export { ContractUserDelete } from './contractUserDelete'
 export { CredentialAccept } from './CredentialAccept'
 export { CredentialCreate } from './CredentialCreate'
 export { CredentialDelete } from './CredentialDelete'

@@ -326,3 +326,42 @@ export interface MPTokenMetadataUri {
    */
   title: string
 }
+
+export interface Function {
+  Function: {
+    FunctionName: string
+    Parameters?: Parameter[]
+  }
+}
+
+export interface ParameterType {
+  type: string
+}
+
+export interface ParameterValue {
+  type: string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- value can be any type depending on the parameter
+  value: any
+}
+
+export interface Parameter {
+  Parameter: {
+    ParameterFlag?: number
+    ParameterType?: ParameterType
+    ParameterValue?: ParameterValue
+  }
+}
+
+export interface InstanceParameter {
+  InstanceParameter: {
+    ParameterFlag: number
+    ParameterType: ParameterType
+  }
+}
+
+export interface InstanceParameterValue {
+  InstanceParameterValue: {
+    ParameterFlag: number
+    ParameterValue: ParameterValue
+  }
+}

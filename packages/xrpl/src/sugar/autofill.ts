@@ -2,6 +2,7 @@
 /* eslint-disable max-lines -- lots of helper functions needed for autofill */
 import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import { encode } from 'ripple-binary-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
@@ -15,7 +16,7 @@ import { Batch, Payment, Transaction } from '../models/transactions'
 import { Account } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
-import getFeeXrp from './getFeeXrp'
+import getFeeXrp, { getGasEstimate } from './getFeeXrp'
 
 // Expire unconfirmed transactions after 20 ledger versions, approximately 1 minute, by default
 const LEDGER_OFFSET = 20
@@ -406,6 +407,27 @@ export async function getTransactionFee(
   const fee = await calculateFeePerTransactionType(client, tx, signersCount)
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
+}
+
+/**
+ * Estimates and sets the ComputationAllowance for a transaction by encoding
+ * a copy of the transaction with an empty SigningPubKey and zero Fee, then
+ * querying the gas estimate from the server.
+ *
+ * @param client - The client used to request the gas estimate.
+ * @param tx - The transaction object to set ComputationAllowance on.
+ * @returns A promise that resolves once ComputationAllowance has been set.
+ */
+export async function getComputationAllowance(
+  client: Client,
+  tx: Transaction,
+): Promise<void> {
+  const copyTx = { ...tx }
+  copyTx.ComputationAllowance = 100000000000
+  delete copyTx.SigningPubKey
+  const tx_blob = encode(copyTx)
+  // eslint-disable-next-line require-atomic-updates, no-param-reassign -- ignore
+  tx.ComputationAllowance = await getGasEstimate(client, tx_blob)
 }
 
 /**

@@ -23,6 +23,15 @@ import {
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
+import { ContractCall, validateContractCall } from './contractCall'
+import { ContractClawback, validateContractClawback } from './contractClawback'
+import { ContractCreate, validateContractCreate } from './contractCreate'
+import { ContractDelete, validateContractDelete } from './contractDelete'
+import { ContractModify, validateContractModify } from './contractModify'
+import {
+  ContractUserDelete,
+  validateContractUserDelete,
+} from './contractUserDelete'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -165,6 +174,12 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | ContractCall
+  | ContractClawback
+  | ContractCreate
+  | ContractDelete
+  | ContractModify
+  | ContractUserDelete
   | CredentialAccept
   | CredentialCreate
   | CredentialDelete
@@ -344,6 +359,30 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'Clawback':
       validateClawback(tx)
+      break
+
+    case 'ContractCall':
+      validateContractCall(tx)
+      break
+
+    case 'ContractClawback':
+      validateContractClawback(tx)
+      break
+
+    case 'ContractCreate':
+      validateContractCreate(tx)
+      break
+
+    case 'ContractDelete':
+      validateContractDelete(tx)
+      break
+
+    case 'ContractModify':
+      validateContractModify(tx)
+      break
+
+    case 'ContractUserDelete':
+      validateContractUserDelete(tx)
       break
 
     case 'CredentialAccept':

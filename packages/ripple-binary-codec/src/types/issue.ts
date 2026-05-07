@@ -3,7 +3,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { Currency } from './currency'
-import { JsonObject, SerializedType } from './serialized-type'
+import { JsonObject, SerializedType, SerializedTypeID } from './serialized-type'
 import { Hash192 } from './hash-192'
 import { readUInt32BE, writeUInt32BE } from '../utils'
 
@@ -157,6 +157,10 @@ class Issue extends SerializedType {
       currency: currency.toJSON(),
       issuer: issuer.toJSON(),
     }
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_ISSUE
   }
 }
 

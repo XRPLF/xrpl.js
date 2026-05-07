@@ -3,6 +3,7 @@ import { BinaryParser } from '../serdes/binary-parser'
 import { bytesToHex, concat, hexToBytes } from '@xrplf/isomorphic/utils'
 import { readUInt32BE, writeUInt32BE } from '../utils'
 import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
+import { SerializedTypeID } from './serialized-type'
 
 const HEX_REGEX = /^[a-fA-F0-9]{1,16}$/
 const BASE10_REGEX = /^[0-9]{1,20}$/
@@ -130,6 +131,10 @@ class UInt64 extends UInt {
    */
   toBytes(): Uint8Array {
     return this.bytes
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_UINT64
   }
 }
 

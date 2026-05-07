@@ -69,6 +69,7 @@ import {
   autofillBatchTxn,
   handleDeliverMax,
   getTransactionFee,
+  getComputationAllowance,
 } from '../sugar/autofill'
 import { formatBalances } from '../sugar/balances'
 import {
@@ -688,6 +689,7 @@ class Client extends EventEmitter<EventTypes> {
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
+  // eslint-disable-next-line complexity -- ignore
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
@@ -716,6 +718,9 @@ class Client extends EventEmitter<EventTypes> {
     }
     if (tx.TransactionType === 'Payment' && tx.DeliverMax != null) {
       handleDeliverMax(tx)
+    }
+    if (tx.TransactionType === 'ContractCall' && !tx.ComputationAllowance) {
+      promises.push(getComputationAllowance(this, tx))
     }
 
     return Promise.all(promises).then(() => tx)

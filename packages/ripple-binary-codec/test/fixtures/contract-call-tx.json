@@ -1,0 +1,132 @@
+{
+  "Account": "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn",
+  "ComputationAllowance": 1000000,
+  "ContractAccount": "rBziFEmkBf1QaVKq36EHu9BXaLGmvDC6ww",
+  "Fee": "200",
+  "FunctionName": "66756E6374696F6E5F706172616D73",
+  "Parameters": [
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "UInt8",
+          "value": 255
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "UInt16",
+          "value": 65535
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "UInt32",
+          "value": 4294967295
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "UInt64",
+          "value": "7FFFFFFFFFFFFFFF"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Hash128",
+          "value": "00000000000000000000000000000001"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Hash160",
+          "value": "0000000000000000000000000000000000000001"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Hash192",
+          "value": "000000000000000000000000000000000000000000000001"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Hash256",
+          "value": "D955DAC2E77519F05AD151A5D3C99FC8125FB39D58FF9F106F1ACA4491902C25"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Blob",
+          "value": "DEADBEEF"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "AccountID",
+          "value": "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Amount",
+          "value": "1000000"
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Amount",
+          "value": {
+            "currency": "USD",
+            "issuer": "rExKpRKXNz25UAjbckCRtQsJFcSfjL9Er3",
+            "value": "1.2"
+          }
+        }
+      }
+    },
+    {
+      "Parameter": {
+        "ParameterFlag": 0,
+        "ParameterValue": {
+          "type": "Number",
+          "value": "1.2"
+        }
+      }
+    }
+  ],
+  "Sequence": 5,
+  "TransactionType": "ContractCall"
+}

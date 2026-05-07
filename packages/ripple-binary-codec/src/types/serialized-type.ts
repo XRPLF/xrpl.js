@@ -2,6 +2,69 @@ import { BytesList } from '../serdes/binary-serializer'
 import { BinaryParser } from '../serdes/binary-parser'
 import { XrplDefinitionsBase } from '../enums'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
+import definitions from '../enums/definitions.json'
+
+/**
+ * Enum for SerializedTypeID values used in XRPL
+ * These match the C++ implementation's STI_ constants
+ */
+export enum SerializedTypeID {
+  STI_NOTPRESENT = 0,
+  STI_UINT16 = 1,
+  STI_UINT32 = 2,
+  STI_UINT64 = 3,
+  STI_UINT128 = 4,
+  STI_UINT256 = 5,
+  STI_AMOUNT = 6,
+  STI_VL = 7,
+  STI_ACCOUNT = 8,
+  STI_NUMBER = 9,
+  STI_INT32 = 10,
+  STI_INT64 = 11,
+
+  STI_OBJECT = 14,
+  STI_ARRAY = 15,
+
+  STI_UINT8 = 16,
+  STI_UINT160 = 17,
+  STI_PATHSET = 18,
+  STI_VECTOR256 = 19,
+  STI_UINT96 = 20,
+  STI_UINT192 = 21,
+  STI_UINT384 = 22,
+  STI_UINT512 = 23,
+  STI_ISSUE = 24,
+  STI_XCHAIN_BRIDGE = 25,
+  STI_CURRENCY = 26,
+  STI_DATA = 27,
+  STI_DATATYPE = 28,
+  STI_JSON = 29,
+}
+
+/**
+ * Maps built dynamically from definitions.json TYPES.
+ * This ensures type string names (e.g. "Hash256", "Hash128") stay in sync
+ * with the canonical definitions rather than using hardcoded uppercase variants.
+ */
+
+// Map of type name strings to SerializedTypeID values
+export const TYPE_STRING_TO_ID: Record<string, SerializedTypeID> = {}
+
+// Map of numeric type codes to SerializedTypeID values
+export const TYPE_NUMBER_TO_ID: Record<number, SerializedTypeID> = {}
+
+// Map of SerializedTypeID values to type name strings
+export const TYPE_ID_TO_STRING: Record<number, string> = {}
+
+// Populate all three maps from definitions.json TYPES
+for (const [name, id] of Object.entries(definitions.TYPES)) {
+  if (id >= 0) {
+    const typeId = id as SerializedTypeID
+    TYPE_STRING_TO_ID[name] = typeId
+    TYPE_NUMBER_TO_ID[id] = typeId
+    TYPE_ID_TO_STRING[typeId] = name
+  }
+}
 
 type JSON = string | number | boolean | null | undefined | JSON[] | JsonObject
 
@@ -76,6 +139,10 @@ class SerializedType {
    */
   toString(): string {
     return this.toHex()
+  }
+
+  getSType(): SerializedTypeID {
+    return this.getSType()
   }
 }
 

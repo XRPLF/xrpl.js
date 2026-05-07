@@ -2,6 +2,7 @@ import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { writeUInt8 } from '../utils'
+import { SerializedTypeID } from './serialized-type'
 
 /**
  * Derived UInt class for serializing/deserializing 8 bit UInt
@@ -46,6 +47,10 @@ class UInt8 extends UInt {
    */
   valueOf(): number {
     return parseInt(bytesToHex(this.bytes), 16)
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_UINT8
   }
 }
 
