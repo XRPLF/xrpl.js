@@ -125,13 +125,13 @@ describe('getAlgorithmFromKey', () => {
     expect(publicThrown?.message).toContain(`Key: ${invalidPublicKey}`)
   })
 
-  it.each([
+  const nonStandardLengthCases: Array<[string, string]> = [
     ['empty string', ''],
     ['odd-length hex', `ff${hexData(61)}`],
     ['oversized hex string', hexData(200)],
-  ])(
-    'should redact private key material for non-standard length: %s',
-    (_label, invalidPrivateKey) => {
+  ]
+  for (const [label, invalidPrivateKey] of nonStandardLengthCases) {
+    it(`should redact private key material for non-standard length: ${label}`, () => {
       let thrown: Error | undefined
       try {
         getAlgorithmFromKey(invalidPrivateKey, 'private')
@@ -146,6 +146,6 @@ describe('getAlgorithmFromKey', () => {
       if (invalidPrivateKey.length > 0) {
         expect(thrown?.message).not.toContain(invalidPrivateKey)
       }
-    },
-  )
+    })
+  }
 })
