@@ -3,6 +3,28 @@
 ## Unreleased
 
 ### Fixed
+* Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
+* Fix: Validate the input of non-numeric values for `Amount` field.
+* Fix: Add validation checks for negative inputs to `read`, `peek` and `skip` methods in the binary-codec.
+* Fix: `Amount.toJSON()` no longer mutates the internal buffer for native XRP amounts; subsequent calls and re-serializations now return consistent values (#3319).
+
+## 2.7.0 (2026-02-12)
+
+### Added
+* Add `Int32` serialized type.
+
+### Fixed
+* Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
+* Error if a decimal is passed into a `UInt`-typed field.
+
+## 2.6.0 (2025-12-16)
+
+### Added
+* Allow `encodeForMultisigning` to work with transactions that have non-empty `SigningPubKey`. Required to encode `LoanSet` transaction by counterparty signers for signing.
+
+## 2.5.1 (2025-10-29)
+
+### Fixed
 * Fix serialization/deserialization issues in `Issue` serialized type for MPTIssue.
 
 ## 2.5.0 (2025-07-29)

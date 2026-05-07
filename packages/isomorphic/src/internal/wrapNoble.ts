@@ -1,4 +1,4 @@
-import { CHash } from '@noble/hashes/utils'
+import { CHash } from '@noble/hashes/utils.js'
 import { Hash, HashFn, Input } from './types'
 import normalizeInput from './normalizeInput'
 

@@ -253,6 +253,16 @@ class Client extends EventEmitter<EventTypes> {
       )
     }
 
+    if (
+      options.authorization != null &&
+      !server.startsWith('wss://') &&
+      !server.startsWith('wss+unix://')
+    ) {
+      throw new ValidationError(
+        'Authorization Credentials cannot be sent over an unencrypted connection. Use wss:// or wss+unix:// instead.',
+      )
+    }
+
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
 
@@ -263,7 +273,12 @@ class Client extends EventEmitter<EventTypes> {
     })
 
     this.connection.on('reconnect', () => {
-      this.connection.on('connected', () => this.emit('connected'))
+      // Remove any stale 'connected' listeners from previous reconnect attempts
+      // to prevent duplicate event emissions (N+1 listener accumulation)
+      this.connection.removeAllListeners('connected')
+
+      // Use .once() so the listener auto-removes after firing
+      this.connection.once('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {
@@ -508,9 +523,19 @@ class Client extends EventEmitter<EventTypes> {
   }
 
   /**
-   * Get networkID and buildVersion from server_info
+   * Get networkID and buildVersion from server_info.
+   *
+   * Throws if the underlying `server_info` request fails (e.g. `RippledError`
+   * for `noNetwork` / `notSynced`, `DisconnectedError`, `TimeoutError`), or if
+   * the response succeeds but does not include `network_id`. Callers must
+   * handle these — letting them propagate is intentional, since signing a
+   * transaction without a known network ID can produce a signature that is
+   * valid on the wrong network (cross-network replay).
    *
    * @returns void
+   * @throws {XrplError} If the `server_info` response does not include a `network_id`.
+   * @throws {RippledError} If rippled returns an error (e.g. server not synced to network).
+   * @throws {DisconnectedError | TimeoutError | NotConnectedError} If the request cannot reach the server.
    * @example
    * ```ts
    * const { Client } = require('xrpl')
@@ -521,15 +546,15 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async getServerInfo(): Promise<void> {
-    try {
-      const response = await this.request({
-        command: 'server_info',
-      })
-      this.networkID = response.result.info.network_id ?? undefined
-      this.buildVersion = response.result.info.build_version
-    } catch (error) {
-      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
-      console.error(error)
+    const response = await this.request({
+      command: 'server_info',
+    })
+    this.networkID = response.result.info.network_id ?? undefined
+    this.buildVersion = response.result.info.build_version
+    if (this.networkID === undefined) {
+      throw new XrplError(
+        'server_info response is missing network_id; cannot safely sign transactions without a known network ID',
+      )
     }
   }
 
@@ -1150,7 +1175,7 @@ class Client extends EventEmitter<EventTypes> {
    * const newWallet = Wallet.generate()
    * const { balance, wallet  } = await client.fundWallet(newWallet, {
    *       amount: '10',
-   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetHost: 'custom-faucet.example.com',
    *       faucetPath: '/accounts'
    *     })
    *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
@@ -1160,6 +1185,20 @@ class Client extends EventEmitter<EventTypes> {
    * }
    * ```
    *
+   * Example 3: Fund wallet using a local faucet server
+   *
+   * To interact with a faucet server running on http://, use the faucetProtocol option:
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'localhost:8000',
+   *       faucetPath: '/accounts',
+   *       faucetProtocol: 'http'
+   *     })
+   * ```
+   *
    * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
    * @param options - See below.
    * @param options.faucetHost - A custom host for a faucet server. On devnet,
@@ -1167,6 +1206,8 @@ class Client extends EventEmitter<EventTypes> {
    * attempt to determine the correct server automatically. In other environments,
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,

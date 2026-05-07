@@ -48,12 +48,12 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Amount of assets currently available for withdrawal.
        */
-      AssetsAvailable: string
+      AssetsAvailable?: string
 
       /**
        * Total amount of assets in the vault.
        */
-      AssetsTotal: string
+      AssetsTotal?: string
 
       /**
        * Ledger entry type, always "Vault".
@@ -166,6 +166,22 @@ export interface VaultInfoResponse extends BaseResponse {
       WithdrawalPolicy?: number
 
       /**
+       * The maximum asset amount that can be held in the vault. Zero value indicates there is no cap.
+       */
+      AssetsMaximum?: string
+
+      /**
+       * Arbitrary metadata about the Vault. Limited to 256 bytes.
+       */
+      Data?: string
+
+      /**
+       * The scaling factor for vault shares. Only applicable for IOU assets.
+       * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
+       */
+      Scale?: number
+
+      /**
        * Flags
        */
       Flags?: number
@@ -182,6 +198,12 @@ export interface VaultInfoResponse extends BaseResponse {
      * response.
      */
     ledger_index?: number
+
+    /**
+     * The ledger index of the current in-progress ledger, which was used when
+     * retrieving this information. May be omitted.
+     */
+    ledger_current_index?: number
 
     /**
      * If included and set to true, the information in this response comes from

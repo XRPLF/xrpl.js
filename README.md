@@ -78,7 +78,6 @@ If you're using xrpl.js with React or Deno, you'll need to do a couple extra ste
 - [Using xrpl.js with `create-react-app`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-create-react-app)
 - [Using xrpl.js with `React Native`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-react-native)
 - [Using xrpl.js with `Vite React`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-vite-react)
-- [Using xrpl.js with `Deno`](https://github.com/XRPLF/xrpl.js/blob/main/UNIQUE_SETUPS.md#using-xrpljs-with-deno)
 
 ## Documentation
 
@@ -111,7 +110,7 @@ You are also welcome to create an [issue](https://github.com/XRPLF/xrpl.js/issue
 
 - [xrpl.js Reference Docs](https://js.xrpl.org/)
 - [xrpl.org (Detailed docs on how the XRPL works)](https://xrpl.org/references.html)
-- [XRPL Code Samples](https://github.com/XRPLF/xrpl-dev-portal/tree/master/content/_code-samples)
+- [XRPL Code Samples](https://github.com/XRPLF/xrpl-dev-portal/tree/master/_code-samples)
 - [#javascript in the XRPL Developer Discord for questions & support](https://xrpldevs.org)
 - [xrpl-announce (The mailing list for new xrpl.js versions)](https://groups.google.com/g/xrpl-announce)
 - [Applications that use xrpl.js](https://github.com/XRPLF/xrpl.js/blob/main/APPLICATIONS.md) (You can open a PR to add your project!)

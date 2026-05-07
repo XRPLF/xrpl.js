@@ -196,7 +196,7 @@ export function compare(a: TypedArray, b: TypedArray): 1 | -1 | 0 {
     throw new Error('Cannot compare arrays of different length')
   }
 
-  for (let i = 0; i < a.length - 1; i += 1) {
+  for (let i = 0; i < a.length; i += 1) {
     if (a[i] > b[i]) return 1
     if (a[i] < b[i]) return -1
   }

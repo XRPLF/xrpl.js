@@ -81,10 +81,13 @@ async function createServer(): Promise<net.Server> {
 
 describe('Connection', function () {
   let clientContext: XrplTestContext
+  const CONNECTION_TIMEOUT = 1000
 
   beforeEach(async () => {
     // console.log(`before: `, expect.getState().currentTestName)
-    clientContext = await setupClient()
+    clientContext = await setupClient({
+      clientOptions: { connectionTimeout: CONNECTION_TIMEOUT },
+    })
   })
   afterEach(async () => {
     // console.log(`after: `, expect.getState().currentTestName)
@@ -425,7 +428,7 @@ describe('Connection', function () {
       } catch (error) {
         // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
-          "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
+          `Error: connect() timed out after ${CONNECTION_TIMEOUT} ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         )
         expect(spy).toHaveBeenCalled()
         // @ts-expect-error -- Promise throws timeout error after test is done
@@ -460,7 +463,7 @@ describe('Connection', function () {
     'reconnect on unexpected close',
     async () => {
       const connectedPromise = new Promise<void>((resolve) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           resolve()
         })
       })
@@ -506,7 +509,7 @@ describe('Connection', function () {
       const num = 3
 
       const connectedPromise = new Promise<void>((resolve, reject) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           connectsCount += 1
           if (connectsCount < num) {
             breakConnection()
@@ -636,7 +639,7 @@ describe('Connection', function () {
           reject(new XrplError(`should not throw error, got ${String(error)}`))
         })
 
-        setTimeout(resolve, 5000)
+        setTimeout(resolve, 500)
       })
 
       const disconnectedPromise = new Promise<void>((resolve) => {
@@ -668,6 +671,26 @@ describe('Connection', function () {
       // @ts-expect-error -- Testing private member
       clientContext.client.connection.ws.close()
       await connectedPromise
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'should not accumulate connected listeners after multiple reconnects',
+    async () => {
+      // Simulate multiple reconnect events
+      for (let iter = 0; iter < 5; iter++) {
+        clientContext.client.connection.emit('reconnect')
+      }
+
+      // There should be at most 1 'connected' listener on the connection,
+      // not 5 (which would indicate listener accumulation / leak)
+      const count = clientContext.client.connection.listenerCount('connected')
+      assert.strictEqual(
+        count,
+        1,
+        `Expected exactly 1 'connected' listener but found ${count}`,
+      )
     },
     TIMEOUT,
   )
@@ -915,7 +938,7 @@ describe('Connection', function () {
         reject(new XrplError('Should not emit error.'))
       })
 
-      setTimeout(resolve, 5000)
+      setTimeout(resolve, 500)
     })
 
     let disconnectedCount = 0
@@ -1015,7 +1038,7 @@ describe('Connection', function () {
 
       // wait to ensure that XrplError is not thrown after test is done
       await new Promise((resolve) => {
-        setTimeout(resolve, 2000)
+        setTimeout(resolve, 1500)
       })
 
       assert.includeMembers(traceMessages, [

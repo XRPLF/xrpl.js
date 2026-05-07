@@ -78,7 +78,7 @@ describe('Single Asset Vault', function () {
         LimitAmount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999999999e80',
         },
       }
 
@@ -91,7 +91,7 @@ describe('Single Asset Vault', function () {
         Amount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999',
         },
       }
 
@@ -109,9 +109,8 @@ describe('Single Asset Vault', function () {
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
+        AssetsMaximum: '9999900000000000000000000',
+        Scale: 2,
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)
@@ -137,7 +136,8 @@ describe('Single Asset Vault', function () {
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(assetsMaximum, '500')
+      assert.equal(assetsMaximum, '99999e20')
+      assert.equal(vault.Scale, 2)
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data
@@ -191,7 +191,7 @@ describe('Single Asset Vault', function () {
 
       // Should have new balance after deposit (this assumes AssetsTotal tracks deposits)
       assert.equal(
-        afterDepositVault.AssetsTotal,
+        afterDepositVault.AssetsTotal ?? '0',
         depositAmount,
         'Vault should reflect deposited assets',
       )
@@ -208,6 +208,8 @@ describe('Single Asset Vault', function () {
           issuer: issuerWallet.classicAddress,
           value: withdrawAmount,
         },
+        Destination: holderWallet.classicAddress,
+        DestinationTag: 10,
         Fee: '5000000',
       }
 
@@ -224,9 +226,9 @@ describe('Single Asset Vault', function () {
 
       // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
       assert.equal(
-        afterWithdrawVault.AssetsTotal,
+        afterWithdrawVault.AssetsTotal ?? '0',
         (
-          BigInt(afterDepositVault.AssetsTotal) - BigInt(withdrawAmount)
+          BigInt(afterDepositVault.AssetsTotal ?? '0') - BigInt(withdrawAmount)
         ).toString(),
         'Vault should reflect withdrawn assets',
       )
@@ -255,13 +257,14 @@ describe('Single Asset Vault', function () {
         account: vaultOwnerWallet.classicAddress,
         type: 'vault',
       })
+
       const afterClawbackVault = afterClawbackResult.result
         .account_objects[0] as Vault
 
       assert.equal(
-        afterClawbackVault.AssetsTotal,
+        afterClawbackVault.AssetsTotal ?? '0',
         (
-          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+          BigInt(afterWithdrawVault.AssetsTotal ?? '0') - BigInt(clawbackAmount)
         ).toString(),
         'Vault should reflect assets after clawback',
       )
@@ -356,8 +359,6 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
         Flags: VaultCreateFlags.tfVaultShareNonTransferable,
       }
 
@@ -470,9 +471,9 @@ describe('Single Asset Vault', function () {
 
       // Should have reduced balance after withdrawal (should be 0 if all withdrawn)
       assert.equal(
-        afterWithdrawVault.AssetsTotal,
+        afterWithdrawVault.AssetsTotal ?? '0',
         (
-          BigInt(afterDepositVault.AssetsTotal) - BigInt(withdrawAmount)
+          BigInt(afterDepositVault.AssetsTotal ?? '0') - BigInt(withdrawAmount)
         ).toString(),
         'Vault should reflect withdrawn assets',
       )
@@ -504,9 +505,9 @@ describe('Single Asset Vault', function () {
         .account_objects[0] as Vault
 
       assert.equal(
-        afterClawbackVault.AssetsTotal,
+        afterClawbackVault.AssetsTotal ?? '0',
         (
-          BigInt(afterWithdrawVault.AssetsTotal) - BigInt(clawbackAmount)
+          BigInt(afterWithdrawVault.AssetsTotal ?? '0') - BigInt(clawbackAmount)
         ).toString(),
         'Vault should reflect assets after clawback',
       )

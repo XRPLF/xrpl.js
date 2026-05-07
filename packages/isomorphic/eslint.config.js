@@ -1,5 +1,5 @@
 const globals = require('globals')
-const eslintConfig = require('@xrplf/eslint-config/base')
+const eslintConfig = require('@xrplf/eslint-config/base').default
 const tseslint = require('typescript-eslint')
 
 module.exports = [
@@ -74,6 +74,8 @@ module.exports = [
       'multiline-comment-style': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
+      // Allow .js extensions for @noble packages (required by @noble/hashes 2.0+)
+      'import/extensions': 'off',
     },
   },
   {

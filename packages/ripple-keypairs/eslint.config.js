@@ -1,5 +1,5 @@
 const globals = require('globals')
-const eslintConfig = require('@xrplf/eslint-config/base')
+const eslintConfig = require('@xrplf/eslint-config/base').default
 const tseslint = require('typescript-eslint')
 
 module.exports = [
@@ -67,6 +67,7 @@ module.exports = [
       'no-shadow': 'off',
       'multiline-comment-style': 'off',
       '@typescript-eslint/no-require-imports': 'off',
+      'import/extensions': 'off',
     },
   },
 ]

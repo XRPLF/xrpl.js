@@ -11,6 +11,8 @@ import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
 import { MPTokenIssuance } from './MPTokenIssuance'
+import Loan from './Loan'
+import LoanBroker from './LoanBroker'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
@@ -36,6 +38,8 @@ type LedgerEntry =
   | Escrow
   | FeeSettings
   | LedgerHashes
+  | Loan
+  | LoanBroker
   | NegativeUNL
   | Offer
   | Oracle
@@ -63,6 +67,8 @@ type LedgerEntryFilter =
   | 'escrow'
   | 'fee'
   | 'hashes'
+  | 'loan'
+  | 'loan_broker'
   | 'mpt_issuance'
   | 'mptoken'
   | 'nft_offer'
