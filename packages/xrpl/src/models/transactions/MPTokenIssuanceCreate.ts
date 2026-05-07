@@ -58,12 +58,13 @@ export enum MPTokenIssuanceCreateFlags {
 }
 
 /**
- * Map of flags to boolean values representing {@link MPTokenIssuanceCreate} transaction
- * flags.
+ * Map of flags to boolean values representing {@link MPTokenIssuanceCreate}
+ * transaction flags.
  *
  * @category Transaction Flags
  */
 
+// eslint-disable-next-line max-len -- Interface name is descriptive and intentionally long
 export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
   tfMPTRequireAuth?: boolean

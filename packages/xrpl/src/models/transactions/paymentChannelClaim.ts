@@ -74,6 +74,7 @@ export enum PaymentChannelClaimFlags {
  * ```
  */
 
+// eslint-disable-next-line max-len -- Interface name is descriptive and intentionally long
 export interface PaymentChannelClaimFlagsInterface extends GlobalFlagsInterface {
   /**
    * Clear the channel's Expiration time. (Expiration is different from the
