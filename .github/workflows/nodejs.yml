@@ -140,7 +140,6 @@ jobs:
           fetch-depth: 0
 
       - name: Run docker in background
-        id: run-docker
         run: |
           docker run \
             --detach \
@@ -177,17 +176,6 @@ jobs:
         run: npm ci
 
       - run: npm run build
-
-      - name: Check if Docker container is running
-        id: check-docker-container
-        run: |
-          if ! docker ps | grep -q rippled-service; then
-            echo "INFO: Currently running docker containers:"
-            docker ps
-            echo "ERROR: rippled-service Docker container is not running"
-            exit 1
-          fi
-          docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
         run: npm run test:integration
@@ -217,7 +205,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Run docker in background
-        id: run-docker
         run: |
           docker run \
             --detach \
@@ -249,17 +236,6 @@ jobs:
         run: npm ci
 
       - run: npm run build
-
-      - name: Check if Docker container is running
-        id: check-docker-container
-        run: |
-          if ! docker ps | grep -q rippled-service; then
-            echo "INFO: Currently running docker containers:"
-            docker ps
-            echo "ERROR: rippled-service Docker container is not running"
-            exit 1
-          fi
-          docker inspect ${{ steps.run-docker.outputs.docker-container-id }}
 
       - name: Run integration test
         run: npm run test:browser
