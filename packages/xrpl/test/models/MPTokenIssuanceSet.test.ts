@@ -220,6 +220,34 @@ describe('MPTokenIssuanceSet', function () {
     )
   })
 
+  it(`Throws w/ object-form Flags that resolve to 0 (empty object)`, function () {
+    const noOpMPTokenIssuanceSet = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Flags: {},
+    } as any
+
+    assertInvalid(
+      noOpMPTokenIssuanceSet,
+      'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
+    )
+  })
+
+  it(`Throws w/ object-form Flags that resolve to 0 (all flags false)`, function () {
+    const noOpMPTokenIssuanceSet = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Flags: { tfMPTLock: false, tfMPTUnlock: false },
+    } as any
+
+    assertInvalid(
+      noOpMPTokenIssuanceSet,
+      'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
+    )
+  })
+
   it(`Throws w/ Holder field and mutating the MPTokenIssuance ledger object`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',

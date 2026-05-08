@@ -201,7 +201,8 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     tx.MPTokenMetadata != null ||
     tx.TransferFee != null
   if (
-    (tx.Flags === 0 || tx.Flags === undefined) &&
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
+    convertTxFlagsToNumber(tx as Transaction) === 0 &&
     tx.DomainID == null &&
     !isMutate
   ) {
