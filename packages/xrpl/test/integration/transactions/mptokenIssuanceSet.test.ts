@@ -8,7 +8,10 @@ import {
   TransactionMetadata,
   MPTokenIssuanceCreateMutableFlags,
   MPTokenIssuanceSetMutableFlags,
+  parseMPTokenIssuanceFlags,
+  parseMPTokenIssuanceMutableFlags,
 } from '../../../src'
+import type { MPTokenIssuance } from '../../../src/models/ledger/MPTokenIssuance'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -138,4 +141,127 @@ describe('MPTokenIssuanceDestroy', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'parsed lsf*/lsmf* flag views reflect mutations applied via MPTokenIssuanceSet',
+    async () => {
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock,
+      }
+
+      const createSubmitResponse = await testTransaction(
+        testContext.client,
+        createTx,
+        testContext.wallet,
+      )
+      const createTxResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: createSubmitResponse.result.tx_json.hash,
+      })
+      const createMeta = createTxResponse.result
+        .meta as TransactionMetadata<MPTokenIssuanceCreate>
+      const issuanceId = createMeta.mpt_issuance_id
+      assert.isString(issuanceId, 'Create did not return an mpt_issuance_id')
+
+      const issuanceBeforeSet = await readMPTokenIssuance(
+        testContext,
+        issuanceId!,
+      )
+      const parsedReadOnlyFlagsBeforeSet = parseMPTokenIssuanceFlags(
+        issuanceBeforeSet.Flags,
+      )
+      const parsedMutableFlagsBeforeSet = parseMPTokenIssuanceMutableFlags(
+        issuanceBeforeSet.MutableFlags,
+      )
+
+      assert.isUndefined(
+        parsedReadOnlyFlagsBeforeSet.lsfMPTCanLock,
+        'lsfMPTCanLock should not be set on a freshly-created MPT issuance',
+      )
+      assert.isTrue(
+        parsedMutableFlagsBeforeSet.lsmfMPTCanMutateCanLock,
+        'lsmfMPTCanMutateCanLock should reflect the create-time tmfMPTCanMutateCanLock',
+      )
+
+      const enableCanLockTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId!,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+      }
+      await testTransaction(
+        testContext.client,
+        enableCanLockTx,
+        testContext.wallet,
+      )
+
+      const issuanceAfterEnable = await readMPTokenIssuance(
+        testContext,
+        issuanceId!,
+      )
+      const parsedReadOnlyFlagsAfterEnable = parseMPTokenIssuanceFlags(
+        issuanceAfterEnable.Flags,
+      )
+      const parsedMutableFlagsAfterEnable = parseMPTokenIssuanceMutableFlags(
+        issuanceAfterEnable.MutableFlags,
+      )
+
+      assert.isTrue(
+        parsedReadOnlyFlagsAfterEnable.lsfMPTCanLock,
+        'lsfMPTCanLock should be set after applying tmfMPTSetCanLock',
+      )
+      assert.isTrue(
+        parsedMutableFlagsAfterEnable.lsmfMPTCanMutateCanLock,
+        'lsmfMPTCanMutateCanLock should remain set; mutability is not consumed by toggling',
+      )
+
+      const disableCanLockTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId!,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
+      }
+      await testTransaction(
+        testContext.client,
+        disableCanLockTx,
+        testContext.wallet,
+      )
+
+      const issuanceAfterDisable = await readMPTokenIssuance(
+        testContext,
+        issuanceId!,
+      )
+      const parsedReadOnlyFlagsAfterDisable = parseMPTokenIssuanceFlags(
+        issuanceAfterDisable.Flags,
+      )
+
+      assert.isUndefined(
+        parsedReadOnlyFlagsAfterDisable.lsfMPTCanLock,
+        'lsfMPTCanLock should be cleared after applying tmfMPTClearCanLock',
+      )
+    },
+    TIMEOUT,
+  )
 })
+
+async function readMPTokenIssuance(
+  testContext: XrplIntegrationTestContext,
+  issuanceId: string,
+): Promise<MPTokenIssuance> {
+  const accountObjectsResponse = await testContext.client.request({
+    command: 'account_objects',
+    account: testContext.wallet.classicAddress,
+    type: 'mpt_issuance',
+  })
+  const issuanceNode = accountObjectsResponse.result.account_objects.find(
+    (node) =>
+      (node as { mpt_issuance_id?: string }).mpt_issuance_id === issuanceId,
+  ) as MPTokenIssuance | undefined
+  assert.exists(
+    issuanceNode,
+    `MPTokenIssuance with id ${issuanceId} not found in account_objects`,
+  )
+  return issuanceNode
+}

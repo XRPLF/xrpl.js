@@ -23,7 +23,9 @@ export interface MPTokenIssuanceFlagsInterface {
   lsfMPTCanTrade?: boolean
   lsfMPTCanTransfer?: boolean
   lsfMPTCanClawback?: boolean
+}
 
+export interface MPTokenIssuanceMutableFlagsInterface {
   /**
    * Indicates flag lsfMPTCanLock can be changed
    */
@@ -66,37 +68,15 @@ export enum MPTokenIssuanceFlags {
   lsfMPTCanTrade = 0x00000010,
   lsfMPTCanTransfer = 0x00000020,
   lsfMPTCanClawback = 0x00000040,
+}
 
-  /**
-   * Indicates flag lsfMPTCanLock can be changed
-   */
+export enum MPTokenIssuanceMutableFlags {
   lsmfMPTCanMutateCanLock = 0x00000002,
-  /**
-   * Indicates flag lsfMPTRequireAuth can be changed
-   */
   lsmfMPTCanMutateRequireAuth = 0x00000004,
-  /**
-   * Indicates flag lsfMPTCanEscrow can be changed
-   */
   lsmfMPTCanMutateCanEscrow = 0x00000008,
-  /**
-   * Indicates flag lsfMPTCanTrade can be changed
-   */
   lsmfMPTCanMutateCanTrade = 0x00000010,
-  /**
-   * Indicates flag lsfMPTCanTransfer can be changed
-   */
   lsmfMPTCanMutateCanTransfer = 0x00000020,
-  /**
-   * Indicates flag lsfMPTCanClawback can be changed
-   */
   lsmfMPTCanMutateCanClawback = 0x00000040,
-  /**
-   * Allows field MPTokenMetadata to be modified
-   */
   lsmfMPTCanMutateMetadata = 0x00010000,
-  /**
-   * Allows field TransferFee to be modified
-   */
   lsmfMPTCanMutateTransferFee = 0x00020000,
 }
