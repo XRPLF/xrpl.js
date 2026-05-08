@@ -2,6 +2,11 @@ import { ValidationError } from '../../errors'
 import { isFlagEnabled, isHex } from '../utils'
 // eslint-disable-next-line import/no-cycle -- this method is needed to convert txn flags to number
 import { convertTxFlagsToNumber } from '../utils/flags'
+import {
+  MAX_MPT_META_BYTE_LENGTH,
+  MPT_META_WARNING_HEADER,
+  validateMPTokenMetadata,
+} from '../utils/mptokenMetadata'
 
 import {
   BaseTransaction,
@@ -13,10 +18,7 @@ import {
   isAccount,
   GlobalFlagsInterface,
   isNumber,
-  MAX_MPT_META_BYTE_LENGTH,
   isDomainID,
-  validateMPTokenMetadata,
-  MPT_META_WARNING_HEADER,
 } from './common'
 import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
 

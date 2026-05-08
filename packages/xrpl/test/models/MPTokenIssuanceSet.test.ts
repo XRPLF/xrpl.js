@@ -1,13 +1,13 @@
 import { stringToHex } from '@xrplf/isomorphic/dist/utils'
 
 import { MPTokenIssuanceSetFlags } from '../../src'
-import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/transactions/common'
 import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
   validateMPTokenIssuanceSet,
   tmfMPTokenIssuanceSetMutableMask,
   MPTokenIssuanceSetMutableFlags,
 } from '../../src/models/transactions/MPTokenIssuanceSet'
+import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
