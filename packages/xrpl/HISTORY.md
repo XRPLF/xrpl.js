@@ -6,6 +6,12 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### BREAKING CHANGES:
 * `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+* `Wallet.fromSeed` and `Wallet.fromSecret` no longer default to ed25519 when `opts.algorithm` is omitted. The algorithm is now inferred from the seed prefix: `sEd…` seeds derive an ed25519 keypair, all other family seeds (`s…`) derive a secp256k1 keypair. This fixes the long-standing case where ingesting a secp256k1 family seed without an explicit algorithm silently produced an ed25519 keypair for an unrelated account.
+
+  Migration:
+  - **Callers that want ed25519 keys must now pass `algorithm: ECDSA.ed25519` explicitly.** This applies both to `sEd…` seeds (where the inferred result happens to match, so being explicit is defensive but recommended) and to any code that previously relied on the old ed25519 default being applied to an `s…` family seed (where explicitness is *required* to preserve the old keypair).
+  - Callers that want secp256k1 keys from an `s…` family seed can drop the now-redundant `algorithm: ECDSA.secp256k1` argument; the inference produces the same result.
+  - Callers that pass an explicit `opts.algorithm` (either curve) are unaffected.
 * `Client.getServerInfo()` and `Client.connect()` now throw if the `server_info` request fails, or if the response succeeds but does not include a `network_id`. Previously, these failures were swallowed and only logged via `console.error`, leaving `client.networkID` undefined and causing `autofill()` to omit the `NetworkID` field — producing transactions valid on the wrong network. Servers running rippled <1.11 (which do not return `network_id`) will now fail to connect; upgrade to rippled 1.11+ or set `client.networkID` manually after construction.
 
 ### Added
