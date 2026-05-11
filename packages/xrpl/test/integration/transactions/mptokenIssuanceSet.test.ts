@@ -366,6 +366,90 @@ describe('MPTokenIssuanceDestroy', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'rejects toggling an lsf flag via MPTokenIssuanceSet when the corresponding mutate flag was not set at create time',
+    async () => {
+      // Create an issuance with no MutableFlags, so no lsf* flag is mutable.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const setCanLockTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+      }
+      await testTransaction(
+        testContext.client,
+        setCanLockTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'rejects TransferFee mutation via MPTokenIssuanceSet when tmfMPTCanMutateTransferFee was not set at create time',
+    async () => {
+      // tfMPTCanTransfer is required for TransferFee to be accepted by the
+      // validator; mutability for TransferFee is intentionally omitted.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const updateTransferFeeTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        TransferFee: 100,
+      }
+      await testTransaction(
+        testContext.client,
+        updateTransferFeeTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'rejects DomainID mutation via MPTokenIssuanceSet on an issuance created without tfMPTRequireAuth',
+    async () => {
+      const domainId = await createPermissionedDomain(testContext)
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const setDomainTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        DomainID: domainId,
+      }
+      await testTransaction(
+        testContext.client,
+        setDomainTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
+      )
+    },
+    TIMEOUT,
+  )
 })
 
 async function readMPTokenIssuance(
