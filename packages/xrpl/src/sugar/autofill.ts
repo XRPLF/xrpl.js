@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
+import { amountsEqual } from '../client/partialPayment'
 import { ValidationError, XrplError } from '../errors'
 import { LoanBroker } from '../models/ledger'
 import {
@@ -478,8 +479,12 @@ export function handleDeliverMax(tx: Payment): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-param-reassign -- needed here
     tx.Amount ??= tx.DeliverMax
 
+    // Use `amountsEqual` rather than `!==` so two distinct objects with identical
+    // currency/issuer/value fields don't trigger a spurious validation error. The previous
+    // reference-equality check rejected every IOU payment whose caller built `Amount` and
+    // `DeliverMax` as separate object literals (issue #3313).
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- needed here
-    if (tx.Amount != null && tx.Amount !== tx.DeliverMax) {
+    if (tx.Amount != null && !amountsEqual(tx.Amount, tx.DeliverMax)) {
       throw new ValidationError(
         'PaymentTransaction: Amount and DeliverMax fields must be identical when both are provided',
       )

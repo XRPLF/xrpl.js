@@ -105,6 +105,31 @@ describe('client.autofill', function () {
     await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
   })
 
+  it('Validate Payment transaction API v2: Payment Transaction: identical IOU DeliverMax and Amount as separate objects (#3313)', async function () {
+    // Regression test: the previous `tx.Amount !== tx.DeliverMax` used reference equality,
+    // which always returned false for two distinct IssuedCurrencyAmount object literals
+    // even when their fields were identical — every IOU payment that set both fields was
+    // rejected.
+    const issuer = 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X'
+    paymentTx.Amount = { currency: 'USD', issuer, value: '100' }
+    paymentTx.DeliverMax = { currency: 'USD', issuer, value: '100' }
+
+    const txResult = await testContext.client.autofill(paymentTx)
+
+    assert.deepEqual(txResult.Amount, { currency: 'USD', issuer, value: '100' })
+    assert.strictEqual('DeliverMax' in txResult, false)
+  })
+
+  it('Validate Payment transaction API v2: Payment Transaction: differing IOU DeliverMax and Amount values still rejected', async function () {
+    // Companion to the case above: ensure the fix didn't loosen validation. Identical
+    // currency/issuer but different `value` must still throw.
+    const issuer = 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X'
+    paymentTx.Amount = { currency: 'USD', issuer, value: '100' }
+    paymentTx.DeliverMax = { currency: 'USD', issuer, value: '200' }
+
+    await assertRejects(testContext.client.autofill(paymentTx), ValidationError)
+  })
+
   it('should not autofill if fields are present', async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
