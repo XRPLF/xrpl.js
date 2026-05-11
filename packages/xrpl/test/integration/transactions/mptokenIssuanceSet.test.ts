@@ -1,3 +1,4 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
@@ -5,6 +6,7 @@ import {
   MPTokenIssuanceSet,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSetFlags,
+  PermissionedDomainSet,
   TransactionMetadata,
   MPTokenIssuanceCreateMutableFlags,
   MPTokenIssuanceSetMutableFlags,
@@ -12,6 +14,7 @@ import {
   parseMPTokenIssuanceMutableFlags,
 } from '../../../src'
 import type { MPTokenIssuance } from '../../../src/models/ledger/MPTokenIssuance'
+import type PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -244,6 +247,125 @@ describe('MPTokenIssuanceDestroy', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'persists DomainID on the MPTokenIssuance ledger object when set at create time',
+    async () => {
+      const domainId = await createPermissionedDomain(testContext)
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTRequireAuth,
+        DomainID: domainId,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+      const issuance = await readMPTokenIssuance(testContext, issuanceId)
+
+      assert.equal(issuance.DomainID, domainId)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'updates DomainID on the MPTokenIssuance ledger object via MPTokenIssuanceSet',
+    async () => {
+      const firstDomainId = await createPermissionedDomain(testContext)
+      const secondDomainId = await createPermissionedDomain(testContext)
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTRequireAuth,
+        DomainID: firstDomainId,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const changeDomainTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        DomainID: secondDomainId,
+      }
+      await testTransaction(
+        testContext.client,
+        changeDomainTx,
+        testContext.wallet,
+      )
+
+      const issuanceAfterChange = await readMPTokenIssuance(
+        testContext,
+        issuanceId,
+      )
+      assert.equal(issuanceAfterChange.DomainID, secondDomainId)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'mutates MPTokenMetadata via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was set at create time',
+    async () => {
+      const initialMetadataHex = stringToHex('initial metadata')
+      const updatedMetadataHex = stringToHex('updated metadata')
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata,
+        MPTokenMetadata: initialMetadataHex,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const updateMetadataTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        MPTokenMetadata: updatedMetadataHex,
+      }
+      await testTransaction(
+        testContext.client,
+        updateMetadataTx,
+        testContext.wallet,
+      )
+
+      const issuanceAfterUpdate = await readMPTokenIssuance(
+        testContext,
+        issuanceId,
+      )
+      assert.equal(issuanceAfterUpdate.MPTokenMetadata, updatedMetadataHex)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'rejects MPTokenMetadata mutation via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was not set at create time',
+    async () => {
+      // Create an issuance whose MutableFlags grant only the unrelated
+      // CanMutateCanLock permission, so the issuance cannot have its
+      // metadata mutated.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const updateMetadataTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        MPTokenMetadata: stringToHex('updated metadata'),
+      }
+      await testTransaction(
+        testContext.client,
+        updateMetadataTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
+      )
+    },
+    TIMEOUT,
+  )
 })
 
 async function readMPTokenIssuance(
@@ -264,4 +386,53 @@ async function readMPTokenIssuance(
     `MPTokenIssuance with id ${issuanceId} not found in account_objects`,
   )
   return issuanceNode
+}
+
+async function submitMPTCreateAndGetId(
+  testContext: XrplIntegrationTestContext,
+  createTx: MPTokenIssuanceCreate,
+): Promise<string> {
+  const submitResponse = await testTransaction(
+    testContext.client,
+    createTx,
+    testContext.wallet,
+  )
+  const txResponse = await testContext.client.request({
+    command: 'tx',
+    transaction: submitResponse.result.tx_json.hash,
+  })
+  const meta = txResponse.result
+    .meta as TransactionMetadata<MPTokenIssuanceCreate>
+  assert.isString(
+    meta.mpt_issuance_id,
+    'MPTokenIssuanceCreate did not return an mpt_issuance_id',
+  )
+  return meta.mpt_issuance_id!
+}
+
+async function createPermissionedDomain(
+  testContext: XrplIntegrationTestContext,
+): Promise<string> {
+  const sampleCredential = {
+    Credential: {
+      CredentialType: stringToHex('Passport'),
+      Issuer: testContext.wallet.classicAddress,
+    },
+  }
+  const pdSet: PermissionedDomainSet = {
+    TransactionType: 'PermissionedDomainSet',
+    Account: testContext.wallet.classicAddress,
+    AcceptedCredentials: [sampleCredential],
+  }
+  await testTransaction(testContext.client, pdSet, testContext.wallet)
+
+  const accountObjects = await testContext.client.request({
+    command: 'account_objects',
+    account: testContext.wallet.classicAddress,
+    type: 'permissioned_domain',
+  })
+  const newestDomain = accountObjects.result.account_objects[
+    accountObjects.result.account_objects.length - 1
+  ] as PermissionedDomain
+  return newestDomain.index
 }
