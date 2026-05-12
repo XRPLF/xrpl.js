@@ -107,9 +107,9 @@ describe('client.autofill', function () {
 
   it('Validate Payment transaction API v2: Payment Transaction: identical IOU DeliverMax and Amount as separate objects (#3313)', async function () {
     // Regression test: the previous `tx.Amount !== tx.DeliverMax` used reference equality,
-    // which always returned false for two distinct IssuedCurrencyAmount object literals
-    // even when their fields were identical — every IOU payment that set both fields was
-    // rejected.
+    // which always returned true for two distinct IssuedCurrencyAmount object literals
+    // (different references, even with identical fields) — every IOU payment that set both
+    // fields as separate objects therefore tripped the validation throw.
     const issuer = 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X'
     paymentTx.Amount = { currency: 'USD', issuer, value: '100' }
     paymentTx.DeliverMax = { currency: 'USD', issuer, value: '100' }
