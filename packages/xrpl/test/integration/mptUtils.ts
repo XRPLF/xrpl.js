@@ -8,7 +8,7 @@ import {
   TransactionMetadata,
   Wallet,
 } from '../../src'
-import type { MPTAmount, MPTCurrency } from '../../src/models/common'
+import type { MPTCurrency } from '../../src/models/common'
 
 import { generateFundedWallet, testTransaction } from './utils'
 
@@ -145,11 +145,11 @@ export async function createAMMPoolWithMPT(
     Amount: {
       mpt_issuance_id: mptIssuanceId1,
       value: '250',
-    } as unknown as MPTAmount,
+    },
     Amount2: {
       mpt_issuance_id: mptIssuanceId2,
       value: '250',
-    } as unknown as MPTAmount,
+    },
     TradingFee: 12,
   }
 
