@@ -81,6 +81,12 @@ class Hop extends SerializedType {
       )
     }
 
+    if (value.issuer && value.mpt_issuance_id) {
+      throw new Error(
+        'issuer and mpt_issuance_id are mutually exclusive in a path hop (the issuer is encoded inside the MPTIssuanceID)',
+      )
+    }
+
     if (value.currency) {
       bytes.push(Currency.from(value.currency).toBytes())
       bytes[0][0] |= TYPE_CURRENCY
@@ -110,6 +116,12 @@ class Hop extends SerializedType {
     if (type & TYPE_CURRENCY && type & TYPE_MPT) {
       throw new Error(
         'Currency and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Currency and mpt_issuance_id elements',
+      )
+    }
+
+    if (type & TYPE_ISSUER && type & TYPE_MPT) {
+      throw new Error(
+        'Issuer and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Issuer and mpt_issuance_id elements',
       )
     }
 
