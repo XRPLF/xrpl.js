@@ -305,4 +305,60 @@ describe('Path-Set binary-codec unit tests', () => {
       ),
     )
   })
+
+  it(`PathSet: Issuer and MPT are mutually exclusive in a hop`, () => {
+    const issuerAccount = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+    const mptIssuanceId = '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8'
+
+    const invalidPath = [
+      [
+        {
+          issuer: issuerAccount,
+          mpt_issuance_id: mptIssuanceId,
+        } as HopObject,
+      ],
+    ]
+
+    expect(() => coreTypes.PathSet.from(invalidPath)).toThrow(
+      new Error(
+        'issuer and mpt_issuance_id are mutually exclusive in a path hop (the issuer is encoded inside the MPTIssuanceID)',
+      ),
+    )
+  })
+
+  it(`PathSet: Deserialization rejects a hop with both Issuer and MPT flags`, () => {
+    // Type byte 0x60 = TYPE_ISSUER (0x20) | TYPE_MPT (0x40)
+    const invalidHex =
+      '60' +
+      '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8' +
+      AccountID.from('rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh')
+        .toHex()
+        .toUpperCase() +
+      '00'
+
+    const parser = new BinaryParser(invalidHex)
+    expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
+      new Error(
+        'Issuer and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Issuer and mpt_issuance_id elements',
+      ),
+    )
+  })
+
+  it(`PathSet: Deserialization rejects type byte 0x61 (Account + Issuer + MPT)`, () => {
+    // Type byte 0x61 = TYPE_ACCOUNT (0x01) | TYPE_ISSUER (0x20) | TYPE_MPT (0x40)
+    const accountId = 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh'
+    const invalidHex =
+      '61' +
+      AccountID.from(accountId).toHex().toUpperCase() +
+      '00000001B5F762798A53D543A014CAF8B297CFF8F2F937E8' +
+      AccountID.from(accountId).toHex().toUpperCase() +
+      '00'
+
+    const parser = new BinaryParser(invalidHex)
+    expect(() => coreTypes.PathSet.fromParser(parser)).toThrow(
+      new Error(
+        'Issuer and mpt_issuance_id are mutually exclusive in a path hop. The BinaryParser has a bitmask containing both Issuer and mpt_issuance_id elements',
+      ),
+    )
+  })
 })
