@@ -1,4 +1,5 @@
 import { assert } from 'chai'
+import cloneDeep from 'lodash/cloneDeep'
 
 import { getBalanceChanges } from '../../src/utils'
 import paymentToken from '../fixtures/utils/paymentToken.json'
@@ -28,6 +29,17 @@ describe('getBalanceChanges', function () {
       },
     ]
     assert.deepStrictEqual(result, expected)
+  })
+
+  it('XRP create account with a large balance', function () {
+    const metadata = cloneDeep(paymentXrpCreateAccount.metadata)
+    metadata.AffectedNodes[0].CreatedNode!.NewFields.Balance =
+      '9999999999999999'
+    const result = getBalanceChanges(metadata)
+    assert.deepStrictEqual(result[0], {
+      account: 'rLDYrujdKUfVx28T9vRDAbyJ7G2WVXKo4K',
+      balances: [{ currency: 'XRP', value: '9999999999.999999' }],
+    })
   })
 
   it('USD payment to account with no USD', function () {
