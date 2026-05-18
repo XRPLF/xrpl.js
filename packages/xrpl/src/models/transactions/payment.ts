@@ -255,6 +255,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
   }
 }
 
+// eslint-disable-next-line max-lines-per-function -- distinct validation branches per PathStep shape
 function isPathStep(pathStep: Record<string, unknown>): boolean {
   if (pathStep.account !== undefined && typeof pathStep.account !== 'string') {
     return false
@@ -269,17 +270,20 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
     return false
   }
 
-  // mpt_issuance_id is mutually exclusive with account and currency
+  // mpt_issuance_id is mutually exclusive with account, currency, and issuer
   if (pathStep.mpt_issuance_id !== undefined) {
-    if (pathStep.account !== undefined || pathStep.currency !== undefined) {
+    if (
+      pathStep.account !== undefined ||
+      pathStep.currency !== undefined ||
+      pathStep.issuer !== undefined
+    ) {
       return false
     }
 
-    if (typeof pathStep.mpt_issuance_id !== 'string') {
-      return false
-    }
-
-    if (!/^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id)) {
+    if (
+      typeof pathStep.mpt_issuance_id !== 'string' ||
+      !/^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id)
+    ) {
       return false
     }
 
