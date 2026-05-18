@@ -903,6 +903,97 @@ describe('Connection', function () {
     TIMEOUT,
   )
 
+  // DGE-6740: Server messages whose `type` collides with a reserved internal
+  // event name (`connected`, `disconnected`, `error`, `reconnect`) must not
+  // be forwarded as that internal event. Otherwise a rogue server could spoof
+  // connection state.
+  it.each(['connected', 'disconnected', 'reconnect'])(
+    'drops server message with reserved internal event type "%s"',
+    async (reservedType) => {
+      // If the fix regresses, the reserved listener will fire and we'll fail.
+      const spoofTrigger = new Promise<never>((_resolve, reject) => {
+        clientContext.client.connection.on(reservedType, () => {
+          reject(
+            new XrplError(
+              `Reserved internal event "${reservedType}" was emitted from a server message`,
+            ),
+          )
+        })
+      })
+
+      const errorReceived = new Promise<void>((resolve) => {
+        clientContext.client.connection.on(
+          'error',
+          (errorCode, errorMessage) => {
+            if (
+              errorCode === 'badMessage' &&
+              typeof errorMessage === 'string' &&
+              errorMessage.includes(reservedType)
+            ) {
+              resolve()
+            }
+          },
+        )
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(
+        JSON.stringify({ type: reservedType }),
+      )
+
+      await Promise.race([errorReceived, spoofTrigger])
+    },
+    TIMEOUT,
+  )
+
+  // DGE-6740: A spoofed `{"type":"error"}` payload must not be forwarded to
+  // 'error' listeners as the raw payload. Instead the fix emits an 'error'
+  // event whose first arg is the string code 'badMessage'. We verify the
+  // 'error' listener never receives the raw spoofed object.
+  it(
+    'drops server message with reserved internal event type "error"',
+    async () => {
+      const spoofedPayload = { type: 'error', error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        clientContext.client.connection.on(
+          'error',
+          (errorCodeOrPayload, errorMessage) => {
+            // The fix's emission: emit('error', 'badMessage', '<msg>', rawJson).
+            if (
+              errorCodeOrPayload === 'badMessage' &&
+              typeof errorMessage === 'string' &&
+              errorMessage.includes('error')
+            ) {
+              resolve()
+              return
+            }
+            // Anything that looks like the spoofed payload object indicates
+            // the raw server message reached 'error' listeners, which is the
+            // exact bug being fixed.
+            if (
+              errorCodeOrPayload != null &&
+              typeof errorCodeOrPayload === 'object' &&
+              (errorCodeOrPayload as { type?: unknown }).type === 'error'
+            ) {
+              reject(
+                new XrplError(
+                  'Spoofed server payload was forwarded to error listeners',
+                ),
+              )
+            }
+          },
+        )
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await clientContext.client.disconnect()
   //   // fail on connection
