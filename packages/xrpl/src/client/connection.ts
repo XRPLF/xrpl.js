@@ -23,6 +23,21 @@ const TIMEOUT = 20
 const CONNECTION_TIMEOUT = 5
 
 /**
+ * Event names that are emitted internally by Connection to signal local
+ * client/socket state transitions. These must never be emitted as a result
+ * of a server-supplied `data.type`, otherwise a malicious or compromised
+ * rippled server could spoof connection state (e.g. claim the client is
+ * `connected` when it is not, or inject a fake `error`/`disconnected`/
+ * `reconnect` to drive the client into a bad state). See DGE-6740.
+ */
+const RESERVED_INTERNAL_EVENTS: ReadonlySet<string> = new Set([
+  'connected',
+  'disconnected',
+  'error',
+  'reconnect',
+])
+
+/**
  * ConnectionOptions is the configuration for the Connection class.
  */
 interface ConnectionOptions {
@@ -354,7 +369,21 @@ export class Connection extends EventEmitter {
     }
     if (data.type) {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      this.emit(data.type as string, data)
+      const type = data.type as string
+      // Refuse to forward server-supplied event names that collide with
+      // Connection's internal state events. Otherwise a rogue server could
+      // spoof local connection state by sending e.g. `{"type":"connected"}`
+      // or `{"type":"error"}`. See DGE-6740.
+      if (RESERVED_INTERNAL_EVENTS.has(type)) {
+        this.emit(
+          'error',
+          'badMessage',
+          `Server message used reserved internal event type "${type}"; dropping.`,
+          message,
+        )
+        return
+      }
+      this.emit(type, data)
     }
     if (data.type === 'response') {
       try {
