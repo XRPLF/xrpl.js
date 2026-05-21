@@ -112,11 +112,23 @@ describe('Wallet', function () {
   })
 
   describe('fromSeed', function () {
-    it('derives a wallet using default algorithm', function () {
+    it('infers secp256k1 from a non-sEd seed prefix when algorithm is omitted', function () {
       const wallet = Wallet.fromSeed(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
+    })
+
+    it('infers ed25519 from an sEd seed prefix when algorithm is omitted', function () {
+      const ed25519Seed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const inferred = Wallet.fromSeed(ed25519Seed)
+      const explicit = Wallet.fromSeed(ed25519Seed, {
+        algorithm: ECDSA.ed25519,
+      })
+
+      assert.equal(inferred.publicKey, explicit.publicKey)
+      assert.equal(inferred.privateKey, explicit.privateKey)
+      assert.equal(inferred.classicAddress, explicit.classicAddress)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -218,11 +230,23 @@ describe('Wallet', function () {
   })
 
   describe('fromSecret', function () {
-    it('derives a wallet using default algorithm', function () {
+    it('infers secp256k1 from a non-sEd seed prefix when algorithm is omitted', function () {
       const wallet = Wallet.fromSecret(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
+    })
+
+    it('infers ed25519 from an sEd seed prefix when algorithm is omitted', function () {
+      const ed25519Seed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const inferred = Wallet.fromSecret(ed25519Seed)
+      const explicit = Wallet.fromSecret(ed25519Seed, {
+        algorithm: ECDSA.ed25519,
+      })
+
+      assert.equal(inferred.publicKey, explicit.publicKey)
+      assert.equal(inferred.privateKey, explicit.privateKey)
+      assert.equal(inferred.classicAddress, explicit.classicAddress)
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
