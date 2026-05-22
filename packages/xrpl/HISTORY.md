@@ -17,7 +17,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
 * Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
 * Fix `Client.getServerInfo()` swallowing errors from the underlying `server_info` request, which left `client.networkID` undefined and caused `autofill()` to silently omit the `NetworkID` field — producing signed transactions valid on the wrong network (cross-network replay risk). The method now throws on request failure or when the response is missing `network_id`. ([#3321](https://github.com/XRPLF/xrpl.js/issues/3321))
-* Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger object.
+* Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
 
 
 ## 4.6.0 (2026-02-12)
