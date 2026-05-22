@@ -104,7 +104,7 @@ function getXRPQuantity(
     account: (node.FinalFields?.Account ?? node.NewFields?.Account) as string,
     balance: {
       currency: 'XRP',
-      value: dropsToXrp(value),
+      value: dropsToXrp(value).toString(),
     },
   }
 }
