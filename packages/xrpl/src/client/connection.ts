@@ -28,13 +28,14 @@ const CONNECTION_TIMEOUT = 5
  * of a server-supplied `data.type`, otherwise a malicious or compromised
  * rippled server could spoof connection state (e.g. claim the client is
  * `connected` when it is not, or inject a fake `error`/`disconnected`/
- * `reconnect` to drive the client into a bad state). See DGE-6740.
+ * `reconnect`/`reconnecting` to drive the client into a bad state).
  */
 const RESERVED_INTERNAL_EVENTS: ReadonlySet<string> = new Set([
   'connected',
   'disconnected',
   'error',
   'reconnect',
+  'reconnecting',
 ])
 
 /**
@@ -373,7 +374,7 @@ export class Connection extends EventEmitter {
       // Refuse to forward server-supplied event names that collide with
       // Connection's internal state events. Otherwise a rogue server could
       // spoof local connection state by sending e.g. `{"type":"connected"}`
-      // or `{"type":"error"}`. See DGE-6740.
+      // or `{"type":"error"}`.
       if (RESERVED_INTERNAL_EVENTS.has(type)) {
         this.emit(
           'error',
