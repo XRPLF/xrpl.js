@@ -143,6 +143,13 @@ export interface VaultInfoResponse extends BaseResponse {
          * Bit-field flags associated with the shares issuance.
          */
         Flags?: number
+
+        /**
+         * Hash256 pointing to the vault pseudo-account's holding for the
+         * underlying asset. Present for IOU and MPT-backed vaults.
+         * Absent for XRP-backed vaults.
+         */
+        ReferenceHolding?: string
       }
 
       /**
