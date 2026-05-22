@@ -115,7 +115,7 @@ npm run build
 docker run \
   --detach \
   --publish 6006:6006 \
-  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --volume "$PWD/.ci-config:/etc/xrpld/" \
   --name xrpld-service \
   rippleci/xrpld:develop --standalone
 npm run test:browser
