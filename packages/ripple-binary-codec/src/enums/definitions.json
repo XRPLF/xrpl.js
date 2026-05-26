@@ -72,7 +72,7 @@
       "Generic",
       {
         "isSerialized": true,
-        "isSigningField": false,
+        "isSigningField": true,
         "isVLEncoded": false,
         "nth": 0,
         "type": "Unknown"
@@ -1525,6 +1525,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 38,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ReferenceHolding",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 39,
         "type": "Hash256"
       }
     ],
@@ -3884,6 +3894,10 @@
         "optionality": 0
       },
       {
+        "name": "DestinationNode",
+        "optionality": 1
+      },
+      {
         "name": "PreviousTxnID",
         "optionality": 0
       },
@@ -4360,6 +4374,10 @@
       {
         "name": "MutableFlags",
         "optionality": 2
+      },
+      {
+        "name": "ReferenceHolding",
+        "optionality": 1
       }
     ],
     "NFTokenOffer": [
@@ -5426,6 +5444,10 @@
       },
       {
         "name": "Owner",
+        "optionality": 1
+      },
+      {
+        "name": "BookDirectory",
         "optionality": 1
       }
     ],
@@ -6680,5 +6702,5 @@
     "Vector256": 19,
     "XChainBridge": 25
   },
-  "hash": "0DB6EC5980714AEA0CEC110EE94D3D7641DEA9D7C25D57E9DFD1A0DCE460D5F5"
+  "hash": "C685734F5FEB756693B4BB978BBB3A158A65652E71EEB2977068B0D680689213"
 }
