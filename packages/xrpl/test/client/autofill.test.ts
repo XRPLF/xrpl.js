@@ -375,6 +375,48 @@ describe('client.autofill', function () {
 
       assert.strictEqual(txResult.Fee, '447')
     })
+
+    it('should autofill Fee of a confidential MPT transaction', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'ConfidentialMPTMergeInbox',
+        MPTokenIssuanceID: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx)
+      // base (12) × kCONFIDENTIAL_FEE_MULTIPLIER-plus-one (10) = 120.
+      assert.strictEqual(txResult.Fee, '120')
+    })
+
+    it('should autofill Fee of a confidential MPT transaction with signersCount', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'ConfidentialMPTMergeInbox',
+        MPTokenIssuanceID: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx, 4)
+      // base (12) × (10 + signersCount 4) = 168.
+      assert.strictEqual(txResult.Fee, '168')
+    })
   })
 
   it("should autofill LastLedgerSequence when it's missing", async function () {
