@@ -15,6 +15,17 @@
   "unpkg": "build/xrpl-latest-min.js",
   "jsdelivr": "build/xrpl-latest-min.js",
   "types": "dist/npm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/npm/index.d.ts",
+      "default": "./dist/npm/index.js"
+    },
+    "./confidential": {
+      "types": "./dist/npm/confidential/index.d.ts",
+      "default": "./dist/npm/confidential/index.js"
+    },
+    "./dist/npm/*": "./dist/npm/*"
+  },
   "directories": {
     "test": "test"
   },
@@ -32,6 +43,14 @@
     "ripple-address-codec": "^5.0.0",
     "ripple-binary-codec": "^2.7.0",
     "ripple-keypairs": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@xrplf/mpt-crypto": "^0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@xrplf/mpt-crypto": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^18.18.38",

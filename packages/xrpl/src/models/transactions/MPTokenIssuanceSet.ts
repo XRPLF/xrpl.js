@@ -4,12 +4,14 @@ import { isFlagEnabled } from '../utils'
 import {
   BaseTransaction,
   isString,
+  isHexWithByteLength,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  CONFIDENTIAL_EC_POINT_BYTES,
 } from './common'
 
 /**
@@ -54,6 +56,16 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    * If omitted, this transaction will apply to all any accounts holding MPTs.
    */
   Holder?: Account
+  /**
+   * The issuer's compressed ElGamal encryption key (33-byte EC point),
+   * registered so confidential amounts can be encrypted to the issuer.
+   */
+  IssuerEncryptionKey?: string
+  /**
+   * The auditor's compressed ElGamal encryption key (33-byte EC point),
+   * registered so confidential amounts can be encrypted to an auditor.
+   */
+  AuditorEncryptionKey?: string
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 }
 
@@ -67,6 +79,16 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateOptionalField(
+    tx,
+    'IssuerEncryptionKey',
+    isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES),
+  )
+  validateOptionalField(
+    tx,
+    'AuditorEncryptionKey',
+    isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES),
+  )
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface

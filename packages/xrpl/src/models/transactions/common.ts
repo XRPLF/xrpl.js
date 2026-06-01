@@ -24,6 +24,14 @@ const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 const SHA_512_HALF_LENGTH = 64
 
+// Confidential MPT (XLS-0096) fixed field byte lengths.
+// A compressed secp256k1 point (encryption keys and Pedersen commitments).
+export const CONFIDENTIAL_EC_POINT_BYTES = 33
+// An ElGamal ciphertext is two compressed points.
+export const CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES = 66
+// A scalar blinding factor (Hash256).
+export const CONFIDENTIAL_BLINDING_FACTOR_BYTES = 32
+
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
 
@@ -368,6 +376,33 @@ export function validateHexMetadata(
     input.length > 0 &&
     input.length <= lengthUpto
   )
+}
+
+/**
+ * Verify the form and type of a non-empty hex string at runtime.
+ *
+ * @param inp - The value to check the form and type of.
+ * @returns Whether the value is a non-empty hex string.
+ */
+export function isHexBlob(inp: unknown): inp is string {
+  return isString(inp) && isHex(inp)
+}
+
+/**
+ * Build a type guard that checks the input is a hex string encoding exactly
+ * `byteLength` bytes. Used by the Confidential MPT transactions to enforce
+ * fixed-size cryptographic fields (EC points, ElGamal ciphertexts, scalars).
+ *
+ * @param byteLength - The exact number of bytes the hex string must encode.
+ * @returns A type guard validating a hex string of the given byte length.
+ */
+export function isHexWithByteLength(
+  byteLength: number,
+): (inp: unknown) => inp is string {
+  // eslint-disable-next-line func-style -- returning a type guard
+  const check = (inp: unknown): inp is string =>
+    isString(inp) && isHex(inp) && inp.length === byteLength * 2
+  return check
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */

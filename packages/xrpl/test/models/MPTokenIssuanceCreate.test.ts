@@ -41,6 +41,20 @@ describe('MPTokenIssuanceCreate', function () {
     assertValid(validMPTokenIssuanceCreate)
   })
 
+  it(`verifies valid MPTokenIssuanceCreate w/ tfMPTCanConfidentialAmount`, function () {
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: MPTokenIssuanceCreateFlags.tfMPTCanConfidentialAmount,
+    } as any)
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: { tfMPTCanConfidentialAmount: true },
+    } as any)
+  })
+
   it(`throws w/ MPTokenMetadata being an empty string`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',

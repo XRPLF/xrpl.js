@@ -75,4 +75,30 @@ describe('MPTokenIssuanceSet', function () {
 
     assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
   })
+
+  it(`verifies valid MPTokenIssuanceSet w/ confidential encryption keys`, function () {
+    // 33-byte compressed EC point.
+    const EC_POINT = `02${'AB'.repeat(32)}`
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      IssuerEncryptionKey: EC_POINT,
+      AuditorEncryptionKey: EC_POINT,
+    } as any)
+  })
+
+  it(`throws w/ wrong-length IssuerEncryptionKey`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        // 32-byte value where a 33-byte EC point is required.
+        IssuerEncryptionKey: 'AB'.repeat(32),
+      } as any,
+      'MPTokenIssuanceSet: invalid field IssuerEncryptionKey',
+    )
+  })
 })

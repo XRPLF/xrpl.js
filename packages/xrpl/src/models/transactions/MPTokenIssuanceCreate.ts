@@ -55,6 +55,11 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+  /**
+   * If set, indicates that holders may hold confidential (encrypted) balances
+   * of this token and use the Confidential MPT transactions.
+   */
+  tfMPTCanConfidentialAmount = 0x00000080,
 }
 
 /**
@@ -71,6 +76,7 @@ export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterfac
   tfMPTCanTrade?: boolean
   tfMPTCanTransfer?: boolean
   tfMPTCanClawback?: boolean
+  tfMPTCanConfidentialAmount?: boolean
 }
 
 /**
