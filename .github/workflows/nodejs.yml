@@ -144,7 +144,7 @@ jobs:
           docker run \
             --detach \
             --publish 6006:6006 \
-            --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/xrpld/" \
+            --volume "${{ github.workspace }}/.ci-config/":"/etc/xrpld/" \
             --name xrpld-service \
             ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
 
@@ -209,7 +209,7 @@ jobs:
           docker run \
             --detach \
             --publish 6006:6006 \
-            --volume "${{ github.workspace }}/.ci-config/":"/etc/opt/xrpld/" \
+            --volume "${{ github.workspace }}/.ci-config/":"/etc/xrpld/" \
             --name xrpld-service \
             ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
 
