@@ -4,6 +4,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+## 5.0.0 (2026-06-05)
+
 ### BREAKING CHANGES:
 * `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
 * `Wallet.fromSeed` and `Wallet.fromSecret` no longer default to ed25519 when `opts.algorithm` is omitted. The algorithm is now inferred from the seed prefix: `sEd…` seeds derive an ed25519 keypair, all other family seeds (`s…`) derive a secp256k1 keypair. This fixes the long-standing case where ingesting a secp256k1 family seed without an explicit algorithm silently produced an ed25519 keypair for an unrelated account.

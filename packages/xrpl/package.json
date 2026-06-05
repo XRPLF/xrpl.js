@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "4.6.0",
+  "version": "5.0.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -24,13 +24,13 @@
   "dependencies": {
     "@scure/bip32": "^2.0.1",
     "@scure/bip39": "^2.0.1",
-    "@xrplf/isomorphic": "^1.0.1",
-    "@xrplf/secret-numbers": "^2.0.0",
+    "@xrplf/isomorphic": "^1.0.2",
+    "@xrplf/secret-numbers": "^3.0.0",
     "bignumber.js": "^10.0.2",
     "eventemitter3": "^5.0.1",
     "fast-json-stable-stringify": "^2.1.0",
-    "ripple-address-codec": "^5.0.0",
-    "ripple-binary-codec": "^2.7.0",
+    "ripple-address-codec": "^5.0.1",
+    "ripple-binary-codec": "^2.8.0",
     "ripple-keypairs": "^3.0.0"
   },
   "devDependencies": {
