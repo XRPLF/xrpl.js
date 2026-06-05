@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
@@ -11,9 +11,9 @@
     "test": "test"
   },
   "dependencies": {
-    "@xrplf/isomorphic": "^1.0.1",
+    "@xrplf/isomorphic": "^1.0.2",
     "bignumber.js": "^10.0.2",
-    "ripple-address-codec": "^5.0.0"
+    "ripple-address-codec": "^5.0.1"
   },
   "scripts": {
     "build": "tsc --build tsconfig.build.json && copyfiles ./src/enums/definitions.json ./dist/enums/",
