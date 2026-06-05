@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96).
+
 ### Fixed
 * Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
 * Fix: Validate the input of non-numeric values for `Amount` field.
