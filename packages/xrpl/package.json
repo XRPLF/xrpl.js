@@ -31,7 +31,7 @@
     "fast-json-stable-stringify": "^2.1.0",
     "ripple-address-codec": "^5.0.0",
     "ripple-binary-codec": "^2.7.0",
-    "ripple-keypairs": "^2.0.0"
+    "ripple-keypairs": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
