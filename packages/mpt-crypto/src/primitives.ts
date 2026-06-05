@@ -7,29 +7,8 @@ import {
 } from './constants'
 import { bytesToHex, hexToBytes } from './hex'
 import { withModule } from './runtime'
-import { Keypair } from './types'
 
 const U64_BYTES = 8
-
-/**
- * Generate a fresh secp256k1 ElGamal keypair.
- *
- * @returns The hex-encoded private and public keys.
- * @throws If the underlying WASM call fails.
- */
-export async function generateKeypair(): Promise<Keypair> {
-  return withModule((mod, marshaller) => {
-    const privPtr = marshaller.alloc(PRIVKEY_SIZE)
-    const pubPtr = marshaller.alloc(PUBKEY_SIZE)
-    if (mod._mpt_generate_keypair(privPtr, pubPtr) !== 0) {
-      throw new Error('mpt_generate_keypair failed')
-    }
-    return {
-      privateKey: bytesToHex(marshaller.readBytes(privPtr, PRIVKEY_SIZE)),
-      publicKey: bytesToHex(marshaller.readBytes(pubPtr, PUBKEY_SIZE)),
-    }
-  })
-}
 
 /**
  * Generate a 32-byte blinding factor / ElGamal randomness scalar.

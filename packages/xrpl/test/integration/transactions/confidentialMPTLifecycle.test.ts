@@ -1,5 +1,3 @@
-/* eslint-disable n/no-process-env -- gated on a confidential-capable rippled */
-import { generateKeypair } from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
@@ -16,6 +14,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 import {
   auditorReads,
   createConfidentialIssuance,
+  generateElGamalKeypair,
   getSpendable,
   holderWithBalance,
   registerHolderKey,
@@ -28,13 +27,13 @@ import {
  * The four-party scenario (issuer, auditor, and two holders). It exercises every
  * confidential transaction type in sequence and verifies auditor selective
  * disclosure (the auditor decrypts each holder's balance) after each change.
- * Gated like the per-transaction tests; see ./setup.ts.
+ * Requires the MPTokensV1 + Clawback + ConfidentialTransfer amendments (see
+ * ./confidentialMPTUtils.ts).
  */
-const RUN = process.env.CONFIDENTIAL_MPT === 'true'
 const SETUP_TIMEOUT = 60000
 const LIFECYCLE_TIMEOUT = 240000
 
-;(RUN ? describe : describe.skip)(
+describe(
   'Confidential MPT 4-party lifecycle',
   function () {
     let testContext: ConfidentialContext
@@ -46,8 +45,8 @@ const LIFECYCLE_TIMEOUT = 240000
     beforeAll(async () => {
       testContext = await setupConfidentialClient(serverUrl)
       issuer = await generateFundedWallet(testContext.client)
-      issuerKey = await generateKeypair()
-      auditorKey = await generateKeypair()
+      issuerKey = generateElGamalKeypair()
+      auditorKey = generateElGamalKeypair()
       mptID = await createConfidentialIssuance(
         testContext.client,
         issuer,

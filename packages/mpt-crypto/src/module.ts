@@ -20,7 +20,6 @@ export interface WasmModule {
   _free: (ptr: number) => void
   _mpt_secp256k1_context: () => number
 
-  _mpt_generate_keypair: (outPriv: number, outPub: number) => number
   _mpt_generate_blinding_factor: (outFactor: number) => number
   _mpt_encrypt_amount: (
     amount: bigint,

@@ -33,7 +33,6 @@ export type {
 } from './types'
 
 export {
-  generateKeypair,
   generateBlindingFactor,
   encryptAmount,
   decryptAmount,

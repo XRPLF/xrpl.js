@@ -1,5 +1,4 @@
-/* eslint-disable n/no-process-env -- gated on a confidential-capable rippled */
-import { decryptAmount, generateKeypair } from '@xrplf/mpt-crypto'
+import { decryptAmount } from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
@@ -14,6 +13,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 
 import {
   createConfidentialIssuance,
+  generateElGamalKeypair,
   getSpendable,
   setupConfidentialClient,
   setupHolder,
@@ -22,19 +22,14 @@ import {
 } from '../confidentialMPTUtils'
 
 /*
- * Skipped unless CONFIDENTIAL_MPT=true, since it needs a rippled with the
- * MPTokensV1 + Clawback + ConfidentialTransfer amendments enabled. Run against a
- * local standalone (a confidential-enabled CI docker image will replace it):
- *
- *   CONFIDENTIAL_MPT=true HOST=127.0.0.1 PORT=6006 \
- *     npx jest --config=jest.config.integration.js \
- *     test/integration/confidential/confidentialMPTConvert.test.ts
+ * Requires a rippled with the MPTokensV1 + Clawback + ConfidentialTransfer
+ * amendments enabled — the `develop` CI image once PR #5860 lands (a local
+ * standalone in the meantime).
  */
-const RUN = process.env.CONFIDENTIAL_MPT === 'true'
 const SETUP_TIMEOUT = 60000
 const TIMEOUT = 60000
 
-;(RUN ? describe : describe.skip)('ConfidentialMPTConvert', function () {
+describe('ConfidentialMPTConvert', function () {
   let testContext: ConfidentialContext
   let issuer: Wallet
   let issuerKey: ConfidentialKeypair
@@ -43,7 +38,7 @@ const TIMEOUT = 60000
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = await generateKeypair()
+    issuerKey = generateElGamalKeypair()
     mptID = await createConfidentialIssuance(testContext.client, issuer, issuerKey)
   }, SETUP_TIMEOUT)
 

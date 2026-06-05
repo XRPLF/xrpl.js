@@ -5,8 +5,8 @@
  */
 
 /**
- * A keypair produced by {@link generateKeypair}: a 32-byte private key and the
- * corresponding 33-byte compressed secp256k1 public key, both hex-encoded.
+ * An ElGamal keypair: a 32-byte private key and the corresponding 33-byte
+ * compressed secp256k1 public key, both hex-encoded.
  */
 export interface Keypair {
   privateKey: string

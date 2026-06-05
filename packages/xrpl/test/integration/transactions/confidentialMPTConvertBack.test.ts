@@ -1,5 +1,3 @@
-/* eslint-disable n/no-process-env -- gated on a confidential-capable rippled */
-import { generateKeypair } from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
@@ -12,6 +10,7 @@ import { generateFundedWallet, testTransaction } from '../utils'
 
 import {
   createConfidentialIssuance,
+  generateElGamalKeypair,
   getSpendable,
   holderWithBalance,
   setupConfidentialClient,
@@ -19,11 +18,10 @@ import {
   type ConfidentialContext,
 } from '../confidentialMPTUtils'
 
-const RUN = process.env.CONFIDENTIAL_MPT === 'true'
 const SETUP_TIMEOUT = 60000
 const TIMEOUT = 120000
 
-;(RUN ? describe : describe.skip)('ConfidentialMPTConvertBack', function () {
+describe('ConfidentialMPTConvertBack', function () {
   let testContext: ConfidentialContext
   let issuer: Wallet
   let issuerKey: ConfidentialKeypair
@@ -32,7 +30,7 @@ const TIMEOUT = 120000
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = await generateKeypair()
+    issuerKey = generateElGamalKeypair()
     mptID = await createConfidentialIssuance(testContext.client, issuer, issuerKey)
   }, SETUP_TIMEOUT)
 
