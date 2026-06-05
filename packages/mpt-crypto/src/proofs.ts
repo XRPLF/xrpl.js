@@ -1,5 +1,6 @@
 /* eslint-disable max-params, max-lines-per-function -- proof builders mirror the C ABI */
 import {
+  BLINDING_FACTOR_SIZE,
   CLAWBACK_PROOF_SIZE,
   CONVERT_BACK_PROOF_SIZE,
   CONVERT_PROOF_SIZE,
@@ -146,7 +147,11 @@ export async function getConfidentialSendProof(
 ): Promise<string> {
   const priv = hexToBytes(params.privateKey, 'privateKey', PRIVKEY_SIZE)
   const pub = hexToBytes(params.publicKey, 'publicKey', PUBKEY_SIZE)
-  const txBlinding = hexToBytes(params.txBlindingFactor, 'txBlindingFactor', 32)
+  const txBlinding = hexToBytes(
+    params.txBlindingFactor,
+    'txBlindingFactor',
+    BLINDING_FACTOR_SIZE,
+  )
   const ctx = hexToBytes(params.contextHash, 'contextHash', CONTEXT_HASH_SIZE)
   const amountCommitment = hexToBytes(
     params.amountCommitment,
