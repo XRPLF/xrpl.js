@@ -1,4 +1,3 @@
-/* eslint-disable n/no-process-env -- local-node connection comes from env vars */
 import { decryptAmount } from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
 import { deriveKeypair, generateSeed } from 'ripple-keypairs'
@@ -16,6 +15,7 @@ import {
   MPTokenIssuanceSet,
   Payment,
 } from '../../src/models/transactions'
+
 import serverUrl from './serverUrl'
 import { generateFundedWallet, testTransaction } from './utils'
 

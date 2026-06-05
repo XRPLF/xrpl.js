@@ -5,9 +5,6 @@ import {
   prepareConfidentialClawback,
   type ConfidentialKeypair,
 } from '../../../src/confidential'
-import serverUrl from '../serverUrl'
-import { generateFundedWallet, testTransaction } from '../utils'
-
 import {
   createConfidentialIssuance,
   generateElGamalKeypair,
@@ -17,6 +14,8 @@ import {
   teardownConfidential,
   type ConfidentialContext,
 } from '../confidentialMPTUtils'
+import serverUrl from '../serverUrl'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 const SETUP_TIMEOUT = 60000
 const TIMEOUT = 120000
@@ -31,7 +30,11 @@ describe('ConfidentialMPTClawback', function () {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
     issuerKey = generateElGamalKeypair()
-    mptID = await createConfidentialIssuance(testContext.client, issuer, issuerKey)
+    mptID = await createConfidentialIssuance(
+      testContext.client,
+      issuer,
+      issuerKey,
+    )
   }, SETUP_TIMEOUT)
 
   afterAll(async () => teardownConfidential(testContext))
