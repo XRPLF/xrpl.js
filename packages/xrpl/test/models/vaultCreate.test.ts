@@ -8,7 +8,11 @@ import {
 } from '../../src/models/transactions'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
 import { MPT_META_WARNING_HEADER } from '../../src/models/utils/mptokenMetadata'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  MPT_ISSUANCE_ID_1,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateVaultCreate)
 const assertInvalid = (tx: any, message: string): void =>
@@ -37,8 +41,7 @@ describe('VaultCreate', function () {
 
   it('verifies MPT/IOU Currency as Asset', function () {
     tx.Asset = {
-      mpt_issuance_id:
-        '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+      mpt_issuance_id: MPT_ISSUANCE_ID_1,
     }
     assertValid(tx)
 
@@ -120,8 +123,7 @@ describe('VaultCreate', function () {
 
     it('throws w/ Scale provided for MPT asset', function () {
       tx.Asset = {
-        mpt_issuance_id:
-          '983F536DBB46D5BBF43A0B5890576874EE1CF48CE31CA508A529EC17CD1A90EF',
+        mpt_issuance_id: MPT_ISSUANCE_ID_1,
       }
       tx.Scale = 5
       assertInvalid(

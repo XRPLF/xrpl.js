@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Amount serializes three currency variants (XRP, IOU, MPT) plus shared validators in one type. */
 import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
@@ -18,6 +19,20 @@ const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
 const mptMask = BigInt(0x8000000000000000)
+
+// Reject non-canonical MPT wire blobs: high-bit mantissa or negative-zero.
+function assertMptBytesAreCanonical(bytes: Uint8Array): void {
+  if ((bytes[1] & 0x80) !== 0) {
+    throw new Error(
+      'non-canonical MPT amount: mantissa exceeds maxMPTokenAmount',
+    )
+  }
+  const isPositive = (bytes[0] & 0x40) !== 0
+  const mantissaIsZero = bytes.subarray(1, 9).every((b) => b === 0)
+  if (!isPositive && mantissaIsZero) {
+    throw new Error('non-canonical MPT amount: negative-zero encoding')
+  }
+}
 
 /**
  * BigNumber configuration for Amount IOUs
@@ -165,7 +180,9 @@ class Amount extends SerializedType {
       amount = concat(intBuf)
 
       const mptIssuanceID = Hash192.from(value.mpt_issuance_id).toBytes()
-      return new Amount(concat([leadingByte, amount, mptIssuanceID]))
+      const mptBytes = concat([leadingByte, amount, mptIssuanceID])
+      assertMptBytesAreCanonical(mptBytes)
+      return new Amount(mptBytes)
     }
 
     throw new Error('Invalid type to construct an Amount')
@@ -183,8 +200,12 @@ class Amount extends SerializedType {
 
     // the amount can be either MPT or XRP at this point
     const isMPT = parser.peek() & 0x20
-    const numBytes = isMPT ? 33 : 8
-    return new Amount(parser.read(numBytes))
+    if (isMPT) {
+      const bytes = parser.read(33)
+      assertMptBytesAreCanonical(bytes)
+      return new Amount(bytes)
+    }
+    return new Amount(parser.read(8))
   }
 
   /**
@@ -234,6 +255,7 @@ class Amount extends SerializedType {
     }
 
     if (this.isMPT()) {
+      assertMptBytesAreCanonical(this.bytes)
       const parser = new BinaryParser(this.toString())
       const leadingByte = parser.read(1)
       const amount = parser.read(8)

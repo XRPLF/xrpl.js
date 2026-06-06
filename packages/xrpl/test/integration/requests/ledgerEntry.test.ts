@@ -1,6 +1,8 @@
 import { assert } from 'chai'
 
-import type { LedgerEntryRequest } from '../../../src'
+import { LedgerEntryRequest } from '../../../src'
+import type AMM from '../../../src/models/ledger/AMM'
+import { createAMMPoolWithMPT } from '../mptUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -92,20 +94,47 @@ describe('ledger_entry', function () {
     TIMEOUT,
   )
 
+  it('binary = true', async () => {
+    const wallet = await generateFundedWallet(testContext.client)
+
+    const ledgerEntryResponse = await testContext.client.request({
+      command: 'ledger_entry',
+      account_root: wallet.address,
+      binary: true,
+    })
+
+    // @ts-expect-error - node is not present in the response
+    assert.isUndefined(ledgerEntryResponse.result.node)
+    assert.isDefined(ledgerEntryResponse.result.node_binary)
+  })
+
   it(
-    'binary = true',
+    'ledger_entry for AMM with MPT assets',
     async () => {
-      const wallet = await generateFundedWallet(testContext.client)
+      const mptPool = await createAMMPoolWithMPT(testContext.client)
+      const { asset, asset2 } = mptPool
 
       const ledgerEntryResponse = await testContext.client.request({
         command: 'ledger_entry',
-        account_root: wallet.address,
-        binary: true,
+        amm: {
+          asset,
+          asset2,
+        },
       })
 
-      // @ts-expect-error - node is not present in the response
-      assert.isUndefined(ledgerEntryResponse.result.node)
-      assert.isDefined(ledgerEntryResponse.result.node_binary)
+      assert.equal(ledgerEntryResponse.type, 'response')
+
+      const node = ledgerEntryResponse.result.node as unknown as AMM
+      assert.equal(node.LedgerEntryType, 'AMM')
+      assert.deepEqual(node.Asset, {
+        mpt_issuance_id: asset.mpt_issuance_id,
+      })
+      assert.deepEqual(node.Asset2, {
+        mpt_issuance_id: asset2.mpt_issuance_id,
+      })
+      assert.equal(node.TradingFee, 12)
+      assert.ok(node.LPTokenBalance)
+      assert.ok(node.Account)
     },
     TIMEOUT,
   )

@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { Amount, Path, MPTAmount } from '../common'
+import { Amount, Path } from '../common'
 import { isFlagEnabled } from '../utils'
 
 import {
@@ -120,9 +120,9 @@ export interface Payment extends BaseTransaction {
    * names MUST be lower-case. If the tfPartialPayment flag is set, deliver up
    * to this amount instead.
    */
-  Amount: Amount | MPTAmount
+  Amount: Amount
 
-  DeliverMax?: Amount | MPTAmount
+  DeliverMax?: Amount
 
   /** The unique address of the account receiving the payment. */
   Destination: Account
@@ -149,13 +149,13 @@ export interface Payment extends BaseTransaction {
    * cross-currency/cross-issue payments. Must be omitted for XRP-to-XRP
    * Payments.
    */
-  SendMax?: Amount | MPTAmount
+  SendMax?: Amount
   /**
    * Minimum amount of destination currency this transaction should deliver.
    * Only valid if this is a partial payment. For non-XRP amounts, the nested
    * field names are lower-case.
    */
-  DeliverMin?: Amount | MPTAmount
+  DeliverMin?: Amount
   /**
    * Credentials associated with the sender of this transaction.
    * The credentials included must not be expired.
@@ -177,8 +177,8 @@ export interface Payment extends BaseTransaction {
 }
 
 export interface PaymentMetadata extends TransactionMetadataBase {
-  DeliveredAmount?: Amount | MPTAmount
-  delivered_amount?: Amount | MPTAmount | 'unavailable'
+  DeliveredAmount?: Amount
+  delivered_amount?: Amount | 'unavailable'
 }
 
 /**
@@ -255,6 +255,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
   }
 }
 
+// eslint-disable-next-line max-lines-per-function -- distinct validation branches per PathStep shape
 function isPathStep(pathStep: Record<string, unknown>): boolean {
   if (pathStep.account !== undefined && typeof pathStep.account !== 'string') {
     return false
@@ -268,6 +269,27 @@ function isPathStep(pathStep: Record<string, unknown>): boolean {
   if (pathStep.issuer !== undefined && typeof pathStep.issuer !== 'string') {
     return false
   }
+
+  // mpt_issuance_id is mutually exclusive with account, currency, and issuer
+  if (pathStep.mpt_issuance_id !== undefined) {
+    if (
+      pathStep.account !== undefined ||
+      pathStep.currency !== undefined ||
+      pathStep.issuer !== undefined
+    ) {
+      return false
+    }
+
+    if (
+      typeof pathStep.mpt_issuance_id !== 'string' ||
+      !/^[A-F0-9]{48}$/iu.test(pathStep.mpt_issuance_id)
+    ) {
+      return false
+    }
+
+    return true
+  }
+
   if (
     pathStep.account !== undefined &&
     pathStep.currency === undefined &&
