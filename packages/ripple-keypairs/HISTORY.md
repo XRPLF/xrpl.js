@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-06-05)
+
 ### BREAKING CHANGES
 - Update the default signing algorithm in `ripple-keypairs` package's `generateSeed` function to `ed25519`. This brings compatibility with the `Wallet`-related methods in the `xrpl` package. Users can retrieve the cryptographic material used in the prior versions of the package by explicitly specifying `ecdsa-secp256k1` in the `ripple-keypairs` package's `generateSeed` function parameter.
 

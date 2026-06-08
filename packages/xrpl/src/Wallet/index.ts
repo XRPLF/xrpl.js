@@ -146,7 +146,8 @@ export class Wallet {
    *
    * @param seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         the algorithm is inferred from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
@@ -165,7 +166,8 @@ export class Wallet {
    *
    * @param secret - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         the algorithm is inferred from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
@@ -285,7 +287,8 @@ export class Wallet {
    *
    * @param seed - The seed used to derive the wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         `deriveKeypair` infers it from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from the seed.
    */
@@ -294,7 +297,7 @@ export class Wallet {
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, {
-      algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
+      algorithm: opts.algorithm,
     })
     return new Wallet(publicKey, privateKey, {
       seed,
