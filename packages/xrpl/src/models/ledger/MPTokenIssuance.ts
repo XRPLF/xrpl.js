@@ -60,7 +60,7 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    * Identifies the page in the owner's directory where this
    * item is referenced.
    */
-  OwnerNode?: string
+  OwnerNode: string
   /**
    * The total amount of this MPT that is currently locked
    * across all holders via Escrow or PaymentChannel.

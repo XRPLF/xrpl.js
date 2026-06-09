@@ -127,7 +127,7 @@ export interface VaultInfoResponse extends BaseResponse {
         /**
          * Identifier for the owner node of the shares.
          */
-        OwnerNode?: string
+        OwnerNode: string
 
         /**
          * The ID of the MPTokenIssuance object. It will always be equal to vault.ShareMPTID.
