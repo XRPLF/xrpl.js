@@ -37,7 +37,7 @@ Run the full test suite in order:
 2. npm test
 3. Start xrpld Docker container (based on CONTRIBUTING.md):
    - Pre-run cleanup (in case a previous run left a container behind): `docker rm -f xrpld-service 2>/dev/null || true`
-   - Start the container: `docker run --detach --rm --publish 6006:6006 --volume "$PWD/.ci-config:/etc/opt/xrpld/" --name xrpld-service rippleci/xrpld:develop --standalone`
+   - Start the container: `docker run --detach --rm --publish 6006:6006 --volume "$PWD/.ci-config:/etc/xrpld/" --name xrpld-service rippleci/xrpld:develop --standalone`
    - Wait for port 6006 with a bounded timeout and halt on failure:
      ```bash
      SECONDS=0

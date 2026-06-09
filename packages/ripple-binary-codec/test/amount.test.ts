@@ -90,5 +90,64 @@ describe('Amount', function () {
     )
   })
 
+  it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
+    const amt = Amount.from('1000000')
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for IOU amounts', function () {
+    const amt = Amount.from({
+      value: '1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative IOU amounts', function () {
+    const amt = Amount.from({
+      value: '-1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for MPT amounts', function () {
+    const amt = Amount.from({
+      value: '100',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative MPT amounts', function () {
+    const parser = makeParser(
+      '20000000000000006400002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    )
+    const amt = parser.readType(Amount)
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
   amountErrorTests()
 })
