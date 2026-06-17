@@ -214,7 +214,7 @@ function signingBatchData(batch: BatchObject): Uint8Array {
     throw Error('No field `sequence`')
   }
   if (batch.flags == null) {
-    throw Error("No field `flags'")
+    throw Error('No field `flags`')
   }
   if (batch.txIDs == null) {
     throw Error('No field `txIDs`')
@@ -239,7 +239,13 @@ function signingBatchData(batch: BatchObject): Uint8Array {
   if (batch.batchAccount != null) {
     bytesList.put(coreTypes.AccountID.from(batch.batchAccount).toBytes())
   }
+  // The wire format is positional, so `signerAccount` must follow `batchAccount`.
+  // Reject `signerAccount` without `batchAccount` to avoid binding the signature
+  // to the wrong account.
   if (batch.signerAccount != null) {
+    if (batch.batchAccount == null) {
+      throw Error('Field `signerAccount` requires `batchAccount`')
+    }
     bytesList.put(coreTypes.AccountID.from(batch.signerAccount).toBytes())
   }
 
