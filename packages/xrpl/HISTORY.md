@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Changed
+* Add XLS-56 Batch V1_1 support to `signMultiBatch` and `combineBatchSigners` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
+
 ## 5.0.0 (2026-06-05)
 
 ### BREAKING CHANGES:
