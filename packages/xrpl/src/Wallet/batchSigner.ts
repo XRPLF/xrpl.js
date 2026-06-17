@@ -186,31 +186,40 @@ export function combineBatchSigners(
 }
 
 /**
+ * Builds a comparison key over every field bound into a Batch signature
+ * (XLS-56 V1_1): the outer account, sequence value, flags, and inner
+ * transaction IDs. Fragments that disagree on any of these were signed over
+ * different payloads and cannot be combined.
+ *
+ * @param tx - The Batch transaction to derive the key from.
+ * @returns A stable string key for equivalence comparison.
+ */
+function getBatchEquivalenceKey(tx: Batch): string {
+  return JSON.stringify({
+    account: tx.Account,
+    sequence: getBatchSeqValue(tx),
+    flags: tx.Flags,
+    transactionIDs: tx.RawTransactions.map((rawTx) =>
+      hashSignedTx(rawTx.RawTransaction),
+    ),
+  })
+}
+
+/**
  * The transactions should all be equal except for the 'Signers' field.
  *
  * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
  * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
  */
 function validateBatchTransactionEquivalence(transactions: Batch[]): void {
-  const exampleTransaction = JSON.stringify({
-    flags: transactions[0].Flags,
-    transactionIDs: transactions[0].RawTransactions.map((rawTx) =>
-      hashSignedTx(rawTx.RawTransaction),
-    ),
-  })
+  const exampleTransaction = getBatchEquivalenceKey(transactions[0])
   if (
-    transactions.slice(1).some(
-      (tx) =>
-        JSON.stringify({
-          flags: tx.Flags,
-          transactionIDs: tx.RawTransactions.map((rawTx) =>
-            hashSignedTx(rawTx.RawTransaction),
-          ),
-        }) !== exampleTransaction,
-    )
+    transactions
+      .slice(1)
+      .some((tx) => getBatchEquivalenceKey(tx) !== exampleTransaction)
   ) {
     throw new ValidationError(
-      'Flags and transaction hashes are not the same for all provided transactions.',
+      'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
     )
   }
 }

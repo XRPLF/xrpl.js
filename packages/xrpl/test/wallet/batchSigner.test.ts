@@ -365,7 +365,25 @@ describe('Wallet batch operations', function () {
       assert.throws(
         () => combineBatchSigners([tx1, badTx2]),
         ValidationError,
-        'Flags and transaction hashes are not the same for all provided transactions.',
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
+      )
+    })
+
+    it('fails with different outer Account signed', function () {
+      const badTx2 = { ...tx2, Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7' }
+      assert.throws(
+        () => combineBatchSigners([tx1, badTx2]),
+        ValidationError,
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
+      )
+    })
+
+    it('fails with different Sequence signed', function () {
+      const badTx2 = { ...tx2, Sequence: 216 }
+      assert.throws(
+        () => combineBatchSigners([tx1, badTx2]),
+        ValidationError,
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
       )
     })
   })
