@@ -63,6 +63,10 @@
     "webpack-bundle-analyzer": "^5.3.0",
     "webpack-cli": "^7.0.2"
   },
+  "//overrides": "nx@22 hard-pins tmp@0.2.6 (a known vulnerable version); this forces tmp to 0.2.7 to match the version karma already uses. Remove once nx ships a release that depends on tmp>=0.2.7.",
+  "overrides": {
+    "tmp": "0.2.7"
+  },
   "workspaces": [
     "./packages/*"
   ],
