@@ -369,22 +369,7 @@ export class Connection extends EventEmitter {
       return
     }
     if (data.type) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      const type = data.type as string
-      // Refuse to forward server-supplied event names that collide with
-      // Connection's internal state events. Otherwise a rogue server could
-      // spoof local connection state by sending e.g. `{"type":"connected"}`
-      // or `{"type":"error"}`.
-      if (RESERVED_INTERNAL_EVENTS.has(type)) {
-        this.emit(
-          'error',
-          'badMessage',
-          `Server message used reserved internal event type "${type}"; dropping.`,
-          message,
-        )
-        return
-      }
-      this.emit(type, data)
+      this.forwardServerMessage(data, message)
     }
     if (data.type === 'response') {
       try {
@@ -397,6 +382,52 @@ export class Connection extends EventEmitter {
         }
       }
     }
+  }
+
+  /**
+   * Forwards a server message to listeners keyed by its `data.type`, after
+   * validating the server-controlled `type`. Messages whose `type` is not a
+   * string, or whose `type` collides with one of Connection's reserved
+   * internal event names, are dropped and surfaced as a `badMessage` error
+   * rather than forwarded.
+   *
+   * @param data - The parsed server message.
+   * @param message - The raw message string, used for diagnostics.
+   */
+  private forwardServerMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    // `data.type` is server-controlled, so its runtime type must be checked
+    // before it is used as an event name. A compile-time `as string` is not
+    // enough: a payload like `{"type":["error"]}` slips past
+    // `RESERVED_INTERNAL_EVENTS.has(...)` (an array never matches a string in
+    // the Set) yet still coerces to the string "error" when passed to `emit`,
+    // re-opening the spoofing hole. Reject any non-string `type` outright.
+    if (typeof data.type !== 'string') {
+      this.emit(
+        'error',
+        'badMessage',
+        `Server message 'type' must be a string; dropping.`,
+        message,
+      )
+      return
+    }
+    const type = data.type
+    // Refuse to forward server-supplied event names that collide with
+    // Connection's internal state events. Otherwise a rogue server could
+    // spoof local connection state by sending e.g. `{"type":"connected"}`
+    // or `{"type":"error"}`.
+    if (RESERVED_INTERNAL_EVENTS.has(type)) {
+      this.emit(
+        'error',
+        'badMessage',
+        `Server message used reserved internal event type "${type}"; dropping.`,
+        message,
+      )
+      return
+    }
+    this.emit(type, data)
   }
 
   /**

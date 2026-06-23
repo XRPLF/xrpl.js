@@ -965,6 +965,54 @@ describe('Connection', function () {
     TIMEOUT,
   )
 
+  // A non-string `type` must never be used as an event name. Arrays are the
+  // dangerous case: `{"type":["error"]}` fails the RESERVED_INTERNAL_EVENTS
+  // Set check (an array is never === a string) but coerces to the string
+  // "error" when passed to `emit`, which would otherwise re-open the spoofing
+  // hole the reserved-event guard closes. All non-string types are dropped and
+  // surfaced as `badMessage`.
+  it.each([
+    ['connected', ['connected']],
+    ['disconnected', ['disconnected']],
+    ['reconnect', [['reconnect']]],
+    ['error', ['error']],
+  ])(
+    'drops server message whose non-string type coerces to "%s"',
+    async (coercesTo, spoofedType) => {
+      const spoofedPayload = { type: spoofedType, error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        // Regression guard: the event the non-string type coerces to must never
+        // receive the raw server payload. Keying off the forwarded payload
+        // object (rather than the event merely firing) lets this same check
+        // cover the `error` case, where the event is also the channel the fix
+        // uses to report `badMessage`.
+        clientContext.client.connection.on(coercesTo, (forwarded) => {
+          if (forwarded != null && typeof forwarded === 'object') {
+            reject(
+              new XrplError(
+                `Non-string server type was forwarded as internal event "${coercesTo}"`,
+              ),
+            )
+          }
+        })
+
+        // Success: the message is dropped and surfaced as a badMessage error.
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await clientContext.client.disconnect()
   //   // fail on connection
