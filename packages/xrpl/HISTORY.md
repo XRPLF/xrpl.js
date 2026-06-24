@@ -11,6 +11,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
+* Reverted [#3331](https://github.com/XRPLF/xrpl.js/pull/3331), which made `Client.getServerInfo()` and `Client.connect()` throw when the `server_info` request failed or the response omitted `network_id`. The SDK must not enforce `network_id` rules more strictly than a rippled node does for custom XRPL networks, so `getServerInfo()` once again logs such failures via `console.error` and leaves `client.networkID` undefined rather than throwing.
 
 
 ## 5.0.0 (2026-06-05)
