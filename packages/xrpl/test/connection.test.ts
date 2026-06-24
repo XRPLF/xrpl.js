@@ -975,6 +975,7 @@ describe('Connection', function () {
     ['connected', ['connected']],
     ['disconnected', ['disconnected']],
     ['reconnect', [['reconnect']]],
+    ['reconnecting', ['reconnecting']],
     ['error', ['error']],
   ])(
     'drops server message whose non-string type coerces to "%s"',
