@@ -408,7 +408,7 @@ export class Connection extends EventEmitter {
       this.emit(
         'error',
         'badMessage',
-        `Server message 'type' must be a string; dropping.`,
+        `Server message 'type' must be a string (got ${typeof data.type}); dropping.`,
         message,
       )
       return

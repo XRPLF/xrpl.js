@@ -952,7 +952,15 @@ describe('Connection', function () {
                   'Spoofed server payload was forwarded to error listeners',
                 ),
               )
+              return
             }
+            // Any other 'error' emission is unexpected — fail fast instead of
+            // waiting for the test to time out.
+            reject(
+              new XrplError(
+                `Unexpected 'error' emission: ${JSON.stringify(errorCodeOrPayload)}`,
+              ),
+            )
           },
         )
       })
