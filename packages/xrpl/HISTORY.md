@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 
 ### Added
+* Support for `Dynamic MPT` (XLS-94D)
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
 
 ### Fixed
@@ -26,7 +27,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `Client.getServerInfo()` and `Client.connect()` now throw if the `server_info` request fails, or if the response succeeds but does not include a `network_id`. Previously, these failures were swallowed and only logged via `console.error`, leaving `client.networkID` undefined and causing `autofill()` to omit the `NetworkID` field — producing transactions valid on the wrong network. Servers running rippled <1.11 (which do not return `network_id`) will now fail to connect; upgrade to rippled 1.11+ or set `client.networkID` manually after construction.
 
 ### Added
-* Support for `Dynamic MPT` (XLS-94D)
 * Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
 
 ### Fixed
