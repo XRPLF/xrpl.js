@@ -78,6 +78,17 @@ describe('MPTokenIssuanceSet', function () {
     } as any)
   })
 
+  it(`accepts an empty MPTokenMetadata (clears the field per rippled)`, function () {
+    // rippled MPTokenIssuanceSet doApply treats an empty blob as a clear
+    // (makeFieldAbsent), so an empty string must pass client validation.
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MPTokenMetadata: '',
+    } as any)
+  })
+
   it(`throws w/ missing MPTokenIssuanceID`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
@@ -214,7 +225,7 @@ describe('MPTokenIssuanceSet', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
     )
   })
 
@@ -228,7 +239,7 @@ describe('MPTokenIssuanceSet', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
     )
   })
 

@@ -233,14 +233,16 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     }
   }
 
-  if (tx.MPTokenMetadata != null) {
+  // An empty MPTokenMetadata is valid on MPTokenIssuanceSet: per rippled it
+  // clears the existing metadata (makeFieldAbsent). Only validate the hex
+  // format, length, and XLS-89 schema when a non-empty value is supplied.
+  if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata.length > 0) {
     if (
-      typeof tx.MPTokenMetadata === 'string' &&
-      (!isHex(tx.MPTokenMetadata) ||
-        tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH)
+      !isHex(tx.MPTokenMetadata) ||
+      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH
     ) {
       throw new ValidationError(
-        `MPTokenIssuanceSet: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+        `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
       )
     }
 
