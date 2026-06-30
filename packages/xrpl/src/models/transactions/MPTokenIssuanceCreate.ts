@@ -60,29 +60,29 @@ export enum MPTokenIssuanceCreateFlags {
 
 export enum MPTokenIssuanceCreateMutableFlags {
   /**
-   * If set, Indicates flag lsfMPTCanLock can be changed.
+   * If set, indicates the lsfMPTCanLock flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanLock = 0x00000002,
+  tmfMPTCanEnableCanLock = 0x00000002,
   /**
-   * If set, Indicates flag lsfMPTRequireAuth can be changed
+   * If set, indicates the lsfMPTRequireAuth flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateRequireAuth = 0x00000004,
+  tmfMPTCanEnableRequireAuth = 0x00000004,
   /**
-   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   * If set, indicates the lsfMPTCanEscrow flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanEscrow = 0x00000008,
+  tmfMPTCanEnableCanEscrow = 0x00000008,
   /**
-   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   * If set, indicates the lsfMPTCanTrade flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanTrade = 0x00000010,
+  tmfMPTCanEnableCanTrade = 0x00000010,
   /**
-   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   * If set, indicates the lsfMPTCanTransfer flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanTransfer = 0x00000020,
+  tmfMPTCanEnableCanTransfer = 0x00000020,
   /**
-   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   * If set, indicates the lsfMPTCanClawback flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanClawback = 0x00000040,
+  tmfMPTCanEnableCanClawback = 0x00000040,
   /**
    * If set, Allows field MPTokenMetadata to be modified.
    */
@@ -95,12 +95,12 @@ export enum MPTokenIssuanceCreateMutableFlags {
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
 export const tmfMPTokenIssuanceCreateMutableMask = ~(
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateRequireAuth |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanEscrow |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTrade |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanClawback |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanLock |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableRequireAuth |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanEscrow |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTrade |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTransfer |
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanClawback |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee
 )
@@ -143,29 +143,29 @@ export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterfac
 
 export interface MPTokenIssuanceCreateMutableFlagsInterface {
   /**
-   * If set, Indicates flag lsfMPTCanLock can be changed.
+   * If set, indicates the lsfMPTCanLock flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanLock?: boolean
+  tmfMPTCanEnableCanLock?: boolean
   /**
-   * If set, Indicates flag lsfMPTRequireAuth can be changed.
+   * If set, indicates the lsfMPTRequireAuth flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateRequireAuth?: boolean
+  tmfMPTCanEnableRequireAuth?: boolean
   /**
-   * If set, Indicates flag lsfMPTCanEscrow can be changed.
+   * If set, indicates the lsfMPTCanEscrow flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanEscrow?: boolean
+  tmfMPTCanEnableCanEscrow?: boolean
   /**
-   * If set, Indicates flag lsfMPTCanTrade can be changed.
+   * If set, indicates the lsfMPTCanTrade flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanTrade?: boolean
+  tmfMPTCanEnableCanTrade?: boolean
   /**
-   * If set, Indicates flag lsfMPTCanTransfer can be changed.
+   * If set, indicates the lsfMPTCanTransfer flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanTransfer?: boolean
+  tmfMPTCanEnableCanTransfer?: boolean
   /**
-   * If set, Indicates flag lsfMPTCanClawback can be changed.
+   * If set, indicates the lsfMPTCanClawback flag can later be enabled via MPTokenIssuanceSet.
    */
-  tmfMPTCanMutateCanClawback?: boolean
+  tmfMPTCanEnableCanClawback?: boolean
   /**
    * If set, Allows field MPTokenMetadata to be modified.
    */

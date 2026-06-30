@@ -93,29 +93,29 @@ export interface MPTokenIssuanceFlagsInterface {
 
 export interface MPTokenIssuanceMutableFlagsInterface {
   /**
-   * Indicates flag lsfMPTCanLock can be changed
+   * Indicates flag lsfMPTCanLock can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateCanLock?: boolean
+  lsmfMPTCanEnableCanLock?: boolean
   /**
-   * Indicates flag lsfMPTRequireAuth can be changed
+   * Indicates flag lsfMPTRequireAuth can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateRequireAuth?: boolean
+  lsmfMPTCanEnableRequireAuth?: boolean
   /**
-   * Indicates flag lsfMPTCanEscrow can be changed
+   * Indicates flag lsfMPTCanEscrow can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateCanEscrow?: boolean
+  lsmfMPTCanEnableCanEscrow?: boolean
   /**
-   * Indicates flag lsfMPTCanTrade can be changed
+   * Indicates flag lsfMPTCanTrade can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateCanTrade?: boolean
+  lsmfMPTCanEnableCanTrade?: boolean
   /**
-   * Indicates flag lsfMPTCanTransfer can be changed
+   * Indicates flag lsfMPTCanTransfer can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateCanTransfer?: boolean
+  lsmfMPTCanEnableCanTransfer?: boolean
   /**
-   * Indicates flag lsfMPTCanClawback can be changed
+   * Indicates flag lsfMPTCanClawback can be enabled via MPTokenIssuanceSet
    */
-  lsmfMPTCanMutateCanClawback?: boolean
+  lsmfMPTCanEnableCanClawback?: boolean
   /**
    * Allows field MPTokenMetadata to be modified
    */
@@ -137,12 +137,12 @@ export enum MPTokenIssuanceFlags {
 }
 
 export enum MPTokenIssuanceMutableFlags {
-  lsmfMPTCanMutateCanLock = 0x00000002,
-  lsmfMPTCanMutateRequireAuth = 0x00000004,
-  lsmfMPTCanMutateCanEscrow = 0x00000008,
-  lsmfMPTCanMutateCanTrade = 0x00000010,
-  lsmfMPTCanMutateCanTransfer = 0x00000020,
-  lsmfMPTCanMutateCanClawback = 0x00000040,
+  lsmfMPTCanEnableCanLock = 0x00000002,
+  lsmfMPTCanEnableRequireAuth = 0x00000004,
+  lsmfMPTCanEnableCanEscrow = 0x00000008,
+  lsmfMPTCanEnableCanTrade = 0x00000010,
+  lsmfMPTCanEnableCanTransfer = 0x00000020,
+  lsmfMPTCanEnableCanClawback = 0x00000040,
   lsmfMPTCanMutateMetadata = 0x00010000,
   lsmfMPTCanMutateTransferFee = 0x00020000,
 }

@@ -13,7 +13,11 @@ import {
   parseMPTokenIssuanceFlags,
   parseMPTokenIssuanceMutableFlags,
 } from '../../../src'
-import type { MPTokenIssuance } from '../../../src/models/ledger/MPTokenIssuance'
+import type {
+  MPTokenIssuance,
+  MPTokenIssuanceFlagsInterface,
+  MPTokenIssuanceMutableFlagsInterface,
+} from '../../../src/models/ledger/MPTokenIssuance'
 import type PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
 import serverUrl from '../serverUrl'
 import {
@@ -26,7 +30,60 @@ import { testTransaction } from '../utils'
 // how long before each test case times out
 const TIMEOUT = 20000
 
-describe('MPTokenIssuanceDestroy', function () {
+/**
+ * Each MPTokenIssuanceSet "set" MutableFlag maps one-way to an MPTokenIssuance
+ * capability flag. The corresponding create-time "can enable" MutableFlag must
+ * have granted permission for the change to be applied (XLS-94D).
+ */
+const MUTABILITY_FLAG_MAP: Array<{
+  createEnableFlag: MPTokenIssuanceCreateMutableFlags
+  setFlag: MPTokenIssuanceSetMutableFlags
+  lsfKey: keyof MPTokenIssuanceFlagsInterface
+  lsmfKey: keyof MPTokenIssuanceMutableFlagsInterface
+}> = [
+  {
+    createEnableFlag: MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanLock,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+    lsfKey: 'lsfMPTCanLock',
+    lsmfKey: 'lsmfMPTCanEnableCanLock',
+  },
+  {
+    createEnableFlag:
+      MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableRequireAuth,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth,
+    lsfKey: 'lsfMPTRequireAuth',
+    lsmfKey: 'lsmfMPTCanEnableRequireAuth',
+  },
+  {
+    createEnableFlag:
+      MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanEscrow,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow,
+    lsfKey: 'lsfMPTCanEscrow',
+    lsmfKey: 'lsmfMPTCanEnableCanEscrow',
+  },
+  {
+    createEnableFlag: MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTrade,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade,
+    lsfKey: 'lsfMPTCanTrade',
+    lsmfKey: 'lsmfMPTCanEnableCanTrade',
+  },
+  {
+    createEnableFlag:
+      MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTransfer,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+    lsfKey: 'lsfMPTCanTransfer',
+    lsmfKey: 'lsmfMPTCanEnableCanTransfer',
+  },
+  {
+    createEnableFlag:
+      MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanClawback,
+    setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+    lsfKey: 'lsfMPTCanClawback',
+    lsmfKey: 'lsmfMPTCanEnableCanClawback',
+  },
+]
+
+describe('MPTokenIssuanceSet', function () {
   let testContext: XrplIntegrationTestContext
 
   beforeEach(async () => {
@@ -85,164 +142,249 @@ describe('MPTokenIssuanceDestroy', function () {
   )
 
   it(
-    'Test Mutability of Flags as per Dynamic MPT (XLS-94D) amendment',
+    'enables every capability flag one-way via MPTokenIssuanceSet (XLS-94D)',
     async () => {
+      // Create an issuance that grants the "can enable" permission for every
+      // mutable capability, but with none of the lsf capabilities set yet.
       const createTx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-        MutableFlags:
-          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee +
-          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanTransfer,
+        MutableFlags: MUTABILITY_FLAG_MAP.reduce(
+          // eslint-disable-next-line no-bitwise -- combine the flags
+          (acc, entry) => acc | entry.createEnableFlag,
+          0,
+        ),
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const issuanceBeforeSet = await readMPTokenIssuance(
+        testContext,
+        issuanceId,
+      )
+      const lsmfBeforeSet = parseMPTokenIssuanceMutableFlags(
+        issuanceBeforeSet.MutableFlags,
+      )
+      const lsfBeforeSet = parseMPTokenIssuanceFlags(issuanceBeforeSet.Flags)
+
+      // Every create-time "can enable" flag is reflected on the ledger object,
+      // while none of the capability flags themselves are set yet.
+      for (const entry of MUTABILITY_FLAG_MAP) {
+        assert.isTrue(
+          lsmfBeforeSet[entry.lsmfKey],
+          `${entry.lsmfKey} should be set from the create-time mutable flag`,
+        )
+        assert.isUndefined(
+          lsfBeforeSet[entry.lsfKey],
+          `${entry.lsfKey} should not be set on a freshly created issuance`,
+        )
       }
 
-      const mptCreateRes = await testTransaction(
-        testContext.client,
-        createTx,
-        testContext.wallet,
-      )
-
-      const txHash = mptCreateRes.result.tx_json.hash
-
-      const txResponse = await testContext.client.request({
-        command: 'tx',
-        transaction: txHash,
-      })
-
-      const meta = txResponse.result
-        .meta as TransactionMetadata<MPTokenIssuanceCreate>
-
-      const mptID = meta.mpt_issuance_id
-
-      const setTransferFeeTx: MPTokenIssuanceSet = {
+      // Enable every capability in a single MPTokenIssuanceSet transaction.
+      const enableAllTx: MPTokenIssuanceSet = {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: mptID!,
-        // set the transfer fee to a non-zero value
-        TransferFee: 200,
+        MPTokenIssuanceID: issuanceId,
+        MutableFlags: MUTABILITY_FLAG_MAP.reduce(
+          // eslint-disable-next-line no-bitwise -- combine the flags
+          (acc, entry) => acc | entry.setFlag,
+          0,
+        ),
       }
+      await testTransaction(testContext.client, enableAllTx, testContext.wallet)
 
-      await testTransaction(
-        testContext.client,
-        setTransferFeeTx,
-        testContext.wallet,
+      const issuanceAfterSet = await readMPTokenIssuance(
+        testContext,
+        issuanceId,
+      )
+      const lsfAfterSet = parseMPTokenIssuanceFlags(issuanceAfterSet.Flags)
+      const lsmfAfterSet = parseMPTokenIssuanceMutableFlags(
+        issuanceAfterSet.MutableFlags,
       )
 
-      // remove the ability to transfer the MPT
-      const clearTransferFlagTx: MPTokenIssuanceSet = {
+      for (const entry of MUTABILITY_FLAG_MAP) {
+        assert.isTrue(
+          lsfAfterSet[entry.lsfKey],
+          `${entry.lsfKey} should be set after applying ${MPTokenIssuanceSetMutableFlags[entry.setFlag]}`,
+        )
+        // Mutability is not consumed: the "can enable" grant remains.
+        assert.isTrue(
+          lsmfAfterSet[entry.lsmfKey],
+          `${entry.lsmfKey} should remain set after enabling the capability`,
+        )
+      }
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'rejects enabling a capability that was not granted at create time',
+    async () => {
+      // Create an issuance with no MutableFlags, so no lsf* flag is mutable.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const setCanLockTx: MPTokenIssuanceSet = {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: mptID!,
-        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+        MPTokenIssuanceID: issuanceId,
+        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
       }
-
       await testTransaction(
         testContext.client,
-        clearTransferFlagTx,
+        setCanLockTx,
         testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
       )
     },
     TIMEOUT,
   )
 
   it(
-    'parsed lsf*/lsmf* flag views reflect mutations applied via MPTokenIssuanceSet',
+    'mutates TransferFee via MPTokenIssuanceSet when tmfMPTCanMutateTransferFee was set at create time',
     async () => {
       const createTx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+        MutableFlags:
+          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
       }
-
-      const createSubmitResponse = await testTransaction(
-        testContext.client,
-        createTx,
-        testContext.wallet,
-      )
-      const createTxResponse = await testContext.client.request({
-        command: 'tx',
-        transaction: createSubmitResponse.result.tx_json.hash,
-      })
-      const createMeta = createTxResponse.result
-        .meta as TransactionMetadata<MPTokenIssuanceCreate>
-      const issuanceId = createMeta.mpt_issuance_id
-      assert.isString(issuanceId, 'Create did not return an mpt_issuance_id')
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
 
       const issuanceBeforeSet = await readMPTokenIssuance(
         testContext,
-        issuanceId!,
-      )
-      const parsedReadOnlyFlagsBeforeSet = parseMPTokenIssuanceFlags(
-        issuanceBeforeSet.Flags,
-      )
-      const parsedMutableFlagsBeforeSet = parseMPTokenIssuanceMutableFlags(
-        issuanceBeforeSet.MutableFlags,
-      )
-
-      assert.isUndefined(
-        parsedReadOnlyFlagsBeforeSet.lsfMPTCanLock,
-        'lsfMPTCanLock should not be set on a freshly-created MPT issuance',
+        issuanceId,
       )
       assert.isTrue(
-        parsedMutableFlagsBeforeSet.lsmfMPTCanMutateCanLock,
-        'lsmfMPTCanMutateCanLock should reflect the create-time tmfMPTCanMutateCanLock',
+        parseMPTokenIssuanceMutableFlags(issuanceBeforeSet.MutableFlags)
+          .lsmfMPTCanMutateTransferFee,
+        'lsmfMPTCanMutateTransferFee should be set from the create-time mutable flag',
       )
 
-      const enableCanLockTx: MPTokenIssuanceSet = {
+      const setTransferFeeTx: MPTokenIssuanceSet = {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId!,
-        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
+        MPTokenIssuanceID: issuanceId,
+        TransferFee: 200,
       }
       await testTransaction(
         testContext.client,
-        enableCanLockTx,
+        setTransferFeeTx,
         testContext.wallet,
       )
 
-      const issuanceAfterEnable = await readMPTokenIssuance(
+      const issuanceAfterSet = await readMPTokenIssuance(
         testContext,
-        issuanceId!,
+        issuanceId,
       )
-      const parsedReadOnlyFlagsAfterEnable = parseMPTokenIssuanceFlags(
-        issuanceAfterEnable.Flags,
-      )
-      const parsedMutableFlagsAfterEnable = parseMPTokenIssuanceMutableFlags(
-        issuanceAfterEnable.MutableFlags,
-      )
+      assert.equal(issuanceAfterSet.TransferFee, 200)
+    },
+    TIMEOUT,
+  )
 
-      assert.isTrue(
-        parsedReadOnlyFlagsAfterEnable.lsfMPTCanLock,
-        'lsfMPTCanLock should be set after applying tmfMPTSetCanLock',
-      )
-      assert.isTrue(
-        parsedMutableFlagsAfterEnable.lsmfMPTCanMutateCanLock,
-        'lsmfMPTCanMutateCanLock should remain set; mutability is not consumed by toggling',
-      )
+  it(
+    'rejects TransferFee mutation via MPTokenIssuanceSet when tmfMPTCanMutateTransferFee was not set at create time',
+    async () => {
+      // tfMPTCanTransfer is required for TransferFee to be accepted by the
+      // validator; mutability for TransferFee is intentionally omitted.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
 
-      const disableCanLockTx: MPTokenIssuanceSet = {
+      const updateTransferFeeTx: MPTokenIssuanceSet = {
         TransactionType: 'MPTokenIssuanceSet',
         Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId!,
-        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
+        MPTokenIssuanceID: issuanceId,
+        TransferFee: 100,
       }
       await testTransaction(
         testContext.client,
-        disableCanLockTx,
+        updateTransferFeeTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'mutates MPTokenMetadata via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was set at create time',
+    async () => {
+      const initialMetadataHex = stringToHex('initial metadata')
+      const updatedMetadataHex = stringToHex('updated metadata')
+
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata,
+        MPTokenMetadata: initialMetadataHex,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const issuanceBeforeSet = await readMPTokenIssuance(
+        testContext,
+        issuanceId,
+      )
+      assert.isTrue(
+        parseMPTokenIssuanceMutableFlags(issuanceBeforeSet.MutableFlags)
+          .lsmfMPTCanMutateMetadata,
+        'lsmfMPTCanMutateMetadata should be set from the create-time mutable flag',
+      )
+
+      const updateMetadataTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        MPTokenMetadata: updatedMetadataHex,
+      }
+      await testTransaction(
+        testContext.client,
+        updateMetadataTx,
         testContext.wallet,
       )
 
-      const issuanceAfterDisable = await readMPTokenIssuance(
+      const issuanceAfterUpdate = await readMPTokenIssuance(
         testContext,
-        issuanceId!,
+        issuanceId,
       )
-      const parsedReadOnlyFlagsAfterDisable = parseMPTokenIssuanceFlags(
-        issuanceAfterDisable.Flags,
-      )
+      assert.equal(issuanceAfterUpdate.MPTokenMetadata, updatedMetadataHex)
+    },
+    TIMEOUT,
+  )
 
-      assert.isUndefined(
-        parsedReadOnlyFlagsAfterDisable.lsfMPTCanLock,
-        'lsfMPTCanLock should be cleared after applying tmfMPTClearCanLock',
+  it(
+    'rejects MPTokenMetadata mutation via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was not set at create time',
+    async () => {
+      // Create an issuance whose MutableFlags grant only the unrelated
+      // CanEnableCanLock permission, so the issuance cannot have its
+      // metadata mutated.
+      const createTx: MPTokenIssuanceCreate = {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: testContext.wallet.classicAddress,
+        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanLock,
+      }
+      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
+
+      const updateMetadataTx: MPTokenIssuanceSet = {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: testContext.wallet.classicAddress,
+        MPTokenIssuanceID: issuanceId,
+        MPTokenMetadata: stringToHex('updated metadata'),
+      }
+      await testTransaction(
+        testContext.client,
+        updateMetadataTx,
+        testContext.wallet,
+        undefined,
+        'tecNO_PERMISSION',
       )
     },
     TIMEOUT,
@@ -298,127 +440,6 @@ describe('MPTokenIssuanceDestroy', function () {
         issuanceId,
       )
       assert.equal(issuanceAfterChange.DomainID, secondDomainId)
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'mutates MPTokenMetadata via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was set at create time',
-    async () => {
-      const initialMetadataHex = stringToHex('initial metadata')
-      const updatedMetadataHex = stringToHex('updated metadata')
-
-      const createTx: MPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: testContext.wallet.classicAddress,
-        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata,
-        MPTokenMetadata: initialMetadataHex,
-      }
-      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
-
-      const updateMetadataTx: MPTokenIssuanceSet = {
-        TransactionType: 'MPTokenIssuanceSet',
-        Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId,
-        MPTokenMetadata: updatedMetadataHex,
-      }
-      await testTransaction(
-        testContext.client,
-        updateMetadataTx,
-        testContext.wallet,
-      )
-
-      const issuanceAfterUpdate = await readMPTokenIssuance(
-        testContext,
-        issuanceId,
-      )
-      assert.equal(issuanceAfterUpdate.MPTokenMetadata, updatedMetadataHex)
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'rejects MPTokenMetadata mutation via MPTokenIssuanceSet when tmfMPTCanMutateMetadata was not set at create time',
-    async () => {
-      // Create an issuance whose MutableFlags grant only the unrelated
-      // CanMutateCanLock permission, so the issuance cannot have its
-      // metadata mutated.
-      const createTx: MPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: testContext.wallet.classicAddress,
-        MutableFlags: MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateCanLock,
-      }
-      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
-
-      const updateMetadataTx: MPTokenIssuanceSet = {
-        TransactionType: 'MPTokenIssuanceSet',
-        Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId,
-        MPTokenMetadata: stringToHex('updated metadata'),
-      }
-      await testTransaction(
-        testContext.client,
-        updateMetadataTx,
-        testContext.wallet,
-        undefined,
-        'tecNO_PERMISSION',
-      )
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'rejects toggling an lsf flag via MPTokenIssuanceSet when the corresponding mutate flag was not set at create time',
-    async () => {
-      // Create an issuance with no MutableFlags, so no lsf* flag is mutable.
-      const createTx: MPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: testContext.wallet.classicAddress,
-      }
-      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
-
-      const setCanLockTx: MPTokenIssuanceSet = {
-        TransactionType: 'MPTokenIssuanceSet',
-        Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId,
-        MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
-      }
-      await testTransaction(
-        testContext.client,
-        setCanLockTx,
-        testContext.wallet,
-        undefined,
-        'tecNO_PERMISSION',
-      )
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'rejects TransferFee mutation via MPTokenIssuanceSet when tmfMPTCanMutateTransferFee was not set at create time',
-    async () => {
-      // tfMPTCanTransfer is required for TransferFee to be accepted by the
-      // validator; mutability for TransferFee is intentionally omitted.
-      const createTx: MPTokenIssuanceCreate = {
-        TransactionType: 'MPTokenIssuanceCreate',
-        Account: testContext.wallet.classicAddress,
-        Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      }
-      const issuanceId = await submitMPTCreateAndGetId(testContext, createTx)
-
-      const updateTransferFeeTx: MPTokenIssuanceSet = {
-        TransactionType: 'MPTokenIssuanceSet',
-        Account: testContext.wallet.classicAddress,
-        MPTokenIssuanceID: issuanceId,
-        TransferFee: 100,
-      }
-      await testTransaction(
-        testContext.client,
-        updateTransferFeeTx,
-        testContext.wallet,
-        undefined,
-        'tecNO_PERMISSION',
-      )
     },
     TIMEOUT,
   )

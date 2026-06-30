@@ -36,18 +36,45 @@ describe('MPTokenIssuanceSet', function () {
     validMPTokenIssuanceSet = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      MPTokenIssuanceID: TOKEN_ID,
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
     assertValid(validMPTokenIssuanceSet)
 
+    // A single MutableFlags "enable" bit is valid.
     assertValid({
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+    } as any)
+  })
+
+  it(`verifies valid MPTokenIssuanceSet with multiple MutableFlags`, function () {
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      MutableFlags:
+        // eslint-disable-next-line no-bitwise -- required to OR the flags
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+    } as any)
+  })
+
+  it(`verifies valid MPTokenIssuanceSet mutating TransferFee and MPTokenMetadata`, function () {
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      TransferFee: 100,
+      MPTokenMetadata: stringToHex('updated metadata'),
     } as any)
   })
 
@@ -142,6 +169,18 @@ describe('MPTokenIssuanceSet', function () {
     assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
   })
 
+  it(`Throws w/ a MutableFlags bit outside the DynamicMPT range`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      // 0x40 is above the highest DynamicMPT "set" flag (tmfMPTSetCanClawback = 0x20)
+      MutableFlags: 0x00000040,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+  })
+
   it(`Throws w/ invalid type of MPTokenMetadata`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
@@ -190,6 +229,22 @@ describe('MPTokenIssuanceSet', function () {
     } as any
 
     assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field DomainID')
+  })
+
+  it(`Throws w/ both DomainID and Holder fields`, function () {
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      DomainID:
+        'DDC2BBBDC8E8F03A78AEFC68C28EC9AF40CB3499310B9F5E0CC0C0FEDFEE2D6F',
+    } as any
+
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: Cannot set both DomainID and Holder fields.',
+    )
   })
 
   it(`throws w/ identical holder and account ID`, function () {
@@ -253,7 +308,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
     } as any
 
@@ -268,115 +323,13 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
+      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
       Flags: MPTokenIssuanceSetFlags.tfMPTLock,
     } as any
 
     assertInvalid(
       invalid,
       'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanLock flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanTransfer flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanClawback flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanEscrow flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanTrade flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
-    )
-  })
-
-  it(`Throws w/ setting and clearing the tmfMPTCanRequireAuth flag`, function () {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
-        // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
-        MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth,
-    } as any
-
-    assertInvalid(
-      invalid,
-      'MPTokenIssuanceSet: Can not set and clear the same flag.',
     )
   })
 })

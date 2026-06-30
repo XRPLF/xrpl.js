@@ -40,47 +40,36 @@ export enum MPTokenIssuanceSetFlags {
   tfMPTUnlock = 0x00000002,
 }
 
+/**
+ * MutableFlags for an MPTokenIssuanceSet transaction (XLS-94D).
+ *
+ * Each flag enables the corresponding capability flag on the MPTokenIssuance
+ * ledger object. These flags are one-way: once a capability is enabled, it can
+ * not be disabled via a subsequent MPTokenIssuanceSet transaction.
+ */
 export enum MPTokenIssuanceSetMutableFlags {
-  /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
+  /* Enables the lsfMPTCanLock flag. Allows the token to be locked both individually and globally. */
   tmfMPTSetCanLock = 0x00000001,
-  /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */
-  tmfMPTClearCanLock = 0x00000002,
-  /* Sets the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
-  tmfMPTSetRequireAuth = 0x00000004,
-  /* Clears the lsfMPTRequireAuth flag. Holders are not required to be authorized. */
-  tmfMPTClearRequireAuth = 0x00000008,
-  /* Sets the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
-  tmfMPTSetCanEscrow = 0x00000010,
-  /* Clears the lsfMPTCanEscrow flag. Disallows holders from placing balances into escrow. */
-  tmfMPTClearCanEscrow = 0x00000020,
-  /* Sets the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
-  tmfMPTSetCanTrade = 0x00000040,
-  /* Clears the lsfMPTCanTrade flag. Disallows holders from trading balances on the XRPL DEX. */
-  tmfMPTClearCanTrade = 0x00000080,
-  /* Sets the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
-  tmfMPTSetCanTransfer = 0x00000100,
-  /* Clears the lsfMPTCanTransfer flag. Disallows transfers to non-issuer accounts. */
-  tmfMPTClearCanTransfer = 0x00000200,
-  /* Sets the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
-  tmfMPTSetCanClawback = 0x00000400,
-  /* Clears the lsfMPTCanClawback flag. The token can not be clawed back. */
-  tmfMPTClearCanClawback = 0x00000800,
+  /* Enables the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
+  tmfMPTSetRequireAuth = 0x00000002,
+  /* Enables the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
+  tmfMPTSetCanEscrow = 0x00000004,
+  /* Enables the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
+  tmfMPTSetCanTrade = 0x00000008,
+  /* Enables the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
+  tmfMPTSetCanTransfer = 0x00000010,
+  /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
+  tmfMPTSetCanClawback = 0x00000020,
 }
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
 export const tmfMPTokenIssuanceSetMutableMask = ~(
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
-  MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback
 )
 /* eslint-enable no-bitwise */
 
@@ -96,30 +85,18 @@ export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
 }
 
 export interface MPTokenIssuanceSetMutableFlagsInterface {
-  /* Sets the lsfMPTCanLock flag. Enables the token to be locked both individually and globally. */
+  /* Enables the lsfMPTCanLock flag. Allows the token to be locked both individually and globally. */
   tmfMPTSetCanLock?: boolean
-  /* Clears the lsfMPTCanLock flag. Disables both individual and global locking of the token. */
-  tmfMPTClearCanLock?: boolean
-  /* Sets the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
+  /* Enables the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
   tmfMPTSetRequireAuth?: boolean
-  /* Clears the lsfMPTRequireAuth flag. Holders are not required to be authorized. */
-  tmfMPTClearRequireAuth?: boolean
-  /* Sets the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
+  /* Enables the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
   tmfMPTSetCanEscrow?: boolean
-  /* Clears the lsfMPTCanEscrow flag. Disallows holders from placing balances into escrow. */
-  tmfMPTClearCanEscrow?: boolean
-  /* Sets the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
+  /* Enables the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
   tmfMPTSetCanTrade?: boolean
-  /* Clears the lsfMPTCanTrade flag. Disallows holders from trading balances on the XRPL DEX. */
-  tmfMPTClearCanTrade?: boolean
-  /* Sets the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
+  /* Enables the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
   tmfMPTSetCanTransfer?: boolean
-  /* Clears the lsfMPTCanTransfer flag. Disallows transfers to non-issuer accounts. */
-  tmfMPTClearCanTransfer?: boolean
-  /* Sets the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
+  /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
   tmfMPTSetCanClawback?: boolean
-  /* Clears the lsfMPTCanClawback flag. The token can not be clawed back. */
-  tmfMPTClearCanClawback?: boolean
 }
 
 /**
@@ -222,47 +199,6 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     throw new ValidationError(
       'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
     )
-  }
-
-  const MPTMutabilityFlags: Array<{ setFlag: number; clearFlag: number }> = [
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanLock,
-    },
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearRequireAuth,
-    },
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanEscrow,
-    },
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTrade,
-    },
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanTransfer,
-    },
-    {
-      setFlag: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
-      clearFlag: MPTokenIssuanceSetMutableFlags.tmfMPTClearCanClawback,
-    },
-  ]
-
-  // Can not set and clear the same flag
-  if (tx.MutableFlags != null) {
-    for (const flagPair of MPTMutabilityFlags) {
-      if (
-        isFlagEnabled(tx.MutableFlags, flagPair.setFlag) &&
-        isFlagEnabled(tx.MutableFlags, flagPair.clearFlag)
-      ) {
-        throw new ValidationError(
-          'MPTokenIssuanceSet: Can not set and clear the same flag.',
-        )
-      }
-    }
   }
 
   if (typeof tx.TransferFee === 'number') {

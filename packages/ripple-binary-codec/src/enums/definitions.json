@@ -3524,13 +3524,13 @@
       "lsfMPTRequireAuth": 4
     },
     "MPTokenIssuanceMutable": {
-      "lsmfMPTCanMutateCanClawback": 64,
-      "lsmfMPTCanMutateCanEscrow": 8,
-      "lsmfMPTCanMutateCanLock": 2,
-      "lsmfMPTCanMutateCanTrade": 16,
-      "lsmfMPTCanMutateCanTransfer": 32,
+      "lsmfMPTCanEnableCanClawback": 64,
+      "lsmfMPTCanEnableCanEscrow": 8,
+      "lsmfMPTCanEnableCanLock": 2,
+      "lsmfMPTCanEnableCanTrade": 16,
+      "lsmfMPTCanEnableCanTransfer": 32,
+      "lsmfMPTCanEnableRequireAuth": 4,
       "lsmfMPTCanMutateMetadata": 65536,
-      "lsmfMPTCanMutateRequireAuth": 4,
       "lsmfMPTCanMutateTransferFee": 131072
     },
     "NFTokenOffer": {
