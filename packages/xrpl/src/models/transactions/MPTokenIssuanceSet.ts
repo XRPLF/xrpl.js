@@ -143,12 +143,15 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
       'MPTokenIssuanceSet: Cannot set both DomainID and Holder fields.',
     )
   }
-  if (
-    tx.MutableFlags != null &&
+  if (tx.MutableFlags != null) {
     // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
-    tx.MutableFlags & tmfMPTokenIssuanceSetMutableMask
-  ) {
-    throw new ValidationError('MPTokenIssuanceSet: Invalid MutableFlags value')
+    const invalidBits = tx.MutableFlags & tmfMPTokenIssuanceSetMutableMask
+    // rippled rejects a present-but-zero MutableFlags, as well as out-of-mask bits.
+    if (tx.MutableFlags === 0 || invalidBits !== 0) {
+      throw new ValidationError(
+        'MPTokenIssuanceSet: Invalid MutableFlags value',
+      )
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary

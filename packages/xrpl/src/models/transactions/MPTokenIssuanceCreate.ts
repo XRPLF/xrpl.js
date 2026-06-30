@@ -267,14 +267,15 @@ export function validateMPTokenIssuanceCreate(
     )
   }
 
-  if (
-    tx.MutableFlags != null &&
+  if (tx.MutableFlags != null) {
     // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
-    tx.MutableFlags & tmfMPTokenIssuanceCreateMutableMask
-  ) {
-    throw new ValidationError(
-      'MPTokenIssuanceCreate: Invalid MutableFlags value',
-    )
+    const invalidBits = tx.MutableFlags & tmfMPTokenIssuanceCreateMutableMask
+    // rippled rejects a present-but-zero MutableFlags, as well as out-of-mask bits.
+    if (tx.MutableFlags === 0 || invalidBits !== 0) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: Invalid MutableFlags value',
+      )
+    }
   }
 
   if (

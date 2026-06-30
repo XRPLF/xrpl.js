@@ -158,6 +158,17 @@ describe('MPTokenIssuanceCreate', function () {
     assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
   })
 
+  it(`throws w/ MutableFlags explicitly set to 0`, async () => {
+    // rippled rejects a present-but-zero MutableFlags with temINVALID_FLAG.
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MutableFlags: 0,
+    } as any
+
+    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+  })
+
   it(`throws with Zero MaximumAmount`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
