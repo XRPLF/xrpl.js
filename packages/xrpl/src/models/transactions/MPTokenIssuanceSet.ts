@@ -116,9 +116,30 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
   Holder?: Account
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 
+  /**
+   * New metadata to set on the issuance, in hex format (max 1024 bytes). The
+   * issuance must have been created with `tmfMPTCanMutateMetadata`, otherwise
+   * the mutation is rejected. Should follow the
+   * {@link https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0089-multi-purpose-token-metadata-schema | XLS-89} standard.
+   */
   MPTokenMetadata?: string
+  /**
+   * New transfer fee for secondary sales, between 0 and 50,000 inclusive (in
+   * increments of 0.001%). The issuance must have been created with
+   * `tmfMPTCanMutateTransferFee`, otherwise the mutation is rejected.
+   */
   TransferFee?: number
+  /**
+   * A one-way "enable" bitmask of {@link MPTokenIssuanceSetMutableFlags} that
+   * turns on the corresponding capability flag(s) on the MPTokenIssuance. Each
+   * enable requires the matching `tmfMPTCanEnable*` flag to have been granted
+   * at creation; once enabled a capability cannot be disabled. (XLS-94D)
+   */
   MutableFlags?: number
+  /**
+   * The PermissionedDomain object ID that gates who may hold this MPT. Cannot
+   * be set together with the `Holder` field.
+   */
   DomainID?: string
 }
 

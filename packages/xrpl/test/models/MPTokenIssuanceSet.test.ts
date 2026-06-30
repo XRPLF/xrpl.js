@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/dist/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceSetFlags } from '../../src'
 import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
