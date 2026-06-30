@@ -78,7 +78,13 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    */
   ReferenceHolding?: string
 
-  MutableFlags: number
+  /**
+   * A set of XLS-94D mutability flags (`lsmfMPT*`) indicating which capabilities
+   * or fields may still be enabled or modified via MPTokenIssuanceSet. Absent on
+   * issuances created without any mutable flags, and on objects that predate the
+   * DynamicMPT amendment.
+   */
+  MutableFlags?: number
 }
 
 export interface MPTokenIssuanceFlagsInterface {

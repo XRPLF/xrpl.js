@@ -86,13 +86,19 @@ export function parseMPTokenIssuanceFlags(
  * Convert the `MutableFlags` field of an `MPTokenIssuance` ledger object into a
  * typed boolean view of the `lsmfMPT*` mutability flags (XLS-94D).
  *
- * @param flags - The numeric value of `MPTokenIssuance.MutableFlags`.
+ * @param flags - The numeric value of `MPTokenIssuance.MutableFlags`. This
+ * field is absent on issuances created without mutable flags and on
+ * pre-amendment objects, in which case an empty interface is returned.
  * @returns An interface with each set `lsmfMPT*` flag as `true`.
  */
 export function parseMPTokenIssuanceMutableFlags(
-  flags: number,
+  flags: number | undefined,
 ): MPTokenIssuanceMutableFlagsInterface {
   const flagsInterface: MPTokenIssuanceMutableFlagsInterface = {}
+
+  if (flags == null) {
+    return flagsInterface
+  }
 
   Object.values(MPTokenIssuanceMutableFlags).forEach((flag) => {
     if (
