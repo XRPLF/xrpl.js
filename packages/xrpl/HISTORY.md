@@ -4,8 +4,25 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES
+
+### Added
+* Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
+
+### Fixed
+* Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
+
+
+## 5.0.0 (2026-06-05)
+
 ### BREAKING CHANGES:
 * `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+* `Wallet.fromSeed` and `Wallet.fromSecret` no longer default to ed25519 when `opts.algorithm` is omitted. The algorithm is now inferred from the seed prefix: `sEd…` seeds derive an ed25519 keypair, all other family seeds (`s…`) derive a secp256k1 keypair. This fixes the long-standing case where ingesting a secp256k1 family seed without an explicit algorithm silently produced an ed25519 keypair for an unrelated account.
+
+  Migration:
+  - **Callers that want ed25519 keys must now pass `algorithm: ECDSA.ed25519` explicitly.** This applies both to `sEd…` seeds (where the inferred result happens to match, so being explicit is defensive but recommended) and to any code that previously relied on the old ed25519 default being applied to an `s…` family seed (where explicitness is *required* to preserve the old keypair).
+  - Callers that want secp256k1 keys from an `s…` family seed can drop the now-redundant `algorithm: ECDSA.secp256k1` argument; the inference produces the same result.
+  - Callers that pass an explicit `opts.algorithm` (either curve) are unaffected.
 * `Client.getServerInfo()` and `Client.connect()` now throw if the `server_info` request fails, or if the response succeeds but does not include a `network_id`. Previously, these failures were swallowed and only logged via `console.error`, leaving `client.networkID` undefined and causing `autofill()` to omit the `NetworkID` field — producing transactions valid on the wrong network. Servers running rippled <1.11 (which do not return `network_id`) will now fail to connect; upgrade to rippled 1.11+ or set `client.networkID` manually after construction.
 
 ### Added
@@ -17,6 +34,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
 * Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
 * Fix `Client.getServerInfo()` swallowing errors from the underlying `server_info` request, which left `client.networkID` undefined and caused `autofill()` to silently omit the `NetworkID` field — producing signed transactions valid on the wrong network (cross-network replay risk). The method now throws on request failure or when the response is missing `network_id`. ([#3321](https://github.com/XRPLF/xrpl.js/issues/3321))
+
 
 ## 4.6.0 (2026-02-12)
 

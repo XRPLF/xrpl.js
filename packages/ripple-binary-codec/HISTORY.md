@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.8.0 (2026-06-04)
+
 ### Fixed
 * Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
 * Fix: Validate the input of non-numeric values for `Amount` field.
