@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@scure/bip32": "^2.0.1",
-    "@scure/bip39": "^2.0.1",
+    "@scure/bip39": "^2.2.0",
     "@xrplf/isomorphic": "^1.0.2",
     "@xrplf/secret-numbers": "^3.0.0",
     "bignumber.js": "^10.0.2",
