@@ -30,6 +30,7 @@ import {
   LoanFlags,
   type Loan,
   type LoanBroker,
+  type Vault,
 } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
@@ -138,6 +139,35 @@ describe('Lending Protocol IT', () => {
 
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
+
+      // ========== Verify pseudo-account AccountRoot designators ==========
+      // The Vault and LoanBroker each own a pseudo-account whose AccountRoot
+      // carries a back-pointer to the owning object (VaultID / LoanBrokerID).
+      const vaultLedgerEntry = await testContext.client.request({
+        command: 'ledger_entry',
+        index: vaultObjectId,
+      })
+      const vaultPseudoAccount = (vaultLedgerEntry.result.node as Vault).Account
+
+      const vaultPseudoAccountInfo = await testContext.client.request({
+        command: 'account_info',
+        account: vaultPseudoAccount,
+      })
+      assert.equal(
+        vaultPseudoAccountInfo.result.account_data.VaultID,
+        vaultObjectId,
+        "Vault pseudo-account's AccountRoot should carry VaultID",
+      )
+
+      const loanBrokerPseudoAccountInfo = await testContext.client.request({
+        command: 'account_info',
+        account: loanBrokerObject.Account,
+      })
+      assert.equal(
+        loanBrokerPseudoAccountInfo.result.account_data.LoanBrokerID,
+        loanBrokerObjectId,
+        "LoanBroker pseudo-account's AccountRoot should carry LoanBrokerID",
+      )
 
       // ========== STEP 4: Create Loan ==========
       // The loan broker initiates a loan for the borrower
