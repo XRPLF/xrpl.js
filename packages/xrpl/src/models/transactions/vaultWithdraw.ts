@@ -51,8 +51,12 @@ export interface VaultWithdraw extends BaseTransaction {
 export function validateVaultWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateRequiredField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'VaultID', isString, { expectedType: 'a string' })
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
+  validateOptionalField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 }

@@ -74,7 +74,10 @@ describe('PaymentChannelCreate', function () {
   it(`invalid Destination`, function () {
     channel.Destination = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field Destination')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`invalid SettleDelay`, function () {
@@ -92,7 +95,10 @@ describe('PaymentChannelCreate', function () {
   it(`invalid DestinationTag`, function () {
     channel.DestinationTag = '10'
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field DestinationTag')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: invalid field DestinationTag: expected a number',
+    )
   })
 
   it(`invalid CancelAfter`, function () {

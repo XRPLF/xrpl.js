@@ -62,6 +62,10 @@ export interface MPTokenAuthorize extends BaseTransaction {
  */
 export function validateMPTokenAuthorize(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateOptionalField(tx, 'Holder', isAccount)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'Holder', isAccount, {
+    expectedType: 'a valid account',
+  })
 }

@@ -58,7 +58,7 @@ describe('VaultCreate', function () {
   it('throws w/ invalid Asset', function () {
     // @ts-expect-error for test
     tx.Asset = 123
-    assertInvalid(tx, 'VaultCreate: invalid field Asset')
+    assertInvalid(tx, 'VaultCreate: invalid field Asset: expected a Currency')
   })
 
   it('throws w/ Data field not hex', function () {
@@ -90,7 +90,10 @@ describe('VaultCreate', function () {
   it('throws w/ non-number WithdrawalPolicy', function () {
     // @ts-expect-error for test
     tx.WithdrawalPolicy = 'invalid'
-    assertInvalid(tx, 'VaultCreate: invalid field WithdrawalPolicy')
+    assertInvalid(
+      tx,
+      'VaultCreate: invalid field WithdrawalPolicy: expected a number',
+    )
   })
 
   it('allows DomainID when tfVaultPrivate flag set', function () {
@@ -188,7 +191,7 @@ describe('VaultCreate', function () {
       }
       // @ts-expect-error for test
       tx.Scale = 'invalid'
-      assertInvalid(tx, 'VaultCreate: invalid field Scale')
+      assertInvalid(tx, 'VaultCreate: invalid field Scale: expected a number')
     })
 
     it('allows no Scale for IOU asset', function () {

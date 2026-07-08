@@ -75,8 +75,12 @@ export function validatePaymentChannelCreate(
     throw new ValidationError('PaymentChannelCreate: Amount must be a string')
   }
 
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (tx.SettleDelay === undefined) {
     throw new ValidationError('PaymentChannelCreate: missing SettleDelay')

@@ -112,13 +112,19 @@ export interface VaultCreate extends BaseTransaction {
 export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Asset', isCurrency)
-  validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
-  validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
-  validateOptionalField(tx, 'DomainID', isString)
-  validateOptionalField(tx, 'Scale', isNumber)
+  validateRequiredField(tx, 'Asset', isCurrency, { expectedType: 'a Currency' })
+  validateOptionalField(tx, 'Data', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'MPTokenMetadata', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'WithdrawalPolicy', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'DomainID', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'Scale', isNumber, { expectedType: 'a number' })
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data

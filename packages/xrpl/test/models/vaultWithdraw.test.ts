@@ -40,7 +40,7 @@ describe('VaultWithdraw', function () {
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field VaultID')
+    assertInvalid(tx, 'VaultWithdraw: invalid field VaultID: expected a string')
   })
 
   it('throws w/ missing Amount', function () {
@@ -52,7 +52,7 @@ describe('VaultWithdraw', function () {
   it('throws w/ non-string Amount', function () {
     // @ts-expect-error for test
     tx.Amount = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field Amount')
+    assertInvalid(tx, 'VaultWithdraw: invalid field Amount: expected an Amount')
   })
 
   it('verifies valid VaultWithdraw with Destination', function () {
@@ -65,6 +65,9 @@ describe('VaultWithdraw', function () {
   it('throws w/ invalid Destination', function () {
     // @ts-expect-error for test
     tx.Destination = 123
-    assertInvalid(tx, 'VaultWithdraw: invalid field Destination')
+    assertInvalid(
+      tx,
+      'VaultWithdraw: invalid field Destination: expected a valid account',
+    )
   })
 })

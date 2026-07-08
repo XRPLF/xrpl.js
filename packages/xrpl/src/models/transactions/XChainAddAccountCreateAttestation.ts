@@ -91,33 +91,47 @@ export function validateXChainAddAccountCreateAttestation(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 
-  validateRequiredField(tx, 'AttestationRewardAccount', isAccount)
+  validateRequiredField(tx, 'AttestationRewardAccount', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'AttestationSignerAccount', isAccount)
+  validateRequiredField(tx, 'AttestationSignerAccount', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'Destination', isAccount)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'OtherChainSource', isAccount)
+  validateRequiredField(tx, 'OtherChainSource', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isString, { expectedType: 'a string' })
 
-  validateRequiredField(tx, 'Signature', isString)
+  validateRequiredField(tx, 'Signature', isString, { expectedType: 'a string' })
 
-  validateRequiredField(tx, 'SignatureReward', isAmount)
+  validateRequiredField(tx, 'SignatureReward', isAmount, {
+    expectedType: 'an Amount',
+  })
 
   validateRequiredField(
     tx,
     'WasLockingChainSend',
     (inp: unknown): inp is 0 | 1 => inp === 0 || inp === 1,
+    { expectedType: '0 or 1' },
   )
 
   validateRequiredField(
     tx,
     'XChainAccountCreateCount',
     (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
+    { expectedType: 'a number or string' },
   )
 
-  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge, {
+    expectedType: 'an XChainBridge',
+  })
 }

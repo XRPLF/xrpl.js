@@ -35,8 +35,30 @@ describe('unit test LoanBrokerCoverWithdraw', () => {
       'LoanBrokerCoverWithdraw: LoanBrokerID must be 64 characters hexadecimal string',
     )
 
+    tx.LoanBrokerID = 12345
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: invalid field LoanBrokerID: expected a string',
+    )
+
     delete tx.LoanBrokerID
     assertInvalid(tx, 'LoanBrokerCoverWithdraw: missing field LoanBrokerID')
+  })
+
+  test('incorrect Destination', () => {
+    tx.Destination = 12345
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: invalid field Destination: expected a valid account',
+    )
+  })
+
+  test('incorrect DestinationTag', () => {
+    tx.DestinationTag = 'INCORRECT_VALUE'
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: invalid field DestinationTag: expected a number',
+    )
   })
 
   test('incorrect Amount', () => {
@@ -44,7 +66,10 @@ describe('unit test LoanBrokerCoverWithdraw', () => {
       mpt_issuanceId: '0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47',
       value: '1000000',
     }
-    assertInvalid(tx, 'LoanBrokerCoverWithdraw: invalid field Amount')
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: invalid field Amount: expected an Amount',
+    )
 
     delete tx.Amount
     assertInvalid(tx, 'LoanBrokerCoverWithdraw: missing field Amount')

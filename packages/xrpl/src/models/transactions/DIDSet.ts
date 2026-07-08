@@ -31,11 +31,13 @@ export interface DIDSet extends BaseTransaction {
 export function validateDIDSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isString, { expectedType: 'a string' })
 
-  validateOptionalField(tx, 'DIDDocument', isString)
+  validateOptionalField(tx, 'DIDDocument', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isString, { expectedType: 'a string' })
 
   if (
     tx.Data === undefined &&

@@ -49,7 +49,8 @@ describe('DelegateSet', function () {
 
   it(`throws w/ invalid field Permissions`, function () {
     tx.Permissions = 'TrustlineAuthorize'
-    const errorMessage = 'DelegateSet: invalid field Permissions'
+    const errorMessage =
+      'DelegateSet: invalid field Permissions: expected an array'
     assertInvalid(tx, errorMessage)
   })
 

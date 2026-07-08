@@ -47,13 +47,15 @@ export interface CredentialCreate extends BaseTransaction {
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isString, { expectedType: 'a string' })
 
-  validateRequiredField(tx, 'Subject', isString)
+  validateRequiredField(tx, 'Subject', isString, { expectedType: 'a string' })
 
   validateCredentialType(tx)
 
-  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'Expiration', isNumber, {
+    expectedType: 'a number',
+  })
 
   validateURI(tx.URI)
 }

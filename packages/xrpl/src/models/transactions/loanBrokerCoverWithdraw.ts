@@ -54,10 +54,16 @@ export function validateLoanBrokerCoverWithdraw(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanBrokerID', isString)
-  validateRequiredField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
+  validateOptionalField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

@@ -36,8 +36,10 @@ export function validatePermissionedDomainSet(
 ): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'DomainID', isString)
-  validateRequiredField(tx, 'AcceptedCredentials', isArray)
+  validateOptionalField(tx, 'DomainID', isString, { expectedType: 'a string' })
+  validateRequiredField(tx, 'AcceptedCredentials', isArray, {
+    expectedType: 'an array',
+  })
 
   validateCredentialsList(
     tx.AcceptedCredentials,

@@ -30,5 +30,7 @@ export function validateMPTokenIssuanceDestroy(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isString, {
+    expectedType: 'a string',
+  })
 }

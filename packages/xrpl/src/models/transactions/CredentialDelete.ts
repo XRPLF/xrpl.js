@@ -45,11 +45,11 @@ export function validateCredentialDelete(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isString, { expectedType: 'a string' })
 
   validateCredentialType(tx)
 
-  validateOptionalField(tx, 'Subject', isString)
+  validateOptionalField(tx, 'Subject', isString, { expectedType: 'a string' })
 
-  validateOptionalField(tx, 'Issuer', isString)
+  validateOptionalField(tx, 'Issuer', isString, { expectedType: 'a string' })
 }

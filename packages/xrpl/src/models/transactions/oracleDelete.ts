@@ -28,5 +28,7 @@ export interface OracleDelete extends BaseTransaction {
 export function validateOracleDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'OracleDocumentID', isNumber)
+  validateRequiredField(tx, 'OracleDocumentID', isNumber, {
+    expectedType: 'a number',
+  })
 }

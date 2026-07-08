@@ -49,7 +49,11 @@ export interface VaultClawback extends BaseTransaction {
 export function validateVaultClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateRequiredField(tx, 'Holder', isAccount)
-  validateOptionalField(tx, 'Amount', isClawbackAmount)
+  validateRequiredField(tx, 'VaultID', isString, { expectedType: 'a string' })
+  validateRequiredField(tx, 'Holder', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'Amount', isClawbackAmount, {
+    expectedType: 'a ClawbackAmount',
+  })
 }

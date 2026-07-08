@@ -40,8 +40,10 @@ export function validateLoanBrokerCoverDeposit(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanBrokerID', isString)
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

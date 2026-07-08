@@ -49,7 +49,8 @@ describe('OracleSet', function () {
 
   it(`throws w/ invalid OracleDocumentID`, function () {
     tx.OracleDocumentID = '1234'
-    const errorMessage = 'OracleSet: invalid field OracleDocumentID'
+    const errorMessage =
+      'OracleSet: invalid field OracleDocumentID: expected a number'
     assertInvalid(tx, errorMessage)
   })
 
@@ -61,25 +62,27 @@ describe('OracleSet', function () {
 
   it(`throws w/ invalid LastUpdateTime`, function () {
     tx.LastUpdateTime = '768062172'
-    const errorMessage = 'OracleSet: invalid field LastUpdateTime'
+    const errorMessage =
+      'OracleSet: invalid field LastUpdateTime: expected a number'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid Provider`, function () {
     tx.Provider = 1234
-    const errorMessage = 'OracleSet: invalid field Provider'
+    const errorMessage = 'OracleSet: invalid field Provider: expected a string'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid URI`, function () {
     tx.URI = 1234
-    const errorMessage = 'OracleSet: invalid field URI'
+    const errorMessage = 'OracleSet: invalid field URI: expected a string'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ missing invalid AssetClass`, function () {
     tx.AssetClass = 1234
-    const errorMessage = 'OracleSet: invalid field AssetClass'
+    const errorMessage =
+      'OracleSet: invalid field AssetClass: expected a string'
     assertInvalid(tx, errorMessage)
   })
 

@@ -42,7 +42,7 @@ describe('VaultClawback', function () {
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
-    assertInvalid(tx, 'VaultClawback: invalid field VaultID')
+    assertInvalid(tx, 'VaultClawback: invalid field VaultID: expected a string')
   })
 
   it('throws w/ missing Holder', function () {
@@ -54,12 +54,18 @@ describe('VaultClawback', function () {
   it('throws w/ invalid Holder', function () {
     // @ts-expect-error for test
     tx.Holder = 123
-    assertInvalid(tx, 'VaultClawback: invalid field Holder')
+    assertInvalid(
+      tx,
+      'VaultClawback: invalid field Holder: expected a valid account',
+    )
   })
 
   it('throws w/ string Amount', function () {
     // @ts-expect-error for test
     tx.Amount = '123456'
-    assertInvalid(tx, 'VaultClawback: invalid field Amount')
+    assertInvalid(
+      tx,
+      'VaultClawback: invalid field Amount: expected a ClawbackAmount',
+    )
   })
 })

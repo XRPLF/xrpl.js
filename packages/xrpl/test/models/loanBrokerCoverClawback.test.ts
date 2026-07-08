@@ -40,10 +40,16 @@ describe('unit test LoanBrokerCoverClawback', () => {
       mpt_issuanceId: '0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47',
       value: '1000000',
     }
-    assertInvalid(tx, 'LoanBrokerCoverClawback: invalid field Amount')
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverClawback: invalid field Amount: expected a token amount',
+    )
 
     tx.Amount = '100'
-    assertInvalid(tx, 'LoanBrokerCoverClawback: invalid field Amount')
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverClawback: invalid field Amount: expected a token amount',
+    )
   })
 
   test('missing LoanBrokerId and Amount', () => {

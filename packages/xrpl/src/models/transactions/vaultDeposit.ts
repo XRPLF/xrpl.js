@@ -37,6 +37,6 @@ export interface VaultDeposit extends BaseTransaction {
 export function validateVaultDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'VaultID', isString, { expectedType: 'a string' })
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 }

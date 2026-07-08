@@ -33,7 +33,9 @@ export interface EscrowCancel extends BaseTransaction {
 export function validateEscrowCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Owner', isAccount)
+  validateRequiredField(tx, 'Owner', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (tx.OfferSequence == null) {
     throw new ValidationError('EscrowCancel: missing OfferSequence')

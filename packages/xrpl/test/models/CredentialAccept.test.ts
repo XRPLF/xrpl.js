@@ -39,7 +39,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ Account not a string`, function () {
     credentialAccept.Account = 123
-    const errorMessage = 'CredentialAccept: invalid field Account'
+    const errorMessage =
+      'CredentialAccept: invalid field Account: expected a string'
     assertInvalid(credentialAccept, errorMessage)
   })
 
@@ -51,7 +52,8 @@ describe('CredentialAccept', function () {
 
   it(`throws w/ Issuer not a string`, function () {
     credentialAccept.Issuer = 123
-    const errorMessage = 'CredentialAccept: invalid field Issuer'
+    const errorMessage =
+      'CredentialAccept: invalid field Issuer: expected a string'
     assertInvalid(credentialAccept, errorMessage)
   })
 

@@ -47,13 +47,19 @@ describe('EscrowCreate', function () {
   it(`throws w/ invalid Destination`, function () {
     escrow.Destination = 10
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field Destination')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`throws w/ invalid Amount`, function () {
     escrow.Amount = 1000
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field Amount')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field Amount: expected an Amount',
+    )
   })
 
   it(`invalid CancelAfter`, function () {
@@ -77,7 +83,10 @@ describe('EscrowCreate', function () {
   it(`invalid DestinationTag`, function () {
     escrow.DestinationTag = '100'
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field DestinationTag')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field DestinationTag: expected a number',
+    )
   })
 
   it(`Missing both CancelAfter and FinishAfter`, function () {

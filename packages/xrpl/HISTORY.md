@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
+* Include the expected field type in `ValidationError` messages thrown by transaction validators (e.g. `Payment: invalid field Fee: expected a string`). ([#2858](https://github.com/XRPLF/xrpl.js/issues/2858))
 
 ### Fixed
 * Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.

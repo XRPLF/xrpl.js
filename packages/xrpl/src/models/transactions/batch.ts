@@ -84,22 +84,27 @@ function validateBatchInnerTransaction(
     )
   }
   validateOptionalField(tx, 'Fee', isValue('0'), {
+    expectedType: 'the exact value "0"',
     paramName: `RawTransactions[${index}].RawTransaction.Fee`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'SigningPubKey', isValue(''), {
+    expectedType: 'the exact value ""',
     paramName: `RawTransactions[${index}].RawTransaction.SigningPubKey`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'TxnSignature', isNull, {
+    expectedType: 'null',
     paramName: `RawTransactions[${index}].RawTransaction.TxnSignature`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'Signers', isNull, {
+    expectedType: 'null',
     paramName: `RawTransactions[${index}].RawTransaction.Signers`,
     txType: 'Batch',
   })
   validateOptionalField(tx, 'LastLedgerSequence', isNull, {
+    expectedType: 'null',
     paramName: `RawTransactions[${index}].RawTransaction.LastLedgerSequence`,
     txType: 'Batch',
   })
@@ -115,7 +120,9 @@ function validateBatchInnerTransaction(
 export function validateBatch(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'RawTransactions', isArray)
+  validateRequiredField(tx, 'RawTransactions', isArray, {
+    expectedType: 'an array',
+  })
 
   tx.RawTransactions.forEach((rawTxObj, index) => {
     if (!isRecord(rawTxObj)) {
@@ -124,6 +131,7 @@ export function validateBatch(tx: Record<string, unknown>): void {
       )
     }
     validateRequiredField(rawTxObj, 'RawTransaction', isRecord, {
+      expectedType: 'an object',
       paramName: `RawTransactions[${index}].RawTransaction`,
       txType: 'Batch',
     })
@@ -134,7 +142,9 @@ export function validateBatch(tx: Record<string, unknown>): void {
     // Full validation of each `RawTransaction` object is done in `validate` to avoid dependency cycles
   })
 
-  validateOptionalField(tx, 'BatchSigners', isArray)
+  validateOptionalField(tx, 'BatchSigners', isArray, {
+    expectedType: 'an array',
+  })
 
   tx.BatchSigners?.forEach((signerObj, index) => {
     if (!isRecord(signerObj)) {
@@ -143,24 +153,29 @@ export function validateBatch(tx: Record<string, unknown>): void {
 
     const signerRecord = signerObj
     validateRequiredField(signerRecord, 'BatchSigner', isRecord, {
+      expectedType: 'an object',
       paramName: `BatchSigners[${index}].BatchSigner`,
       txType: 'Batch',
     })
 
     const signer = signerRecord.BatchSigner
     validateRequiredField(signer, 'Account', isString, {
+      expectedType: 'a string',
       paramName: `BatchSigners[${index}].BatchSigner.Account`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'SigningPubKey', isString, {
+      expectedType: 'a string',
       paramName: `BatchSigners[${index}].BatchSigner.SigningPubKey`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'TxnSignature', isString, {
+      expectedType: 'a string',
       paramName: `BatchSigners[${index}].BatchSigner.TxnSignature`,
       txType: 'Batch',
     })
     validateOptionalField(signer, 'Signers', isArray, {
+      expectedType: 'an array',
       paramName: `BatchSigners[${index}].BatchSigner.Signers`,
       txType: 'Batch',
     })

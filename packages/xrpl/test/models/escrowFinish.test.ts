@@ -48,7 +48,10 @@ describe('EscrowFinish', function () {
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
 
-    assertInvalid(escrow, 'EscrowFinish: invalid field Owner')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Owner: expected a valid account',
+    )
   })
 
   it(`throws w/ invalid OfferSequence`, function () {

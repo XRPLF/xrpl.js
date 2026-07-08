@@ -30,6 +30,12 @@ describe('unit test LoanBrokerDelete', () => {
       'LoanBrokerDelete: LoanBrokerID must be 64 characters hexadecimal string',
     )
 
+    tx.LoanBrokerID = 12345
+    assertInvalid(
+      tx,
+      'LoanBrokerDelete: invalid field LoanBrokerID: expected a string',
+    )
+
     delete tx.LoanBrokerID
     assertInvalid(tx, 'LoanBrokerDelete: missing field LoanBrokerID')
   })

@@ -79,9 +79,13 @@ export interface AMMClawback extends BaseTransaction {
 export function validateAMMClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Holder', isAccount)
+  validateRequiredField(tx, 'Holder', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isIssuedCurrency, {
+    expectedType: 'an IssuedCurrency',
+  })
 
   const asset = tx.Asset
 
@@ -97,9 +101,13 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency, {
+    expectedType: 'an IssuedCurrency',
+  })
 
-  validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount)
+  validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount, {
+    expectedType: 'an IssuedCurrencyAmount',
+  })
 
   if (tx.Amount != null) {
     if (tx.Amount.currency !== asset.currency) {

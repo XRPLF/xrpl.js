@@ -198,8 +198,12 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Amount')
   }
 
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   validateCredentialsList(
     tx.CredentialIDs,
@@ -213,6 +217,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
   }
 
   validateOptionalField(tx, 'DomainID', isDomainID, {
+    expectedType: 'a 64-character hex string',
     txType: 'PaymentTransaction',
     paramName: 'DomainID',
   })

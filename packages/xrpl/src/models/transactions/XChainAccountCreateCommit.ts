@@ -59,11 +59,17 @@ export function validateXChainAccountCreateCommit(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge, {
+    expectedType: 'an XChainBridge',
+  })
 
-  validateRequiredField(tx, 'SignatureReward', isAmount)
+  validateRequiredField(tx, 'SignatureReward', isAmount, {
+    expectedType: 'an Amount',
+  })
 
-  validateRequiredField(tx, 'Destination', isAccount)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 }

@@ -121,7 +121,10 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+    assertInvalid(
+      offerTx,
+      'OfferCreate: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`throws -- invalid DomainID , exceeds expected length`, function () {
@@ -137,7 +140,10 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+    assertInvalid(
+      offerTx,
+      'OfferCreate: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`throws -- invalid DomainID , falls short of expected length`, function () {
@@ -153,7 +159,10 @@ describe('OfferCreate', function () {
       TransactionType: 'OfferCreate',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid field DomainID')
+    assertInvalid(
+      offerTx,
+      'OfferCreate: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`throws -- invalid flag (interface) specified without DomainID`, function () {

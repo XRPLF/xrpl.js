@@ -77,15 +77,21 @@ export interface OracleSet extends BaseTransaction {
 export function validateOracleSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'OracleDocumentID', isNumber)
+  validateRequiredField(tx, 'OracleDocumentID', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateRequiredField(tx, 'LastUpdateTime', isNumber)
+  validateRequiredField(tx, 'LastUpdateTime', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateOptionalField(tx, 'Provider', isString)
+  validateOptionalField(tx, 'Provider', isString, { expectedType: 'a string' })
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isString, { expectedType: 'a string' })
 
-  validateOptionalField(tx, 'AssetClass', isString)
+  validateOptionalField(tx, 'AssetClass', isString, {
+    expectedType: 'a string',
+  })
 
   /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(
@@ -190,6 +196,7 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       }
       return true
     },
+    { expectedType: 'a PriceData array' },
   )
   /* eslint-enable max-statements, max-lines-per-function */
 }

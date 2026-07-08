@@ -47,6 +47,8 @@ export interface NFTokenBurn extends BaseTransaction {
  */
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'NFTokenID', isString)
-  validateOptionalField(tx, 'Owner', isAccount)
+  validateRequiredField(tx, 'NFTokenID', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'Owner', isAccount, {
+    expectedType: 'a valid account',
+  })
 }

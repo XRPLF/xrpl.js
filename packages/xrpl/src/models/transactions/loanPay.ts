@@ -74,8 +74,8 @@ export interface LoanPay extends BaseTransaction {
 export function validateLoanPay(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanID', isString)
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'LoanID', isString, { expectedType: 'a string' })
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 
   if (!isLedgerEntryId(tx.LoanID)) {
     throw new ValidationError(
