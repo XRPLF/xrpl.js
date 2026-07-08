@@ -86,6 +86,9 @@ import { Wallet } from '../Wallet'
 import {
   type FaucetRequestBody,
   FundingOptions,
+  generateWalletToFund,
+  getStartingBalance,
+  requestAddressFunding,
   requestFunding,
 } from '../Wallet/fundWallet'
 
@@ -1224,10 +1227,15 @@ class Client extends EventEmitter<EventTypes> {
     const existingWallet = Boolean(wallet)
 
     // Generate a new Wallet if no existing Wallet is provided or its address is invalid to fund
-    const walletToFund =
-      wallet && isValidClassicAddress(wallet.classicAddress)
-        ? wallet
-        : Wallet.generate()
+    const walletToFund = generateWalletToFund(wallet)
+
+    let startingBalance = 0
+    if (existingWallet) {
+      startingBalance = await getStartingBalance(
+        this,
+        walletToFund.classicAddress,
+      )
+    }
 
     // Create the POST request body
     const postBody: FaucetRequestBody = {
@@ -1237,22 +1245,87 @@ class Client extends EventEmitter<EventTypes> {
       userAgent: 'xrpl.js',
     }
 
-    let startingBalance = 0
-    if (existingWallet) {
-      try {
-        startingBalance = Number(
-          await this.getXrpBalance(walletToFund.classicAddress),
-        )
-      } catch {
-        /* startingBalance remains what it was previously */
-      }
-    }
-
     return requestFunding(
       options,
       this,
       startingBalance,
       walletToFund,
+      postBody,
+    )
+  }
+
+  /**
+   * The fundAccount() method sends an amount of XRP (usually 1000) from a testnet or devnet faucet to an
+   * existing classic address, without requiring a `Wallet` object. This is useful when you already know the
+   * address you want funded (for example, one derived offline) and don't need `fundWallet`'s key-management
+   * behavior.
+   *
+   * @category Faucet
+   *
+   * @example
+   *
+   * Fund a known address:
+   * ```ts
+   * const { Client, Wallet } = require('xrpl')
+   *
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
+   * await client.connect()
+   *
+   * const address = Wallet.generate().classicAddress
+   * const { address: fundedAddress, balance } = await client.fundAccount(address)
+   * console.log(`Funded ${fundedAddress}. New balance: ${balance} XRP`)
+   * ```
+   *
+   * @param address - The classic address to fund.
+   * @param options - See below.
+   * @param options.faucetHost - A custom host for a faucet server. On devnet,
+   * testnet, AMM devnet, and HooksV3 testnet, `fundAccount` will
+   * attempt to determine the correct server automatically. In other environments,
+   * or if you would like to customize the faucet host in devnet or testnet,
+   * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
+   * @param options.faucetPath - A custom path for a faucet server. On devnet,
+   * testnet, AMM devnet, and HooksV3 testnet, `fundAccount` will
+   * attempt to determine the correct path automatically. In other environments,
+   * or if you would like to customize the faucet path in devnet or testnet,
+   * you should provide the path using this option.
+   * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+   * @param options.usageContext - An optional field to indicate the use case context of the faucet transaction.
+   * @returns The classic address that was funded, and its balance in XRP.
+   * @throws When either Client isn't connected, `address` isn't a valid classic address, or the faucet is
+   * unable to fund the address.
+   */
+  public async fundAccount(
+    this: Client,
+    address: string,
+    options: FundingOptions = {},
+  ): Promise<{
+    address: string
+    balance: number
+  }> {
+    if (!this.isConnected()) {
+      throw new RippledError('Client not connected, cannot call faucet')
+    }
+    if (!isValidClassicAddress(address)) {
+      throw new ValidationError(`Invalid address to fund: ${address}`)
+    }
+
+    const startingBalance = await getStartingBalance(this, address)
+
+    // Create the POST request body
+    const postBody: FaucetRequestBody = {
+      destination: address,
+      xrpAmount: options.amount,
+      usageContext: options.usageContext,
+      userAgent: 'xrpl.js',
+    }
+
+    return requestAddressFunding(
+      options,
+      this,
+      startingBalance,
+      address,
       postBody,
     )
   }

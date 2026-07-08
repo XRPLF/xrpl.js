@@ -112,6 +112,72 @@ export interface FundWalletOptions {
 
 /**
  *
+ * Helper function to request funding from a faucet for a plain classic address (no Wallet object required).
+ * Should not be called directly from outside the xrpl.js library.
+ *
+ * @param options - See below
+ * @param options.faucetHost - A custom host for a faucet server. On devnet,
+ * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * attempt to determine the correct server automatically. In other environments,
+ * or if you would like to customize the faucet host in devnet or testnet,
+ * you should provide the host using this option.
+ * @param options.faucetPath - A custom path for a faucet server. On devnet,
+ * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
+ * attempt to determine the correct path automatically. In other environments,
+ * or if you would like to customize the faucet path in devnet or testnet,
+ * you should provide the path using this option.
+ * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
+ * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+ * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+ * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
+ * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
+ * @param client - A connection to the XRPL to send requests and transactions.
+ * @param startingBalance - The amount of XRP at classicAddress on ledger already.
+ * @param classicAddress - The classic address to fund.
+ * @param postBody - The content to send the faucet to indicate which address to fund, how much to fund it, and
+ * where the request is coming from.
+ * @returns A promise that resolves to the funded address and the balance within it.
+ */
+// eslint-disable-next-line max-params -- Helper function created for organizational purposes
+export async function requestAddressFunding(
+  options: FundingOptions,
+  client: Client,
+  startingBalance: number,
+  classicAddress: string,
+  postBody: FaucetRequestBody,
+): Promise<{
+  address: string
+  balance: number
+}> {
+  const hostname = options.faucetHost ?? getFaucetHost(client)
+  if (!hostname) {
+    throw new XRPLFaucetError('No faucet hostname could be derived')
+  }
+  const pathname = options.faucetPath ?? getFaucetPath(hostname)
+  const protocol = options.faucetProtocol ?? 'https'
+  const response = await fetch(`${protocol}://${hostname}${pathname}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(postBody),
+  })
+
+  if (
+    response.ok &&
+    response.headers.get('Content-Type')?.startsWith('application/json')
+  ) {
+    const body: unknown = await response.json()
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
+    const faucetWallet = body as FaucetWallet
+    const fundedAddress = faucetWallet.account.classicAddress ?? classicAddress
+    return processSuccessfulResponse(client, fundedAddress, startingBalance)
+  }
+  return processError(response)
+}
+
+/**
+ *
  * Helper function to request funding from a faucet. Should not be called directly from outside the xrpl.js library.
  *
  * @param options - See below
@@ -148,45 +214,25 @@ export async function requestFunding(
   wallet: Wallet
   balance: number
 }> {
-  const hostname = options.faucetHost ?? getFaucetHost(client)
-  if (!hostname) {
-    throw new XRPLFaucetError('No faucet hostname could be derived')
+  const { balance } = await requestAddressFunding(
+    options,
+    client,
+    startingBalance,
+    walletToFund.classicAddress,
+    postBody,
+  )
+  return {
+    wallet: walletToFund,
+    balance,
   }
-  const pathname = options.faucetPath ?? getFaucetPath(hostname)
-  const protocol = options.faucetProtocol ?? 'https'
-  const response = await fetch(`${protocol}://${hostname}${pathname}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(postBody),
-  })
-
-  if (
-    response.ok &&
-    response.headers.get('Content-Type')?.startsWith('application/json')
-  ) {
-    const body: unknown = await response.json()
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It's a FaucetWallet
-    const classicAddress = (body as FaucetWallet).account.classicAddress
-    return processSuccessfulResponse(
-      client,
-      classicAddress,
-      walletToFund,
-      startingBalance,
-    )
-  }
-  return processError(response)
 }
 
-// eslint-disable-next-line max-params -- Only used as a helper function, lines inc due to added balance.
 async function processSuccessfulResponse(
   client: Client,
   classicAddress: string | undefined,
-  walletToFund: Wallet,
   startingBalance: number,
 ): Promise<{
-  wallet: Wallet
+  address: string
   balance: number
 }> {
   if (!classicAddress) {
@@ -203,7 +249,7 @@ async function processSuccessfulResponse(
 
   if (updatedBalance > startingBalance) {
     return {
-      wallet: walletToFund,
+      address: classicAddress,
       balance: updatedBalance,
     }
   }

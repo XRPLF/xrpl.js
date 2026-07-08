@@ -8,6 +8,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
+* Add `Client.fundAccount(address, options)` to fund an existing classic address from the testnet/devnet faucet without needing a `Wallet` object. `Client.fundWallet` is unchanged and now delegates to it internally. ([#2302](https://github.com/XRPLF/xrpl.js/issues/2302))
 
 ### Fixed
 * Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
