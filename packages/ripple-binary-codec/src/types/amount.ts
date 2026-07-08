@@ -17,7 +17,10 @@ const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
-const mptMask = BigInt(0x8000000000000000)
+// MPT amounts are serialized as a signed 64-bit integer, so the largest
+// representable value is 2^63 - 1. Values outside [0, 2^63 - 1] cannot be
+// encoded without truncation and must be rejected.
+const MAX_MPT_AMOUNT = new BigNumber('9223372036854775807')
 
 /**
  * BigNumber configuration for Amount IOUs
@@ -322,7 +325,11 @@ class Amount extends SerializedType {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
 
-      if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
+      // The previous bit-mask check (`& 0x8000000000000000`) only rejected
+      // values with bit 63 set, so any value >= 2^64 (bit 63 clear) slipped
+      // through and the serializer wrote only the low 64 bits, signing a
+      // different, truncated amount. Compare against the true maximum instead.
+      if (decimal.gt(MAX_MPT_AMOUNT)) {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
     }

@@ -90,6 +90,75 @@ describe('Amount', function () {
     )
   })
 
+  it('accepts the maximum valid MPT amount (2^63 - 1) and round-trips it', function () {
+    const fixture = {
+      value: '9223372036854775807',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    const amt = Amount.from(fixture)
+    expect(amt.toJSON()).toEqual(fixture)
+  })
+
+  it('accepts a zero MPT amount', function () {
+    const fixture = {
+      value: '0',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    const amt = Amount.from(fixture)
+    expect(amt.toJSON()).toEqual(fixture)
+  })
+
+  it('rejects an MPT amount one above the maximum (2^63)', function () {
+    const mpt = {
+      value: '9223372036854775808',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+  })
+
+  it('rejects an out-of-range MPT amount of 2^64 instead of encoding a truncated 0', function () {
+    const mpt = {
+      value: '18446744073709551616',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+  })
+
+  it('rejects an out-of-range MPT amount of 2^64 + 5 instead of encoding a truncated 5', function () {
+    const mpt = {
+      value: '18446744073709551621',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    // Regression for #3368: this value previously passed validation and the
+    // serializer wrote only the low 64 bits, signing "5" instead of failing.
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+    // Prove the truncation path is closed: encoding must throw, never produce
+    // an Amount whose JSON value is the truncated "5".
+    let encoded: unknown
+    try {
+      encoded = Amount.from(mpt).toJSON()
+    } catch {
+      encoded = undefined
+    }
+    expect(encoded).toBeUndefined()
+  })
+
+  it('rejects a negative MPT amount', function () {
+    const mpt = {
+      value: '-1',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+  })
+
   it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
     const amt = Amount.from('1000000')
     const serializedHexBeforeJsonCalls = amt.toHex()
