@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "2.9.0-batch.1",
+  "version": "2.8.0",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",

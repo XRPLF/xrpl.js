@@ -202,6 +202,26 @@ describe('Wallet batch operations', function () {
       )
     })
 
+    it('requires the delegate, not the account, to sign a delegated inner transaction', function () {
+      // Delegate the first inner transaction to regkeyWallet.
+      transaction.RawTransactions[0].RawTransaction.Delegate =
+        regkeyWallet.address
+
+      // The inner account holder (edWallet) is no longer a required signer.
+      assert.throws(
+        () => signMultiBatch(edWallet, transaction),
+        ValidationError,
+        'Must be signing for an address submitting a transaction in the Batch.',
+      )
+
+      // The delegate can sign on its behalf.
+      signMultiBatch(regkeyWallet, transaction)
+      assert.strictEqual(
+        transaction.BatchSigners?.[0].BatchSigner.Account,
+        regkeyWallet.address,
+      )
+    })
+
     it('fails with not-included account', function () {
       assert.throws(
         () => signMultiBatch(otherWallet, transaction),
