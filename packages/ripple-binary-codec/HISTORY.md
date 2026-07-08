@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Reject out-of-range MPT amounts (outside `[0, 2^63 - 1]`) instead of encoding truncated values. Previously a single-bit mask only rejected values with bit 63 set, so values `>= 2^64` passed validation and serialized to only their low 64 bits, signing a different amount than was validated (#3368).
+
 ## 2.8.0 (2026-06-04)
 
 ### Fixed
