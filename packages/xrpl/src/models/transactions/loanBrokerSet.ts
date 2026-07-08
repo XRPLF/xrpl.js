@@ -76,13 +76,23 @@ export interface LoanBrokerSet extends BaseTransaction {
 export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateOptionalField(tx, 'LoanBrokerID', isString)
-  validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'ManagementFeeRate', isNumber)
-  validateOptionalField(tx, 'DebtMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'CoverRateMinimum', isNumber)
-  validateOptionalField(tx, 'CoverRateLiquidation', isNumber)
+  validateRequiredField(tx, 'VaultID', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'Data', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'ManagementFeeRate', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'DebtMaximum', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'CoverRateMinimum', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'CoverRateLiquidation', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (!isLedgerEntryId(tx.VaultID)) {
     throw new ValidationError(

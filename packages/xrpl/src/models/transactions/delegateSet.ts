@@ -57,7 +57,9 @@ export interface DelegateSet extends BaseTransaction {
 export function validateDelegateSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Authorize', isAccount)
+  validateRequiredField(tx, 'Authorize', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (tx.Authorize === tx.Account) {
     throw new ValidationError(
@@ -65,7 +67,9 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Permissions', Array.isArray)
+  validateRequiredField(tx, 'Permissions', Array.isArray, {
+    expectedType: 'an array',
+  })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required for validation
   const permissions = tx.Permissions as DelegateSet['Permissions']

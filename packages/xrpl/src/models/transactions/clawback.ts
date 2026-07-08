@@ -44,8 +44,12 @@ export interface Clawback extends BaseTransaction {
  */
 export function validateClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'Amount', isClawbackAmount)
-  validateOptionalField(tx, 'Holder', isAccount)
+  validateRequiredField(tx, 'Amount', isClawbackAmount, {
+    expectedType: 'a ClawbackAmount',
+  })
+  validateOptionalField(tx, 'Holder', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (!isIssuedCurrencyAmount(tx.Amount) && !isMPTAmount(tx.Amount)) {
     throw new ValidationError('Clawback: invalid Amount')

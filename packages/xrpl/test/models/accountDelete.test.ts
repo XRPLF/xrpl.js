@@ -40,13 +40,15 @@ describe('AccountDelete', function () {
 
   it(`throws w/ invalid Destination`, function () {
     validAccountDelete.Destination = 65478965
-    const errorMessage = 'AccountDelete: invalid field Destination'
+    const errorMessage =
+      'AccountDelete: invalid field Destination: expected a valid account'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
     validAccountDelete.DestinationTag = 'gvftyujnbv'
-    const errorMessage = 'AccountDelete: invalid field DestinationTag'
+    const errorMessage =
+      'AccountDelete: invalid field DestinationTag: expected a number'
     assertInvalid(validAccountDelete, errorMessage)
   })
 

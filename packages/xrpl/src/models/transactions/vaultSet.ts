@@ -51,10 +51,12 @@ export interface VaultSet extends BaseTransaction {
 export function validateVaultSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
-  validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateRequiredField(tx, 'VaultID', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'Data', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'DomainID', isString, { expectedType: 'a string' })
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data

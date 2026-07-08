@@ -135,8 +135,12 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  validateOptionalField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'Owner', isAccount)
+  validateOptionalField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'Owner', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (tx.NFTokenID == null) {
     throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')

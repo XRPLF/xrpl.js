@@ -80,7 +80,7 @@ describe('BaseTransaction', function () {
       Fee: 1000,
     } as any
 
-    assertInvalid(invalidFee, 'Payment: invalid field Fee')
+    assertInvalid(invalidFee, 'Payment: invalid field Fee: expected a string')
   })
 
   it(`Handles invalid Sequence`, function () {
@@ -90,7 +90,10 @@ describe('BaseTransaction', function () {
       Sequence: '145',
     } as any
 
-    assertInvalid(invalidSeq, 'Payment: invalid field Sequence')
+    assertInvalid(
+      invalidSeq,
+      'Payment: invalid field Sequence: expected a number',
+    )
   })
 
   it(`Handles invalid AccountTxnID`, function () {
@@ -100,7 +103,10 @@ describe('BaseTransaction', function () {
       AccountTxnID: ['WRONG'],
     } as any
 
-    assertInvalid(invalidID, 'Payment: invalid field AccountTxnID')
+    assertInvalid(
+      invalidID,
+      'Payment: invalid field AccountTxnID: expected a string',
+    )
   })
 
   it(`Handles invalid LastLedgerSequence`, function () {
@@ -112,7 +118,7 @@ describe('BaseTransaction', function () {
 
     assertInvalid(
       invalidLastLedgerSequence,
-      'Payment: invalid field LastLedgerSequence',
+      'Payment: invalid field LastLedgerSequence: expected a number',
     )
   })
 
@@ -123,7 +129,10 @@ describe('BaseTransaction', function () {
       SourceTag: ['ARRAY'],
     } as any
 
-    assertInvalid(invalidSourceTag, 'Payment: invalid field SourceTag')
+    assertInvalid(
+      invalidSourceTag,
+      'Payment: invalid field SourceTag: expected a number',
+    )
   })
 
   it(`Handles invalid SigningPubKey`, function () {
@@ -133,7 +142,10 @@ describe('BaseTransaction', function () {
       SigningPubKey: 1000,
     } as any
 
-    assertInvalid(invalidSigningPubKey, 'Payment: invalid field SigningPubKey')
+    assertInvalid(
+      invalidSigningPubKey,
+      'Payment: invalid field SigningPubKey: expected a string',
+    )
   })
 
   it(`Handles invalid TicketSequence`, function () {
@@ -145,7 +157,7 @@ describe('BaseTransaction', function () {
 
     assertInvalid(
       invalidTicketSequence,
-      'Payment: invalid field TicketSequence',
+      'Payment: invalid field TicketSequence: expected a number',
     )
   })
 
@@ -156,7 +168,10 @@ describe('BaseTransaction', function () {
       TxnSignature: 1000,
     } as any
 
-    assertInvalid(invalidTxnSignature, 'Payment: invalid field TxnSignature')
+    assertInvalid(
+      invalidTxnSignature,
+      'Payment: invalid field TxnSignature: expected a string',
+    )
   })
 
   it(`Handles invalid Signers`, function () {
@@ -206,7 +221,10 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       NetworkID: '1024',
     }
-    assertInvalid(invalidNetworkID, 'Payment: invalid field NetworkID')
+    assertInvalid(
+      invalidNetworkID,
+      'Payment: invalid field NetworkID: expected a number',
+    )
   })
 
   it(`Handles invalid Delegate`, function () {
@@ -215,7 +233,10 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       Delegate: 1234,
     }
-    assertInvalid(invalidDelegate, 'Payment: invalid field Delegate')
+    assertInvalid(
+      invalidDelegate,
+      'Payment: invalid field Delegate: expected a valid account',
+    )
   })
 
   it(`Handles Account and Delegate being the same error`, function () {

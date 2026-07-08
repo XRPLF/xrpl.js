@@ -61,8 +61,12 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('CheckCreate: missing field SendMax')
   }
 
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (typeof tx.SendMax !== 'string' && !isIssuedCurrencyAmount(tx.SendMax)) {
     throw new ValidationError('CheckCreate: invalid SendMax')

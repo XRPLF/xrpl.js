@@ -61,9 +61,13 @@ export interface EscrowCreate extends BaseTransaction {
 export function validateEscrowCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isAmount)
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
     throw new ValidationError(

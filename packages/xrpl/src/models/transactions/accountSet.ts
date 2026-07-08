@@ -178,7 +178,9 @@ const MAX_TICK_SIZE = 15
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'NFTokenMinter', isAccount)
+  validateOptionalField(tx, 'NFTokenMinter', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {

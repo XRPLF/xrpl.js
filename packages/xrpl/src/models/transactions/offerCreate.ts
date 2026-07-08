@@ -153,6 +153,7 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   }
 
   validateOptionalField(tx, 'DomainID', isDomainID, {
+    expectedType: 'a 64-character hex string',
     txType: 'OfferCreate',
     paramName: 'DomainID',
   })

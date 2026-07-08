@@ -49,7 +49,9 @@ export interface EscrowFinish extends BaseTransaction {
 export function validateEscrowFinish(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Owner', isAccount)
+  validateRequiredField(tx, 'Owner', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   validateCredentialsList(
     tx.CredentialIDs,

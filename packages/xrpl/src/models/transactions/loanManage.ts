@@ -69,7 +69,7 @@ export interface LoanManageFlagsInterface extends GlobalFlagsInterface {
 export function validateLoanManage(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanID', isString)
+  validateRequiredField(tx, 'LoanID', isString, { expectedType: 'a string' })
 
   if (!isLedgerEntryId(tx.LoanID)) {
     throw new ValidationError(

@@ -47,14 +47,18 @@ const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
 export function validateSignerListSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'SignerQuorum', isNumber)
+  validateRequiredField(tx, 'SignerQuorum', isNumber, {
+    expectedType: 'a number',
+  })
 
   // All other checks are for if SignerQuorum is greater than 0
   if (tx.SignerQuorum === 0) {
     return
   }
 
-  validateRequiredField(tx, 'SignerEntries', isArray)
+  validateRequiredField(tx, 'SignerEntries', isArray, {
+    expectedType: 'an array',
+  })
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',

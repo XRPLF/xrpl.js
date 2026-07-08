@@ -40,7 +40,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidDestination, 'CheckCreate: invalid field Destination')
+    assertInvalid(
+      invalidDestination,
+      'CheckCreate: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`throws w/ invalid SendMax`, function () {
@@ -74,7 +77,7 @@ describe('CheckCreate', function () {
 
     assertInvalid(
       invalidDestinationTag,
-      'CheckCreate: invalid field DestinationTag',
+      'CheckCreate: invalid field DestinationTag: expected a number',
     )
   })
 

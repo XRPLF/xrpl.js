@@ -47,8 +47,12 @@ export function validateLoanBrokerCoverClawback(
 ): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'LoanBrokerID', isString)
-  validateOptionalField(tx, 'Amount', isTokenAmount)
+  validateOptionalField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'Amount', isTokenAmount, {
+    expectedType: 'a token amount',
+  })
 
   if (tx.LoanBrokerID != null && !isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

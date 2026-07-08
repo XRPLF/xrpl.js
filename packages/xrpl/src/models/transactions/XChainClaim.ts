@@ -63,17 +63,24 @@ export interface XChainClaim extends BaseTransaction {
 export function validateXChainClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge, {
+    expectedType: 'an XChainBridge',
+  })
 
   validateRequiredField(
     tx,
     'XChainClaimID',
     (inp: unknown): inp is number | string => isNumber(inp) || isString(inp),
+    { expectedType: 'a number or string' },
   )
 
-  validateRequiredField(tx, 'Destination', isAccount)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
 
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateRequiredField(tx, 'Amount', isAmount)
+  validateRequiredField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
 }

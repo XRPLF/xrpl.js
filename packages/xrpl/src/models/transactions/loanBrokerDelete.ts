@@ -31,7 +31,9 @@ export interface LoanBrokerDelete extends BaseTransaction {
 export function validateLoanBrokerDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanBrokerID', isString)
+  validateRequiredField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

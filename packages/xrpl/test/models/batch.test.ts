@@ -103,7 +103,7 @@ describe('Batch', function () {
 
   it('throws w/ invalid BatchSigners', function () {
     tx.BatchSigners = 0
-    assertInvalid(tx, 'Batch: invalid field BatchSigners')
+    assertInvalid(tx, 'Batch: invalid field BatchSigners: expected an array')
   })
 
   it('throws w/ missing RawTransactions', function () {
@@ -113,7 +113,7 @@ describe('Batch', function () {
 
   it('throws w/ invalid RawTransactions', function () {
     tx.RawTransactions = 0
-    assertInvalid(tx, 'Batch: invalid field RawTransactions')
+    assertInvalid(tx, 'Batch: invalid field RawTransactions: expected an array')
   })
 
   it('throws w/ invalid RawTransactions object', function () {
@@ -123,7 +123,10 @@ describe('Batch', function () {
 
   it('throws w/ invalid RawTransactions.RawTransaction object', function () {
     tx.RawTransactions = [{ RawTransaction: 0 }]
-    assertInvalid(tx, 'Batch: invalid field RawTransactions[0].RawTransaction')
+    assertInvalid(
+      tx,
+      'Batch: invalid field RawTransactions[0].RawTransaction: expected an object',
+    )
   })
 
   it('throws w/ nested Batch', function () {

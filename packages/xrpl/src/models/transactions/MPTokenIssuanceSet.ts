@@ -65,8 +65,12 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateOptionalField(tx, 'Holder', isAccount)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'Holder', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
   const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface

@@ -59,7 +59,10 @@ describe('Payment', function () {
       DomainID: { sampleDictKey: 1 },
     } as any
 
-    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+    assertInvalid(
+      paymentTx,
+      'PaymentTransaction: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`throws -- invalid DomainID , exceeds expected length`, function () {
@@ -71,7 +74,10 @@ describe('Payment', function () {
       DomainID: '5'.repeat(65),
     } as any
 
-    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+    assertInvalid(
+      paymentTx,
+      'PaymentTransaction: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`throws -- invalid DomainID , falls short of expected length`, function () {
@@ -83,7 +89,10 @@ describe('Payment', function () {
       DomainID: '5'.repeat(63),
     } as any
 
-    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+    assertInvalid(
+      paymentTx,
+      'PaymentTransaction: invalid field DomainID: expected a 64-character hex string',
+    )
   })
 
   it(`Verifies memos correctly`, function () {
@@ -128,12 +137,18 @@ describe('Payment', function () {
 
   it(`throws when Destination is invalid`, function () {
     payment.Destination = 7896214
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`throws when Destination is invalid classic address`, function () {
     payment.Destination = 'rABCD'
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`does not throw when Destination is a valid x-address`, function () {
@@ -143,12 +158,18 @@ describe('Payment', function () {
 
   it(`throws when Destination is an empty string`, function () {
     payment.Destination = ''
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination: expected a valid account',
+    )
   })
 
   it(`throws when DestinationTag is not a number`, function () {
     payment.DestinationTag = '1'
-    assertInvalid(payment, 'Payment: invalid field DestinationTag')
+    assertInvalid(
+      payment,
+      'Payment: invalid field DestinationTag: expected a number',
+    )
   })
 
   it(`throws when InvoiceID is not a string`, function () {

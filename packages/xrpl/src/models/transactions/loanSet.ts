@@ -176,23 +176,55 @@ export interface LoanSetFlagsInterface extends GlobalFlagsInterface {
 export function validateLoanSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanBrokerID', isString)
-  validateRequiredField(tx, 'PrincipalRequested', isXRPLNumber)
-  validateOptionalField(tx, 'CounterpartySignature', isRecord)
-  validateOptionalField(tx, 'Data', isString)
-  validateOptionalField(tx, 'Counterparty', isAccount)
-  validateOptionalField(tx, 'LoanOriginationFee', isXRPLNumber)
-  validateOptionalField(tx, 'LoanServiceFee', isXRPLNumber)
-  validateOptionalField(tx, 'LatePaymentFee', isXRPLNumber)
-  validateOptionalField(tx, 'ClosePaymentFee', isXRPLNumber)
-  validateOptionalField(tx, 'OverpaymentFee', isNumber)
-  validateOptionalField(tx, 'InterestRate', isNumber)
-  validateOptionalField(tx, 'LateInterestRate', isNumber)
-  validateOptionalField(tx, 'CloseInterestRate', isNumber)
-  validateOptionalField(tx, 'OverpaymentInterestRate', isNumber)
-  validateOptionalField(tx, 'PaymentTotal', isNumber)
-  validateOptionalField(tx, 'PaymentInterval', isNumber)
-  validateOptionalField(tx, 'GracePeriod', isNumber)
+  validateRequiredField(tx, 'LoanBrokerID', isString, {
+    expectedType: 'a string',
+  })
+  validateRequiredField(tx, 'PrincipalRequested', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'CounterpartySignature', isRecord, {
+    expectedType: 'an object',
+  })
+  validateOptionalField(tx, 'Data', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'Counterparty', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'LoanOriginationFee', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'LoanServiceFee', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'LatePaymentFee', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'ClosePaymentFee', isXRPLNumber, {
+    expectedType: 'an XRPL number string',
+  })
+  validateOptionalField(tx, 'OverpaymentFee', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'InterestRate', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'LateInterestRate', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'CloseInterestRate', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'OverpaymentInterestRate', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'PaymentTotal', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'PaymentInterval', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'GracePeriod', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(

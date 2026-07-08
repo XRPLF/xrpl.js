@@ -41,7 +41,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Account not string`, function () {
     credentialCreate.Account = 123
-    const errorMessage = 'CredentialCreate: invalid field Account'
+    const errorMessage =
+      'CredentialCreate: invalid field Account: expected a string'
     assertInvalid(credentialCreate, errorMessage)
   })
 
@@ -53,7 +54,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Subject not string`, function () {
     credentialCreate.Subject = 123
-    const errorMessage = 'CredentialCreate: invalid field Subject'
+    const errorMessage =
+      'CredentialCreate: invalid field Subject: expected a string'
     assertInvalid(credentialCreate, errorMessage)
   })
 
@@ -86,7 +88,8 @@ describe('credentialCreate', function () {
 
   it(`throws w/ Expiration field not number`, function () {
     credentialCreate.Expiration = 'this is not a number'
-    const errorMessage = 'CredentialCreate: invalid field Expiration'
+    const errorMessage =
+      'CredentialCreate: invalid field Expiration: expected a number'
     assertInvalid(credentialCreate, errorMessage)
   })
 

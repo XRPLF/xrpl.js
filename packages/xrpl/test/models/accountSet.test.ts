@@ -72,6 +72,9 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid NFTokenMinter`, function () {
     tx.NFTokenMinter = ''
-    assertInvalid(tx, 'AccountSet: invalid field NFTokenMinter')
+    assertInvalid(
+      tx,
+      'AccountSet: invalid field NFTokenMinter: expected a valid account',
+    )
   })
 })

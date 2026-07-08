@@ -37,7 +37,7 @@ describe('VaultSet', function () {
   it('throws w/ non-string VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123456
-    assertInvalid(tx, 'VaultSet: invalid field VaultID')
+    assertInvalid(tx, 'VaultSet: invalid field VaultID: expected a string')
   })
 
   it('throws w/ Data field not hex', function () {
@@ -52,18 +52,21 @@ describe('VaultSet', function () {
 
   it('throws w/ non-XRPLNumber AssetsMaximum', function () {
     tx.AssetsMaximum = 'notanumber'
-    assertInvalid(tx, 'VaultSet: invalid field AssetsMaximum')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field AssetsMaximum: expected an XRPL number string',
+    )
   })
 
   it('throws w/ non-string Data', function () {
     // @ts-expect-error for test
     tx.Data = 1234
-    assertInvalid(tx, 'VaultSet: invalid field Data')
+    assertInvalid(tx, 'VaultSet: invalid field Data: expected a string')
   })
 
   it('throws w/ non-string DomainID', function () {
     // @ts-expect-error for test
     tx.DomainID = 1234
-    assertInvalid(tx, 'VaultSet: invalid field DomainID')
+    assertInvalid(tx, 'VaultSet: invalid field DomainID: expected a string')
   })
 })

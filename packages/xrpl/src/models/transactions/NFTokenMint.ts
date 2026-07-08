@@ -152,7 +152,9 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     )
   }
 
-  validateOptionalField(tx, 'Issuer', isAccount)
+  validateOptionalField(tx, 'Issuer', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   if (typeof tx.URI === 'string' && tx.URI === '') {
     throw new ValidationError('NFTokenMint: URI must not be empty string')
@@ -174,7 +176,11 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     }
   }
 
-  validateOptionalField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'Expiration', isNumber)
-  validateOptionalField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'Amount', isAmount, { expectedType: 'an Amount' })
+  validateOptionalField(tx, 'Expiration', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
 }

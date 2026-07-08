@@ -69,9 +69,15 @@ export interface XChainModifyBridge extends BaseTransaction {
 export function validateXChainModifyBridge(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'XChainBridge', isXChainBridge)
+  validateRequiredField(tx, 'XChainBridge', isXChainBridge, {
+    expectedType: 'an XChainBridge',
+  })
 
-  validateOptionalField(tx, 'SignatureReward', isAmount)
+  validateOptionalField(tx, 'SignatureReward', isAmount, {
+    expectedType: 'an Amount',
+  })
 
-  validateOptionalField(tx, 'MinAccountCreateAmount', isAmount)
+  validateOptionalField(tx, 'MinAccountCreateAmount', isAmount, {
+    expectedType: 'an Amount',
+  })
 }

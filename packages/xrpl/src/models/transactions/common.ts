@@ -370,7 +370,28 @@ export function validateHexMetadata(
   )
 }
 
-/* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
+interface FieldValidationErrorOptions {
+  txType?: string
+  paramName?: string
+  expectedType?: string
+}
+
+/**
+ * Format the invalid-field error shared by required and optional validators.
+ *
+ * @param txType - The transaction type throwing the error.
+ * @param paramName - The name of the parameter in the transaction with the error.
+ * @param expectedType - Human-readable type name to include in invalid-field errors.
+ * @returns The formatted invalid-field message.
+ */
+function invalidFieldMessage(
+  txType: string,
+  paramName: string,
+  expectedType?: string,
+): string {
+  const message = `${txType}: invalid field ${paramName}`
+  return expectedType == null ? message : `${message}: expected ${expectedType}`
+}
 
 /**
  * Verify the form and type of a required type for a transaction at runtime.
@@ -381,6 +402,7 @@ export function validateHexMetadata(
  * @param errorOpts - Extra values to make the error message easier to understand.
  * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @param errorOpts.expectedType - Human-readable type name to include in invalid-field errors.
  * @throws ValidationError if the parameter is missing or invalid.
  */
 // eslint-disable-next-line max-params -- helper function
@@ -392,22 +414,17 @@ export function validateRequiredField<
   tx: T,
   param: K,
   checkValidity: (inp: unknown) => inp is V,
-  errorOpts: {
-    txType?: string
-    paramName?: string
-  } = {},
+  errorOpts: FieldValidationErrorOptions = {},
 ): asserts tx is T & { [P in K]: V } {
-  const paramNameStr = errorOpts.paramName ?? param
-  const txType = errorOpts.txType ?? tx.TransactionType
+  const paramNameStr = String(errorOpts.paramName ?? param)
+  const txType = String(errorOpts.txType ?? tx.TransactionType)
   if (tx[param] == null) {
-    throw new ValidationError(
-      `${txType}: missing field ${String(paramNameStr)}`,
-    )
+    throw new ValidationError(`${txType}: missing field ${paramNameStr}`)
   }
 
   if (!checkValidity(tx[param])) {
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      invalidFieldMessage(txType, paramNameStr, errorOpts.expectedType),
     )
   }
 }
@@ -421,6 +438,7 @@ export function validateRequiredField<
  * @param errorOpts - Extra values to make the error message easier to understand.
  * @param errorOpts.txType - The transaction type throwing the error.
  * @param errorOpts.paramName - The name of the parameter in the transaction with the error.
+ * @param errorOpts.expectedType - Human-readable type name to include in invalid-field errors.
  * @throws ValidationError if the parameter is invalid.
  */
 // eslint-disable-next-line max-params -- helper function
@@ -432,21 +450,16 @@ export function validateOptionalField<
   tx: T,
   param: K,
   checkValidity: (inp: unknown) => inp is V,
-  errorOpts: {
-    txType?: string
-    paramName?: string
-  } = {},
+  errorOpts: FieldValidationErrorOptions = {},
 ): asserts tx is T & { [P in K]: V | undefined } {
-  const paramNameStr = errorOpts.paramName ?? param
-  const txType = errorOpts.txType ?? tx.TransactionType
+  const paramNameStr = String(errorOpts.paramName ?? param)
+  const txType = String(errorOpts.txType ?? tx.TransactionType)
   if (tx[param] !== undefined && !checkValidity(tx[param])) {
     throw new ValidationError(
-      `${txType}: invalid field ${String(paramNameStr)}`,
+      invalidFieldMessage(txType, paramNameStr, errorOpts.expectedType),
     )
   }
 }
-
-/* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
 
 export enum GlobalFlags {
   tfInnerBatchTxn = 0x40000000,
@@ -568,15 +581,25 @@ export function validateBaseTransaction(
     )
   }
 
-  validateRequiredField(common, 'Account', isString)
+  validateRequiredField(common, 'Account', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(common, 'Fee', isString)
+  validateOptionalField(common, 'Fee', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(common, 'Sequence', isNumber)
+  validateOptionalField(common, 'Sequence', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateOptionalField(common, 'AccountTxnID', isString)
+  validateOptionalField(common, 'AccountTxnID', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(common, 'LastLedgerSequence', isNumber)
+  validateOptionalField(common, 'LastLedgerSequence', isNumber, {
+    expectedType: 'a number',
+  })
 
   const memos = common.Memos
   if (memos != null && (!isArray(memos) || !memos.every(isMemo))) {
@@ -592,17 +615,29 @@ export function validateBaseTransaction(
     throw new ValidationError('BaseTransaction: invalid Signers')
   }
 
-  validateOptionalField(common, 'SourceTag', isNumber)
+  validateOptionalField(common, 'SourceTag', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateOptionalField(common, 'SigningPubKey', isString)
+  validateOptionalField(common, 'SigningPubKey', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(common, 'TicketSequence', isNumber)
+  validateOptionalField(common, 'TicketSequence', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateOptionalField(common, 'TxnSignature', isString)
+  validateOptionalField(common, 'TxnSignature', isString, {
+    expectedType: 'a string',
+  })
 
-  validateOptionalField(common, 'NetworkID', isNumber)
+  validateOptionalField(common, 'NetworkID', isNumber, {
+    expectedType: 'a number',
+  })
 
-  validateOptionalField(common, 'Delegate', isAccount)
+  validateOptionalField(common, 'Delegate', isAccount, {
+    expectedType: 'a valid account',
+  })
 
   const delegate = common.Delegate
   if (delegate != null && delegate === common.Account) {

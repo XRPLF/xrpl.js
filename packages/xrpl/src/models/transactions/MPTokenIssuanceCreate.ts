@@ -138,10 +138,18 @@ export function validateMPTokenIssuanceCreate(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
-  validateOptionalField(tx, 'MaximumAmount', isString)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
-  validateOptionalField(tx, 'TransferFee', isNumber)
-  validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'MaximumAmount', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'MPTokenMetadata', isString, {
+    expectedType: 'a string',
+  })
+  validateOptionalField(tx, 'TransferFee', isNumber, {
+    expectedType: 'a number',
+  })
+  validateOptionalField(tx, 'AssetScale', isNumber, {
+    expectedType: 'a number',
+  })
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&

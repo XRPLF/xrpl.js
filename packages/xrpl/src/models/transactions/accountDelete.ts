@@ -47,8 +47,12 @@ export interface AccountDelete extends BaseTransaction {
 export function validateAccountDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateRequiredField(tx, 'Destination', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'DestinationTag', isNumber, {
+    expectedType: 'a number',
+  })
 
   validateCredentialsList(
     tx.CredentialIDs,

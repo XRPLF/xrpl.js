@@ -35,6 +35,6 @@ describe('VaultDelete', function () {
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
-    assertInvalid(tx, 'VaultDelete: invalid field VaultID')
+    assertInvalid(tx, 'VaultDelete: invalid field VaultID: expected a string')
   })
 })

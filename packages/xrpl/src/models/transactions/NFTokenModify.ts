@@ -52,9 +52,11 @@ export interface NFTokenModify extends BaseTransaction {
 export function validateNFTokenModify(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'NFTokenID', isString)
-  validateOptionalField(tx, 'Owner', isAccount)
-  validateOptionalField(tx, 'URI', isString)
+  validateRequiredField(tx, 'NFTokenID', isString, { expectedType: 'a string' })
+  validateOptionalField(tx, 'Owner', isAccount, {
+    expectedType: 'a valid account',
+  })
+  validateOptionalField(tx, 'URI', isString, { expectedType: 'a string' })
 
   if (tx.URI !== undefined && typeof tx.URI === 'string') {
     if (tx.URI === '') {

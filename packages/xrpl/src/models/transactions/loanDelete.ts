@@ -31,7 +31,7 @@ export interface LoanDelete extends BaseTransaction {
 export function validateLoanDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'LoanID', isString)
+  validateRequiredField(tx, 'LoanID', isString, { expectedType: 'a string' })
 
   if (!isLedgerEntryId(tx.LoanID)) {
     throw new ValidationError(
