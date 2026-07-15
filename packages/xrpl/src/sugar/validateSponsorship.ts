@@ -174,7 +174,6 @@ async function getSponsorshipEntry(
     const entry = response.result.node
 
     if (
-      entry &&
       typeof entry === 'object' &&
       'LedgerEntryType' in entry &&
       entry.LedgerEntryType === 'Sponsorship'

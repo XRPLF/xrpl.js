@@ -4,7 +4,7 @@
 name: Node.js CI
 
 env:
-  XRPLD_DOCKER_IMAGE: rippleci/rippled:develop
+  XRPLD_DOCKER_IMAGE: legleux/xrpld:sponsor
   GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
