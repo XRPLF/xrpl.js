@@ -523,19 +523,9 @@ class Client extends EventEmitter<EventTypes> {
   }
 
   /**
-   * Get networkID and buildVersion from server_info.
-   *
-   * Throws if the underlying `server_info` request fails (e.g. `RippledError`
-   * for `noNetwork` / `notSynced`, `DisconnectedError`, `TimeoutError`), or if
-   * the response succeeds but does not include `network_id`. Callers must
-   * handle these — letting them propagate is intentional, since signing a
-   * transaction without a known network ID can produce a signature that is
-   * valid on the wrong network (cross-network replay).
+   * Get networkID and buildVersion from server_info
    *
    * @returns void
-   * @throws {XrplError} If the `server_info` response does not include a `network_id`.
-   * @throws {RippledError} If rippled returns an error (e.g. server not synced to network).
-   * @throws {DisconnectedError | TimeoutError | NotConnectedError} If the request cannot reach the server.
    * @example
    * ```ts
    * const { Client } = require('xrpl')
@@ -546,15 +536,15 @@ class Client extends EventEmitter<EventTypes> {
    * ```
    */
   public async getServerInfo(): Promise<void> {
-    const response = await this.request({
-      command: 'server_info',
-    })
-    this.networkID = response.result.info.network_id ?? undefined
-    this.buildVersion = response.result.info.build_version
-    if (this.networkID === undefined) {
-      throw new XrplError(
-        'server_info response is missing network_id; cannot safely sign transactions without a known network ID',
-      )
+    try {
+      const response = await this.request({
+        command: 'server_info',
+      })
+      this.networkID = response.result.info.network_id ?? undefined
+      this.buildVersion = response.result.info.build_version
+    } catch (error) {
+      // eslint-disable-next-line no-console -- Print the error to console but allows client to be connected.
+      console.error(error)
     }
   }
 
