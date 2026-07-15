@@ -146,7 +146,8 @@ export class Wallet {
    *
    * @param seed - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         the algorithm is inferred from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a seed.
    */
@@ -165,7 +166,8 @@ export class Wallet {
    *
    * @param secret - A string used to generate a keypair (publicKey/privateKey) to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         the algorithm is inferred from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from a secret (AKA a seed).
    */
@@ -212,8 +214,7 @@ export class Wallet {
    * @param opts.mnemonicEncoding - If set to 'rfc1751', this interprets the mnemonic as a rippled RFC1751 mnemonic like
    *                          `wallet_propose` generates in rippled. Otherwise the function defaults to bip39 decoding.
    * @param opts.algorithm - Only used if opts.mnemonicEncoding is 'rfc1751'. Allows the mnemonic to generate its
-   *                         secp256k1 seed, or its ed25519 seed. By default, it will generate the secp256k1 seed
-   *                         to match the rippled `wallet_propose` default algorithm.
+   *                         secp256k1 seed, or its ed25519 seed. By default, it will generate the ed25519 seed.
    * @returns A Wallet derived from a mnemonic.
    * @throws ValidationError if unable to derive private key from mnemonic input.
    */
@@ -229,7 +230,7 @@ export class Wallet {
     if (opts.mnemonicEncoding === 'rfc1751') {
       return Wallet.fromRFC1751Mnemonic(mnemonic, {
         masterAddress: opts.masterAddress,
-        algorithm: opts.algorithm,
+        algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
       })
     }
     // Otherwise decode using bip39's mnemonic standard
@@ -269,11 +270,10 @@ export class Wallet {
   ): Wallet {
     const seed = rfc1751MnemonicToKey(mnemonic)
     let encodeAlgorithm: 'ed25519' | 'secp256k1'
-    if (opts.algorithm === ECDSA.ed25519) {
-      encodeAlgorithm = 'ed25519'
-    } else {
-      // Defaults to secp256k1 since that's the default for `wallet_propose`
+    if (opts.algorithm === ECDSA.secp256k1) {
       encodeAlgorithm = 'secp256k1'
+    } else {
+      encodeAlgorithm = 'ed25519'
     }
     const encodedSeed = encodeSeed(seed, encodeAlgorithm)
     return Wallet.fromSeed(encodedSeed, {
@@ -287,7 +287,8 @@ export class Wallet {
    *
    * @param seed - The seed used to derive the wallet.
    * @param opts - (Optional) Options to derive a Wallet.
-   * @param opts.algorithm - The digital signature algorithm to generate an address for.
+   * @param opts.algorithm - The digital signature algorithm to generate an address for. When omitted,
+   *                         `deriveKeypair` infers it from the seed prefix (`sEd…` → ed25519, otherwise secp256k1).
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from the seed.
    */
@@ -296,7 +297,7 @@ export class Wallet {
     opts: { masterAddress?: string; algorithm?: ECDSA } = {},
   ): Wallet {
     const { publicKey, privateKey } = deriveKeypair(seed, {
-      algorithm: opts.algorithm ?? DEFAULT_ALGORITHM,
+      algorithm: opts.algorithm,
     })
     return new Wallet(publicKey, privateKey, {
       seed,

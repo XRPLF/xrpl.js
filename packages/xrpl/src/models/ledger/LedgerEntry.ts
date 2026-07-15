@@ -12,6 +12,7 @@ import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
 import Loan from './Loan'
 import LoanBroker from './LoanBroker'
+import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
@@ -52,6 +53,7 @@ type LedgerEntry =
   | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
+  | MPTokenIssuance
 
 type LedgerEntryFilter =
   | 'account'
