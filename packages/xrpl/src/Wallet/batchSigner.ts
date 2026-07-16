@@ -46,6 +46,21 @@ function constructBatchSignerObject(
 }
 
 /**
+ * Resolve the sequence value bound into a Batch signature: the `Sequence` when
+ * non-zero, otherwise the `TicketSequence` value (or 0).
+ *
+ * @param transaction - The Batch transaction being signed.
+ * @returns The sequence value to bind into the signature.
+ */
+function getBatchSeqValue(transaction: Batch): number {
+  const sequence = transaction.Sequence ?? 0
+  if (sequence !== 0) {
+    return sequence
+  }
+  return transaction.TicketSequence ?? 0
+}
+
+/**
  * Sign a multi-account Batch transaction.
  *
  * @param wallet - Wallet instance.
@@ -56,6 +71,7 @@ function constructBatchSignerObject(
  *                       The actual address is only needed in the case of regular key usage.
  * @throws ValidationError if the transaction is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- cohesive signing routine
 export function signMultiBatch(
   wallet: Wallet,
   transaction: Batch,
@@ -79,19 +95,37 @@ export function signMultiBatch(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
   validate(transaction as unknown as Record<string, unknown>)
 
-  const involvedAccounts = new Set(
-    transaction.RawTransactions.map((raw) => raw.RawTransaction.Account),
-  )
+  // An account must sign the Batch if it authorizes an inner transaction or is
+  // the `Counterparty` of one.
+  const involvedAccounts = new Set<string>()
+  transaction.RawTransactions.forEach((raw) => {
+    // A delegated inner transaction is authorized by the delegate, not the
+    // account holder, so the delegate is the required signer when present.
+    involvedAccounts.add(
+      raw.RawTransaction.Delegate ?? raw.RawTransaction.Account,
+    )
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Counterparty only exists on some inner tx types
+    const counterparty = (raw.RawTransaction as Record<string, unknown>)
+      .Counterparty
+    if (typeof counterparty === 'string') {
+      involvedAccounts.add(counterparty)
+    }
+  })
   if (!involvedAccounts.has(batchAccount)) {
     throw new ValidationError(
       'Must be signing for an address submitting a transaction in the Batch.',
     )
   }
   const fieldsToSign = {
+    account: transaction.Account,
+    sequence: getBatchSeqValue(transaction),
     flags: transaction.Flags,
     txIDs: transaction.RawTransactions.map((rawTx) =>
       hashSignedTx(rawTx.RawTransaction),
     ),
+    batchAccount,
+    // Multi-signed batch signers also bind the inner signer account.
+    ...(multisignAddress ? { signerAccount: multisignAddress } : {}),
   }
   const signature = sign(encodeForSigningBatch(fieldsToSign), wallet.privateKey)
 
@@ -156,43 +190,67 @@ export function combineBatchSigners(
 }
 
 /**
+ * Builds a comparison key over every field bound into a Batch signature
+ * (XLS-56 V1_1): the outer account, sequence value, flags, and inner
+ * transaction IDs. Fragments that disagree on any of these were signed over
+ * different payloads and cannot be combined.
+ *
+ * @param tx - The Batch transaction to derive the key from.
+ * @returns A stable string key for equivalence comparison.
+ */
+function getBatchEquivalenceKey(tx: Batch): string {
+  return JSON.stringify({
+    account: tx.Account,
+    sequence: getBatchSeqValue(tx),
+    flags: tx.Flags,
+    transactionIDs: tx.RawTransactions.map((rawTx) =>
+      hashSignedTx(rawTx.RawTransaction),
+    ),
+  })
+}
+
+/**
  * The transactions should all be equal except for the 'Signers' field.
  *
  * @param transactions - An array of Transactions which are expected to be equal other than 'Signers'.
  * @throws ValidationError if the transactions are not equal in any field other than 'Signers'.
  */
 function validateBatchTransactionEquivalence(transactions: Batch[]): void {
-  const exampleTransaction = JSON.stringify({
-    flags: transactions[0].Flags,
-    transactionIDs: transactions[0].RawTransactions.map((rawTx) =>
-      hashSignedTx(rawTx.RawTransaction),
-    ),
-  })
+  const exampleTransaction = getBatchEquivalenceKey(transactions[0])
   if (
-    transactions.slice(1).some(
-      (tx) =>
-        JSON.stringify({
-          flags: tx.Flags,
-          transactionIDs: tx.RawTransactions.map((rawTx) =>
-            hashSignedTx(rawTx.RawTransaction),
-          ),
-        }) !== exampleTransaction,
-    )
+    transactions
+      .slice(1)
+      .some((tx) => getBatchEquivalenceKey(tx) !== exampleTransaction)
   ) {
     throw new ValidationError(
-      'Flags and transaction hashes are not the same for all provided transactions.',
+      'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
     )
   }
 }
 
 function getTransactionWithAllBatchSigners(transactions: Batch[]): Batch {
+  const outerAccount = transactions[0].Account
+
   // Signers must be sorted in the combined transaction - See compareSigners' documentation for more details
   const sortedSigners: BatchSigner[] = transactions
     .flatMap((tx) => tx.BatchSigners ?? [])
-    .filter((signer) => signer.BatchSigner.Account !== transactions[0].Account)
+    // A batch signer cannot be the outer account (rippled: temBAD_SIGNER).
+    .filter((signer) => signer.BatchSigner.Account !== outerAccount)
     .sort((signer1, signer2) =>
       compareSigners(signer1.BatchSigner, signer2.BatchSigner),
     )
 
-  return { ...transactions[0], BatchSigners: sortedSigners }
+  // BatchSigners must be strictly ascending and unique by account, so
+  // de-duplicate when combining fragments that share a signer.
+  const dedupedSigners: BatchSigner[] = []
+  let lastAccount = ''
+  for (const signer of sortedSigners) {
+    const account = signer.BatchSigner.Account
+    if (account !== lastAccount) {
+      dedupedSigners.push(signer)
+      lastAccount = account
+    }
+  }
+
+  return { ...transactions[0], BatchSigners: dedupedSigners }
 }
