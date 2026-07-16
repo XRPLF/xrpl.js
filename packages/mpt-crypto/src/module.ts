@@ -31,6 +31,8 @@ export interface WasmModule {
     ciphertext: number,
     privkey: number,
     outAmount: number,
+    rangeLow: bigint,
+    rangeHigh: bigint,
   ) => number
   _mpt_get_pedersen_commitment: (
     amount: bigint,

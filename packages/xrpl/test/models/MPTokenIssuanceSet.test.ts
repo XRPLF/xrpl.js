@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- many validation cases in one describe block */
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceSetFlags } from '../../src'

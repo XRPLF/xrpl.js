@@ -10,6 +10,13 @@ import { withModule } from './runtime'
 
 const U64_BYTES = 8
 
+// mpt-crypto decrypts an ElGamal amount by brute-forcing the discrete log over
+// [DECRYPT_RANGE_LOW, DECRYPT_RANGE_HIGH]; the search stops at the recovered
+// value, so cost scales with the amount, not the window. These are the library's
+// recommended defaults (secp256k1_mpt.h): [0, 1_000_000]. High must be < UINT64_MAX.
+const DECRYPT_RANGE_LOW = 0n
+const DECRYPT_RANGE_HIGH = 1_000_000n
+
 /**
  * Generate a 32-byte blinding factor / ElGamal randomness scalar.
  *
@@ -60,10 +67,14 @@ export async function encryptAmount(
 /**
  * Decrypt an ElGamal ciphertext with a private key.
  *
+ * The amount is recovered by searching [DECRYPT_RANGE_LOW, DECRYPT_RANGE_HIGH]
+ * (the library's recommended defaults); an amount outside that range fails.
+ *
  * @param ciphertext - The 66-byte hex ciphertext.
  * @param privateKey - The 32-byte hex private key.
  * @returns The decrypted integer amount.
- * @throws If inputs are malformed or the WASM call fails.
+ * @throws If inputs are malformed, the amount is outside the range, or the WASM
+ * call fails.
  */
 export async function decryptAmount(
   ciphertext: string,
@@ -75,7 +86,15 @@ export async function decryptAmount(
     const ctPtr = marshaller.allocBytes(ct)
     const privPtr = marshaller.allocBytes(priv)
     const outPtr = marshaller.alloc(U64_BYTES)
-    if (mod._mpt_decrypt_amount(ctPtr, privPtr, outPtr) !== 0) {
+    if (
+      mod._mpt_decrypt_amount(
+        ctPtr,
+        privPtr,
+        outPtr,
+        DECRYPT_RANGE_LOW,
+        DECRYPT_RANGE_HIGH,
+      ) !== 0
+    ) {
       throw new Error('mpt_decrypt_amount failed')
     }
     return marshaller.readU64(outPtr)

@@ -3494,7 +3494,7 @@
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 39,
+        "nth": 40,
         "type": "Hash256"
       }
     ],
