@@ -2,10 +2,12 @@ import {
   Account,
   BaseTransaction,
   isAccount,
-  isHexBlob,
+  isHexWithByteLength,
   isString,
   validateBaseTransaction,
   validateRequiredField,
+  validateConfidentialMPTAmount,
+  CONFIDENTIAL_CLAWBACK_PROOF_BYTES,
 } from './common'
 
 /**
@@ -45,6 +47,10 @@ export function validateConfidentialMPTClawback(
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateRequiredField(tx, 'Holder', isAccount)
-  validateRequiredField(tx, 'MPTAmount', isString)
-  validateRequiredField(tx, 'ZKProof', isHexBlob)
+  validateConfidentialMPTAmount(tx, false)
+  validateRequiredField(
+    tx,
+    'ZKProof',
+    isHexWithByteLength(CONFIDENTIAL_CLAWBACK_PROOF_BYTES),
+  )
 }

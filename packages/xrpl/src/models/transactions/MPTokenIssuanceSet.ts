@@ -62,6 +62,8 @@ export enum MPTokenIssuanceSetMutableFlags {
   tmfMPTSetCanTransfer = 0x00000010,
   /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
   tmfMPTSetCanClawback = 0x00000020,
+  /* Enables the lsfMPTCanHoldConfidentialBalance flag. Allows holders to hold confidential (encrypted) balances of this token. */
+  tmfMPTSetCanHoldConfidentialBalance = 0x00000040,
 }
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
@@ -71,7 +73,8 @@ export const tmfMPTokenIssuanceSetMutableMask = ~(
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanHoldConfidentialBalance
 )
 /* eslint-enable no-bitwise */
 
@@ -99,6 +102,8 @@ export interface MPTokenIssuanceSetMutableFlagsInterface {
   tmfMPTSetCanTransfer?: boolean
   /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
   tmfMPTSetCanClawback?: boolean
+  /* Enables the lsfMPTCanHoldConfidentialBalance flag. Allows holders to hold confidential (encrypted) balances of this token. */
+  tmfMPTSetCanHoldConfidentialBalance?: boolean
 }
 
 /**
@@ -176,6 +181,11 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     'AuditorEncryptionKey',
     isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES),
   )
+  if (tx.AuditorEncryptionKey != null && tx.IssuerEncryptionKey == null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: AuditorEncryptionKey requires IssuerEncryptionKey',
+    )
+  }
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)

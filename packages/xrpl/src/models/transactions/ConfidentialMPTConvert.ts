@@ -1,14 +1,17 @@
+import { ValidationError } from '../../errors'
+
 import {
   BaseTransaction,
   isString,
-  isHexBlob,
   isHexWithByteLength,
   validateBaseTransaction,
   validateRequiredField,
   validateOptionalField,
+  validateConfidentialMPTAmount,
   CONFIDENTIAL_EC_POINT_BYTES,
   CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
   CONFIDENTIAL_BLINDING_FACTOR_BYTES,
+  CONFIDENTIAL_CONVERT_PROOF_BYTES,
 } from './common'
 
 /**
@@ -59,6 +62,22 @@ export interface ConfidentialMPTConvert extends BaseTransaction {
 }
 
 /**
+ * HolderEncryptionKey and ZKProof are set together or not at all: rippled rejects
+ * a Convert carrying one without the other (temMALFORMED). The ZKProof is a
+ * Schnorr proof that registers the holder key.
+ *
+ * @param tx - The transaction to validate.
+ * @throws ValidationError if only one of the pair is present.
+ */
+function validateHolderKeyProofPairing(tx: Record<string, unknown>): void {
+  if ((tx.HolderEncryptionKey == null) !== (tx.ZKProof == null)) {
+    throw new ValidationError(
+      'ConfidentialMPTConvert: set HolderEncryptionKey and ZKProof together',
+    )
+  }
+}
+
+/**
  * Verify the form and type of a ConfidentialMPTConvert at runtime.
  *
  * @param tx - A ConfidentialMPTConvert Transaction.
@@ -69,7 +88,7 @@ export function validateConfidentialMPTConvert(
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateRequiredField(tx, 'MPTAmount', isString)
+  validateConfidentialMPTAmount(tx, true)
   validateOptionalField(
     tx,
     'HolderEncryptionKey',
@@ -95,5 +114,10 @@ export function validateConfidentialMPTConvert(
     'BlindingFactor',
     isHexWithByteLength(CONFIDENTIAL_BLINDING_FACTOR_BYTES),
   )
-  validateOptionalField(tx, 'ZKProof', isHexBlob)
+  validateOptionalField(
+    tx,
+    'ZKProof',
+    isHexWithByteLength(CONFIDENTIAL_CONVERT_PROOF_BYTES),
+  )
+  validateHolderKeyProofPairing(tx)
 }

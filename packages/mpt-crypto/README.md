@@ -57,7 +57,20 @@ const amount = await decryptAmount(ciphertext, privateKey) // 1000n
 ## The vendored WASM
 
 `wasm/mpt_crypto.{js,wasm}` is a committed Emscripten build of the reference
-`mpt-crypto` C library. **It must stay in lockstep with the `mpt-crypto` version
-that `rippled` pins** — a mismatch produces valid-looking transactions that
-`rippled` rejects with `tecBAD_PROOF`. When updating, rebuild from the same
-`mpt-crypto` tag rippled uses and re-vendor both files.
+`mpt-crypto` C library ([`XRPLF/mpt-crypto`](https://github.com/XRPLF/mpt-crypto)),
+the same library `rippled` links. It is produced by that repo's `build_emcc.sh`
+(`emcc`, statically bundling secp256k1 + a stripped OpenSSL), which emits
+`emcc_out/mpt_crypto.{js,wasm}`; both files are copied here verbatim.
+
+**It must stay in lockstep with the `mpt-crypto` version that `rippled` pins** — a
+mismatch produces valid-looking transactions that `rippled` rejects with
+`tecBAD_PROOF`. To update:
+
+1. Find the pinned version in rippled's `conanfile.py` (e.g. `mpt-crypto/0.4.0-rc4`).
+2. In `XRPLF/mpt-crypto`, check out that tag and run `./build_emcc.sh`.
+3. Copy `emcc_out/mpt_crypto.{js,wasm}` into `wasm/` here.
+
+The build is deterministic from the tagged source, so provenance is verified by
+reproducing it; distribution integrity is provided by the npm package hash rather
+than an in-package checksum (which would ship alongside — and be replaceable with —
+the binary it claims to verify).

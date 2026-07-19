@@ -75,7 +75,6 @@ export async function prepareConfidentialConvert(
     HolderEncryptedAmount: holderEncryptedAmount,
     IssuerEncryptedAmount: issuerEncryptedAmount,
     BlindingFactor: blindingFactor,
-    ZKProof: zkProof,
   }
   if (issuance.AuditorEncryptionKey != null) {
     tx.AuditorEncryptedAmount = await crypto.encryptAmount(
@@ -84,8 +83,14 @@ export async function prepareConfidentialConvert(
       blindingFactor,
     )
   }
+  // `HolderEncryptionKey` and `ZKProof` must be set together or omitted together:
+  // the ZKProof is a Schnorr proof of ownership of the holder key, so it is only
+  // meaningful when registering that key. rippled rejects a Convert carrying one
+  // without the other with `temMALFORMED`, so both are gated on `registerKey`
+  // (true only for the holder's first Convert on the issuance).
   if (params.registerKey ?? true) {
     tx.HolderEncryptionKey = holder.publicKey
+    tx.ZKProof = zkProof
   }
   return tx
 }

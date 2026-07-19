@@ -51,6 +51,11 @@ export class Marshaller {
   /** Allocate `size` bytes of zero-initialized scratch memory. */
   public alloc(size: number): number {
     const ptr = this.mod._malloc(size)
+    // `_malloc` returns 0 on failure; writing at address 0 would corrupt the
+    // WASM heap, so fail loudly instead.
+    if (ptr === 0) {
+      throw new Error(`mpt-crypto: failed to allocate ${size} bytes`)
+    }
     this.mod.HEAPU8.fill(0, ptr, ptr + size)
     this.ptrs.push(ptr)
     return ptr
@@ -59,6 +64,9 @@ export class Marshaller {
   /** Allocate and copy `data` into WASM memory; returns the pointer. */
   public allocBytes(data: Uint8Array): number {
     const ptr = this.mod._malloc(data.length)
+    if (ptr === 0) {
+      throw new Error(`mpt-crypto: failed to allocate ${data.length} bytes`)
+    }
     this.mod.HEAPU8.set(data, ptr)
     this.ptrs.push(ptr)
     return ptr

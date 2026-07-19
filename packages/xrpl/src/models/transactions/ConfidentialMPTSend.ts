@@ -2,7 +2,6 @@ import {
   Account,
   BaseTransaction,
   isAccount,
-  isHexBlob,
   isHexWithByteLength,
   isNumber,
   isString,
@@ -13,6 +12,7 @@ import {
   MAX_AUTHORIZED_CREDENTIALS,
   CONFIDENTIAL_EC_POINT_BYTES,
   CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
+  CONFIDENTIAL_SEND_PROOF_BYTES,
 } from './common'
 
 /**
@@ -95,7 +95,11 @@ export function validateConfidentialMPTSend(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'DestinationEncryptedAmount', isCiphertext)
   validateRequiredField(tx, 'IssuerEncryptedAmount', isCiphertext)
   validateOptionalField(tx, 'AuditorEncryptedAmount', isCiphertext)
-  validateRequiredField(tx, 'ZKProof', isHexBlob)
+  validateRequiredField(
+    tx,
+    'ZKProof',
+    isHexWithByteLength(CONFIDENTIAL_SEND_PROOF_BYTES),
+  )
   validateRequiredField(tx, 'AmountCommitment', isCommitment)
   validateRequiredField(tx, 'BalanceCommitment', isCommitment)
   validateCredentialsList(

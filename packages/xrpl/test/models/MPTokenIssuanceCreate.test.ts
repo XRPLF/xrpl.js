@@ -47,17 +47,17 @@ describe('MPTokenIssuanceCreate', function () {
     assertValid(validMPTokenIssuanceCreate)
   })
 
-  it(`verifies valid MPTokenIssuanceCreate w/ tfMPTCanConfidentialAmount`, function () {
+  it(`verifies valid MPTokenIssuanceCreate w/ tfMPTCanHoldConfidentialBalance`, function () {
     assertValid({
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      Flags: MPTokenIssuanceCreateFlags.tfMPTCanConfidentialAmount,
+      Flags: MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
     } as any)
 
     assertValid({
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      Flags: { tfMPTCanConfidentialAmount: true },
+      Flags: { tfMPTCanHoldConfidentialBalance: true },
     } as any)
   })
 

@@ -65,7 +65,8 @@ describe('MPTokenIssuanceSet', function () {
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanHoldConfidentialBalance,
     } as any)
   })
 
@@ -131,6 +132,18 @@ describe('MPTokenIssuanceSet', function () {
       IssuerEncryptionKey: EC_POINT,
       AuditorEncryptionKey: EC_POINT,
     } as any)
+  })
+
+  it(`throws w/ AuditorEncryptionKey but no IssuerEncryptionKey`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        AuditorEncryptionKey: `02${'AB'.repeat(32)}`,
+      } as any,
+      'MPTokenIssuanceSet: AuditorEncryptionKey requires IssuerEncryptionKey',
+    )
   })
 
   it(`throws w/ wrong-length IssuerEncryptionKey`, function () {
@@ -212,8 +225,8 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      // 0x40 is above the highest DynamicMPT "set" flag (tmfMPTSetCanClawback = 0x20)
-      MutableFlags: 0x00000040,
+      // 0x80 is above the highest MPTokenIssuanceSet mutable flag (tmfMPTSetCanHoldConfidentialBalance = 0x40)
+      MutableFlags: 0x00000080,
     } as any
 
     assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')

@@ -117,7 +117,7 @@ export async function createConfidentialIssuance(
       tfMPTCanLock: true,
       tfMPTCanTransfer: true,
       tfMPTCanClawback: true,
-      tfMPTCanConfidentialAmount: true,
+      tfMPTCanHoldConfidentialBalance: true,
     },
   }
   const created = await testTransaction(client, createTx, issuer)

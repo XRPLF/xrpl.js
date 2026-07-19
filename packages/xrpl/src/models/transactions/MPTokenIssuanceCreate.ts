@@ -60,7 +60,7 @@ export enum MPTokenIssuanceCreateFlags {
    * If set, indicates that holders may hold confidential (encrypted) balances
    * of this token and use the Confidential MPT transactions.
    */
-  tfMPTCanConfidentialAmount = 0x00000080,
+  tfMPTCanHoldConfidentialBalance = 0x00000080,
 }
 
 export enum MPTokenIssuanceCreateMutableFlags {
@@ -89,6 +89,12 @@ export enum MPTokenIssuanceCreateMutableFlags {
    */
   tmfMPTCanEnableCanClawback = 0x00000040,
   /**
+   * If set at creation, permanently prevents lsfMPTCanHoldConfidentialBalance
+   * from ever being enabled later via MPTokenIssuanceSet. (Confidential balances
+   * are otherwise enableable post-creation by default.)
+   */
+  tmfMPTCannotEnableCanHoldConfidentialBalance = 0x00000080,
+  /**
    * If set, Allows field MPTokenMetadata to be modified.
    */
   tmfMPTCanMutateMetadata = 0x00010000,
@@ -106,6 +112,8 @@ export const tmfMPTokenIssuanceCreateMutableMask = ~(
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTrade |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTransfer |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanClawback |
+  // eslint-disable-next-line max-len -- long protocol flag identifier
+  MPTokenIssuanceCreateMutableFlags.tmfMPTCannotEnableCanHoldConfidentialBalance |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata |
   MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee
 )
@@ -144,7 +152,11 @@ export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterfac
    * to clawback value from individual holders.
    */
   tfMPTCanClawback?: boolean
-  tfMPTCanConfidentialAmount?: boolean
+  /**
+   * If set, indicates that holders may hold confidential (encrypted) balances
+   * of this token and use the Confidential MPT transactions.
+   */
+  tfMPTCanHoldConfidentialBalance?: boolean
 }
 
 export interface MPTokenIssuanceCreateMutableFlagsInterface {
@@ -172,6 +184,11 @@ export interface MPTokenIssuanceCreateMutableFlagsInterface {
    * If set, indicates the lsfMPTCanClawback flag can later be enabled via MPTokenIssuanceSet.
    */
   tmfMPTCanEnableCanClawback?: boolean
+  /**
+   * If set at creation, permanently prevents lsfMPTCanHoldConfidentialBalance
+   * from ever being enabled later via MPTokenIssuanceSet.
+   */
+  tmfMPTCannotEnableCanHoldConfidentialBalance?: boolean
   /**
    * If set, Allows field MPTokenMetadata to be modified.
    */

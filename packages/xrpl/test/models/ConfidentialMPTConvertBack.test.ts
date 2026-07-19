@@ -14,7 +14,7 @@ const EC_POINT = `02${'AB'.repeat(32)}`
 const CIPHERTEXT = `02${'AB'.repeat(32)}03${'CD'.repeat(32)}`
 // 32-byte scalar blinding factor.
 const BLINDING = 'AB'.repeat(32)
-const PROOF = 'AB'.repeat(408)
+const PROOF = 'AB'.repeat(816)
 
 /**
  * ConfidentialMPTConvertBack Transaction Verification Testing.
@@ -49,6 +49,23 @@ describe('ConfidentialMPTConvertBack', function () {
       ZKProof: PROOF,
       BalanceCommitment: EC_POINT,
     })
+  })
+
+  it(`throws w/ zero MPTAmount`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvertBack',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        MPTAmount: '0',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+        ZKProof: PROOF,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTConvertBack: MPTAmount out of range',
+    )
   })
 
   it(`throws w/ missing ZKProof`, function () {

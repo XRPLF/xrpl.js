@@ -16,7 +16,7 @@ import {
   Signer,
   XChainBridge,
 } from '../common'
-import { isHex, onlyHasFields } from '../utils'
+import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
@@ -31,6 +31,15 @@ export const CONFIDENTIAL_EC_POINT_BYTES = 33
 export const CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES = 66
 // A scalar blinding factor (Hash256).
 export const CONFIDENTIAL_BLINDING_FACTOR_BYTES = 32
+// ZKProof byte lengths, fixed per transaction type by the mpt-crypto proof system.
+// Convert/Clawback are a compact Schnorr proof; ConvertBack and Send add a
+// (double) bulletproof range proof.
+export const CONFIDENTIAL_CONVERT_PROOF_BYTES = 64
+export const CONFIDENTIAL_CLAWBACK_PROOF_BYTES = 64
+export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
+export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
+// Max MPT amount: 2^63 - 1.
+export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -478,6 +487,31 @@ export function validateOptionalField<
     throw new ValidationError(
       `${txType}: invalid field ${String(paramNameStr)}`,
     )
+  }
+}
+
+/**
+ * Validate a Confidential MPT `MPTAmount`: a required non-negative uint64 string.
+ * ConfidentialMPTConvert permits zero (a zero-amount convert registers the holder
+ * key); ConfidentialMPTConvertBack and ConfidentialMPTClawback forbid zero.
+ *
+ * @param tx - The transaction to validate.
+ * @param allowZero - Whether a zero amount is permitted.
+ * @throws ValidationError if MPTAmount is missing, malformed, or out of range.
+ */
+export function validateConfidentialMPTAmount(
+  tx: Record<string, unknown>,
+  allowZero: boolean,
+): void {
+  validateRequiredField(tx, 'MPTAmount', isString)
+  if (typeof tx.MPTAmount === 'string') {
+    if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
+      throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
+    }
+    const amount = BigInt(tx.MPTAmount)
+    if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
+      throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
+    }
   }
 }
 

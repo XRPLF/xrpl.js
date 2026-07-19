@@ -1,14 +1,15 @@
 import {
   BaseTransaction,
   isString,
-  isHexBlob,
   isHexWithByteLength,
   validateBaseTransaction,
   validateRequiredField,
   validateOptionalField,
+  validateConfidentialMPTAmount,
   CONFIDENTIAL_EC_POINT_BYTES,
   CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
   CONFIDENTIAL_BLINDING_FACTOR_BYTES,
+  CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES,
 } from './common'
 
 /**
@@ -69,7 +70,7 @@ export function validateConfidentialMPTConvertBack(
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
-  validateRequiredField(tx, 'MPTAmount', isString)
+  validateConfidentialMPTAmount(tx, false)
   validateRequiredField(
     tx,
     'HolderEncryptedAmount',
@@ -90,7 +91,11 @@ export function validateConfidentialMPTConvertBack(
     'BlindingFactor',
     isHexWithByteLength(CONFIDENTIAL_BLINDING_FACTOR_BYTES),
   )
-  validateRequiredField(tx, 'ZKProof', isHexBlob)
+  validateRequiredField(
+    tx,
+    'ZKProof',
+    isHexWithByteLength(CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES),
+  )
   validateRequiredField(
     tx,
     'BalanceCommitment',

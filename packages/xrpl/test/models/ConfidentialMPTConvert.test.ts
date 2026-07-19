@@ -168,4 +168,63 @@ describe('ConfidentialMPTConvert', function () {
       'ConfidentialMPTConvert: invalid field IssuerEncryptedAmount',
     )
   })
+
+  it(`throws w/ HolderEncryptionKey but no ZKProof`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvert',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        MPTAmount: '100',
+        HolderEncryptionKey: EC_POINT,
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+      },
+      'ConfidentialMPTConvert: set HolderEncryptionKey and ZKProof together',
+    )
+  })
+
+  it(`throws w/ ZKProof but no HolderEncryptionKey`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvert',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        MPTAmount: '100',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTConvert: set HolderEncryptionKey and ZKProof together',
+    )
+  })
+
+  it(`allows a zero MPTAmount (holder-key registration)`, function () {
+    assertValid({
+      TransactionType: 'ConfidentialMPTConvert',
+      Account: ACCOUNT,
+      MPTokenIssuanceID: MPT_ISSUANCE_ID,
+      MPTAmount: '0',
+      HolderEncryptedAmount: CIPHERTEXT,
+      IssuerEncryptedAmount: CIPHERTEXT,
+      BlindingFactor: BLINDING,
+    })
+  })
+
+  it(`throws w/ MPTAmount out of range`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvert',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        MPTAmount: '9223372036854775808',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+      },
+      'ConfidentialMPTConvert: MPTAmount out of range',
+    )
+  })
 })
