@@ -11,6 +11,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
+  RippledError,
   XrplError,
   TimeoutError,
   SubscribeRequest,
@@ -1063,9 +1064,10 @@ describe('Connection', function () {
     }
     clientContext.mockRippled?.addResponse(request.command, response)
 
-    await clientContext.client.request(request).catch((error) => {
-      assert.strictEqual(error.name, 'Error')
-      assert.strictEqual(error.message, 'jsonInvalid')
-    })
+    await assertRejects(
+      clientContext.client.request(request),
+      RippledError,
+      'jsonInvalid',
+    )
   }, 4000)
 })

@@ -22,10 +22,27 @@ export function createResponse(
     )
   }
   if (response.type === 'error' && 'value' in response) {
-    const value = JSON.parse(response.value as string)
-    value.id = request.id
-    response.value = JSON.stringify(value)
-    return JSON.stringify(response)
+    if (typeof response.value !== 'string') {
+      throw new XrplError(
+        `Bad error response format. \`value\` must be a JSON string. ${JSON.stringify(
+          response,
+        )}`,
+      )
+    }
+    let value: Record<string, unknown>
+    try {
+      value = JSON.parse(response.value) as Record<string, unknown>
+    } catch (error) {
+      throw new XrplError(
+        `Bad error response format. \`value\` must be valid JSON. ${JSON.stringify(
+          response,
+        )}`,
+      )
+    }
+    return JSON.stringify({
+      ...response,
+      value: JSON.stringify({ ...value, id: request.id }),
+    })
   }
   return JSON.stringify({ ...response, id: request.id })
 }

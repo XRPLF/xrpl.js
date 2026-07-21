@@ -9,6 +9,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
+  RippledError,
   XrplError,
 } from '../errors'
 import type { APIVersion, RequestResponseMap } from '../models'
@@ -370,18 +371,40 @@ export class Connection extends EventEmitter {
       }
     }
     if (data.type === 'error' && data.value != null) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- needed
-      const parsedValue: Record<string, unknown> = JSON.parse(
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-        data.value as string,
-      )
-      if (parsedValue.id != null) {
-        this.requestManager.reject(
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-          parsedValue.id as string | number,
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-          new Error(data.error as string),
+      if (typeof data.value !== 'string') {
+        this.emit(
+          'error',
+          'badMessage',
+          'Expected error value to be a JSON string',
+          data,
         )
+        return
+      }
+      let parsedValue: Record<string, unknown>
+      try {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
+        parsedValue = JSON.parse(data.value) as Record<string, unknown>
+      } catch (error) {
+        if (error instanceof Error) {
+          this.emit('error', 'badMessage', error.message, data.value)
+        } else {
+          this.emit('error', 'badMessage', error, error)
+        }
+        return
+      }
+      if (parsedValue.id != null) {
+        try {
+          this.requestManager.reject(
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+            parsedValue.id as string | number,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+            new RippledError(data.error as string, data),
+          )
+        } catch (error) {
+          const errMsg = error instanceof Error ? error.message : error
+          const errData = error instanceof Error ? message : error
+          this.emit('error', 'badMessage', errMsg, errData)
+        }
       }
     }
   }
