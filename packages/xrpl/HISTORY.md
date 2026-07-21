@@ -47,8 +47,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Support for `Lending Protocol` (XLS-66d).
-* Export signing and binary co
-* dec utilities.
+* Export signing and binary codec utilities.
 
 ### Fixed
 * Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
