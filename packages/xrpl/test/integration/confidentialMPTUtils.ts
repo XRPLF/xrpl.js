@@ -99,14 +99,17 @@ export function generateElGamalKeypair(): ConfidentialKeypair {
  * @param issuer - The issuer wallet.
  * @param issuerKey - The issuer ElGamal keypair.
  * @param auditorKey - An optional auditor ElGamal keypair to register.
+ * @param requireAuth - Create the issuance with RequireAuth (the issuer must
+ *   authorize each holder before it can hold the token). Defaults to false.
  * @returns The new MPTokenIssuanceID.
  */
-// eslint-disable-next-line max-params -- (client, issuer, issuerKey, auditorKey) setup tuple
+// eslint-disable-next-line max-params -- setup tuple (+ optional auditorKey, requireAuth)
 export async function createConfidentialIssuance(
   client: Client,
   issuer: Wallet,
   issuerKey: ConfidentialKeypair,
   auditorKey?: ConfidentialKeypair,
+  requireAuth = false,
 ): Promise<string> {
   const createTx: MPTokenIssuanceCreate = {
     TransactionType: 'MPTokenIssuanceCreate',
@@ -118,6 +121,7 @@ export async function createConfidentialIssuance(
       tfMPTCanTransfer: true,
       tfMPTCanClawback: true,
       tfMPTCanHoldConfidentialBalance: true,
+      ...(requireAuth ? { tfMPTRequireAuth: true } : {}),
     },
   }
   const created = await testTransaction(client, createTx, issuer)
@@ -282,5 +286,62 @@ export async function auditorReads(
   return decryptAmount(
     token.AuditorEncryptedBalance as string,
     auditorKey.privateKey,
+  )
+}
+
+/**
+ * Issuer-side authorization of a holder's MPToken — required to hold a
+ * RequireAuth issuance. Sets `lsfMPTAuthorized` on the holder's MPToken.
+ *
+ * @param client - A connected client.
+ * @param issuer - The issuer wallet.
+ * @param holder - The holder's classic address.
+ * @param mptID - The MPTokenIssuanceID.
+ */
+// eslint-disable-next-line max-params -- (client, issuer, holder, mptID) tuple
+export async function authorizeHolder(
+  client: Client,
+  issuer: Wallet,
+  holder: string,
+  mptID: string,
+): Promise<void> {
+  await testTransaction(
+    client,
+    {
+      TransactionType: 'MPTokenAuthorize',
+      Account: issuer.classicAddress,
+      MPTokenIssuanceID: mptID,
+      Holder: holder,
+    },
+    issuer,
+  )
+}
+
+/**
+ * Issuer locks an individual holder's MPToken (`tfMPTLock` + `Holder`), setting
+ * `lsfMPTLocked` on that holder's MPToken.
+ *
+ * @param client - A connected client.
+ * @param issuer - The issuer wallet.
+ * @param holder - The holder's classic address.
+ * @param mptID - The MPTokenIssuanceID.
+ */
+// eslint-disable-next-line max-params -- (client, issuer, holder, mptID) tuple
+export async function lockHolder(
+  client: Client,
+  issuer: Wallet,
+  holder: string,
+  mptID: string,
+): Promise<void> {
+  await testTransaction(
+    client,
+    {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: issuer.classicAddress,
+      MPTokenIssuanceID: mptID,
+      Holder: holder,
+      Flags: { tfMPTLock: true },
+    },
+    issuer,
   )
 }
