@@ -6,7 +6,7 @@
 
 /**
  * Typed view of the Emscripten-generated `mpt_crypto` WASM module. Only the
- * exports vendored by `build_emcc.sh` are declared. All `uint64_t` parameters
+ * exports vendored by `.github/scripts/build-wasm.sh` are declared. All `uint64_t` parameters
  * are passed as JS `bigint` (the module is built with `-sWASM_BIGINT=1`); all
  * pointer parameters are byte offsets into {@link WasmModule.HEAPU8}.
  *
