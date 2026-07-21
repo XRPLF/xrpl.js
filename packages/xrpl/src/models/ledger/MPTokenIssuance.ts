@@ -130,11 +130,6 @@ export interface MPTokenIssuanceMutableFlagsInterface {
    */
   lsmfMPTCanEnableCanClawback?: boolean
   /**
-   * Indicates lsfMPTCanHoldConfidentialBalance can NOT be enabled later via
-   * MPTokenIssuanceSet (set at creation to permanently lock it off).
-   */
-  lsmfMPTCannotEnableCanHoldConfidentialBalance?: boolean
-  /**
    * Allows field MPTokenMetadata to be modified
    */
   lsmfMPTCanMutateMetadata?: boolean
@@ -162,7 +157,6 @@ export enum MPTokenIssuanceMutableFlags {
   lsmfMPTCanEnableCanTrade = 0x00000010,
   lsmfMPTCanEnableCanTransfer = 0x00000020,
   lsmfMPTCanEnableCanClawback = 0x00000040,
-  lsmfMPTCannotEnableCanHoldConfidentialBalance = 0x00000080,
   lsmfMPTCanMutateMetadata = 0x00010000,
   lsmfMPTCanMutateTransferFee = 0x00020000,
 }

@@ -40,6 +40,11 @@ export enum MPTokenIssuanceSetFlags {
    * If set, indicates that issuer unlocks the MPT
    */
   tfMPTUnlock = 0x00000002,
+  /**
+   * Enables the lsfMPTCanHoldConfidentialBalance flag on the issuance. Allows
+   * holders to hold confidential (encrypted) balances of this token.
+   */
+  tfMPTSetCanHoldConfidentialBalance = 0x00000100,
 }
 
 /**
@@ -62,8 +67,6 @@ export enum MPTokenIssuanceSetMutableFlags {
   tmfMPTSetCanTransfer = 0x00000010,
   /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
   tmfMPTSetCanClawback = 0x00000020,
-  /* Enables the lsfMPTCanHoldConfidentialBalance flag. Allows holders to hold confidential (encrypted) balances of this token. */
-  tmfMPTSetCanHoldConfidentialBalance = 0x00000040,
 }
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
@@ -73,8 +76,7 @@ export const tmfMPTokenIssuanceSetMutableMask = ~(
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
   MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanHoldConfidentialBalance
+  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback
 )
 /* eslint-enable no-bitwise */
 
@@ -87,6 +89,8 @@ export const tmfMPTokenIssuanceSetMutableMask = ~(
 export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
+  /* Enables the lsfMPTCanHoldConfidentialBalance flag. Allows holders to hold confidential (encrypted) balances of this token. */
+  tfMPTSetCanHoldConfidentialBalance?: boolean
 }
 
 export interface MPTokenIssuanceSetMutableFlagsInterface {
@@ -102,8 +106,6 @@ export interface MPTokenIssuanceSetMutableFlagsInterface {
   tmfMPTSetCanTransfer?: boolean
   /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
   tmfMPTSetCanClawback?: boolean
-  /* Enables the lsfMPTCanHoldConfidentialBalance flag. Allows holders to hold confidential (encrypted) balances of this token. */
-  tmfMPTSetCanHoldConfidentialBalance?: boolean
 }
 
 /**

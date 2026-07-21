@@ -25,31 +25,22 @@ const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
  */
 describe('MPTokenIssuanceSet', function () {
   it(`verifies valid MPTokenIssuanceSet`, function () {
-    let validMPTokenIssuanceSet = {
+    const base = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      Flags: MPTokenIssuanceSetFlags.tfMPTLock,
-    } as any
+    }
 
-    assertValid(validMPTokenIssuanceSet)
-
-    validMPTokenIssuanceSet = {
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
-      MPTokenIssuanceID: TOKEN_ID,
-      Flags: MPTokenIssuanceSetFlags.tfMPTLock,
-    } as any
-
-    assertValid(validMPTokenIssuanceSet)
-
+    assertValid({ ...base, Flags: MPTokenIssuanceSetFlags.tfMPTLock } as any)
     // A single MutableFlags "enable" bit is valid.
     assertValid({
-      TransactionType: 'MPTokenIssuanceSet',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MPTokenIssuanceID: TOKEN_ID,
+      ...base,
       MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+    } as any)
+    // The confidential-balance capability is enabled via the standard Flags field.
+    assertValid({
+      ...base,
+      Flags: { tfMPTSetCanHoldConfidentialBalance: true },
     } as any)
   })
 
@@ -65,8 +56,7 @@ describe('MPTokenIssuanceSet', function () {
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
         MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanHoldConfidentialBalance,
+        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
     } as any)
   })
 
@@ -225,7 +215,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      // 0x80 is above the highest MPTokenIssuanceSet mutable flag (tmfMPTSetCanHoldConfidentialBalance = 0x40)
+      // 0x80 is above the highest MPTokenIssuanceSet mutable flag (tmfMPTSetCanClawback = 0x20)
       MutableFlags: 0x00000080,
     } as any
 
