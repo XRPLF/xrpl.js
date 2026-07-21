@@ -108,7 +108,7 @@ export interface SponsorshipSet extends BaseTransaction {
    * (Optional) The number of reserve units the sponsor agrees to cover.
    * Used when establishing reserve-based sponsorship.
    */
-  ReserveCount?: number
+  RemainingOwnerCount?: number
   Flags?: number | SponsorshipSetFlagsInterface
 }
 
@@ -211,23 +211,28 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
   }
 
-  // Validate ReserveCount if present
-  if (tx.ReserveCount !== undefined) {
-    if (typeof tx.ReserveCount !== 'number') {
-      throw new ValidationError('SponsorshipSet: ReserveCount must be a number')
+  // Validate RemainingOwnerCount if present
+  if (tx.RemainingOwnerCount !== undefined) {
+    if (typeof tx.RemainingOwnerCount !== 'number') {
+      throw new ValidationError(
+        'SponsorshipSet: RemainingOwnerCount must be a number',
+      )
     }
 
-    if (tx.ReserveCount < 0 || !Number.isInteger(tx.ReserveCount)) {
+    if (
+      tx.RemainingOwnerCount < 0 ||
+      !Number.isInteger(tx.RemainingOwnerCount)
+    ) {
       throw new ValidationError(
-        'SponsorshipSet: ReserveCount must be a non-negative integer',
+        'SponsorshipSet: RemainingOwnerCount must be a non-negative integer',
       )
     }
 
     // Prevent overflow - UInt32 max value
     const MAX_UINT32 = 4294967295
-    if (tx.ReserveCount > MAX_UINT32) {
+    if (tx.RemainingOwnerCount > MAX_UINT32) {
       throw new ValidationError(
-        `SponsorshipSet: ReserveCount cannot exceed ${MAX_UINT32}`,
+        `SponsorshipSet: RemainingOwnerCount cannot exceed ${MAX_UINT32}`,
       )
     }
   }

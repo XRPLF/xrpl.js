@@ -48,11 +48,10 @@ const secp256k1: SigningScheme = {
         lowS: true,
         // Would fail tests if signatures aren't deterministic
         extraEntropy: undefined,
+        format: 'der',
         // We pass a pre-hashed message (Sha512Half), so disable secp256k1's
         // default SHA-256 prehashing (added as default in @noble/curves 2.0.0)
         prehash: false,
-        // Return DER-encoded signature bytes
-        format: 'der',
       }),
     ).toUpperCase()
   },

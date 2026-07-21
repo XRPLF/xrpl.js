@@ -72,16 +72,12 @@ export interface SponsorshipTransfer extends BaseTransaction {
    */
   ObjectID?: string
   /**
-   * (Optional) The new sponsor account that will pay the reserve for the object.
-   * Required for tfSponsorshipCreate and tfSponsorshipReassign scenarios.
-   * Omitted for tfSponsorshipEnd scenario.
-   *
-   * Note: In the context of SponsorshipTransfer, this field indicates the new
-   * reserve-payer for the ledger object. This is distinct from the inherited
-   * BaseTransaction.Sponsor field, which when used with BaseTransaction.SponsorFlags
-   * indicates fee sponsorship for the transaction itself.
+   * (Optional) The account whose object/account-level sponsorship is being
+   * ended. Only valid for the tfSponsorshipEnd scenario; must not be present
+   * for tfSponsorshipCreate or tfSponsorshipReassign. Defaults to Account
+   * when omitted.
    */
-  Sponsor?: string
+  Sponsee?: string
   Flags?: number | SponsorshipTransferFlagsInterface
 }
 
@@ -184,6 +180,36 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
     if (!isAccount(tx.Sponsor)) {
       throw new ValidationError(
         'SponsorshipTransfer: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  // Validate Sponsee based on scenario
+  const hasSponsee = tx.Sponsee !== undefined
+
+  // tfSponsorshipCreate or tfSponsorshipReassign: Sponsee must NOT be present
+  if ((hasCreate || hasReassign) && hasSponsee) {
+    throw new ValidationError(
+      'SponsorshipTransfer: Sponsee field must not be present for tfSponsorshipCreate or tfSponsorshipReassign scenarios',
+    )
+  }
+
+  // Validate Sponsee if present
+  if (tx.Sponsee !== undefined) {
+    if (!isString(tx.Sponsee)) {
+      throw new ValidationError('SponsorshipTransfer: Sponsee must be a string')
+    }
+
+    // Check identity before validating address format
+    if (isString(tx.Account) && areAddressesEqual(tx.Account, tx.Sponsee)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Account and Sponsee cannot be the same',
+      )
+    }
+
+    if (!isAccount(tx.Sponsee)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Sponsee must be a valid account address',
       )
     }
   }

@@ -70,5 +70,11 @@ export default interface Sponsorship extends BaseLedgerEntry, HasPreviousTxnID {
    * pays for object creation and decremented when sponsored objects are
    * deleted. Default value is 0.
    */
-  ReserveCount?: number
+  RemainingOwnerCount?: number
+  /**
+   * (Optional) The account sponsoring the reserve for this Sponsorship
+   * object itself. If present, the sponsor is responsible for the reserve
+   * requirement of this object instead of the owner.
+   */
+  Sponsor?: string
 }

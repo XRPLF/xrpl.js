@@ -277,7 +277,7 @@ export function addPreFundedSponsor(
   sponsorAddress: string,
   sponsorFlags: number,
 ): Transaction {
-  if (transaction.Account === sponsorAddress) {
+  if (areAddressesEqual(transaction.Account, sponsorAddress)) {
     throw new ValidationError(
       'addPreFundedSponsor: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
     )
