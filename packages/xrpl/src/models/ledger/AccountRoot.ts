@@ -35,6 +35,18 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
    */
   AMMID?: string
   /**
+   * The ledger entry ID of the corresponding Vault ledger entry.
+   * Present only on a vault's pseudo-account AccountRoot; always omitted on
+   * non-vault accounts.
+   */
+  VaultID?: string
+  /**
+   * The ledger entry ID of the corresponding LoanBroker ledger entry.
+   * Present only on a loan broker's pseudo-account AccountRoot; always omitted
+   * on non-loan-broker accounts.
+   */
+  LoanBrokerID?: string
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */
