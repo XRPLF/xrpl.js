@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Changed
+* Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)). Tracks an unmerged rippled PR; the wire format may still change.
+
 ## 2.8.0 (2026-06-04)
 
 ### Fixed

@@ -178,40 +178,76 @@ function multiSigningData(
 }
 
 /**
- * Interface describing fields required for a Batch signer
- * @property flags - Flags indicating Batch transaction properties
- * @property txIDs - Array of transaction IDs included in the Batch
+ * Fields required to serialize an XLS-56 Batch V1_1 signing payload.
+ *
+ * @property account - The outer Batch transaction's `Account`.
+ * @property sequence - The outer Batch's sequence value (`Sequence`, or the
+ *   `TicketSequence` value when a ticket is used).
+ * @property flags - Flags indicating Batch transaction properties.
+ * @property txIDs - Array of inner transaction IDs included in the Batch.
+ * @property batchAccount - The `BatchSigner.Account` the signature binds to.
+ * @property signerAccount - For a multi-signed `BatchSigner`, the inner
+ *   `Signers` entry account, appended after `batchAccount`.
  */
 interface BatchObject extends JsonObject {
+  account: string
+  sequence: number
   flags: number
   txIDs: string[]
+  batchAccount?: string
+  signerAccount?: string
 }
 
 /**
- * Serialize a signingClaim
+ * Serialize an XLS-56 Batch V1_1 signing payload:
+ *   HashPrefix.batch | account | sequence | flags | txIDCount | txIDs[]
+ *   [ | batchAccount [ | signerAccount ] ]
  *
  * @param batch A Batch object to serialize.
  * @returns the serialized object with appropriate prefix
  */
 function signingBatchData(batch: BatchObject): Uint8Array {
+  if (batch.account == null) {
+    throw Error('No field `account`')
+  }
+  if (batch.sequence == null) {
+    throw Error('No field `sequence`')
+  }
   if (batch.flags == null) {
-    throw Error("No field `flags'")
+    throw Error('No field `flags`')
   }
   if (batch.txIDs == null) {
     throw Error('No field `txIDs`')
   }
   const prefix = HashPrefix.batch
+  const account = coreTypes.AccountID.from(batch.account).toBytes()
+  const sequence = coreTypes.UInt32.from(batch.sequence).toBytes()
   const flags = coreTypes.UInt32.from(batch.flags).toBytes()
   const txIDsLength = coreTypes.UInt32.from(batch.txIDs.length).toBytes()
 
   const bytesList = new BytesList()
 
   bytesList.put(prefix)
+  bytesList.put(account)
+  bytesList.put(sequence)
   bytesList.put(flags)
   bytesList.put(txIDsLength)
   batch.txIDs.forEach((txID: string) => {
     bytesList.put(coreTypes.Hash256.from(txID).toBytes())
   })
+
+  if (batch.batchAccount != null) {
+    bytesList.put(coreTypes.AccountID.from(batch.batchAccount).toBytes())
+  }
+  // The wire format is positional, so `signerAccount` must follow `batchAccount`.
+  // Reject `signerAccount` without `batchAccount` to avoid binding the signature
+  // to the wrong account.
+  if (batch.signerAccount != null) {
+    if (batch.batchAccount == null) {
+      throw Error('Field `signerAccount` requires `batchAccount`')
+    }
+    bytesList.put(coreTypes.AccountID.from(batch.signerAccount).toBytes())
+  }
 
   return bytesList.toBytes()
 }

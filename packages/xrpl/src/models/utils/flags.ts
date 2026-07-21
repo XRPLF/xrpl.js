@@ -4,6 +4,12 @@ import {
   AccountRootFlagsInterface,
   AccountRootFlags,
 } from '../ledger/AccountRoot'
+import {
+  MPTokenIssuanceFlags,
+  MPTokenIssuanceFlagsInterface,
+  MPTokenIssuanceMutableFlags,
+  MPTokenIssuanceMutableFlagsInterface,
+} from '../ledger/MPTokenIssuance'
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
@@ -14,6 +20,7 @@ import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+// eslint-disable-next-line import/no-cycle -- this method is needed to map txn flags
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
@@ -43,6 +50,60 @@ export function parseAccountRootFlags(
     if (
       typeof flag === 'string' &&
       isFlagEnabled(flags, AccountRootFlags[flag])
+    ) {
+      flagsInterface[flag] = true
+    }
+  })
+
+  return flagsInterface
+}
+
+/**
+ * Convert the `Flags` field of an `MPTokenIssuance` ledger object into a typed
+ * boolean view of the `lsfMPT*` flags.
+ *
+ * @param flags - The numeric value of `MPTokenIssuance.Flags`.
+ * @returns An interface with each set `lsfMPT*` flag as `true`.
+ */
+export function parseMPTokenIssuanceFlags(
+  flags: number,
+): MPTokenIssuanceFlagsInterface {
+  const flagsInterface: MPTokenIssuanceFlagsInterface = {}
+
+  Object.values(MPTokenIssuanceFlags).forEach((flag) => {
+    if (
+      typeof flag === 'string' &&
+      isFlagEnabled(flags, MPTokenIssuanceFlags[flag])
+    ) {
+      flagsInterface[flag] = true
+    }
+  })
+
+  return flagsInterface
+}
+
+/**
+ * Convert the `MutableFlags` field of an `MPTokenIssuance` ledger object into a
+ * typed boolean view of the `lsmfMPT*` mutability flags (XLS-94D).
+ *
+ * @param flags - The numeric value of `MPTokenIssuance.MutableFlags`. This
+ * field is absent on issuances created without mutable flags and on
+ * pre-amendment objects, in which case an empty interface is returned.
+ * @returns An interface with each set `lsmfMPT*` flag as `true`.
+ */
+export function parseMPTokenIssuanceMutableFlags(
+  flags: number | undefined,
+): MPTokenIssuanceMutableFlagsInterface {
+  const flagsInterface: MPTokenIssuanceMutableFlagsInterface = {}
+
+  if (flags == null) {
+    return flagsInterface
+  }
+
+  Object.values(MPTokenIssuanceMutableFlags).forEach((flag) => {
+    if (
+      typeof flag === 'string' &&
+      isFlagEnabled(flags, MPTokenIssuanceMutableFlags[flag])
     ) {
       flagsInterface[flag] = true
     }
