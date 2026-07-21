@@ -135,6 +135,7 @@ describe('Client subscription', function () {
           0xff,
           ...Buffer.from('"}'),
         ]),
+        { binary: false },
       )
     })
   })
