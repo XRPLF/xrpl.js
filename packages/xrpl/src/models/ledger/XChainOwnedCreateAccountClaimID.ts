@@ -61,4 +61,11 @@ export default interface XChainOwnedCreateAccountClaimID
    * object, in case the directory consists of multiple pages.
    */
   OwnerNode: string
+
+  /**
+   * (Optional) The account sponsoring the reserve for this
+   * XChainOwnedCreateAccountClaimID. If present, the sponsor is responsible
+   * for the reserve requirement of this object instead of the owner.
+   */
+  Sponsor?: string
 }
