@@ -46,8 +46,13 @@ class BinaryParser {
    * @param n the number of bytes to skip
    */
   skip(n: number): void {
+    if (n < 0) {
+      throw new Error(`skip: negative length ${n}`)
+    }
     if (n > this.bytes.byteLength) {
-      throw new Error()
+      throw new Error(
+        `skip: requested ${n} bytes but only ${this.bytes.byteLength} available`,
+      )
     }
     this.bytes = this.bytes.slice(n)
   }
@@ -59,8 +64,13 @@ class BinaryParser {
    * @return The bytes
    */
   read(n: number): Uint8Array {
+    if (n < 0) {
+      throw new Error(`read: negative length ${n}`)
+    }
     if (n > this.bytes.byteLength) {
-      throw new Error()
+      throw new Error(
+        `read: requested ${n} bytes but only ${this.bytes.byteLength} available`,
+      )
     }
 
     const slice = this.bytes.slice(0, n)

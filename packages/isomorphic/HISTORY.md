@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 1.0.2 (2026-06-04)
+* bump @noble/hashes from 1.8.0 to 2.0.1
+
 ## 1.0.1 (2024-06-03)
 
 ### Fixed

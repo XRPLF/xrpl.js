@@ -1,12 +1,13 @@
 import { assert } from 'chai'
 
-import { LedgerEntryRequest, LedgerEntryResponse } from '../../../src'
+import type { LedgerEntryRequest } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
+import { generateFundedWallet } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -38,7 +39,7 @@ describe('ledger_entry', function () {
       const ledgerEntryResponse =
         await testContext.client.request(ledgerEntryRequest)
 
-      const expectedResponse: LedgerEntryResponse = {
+      const expectedResponse = {
         api_version: 2,
         id: ledgerEntryResponse.id,
         type: 'response',
@@ -52,6 +53,59 @@ describe('ledger_entry', function () {
 
       assert.equal(ledgerEntryResponse.type, 'response')
       assert.deepEqual(ledgerEntryResponse, expectedResponse)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'binary = (default)',
+    async () => {
+      const wallet = await generateFundedWallet(testContext.client)
+
+      const ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        account_root: wallet.address,
+      })
+
+      assert.isDefined(ledgerEntryResponse.result.node)
+      // @ts-expect-error - node_binary is not present in the response
+      assert.isUndefined(ledgerEntryResponse.result.node_binary)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'binary = false',
+    async () => {
+      const wallet = await generateFundedWallet(testContext.client)
+
+      const ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        account_root: wallet.address,
+        binary: false,
+      })
+
+      assert.isDefined(ledgerEntryResponse.result.node)
+      // @ts-expect-error - node_binary is not present in the response
+      assert.isUndefined(ledgerEntryResponse.result.node_binary)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'binary = true',
+    async () => {
+      const wallet = await generateFundedWallet(testContext.client)
+
+      const ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        account_root: wallet.address,
+        binary: true,
+      })
+
+      // @ts-expect-error - node is not present in the response
+      assert.isUndefined(ledgerEntryResponse.result.node)
+      assert.isDefined(ledgerEntryResponse.result.node_binary)
     },
     TIMEOUT,
   )

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 5.0.1 (2026-06-04)
+
+### Fixed
+* Fix: Prevent early-returns in `arrayEqual` method. Out of an abundance of caution, prevent any potential side-channel timing attacks for applications that use `decodeSeed` method.
+
 ## 5.0.0 (2024-02-01)
 
 ### BREAKING CHANGES

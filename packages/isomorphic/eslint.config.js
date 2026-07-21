@@ -74,6 +74,8 @@ module.exports = [
       'multiline-comment-style': 'off',
       '@typescript-eslint/no-require-imports': 'off',
       'n/no-unsupported-features/node-builtins': 'off',
+      // Allow .js extensions for @noble packages (required by @noble/hashes 2.0+)
+      'import/extensions': 'off',
     },
   },
   {
