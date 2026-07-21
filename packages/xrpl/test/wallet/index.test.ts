@@ -112,11 +112,21 @@ describe('Wallet', function () {
   })
 
   describe('fromSeed', function () {
-    it('derives a wallet using default algorithm', function () {
+    it('infers secp256k1 from a non-sEd seed prefix when algorithm is omitted', function () {
       const wallet = Wallet.fromSeed(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
+    })
+
+    it('infers ed25519 from an sEd seed prefix when algorithm is omitted', function () {
+      const edSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const inferred = Wallet.fromSeed(edSeed)
+      const explicit = Wallet.fromSeed(edSeed, { algorithm: ECDSA.ed25519 })
+
+      assert.equal(inferred.publicKey, explicit.publicKey)
+      assert.equal(inferred.privateKey, explicit.privateKey)
+      assert.isTrue(inferred.publicKey.startsWith('ED'))
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -218,11 +228,21 @@ describe('Wallet', function () {
   })
 
   describe('fromSecret', function () {
-    it('derives a wallet using default algorithm', function () {
+    it('infers secp256k1 from a non-sEd seed prefix when algorithm is omitted', function () {
       const wallet = Wallet.fromSecret(knownSecret)
 
-      assert.equal(wallet.publicKey, publicKeyED25519)
-      assert.equal(wallet.privateKey, privateKeyED25519)
+      assert.equal(wallet.publicKey, publicKeySecp256k1)
+      assert.equal(wallet.privateKey, privateKeySecp256k1)
+    })
+
+    it('infers ed25519 from an sEd seed prefix when algorithm is omitted', function () {
+      const edSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const inferred = Wallet.fromSecret(edSeed)
+      const explicit = Wallet.fromSecret(edSeed, { algorithm: ECDSA.ed25519 })
+
+      assert.equal(inferred.publicKey, explicit.publicKey)
+      assert.equal(inferred.privateKey, explicit.privateKey)
+      assert.isTrue(inferred.publicKey.startsWith('ED'))
     })
 
     it('derives a wallet using algorithm ecdsa-secp256k1', function () {
@@ -304,6 +324,26 @@ describe('Wallet', function () {
         masterAddress,
         mnemonicEncoding: 'rfc1751',
         algorithm: ECDSA.secp256k1,
+      })
+
+      assert.equal(wallet.publicKey, regularKeyPair.publicKey)
+      assert.equal(wallet.privateKey, regularKeyPair.privateKey)
+      assert.equal(wallet.classicAddress, masterAddress)
+    })
+
+    it('derive a wallet using the default signing algorithm (ed25519) with RFC1751 mnemonic', function () {
+      const masterAddress = 'rUAi7pipxGpYfPNg3LtPcf2ApiS8aw9A93'
+      const regularKeyPair = {
+        mnemonic: 'I IRE BOND BOW TRIO LAID SEAT GOAL HEN IBIS IBIS DARE',
+        publicKey:
+          'EDAAC3F98BB94F451804EF5993C847DAAA4E6154F455635659D88AA5C80F156303',
+        privateKey:
+          'ED93D09224D09221B8845E7A9772E0D6259CD01029C557CD95978CC674E0192B25',
+      }
+
+      const wallet = Wallet.fromMnemonic(regularKeyPair.mnemonic, {
+        masterAddress,
+        mnemonicEncoding: 'rfc1751',
       })
 
       assert.equal(wallet.publicKey, regularKeyPair.publicKey)

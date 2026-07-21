@@ -268,26 +268,30 @@ it('empty payload should throw', () => {
 })
 
 it('decode data', () => {
-  expect(
-    codec.decode('rnaC7gW34M77Kneb78s', {
-      versions: [0],
-    }),
-  ).toEqual({
+  const result = codec.decode('rnaC7gW34M77Kneb78s', {
+    versions: [0],
+  })
+  expect({
+    ...result,
+    bytes: Array.from(result.bytes),
+  }).toEqual({
     version: [0],
-    bytes: stringToBytes('123456789'),
+    bytes: Array.from(stringToBytes('123456789')),
     type: null,
   })
 })
 
 it('decode data with expected length', function () {
-  expect(
-    codec.decode('rnaC7gW34M77Kneb78s', {
-      versions: [0],
-      expectedLength: 9,
-    }),
-  ).toEqual({
+  const result = codec.decode('rnaC7gW34M77Kneb78s', {
+    versions: [0],
+    expectedLength: 9,
+  })
+  expect({
+    ...result,
+    bytes: Array.from(result.bytes),
+  }).toEqual({
     version: [0],
-    bytes: stringToBytes('123456789'),
+    bytes: Array.from(stringToBytes('123456789')),
     type: null,
   })
 })

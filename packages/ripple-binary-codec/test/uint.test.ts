@@ -163,7 +163,7 @@ it('compareToTest[7]', () => {
 })
 
 it('UInt64 from string zero', () => {
-  expect(UInt64.from('0')).toEqual(UInt64.from(0))
+  expect(UInt64.from('0').toJSON()).toEqual(UInt64.from(0).toJSON())
   expect(encode(json)).toEqual(binary)
 })
 

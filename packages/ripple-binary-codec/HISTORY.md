@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Changed
+* Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)). Tracks an unmerged rippled PR; the wire format may still change.
+
+## 2.8.0 (2026-06-04)
+
+### Fixed
+* Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
+* Fix: Validate the input of non-numeric values for `Amount` field.
+* Fix: Add validation checks for negative inputs to `read`, `peek` and `skip` methods in the binary-codec.
+* Fix: `Amount.toJSON()` no longer mutates the internal buffer for native XRP amounts; subsequent calls and re-serializations now return consistent values (#3319).
+
 ## 2.7.0 (2026-02-12)
 
 ### Added
