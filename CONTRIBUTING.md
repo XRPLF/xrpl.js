@@ -82,6 +82,10 @@ Breaking down the command:
 * `rippleci/xrpld:develop` is the image, regularly rebuilt from the `develop` branch of `rippled`. Omitting the tag resolves to `:latest`.
 * `--standalone` is passed to the image's entrypoint (`xrpld`) to start the node in standalone mode.
 
+Maintainers can run integration and browser tests against a private xrpld image from the **Node.js CI** workflow in GitHub Actions. Enable `use_private_xrpld_image` and enter `xrpld_image_version` without the `private-` prefix (for example, `3.3.0-rc2`). The workflow pulls `registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private:private-<version>`.
+
+Private image access requires the repository secrets `GITLAB_REGISTRY_USERNAME` and `GITLAB_REGISTRY_TOKEN`, configured with a GitLab deploy token that has `read_registry` access. Credentials are not accepted as workflow inputs.
+
 Note to Contributors: When you're done, stop and remove the container with `docker stop xrpld-service && docker rm xrpld-service`.
 
 ### Faucet Tests

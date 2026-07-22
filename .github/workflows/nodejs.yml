@@ -4,7 +4,6 @@
 name: Node.js CI
 
 env:
-  XRPLD_DOCKER_IMAGE: rippleci/xrpld:develop
   GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
@@ -15,6 +14,16 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+    inputs:
+      use_private_xrpld_image:
+        description: "Use a private xrpld image from the Ripple GitLab registry"
+        required: false
+        type: boolean
+        default: false
+      xrpld_image_version:
+        description: "Private xrpld version without the private- prefix (for example, 3.3.0-rc2)"
+        required: false
+        type: string
   workflow_call:
     inputs:
       git_ref:
@@ -36,8 +45,70 @@ on:
         required: false
         type: boolean
         default: true
+      use_private_xrpld_image:
+        description: "Use a private xrpld image from the Ripple GitLab registry"
+        required: false
+        type: boolean
+        default: false
+      xrpld_image_version:
+        description: "Private xrpld version without the private- prefix (for example, 3.3.0-rc2)"
+        required: false
+        type: string
+    secrets:
+      GITLAB_REGISTRY_USERNAME:
+        description: "GitLab deploy-token username with read_registry access"
+        required: false
+      GITLAB_REGISTRY_TOKEN:
+        description: "GitLab deploy token with read_registry access"
+        required: false
 
 jobs:
+  resolve_xrpld_image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      image: ${{ steps.resolve.outputs.image }}
+      is_private: ${{ steps.resolve.outputs.is_private }}
+
+    steps:
+      - name: Resolve xrpld image
+        id: resolve
+        env:
+          USE_PRIVATE_XRPLD_IMAGE: ${{ inputs.use_private_xrpld_image }}
+          XRPLD_IMAGE_VERSION: ${{ inputs.xrpld_image_version }}
+          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [[ "${USE_PRIVATE_XRPLD_IMAGE}" == "true" ]]; then
+            if ! [[ "${XRPLD_IMAGE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(b|rc)[0-9]+)?$ ]]; then
+              echo "xrpld_image_version must use X.Y.Z, X.Y.Z-bN, or X.Y.Z-rcN format." >&2
+              exit 1
+            fi
+
+            if [[ -z "${GITLAB_REGISTRY_USERNAME}" || -z "${GITLAB_REGISTRY_TOKEN}" ]]; then
+              echo "GITLAB_REGISTRY_USERNAME and GITLAB_REGISTRY_TOKEN secrets are required for private xrpld images." >&2
+              exit 1
+            fi
+
+            XRPLD_DOCKER_IMAGE="registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private:private-${XRPLD_IMAGE_VERSION}"
+            IS_PRIVATE="true"
+          else
+            if [[ -n "${XRPLD_IMAGE_VERSION}" ]]; then
+              echo "xrpld_image_version must be empty unless use_private_xrpld_image is enabled." >&2
+              exit 1
+            fi
+
+            XRPLD_DOCKER_IMAGE="rippleci/xrpld:develop"
+            IS_PRIVATE="false"
+          fi
+
+          {
+            echo "image=${XRPLD_DOCKER_IMAGE}"
+            echo "is_private=${IS_PRIVATE}"
+          } >> "${GITHUB_OUTPUT}"
+
   build-and-lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -126,8 +197,11 @@ jobs:
 
   integration:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_integration_tests != false }}
+    needs: resolve_xrpld_image
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      XRPLD_DOCKER_IMAGE: ${{ needs.resolve_xrpld_image.outputs.image }}
 
     strategy:
       matrix:
@@ -139,6 +213,16 @@ jobs:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
 
+      - name: Log in to the private GitLab registry
+        if: ${{ needs.resolve_xrpld_image.outputs.is_private == 'true' }}
+        env:
+          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+        run: |
+          printf '%s' "${GITLAB_REGISTRY_TOKEN}" | docker login registry.gitlab.com \
+            --username "${GITLAB_REGISTRY_USERNAME}" \
+            --password-stdin
+
       - name: Run docker in background
         run: |
           docker run \
@@ -146,7 +230,7 @@ jobs:
             --publish 6006:6006 \
             --volume "${{ github.workspace }}/.ci-config/":"/etc/xrpld/" \
             --name xrpld-service \
-            ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
+            "${XRPLD_DOCKER_IMAGE}" --standalone
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -186,8 +270,11 @@ jobs:
 
   browser:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_browser_tests != false }}
+    needs: resolve_xrpld_image
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      XRPLD_DOCKER_IMAGE: ${{ needs.resolve_xrpld_image.outputs.image }}
 
     strategy:
       matrix:
@@ -204,6 +291,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Log in to the private GitLab registry
+        if: ${{ needs.resolve_xrpld_image.outputs.is_private == 'true' }}
+        env:
+          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
+        run: |
+          printf '%s' "${GITLAB_REGISTRY_TOKEN}" | docker login registry.gitlab.com \
+            --username "${GITLAB_REGISTRY_USERNAME}" \
+            --password-stdin
+
       - name: Run docker in background
         run: |
           docker run \
@@ -211,7 +308,7 @@ jobs:
             --publish 6006:6006 \
             --volume "${{ github.workspace }}/.ci-config/":"/etc/xrpld/" \
             --name xrpld-service \
-            ${{ env.XRPLD_DOCKER_IMAGE }} --standalone
+            "${XRPLD_DOCKER_IMAGE}" --standalone
 
       - name: Setup npm version 10
         run: |
