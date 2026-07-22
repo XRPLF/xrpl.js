@@ -2,6 +2,7 @@ import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
 import {
+  deriveConfidentialKeypair,
   prepareConfidentialClawback,
   prepareConfidentialConvertBack,
   prepareConfidentialMergeInbox,
@@ -11,7 +12,6 @@ import {
 import {
   auditorReads,
   createConfidentialIssuance,
-  generateElGamalKeypair,
   getSpendable,
   holderWithBalance,
   registerHolderKey,
@@ -42,8 +42,8 @@ describe('Confidential MPT 4-party lifecycle', function () {
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = generateElGamalKeypair()
-    auditorKey = generateElGamalKeypair()
+    issuerKey = deriveConfidentialKeypair()
+    auditorKey = deriveConfidentialKeypair()
     mptID = await createConfidentialIssuance(
       testContext.client,
       issuer,

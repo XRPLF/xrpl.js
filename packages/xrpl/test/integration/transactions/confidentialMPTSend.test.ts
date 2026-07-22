@@ -4,6 +4,7 @@ import { assert } from 'chai'
 
 import { AccountSetAsfFlags, type Payment, Wallet } from '../../../src'
 import {
+  deriveConfidentialKeypair,
   fetchMPToken,
   prepareConfidentialConvert,
   prepareConfidentialMergeInbox,
@@ -13,7 +14,6 @@ import {
 import {
   authorizeHolder,
   createConfidentialIssuance,
-  generateElGamalKeypair,
   getSpendable,
   holderWithBalance,
   lockHolder,
@@ -38,7 +38,7 @@ describe('ConfidentialMPTSend', function () {
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = generateElGamalKeypair()
+    issuerKey = deriveConfidentialKeypair()
     mptID = await createConfidentialIssuance(
       testContext.client,
       issuer,

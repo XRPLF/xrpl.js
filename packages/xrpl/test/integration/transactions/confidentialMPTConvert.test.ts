@@ -3,6 +3,7 @@ import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
 import {
+  deriveConfidentialKeypair,
   fetchMPToken,
   prepareConfidentialConvert,
   type ConfidentialKeypair,
@@ -10,7 +11,6 @@ import {
 import { Payment } from '../../../src/models/transactions'
 import {
   createConfidentialIssuance,
-  generateElGamalKeypair,
   getSpendable,
   setupConfidentialClient,
   setupHolder,
@@ -37,7 +37,7 @@ describe('ConfidentialMPTConvert', function () {
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = generateElGamalKeypair()
+    issuerKey = deriveConfidentialKeypair()
     mptID = await createConfidentialIssuance(
       testContext.client,
       issuer,

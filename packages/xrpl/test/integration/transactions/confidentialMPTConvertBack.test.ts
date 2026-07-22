@@ -2,12 +2,12 @@ import { assert } from 'chai'
 
 import { Wallet } from '../../../src'
 import {
+  deriveConfidentialKeypair,
   prepareConfidentialConvertBack,
   type ConfidentialKeypair,
 } from '../../../src/confidential'
 import {
   createConfidentialIssuance,
-  generateElGamalKeypair,
   getSpendable,
   holderWithBalance,
   setupConfidentialClient,
@@ -29,7 +29,7 @@ describe('ConfidentialMPTConvertBack', function () {
   beforeAll(async () => {
     testContext = await setupConfidentialClient(serverUrl)
     issuer = await generateFundedWallet(testContext.client)
-    issuerKey = generateElGamalKeypair()
+    issuerKey = deriveConfidentialKeypair()
     mptID = await createConfidentialIssuance(
       testContext.client,
       issuer,

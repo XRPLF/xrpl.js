@@ -13,6 +13,8 @@
 export { loadMptCrypto } from './loader'
 export type { MptCryptoModule } from './loader'
 
+export { deriveConfidentialKeypair } from './keys'
+
 export {
   accountIdHex,
   fetchMPToken,

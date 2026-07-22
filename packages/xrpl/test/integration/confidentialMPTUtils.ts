@@ -1,9 +1,9 @@
 import { decryptAmount } from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
-import { deriveKeypair, generateSeed } from 'ripple-keypairs'
 
 import { Client, Wallet, type TransactionMetadata } from '../../src'
 import {
+  deriveConfidentialKeypair,
   fetchMPToken,
   getConfidentialBalance,
   prepareConfidentialConvert,
@@ -69,22 +69,6 @@ export async function teardownConfidential(
 ): Promise<void> {
   context.client.removeAllListeners()
   await context.client.disconnect()
-}
-
-/**
- * Generate a fresh ElGamal keypair via ripple-keypairs — a dedicated secp256k1
- * seed, separate from any signing wallet. (The WASM no longer exposes keygen;
- * confidential keys are derived from a seed.)
- *
- * @returns A fresh ElGamal keypair (33-byte public key, 32-byte private key).
- */
-export function generateElGamalKeypair(): ConfidentialKeypair {
-  const { publicKey, privateKey } = deriveKeypair(
-    generateSeed({ algorithm: 'ecdsa-secp256k1' }),
-  )
-  // ripple-keypairs prefixes secp256k1 private keys with `00`; mpt-crypto wants
-  // the bare 32-byte scalar.
-  return { publicKey, privateKey: privateKey.slice(2) }
 }
 
 /**
@@ -160,7 +144,7 @@ export async function setupHolder(
   mptID: string,
 ): Promise<Holder> {
   const wallet = await generateFundedWallet(client)
-  const key = generateElGamalKeypair()
+  const key = deriveConfidentialKeypair()
   await testTransaction(
     client,
     {
