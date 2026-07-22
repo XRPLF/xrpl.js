@@ -14,16 +14,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
-    inputs:
-      use_private_xrpld_image:
-        description: "Use a private xrpld image from the Ripple GitLab registry"
-        required: false
-        type: boolean
-        default: false
-      xrpld_image_version:
-        description: "Private xrpld version without the private- prefix (for example, 3.3.0-rc2)"
-        required: false
-        type: string
   workflow_call:
     inputs:
       git_ref:
@@ -45,15 +35,6 @@ on:
         required: false
         type: boolean
         default: true
-      use_private_xrpld_image:
-        description: "Use a private xrpld image from the Ripple GitLab registry"
-        required: false
-        type: boolean
-        default: false
-      xrpld_image_version:
-        description: "Private xrpld version without the private- prefix (for example, 3.3.0-rc2)"
-        required: false
-        type: string
     secrets:
       GITLAB_REGISTRY_TOKEN:
         description: "GitLab deploy token with read_registry access"
@@ -63,48 +44,60 @@ jobs:
   resolve_xrpld_image:
     runs-on: ubuntu-latest
     timeout-minutes: 2
-    permissions: {}
+    permissions:
+      contents: read
     outputs:
       image: ${{ steps.resolve.outputs.image }}
       is_private: ${{ steps.resolve.outputs.is_private }}
 
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_REF }}
+
       - name: Resolve xrpld image
         id: resolve
         env:
-          USE_PRIVATE_XRPLD_IMAGE: ${{ inputs.use_private_xrpld_image }}
-          XRPLD_IMAGE_VERSION: ${{ inputs.xrpld_image_version }}
+          IMAGE_CONFIG_FILE: .github/xrpld-image.env
+          DEFAULT_IMAGE: rippleci/xrpld:develop
+          PRIVATE_IMAGE_REPO: registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private
           GITLAB_REGISTRY_USERNAME: ${{ vars.GITLAB_REGISTRY_USERNAME }}
           GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
 
-          if [[ "${USE_PRIVATE_XRPLD_IMAGE}" == "true" ]]; then
-            if ! [[ "${XRPLD_IMAGE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(b|rc)[0-9]+)?$ ]]; then
-              echo "xrpld_image_version must use X.Y.Z, X.Y.Z-bN, or X.Y.Z-rcN format." >&2
-              exit 1
-            fi
-
-            if [[ -z "${GITLAB_REGISTRY_USERNAME}" || -z "${GITLAB_REGISTRY_TOKEN}" ]]; then
-              echo "The GITLAB_REGISTRY_USERNAME variable and GITLAB_REGISTRY_TOKEN secret are required for private xrpld images." >&2
-              exit 1
-            fi
-
-            XRPLD_DOCKER_IMAGE="registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private:private-${XRPLD_IMAGE_VERSION}"
-            IS_PRIVATE="true"
-          else
-            if [[ -n "${XRPLD_IMAGE_VERSION}" ]]; then
-              echo "xrpld_image_version must be empty unless use_private_xrpld_image is enabled." >&2
-              exit 1
-            fi
-
-            XRPLD_DOCKER_IMAGE="rippleci/xrpld:develop"
-            IS_PRIVATE="false"
+          # Read the requested private version from the committed config file.
+          # The file is never sourced: on fork pull requests its contents are
+          # untrusted, so we only extract the value and validate it strictly.
+          PRIVATE_VERSION=""
+          if [[ -f "${IMAGE_CONFIG_FILE}" ]]; then
+            RAW_LINE="$(grep -E '^[[:space:]]*XRPLD_PRIVATE_VERSION[[:space:]]*=' "${IMAGE_CONFIG_FILE}" | tail -n1 || true)"
+            PRIVATE_VERSION="$(printf '%s' "${RAW_LINE#*=}" | tr -d "[:space:]\"'")"
           fi
 
+          if [[ -z "${PRIVATE_VERSION}" ]]; then
+            echo "No private xrpld version configured in ${IMAGE_CONFIG_FILE}; using default image ${DEFAULT_IMAGE}."
+            {
+              echo "image=${DEFAULT_IMAGE}"
+              echo "is_private=false"
+            } >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if ! [[ "${PRIVATE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-(b|rc)[0-9]+)?$ ]]; then
+            echo "XRPLD_PRIVATE_VERSION in ${IMAGE_CONFIG_FILE} must use X.Y.Z, X.Y.Z-bN, or X.Y.Z-rcN format (got '${PRIVATE_VERSION}')." >&2
+            exit 1
+          fi
+
+          if [[ -z "${GITLAB_REGISTRY_USERNAME}" || -z "${GITLAB_REGISTRY_TOKEN}" ]]; then
+            echo "A private xrpld version (${PRIVATE_VERSION}) is configured but the GITLAB_REGISTRY_USERNAME variable and GITLAB_REGISTRY_TOKEN secret are unavailable. These are not exposed to fork pull requests; run the private build from a branch in this repository, or clear XRPLD_PRIVATE_VERSION to use the default image." >&2
+            exit 1
+          fi
+
+          echo "Using private xrpld image for version ${PRIVATE_VERSION}."
           {
-            echo "image=${XRPLD_DOCKER_IMAGE}"
-            echo "is_private=${IS_PRIVATE}"
+            echo "image=${PRIVATE_IMAGE_REPO}:private-${PRIVATE_VERSION}"
+            echo "is_private=true"
           } >> "${GITHUB_OUTPUT}"
 
   build-and-lint:
