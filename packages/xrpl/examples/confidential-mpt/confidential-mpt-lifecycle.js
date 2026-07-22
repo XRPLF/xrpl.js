@@ -1,14 +1,28 @@
 /**
- * Confidential MPT (XLS-0096) end-to-end lifecycle against Devnet.
+ * Confidential MPT (XLS-0096) — end-to-end lifecycle on the XRPL Devnet.
  *
- * Exercises all five confidential transactions — Convert, MergeInbox, Send,
- * ConvertBack, Clawback — plus issuer/auditor key registration and auditor
- * selective disclosure, printing the decrypted balances at each step.
+ * A runnable walkthrough of the whole confidential MPT flow. It funds an issuer
+ * and two holders from the faucet, creates a confidential-capable issuance, then
+ * exercises all five confidential transactions in order — Convert, MergeInbox,
+ * Send, ConvertBack, Clawback — registering the issuer/auditor/holder encryption
+ * keys along the way and printing each decrypted balance so you can watch the
+ * values move. It ends with auditor selective disclosure: the auditor decrypts a
+ * holder's balance using only its own key.
  *
- * Run from packages/xrpl, after building the branch once (`npm run build` so
- * the confidential subpath is compiled into dist):
- *   node examples/confidential-mpt/devnet-lifecycle.js
- *   CONFIDENTIAL_MPT_SERVER=ws://localhost:6006 node examples/confidential-mpt/devnet-lifecycle.js
+ * The confidential subpath (`xrpl/confidential`) and its `@xrplf/mpt-crypto` WASM
+ * ship in this branch but are not on public npm yet, so run it from a checkout of
+ * the branch, built once:
+ *
+ *   git checkout confidential-mpts && npm install && npm run build
+ *   cd packages/xrpl
+ *   node examples/confidential-mpt/confidential-mpt-lifecycle.js
+ *
+ * It targets Devnet by default (which runs the ConfidentialTransfer amendment).
+ * Point it at any other confidential-capable server with an env var:
+ *
+ *   # optional
+ *   CONFIDENTIAL_MPT_SERVER=ws://localhost:6006 \
+ *     node examples/confidential-mpt/confidential-mpt-lifecycle.js
  */
 const { decryptAmount } = require('@xrplf/mpt-crypto')
 const { Client } = require('xrpl')
