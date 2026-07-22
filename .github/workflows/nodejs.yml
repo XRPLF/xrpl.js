@@ -55,9 +55,6 @@ on:
         required: false
         type: string
     secrets:
-      GITLAB_REGISTRY_USERNAME:
-        description: "GitLab deploy-token username with read_registry access"
-        required: false
       GITLAB_REGISTRY_TOKEN:
         description: "GitLab deploy token with read_registry access"
         required: false
@@ -76,7 +73,7 @@ jobs:
         env:
           USE_PRIVATE_XRPLD_IMAGE: ${{ inputs.use_private_xrpld_image }}
           XRPLD_IMAGE_VERSION: ${{ inputs.xrpld_image_version }}
-          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_USERNAME: ${{ vars.GITLAB_REGISTRY_USERNAME }}
           GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
         run: |
           set -euo pipefail
@@ -88,7 +85,7 @@ jobs:
             fi
 
             if [[ -z "${GITLAB_REGISTRY_USERNAME}" || -z "${GITLAB_REGISTRY_TOKEN}" ]]; then
-              echo "GITLAB_REGISTRY_USERNAME and GITLAB_REGISTRY_TOKEN secrets are required for private xrpld images." >&2
+              echo "The GITLAB_REGISTRY_USERNAME variable and GITLAB_REGISTRY_TOKEN secret are required for private xrpld images." >&2
               exit 1
             fi
 
@@ -216,7 +213,7 @@ jobs:
       - name: Log in to the private GitLab registry
         if: ${{ needs.resolve_xrpld_image.outputs.is_private == 'true' }}
         env:
-          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_USERNAME: ${{ vars.GITLAB_REGISTRY_USERNAME }}
           GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
         run: |
           printf '%s' "${GITLAB_REGISTRY_TOKEN}" | docker login registry.gitlab.com \
@@ -294,7 +291,7 @@ jobs:
       - name: Log in to the private GitLab registry
         if: ${{ needs.resolve_xrpld_image.outputs.is_private == 'true' }}
         env:
-          GITLAB_REGISTRY_USERNAME: ${{ secrets.GITLAB_REGISTRY_USERNAME }}
+          GITLAB_REGISTRY_USERNAME: ${{ vars.GITLAB_REGISTRY_USERNAME }}
           GITLAB_REGISTRY_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
         run: |
           printf '%s' "${GITLAB_REGISTRY_TOKEN}" | docker login registry.gitlab.com \
