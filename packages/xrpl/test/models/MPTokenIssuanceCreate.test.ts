@@ -2,8 +2,8 @@ import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
 import {
-  MPTokenIssuanceCreateMutableFlags,
-  tmfMPTokenIssuanceCreateMutableMask,
+  MPTokenIssuanceCreateImmutableFlags,
+  tifMPTokenIssuanceImmutableMask,
   validateMPTokenIssuanceCreate,
 } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
@@ -32,8 +32,7 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MutableFlags:
-        MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
+      ImmutableFlags: MPTokenIssuanceCreateImmutableFlags.tifMPTTransferFee,
       MPTokenMetadata: stringToHex(`{
         "ticker": "TBILL",
         "name": "T-Bill Yield Token",
@@ -148,25 +147,31 @@ describe('MPTokenIssuanceCreate', function () {
     )
   })
 
-  it(`throws w/ invalid MutableFlags value`, async () => {
+  it(`throws w/ invalid ImmutableFlags value`, async () => {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MutableFlags: tmfMPTokenIssuanceCreateMutableMask,
+      ImmutableFlags: tifMPTokenIssuanceImmutableMask,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
+    )
   })
 
-  it(`throws w/ MutableFlags explicitly set to 0`, async () => {
-    // rippled rejects a present-but-zero MutableFlags with temINVALID_FLAG.
+  it(`throws w/ ImmutableFlags explicitly set to 0`, async () => {
+    // rippled rejects a present-but-zero ImmutableFlags with temINVALID_FLAG.
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MutableFlags: 0,
+      ImmutableFlags: 0,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
+    )
   })
 
   it(`throws with Zero MaximumAmount`, function () {
