@@ -63,6 +63,7 @@ jobs:
   resolve_xrpld_image:
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    permissions: {}
     outputs:
       image: ${{ steps.resolve.outputs.image }}
       is_private: ${{ steps.resolve.outputs.is_private }}
