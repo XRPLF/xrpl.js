@@ -13,6 +13,7 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  isHexString,
   isDomainID,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
@@ -248,7 +249,7 @@ export function validateMPTokenIssuanceCreate(
 ): void {
   validateBaseTransaction(tx)
   validateOptionalField(tx, 'MaximumAmount', isString)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
@@ -278,6 +279,12 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
+  if (isHexString(tx.MPTokenMetadata) && tx.MPTokenMetadata === '') {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: MPTokenMetadata must not be empty string',
+    )
+  }
+
   if (
     typeof tx.MPTokenMetadata === 'string' &&
     (!isHex(tx.MPTokenMetadata) ||
@@ -288,7 +295,7 @@ export function validateMPTokenIssuanceCreate(
     )
   }
 
-  if (typeof tx.MaximumAmount === 'string') {
+  if (isString(tx.MaximumAmount)) {
     if (!INTEGER_SANITY_CHECK.exec(tx.MaximumAmount)) {
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
@@ -301,15 +308,12 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  if (typeof tx.TransferFee === 'number') {
+  if (isNumber(tx.TransferFee)) {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-    const flags = (tx.Flags ?? 0) as
-      | number
-      | MPTokenIssuanceCreateFlagsInterface
-    const isTfMPTCanTransfer =
-      typeof flags === 'number'
-        ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
-        : (flags.tfMPTCanTransfer ?? false)
+    const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
+    const isTfMPTCanTransfer = isNumber(flags)
+      ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
+      : flags.tfMPTCanTransfer === true
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(

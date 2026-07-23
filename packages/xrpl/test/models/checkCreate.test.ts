@@ -40,7 +40,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidDestination, 'CheckCreate: invalid field Destination')
+    assertInvalid(
+      invalidDestination,
+      'CheckCreate: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`throws w/ invalid SendMax`, function () {
@@ -56,7 +59,10 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidSendMax, 'CheckCreate: invalid SendMax')
+    assertInvalid(
+      invalidSendMax,
+      'CheckCreate: invalid field SendMax, expected a valid Amount',
+    )
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
@@ -68,13 +74,13 @@ describe('CheckCreate', function () {
       Expiration: 570113521,
       InvoiceID:
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
-      DestinationTag: '1',
+      DestinationTag: 'abcd',
       Fee: '12',
     } as any
 
     assertInvalid(
       invalidDestinationTag,
-      'CheckCreate: invalid field DestinationTag',
+      'CheckCreate: invalid field DestinationTag, expected a valid number',
     )
   })
 
@@ -84,14 +90,17 @@ describe('CheckCreate', function () {
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
       Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       SendMax: '100000000',
-      Expiration: '570113521',
+      Expiration: 'abcd',
       InvoiceID:
         '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
       DestinationTag: 1,
       Fee: '12',
     } as any
 
-    assertInvalid(invalidExpiration, 'CheckCreate: invalid Expiration')
+    assertInvalid(
+      invalidExpiration,
+      'CheckCreate: invalid field Expiration, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid InvoiceID`, function () {
@@ -106,6 +115,9 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid InvoiceID')
+    assertInvalid(
+      invalidInvoiceID,
+      'CheckCreate: invalid field InvoiceID, expected a valid hex string',
+    )
   })
 })

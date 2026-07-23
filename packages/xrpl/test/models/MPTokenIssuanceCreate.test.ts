@@ -1,15 +1,12 @@
-import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
 import {
+  validateMPTokenIssuanceCreate,
   MPTokenIssuanceCreateMutableFlags,
   tmfMPTokenIssuanceCreateMutableMask,
-  validateMPTokenIssuanceCreate,
 } from '../../src/models/transactions/MPTokenIssuanceCreate'
-import {
-  MAX_MPT_META_BYTE_LENGTH,
-  MPT_META_WARNING_HEADER,
-} from '../../src/models/utils/mptokenMetadata'
+import { MPT_META_WARNING_HEADER } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -57,7 +54,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      `MPTokenIssuanceCreate: MPTokenMetadata must not be empty string`,
     )
   })
 
@@ -71,7 +68,7 @@ describe('MPTokenIssuanceCreate', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
+      'MPTokenIssuanceCreate: invalid field MPTokenMetadata, expected a valid hex string',
     )
   })
 

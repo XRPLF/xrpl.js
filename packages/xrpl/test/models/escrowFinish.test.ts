@@ -48,32 +48,45 @@ describe('EscrowFinish', function () {
   it(`throws w/ invalid Owner`, function () {
     escrow.Owner = 0x15415253
 
-    assertInvalid(escrow, 'EscrowFinish: invalid field Owner')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Owner, expected a valid account address',
+    )
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
     escrow.OfferSequence = 'random'
 
-    assertInvalid(escrow, 'EscrowFinish: OfferSequence must be a number')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field OfferSequence, expected a valid number',
+    )
   })
 
   it(`throws w/ invalid Condition`, function () {
     escrow.Condition = 10
 
-    assertInvalid(escrow, 'EscrowFinish: Condition must be a string')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Condition, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid Fulfillment`, function () {
     escrow.Fulfillment = 0x142341
 
-    assertInvalid(escrow, 'EscrowFinish: Fulfillment must be a string')
+    assertInvalid(
+      escrow,
+      'EscrowFinish: invalid field Fulfillment, expected a valid hex string',
+    )
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
     escrow.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'EscrowFinish: Credentials must be an array'
+    const errorMessage =
+      'EscrowFinish: invalid field CredentialIDs, expected a valid array'
 
     assertInvalid(escrow, errorMessage)
   })
@@ -92,7 +105,7 @@ describe('EscrowFinish', function () {
     ]
 
     const errorMessage =
-      'EscrowFinish: Credentials length cannot exceed 8 elements'
+      'EscrowFinish: CredentialIDs length cannot exceed 8 elements'
 
     assertInvalid(escrow, errorMessage)
   })
@@ -100,7 +113,7 @@ describe('EscrowFinish', function () {
   it(`throws w/ empty CredentialIDs`, function () {
     escrow.CredentialIDs = []
 
-    const errorMessage = 'EscrowFinish: Credentials cannot be an empty array'
+    const errorMessage = 'EscrowFinish: CredentialIDs cannot be an empty array'
 
     assertInvalid(escrow, errorMessage)
   })
@@ -111,7 +124,7 @@ describe('EscrowFinish', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'EscrowFinish: Invalid Credentials ID list format'
+    const errorMessage = 'EscrowFinish: Invalid CredentialIDs list format'
 
     assertInvalid(escrow, errorMessage)
   })
@@ -123,7 +136,7 @@ describe('EscrowFinish', function () {
     ]
 
     const errorMessage =
-      'EscrowFinish: Credentials cannot contain duplicate elements'
+      'EscrowFinish: CredentialIDs cannot contain duplicate elements'
 
     assertInvalid(escrow, errorMessage)
   })

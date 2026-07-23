@@ -6,6 +6,7 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isCurrency,
   isIssuedCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
@@ -97,7 +98,7 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
 
   validateOptionalField(tx, 'Amount', isIssuedCurrencyAmount)
 

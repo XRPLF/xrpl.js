@@ -553,7 +553,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /BaseTransaction: invalid Memos/u)
+      }, /BaseTransaction: invalid field Memos/u)
     })
 
     it('sign throws when MemoData is not a hex value', async function () {
@@ -579,7 +579,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /BaseTransaction: invalid Memos/u)
+      }, /BaseTransaction: invalid field Memos/u)
     })
 
     it('sign throws when MemoFormat is not a hex value', async function () {
@@ -605,7 +605,7 @@ describe('Wallet', function () {
       }
       assert.throws(() => {
         Wallet.fromSeed(secret).sign(lowercaseMemoTx)
-      }, /BaseTransaction: invalid Memos/u)
+      }, /BaseTransaction: invalid field Memos/u)
     })
 
     it('sign with EscrowFinish', async function () {
@@ -762,7 +762,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /1\.2 is an illegal amount/u)
+      }, /AccountSet: invalid field Fee, expected a valid XRP Amount/u)
     })
 
     it('sign throws when encoded tx does not match decoded tx because of illegal higher fee', async function () {
@@ -780,7 +780,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /1123456\.7 is an illegal amount/u)
+      }, /AccountSet: invalid field Fee, expected a valid XRP Amount/u)
     })
 
     it('sign with a ticket transaction', async function () {
@@ -859,6 +859,22 @@ describe('Wallet', function () {
       assert.throws(() => {
         wallet.sign(payment)
       }, /^1.1234567 is an illegal amount/u)
+    })
+
+    it('sign throws when an illegal amount is provided', async function () {
+      const payment: Transaction = {
+        TransactionType: 'Payment',
+        Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '1.0',
+        Flags: 2147483648,
+        Sequence: 23,
+        LastLedgerSequence: 8819954,
+        Fee: '12',
+      }
+      assert.throws(() => {
+        wallet.sign(payment)
+      }, /^1.0 is an illegal amount/u)
     })
 
     const issuedCurrencyPayment: Transaction = {
@@ -1235,7 +1251,7 @@ describe('Wallet', function () {
 
       assert.throws(() => {
         wallet.sign(tx)
-      }, /URI must be in hex format/u)
+      }, /^NFTokenMint: invalid field URI, expected a valid hex string$/u)
     })
   })
 

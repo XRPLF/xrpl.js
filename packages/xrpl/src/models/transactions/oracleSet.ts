@@ -1,11 +1,13 @@
 import { ValidationError } from '../../errors'
 import { PriceData } from '../common'
-import { isHex } from '../utils'
 
 import {
   BaseTransaction,
   isArray,
+  isCurrencyString,
+  isHexString,
   isNumber,
+  isNumberWithBounds,
   isRecord,
   isString,
   validateBaseTransaction,
@@ -81,13 +83,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
-  validateOptionalField(tx, 'Provider', isString)
+  validateOptionalField(tx, 'Provider', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
-  validateOptionalField(tx, 'AssetClass', isString)
+  validateOptionalField(tx, 'AssetClass', isHexString)
 
-  /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
+  /* eslint-disable max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(
     tx,
     'PriceDataSeries',
@@ -103,16 +105,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
       }
 
       // TODO: add support for handling inner objects easier (similar to validateRequiredField/validateOptionalField)
-      for (const priceData of value) {
+      value.forEach((priceData, index) => {
         if (!isRecord(priceData)) {
           throw new ValidationError(
             'OracleSet: PriceDataSeries must be an array of objects',
           )
         }
-
-        const priceDataInner = priceData.PriceData
-
-        if (!isRecord(priceDataInner)) {
+        if (!isRecord(priceData.PriceData)) {
           throw new ValidationError(
             'OracleSet: PriceDataSeries must have a `PriceData` object',
           )
@@ -125,20 +124,17 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
           )
         }
 
-        if (
-          priceDataInner.BaseAsset == null ||
-          typeof priceDataInner.BaseAsset !== 'string'
-        ) {
-          throw new ValidationError(
-            'OracleSet: PriceDataSeries must have a `BaseAsset` string',
-          )
-        }
+        const priceDataInner = priceData.PriceData
 
-        if (typeof priceDataInner.QuoteAsset !== 'string') {
-          throw new ValidationError(
-            'OracleSet: PriceDataSeries must have a `QuoteAsset` string',
-          )
-        }
+        validateRequiredField(priceDataInner, 'BaseAsset', isCurrencyString, {
+          paramName: `PriceDataSeries[${index}].BaseAsset`,
+          txType: 'OracleSet',
+        })
+
+        validateRequiredField(priceDataInner, 'QuoteAsset', isCurrencyString, {
+          paramName: `PriceDataSeries[${index}].QuoteAsset`,
+          txType: 'OracleSet',
+        })
 
         // Either AssetPrice and Scale are both present or both excluded
         if (
@@ -150,20 +146,20 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
           )
         }
 
-        /* eslint-disable max-depth --
-      we need to validate priceDataInner.AssetPrice value */
+        validateOptionalField(
+          priceDataInner,
+          'AssetPrice',
+          // eslint-disable-next-line max-nested-callbacks -- okay here
+          (inp: unknown): inp is number | string =>
+            isNumber(inp) || isHexString(inp),
+          {
+            paramName: `PriceDataSeries[${index}].AssetPrice`,
+            txType: 'OracleSet',
+          },
+        )
+
         if ('AssetPrice' in priceDataInner) {
-          if (!isNumber(priceDataInner.AssetPrice)) {
-            if (typeof priceDataInner.AssetPrice !== 'string') {
-              throw new ValidationError(
-                'OracleSet: Field AssetPrice must be a string or a number',
-              )
-            }
-            if (!isHex(priceDataInner.AssetPrice)) {
-              throw new ValidationError(
-                'OracleSet: Field AssetPrice must be a valid hex string',
-              )
-            }
+          if (isString(priceDataInner.AssetPrice)) {
             if (
               priceDataInner.AssetPrice.length < MINIMUM_ASSET_PRICE_LENGTH ||
               priceDataInner.AssetPrice.length > MAXIMUM_ASSET_PRICE_LENGTH
@@ -175,21 +171,18 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
           }
         }
 
-        if ('Scale' in priceDataInner) {
-          if (!isNumber(priceDataInner.Scale)) {
-            throw new ValidationError('OracleSet: invalid field Scale')
-          }
-
-          if (priceDataInner.Scale < 0 || priceDataInner.Scale > SCALE_MAX) {
-            throw new ValidationError(
-              `OracleSet: Scale must be in range 0-${SCALE_MAX}`,
-            )
-          }
-          /* eslint-enable max-depth */
-        }
-      }
+        validateOptionalField(
+          priceDataInner,
+          'Scale',
+          isNumberWithBounds(0, SCALE_MAX),
+          {
+            paramName: `PriceDataSeries[${index}].Scale`,
+            txType: 'OracleSet',
+          },
+        )
+      })
       return true
     },
   )
-  /* eslint-enable max-statements, max-lines-per-function */
+  /* eslint-enable max-lines-per-function */
 }

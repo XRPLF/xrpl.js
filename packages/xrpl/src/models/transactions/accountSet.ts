@@ -5,6 +5,9 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isHexString,
+  isNumber,
+  isNumberWithBounds,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -174,7 +177,6 @@ const MAX_TICK_SIZE = 15
  * @param tx - An AccountSet Transaction.
  * @throws When the AccountSet is Malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- okay for this method, only a little over
 export function validateAccountSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -182,47 +184,35 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   if (tx.ClearFlag !== undefined) {
     if (typeof tx.ClearFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError(
+        'AccountSet: invalid field ClearFlag, expected a valid number',
+      )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError('AccountSet: invalid ClearFlag value')
     }
   }
 
-  if (tx.Domain !== undefined && typeof tx.Domain !== 'string') {
-    throw new ValidationError('AccountSet: invalid Domain')
-  }
-
-  if (tx.EmailHash !== undefined && typeof tx.EmailHash !== 'string') {
-    throw new ValidationError('AccountSet: invalid EmailHash')
-  }
-
-  if (tx.MessageKey !== undefined && typeof tx.MessageKey !== 'string') {
-    throw new ValidationError('AccountSet: invalid MessageKey')
-  }
+  validateOptionalField(tx, 'Domain', isHexString)
+  validateOptionalField(tx, 'EmailHash', isHexString)
+  validateOptionalField(tx, 'MessageKey', isHexString)
 
   if (tx.SetFlag !== undefined) {
     if (typeof tx.SetFlag !== 'number') {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError(
+        'AccountSet: invalid field SetFlag, expected a valid number',
+      )
     }
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError('AccountSet: invalid SetFlag value')
     }
   }
 
-  if (tx.TransferRate !== undefined && typeof tx.TransferRate !== 'number') {
-    throw new ValidationError('AccountSet: invalid TransferRate')
-  }
+  validateOptionalField(tx, 'TransferRate', isNumber)
 
-  if (tx.TickSize !== undefined) {
-    if (typeof tx.TickSize !== 'number') {
-      throw new ValidationError('AccountSet: invalid TickSize')
-    }
-    if (
-      tx.TickSize !== 0 &&
-      (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
-    ) {
-      throw new ValidationError('AccountSet: invalid TickSize')
-    }
-  }
+  validateOptionalField(
+    tx,
+    'TickSize',
+    isNumberWithBounds(MIN_TICK_SIZE, MAX_TICK_SIZE),
+  )
 }

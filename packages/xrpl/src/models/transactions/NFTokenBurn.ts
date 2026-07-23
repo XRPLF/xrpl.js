@@ -2,7 +2,7 @@ import {
   Account,
   BaseTransaction,
   isAccount,
-  isString,
+  isHexString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -47,6 +47,6 @@ export interface NFTokenBurn extends BaseTransaction {
  */
 export function validateNFTokenBurn(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateOptionalField(tx, 'Owner', isAccount)
 }

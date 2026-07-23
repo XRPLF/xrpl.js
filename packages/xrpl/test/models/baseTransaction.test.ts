@@ -5,8 +5,14 @@ import { validateBaseTransaction } from '../../src/models/transactions/common'
 
 const assertValid = (tx: any): void =>
   assert.doesNotThrow(() => validateBaseTransaction(tx))
-const assertInvalid = (tx: any, message: string): void =>
-  assert.throws(() => validateBaseTransaction(tx), ValidationError, message)
+const assertInvalid = (tx: any, message: string): void => {
+  assert.throws(
+    () => validateBaseTransaction(tx),
+    ValidationError,
+    // eslint-disable-next-line require-unicode-regexp -- TS complains if it's included
+    new RegExp(`^${message.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'u'),
+  )
+}
 
 /**
  * Transaction Verification Testing.
@@ -60,7 +66,15 @@ describe('BaseTransaction', function () {
       TxnSignature:
         '3045022100C6708538AE5A697895937C758E99A595B57A16393F370F11B8D4C032E80B532002207776A8E85BB9FAF460A92113B9C60F170CD964196B1F084E0DAB65BAEC368B66',
     }
+    assertValid(txJson)
+  })
 
+  it('Verifies flag map', function () {
+    const txJson = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: { tfNoRippleDirect: true },
+    }
     assertValid(txJson)
   })
 
@@ -80,17 +94,23 @@ describe('BaseTransaction', function () {
       Fee: 1000,
     } as any
 
-    assertInvalid(invalidFee, 'Payment: invalid field Fee')
+    assertInvalid(
+      invalidFee,
+      'Payment: invalid field Fee, expected a valid XRP Amount',
+    )
   })
 
   it(`Handles invalid Sequence`, function () {
     const invalidSeq = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      Sequence: '145',
+      Sequence: 'abcd',
     } as any
 
-    assertInvalid(invalidSeq, 'Payment: invalid field Sequence')
+    assertInvalid(
+      invalidSeq,
+      'Payment: invalid field Sequence, expected a valid number',
+    )
   })
 
   it(`Handles invalid AccountTxnID`, function () {
@@ -100,19 +120,22 @@ describe('BaseTransaction', function () {
       AccountTxnID: ['WRONG'],
     } as any
 
-    assertInvalid(invalidID, 'Payment: invalid field AccountTxnID')
+    assertInvalid(
+      invalidID,
+      'Payment: invalid field AccountTxnID, expected a valid hex string',
+    )
   })
 
   it(`Handles invalid LastLedgerSequence`, function () {
     const invalidLastLedgerSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      LastLedgerSequence: '1000',
+      LastLedgerSequence: 'abcd',
     } as any
 
     assertInvalid(
       invalidLastLedgerSequence,
-      'Payment: invalid field LastLedgerSequence',
+      'Payment: invalid field LastLedgerSequence, expected a valid number',
     )
   })
 
@@ -123,7 +146,23 @@ describe('BaseTransaction', function () {
       SourceTag: ['ARRAY'],
     } as any
 
-    assertInvalid(invalidSourceTag, 'Payment: invalid field SourceTag')
+    assertInvalid(
+      invalidSourceTag,
+      'Payment: invalid field SourceTag, expected a valid number',
+    )
+  })
+
+  it(`Handles invalid Flags`, function () {
+    const invalidFlags = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Flags: 'abcd',
+    } as any
+
+    assertInvalid(
+      invalidFlags,
+      'Payment: invalid field Flags, expected a valid number or Flags object',
+    )
   })
 
   it(`Handles invalid SigningPubKey`, function () {
@@ -133,19 +172,22 @@ describe('BaseTransaction', function () {
       SigningPubKey: 1000,
     } as any
 
-    assertInvalid(invalidSigningPubKey, 'Payment: invalid field SigningPubKey')
+    assertInvalid(
+      invalidSigningPubKey,
+      'Payment: invalid field SigningPubKey, expected a valid hex string',
+    )
   })
 
   it(`Handles invalid TicketSequence`, function () {
     const invalidTicketSequence = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      TicketSequence: '1000',
+      TicketSequence: 'abcd',
     } as any
 
     assertInvalid(
       invalidTicketSequence,
-      'Payment: invalid field TicketSequence',
+      'Payment: invalid field TicketSequence, expected a valid number',
     )
   })
 
@@ -156,7 +198,10 @@ describe('BaseTransaction', function () {
       TxnSignature: 1000,
     } as any
 
-    assertInvalid(invalidTxnSignature, 'Payment: invalid field TxnSignature')
+    assertInvalid(
+      invalidTxnSignature,
+      'Payment: invalid field TxnSignature, expected a valid hex string',
+    )
   })
 
   it(`Handles invalid Signers`, function () {
@@ -166,7 +211,7 @@ describe('BaseTransaction', function () {
       Signers: [],
     } as any
 
-    assertInvalid(invalidSigners, 'BaseTransaction: invalid Signers')
+    assertInvalid(invalidSigners, 'BaseTransaction: invalid field Signers')
 
     const invalidSigners2 = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
@@ -180,7 +225,7 @@ describe('BaseTransaction', function () {
       ],
     } as any
 
-    assertInvalid(invalidSigners2, 'BaseTransaction: invalid Signers')
+    assertInvalid(invalidSigners2, 'BaseTransaction: invalid field Signers')
   })
 
   it(`Handles invalid Memo`, function () {
@@ -197,16 +242,19 @@ describe('BaseTransaction', function () {
       ],
     } as any
 
-    assertInvalid(invalidMemo, 'BaseTransaction: invalid Memos')
+    assertInvalid(invalidMemo, 'BaseTransaction: invalid field Memos')
   })
 
   it(`Handles invalid NetworkID`, function () {
     const invalidNetworkID = {
       Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       TransactionType: 'Payment',
-      NetworkID: '1024',
+      NetworkID: 'abcd',
     }
-    assertInvalid(invalidNetworkID, 'Payment: invalid field NetworkID')
+    assertInvalid(
+      invalidNetworkID,
+      'Payment: invalid field NetworkID, expected a valid number',
+    )
   })
 
   it(`Handles invalid Delegate`, function () {
@@ -215,7 +263,10 @@ describe('BaseTransaction', function () {
       TransactionType: 'Payment',
       Delegate: 1234,
     }
-    assertInvalid(invalidDelegate, 'Payment: invalid field Delegate')
+    assertInvalid(
+      invalidDelegate,
+      'Payment: invalid field Delegate, expected a valid account address',
+    )
   })
 
   it(`Handles Account and Delegate being the same error`, function () {

@@ -169,6 +169,9 @@ describe('NFTokenAcceptOffer', function () {
       Flags: 2147483648,
     } as any
 
-    assertInvalid(invalid, 'NFTokenAcceptOffer: invalid NFTokenBrokerFee')
+    assertInvalid(
+      invalid,
+      'NFTokenAcceptOffer: invalid field NFTokenBrokerFee, expected a valid Amount',
+    )
   })
 })

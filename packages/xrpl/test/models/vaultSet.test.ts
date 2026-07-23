@@ -1,6 +1,5 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
-import { VaultSet } from '../../src'
 import { validateVaultSet } from '../../src/models/transactions/vaultSet'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -14,7 +13,7 @@ const assertInvalid = (tx: any, message: string): void =>
  * Providing runtime verification testing for the VaultSet transaction type.
  */
 describe('VaultSet', function () {
-  let tx: VaultSet
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -29,20 +28,24 @@ describe('VaultSet', function () {
   })
 
   it('throws w/ missing VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = undefined
     assertInvalid(tx, 'VaultSet: missing field VaultID')
   })
 
   it('throws w/ non-string VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = 123456
-    assertInvalid(tx, 'VaultSet: invalid field VaultID')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field VaultID, expected a valid hex string',
+    )
   })
 
   it('throws w/ Data field not hex', function () {
     tx.Data = 'zznothex'
-    assertInvalid(tx, 'VaultSet: Data must be a valid hex string')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field Data, expected a valid hex string',
+    )
   })
 
   it('throws w/ Data field too large', function () {
@@ -52,18 +55,25 @@ describe('VaultSet', function () {
 
   it('throws w/ non-XRPLNumber AssetsMaximum', function () {
     tx.AssetsMaximum = 'notanumber'
-    assertInvalid(tx, 'VaultSet: invalid field AssetsMaximum')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field AssetsMaximum, expected a valid XRPLNumber',
+    )
   })
 
   it('throws w/ non-string Data', function () {
-    // @ts-expect-error for test
     tx.Data = 1234
-    assertInvalid(tx, 'VaultSet: invalid field Data')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field Data, expected a valid hex string',
+    )
   })
 
   it('throws w/ non-string DomainID', function () {
-    // @ts-expect-error for test
     tx.DomainID = 1234
-    assertInvalid(tx, 'VaultSet: invalid field DomainID')
+    assertInvalid(
+      tx,
+      'VaultSet: invalid field DomainID, expected a valid hex string',
+    )
   })
 })

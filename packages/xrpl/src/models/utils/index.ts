@@ -1,6 +1,7 @@
 import type { Transaction } from '../transactions'
 
-const HEX_REGEX = /^[0-9A-Fa-f]+$/u
+const HEX_REGEX = /^[0-9A-Fa-f]*$/u
+
 export const INTEGER_SANITY_CHECK = /^[0-9]+$/u
 
 /**
@@ -20,13 +21,13 @@ export function onlyHasFields(
 /**
  * Perform bitwise AND (&) to check if a flag is enabled within Flags (as a number).
  *
- * @param Flags - A number that represents flags enabled.
- * @param checkFlag - A specific flag to check if it's enabled within Flags.
- * @returns True if checkFlag is enabled within Flags.
+ * @param flags - A number that represents flags enabled.
+ * @param checkFlag - A specific flag to check if it's enabled within flags.
+ * @returns True if checkFlag is enabled within flags.
  */
-export function isFlagEnabled(Flags: number, checkFlag: number): boolean {
+export function isFlagEnabled(flags: number, checkFlag: number): boolean {
   // eslint-disable-next-line no-bitwise -- flags need bitwise
-  return (BigInt(checkFlag) & BigInt(Flags)) === BigInt(checkFlag)
+  return (BigInt(checkFlag) & BigInt(flags)) === BigInt(checkFlag)
 }
 
 /**

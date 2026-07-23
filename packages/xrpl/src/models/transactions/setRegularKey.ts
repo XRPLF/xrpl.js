@@ -1,6 +1,9 @@
-import { ValidationError } from '../../errors'
-
-import { BaseTransaction, validateBaseTransaction } from './common'
+import {
+  BaseTransaction,
+  isAccount,
+  validateBaseTransaction,
+  validateOptionalField,
+} from './common'
 
 /**
  * A SetRegularKey transaction assigns, changes, or removes the regular key
@@ -27,7 +30,5 @@ export interface SetRegularKey extends BaseTransaction {
 export function validateSetRegularKey(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.RegularKey !== undefined && typeof tx.RegularKey !== 'string') {
-    throw new ValidationError('SetRegularKey: RegularKey must be a string')
-  }
+  validateOptionalField(tx, 'RegularKey', isAccount)
 }

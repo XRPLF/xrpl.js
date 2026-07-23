@@ -6,6 +6,9 @@ import {
   validateRequiredField,
   isAccount,
   Account,
+  isArray,
+  isRecord,
+  isString,
 } from './common'
 
 const PERMISSIONS_MAX_LENGTH = 10
@@ -53,7 +56,6 @@ export interface DelegateSet extends BaseTransaction {
  * @param tx - An DelegateSet Transaction.
  * @throws When the DelegateSet is malformed.
  */
-// eslint-disable-next-line max-lines-per-function -- necessary for validation
 export function validateDelegateSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -65,46 +67,37 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Permissions', Array.isArray)
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required for validation
-  const permissions = tx.Permissions as DelegateSet['Permissions']
-  if (permissions.length > PERMISSIONS_MAX_LENGTH) {
+  validateRequiredField(tx, 'Permissions', isArray)
+  if (tx.Permissions.length > PERMISSIONS_MAX_LENGTH) {
     throw new ValidationError(
       `DelegateSet: Permissions array length cannot be greater than ${PERMISSIONS_MAX_LENGTH}.`,
     )
   }
 
   const permissionValueSet = new Set()
-  permissions.forEach((permission: Permission) => {
-    if (
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
-      permission == null ||
-      Object.keys(permission).length !== 1 ||
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
-      permission.Permission == null ||
-      Object.keys(permission.Permission).length !== 1
-    ) {
+  tx.Permissions.forEach((permission, index) => {
+    if (!isRecord(permission) || !isRecord(permission.Permission)) {
       throw new ValidationError(
         'DelegateSet: Permissions array element is malformed',
       )
     }
-    const permissionValue = permission.Permission.PermissionValue
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- required for validation
-    if (permissionValue == null) {
-      throw new ValidationError('DelegateSet: PermissionValue must be defined')
-    }
-    if (typeof permissionValue !== 'string') {
-      throw new ValidationError('DelegateSet: PermissionValue must be a string')
-    }
+    const permissionInner = permission.Permission
+
+    validateRequiredField(permissionInner, 'PermissionValue', isString, {
+      paramName: `Permission[${index}].PermissionValue`,
+      txType: 'DelegateSet',
+    })
+
+    const permissionValue = permissionInner.PermissionValue
+
     if (NON_DELEGABLE_TRANSACTIONS.has(permissionValue)) {
       throw new ValidationError(
-        `DelegateSet: PermissionValue contains a non-delegatable transaction ${permissionValue}`,
+        `DelegateSet: PermissionValue contains non-delegable transaction ${permissionValue}`,
       )
     }
     permissionValueSet.add(permissionValue)
   })
-  if (permissions.length !== permissionValueSet.size) {
+  if (tx.Permissions.length !== permissionValueSet.size) {
     throw new ValidationError(
       'DelegateSet: Permissions array cannot contain duplicate values',
     )

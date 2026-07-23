@@ -40,13 +40,15 @@ describe('AccountDelete', function () {
 
   it(`throws w/ invalid Destination`, function () {
     validAccountDelete.Destination = 65478965
-    const errorMessage = 'AccountDelete: invalid field Destination'
+    const errorMessage =
+      'AccountDelete: invalid field Destination, expected a valid account address'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ invalid DestinationTag`, function () {
     validAccountDelete.DestinationTag = 'gvftyujnbv'
-    const errorMessage = 'AccountDelete: invalid field DestinationTag'
+    const errorMessage =
+      'AccountDelete: invalid field DestinationTag, expected a valid number'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
@@ -54,7 +56,8 @@ describe('AccountDelete', function () {
     validAccountDelete.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'AccountDelete: Credentials must be an array'
+    const errorMessage =
+      'AccountDelete: invalid field CredentialIDs, expected a valid array'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
@@ -72,14 +75,14 @@ describe('AccountDelete', function () {
     ]
 
     const errorMessage =
-      'AccountDelete: Credentials length cannot exceed 8 elements'
+      'AccountDelete: CredentialIDs length cannot exceed 8 elements'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
     validAccountDelete.CredentialIDs = []
 
-    const errorMessage = 'AccountDelete: Credentials cannot be an empty array'
+    const errorMessage = 'AccountDelete: CredentialIDs cannot be an empty array'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
@@ -89,7 +92,7 @@ describe('AccountDelete', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'AccountDelete: Invalid Credentials ID list format'
+    const errorMessage = 'AccountDelete: Invalid CredentialIDs list format'
     assertInvalid(validAccountDelete, errorMessage)
   })
 
@@ -100,7 +103,7 @@ describe('AccountDelete', function () {
     ]
 
     const errorMessage =
-      'AccountDelete: Credentials cannot contain duplicate elements'
+      'AccountDelete: CredentialIDs cannot contain duplicate elements'
     assertInvalid(validAccountDelete, errorMessage)
   })
 })

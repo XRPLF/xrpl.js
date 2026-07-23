@@ -124,10 +124,13 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      TransferFee: '100',
+      TransferFee: 'not-a-number',
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field TransferFee')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field TransferFee, expected a valid number',
+    )
   })
 
   it(`Throws w/ invalid (too low) value of TransferFee`, function () {
@@ -163,10 +166,13 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: '100',
+      MutableFlags: 'not-a-number',
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MutableFlags')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field MutableFlags, expected a valid number',
+    )
   })
 
   it(`Throws w/ invalid MutableFlags value`, function () {
@@ -177,7 +183,7 @@ describe('MPTokenIssuanceSet', function () {
       MutableFlags: tmfMPTokenIssuanceSetMutableMask,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid field MutableFlags')
   })
 
   it(`Throws w/ a MutableFlags bit outside the DynamicMPT range`, function () {
@@ -189,7 +195,7 @@ describe('MPTokenIssuanceSet', function () {
       MutableFlags: 0x00000040,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid field MutableFlags')
   })
 
   it(`Throws w/ MutableFlags explicitly set to 0`, function () {
@@ -201,7 +207,7 @@ describe('MPTokenIssuanceSet', function () {
       MutableFlags: 0,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid field MutableFlags')
   })
 
   it(`Throws w/ invalid type of MPTokenMetadata`, function () {
@@ -212,7 +218,10 @@ describe('MPTokenIssuanceSet', function () {
       MPTokenMetadata: 1234,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MPTokenMetadata')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field MPTokenMetadata, expected a valid hex string',
+    )
   })
 
   it(`Throws w/ invalid (non-hex characters) MPTokenMetadata`, function () {
@@ -225,7 +234,7 @@ describe('MPTokenIssuanceSet', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
+      `MPTokenIssuanceSet: invalid field MPTokenMetadata, expected a valid hex string`,
     )
   })
 

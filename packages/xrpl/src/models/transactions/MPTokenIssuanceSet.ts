@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isFlagEnabled, isHex } from '../utils'
+import { isFlagEnabled } from '../utils'
 // eslint-disable-next-line import/no-cycle -- this method is needed to convert txn flags to number
 import { convertTxFlagsToNumber } from '../utils/flags'
 import {
@@ -10,13 +10,13 @@ import {
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  isHexString,
   isNumber,
   isDomainID,
 } from './common'
@@ -152,9 +152,9 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'MutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
@@ -170,22 +170,20 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     // rippled rejects a present-but-zero MutableFlags, as well as out-of-mask bits.
     if (tx.MutableFlags === 0 || invalidBits !== 0) {
       throw new ValidationError(
-        'MPTokenIssuanceSet: Invalid MutableFlags value',
+        'MPTokenIssuanceSet: Invalid field MutableFlags',
       )
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-  const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
-  const isTfMPTLock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : (flags.tfMPTLock ?? false)
+  const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
+  const isTfMPTLock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
+    : flags.tfMPTLock === true
 
-  const isTfMPTUnlock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : (flags.tfMPTUnlock ?? false)
+  const isTfMPTUnlock = isNumber(flags)
+    ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
+    : flags.tfMPTUnlock === true
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
@@ -237,10 +235,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   // clears the existing metadata (makeFieldAbsent). Only validate the hex
   // format, length, and XLS-89 schema when a non-empty value is supplied.
   if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata.length > 0) {
-    if (
-      !isHex(tx.MPTokenMetadata) ||
-      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH
-    ) {
+    if (tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
       throw new ValidationError(
         `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
       )

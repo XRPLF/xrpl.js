@@ -9,7 +9,7 @@ const assertInvalid = (tx: any, message: string): void =>
   assertTxValidationError(tx, validatePayment, message)
 
 /**
- * PaymentTransaction Verification Testing.
+ * Payment Verification Testing.
  *
  * Providing runtime verification testing for each specific transaction type.
  */
@@ -108,17 +108,20 @@ describe('Payment', function () {
       },
     ]
 
-    assertInvalid(payment, 'BaseTransaction: invalid Memos')
+    assertInvalid(payment, 'BaseTransaction: invalid field Memos')
   })
 
   it(`throws when Amount is missing`, function () {
     delete payment.Amount
-    assertInvalid(payment, 'PaymentTransaction: missing field Amount')
+    assertInvalid(payment, 'Payment: missing field Amount')
   })
 
   it(`throws when Amount is invalid`, function () {
     payment.Amount = 1234
-    assertInvalid(payment, 'PaymentTransaction: invalid Amount')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it(`throws when Destination is missing`, function () {
@@ -128,12 +131,18 @@ describe('Payment', function () {
 
   it(`throws when Destination is invalid`, function () {
     payment.Destination = 7896214
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`throws when Destination is invalid classic address`, function () {
     payment.Destination = 'rABCD'
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`does not throw when Destination is a valid x-address`, function () {
@@ -143,27 +152,42 @@ describe('Payment', function () {
 
   it(`throws when Destination is an empty string`, function () {
     payment.Destination = ''
-    assertInvalid(payment, 'Payment: invalid field Destination')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`throws when DestinationTag is not a number`, function () {
-    payment.DestinationTag = '1'
-    assertInvalid(payment, 'Payment: invalid field DestinationTag')
+    payment.DestinationTag = 'abcd'
+    assertInvalid(
+      payment,
+      'Payment: invalid field DestinationTag, expected a valid number',
+    )
   })
 
   it(`throws when InvoiceID is not a string`, function () {
     payment.InvoiceID = 19832
-    assertInvalid(payment, 'PaymentTransaction: InvoiceID must be a string')
+    assertInvalid(
+      payment,
+      'Payment: invalid field InvoiceID, expected a valid hex string',
+    )
   })
 
   it(`throws when Paths is invalid`, function () {
     payment.Paths = [[{ account: 123 }]]
-    assertInvalid(payment, 'PaymentTransaction: invalid Paths')
+    assertInvalid(
+      payment,
+      'Payment: invalid field Paths, expected a valid Paths array',
+    )
   })
 
   it(`throws when SendMax is invalid`, function () {
     payment.SendMax = 100000000
-    assertInvalid(payment, 'PaymentTransaction: invalid SendMax')
+    assertInvalid(
+      payment,
+      'Payment: invalid field SendMax, expected a valid Amount',
+    )
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
@@ -181,18 +205,21 @@ describe('Payment', function () {
   it(`throws when DeliverMin is invalid`, function () {
     payment.DeliverMin = 10000
     payment.Flags = { tfPartialPayment: true }
-    assertInvalid(payment, 'PaymentTransaction: invalid DeliverMin')
+    assertInvalid(
+      payment,
+      'Payment: invalid field DeliverMin, expected a valid Amount',
+    )
   })
 
   it(`throws when tfPartialPayment flag is missing with valid DeliverMin`, function () {
     payment.DeliverMin = '10000'
     assertInvalid(
       payment,
-      'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+      'Payment: tfPartialPayment flag required with DeliverMin',
     )
   })
 
-  it(`verifies valid MPT PaymentTransaction`, function () {
+  it(`verifies valid MPT Payment`, function () {
     const mptPayment = {
       TransactionType: 'Payment',
       Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
@@ -209,7 +236,9 @@ describe('Payment', function () {
     payment.CredentialIDs =
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F66A'
 
-    const errorMessage = 'Payment: Credentials must be an array'
+    const errorMessage =
+      'Payment: invalid field CredentialIDs, expected a valid array'
+
     assertInvalid(payment, errorMessage)
   })
 
@@ -226,14 +255,15 @@ describe('Payment', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'Payment: Credentials length cannot exceed 8 elements'
+    const errorMessage =
+      'Payment: CredentialIDs length cannot exceed 8 elements'
     assertInvalid(payment, errorMessage)
   })
 
   it(`throws w/ empty CredentialIDs`, function () {
     payment.CredentialIDs = []
 
-    const errorMessage = 'Payment: Credentials cannot be an empty array'
+    const errorMessage = 'Payment: CredentialIDs cannot be an empty array'
     assertInvalid(payment, errorMessage)
   })
 
@@ -243,7 +273,7 @@ describe('Payment', function () {
       'EA85602C1B41F6F1F5E83C0E6B87142FB8957BD209469E4CC347BA2D0C26F662',
     ]
 
-    const errorMessage = 'Payment: Invalid Credentials ID list format'
+    const errorMessage = 'Payment: Invalid CredentialIDs list format'
     assertInvalid(payment, errorMessage)
   })
 
@@ -254,7 +284,7 @@ describe('Payment', function () {
     ]
 
     const errorMessage =
-      'Payment: Credentials cannot contain duplicate elements'
+      'Payment: CredentialIDs cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
   })
 })

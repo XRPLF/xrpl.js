@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { validateNFTokenModify } from '../../src/models/transactions/NFTokenModify'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
@@ -64,6 +64,9 @@ describe('NFTokenModify', function () {
       URI: '--',
     } as any
 
-    assertInvalid(invalid, 'NFTokenModify: URI must be in hex format')
+    assertInvalid(
+      invalid,
+      'NFTokenModify: invalid field URI, expected a valid hex string',
+    )
   })
 })

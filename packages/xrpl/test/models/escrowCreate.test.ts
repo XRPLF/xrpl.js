@@ -47,37 +47,55 @@ describe('EscrowCreate', function () {
   it(`throws w/ invalid Destination`, function () {
     escrow.Destination = 10
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field Destination')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field Destination, expected a valid account address',
+    )
   })
 
   it(`throws w/ invalid Amount`, function () {
     escrow.Amount = 1000
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field Amount')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it(`invalid CancelAfter`, function () {
-    escrow.CancelAfter = '100'
+    escrow.CancelAfter = 'abcd'
 
-    assertInvalid(escrow, 'EscrowCreate: CancelAfter must be a number')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field CancelAfter, expected a valid number',
+    )
   })
 
   it(`invalid FinishAfter`, function () {
-    escrow.FinishAfter = '1000'
+    escrow.FinishAfter = 'abcd'
 
-    assertInvalid(escrow, 'EscrowCreate: FinishAfter must be a number')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field FinishAfter, expected a valid number',
+    )
   })
 
   it(`invalid Condition`, function () {
     escrow.Condition = 0x141243
 
-    assertInvalid(escrow, 'EscrowCreate: Condition must be a string')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field Condition, expected a valid hex string',
+    )
   })
 
   it(`invalid DestinationTag`, function () {
-    escrow.DestinationTag = '100'
+    escrow.DestinationTag = 'abcd'
 
-    assertInvalid(escrow, 'EscrowCreate: invalid field DestinationTag')
+    assertInvalid(
+      escrow,
+      'EscrowCreate: invalid field DestinationTag, expected a valid number',
+    )
   })
 
   it(`Missing both CancelAfter and FinishAfter`, function () {

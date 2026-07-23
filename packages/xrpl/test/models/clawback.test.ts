@@ -41,7 +41,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAmount, 'Clawback: invalid field Amount')
+    assertInvalid(
+      invalidAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
+    )
 
     const invalidStrAmount = {
       TransactionType: 'Clawback',
@@ -49,7 +52,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidStrAmount, 'Clawback: invalid field Amount')
+    assertInvalid(
+      invalidStrAmount,
+      'Clawback: invalid field Amount, expected a valid non-XRP Amount',
+    )
   })
 
   it(`throws w/ invalid holder Account`, function () {
@@ -63,7 +69,10 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAccount, 'Clawback: invalid holder Account')
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Amount.issuer and Account cannot be the same',
+    )
   })
 
   it(`verifies valid MPT Clawback`, function () {
@@ -91,7 +100,10 @@ describe('Clawback', function () {
       Holder: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAccount, 'Clawback: invalid holder Account')
+    assertInvalid(
+      invalidAccount,
+      'Clawback: Account and Holder cannot be the same',
+    )
   })
 
   it(`throws w/ invalid Holder`, function () {
@@ -104,7 +116,7 @@ describe('Clawback', function () {
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
     } as any
 
-    assertInvalid(invalidAccount, 'Clawback: missing Holder')
+    assertInvalid(invalidAccount, 'Clawback: missing field Holder')
   })
 
   it(`throws w/ invalid currency Holder`, function () {

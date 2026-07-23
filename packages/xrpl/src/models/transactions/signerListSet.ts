@@ -4,10 +4,11 @@ import { SignerEntry } from '../common'
 import {
   BaseTransaction,
   isArray,
+  isHexString,
   isNumber,
   isRecord,
-  isString,
   validateBaseTransaction,
+  validateOptionalField,
   validateRequiredField,
 } from './common'
 
@@ -36,8 +37,6 @@ export interface SignerListSet extends BaseTransaction {
 
 const MAX_SIGNERS = 32
 
-const HEX_WALLET_LOCATOR_REGEX = /^[0-9A-Fa-f]{64}$/u
-
 /**
  * Verify the form and type of an SignerListSet at runtime.
  *
@@ -55,6 +54,7 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
   }
 
   validateRequiredField(tx, 'SignerEntries', isArray)
+
   if (tx.SignerEntries.length === 0) {
     throw new ValidationError(
       'SignerListSet: need at least 1 member in SignerEntries',
@@ -67,22 +67,16 @@ export function validateSignerListSet(tx: Record<string, unknown>): void {
     )
   }
 
-  for (const entry of tx.SignerEntries) {
+  tx.SignerEntries.forEach((entry, index) => {
     if (!isRecord(entry) || !isRecord(entry.SignerEntry)) {
       throw new ValidationError(
         'SignerListSet: SignerEntries must be an array of SignerEntry objects',
       )
     }
     const signerEntry = entry.SignerEntry
-    const { WalletLocator } = signerEntry
-    if (
-      WalletLocator != null &&
-      (!isString(WalletLocator) ||
-        !HEX_WALLET_LOCATOR_REGEX.test(WalletLocator))
-    ) {
-      throw new ValidationError(
-        `SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value`,
-      )
-    }
-  }
+    validateOptionalField(signerEntry, 'WalletLocator', isHexString, {
+      paramName: `SignerEntries[${index}].WalletLocator`,
+      txType: 'SignerListSet',
+    })
+  })
 }
