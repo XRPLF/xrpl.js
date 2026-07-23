@@ -5,9 +5,10 @@ import {
   getSendContextHash,
 } from '../src'
 
-const ACCOUNT = 'AB'.repeat(20) // 20-byte AccountID
-const ISSUANCE = 'CD'.repeat(24) // 24-byte MPTokenIssuanceID
-const OTHER = 'EF'.repeat(20) // destination / holder AccountID
+// 20-byte AccountID, 24-byte MPTokenIssuanceID, 20-byte destination/holder id.
+const ACCOUNT = 'AB'.repeat(20)
+const ISSUANCE = 'CD'.repeat(24)
+const OTHER = 'EF'.repeat(20)
 
 describe('context hashes', () => {
   it('convert context hash is deterministic and 32 bytes', async () => {

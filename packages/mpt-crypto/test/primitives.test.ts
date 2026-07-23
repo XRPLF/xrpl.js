@@ -21,13 +21,15 @@ describe('primitives', () => {
   })
 
   it('encrypts then decrypts back to the original amount', async () => {
-    for (const amount of [0n, 1n, 1000n]) {
-      const blinding = await generateBlindingFactor()
-      const ciphertext = await encryptAmount(amount, PUBLIC_KEY, blinding)
-      expect(ciphertext).toHaveLength(132) // 66-byte C1 || C2
-      // eslint-disable-next-line no-await-in-loop -- sequential round-trip check
-      expect(await decryptAmount(ciphertext, PRIVATE_KEY)).toBe(amount)
-    }
+    // A ciphertext is 132 hex chars — the 66-byte (C1 || C2) ElGamal pair.
+    await Promise.all(
+      [0n, 1n, 1000n].map(async (amount) => {
+        const blinding = await generateBlindingFactor()
+        const ciphertext = await encryptAmount(amount, PUBLIC_KEY, blinding)
+        expect(ciphertext).toHaveLength(132)
+        expect(await decryptAmount(ciphertext, PRIVATE_KEY)).toBe(amount)
+      }),
+    )
   })
 
   it('encryptAmount is deterministic for a fixed blinding factor', async () => {
