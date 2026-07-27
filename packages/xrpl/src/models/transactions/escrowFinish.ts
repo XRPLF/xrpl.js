@@ -40,13 +40,13 @@ export interface EscrowFinish extends BaseTransaction {
    */
   CredentialIDs?: string[]
 
-  ComputationAllowance?: number
+  Gas?: number
 }
 
 export interface EscrowFinishMetadata extends TransactionMetadataBase {
-  // if ComputationAllowance is present and the Smart Escrow runs
+  // if Gas is present and the Smart Escrow runs
   GasUsed?: number
-  WasmReturnCode?: number
+  VMReturnCode?: number
 }
 
 /**

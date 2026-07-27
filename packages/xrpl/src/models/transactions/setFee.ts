@@ -33,9 +33,9 @@ export interface SetFeePostAmendment extends BaseTransaction {
    */
   ReserveIncrementDrops: string
 
-  ExtensionComputeLimit?: number
+  GasLimit?: number
 
-  ExtensionSizeLimit?: number
+  BytecodeSizeLimit?: number
 
   GasPrice?: number
 }

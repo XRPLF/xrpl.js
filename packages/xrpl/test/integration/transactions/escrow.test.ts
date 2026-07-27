@@ -338,7 +338,7 @@ describe('Escrow', function () {
         TransactionType: 'EscrowCreate',
         Amount: AMOUNT.toString(),
         Destination: wallet1.classicAddress,
-        FinishFunction: FINISH_FUNCTION,
+        Bytecode: FINISH_FUNCTION,
         CancelAfter: CLOSE_TIME + 200,
       }
 
@@ -368,7 +368,7 @@ describe('Escrow', function () {
         Account: testContext.wallet.classicAddress,
         Owner: testContext.wallet.classicAddress,
         OfferSequence: sequence!,
-        ComputationAllowance: 20000,
+        Gas: 20000,
       }
 
       await testTransaction(testContext.client, finishTx, testContext.wallet)

@@ -348,13 +348,13 @@ async function calculateFeePerTransactionType(
     'VaultCreate',
   ].includes(tx.TransactionType)
 
-  // EscrowCreate transaction with FinishFunction
-  if (tx.TransactionType === 'EscrowCreate' && tx.FinishFunction != null) {
+  // EscrowCreate transaction with Bytecode
+  if (tx.TransactionType === 'EscrowCreate' && tx.Bytecode != null) {
     baseFee = baseFee
       .plus(WASM_FIXED_UPLOAD_COST)
-      .plus((WASM_DROPS_PER_BYTE * tx.FinishFunction.length) / 2)
+      .plus((WASM_DROPS_PER_BYTE * tx.Bytecode.length) / 2)
   } else if (tx.TransactionType === 'EscrowFinish') {
-    // EscrowFinish Transaction with Fulfillment/ComputationAllowance
+    // EscrowFinish Transaction with Fulfillment/Gas
     if (tx.Fulfillment != null) {
       const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
       // BaseFee × (33 + (Fulfillment size in bytes / 16))
@@ -363,10 +363,10 @@ async function calculateFeePerTransactionType(
         33 + fulfillmentBytesSize / 16,
       )
     }
-    if (tx.ComputationAllowance != null) {
+    if (tx.Gas != null) {
       const gasPrice = await fetchGasPrice(client)
       const extraFee: BigNumber = gasPrice
-        .multipliedBy(tx.ComputationAllowance)
+        .multipliedBy(tx.Gas)
         .dividedBy(MICRO_DROPS_PER_DROP)
       baseFee = baseFee.plus(extraFee)
     }

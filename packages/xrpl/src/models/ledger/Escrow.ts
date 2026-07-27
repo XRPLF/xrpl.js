@@ -74,7 +74,7 @@ export default interface Escrow extends BaseLedgerEntry, HasPreviousTxnID {
    */
   IssuerNode?: number
 
-  FinishFunction?: string
+  Bytecode?: string
 
   Data?: string
 }

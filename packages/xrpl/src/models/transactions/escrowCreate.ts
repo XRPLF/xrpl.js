@@ -51,7 +51,7 @@ export interface EscrowCreate extends BaseTransaction {
    */
   DestinationTag?: number
 
-  FinishFunction?: string
+  Bytecode?: string
 
   Data?: string
 }
@@ -78,10 +78,10 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
   if (
     tx.FinishAfter === undefined &&
     tx.Condition === undefined &&
-    tx.FinishFunction === undefined
+    tx.Bytecode === undefined
   ) {
     throw new ValidationError(
-      'EscrowCreate: Either FinishAfter, Condition, or FinishFunction must be specified',
+      'EscrowCreate: Either FinishAfter, Condition, or Bytecode must be specified',
     )
   }
 
