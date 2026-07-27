@@ -366,12 +366,7 @@ function toClassicAddress(address: string): string {
  * @returns True if the addresses refer to the same account, false otherwise.
  */
 export function areAddressesEqual(address1: string, address2: string): boolean {
-  try {
-    return toClassicAddress(address1) === toClassicAddress(address2)
-  } catch {
-    // If conversion fails for any reason, fall back to direct comparison
-    return address1 === address2
-  }
+  return toClassicAddress(address1) === toClassicAddress(address2)
 }
 
 /**

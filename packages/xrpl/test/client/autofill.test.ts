@@ -729,7 +729,10 @@ describe('client.autofill', function () {
     })
 
     it('calculates fee for co-signed sponsorship with multi-sig sponsor', async function () {
-      // Co-signed sponsorship with multiple sponsor signers.
+      // Co-signed sponsorship with multiple sponsor signers. At autofill time
+      // the sponsor's cosigners may not have all signed yet, so the fee is
+      // derived from the sponsor account's own signer list, not from however
+      // many entries currently happen to be in SponsorSignature.Signers.
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -746,28 +749,28 @@ describe('client.autofill', function () {
                 TxnSignature: '3045...',
               },
             },
-            {
-              Signer: {
-                Account: 'rSigner2',
-                SigningPubKey: '02BBBB...',
-                TxnSignature: '3045...',
-              },
-            },
-            {
-              Signer: {
-                Account: 'rSigner3',
-                SigningPubKey: '02CCCC...',
-                TxnSignature: '3045...',
-              },
-            },
           ],
         },
       }
 
-      testContext.mockRippled!.addResponse(
-        'account_info',
-        rippled.account_info.normal,
-      )
+      testContext.mockRippled!.addResponse('account_info', {
+        status: 'success',
+        type: 'response',
+        result: {
+          account_data: {
+            Sequence: 23,
+          },
+          signer_lists: [
+            {
+              SignerEntries: [
+                { SignerEntry: { Account: 'rSigner1' } },
+                { SignerEntry: { Account: 'rSigner2' } },
+                { SignerEntry: { Account: 'rSigner3' } },
+              ],
+            },
+          ],
+        },
+      })
       testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
@@ -776,7 +779,8 @@ describe('client.autofill', function () {
 
       const txResult = await testContext.client.autofill(tx)
 
-      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48
+      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48,
+      // based on the sponsor's actual signer list count, not Signers.length (1).
       assert.strictEqual(txResult.Fee, '48')
     })
   })
