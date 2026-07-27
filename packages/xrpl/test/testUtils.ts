@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any -- required for
 assertions. */
 import net from 'net'
+import path from 'path'
 
 import { assert } from 'chai'
 import omit from 'lodash/omit'
+import ts from 'typescript'
 
 import {
   rippleTimeToUnixTime,
@@ -82,6 +84,125 @@ export function assertTxValidationError(
 ): void {
   assert.throws(() => validateTx(tx), ValidationError, errorMessage)
   assert.throws(() => validate(tx), ValidationError, errorMessage)
+}
+
+// ---------------------------------------------------------------------------
+// Interface-driven type-check test generator
+// ---------------------------------------------------------------------------
+
+/**
+ * Maps a TypeScript type as written in source → a value that will fail
+ * the corresponding runtime validator (isString, isNumber, isAccount, …).
+ */
+const INVALID_VALUE_FOR_TYPE: Record<string, unknown> = {
+  string: 0,
+  number: 'invalid',
+  XRPLNumber: 0, // XRPLNumber is a string alias; a number fails isXRPLNumber
+  Account: 0, // Account is a string alias; a number fails isAccount
+}
+
+/** Fields that should not have auto-generated type tests. */
+const SKIP_FIELDS = new Set(['TransactionType', 'Flags'])
+
+/**
+ * Reads a transaction interface from source and, for each property whose type
+ * maps to a known validator, registers `it(...)` tests that verify:
+ *   - required fields: "missing field X" when absent, "invalid field X" when
+ *     the wrong type is supplied.
+ *   - optional fields: "invalid field X" when the wrong type is supplied.
+ *
+ * Call this directly inside a `describe` block.  Only pure type checks are
+ * generated; semantic-constraint tests must still be written manually.
+ *
+ * @param txType - Transaction type string used in error messages (e.g. `'LoanSet'`).
+ * @param validateFn - The transaction-specific validation function.
+ * @param baseTx - A fully valid base transaction object.
+ * @param fileName - Filename inside `src/models/transactions/` (e.g. `'loanSet.ts'`).
+ * @param interfaceName - Name of the interface to inspect (e.g. `'LoanSet'`).
+ */
+export function generateInterfaceTypeTests(
+  txType: string,
+  validateFn: (tx: Record<string, unknown>) => void,
+  baseTx: Record<string, unknown>,
+  fileName: string,
+  interfaceName: string,
+): void {
+  const srcFilePath = path.resolve(
+    __dirname,
+    '../src/models/transactions',
+    fileName,
+  )
+
+  const program = ts.createProgram([srcFilePath], {
+    skipLibCheck: true,
+    skipDefaultLibCheck: true,
+    noResolve: true,
+  })
+  const sourceFile = program.getSourceFile(srcFilePath)
+  if (!sourceFile) {
+    throw new Error(`generateInterfaceTypeTests: cannot find ${srcFilePath}`)
+  }
+
+  for (const statement of sourceFile.statements) {
+    if (
+      !ts.isInterfaceDeclaration(statement) ||
+      statement.name.text !== interfaceName
+    ) {
+      continue
+    }
+
+    for (const member of statement.members) {
+      if (!ts.isPropertySignature(member) || !member.name) {
+        continue
+      }
+
+      const name = member.name.getText(sourceFile).trim()
+      if (SKIP_FIELDS.has(name)) {
+        continue
+      }
+
+      const typeText = member.type?.getText(sourceFile).trim() ?? ''
+      const optional = Boolean(member.questionToken)
+
+      let invalidValue: unknown
+      if (
+        Object.prototype.hasOwnProperty.call(INVALID_VALUE_FOR_TYPE, typeText)
+      ) {
+        invalidValue = INVALID_VALUE_FOR_TYPE[typeText]
+      } else if (
+        typeText.includes('|') ||
+        typeText.includes('[]') ||
+        typeText.startsWith("'") ||
+        typeText.startsWith('"')
+      ) {
+        // Union, array, or literal types need manual tests
+        continue
+      } else {
+        // Object / interface type — a plain string fails isRecord
+        invalidValue = 'invalid'
+      }
+
+      if (!optional) {
+        it(`throws w/ missing ${name}`, function () {
+          const tx = { ...baseTx }
+          delete tx[name]
+          assertTxValidationError(
+            tx,
+            validateFn,
+            `${txType}: missing field ${name}`,
+          )
+        })
+      }
+
+      it(`throws w/ invalid ${name}`, function () {
+        assertTxValidationError(
+          { ...baseTx, [name]: invalidValue },
+          validateFn,
+          `${txType}: invalid field ${name}`,
+        )
+      })
+    }
+  }
 }
 
 /**
