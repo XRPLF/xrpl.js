@@ -97,12 +97,39 @@ export function assertTxValidationError(
 const INVALID_VALUE_FOR_TYPE: Record<string, unknown> = {
   string: 0,
   number: 'invalid',
-  XRPLNumber: 0, // XRPLNumber is a string alias; a number fails isXRPLNumber
-  Account: 0, // Account is a string alias; a number fails isAccount
+  // XRPLNumber is a string alias; a number fails isXRPLNumber
+  XRPLNumber: 0,
+  // Account is a string alias; a number fails isAccount
+  Account: 0,
 }
 
 /** Fields that should not have auto-generated type tests. */
 const SKIP_FIELDS = new Set(['TransactionType', 'Flags'])
+
+/**
+ * Returns the invalid value to use in type-check tests for the given TypeScript
+ * type text. Returns `null` when the type should be skipped (union, array, or
+ * literal types that need manual tests).
+ *
+ * @param typeText - The TypeScript type text as written in source.
+ * @returns `{ value: unknown }` with the invalid test value, or `null` to skip.
+ */
+function resolveInvalidValue(typeText: string): { value: unknown } | null {
+  if (Object.prototype.hasOwnProperty.call(INVALID_VALUE_FOR_TYPE, typeText)) {
+    return { value: INVALID_VALUE_FOR_TYPE[typeText] }
+  }
+  if (
+    typeText.includes('|') ||
+    typeText.includes('[]') ||
+    typeText.startsWith("'") ||
+    typeText.startsWith('"')
+  ) {
+    // Union, array, or literal types need manual tests
+    return null
+  }
+  // Object / interface type — a plain string fails isRecord
+  return { value: 'invalid' }
+}
 
 /**
  * Reads a transaction interface from source and, for each property whose type
@@ -111,22 +138,29 @@ const SKIP_FIELDS = new Set(['TransactionType', 'Flags'])
  *     the wrong type is supplied.
  *   - optional fields: "invalid field X" when the wrong type is supplied.
  *
- * Call this directly inside a `describe` block.  Only pure type checks are
+ * Call this directly inside a `describe` block. Only pure type checks are
  * generated; semantic-constraint tests must still be written manually.
  *
- * @param txType - Transaction type string used in error messages (e.g. `'LoanSet'`).
- * @param validateFn - The transaction-specific validation function.
- * @param baseTx - A fully valid base transaction object.
- * @param fileName - Filename inside `src/models/transactions/` (e.g. `'loanSet.ts'`).
- * @param interfaceName - Name of the interface to inspect (e.g. `'LoanSet'`).
+ * @param txOptions - Transaction options.
+ * @param txOptions.txType - Transaction type string used in error messages (e.g. `'LoanSet'`).
+ * @param txOptions.validateFn - The transaction-specific validation function.
+ * @param txOptions.baseTx - A fully valid base transaction object.
+ * @param sourceOptions - Source file options.
+ * @param sourceOptions.fileName - Filename inside `src/models/transactions/` (e.g. `'loanSet.ts'`).
+ * @param sourceOptions.interfaceName - Name of the interface to inspect (e.g. `'LoanSet'`).
+ * @throws {Error} If the source file cannot be found.
  */
 export function generateInterfaceTypeTests(
-  txType: string,
-  validateFn: (tx: Record<string, unknown>) => void,
-  baseTx: Record<string, unknown>,
-  fileName: string,
-  interfaceName: string,
+  txOptions: {
+    txType: string
+    validateFn: (tx: Record<string, unknown>) => void
+    baseTx: Record<string, unknown>
+  },
+  sourceOptions: { fileName: string; interfaceName: string },
 ): void {
+  const { txType, validateFn, baseTx } = txOptions
+  const { fileName, interfaceName } = sourceOptions
+
   const srcFilePath = path.resolve(
     __dirname,
     '../src/models/transactions',
@@ -143,51 +177,37 @@ export function generateInterfaceTypeTests(
     throw new Error(`generateInterfaceTypeTests: cannot find ${srcFilePath}`)
   }
 
-  for (const statement of sourceFile.statements) {
-    if (
-      !ts.isInterfaceDeclaration(statement) ||
-      statement.name.text !== interfaceName
-    ) {
-      continue
-    }
+  const interfaceStatement = Array.from(sourceFile.statements).find(
+    (stmt): stmt is ts.InterfaceDeclaration =>
+      ts.isInterfaceDeclaration(stmt) && stmt.name.text === interfaceName,
+  )
 
-    for (const member of statement.members) {
-      if (!ts.isPropertySignature(member) || !member.name) {
-        continue
-      }
+  if (!interfaceStatement) {
+    return
+  }
 
+  Array.from(interfaceStatement.members)
+    .filter(ts.isPropertySignature)
+    .filter(
+      (member) => !SKIP_FIELDS.has(member.name.getText(sourceFile).trim()),
+    )
+    .forEach((member) => {
       const name = member.name.getText(sourceFile).trim()
-      if (SKIP_FIELDS.has(name)) {
-        continue
-      }
-
       const typeText = member.type?.getText(sourceFile).trim() ?? ''
       const optional = Boolean(member.questionToken)
+      const resolved = resolveInvalidValue(typeText)
 
-      let invalidValue: unknown
-      if (
-        Object.prototype.hasOwnProperty.call(INVALID_VALUE_FOR_TYPE, typeText)
-      ) {
-        invalidValue = INVALID_VALUE_FOR_TYPE[typeText]
-      } else if (
-        typeText.includes('|') ||
-        typeText.includes('[]') ||
-        typeText.startsWith("'") ||
-        typeText.startsWith('"')
-      ) {
-        // Union, array, or literal types need manual tests
-        continue
-      } else {
-        // Object / interface type — a plain string fails isRecord
-        invalidValue = 'invalid'
+      if (!resolved) {
+        return
       }
 
       if (!optional) {
         it(`throws w/ missing ${name}`, function () {
-          const tx = { ...baseTx }
-          delete tx[name]
+          const txWithoutField = Object.fromEntries(
+            Object.entries(baseTx).filter(([key]) => key !== name),
+          )
           assertTxValidationError(
-            tx,
+            txWithoutField,
             validateFn,
             `${txType}: missing field ${name}`,
           )
@@ -196,13 +216,12 @@ export function generateInterfaceTypeTests(
 
       it(`throws w/ invalid ${name}`, function () {
         assertTxValidationError(
-          { ...baseTx, [name]: invalidValue },
+          { ...baseTx, [name]: resolved.value },
           validateFn,
           `${txType}: invalid field ${name}`,
         )
       })
-    }
-  }
+    })
 }
 
 /**

@@ -27,11 +27,8 @@ describe('LoanSet', function () {
   // Auto-generated pure type-check tests (required + optional fields)
   describe('field type checks', function () {
     generateInterfaceTypeTests(
-      'LoanSet',
-      validateLoanSet,
-      BASE,
-      'loanSet.ts',
-      'LoanSet',
+      { txType: 'LoanSet', validateFn: validateLoanSet, baseTx: BASE },
+      { fileName: 'loanSet.ts', interfaceName: 'LoanSet' },
     )
   })
 
