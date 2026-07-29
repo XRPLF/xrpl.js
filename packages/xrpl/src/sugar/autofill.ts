@@ -313,65 +313,50 @@ async function fetchCounterPartySignersCount(
 }
 
 /**
- * Fetches the total number of signers for the sponsor of a sponsored transaction.
- *
- * @param client - The client object used to make the request.
- * @param sponsor - The sponsor account to fetch the signer list for.
- * @returns A Promise that resolves to the number of signers for the sponsor.
- */
-async function fetchSponsorSignersCount(
-  client: Client,
-  sponsor: Account,
-): Promise<number> {
-  const signerListRequest: AccountInfoRequest = {
-    command: 'account_info',
-    account: sponsor,
-    ledger_index: 'validated',
-    signer_lists: true,
-  }
-  const signerListResponse = await client.request(signerListRequest)
-  const signerList = signerListResponse.result.signer_lists?.[0]
-  return signerList?.SignerEntries.length ?? 1
-}
-
-/**
  * Calculates additional fees for sponsor signatures.
  *
  * Only adds sponsor signer fees when a SponsorSignature is present on the transaction.
  * Pre-funded sponsorships (which only have Sponsor and SponsorFlags without SponsorSignature)
  * do not require the sponsor to sign, so no additional signer fees are needed.
  *
- * @param client - The client object.
  * @param tx - The transaction object.
  * @param netFeeDrops - The network fee in drops.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
+ * SponsorSignature. Mirrors `signersCount`, which serves the same purpose for the transaction's
+ * own multisigning: at autofill time we can't reliably infer this, since
+ * tx.SponsorSignature.Signers may not yet reflect every cosigner, and the sponsor's SignerList
+ * only reflects its capability to sign, not a commitment to sign with a particular count. So the
+ * caller must supply it explicitly.
  * @returns The additional sponsor fee as a BigNumber.
  */
-async function calculateSponsorFee(
-  client: Client,
+function calculateSponsorFee(
   tx: Transaction,
   netFeeDrops: string,
-): Promise<BigNumber> {
+  sponsorSignersCount = 0,
+): BigNumber {
   // Only add sponsor signer fees when SponsorSignature is present.
   // Pre-funded sponsorships (tx.Sponsor without SponsorSignature) use an existing
   // Sponsorship ledger object and don't require additional sponsor signatures,
   // so they should not incur extra signer fees.
-  if (tx.SponsorSignature != null) {
-    // At autofill time the sponsor's multisig cosigners may not have all signed
-    // yet, so tx.SponsorSignature.Signers can't be trusted to reflect the final
-    // signer count. Fetch the sponsor account's own signer list instead, the
-    // same way LoanSet does for its counterparty.
-    const sponsorSignersCount = tx.SponsorSignature.Signers
-      ? await fetchSponsorSignersCount(client, tx.Sponsor as Account)
-      : 1
-    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
-    console.warn(
-      `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
-    )
-    return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
+  if (tx.SponsorSignature == null) {
+    return new BigNumber(0)
   }
-  // Note: tx.Sponsor without SponsorSignature indicates a pre-funded sponsorship flow.
-  // No additional sponsor fees are charged since the sponsor is not signing.
-  return new BigNumber(0)
+
+  // A single-signed SponsorSignature always needs exactly one sponsor signature fee.
+  // A multisigned SponsorSignature relies on the caller-supplied sponsorSignersCount.
+  const effectiveSponsorSignersCount = tx.SponsorSignature.Signers
+    ? sponsorSignersCount
+    : 1
+
+  if (effectiveSponsorSignersCount <= 0) {
+    return new BigNumber(0)
+  }
+
+  // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+  console.warn(
+    `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+  )
+  return new BigNumber(scaleValue(netFeeDrops, effectiveSponsorSignersCount))
 }
 
 /**
@@ -380,13 +365,16 @@ async function calculateSponsorFee(
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
+ * SponsorSignature (default is 0). Only used when SponsorSignature.Signers is present.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
+  sponsorSignersCount = 0,
 ): Promise<BigNumber> {
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
@@ -448,7 +436,7 @@ async function calculateFeePerTransactionType(
   }
 
   // Add sponsor signature fees if applicable
-  const sponsorFee = await calculateSponsorFee(client, tx, netFeeDrops)
+  const sponsorFee = calculateSponsorFee(tx, netFeeDrops, sponsorSignersCount)
   baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
@@ -469,14 +457,23 @@ async function calculateFeePerTransactionType(
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
+ * SponsorSignature (default is 0). Only used when SponsorSignature.Signers is present.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
+// eslint-disable-next-line max-params -- mirrors calculateFeePerTransactionType
 export async function getTransactionFee(
   client: Client,
   tx: Transaction,
   signersCount = 0,
+  sponsorSignersCount = 0,
 ): Promise<void> {
-  const fee = await calculateFeePerTransactionType(client, tx, signersCount)
+  const fee = await calculateFeePerTransactionType(
+    client,
+    tx,
+    signersCount,
+    sponsorSignersCount,
+  )
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
 }

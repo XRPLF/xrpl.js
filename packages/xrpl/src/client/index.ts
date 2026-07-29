@@ -675,12 +675,17 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link SubmittableTransaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
+   * SponsorSignature. Only used when the transaction's SponsorSignature is itself multisigned
+   * (i.e. has a `Signers` array). Mirrors `signersCount`: this cannot be reliably inferred at
+   * autofill time, so the caller must supply it.
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
+    sponsorSignersCount?: number,
   ): Promise<T> {
     const tx = { ...transaction }
 
@@ -693,7 +698,9 @@ class Client extends EventEmitter<EventTypes> {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(getTransactionFee(this, tx, signersCount))
+      promises.push(
+        getTransactionFee(this, tx, signersCount, sponsorSignersCount),
+      )
     }
     if (tx.LastLedgerSequence == null) {
       promises.push(setLatestValidatedLedgerSequence(this, tx))
@@ -897,14 +904,17 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
+   * SponsorSignature. Only used when the transaction's SponsorSignature is itself multisigned.
    * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
     transaction: SubmittableTransaction,
     signersCount?: number,
+    sponsorSignersCount?: number,
   ): ReturnType<Client['autofill']> {
-    return this.autofill(transaction, signersCount)
+    return this.autofill(transaction, signersCount, sponsorSignersCount)
   }
 
   /**

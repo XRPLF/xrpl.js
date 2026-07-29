@@ -730,9 +730,11 @@ describe('client.autofill', function () {
 
     it('calculates fee for co-signed sponsorship with multi-sig sponsor', async function () {
       // Co-signed sponsorship with multiple sponsor signers. At autofill time
-      // the sponsor's cosigners may not have all signed yet, so the fee is
-      // derived from the sponsor account's own signer list, not from however
-      // many entries currently happen to be in SponsorSignature.Signers.
+      // the sponsor's cosigners may not have all signed yet, and the sponsor's
+      // own SignerList only reflects its capability to sign, not a commitment
+      // to sign with a particular count. So, mirroring `signersCount` for the
+      // transaction's own multisigning, the caller must explicitly supply the
+      // expected sponsor signer count via `sponsorSignersCount`.
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -753,24 +755,55 @@ describe('client.autofill', function () {
         },
       }
 
-      testContext.mockRippled!.addResponse('account_info', {
-        status: 'success',
-        type: 'response',
-        result: {
-          account_data: {
-            Sequence: 23,
-          },
-          signer_lists: [
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(
+        tx,
+        undefined,
+        // sponsorSignersCount
+        3,
+      )
+
+      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48,
+      // based on the caller-supplied sponsorSignersCount, not Signers.length (1).
+      assert.strictEqual(txResult.Fee, '48')
+    })
+
+    it('does not add sponsor fees for a multi-sig sponsor when sponsorSignersCount is omitted', async function () {
+      // Mirrors the existing behavior for the transaction's own multisigning:
+      // if the caller doesn't supply a signer count, no additional fee is added.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+        SponsorSignature: {
+          Signers: [
             {
-              SignerEntries: [
-                { SignerEntry: { Account: 'rSigner1' } },
-                { SignerEntry: { Account: 'rSigner2' } },
-                { SignerEntry: { Account: 'rSigner3' } },
-              ],
+              Signer: {
+                Account: 'rSigner1',
+                SigningPubKey: '02AAAA...',
+                TxnSignature: '3045...',
+              },
             },
           ],
         },
-      })
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
       testContext.mockRippled!.addResponse(
         'server_info',
         rippled.server_info.normal,
@@ -779,9 +812,8 @@ describe('client.autofill', function () {
 
       const txResult = await testContext.client.autofill(tx)
 
-      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48,
-      // based on the sponsor's actual signer list count, not Signers.length (1).
-      assert.strictEqual(txResult.Fee, '48')
+      // Fee should be base fee only (12) - no sponsorSignersCount was supplied.
+      assert.strictEqual(txResult.Fee, '12')
     })
   })
 })
