@@ -11,6 +11,13 @@ import {
 } from './common'
 
 /**
+ * Matches an optionally negative, canonical integer string (no whitespace,
+ * scientific notation, decimals, or leading zeros other than "0" itself).
+ * Used for FeeAmountDelta, which is a signed delta rather than an absolute amount.
+ */
+const SIGNED_INTEGER_SANITY_CHECK = /^-?[0-9]+$/u
+
+/**
  * Flags for the SponsorshipSet transaction.
  *
  * @category Transaction Flags
@@ -93,11 +100,13 @@ export interface SponsorshipSet extends BaseTransaction {
    */
   CounterpartySponsor?: string
   /**
-   * (Optional) The amount of XRP (in drops) to pre-fund for paying transaction
-   * fees on behalf of the sponsee. This creates a balance that gets decremented
-   * as the sponsor pays fees.
+   * (Optional) A signed delta (in drops) to apply to the sponsorship's fee
+   * allocation. A positive value tops up the balance the sponsee can draw from
+   * to pay transaction fees; a negative value draws it down. The delta is
+   * applied to whatever value the Sponsorship ledger entry currently holds,
+   * rather than replacing it outright. Must not be zero.
    */
-  FeeAmount?: string
+  FeeAmountDelta?: string
   /**
    * The maximum fee (in drops) that the sponsor is willing to pay per
    * transaction on behalf of the sponsee. If not specified, there is no
@@ -183,16 +192,25 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
   }
 
-  // Validate FeeAmount if present
-  if (tx.FeeAmount !== undefined) {
-    if (!isString(tx.FeeAmount)) {
-      throw new ValidationError('SponsorshipSet: FeeAmount must be a string')
+  // Validate FeeAmountDelta if present
+  if (tx.FeeAmountDelta !== undefined) {
+    if (!isString(tx.FeeAmountDelta)) {
+      throw new ValidationError(
+        'SponsorshipSet: FeeAmountDelta must be a string',
+      )
     }
 
     // Use strict regex to reject non-canonical strings (whitespace, scientific notation, decimals, etc.)
-    if (!INTEGER_SANITY_CHECK.exec(tx.FeeAmount)) {
+    // Unlike FeeAmount previously, FeeAmountDelta is a signed delta and may be negative.
+    if (!SIGNED_INTEGER_SANITY_CHECK.exec(tx.FeeAmountDelta)) {
       throw new ValidationError(
-        'SponsorshipSet: FeeAmount must be a non-negative numeric string',
+        'SponsorshipSet: FeeAmountDelta must be a numeric string',
+      )
+    }
+
+    if (BigInt(tx.FeeAmountDelta) === BigInt(0)) {
+      throw new ValidationError(
+        'SponsorshipSet: FeeAmountDelta must not be zero',
       )
     }
   }
