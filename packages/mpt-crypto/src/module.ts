@@ -116,14 +116,22 @@ let cached: Promise<WasmModule> | undefined
  * `mpt_crypto.wasm` next to its own `.js` file, so the vendored `wasm/` folder
  * must ship alongside the compiled output.
  *
+ * Provenance: `mpt_crypto.{js,wasm}` are produced by mpt-crypto's
+ * `.github/scripts/build-wasm.sh` (an Emscripten build of the pinned secp256k1 +
+ * OpenSSL + C sources). The release-artifact + checksum/provenance flow is
+ * tracked in `WASM_RELEASE_AND_NPM_PUBLISH.md`.
+ *
  * @returns A promise resolving to the initialized WASM module.
  */
 export async function loadWasmModule(): Promise<WasmModule> {
   cached ??= (async (): Promise<WasmModule> => {
     const factory: ModuleFactory = require('../wasm/mpt_crypto')
     const instance = await factory()
-    // Force one-time initialization of the shared secp256k1 context.
-    instance._mpt_secp256k1_context()
+    // Force one-time initialization of the shared secp256k1 context; a zero
+    // return means creation failed — fail loudly rather than on the first op.
+    if (instance._mpt_secp256k1_context() === 0) {
+      throw new Error('mpt-crypto: failed to initialize the secp256k1 context')
+    }
     return instance
   })()
   return cached

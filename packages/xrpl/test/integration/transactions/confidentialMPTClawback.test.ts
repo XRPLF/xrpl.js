@@ -68,4 +68,34 @@ describe('ConfidentialMPTClawback', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'rejects a clawback whose amount does not match the balance (tecBAD_PROOF)',
+    async () => {
+      const holder = await holderWithBalance(
+        testContext.client,
+        issuer,
+        mptID,
+        1000n,
+      )
+
+      // The clawback proof asserts the issuer-encrypted balance equals the
+      // stated amount, so an amount other than the full balance yields an
+      // unverifiable proof — rippled enforces this server-side.
+      await testTransaction(
+        testContext.client,
+        await prepareConfidentialClawback(testContext.client, {
+          account: issuer.classicAddress,
+          holder: holder.wallet.classicAddress,
+          issuer: issuerKey,
+          amount: 400n,
+          mptIssuanceID: mptID,
+        }),
+        issuer,
+        undefined,
+        'tecBAD_PROOF',
+      )
+    },
+    TIMEOUT,
+  )
 })

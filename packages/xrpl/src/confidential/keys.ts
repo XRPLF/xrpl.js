@@ -13,9 +13,11 @@ import type { ConfidentialKeypair } from './types'
  * yields the same key, so the ability to decrypt a confidential balance can
  * be recovered from a backed-up secret. Omit `seed` for a fresh random key.
  *
- * Any family seed works, including an account's own signing seed — secp256k1
- * is forced regardless of the seed's algorithm, so one secret can back both
- * the signing and confidential keys.
+ * Any family seed works — secp256k1 is forced regardless of the seed's
+ * algorithm. Prefer a *dedicated* seed for confidential keys: reusing an
+ * account's signing seed derives the same scalar and so extends that key's
+ * trust boundary to the confidential crypto (WASM decryption + proof
+ * generation) on top of transaction signing.
  *
  * @param seed - An optional family seed to derive from; a fresh secp256k1
  * seed is generated when omitted.

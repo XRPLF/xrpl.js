@@ -42,7 +42,8 @@ export interface RawPedersenParams {
  */
 export class Marshaller {
   private readonly mod: WasmModule
-  private readonly ptrs: number[] = []
+  // Track size alongside each pointer so dispose() can zero key material.
+  private readonly ptrs: Array<{ ptr: number; size: number }> = []
 
   public constructor(mod: WasmModule) {
     this.mod = mod
@@ -57,7 +58,7 @@ export class Marshaller {
       throw new Error(`mpt-crypto: failed to allocate ${size} bytes`)
     }
     this.mod.HEAPU8.fill(0, ptr, ptr + size)
-    this.ptrs.push(ptr)
+    this.ptrs.push({ ptr, size })
     return ptr
   }
 
@@ -68,7 +69,7 @@ export class Marshaller {
       throw new Error(`mpt-crypto: failed to allocate ${data.length} bytes`)
     }
     this.mod.HEAPU8.set(data, ptr)
-    this.ptrs.push(ptr)
+    this.ptrs.push({ ptr, size: data.length })
     return ptr
   }
 
@@ -138,7 +139,10 @@ export class Marshaller {
 
   /** Free every allocation made through this marshaller. */
   public dispose(): void {
-    for (const ptr of this.ptrs) {
+    // Zero each region before freeing so private keys / blinding factors don't
+    // linger in the freed WASM heap until a later allocation overwrites them.
+    for (const { ptr, size } of this.ptrs) {
+      this.mod.HEAPU8.fill(0, ptr, ptr + size)
       this.mod._free(ptr)
     }
     this.ptrs.length = 0
