@@ -5,10 +5,10 @@ import {
   encodeMPTokenMetadata,
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
-  MPTokenIssuanceCreateMutableFlags,
+  MPTokenIssuanceCreateImmutableFlags,
   MPTokenMetadata,
   parseMPTokenIssuanceFlags,
-  parseMPTokenIssuanceMutableFlags,
+  parseMPTokenIssuanceImmutableFlags,
   TransactionMetadata,
 } from '../../../src'
 import type { MPTokenIssuance } from '../../../src/models/ledger/MPTokenIssuance'
@@ -100,22 +100,17 @@ describe('MPTokenIssuanceCreate', function () {
     TIMEOUT,
   )
 
-  // TODO(confidential-mpts): XLS-94D MutableFlags model; rc2+ renamed it to
-  // ImmutableFlags with inverted semantics (XLS-583 / xrpld-private #303).
-  // Skipped until the client MutableFlags->ImmutableFlags migration lands.
-  xit(
-    'persists Flags and MutableFlags on the MPTokenIssuance ledger object (XLS-94D)',
+  it(
+    'persists Flags and ImmutableFlags on the MPTokenIssuance ledger object (XLS-94D)',
     async () => {
       const tx: MPTokenIssuanceCreate = {
         TransactionType: 'MPTokenIssuanceCreate',
         Account: testContext.wallet.classicAddress,
-        // An immutable capability set at create time...
+        // A capability enabled at create time...
         Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-        // ...plus permissions to enable/mutate fields later.
-        MutableFlags:
-          // eslint-disable-next-line no-bitwise -- combine the flags
-          MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanLock |
-          MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
+        // ...plus permanently making TransferFee immutable. All other fields
+        // and flags remain mutable by default.
+        ImmutableFlags: MPTokenIssuanceCreateImmutableFlags.tifMPTTransferFee,
       }
 
       const submitResponse = await testTransaction(
@@ -144,21 +139,17 @@ describe('MPTokenIssuanceCreate', function () {
       assert.exists(issuance, 'Created MPTokenIssuance not found')
 
       const lsf = parseMPTokenIssuanceFlags(issuance.Flags)
-      const lsmf = parseMPTokenIssuanceMutableFlags(issuance.MutableFlags)
+      const lsif = parseMPTokenIssuanceImmutableFlags(issuance.ImmutableFlags)
 
       assert.isTrue(lsf.lsfMPTCanTransfer, 'lsfMPTCanTransfer should be set')
       assert.isTrue(
-        lsmf.lsmfMPTCanEnableCanLock,
-        'lsmfMPTCanEnableCanLock should reflect tmfMPTCanEnableCanLock',
+        lsif.lsifMPTTransferFee,
+        'lsifMPTTransferFee should reflect tifMPTTransferFee',
       )
-      assert.isTrue(
-        lsmf.lsmfMPTCanMutateTransferFee,
-        'lsmfMPTCanMutateTransferFee should reflect tmfMPTCanMutateTransferFee',
-      )
-      // A capability that was never granted must not appear.
+      // A field/flag that was never made immutable must not appear.
       assert.isUndefined(
-        lsmf.lsmfMPTCanEnableCanClawback,
-        'lsmfMPTCanEnableCanClawback should not be set',
+        lsif.lsifMPTMetadata,
+        'lsifMPTMetadata should not be set',
       )
     },
     TIMEOUT,

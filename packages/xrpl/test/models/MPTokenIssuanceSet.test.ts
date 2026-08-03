@@ -1,13 +1,12 @@
-/* eslint-disable max-statements -- many validation cases in one describe block */
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceSetFlags } from '../../src'
-import { MAX_TRANSFER_FEE } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
-  validateMPTokenIssuanceSet,
-  tmfMPTokenIssuanceSetMutableMask,
-  MPTokenIssuanceSetMutableFlags,
-} from '../../src/models/transactions/MPTokenIssuanceSet'
+  MAX_TRANSFER_FEE,
+  MPTokenIssuanceCreateImmutableFlags,
+  tifMPTokenIssuanceImmutableMask,
+} from '../../src/models/transactions/MPTokenIssuanceCreate'
+import { validateMPTokenIssuanceSet } from '../../src/models/transactions/MPTokenIssuanceSet'
 import { MAX_MPT_META_BYTE_LENGTH } from '../../src/models/utils/mptokenMetadata'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -25,49 +24,91 @@ const TOKEN_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
  */
 describe('MPTokenIssuanceSet', function () {
   it(`verifies valid MPTokenIssuanceSet`, function () {
-    const base = {
+    let validMPTokenIssuanceSet = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-    }
+      Flags: MPTokenIssuanceSetFlags.tfMPTLock,
+    } as any
 
-    assertValid({ ...base, Flags: MPTokenIssuanceSetFlags.tfMPTLock } as any)
-    // A single MutableFlags "enable" bit is valid.
+    assertValid(validMPTokenIssuanceSet)
+
+    validMPTokenIssuanceSet = {
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      MPTokenIssuanceID: TOKEN_ID,
+      Flags: MPTokenIssuanceSetFlags.tfMPTLock,
+    } as any
+
+    assertValid(validMPTokenIssuanceSet)
+
+    // A single capability-setting flag is valid.
     assertValid({
-      ...base,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
-    } as any)
-    // The confidential-balance capability is enabled via the standard Flags field.
-    assertValid({
-      ...base,
-      Flags: { tfMPTSetCanHoldConfidentialBalance: true },
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Flags: MPTokenIssuanceSetFlags.tfMPTSetCanTransfer,
     } as any)
   })
 
-  it(`verifies valid MPTokenIssuanceSet with multiple MutableFlags`, function () {
+  it(`verifies valid MPTokenIssuanceSet with multiple capability-setting flags`, function () {
     assertValid({
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags:
+      Flags:
         // eslint-disable-next-line no-bitwise -- required to OR the flags
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-        MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback,
+        MPTokenIssuanceSetFlags.tfMPTSetCanLock |
+        MPTokenIssuanceSetFlags.tfMPTSetRequireAuth |
+        MPTokenIssuanceSetFlags.tfMPTSetCanEscrow |
+        MPTokenIssuanceSetFlags.tfMPTSetCanTrade |
+        MPTokenIssuanceSetFlags.tfMPTSetCanTransfer |
+        MPTokenIssuanceSetFlags.tfMPTSetCanClawback,
     } as any)
-  })
 
-  it(`verifies valid MPTokenIssuanceSet mutating TransferFee and MPTokenMetadata`, function () {
+    // object-form flags are equivalent.
     assertValid({
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      TransferFee: 100,
-      MPTokenMetadata: stringToHex('updated metadata'),
+      Flags: { tfMPTSetCanEscrow: true, tfMPTSetCanTrade: true },
     } as any)
+  })
+
+  // Grouped in a nested describe to keep valid-mutation coverage together
+  // (and to keep the parent describe under the max-statements limit).
+  describe('valid mutations (XLS-94D)', function () {
+    it(`mutates TransferFee and MPTokenMetadata`, function () {
+      assertValid({
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        TransferFee: 100,
+        MPTokenMetadata: stringToHex('updated metadata'),
+      } as any)
+    })
+
+    it(`enables tfMPTSetCanTransfer and sets a TransferFee atomically`, function () {
+      // XLS-94D allows enabling lsfMPTCanTransfer and setting a non-zero
+      // TransferFee in the same transaction.
+      assertValid({
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        Flags: MPTokenIssuanceSetFlags.tfMPTSetCanTransfer,
+        TransferFee: 200,
+      } as any)
+    })
+
+    it(`accepts ImmutableFlags on its own`, function () {
+      assertValid({
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        ImmutableFlags: MPTokenIssuanceCreateImmutableFlags.tifMPTMetadata,
+      } as any)
+    })
   })
 
   it(`accepts an empty MPTokenMetadata (clears the field per rippled)`, function () {
@@ -188,50 +229,50 @@ describe('MPTokenIssuanceSet', function () {
     )
   })
 
-  it(`Throws w/ invalid type of MutableFlags`, function () {
+  it(`Throws w/ invalid type of ImmutableFlags`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: '100',
+      ImmutableFlags: '100',
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MutableFlags')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field ImmutableFlags')
   })
 
-  it(`Throws w/ invalid MutableFlags value`, function () {
+  it(`Throws w/ invalid ImmutableFlags value`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: tmfMPTokenIssuanceSetMutableMask,
+      ImmutableFlags: tifMPTokenIssuanceImmutableMask,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid ImmutableFlags value')
   })
 
-  it(`Throws w/ a MutableFlags bit outside the DynamicMPT range`, function () {
+  it(`Throws w/ an ImmutableFlags bit outside the DynamicMPT range`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      // 0x80 is above the highest MPTokenIssuanceSet mutable flag (tmfMPTSetCanClawback = 0x20)
-      MutableFlags: 0x00000080,
+      // 0x1 (reserved) is not a valid ImmutableFlags bit.
+      ImmutableFlags: 0x00000001,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid ImmutableFlags value')
   })
 
-  it(`Throws w/ MutableFlags explicitly set to 0`, function () {
-    // rippled rejects a present-but-zero MutableFlags with temINVALID_FLAG.
+  it(`Throws w/ ImmutableFlags explicitly set to 0`, function () {
+    // rippled rejects a present-but-zero ImmutableFlags with temINVALID_FLAG.
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: 0,
+      ImmutableFlags: 0,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid MutableFlags value')
+    assertInvalid(invalid, 'MPTokenIssuanceSet: Invalid ImmutableFlags value')
   })
 
   it(`Throws w/ invalid type of MPTokenMetadata`, function () {
@@ -361,7 +402,7 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
+      Flags: MPTokenIssuanceSetFlags.tfMPTSetCanTransfer,
       Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
     } as any
 
@@ -371,18 +412,32 @@ describe('MPTokenIssuanceSet', function () {
     )
   })
 
-  it(`Throws w/ Flags field and mutating the MPTokenIssuance ledger object`, function () {
+  it(`Throws w/ lock/unlock combined with mutating the MPTokenIssuance ledger object`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      MutableFlags: MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer,
-      Flags: MPTokenIssuanceSetFlags.tfMPTLock,
+      Flags:
+        // eslint-disable-next-line no-bitwise -- required to OR the flags
+        MPTokenIssuanceSetFlags.tfMPTLock |
+        MPTokenIssuanceSetFlags.tfMPTSetCanTransfer,
     } as any
 
     assertInvalid(
       invalid,
-      'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
+      'MPTokenIssuanceSet: Can not lock/unlock while mutating MPTokenIssuance.',
+    )
+
+    // lock combined with a field mutation is also rejected.
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        Flags: MPTokenIssuanceSetFlags.tfMPTUnlock,
+        MPTokenMetadata: stringToHex('updated metadata'),
+      } as any,
+      'MPTokenIssuanceSet: Can not lock/unlock while mutating MPTokenIssuance.',
     )
   })
 })
