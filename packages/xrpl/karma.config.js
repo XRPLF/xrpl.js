@@ -42,6 +42,14 @@ module.exports = function (config) {
     // (karma's default is 30s, which disconnects mid-spec).
     browserNoActivityTimeout: 210000,
 
+    // Each confidential proof is a synchronous CPU-bound WASM call that blocks
+    // the browser's main thread; on CI a single call can exceed karma's default
+    // socket.io ping window (pingInterval 25s + pingTimeout 5s), so the heartbeat
+    // declares the connection dead mid-spec ("Disconnected ... ping timeout").
+    // Widen the pong wait so the heartbeat tolerates these blocks — a truly stuck
+    // spec is still caught by the 180s jasmine / 210s no-activity timeouts above.
+    pingTimeout: 120000,
+
     plugins: [
       'karma-webpack',
       'karma-jasmine',
