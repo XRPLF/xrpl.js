@@ -10,13 +10,13 @@ export type MptCryptoModule = typeof import('@xrplf/mpt-crypto')
 let cached: Promise<MptCryptoModule> | undefined
 
 /**
- * Lazily import the optional `@xrplf/mpt-crypto` peer dependency, caching the
- * resolved module so the WASM binary is only loaded once. Confidential MPT
- * operations are the sole consumers of this loader, so users who never touch
- * `xrpl/confidential` never pay the dependency or load cost.
+ * Lazily import the `@xrplf/mpt-crypto` dependency, caching the resolved module
+ * so the WASM binary is only loaded once. The import is dynamic on purpose:
+ * bundlers code-split the ~2 MB WASM into its own chunk, so apps that never
+ * touch `xrpl/confidential` never load it even though it ships with `xrpl`.
  *
  * @returns The resolved `@xrplf/mpt-crypto` module.
- * @throws {XrplError} If the optional peer dependency is not installed.
+ * @throws {XrplError} If the module fails to load.
  */
 export async function loadMptCrypto(): Promise<MptCryptoModule> {
   /* eslint-disable no-inline-comments -- the webpack chunk-name hint must lead the import specifier */
@@ -25,8 +25,8 @@ export async function loadMptCrypto(): Promise<MptCryptoModule> {
   ).catch((error: unknown) => {
     cached = undefined
     throw new XrplError(
-      'Confidential MPT operations require the optional "@xrplf/mpt-crypto" ' +
-        'package. Install it with `npm install @xrplf/mpt-crypto`.',
+      'Failed to load the "@xrplf/mpt-crypto" module required for Confidential ' +
+        'MPT operations.',
       error,
     )
   })

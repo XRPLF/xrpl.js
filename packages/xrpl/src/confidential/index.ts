@@ -1,13 +1,13 @@
 /**
- * `xrpl/confidential` — optional, lazily-loaded integration layer for
- * Confidential MPT (XLS-0096). High-level builders assemble each confidential
- * transaction (querying ledger state, generating shared-blinding ciphertexts,
- * commitments, and ordered zero-knowledge proofs) so callers never hand-build
- * the cryptographic material.
+ * `xrpl/confidential` — lazily-loaded integration layer for Confidential MPT
+ * (XLS-0096). High-level builders assemble each confidential transaction
+ * (querying ledger state, generating shared-blinding ciphertexts, commitments,
+ * and ordered zero-knowledge proofs) so callers never hand-build the
+ * cryptographic material.
  *
- * The crypto lives in the optional `@xrplf/mpt-crypto` peer dependency, reached
- * only through a dynamic import. Nothing here is exported from `xrpl`'s main
- * entry point, so users who don't need confidential MPT install nothing extra.
+ * The crypto lives in the `@xrplf/mpt-crypto` dependency, reached only through a
+ * dynamic import so bundlers code-split its WASM. Nothing here is exported from
+ * `xrpl`'s main entry point, so apps that don't use confidential MPT never load it.
  */
 
 export { loadMptCrypto } from './loader'

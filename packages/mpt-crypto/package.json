@@ -1,12 +1,12 @@
 {
   "name": "@xrplf/mpt-crypto",
   "version": "0.1.0",
-  "private": true,
   "description": "Confidential MPT (XLS-0096) cryptographic primitives for the XRP Ledger, compiled to WebAssembly",
   "files": [
     "dist/*",
     "wasm/*",
-    "src/*"
+    "src/*",
+    "MPT_CRYPTO_VERSION"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,8 +38,13 @@
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsc --build tsconfig.build.json && tsc -p tsconfig.esm.json && node scripts/finalize-esm.js",
+    "fetch:wasm": "bash scripts/fetch-wasm.sh",
     "test": "jest --passWithNoTests --verbose false --silent=false ./test/*.test.ts",
     "lint": "eslint . --max-warnings 0",
     "clean": "rm -rf ./dist ./coverage tsconfig.build.tsbuildinfo"
