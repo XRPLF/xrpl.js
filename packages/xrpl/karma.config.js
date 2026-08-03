@@ -35,6 +35,14 @@ module.exports = function (config) {
     webpack: webpackConfig,
     files: ['build/xrpl-latest.js', 'test/integration/**/*.test.ts'],
 
+    // A/B ISOLATION (temporary): exclude the confidential specs to test whether
+    // *including* them is what degrades the browser run (funding tests slowed from
+    // sub-second to ~16s, then a 30s no-activity disconnect at spec ~48, before any
+    // confidential spec ran). If this run is green, inclusion is the cause; if it
+    // still degrades on the funding tests, it's rippled/image, not the dual work.
+    // Remove this exclude once the A/B result is known.
+    exclude: ['test/integration/**/confidentialMPT*.test.ts'],
+
     plugins: [
       'karma-webpack',
       'karma-jasmine',
