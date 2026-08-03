@@ -29,11 +29,12 @@ import { generateFundedWallet, testTransaction } from '../utils'
  * Requires the MPTokensV1 + Clawback + ConfidentialTransfer amendments (see
  * ./confidentialMPTUtils.ts).
  */
-// Setup (fund issuer + create the confidential issuance) measures ~0.2s; the
-// full lifecycle it() measures ~40s (dominated by confidential proof
-// generation). Timeouts are ~2x the measured worst case to absorb CI variance.
+// Setup (fund issuer + create the confidential issuance) is light (~0.2s local).
+// The full lifecycle it() measures ~40s locally but runs the confidential
+// proof generation ~2.3x slower on CI (~90s). LIFECYCLE_TIMEOUT is ~2x that CI
+// cost — do NOT size it from the local number alone, or CI will time out.
 const SETUP_TIMEOUT = 10000
-const LIFECYCLE_TIMEOUT = 80000
+const LIFECYCLE_TIMEOUT = 180000
 
 describe('Confidential MPT 4-party lifecycle', function () {
   let testContext: ConfidentialContext

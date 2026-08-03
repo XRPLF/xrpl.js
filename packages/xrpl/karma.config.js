@@ -35,11 +35,12 @@ module.exports = function (config) {
     files: ['build/xrpl-latest.js', 'test/integration/**/*.test.ts'],
 
     // The confidential MPT 4-party lifecycle test drives the whole flow (all
-    // five transaction types + auditor disclosure) in a single ~40s it() that
-    // emits nothing mid-run. Keep karma's no-activity window above that spec's
-    // own 80s jasmine timeout so jasmine — not karma — fails a genuinely stuck
-    // run (karma's default is 30s, which disconnects mid-spec).
-    browserNoActivityTimeout: 100000,
+    // five transaction types + auditor disclosure) in a single it() that runs
+    // ~90s on CI (proof generation is ~2.3x slower there) and emits nothing
+    // mid-run. Keep karma's no-activity window above that spec's own 180s
+    // jasmine timeout so jasmine — not karma — fails a genuinely stuck run
+    // (karma's default is 30s, which disconnects mid-spec).
+    browserNoActivityTimeout: 210000,
 
     plugins: [
       'karma-webpack',
