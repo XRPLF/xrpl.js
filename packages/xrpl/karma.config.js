@@ -43,12 +43,13 @@ module.exports = function (config) {
     browserNoActivityTimeout: 210000,
 
     // Each confidential proof is a synchronous CPU-bound WASM call that blocks
-    // the browser's main thread; on CI a single call can exceed karma's default
-    // socket.io ping window (pingInterval 25s + pingTimeout 5s), so the heartbeat
-    // declares the connection dead mid-spec ("Disconnected ... ping timeout").
-    // Widen the pong wait so the heartbeat tolerates these blocks — a truly stuck
-    // spec is still caught by the 180s jasmine / 210s no-activity timeouts above.
-    pingTimeout: 120000,
+    // the browser's main thread. Measured: the longest single block is ~3.7s
+    // locally, ~8.5s on CI (proof-gen ~2.3x slower) — which exceeds karma's
+    // default socket.io pong wait (pingTimeout 5s), so the heartbeat declares the
+    // connection dead mid-spec ("Disconnected ... ping timeout"). Widen it to ~7x
+    // that worst-case block; a truly stuck spec is still caught by the 180s
+    // jasmine / 210s no-activity timeouts above.
+    pingTimeout: 60000,
 
     plugins: [
       'karma-webpack',
