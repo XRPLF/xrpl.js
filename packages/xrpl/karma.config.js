@@ -6,10 +6,9 @@ const webpackConfig = require('./test/webpack.config')
 delete webpackConfig.entry
 
 // The @xrplf/mpt-crypto ESM glue locates its wasm via new URL(import.meta.url),
-// so webpack emits mpt_crypto.wasm as a hashed asset — but karma only serves files
-// in its `files` list, so the browser's fetch 404s. Stream any *.wasm from the
-// webpack output dir at request time (race-free: it's emitted before the browser
-// asks). This is what lets the Confidential MPT suite run in a real browser.
+// so webpack emits mpt_crypto.wasm as a hashed asset that karma's static file
+// server doesn't know to serve (404). Stream any *.wasm from the webpack output
+// dir at request time so the confidential specs can load the crypto in-browser.
 const WASM_OUTPUT_DIR = path.join(__dirname, 'test', 'testCompiledForWeb')
 function createWasmMiddleware() {
   return function wasmMiddleware(req, res, next) {
@@ -27,21 +26,20 @@ function createWasmMiddleware() {
 }
 
 module.exports = function (config) {
-  // Apply the shared base first, then override — base sets `plugins`, so the
-  // wasm middleware plugin has to be registered after it (not before).
+  // Apply the shared base first: it sets `plugins`, which the override below
+  // extends with the wasm middleware.
   baseKarmaConfig(config)
 
   config.set({
     webpack: webpackConfig,
     files: ['build/xrpl-latest.js', 'test/integration/**/*.test.ts'],
 
-    // A/B ISOLATION (temporary): exclude the confidential specs to test whether
-    // *including* them is what degrades the browser run (funding tests slowed from
-    // sub-second to ~16s, then a 30s no-activity disconnect at spec ~48, before any
-    // confidential spec ran). If this run is green, inclusion is the cause; if it
-    // still degrades on the funding tests, it's rippled/image, not the dual work.
-    // Remove this exclude once the A/B result is known.
-    exclude: ['test/integration/**/confidentialMPT*.test.ts'],
+    // The confidential MPT 4-party lifecycle test drives the whole flow (all
+    // five transaction types + auditor disclosure) in a single ~40s it() that
+    // emits nothing mid-run. Keep karma's no-activity window above that spec's
+    // own 80s jasmine timeout so jasmine — not karma — fails a genuinely stuck
+    // run (karma's default is 30s, which disconnects mid-spec).
+    browserNoActivityTimeout: 100000,
 
     plugins: [
       'karma-webpack',
