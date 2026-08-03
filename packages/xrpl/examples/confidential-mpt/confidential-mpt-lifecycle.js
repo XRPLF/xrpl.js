@@ -63,7 +63,7 @@ async function showBalance(client, name, address, mptID, key) {
 }
 
 async function main() {
-  console.log(`Confidential MPT lifecycle on ${SERVER}\n`)
+  console.log(`Confidential MPT lifecycle\n`)
   const client = new Client(SERVER)
   await client.connect()
 

@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention -- WASM exports keep their C names */
 /* eslint-disable max-params -- this interface mirrors the C ABI; many byte-pointer args are inherent */
-/* eslint-disable n/global-require -- runtime-resolved Emscripten glue */
-/* eslint-disable @typescript-eslint/no-var-requires -- runtime-resolved Emscripten glue */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment -- Emscripten factory typed via ModuleFactory */
 
 /**
  * Typed view of the Emscripten-generated `mpt_crypto` WASM module. Only the
@@ -107,25 +104,30 @@ export interface WasmModule {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-type-alias -- the Emscripten module factory's call signature
-type ModuleFactory = (args?: Record<string, unknown>) => Promise<WasmModule>
+type WasmFactory = (args?: Record<string, unknown>) => Promise<WasmModule>
 
 let cached: Promise<WasmModule> | undefined
 
 /**
- * Load (once) and return the vendored WASM module. The Emscripten glue locates
- * `mpt_crypto.wasm` next to its own `.js` file, so the vendored `wasm/` folder
- * must ship alongside the compiled output.
+ * Load (once) and return the vendored WASM module.
  *
- * Provenance: `mpt_crypto.{js,wasm}` are produced by mpt-crypto's
- * `.github/scripts/build-wasm.sh` (an Emscripten build of the pinned secp256k1 +
- * OpenSSL + C sources). The release-artifact + checksum/provenance flow is
- * tracked in `WASM_RELEASE_AND_NPM_PUBLISH.md`.
+ * The glue is imported via this package's own `./wasm` subpath export so one line
+ * serves both builds: `require`/Jest get the CJS glue, bundlers/browsers the ESM
+ * glue (whose `new URL(import.meta.url)` lets them emit the wasm as an asset). See
+ * the `package.json` exports and `src/wasm.d.ts`.
+ *
+ * Provenance: `mpt_crypto.{js,mjs,wasm}` come from mpt-crypto's
+ * `.github/scripts/build-wasm.sh`; release/checksum flow in `WASM_RELEASE_AND_NPM_PUBLISH.md`.
  *
  * @returns A promise resolving to the initialized WASM module.
  */
 export async function loadWasmModule(): Promise<WasmModule> {
   cached ??= (async (): Promise<WasmModule> => {
-    const factory: ModuleFactory = require('../wasm/mpt_crypto')
+    /* eslint-disable no-inline-comments -- the webpack chunk-name hint must lead the import specifier */
+    const { default: factory }: { default: WasmFactory } = await import(
+      /* webpackChunkName: "mpt-crypto-wasm" */ '@xrplf/mpt-crypto/wasm'
+    )
+    /* eslint-enable no-inline-comments */
     const instance = await factory()
     // Force one-time initialization of the shared secp256k1 context; a zero
     // return means creation failed — fail loudly rather than on the first op.

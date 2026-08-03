@@ -103,7 +103,7 @@ describe('MPTokenIssuanceCreate', function () {
   // TODO(confidential-mpts): XLS-94D MutableFlags model; rc2+ renamed it to
   // ImmutableFlags with inverted semantics (XLS-583 / xrpld-private #303).
   // Skipped until the client MutableFlags->ImmutableFlags migration lands.
-  it.skip(
+  xit(
     'persists Flags and MutableFlags on the MPTokenIssuance ledger object (XLS-94D)',
     async () => {
       const tx: MPTokenIssuanceCreate = {

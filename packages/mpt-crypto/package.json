@@ -10,6 +10,21 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "browser": "./dist/esm/index.js",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./wasm": {
+      "browser": "./wasm/mpt_crypto.mjs",
+      "import": "./wasm/mpt_crypto.mjs",
+      "require": "./wasm/mpt_crypto.js",
+      "default": "./wasm/mpt_crypto.js"
+    }
+  },
   "license": "ISC",
   "keywords": [
     "ripple",
@@ -24,7 +39,7 @@
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "build": "tsc --build tsconfig.build.json && tsc -p tsconfig.esm.json && node scripts/finalize-esm.js",
     "test": "jest --passWithNoTests --verbose false --silent=false ./test/*.test.ts",
     "lint": "eslint . --max-warnings 0",
     "clean": "rm -rf ./dist ./coverage tsconfig.build.tsbuildinfo"
