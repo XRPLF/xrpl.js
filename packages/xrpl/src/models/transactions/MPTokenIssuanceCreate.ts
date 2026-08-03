@@ -58,51 +58,67 @@ export enum MPTokenIssuanceCreateFlags {
   tfMPTCanClawback = 0x00000040,
 }
 
-export enum MPTokenIssuanceCreateMutableFlags {
+/**
+ * ImmutableFlags for an MPTokenIssuanceCreate transaction (XLS-94D DynamicMPT).
+ *
+ * By default `MPTokenMetadata`, `TransferFee`, and the MPT issuance flags below
+ * are mutable via MPTokenIssuanceSet. Setting a bit here permanently makes the
+ * corresponding field or flag immutable. These transaction-level `tif*` bits
+ * share the same numeric values as the on-ledger `lsif*` bits recorded in
+ * {@link MPTokenIssuanceImmutableFlags}.
+ *
+ * @category Transaction Flags
+ */
+export enum MPTokenIssuanceCreateImmutableFlags {
   /**
-   * If set, indicates the lsfMPTCanLock flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanLock` immutable.
    */
-  tmfMPTCanEnableCanLock = 0x00000002,
+  tifMPTCanLock = 0x00000002,
   /**
-   * If set, indicates the lsfMPTRequireAuth flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTRequireAuth` immutable.
    */
-  tmfMPTCanEnableRequireAuth = 0x00000004,
+  tifMPTRequireAuth = 0x00000004,
   /**
-   * If set, indicates the lsfMPTCanEscrow flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanEscrow` immutable.
    */
-  tmfMPTCanEnableCanEscrow = 0x00000008,
+  tifMPTCanEscrow = 0x00000008,
   /**
-   * If set, indicates the lsfMPTCanTrade flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanTrade` immutable.
    */
-  tmfMPTCanEnableCanTrade = 0x00000010,
+  tifMPTCanTrade = 0x00000010,
   /**
-   * If set, indicates the lsfMPTCanTransfer flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanTransfer` immutable.
    */
-  tmfMPTCanEnableCanTransfer = 0x00000020,
+  tifMPTCanTransfer = 0x00000020,
   /**
-   * If set, indicates the lsfMPTCanClawback flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanClawback` immutable.
    */
-  tmfMPTCanEnableCanClawback = 0x00000040,
+  tifMPTCanClawback = 0x00000040,
   /**
-   * If set, Allows field MPTokenMetadata to be modified.
+   * Make flag `lsfMPTCanHoldConfidentialBalance` immutable. (XLS-96 Confidential MPT)
    */
-  tmfMPTCanMutateMetadata = 0x00010000,
+  tifMPTCanHoldConfidentialBalance = 0x00000080,
   /**
-   * If set, Allows field TransferFee to be modified.
+   * Make field `MPTokenMetadata` immutable.
    */
-  tmfMPTCanMutateTransferFee = 0x00020000,
+  tifMPTMetadata = 0x00010000,
+  /**
+   * Make field `TransferFee` immutable.
+   */
+  tifMPTTransferFee = 0x00020000,
 }
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
-export const tmfMPTokenIssuanceCreateMutableMask = ~(
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanLock |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableRequireAuth |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanEscrow |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTrade |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanTransfer |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanEnableCanClawback |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateMetadata |
-  MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee
+export const tifMPTokenIssuanceImmutableMask = ~(
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanLock |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTRequireAuth |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanEscrow |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanTrade |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanTransfer |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanClawback |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanHoldConfidentialBalance |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTMetadata |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTTransferFee
 )
 /* eslint-enable no-bitwise */
 
@@ -141,39 +157,43 @@ export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterfac
   tfMPTCanClawback?: boolean
 }
 
-export interface MPTokenIssuanceCreateMutableFlagsInterface {
+export interface MPTokenIssuanceCreateImmutableFlagsInterface {
   /**
-   * If set, indicates the lsfMPTCanLock flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanLock` immutable.
    */
-  tmfMPTCanEnableCanLock?: boolean
+  tifMPTCanLock?: boolean
   /**
-   * If set, indicates the lsfMPTRequireAuth flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTRequireAuth` immutable.
    */
-  tmfMPTCanEnableRequireAuth?: boolean
+  tifMPTRequireAuth?: boolean
   /**
-   * If set, indicates the lsfMPTCanEscrow flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanEscrow` immutable.
    */
-  tmfMPTCanEnableCanEscrow?: boolean
+  tifMPTCanEscrow?: boolean
   /**
-   * If set, indicates the lsfMPTCanTrade flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanTrade` immutable.
    */
-  tmfMPTCanEnableCanTrade?: boolean
+  tifMPTCanTrade?: boolean
   /**
-   * If set, indicates the lsfMPTCanTransfer flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanTransfer` immutable.
    */
-  tmfMPTCanEnableCanTransfer?: boolean
+  tifMPTCanTransfer?: boolean
   /**
-   * If set, indicates the lsfMPTCanClawback flag can later be enabled via MPTokenIssuanceSet.
+   * Make flag `lsfMPTCanClawback` immutable.
    */
-  tmfMPTCanEnableCanClawback?: boolean
+  tifMPTCanClawback?: boolean
   /**
-   * If set, Allows field MPTokenMetadata to be modified.
+   * Make flag `lsfMPTCanHoldConfidentialBalance` immutable. (XLS-96 Confidential MPT)
    */
-  tmfMPTCanMutateMetadata?: boolean
+  tifMPTCanHoldConfidentialBalance?: boolean
   /**
-   * If set, Allows field TransferFee to be modified.
+   * Make field `MPTokenMetadata` immutable.
    */
-  tmfMPTCanMutateTransferFee?: boolean
+  tifMPTMetadata?: boolean
+  /**
+   * Make field `TransferFee` immutable.
+   */
+  tifMPTTransferFee?: boolean
 }
 
 /**
@@ -225,8 +245,14 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
 
-  /* Indicate specific fields or flags mutable */
-  MutableFlags?: number
+  /**
+   * A bitmask of {@link MPTokenIssuanceCreateImmutableFlags} (`tif*`) that
+   * permanently makes the corresponding fields or MPT issuance flags immutable.
+   * By default `MPTokenMetadata`, `TransferFee`, and the MPT issuance flags
+   * remain mutable via MPTokenIssuanceSet; setting a bit here opts out of that
+   * mutability for the life of the issuance. (XLS-94D)
+   */
+  ImmutableFlags?: number
 
   /* The domainID that governs admissibility pertaining to the MPToken. */
   DomainID?: string
@@ -251,7 +277,7 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
-  validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'ImmutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
 
   if (
@@ -267,13 +293,13 @@ export function validateMPTokenIssuanceCreate(
     )
   }
 
-  if (tx.MutableFlags != null) {
+  if (typeof tx.ImmutableFlags === 'number') {
     // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
-    const invalidBits = tx.MutableFlags & tmfMPTokenIssuanceCreateMutableMask
-    // rippled rejects a present-but-zero MutableFlags, as well as out-of-mask bits.
-    if (tx.MutableFlags === 0 || invalidBits !== 0) {
+    const invalidBits = tx.ImmutableFlags & tifMPTokenIssuanceImmutableMask
+    // rippled rejects a present-but-zero ImmutableFlags, as well as out-of-mask bits.
+    if (tx.ImmutableFlags === 0 || invalidBits !== 0) {
       throw new ValidationError(
-        'MPTokenIssuanceCreate: Invalid MutableFlags value',
+        'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
       )
     }
   }

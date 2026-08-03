@@ -10,7 +10,7 @@ export * as LedgerEntry from './ledger'
 export {
   parseAccountRootFlags,
   parseMPTokenIssuanceFlags,
-  parseMPTokenIssuanceMutableFlags,
+  parseMPTokenIssuanceImmutableFlags,
   setTransactionFlagsToNumber,
   convertTxFlagsToNumber,
   parseTransactionFlags,
