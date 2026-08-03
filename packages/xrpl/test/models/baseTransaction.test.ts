@@ -230,4 +230,56 @@ describe('BaseTransaction', function () {
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   })
+
+  it(`Allows tfSponsorReserve on a rippled-allow-listed transaction type`, function () {
+    const validReserveSponsorship = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      // tfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertValid(validReserveSponsorship)
+  })
+
+  it(`Rejects tfSponsorReserve on a transaction type not on rippled's allow-list`, function () {
+    const invalidReserveSponsorship = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'OfferCreate',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      // tfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertInvalid(
+      invalidReserveSponsorship,
+      'Transaction: OfferCreate cannot use tfSponsorReserve flag',
+    )
+  })
+
+  it(`Rejects tfSponsorReserve combined with Delegate`, function () {
+    const invalidReserveSponsorshipWithDelegate = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Delegate: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // tfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertInvalid(
+      invalidReserveSponsorshipWithDelegate,
+      'Transaction: SponsorFlags.tfSponsorReserve cannot be combined with Delegate',
+    )
+  })
+
+  it(`Allows tfSponsorFee combined with Delegate`, function () {
+    const validFeeSponsorshipWithDelegate = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Delegate: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // tfSponsorFee
+      SponsorFlags: 0x00000001,
+    }
+    assertValid(validFeeSponsorshipWithDelegate)
+  })
 })

@@ -80,7 +80,7 @@ describe('Sponsorship (XLS-68)', function () {
     )
 
     it(
-      'creates sponsorship with FeeAmountDelta',
+      'creates sponsorship with FeeAmount',
       async () => {
         const newSponsee = await generateFundedWallet(testContext.client)
 
@@ -88,7 +88,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: newSponsee.classicAddress,
-          FeeAmountDelta: '10000',
+          FeeAmount: '10000',
           MaxFee: '500',
         }
 
@@ -192,7 +192,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: sponseeWallet.classicAddress,
-          FeeAmountDelta: '10000',
+          FeeAmount: '10000',
           MaxFee: '500',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -261,7 +261,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: lowSponsee.classicAddress,
           // Very low amount
-          FeeAmountDelta: '5',
+          FeeAmount: '5',
           MaxFee: '1000',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -306,7 +306,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: maxFeeSponsee.classicAddress,
-          FeeAmountDelta: '10000',
+          FeeAmount: '10000',
           MaxFee: '20',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -764,7 +764,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: combinedSponsee.classicAddress,
-          FeeAmountDelta: '10000',
+          FeeAmount: '10000',
           MaxFee: '1000',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)

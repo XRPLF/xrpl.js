@@ -53,6 +53,46 @@ describe('SponsorshipTransfer', function () {
     assertValid(sponsorshipTransferTx)
   })
 
+  it('throws when account-level tfSponsorshipCreate is missing SponsorSignature', function () {
+    delete sponsorshipTransferTx.ObjectID
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    assertInvalid(
+      sponsorshipTransferTx,
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
+    )
+  })
+
+  it('throws when account-level tfSponsorshipReassign is missing SponsorSignature', function () {
+    delete sponsorshipTransferTx.ObjectID
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipReassign
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    assertInvalid(
+      sponsorshipTransferTx,
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
+    )
+  })
+
+  it('verifies valid account-level tfSponsorshipCreate with SponsorSignature', function () {
+    delete sponsorshipTransferTx.ObjectID
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorSignature = {
+      SigningPubKey:
+        '02356E89059A75438887F9FEE2056A2890DB82A68353BE9C0C0C8F89C0018B37FC',
+      TxnSignature:
+        '3045022100D184EB4AE5956FF600E7536EE459345C7BBCF097A84CC61A93B9AF7197EDB98702201E' +
+        'F0EBFB08929B1C1171B4D4B943774D6388B3B2F1F1E2F3E4F5F6F7F8F9FA',
+    }
+    assertValid(sponsorshipTransferTx)
+  })
+
+  it('verifies valid object-level tfSponsorshipCreate without SponsorSignature', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    assertValid(sponsorshipTransferTx)
+  })
+
   it('throws when ObjectID is not a string', function () {
     sponsorshipTransferTx.ObjectID = 123
     assertInvalid(

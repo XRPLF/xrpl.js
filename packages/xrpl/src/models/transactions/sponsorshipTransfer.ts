@@ -184,6 +184,19 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
     }
   }
 
+  // Account-level reserve sponsorship (tfSponsorshipCreate or tfSponsorshipReassign with no
+  // ObjectID) changes the reserve responsibility for the account itself, so the new sponsor
+  // must explicitly co-sign via SponsorSignature. Object-level sponsorship may draw from a
+  // pre-funded Sponsorship object's budget instead, so no signature is required there.
+  const isAccountLevelReserveSponsorship =
+    (hasCreate || hasReassign) && tx.ObjectID === undefined
+  if (isAccountLevelReserveSponsorship && tx.SponsorSignature === undefined) {
+    throw new ValidationError(
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate ' +
+        'or tfSponsorshipReassign (no ObjectID)',
+    )
+  }
+
   // Validate Sponsee based on scenario
   const hasSponsee = tx.Sponsee !== undefined
 

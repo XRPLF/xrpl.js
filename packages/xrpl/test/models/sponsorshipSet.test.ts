@@ -35,45 +35,45 @@ describe('SponsorshipSet', function () {
     assertValid(sponsorshipSetTx)
   })
 
-  it('verifies valid SponsorshipSet with positive FeeAmountDelta', function () {
-    sponsorshipSetTx.FeeAmountDelta = '1000000'
+  it('verifies valid SponsorshipSet with positive FeeAmount', function () {
+    sponsorshipSetTx.FeeAmount = '1000000'
     assertValid(sponsorshipSetTx)
   })
 
-  it('verifies valid SponsorshipSet with negative FeeAmountDelta', function () {
-    sponsorshipSetTx.FeeAmountDelta = '-1000000'
+  it('verifies valid SponsorshipSet with negative FeeAmount', function () {
+    sponsorshipSetTx.FeeAmount = '-1000000'
     assertValid(sponsorshipSetTx)
   })
 
-  it('throws when FeeAmountDelta is not a string', function () {
-    sponsorshipSetTx.FeeAmountDelta = 1000000
+  it('throws when FeeAmount is not a string', function () {
+    sponsorshipSetTx.FeeAmount = 1000000
     assertInvalid(
       sponsorshipSetTx,
-      'SponsorshipSet: FeeAmountDelta must be a string',
+      'SponsorshipSet: FeeAmount must be a string',
     )
   })
 
-  it('throws when FeeAmountDelta is not numeric', function () {
-    sponsorshipSetTx.FeeAmountDelta = 'not_a_number'
+  it('throws when FeeAmount is not numeric', function () {
+    sponsorshipSetTx.FeeAmount = 'not_a_number'
     assertInvalid(
       sponsorshipSetTx,
-      'SponsorshipSet: FeeAmountDelta must be a numeric string',
+      'SponsorshipSet: FeeAmount must be a numeric string',
     )
   })
 
-  it('throws when FeeAmountDelta is zero', function () {
-    sponsorshipSetTx.FeeAmountDelta = '0'
+  it('throws when FeeAmount is zero', function () {
+    sponsorshipSetTx.FeeAmount = '0'
     assertInvalid(
       sponsorshipSetTx,
-      'SponsorshipSet: FeeAmountDelta must not be zero',
+      'SponsorshipSet: FeeAmount must not be zero',
     )
   })
 
-  it('throws when FeeAmountDelta is negative zero', function () {
-    sponsorshipSetTx.FeeAmountDelta = '-0'
+  it('throws when FeeAmount is negative zero', function () {
+    sponsorshipSetTx.FeeAmount = '-0'
     assertInvalid(
       sponsorshipSetTx,
-      'SponsorshipSet: FeeAmountDelta must not be zero',
+      'SponsorshipSet: FeeAmount must not be zero',
     )
   })
 

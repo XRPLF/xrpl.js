@@ -643,39 +643,52 @@ export interface BaseTransaction extends Record<string, unknown> {
 }
 
 /**
- * Transaction types that can create ledger objects and thus support reserve sponsorship.
- * These transactions can use the tfSponsorReserve flag.
+ * Transaction types explicitly allow-listed by rippled for reserve sponsorship
+ * (see `isReserveSponsorAllowed` in rippled's SponsorHelpers.cpp). Only these
+ * transaction types may use the tfSponsorReserve flag; all others are
+ * rejected server-side with temINVALID_FLAG.
  */
 const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
-  'CheckCreate',
+  'DelegateSet',
   'DepositPreauth',
-  'EscrowCreate',
-  'NFTokenCreateOffer',
-  'OfferCreate',
-  'PaymentChannelCreate',
+  'Payment',
   'SignerListSet',
-  'TicketCreate',
-  'TrustSet',
-  'AMMCreate',
-  'CredentialCreate',
-  'DIDSet',
+  'CheckCancel',
+  'CheckCash',
+  'CheckCreate',
+  'EscrowCancel',
+  'EscrowCreate',
+  'EscrowFinish',
+  'PaymentChannelClaim',
+  'PaymentChannelCreate',
+  'PaymentChannelFund',
+  'Clawback',
+  'MPTokenAuthorize',
   'MPTokenIssuanceCreate',
-  'OracleSet',
-  'VaultCreate',
-  'LoanBrokerSet',
-  'PermissionedDomainSet',
+  'MPTokenIssuanceDestroy',
+  'MPTokenIssuanceSet',
+  'TrustSet',
+  'CredentialAccept',
+  'CredentialCreate',
+  'CredentialDelete',
+  'AccountSet',
+  'SetRegularKey',
+  'SponsorshipTransfer',
 ])
 
 /**
- * Validate that SponsorFlags contains only valid flag values.
+ * Validate that SponsorFlags contains only valid flag values, and that reserve
+ * sponsorship (tfSponsorReserve) is only used where rippled allows it.
  *
  * @param sponsorFlags - The SponsorFlags value to validate.
  * @param transactionType - The transaction type to validate flags against.
+ * @param hasDelegate - Whether the transaction also carries a Delegate field.
  * @throws ValidationError if flags are invalid.
  */
 function validateSponsorFlagsValue(
   sponsorFlags: number,
-  transactionType?: string,
+  transactionType: string | undefined,
+  hasDelegate: boolean,
 ): void {
   /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
   const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
@@ -691,8 +704,10 @@ function validateSponsorFlagsValue(
     )
   }
 
-  // Validate that reserve sponsorship is only used for transactions that create objects
   const hasReserveFlag = (sponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+  /* eslint-enable no-bitwise */
+
+  // Validate that reserve sponsorship is only used for the rippled allow-listed transaction types
   if (
     hasReserveFlag &&
     transactionType &&
@@ -702,7 +717,15 @@ function validateSponsorFlagsValue(
       `Transaction: ${transactionType} cannot use tfSponsorReserve flag (does not create ledger objects)`,
     )
   }
-  /* eslint-enable no-bitwise */
+
+  // Reserve sponsorship is disallowed under permissioned delegation (rippled's
+  // Transactor::checkSponsor rejects Delegate + tfSponsorReserve with temINVALID).
+  if (hasReserveFlag && hasDelegate) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.tfSponsorReserve cannot be combined with Delegate ' +
+        '(reserve sponsorship under permissioned delegation is disallowed)',
+    )
+  }
 }
 
 /**
@@ -757,7 +780,11 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
     if (!isNumber(sponsorFlags)) {
       throw new ValidationError('Transaction: SponsorFlags must be a number')
     }
-    validateSponsorFlagsValue(sponsorFlags, transactionType)
+    validateSponsorFlagsValue(
+      sponsorFlags,
+      transactionType,
+      tx.Delegate !== undefined,
+    )
   }
 
   /* Validate SponsorSignature field */

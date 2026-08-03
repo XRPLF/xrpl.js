@@ -13,7 +13,7 @@ import {
 /**
  * Matches an optionally negative, canonical integer string (no whitespace,
  * scientific notation, decimals, or leading zeros other than "0" itself).
- * Used for FeeAmountDelta, which is a signed delta rather than an absolute amount.
+ * Used for FeeAmount, which is a signed delta rather than an absolute amount.
  */
 const SIGNED_INTEGER_SANITY_CHECK = /^-?[0-9]+$/u
 
@@ -105,8 +105,12 @@ export interface SponsorshipSet extends BaseTransaction {
    * to pay transaction fees; a negative value draws it down. The delta is
    * applied to whatever value the Sponsorship ledger entry currently holds,
    * rather than replacing it outright. Must not be zero.
+   *
+   * Note: despite being a delta rather than an absolute value, the wire field
+   * name is `FeeAmount` (matching the Sponsorship ledger entry and
+   * ripple-binary-codec's field definitions), not `FeeAmountDelta`.
    */
-  FeeAmountDelta?: string
+  FeeAmount?: string
   /**
    * The maximum fee (in drops) that the sponsor is willing to pay per
    * transaction on behalf of the sponsee. If not specified, there is no
@@ -192,26 +196,22 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
   }
 
-  // Validate FeeAmountDelta if present
-  if (tx.FeeAmountDelta !== undefined) {
-    if (!isString(tx.FeeAmountDelta)) {
-      throw new ValidationError(
-        'SponsorshipSet: FeeAmountDelta must be a string',
-      )
+  // Validate FeeAmount if present (a signed delta, not an absolute value)
+  if (tx.FeeAmount !== undefined) {
+    if (!isString(tx.FeeAmount)) {
+      throw new ValidationError('SponsorshipSet: FeeAmount must be a string')
     }
 
     // Use strict regex to reject non-canonical strings (whitespace, scientific notation, decimals, etc.)
-    // Unlike FeeAmount previously, FeeAmountDelta is a signed delta and may be negative.
-    if (!SIGNED_INTEGER_SANITY_CHECK.exec(tx.FeeAmountDelta)) {
+    // FeeAmount here is a signed delta and may be negative.
+    if (!SIGNED_INTEGER_SANITY_CHECK.exec(tx.FeeAmount)) {
       throw new ValidationError(
-        'SponsorshipSet: FeeAmountDelta must be a numeric string',
+        'SponsorshipSet: FeeAmount must be a numeric string',
       )
     }
 
-    if (BigInt(tx.FeeAmountDelta) === BigInt(0)) {
-      throw new ValidationError(
-        'SponsorshipSet: FeeAmountDelta must not be zero',
-      )
+    if (BigInt(tx.FeeAmount) === BigInt(0)) {
+      throw new ValidationError('SponsorshipSet: FeeAmount must not be zero')
     }
   }
 
