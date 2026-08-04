@@ -129,5 +129,31 @@ describe('confidential/ledger', function () {
       )
       assert.strictEqual(balance, 250n)
     })
+
+    it('returns 0n for a zeroed balance after the issuance amount is spent down', async function () {
+      // After the last balance is clawed/converted back, the issuance's
+      // ConfidentialOutstandingAmount reaches 0 and rippled omits the field, yet
+      // the holder MPToken still carries a spending ciphertext of 0. The bound
+      // must fall back to 0 (not throw) and the zero ciphertext must decrypt.
+      const blinding = await generateBlindingFactor()
+      const zeroCiphertext = await encryptAmount(0n, PUBLIC_KEY, blinding)
+      const client = fakeClient((request) => {
+        if (request.mpt_issuance == null) {
+          // MPToken lookup: a spending balance of encrypted 0.
+          return {
+            result: { node: { ConfidentialBalanceSpending: zeroCiphertext } },
+          }
+        }
+        // MPTokenIssuance lookup: no ConfidentialOutstandingAmount (spent down).
+        return { result: { node: { IssuerEncryptionKey: PUBLIC_KEY } } }
+      })
+      const balance = await getConfidentialBalance(
+        client,
+        ADDRESS,
+        ISSUANCE_ID,
+        PRIVATE_KEY,
+      )
+      assert.strictEqual(balance, BigInt(0))
+    })
   })
 })
