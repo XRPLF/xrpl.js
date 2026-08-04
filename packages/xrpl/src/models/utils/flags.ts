@@ -7,8 +7,8 @@ import {
 import {
   MPTokenIssuanceFlags,
   MPTokenIssuanceFlagsInterface,
-  MPTokenIssuanceMutableFlags,
-  MPTokenIssuanceMutableFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
 } from '../ledger/MPTokenIssuance'
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
@@ -83,27 +83,28 @@ export function parseMPTokenIssuanceFlags(
 }
 
 /**
- * Convert the `MutableFlags` field of an `MPTokenIssuance` ledger object into a
- * typed boolean view of the `lsmfMPT*` mutability flags (XLS-94D).
+ * Convert the `ImmutableFlags` field of an `MPTokenIssuance` ledger object into a
+ * typed boolean view of the `lsifMPT*` immutability flags (XLS-94D).
  *
- * @param flags - The numeric value of `MPTokenIssuance.MutableFlags`. This
- * field is absent on issuances created without mutable flags and on
- * pre-amendment objects, in which case an empty interface is returned.
- * @returns An interface with each set `lsmfMPT*` flag as `true`.
+ * @param flags - The numeric value of `MPTokenIssuance.ImmutableFlags`. This
+ * field is absent (equivalent to 0) on issuances where nothing has been made
+ * immutable and on pre-amendment objects, in which case an empty interface is
+ * returned.
+ * @returns An interface with each set `lsifMPT*` flag as `true`.
  */
-export function parseMPTokenIssuanceMutableFlags(
+export function parseMPTokenIssuanceImmutableFlags(
   flags: number | undefined,
-): MPTokenIssuanceMutableFlagsInterface {
-  const flagsInterface: MPTokenIssuanceMutableFlagsInterface = {}
+): MPTokenIssuanceImmutableFlagsInterface {
+  const flagsInterface: MPTokenIssuanceImmutableFlagsInterface = {}
 
   if (flags == null) {
     return flagsInterface
   }
 
-  Object.values(MPTokenIssuanceMutableFlags).forEach((flag) => {
+  Object.values(MPTokenIssuanceImmutableFlags).forEach((flag) => {
     if (
       typeof flag === 'string' &&
-      isFlagEnabled(flags, MPTokenIssuanceMutableFlags[flag])
+      isFlagEnabled(flags, MPTokenIssuanceImmutableFlags[flag])
     ) {
       flagsInterface[flag] = true
     }

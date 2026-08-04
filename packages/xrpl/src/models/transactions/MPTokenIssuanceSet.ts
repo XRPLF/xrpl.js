@@ -20,7 +20,10 @@ import {
   isNumber,
   isDomainID,
 } from './common'
-import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
+import {
+  MAX_TRANSFER_FEE,
+  tifMPTokenIssuanceImmutableMask,
+} from './MPTokenIssuanceCreate'
 
 import type { Transaction } from '.'
 
@@ -38,39 +41,52 @@ export enum MPTokenIssuanceSetFlags {
    * If set, indicates that issuer unlocks the MPT
    */
   tfMPTUnlock = 0x00000002,
-}
-
-/**
- * MutableFlags for an MPTokenIssuanceSet transaction (XLS-94D).
- *
- * Each flag enables the corresponding capability flag on the MPTokenIssuance
- * ledger object. These flags are one-way: once a capability is enabled, it can
- * not be disabled via a subsequent MPTokenIssuanceSet transaction.
- */
-export enum MPTokenIssuanceSetMutableFlags {
-  /* Enables the lsfMPTCanLock flag. Allows the token to be locked both individually and globally. */
-  tmfMPTSetCanLock = 0x00000001,
-  /* Enables the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
-  tmfMPTSetRequireAuth = 0x00000002,
-  /* Enables the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
-  tmfMPTSetCanEscrow = 0x00000004,
-  /* Enables the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
-  tmfMPTSetCanTrade = 0x00000008,
-  /* Enables the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
-  tmfMPTSetCanTransfer = 0x00000010,
-  /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
-  tmfMPTSetCanClawback = 0x00000020,
+  /**
+   * Sets the `lsfMPTCanLock` flag. Enables the token to be locked both individually and globally. (XLS-94D)
+   */
+  tfMPTSetCanLock = 0x00000004,
+  /**
+   * Sets the `lsfMPTRequireAuth` flag. Requires individual holders to be authorized. (XLS-94D)
+   */
+  tfMPTSetRequireAuth = 0x00000008,
+  /**
+   * Sets the `lsfMPTCanEscrow` flag. Allows holders to place balances into escrow. (XLS-94D)
+   */
+  tfMPTSetCanEscrow = 0x00000010,
+  /**
+   * Sets the `lsfMPTCanTrade` flag. Allows holders to trade balances on the XRPL DEX. (XLS-94D)
+   */
+  tfMPTSetCanTrade = 0x00000020,
+  /**
+   * Sets the `lsfMPTCanTransfer` flag. Allows tokens to be transferred to non-issuer accounts. (XLS-94D)
+   */
+  tfMPTSetCanTransfer = 0x00000040,
+  /**
+   * Sets the `lsfMPTCanClawback` flag. Enables the issuer to claw back tokens
+   * via `Clawback` or `AMMClawback` transactions. (XLS-94D)
+   */
+  tfMPTSetCanClawback = 0x00000080,
+  /**
+   * Sets the `lsfMPTCanHoldConfidentialBalance` flag. Enables the token to be held
+   * in a confidential balance. (XLS-96 Confidential MPT)
+   */
+  tfMPTSetCanHoldConfidentialBalance = 0x00000100,
 }
 
 /* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
-export const tmfMPTokenIssuanceSetMutableMask = ~(
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanLock |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetRequireAuth |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanEscrow |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTrade |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanTransfer |
-  MPTokenIssuanceSetMutableFlags.tmfMPTSetCanClawback
-)
+/**
+ * The set of capability-setting `tfMPTSet*` flags. These one-way flags enable
+ * the corresponding capability on the MPTokenIssuance ledger object; once
+ * enabled, a capability cannot be disabled via a subsequent MPTokenIssuanceSet.
+ */
+export const tfMPTokenIssuanceSetEnableFlagMask =
+  MPTokenIssuanceSetFlags.tfMPTSetCanLock |
+  MPTokenIssuanceSetFlags.tfMPTSetRequireAuth |
+  MPTokenIssuanceSetFlags.tfMPTSetCanEscrow |
+  MPTokenIssuanceSetFlags.tfMPTSetCanTrade |
+  MPTokenIssuanceSetFlags.tfMPTSetCanTransfer |
+  MPTokenIssuanceSetFlags.tfMPTSetCanClawback |
+  MPTokenIssuanceSetFlags.tfMPTSetCanHoldConfidentialBalance
 /* eslint-enable no-bitwise */
 
 /**
@@ -82,21 +98,26 @@ export const tmfMPTokenIssuanceSetMutableMask = ~(
 export interface MPTokenIssuanceSetFlagsInterface extends GlobalFlagsInterface {
   tfMPTLock?: boolean
   tfMPTUnlock?: boolean
-}
-
-export interface MPTokenIssuanceSetMutableFlagsInterface {
-  /* Enables the lsfMPTCanLock flag. Allows the token to be locked both individually and globally. */
-  tmfMPTSetCanLock?: boolean
-  /* Enables the lsfMPTRequireAuth flag. Requires individual holders to be authorized. */
-  tmfMPTSetRequireAuth?: boolean
-  /* Enables the lsfMPTCanEscrow flag. Allows holders to place balances into escrow. */
-  tmfMPTSetCanEscrow?: boolean
-  /* Enables the lsfMPTCanTrade flag. Allows holders to trade balances on the XRPL DEX. */
-  tmfMPTSetCanTrade?: boolean
-  /* Enables the lsfMPTCanTransfer flag. Allows tokens to be transferred to non-issuer accounts. */
-  tmfMPTSetCanTransfer?: boolean
-  /* Enables the lsfMPTCanClawback flag. Enables the issuer to claw back tokens via Clawback or AMMClawback transactions. */
-  tmfMPTSetCanClawback?: boolean
+  /* Sets the `lsfMPTCanLock` flag. Enables the token to be locked both individually and globally. */
+  tfMPTSetCanLock?: boolean
+  /* Sets the `lsfMPTRequireAuth` flag. Requires individual holders to be authorized. */
+  tfMPTSetRequireAuth?: boolean
+  /* Sets the `lsfMPTCanEscrow` flag. Allows holders to place balances into escrow. */
+  tfMPTSetCanEscrow?: boolean
+  /* Sets the `lsfMPTCanTrade` flag. Allows holders to trade balances on the XRPL DEX. */
+  tfMPTSetCanTrade?: boolean
+  /* Sets the `lsfMPTCanTransfer` flag. Allows tokens to be transferred to non-issuer accounts. */
+  tfMPTSetCanTransfer?: boolean
+  /**
+   * Sets the `lsfMPTCanClawback` flag. Enables the issuer to claw back tokens
+   * via `Clawback` or `AMMClawback` transactions.
+   */
+  tfMPTSetCanClawback?: boolean
+  /**
+   * Sets the `lsfMPTCanHoldConfidentialBalance` flag. Enables the token to be
+   * held in a confidential balance. (XLS-96 Confidential MPT)
+   */
+  tfMPTSetCanHoldConfidentialBalance?: boolean
 }
 
 /**
@@ -117,25 +138,29 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 
   /**
-   * New metadata to set on the issuance, in hex format (max 1024 bytes). The
-   * issuance must have been created with `tmfMPTCanMutateMetadata`, otherwise
-   * the mutation is rejected. Should follow the
+   * New metadata to replace the existing value, in hex format (max 1024 bytes).
+   * The transaction will be rejected if `lsifMPTMetadata` has been set in
+   * `ImmutableFlags`. Setting an empty `MPTokenMetadata` removes the field.
+   * Should follow the
    * {@link https://github.com/XRPLF/XRPL-Standards/tree/master/XLS-0089-multi-purpose-token-metadata-schema | XLS-89} standard.
    */
   MPTokenMetadata?: string
   /**
-   * New transfer fee for secondary sales, between 0 and 50,000 inclusive (in
-   * increments of 0.001%). The issuance must have been created with
-   * `tmfMPTCanMutateTransferFee`, otherwise the mutation is rejected.
+   * New transfer fee value, between 0 and 50,000 inclusive (in increments of
+   * 0.001%). The transaction will be rejected if `lsifMPTTransferFee` has been
+   * set in `ImmutableFlags`. A non-zero value requires `lsfMPTCanTransfer` to
+   * already be set on the ledger, or to be enabled by this same transaction via
+   * `tfMPTSetCanTransfer`. Setting `TransferFee` to zero removes the field.
    */
   TransferFee?: number
   /**
-   * A one-way "enable" bitmask of {@link MPTokenIssuanceSetMutableFlags} that
-   * turns on the corresponding capability flag(s) on the MPTokenIssuance. Each
-   * enable requires the matching `tmfMPTCanEnable*` flag to have been granted
-   * at creation; once enabled a capability cannot be disabled. (XLS-94D)
+   * Declares which fields or flags are immutable, via a bitmask of
+   * {@link MPTokenIssuanceCreateImmutableFlags} (`tif*`). Once a bit is set, the
+   * corresponding field or flag can never be set or modified again. The
+   * `ImmutableFlags` provided here are added to the current ledger object's
+   * `ImmutableFlags`; it is not a complete replacement. (XLS-94D)
    */
-  MutableFlags?: number
+  ImmutableFlags?: number
   /**
    * The PermissionedDomain object ID that gates who may hold this MPT. Cannot
    * be set together with the `Holder` field.
@@ -156,7 +181,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Holder', isAccount)
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
-  validateOptionalField(tx, 'MutableFlags', isNumber)
+  validateOptionalField(tx, 'ImmutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
 
   if (tx.DomainID != null && tx.Holder != null) {
@@ -164,28 +189,27 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
       'MPTokenIssuanceSet: Cannot set both DomainID and Holder fields.',
     )
   }
-  if (tx.MutableFlags != null) {
+
+  if (typeof tx.ImmutableFlags === 'number') {
     // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
-    const invalidBits = tx.MutableFlags & tmfMPTokenIssuanceSetMutableMask
-    // rippled rejects a present-but-zero MutableFlags, as well as out-of-mask bits.
-    if (tx.MutableFlags === 0 || invalidBits !== 0) {
+    const invalidBits = tx.ImmutableFlags & tifMPTokenIssuanceImmutableMask
+    // rippled rejects a present-but-zero ImmutableFlags, as well as out-of-mask bits.
+    if (tx.ImmutableFlags === 0 || invalidBits !== 0) {
       throw new ValidationError(
-        'MPTokenIssuanceSet: Invalid MutableFlags value',
+        'MPTokenIssuanceSet: Invalid ImmutableFlags value',
       )
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Not necessary
-  const flags = (tx.Flags ?? 0) as number | MPTokenIssuanceSetFlagsInterface
-  const isTfMPTLock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTLock)
-      : (flags.tfMPTLock ?? false)
-
-  const isTfMPTUnlock =
-    typeof flags === 'number'
-      ? isFlagEnabled(flags, MPTokenIssuanceSetFlags.tfMPTUnlock)
-      : (flags.tfMPTUnlock ?? false)
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
+  const flagsNum = convertTxFlagsToNumber(tx as Transaction)
+  const isTfMPTLock = isFlagEnabled(flagsNum, MPTokenIssuanceSetFlags.tfMPTLock)
+  const isTfMPTUnlock = isFlagEnabled(
+    flagsNum,
+    MPTokenIssuanceSetFlags.tfMPTUnlock,
+  )
+  // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+  const hasEnableFlag = (flagsNum & tfMPTokenIssuanceSetEnableFlagMask) !== 0
 
   if (isTfMPTLock && isTfMPTUnlock) {
     throw new ValidationError('MPTokenIssuanceSet: flag conflict')
@@ -197,16 +221,15 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 
+  // A mutation sets/updates a capability flag, MPTokenMetadata, TransferFee, or
+  // ImmutableFlags. These may not be combined with a Holder or a lock/unlock.
   const isMutate =
-    tx.MutableFlags != null ||
+    hasEnableFlag ||
     tx.MPTokenMetadata != null ||
-    tx.TransferFee != null
-  if (
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
-    convertTxFlagsToNumber(tx as Transaction) === 0 &&
-    tx.DomainID == null &&
-    !isMutate
-  ) {
+    tx.TransferFee != null ||
+    tx.ImmutableFlags != null
+
+  if (flagsNum === 0 && tx.DomainID == null && !isMutate) {
     throw new ValidationError(
       'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
     )
@@ -218,10 +241,9 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Pseudo-Txn missing in BaseTransaction type.
-  if (isMutate && convertTxFlagsToNumber(tx as Transaction) !== 0) {
+  if (isMutate && (isTfMPTLock || isTfMPTUnlock)) {
     throw new ValidationError(
-      'MPTokenIssuanceSet: Can not set flags when mutating MPTokenIssuance.',
+      'MPTokenIssuanceSet: Can not lock/unlock while mutating MPTokenIssuance.',
     )
   }
 
