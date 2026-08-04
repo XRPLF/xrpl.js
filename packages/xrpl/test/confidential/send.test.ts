@@ -68,15 +68,19 @@ describe('confidential/prepareConfidentialSend', function () {
     assert.lengthOf(tx.ZKProof, 1892)
     // each party's ciphertext decrypts to the sent amount with its own key
     assert.strictEqual(
-      await decryptAmount(tx.DestinationEncryptedAmount, KEY_B.privateKey),
+      await decryptAmount(
+        tx.DestinationEncryptedAmount,
+        KEY_B.privateKey,
+        10_000n,
+      ),
       300n,
     )
     assert.strictEqual(
-      await decryptAmount(tx.SenderEncryptedAmount, KEY_A.privateKey),
+      await decryptAmount(tx.SenderEncryptedAmount, KEY_A.privateKey, 10_000n),
       300n,
     )
     assert.strictEqual(
-      await decryptAmount(tx.IssuerEncryptedAmount, KEY_A.privateKey),
+      await decryptAmount(tx.IssuerEncryptedAmount, KEY_A.privateKey, 10_000n),
       300n,
     )
   })
@@ -99,6 +103,7 @@ describe('confidential/prepareConfidentialSend', function () {
       await decryptAmount(
         tx.AuditorEncryptedAmount as string,
         KEY_A.privateKey,
+        10_000n,
       ),
       200n,
     )

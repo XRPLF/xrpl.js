@@ -11,11 +11,9 @@ import { withModule } from './runtime'
 const U64_BYTES = 8
 
 // mpt-crypto decrypts an ElGamal amount by brute-forcing the discrete log over
-// [DECRYPT_RANGE_LOW, DECRYPT_RANGE_HIGH]; the search stops at the recovered
-// value, so cost scales with the amount, not the window. These are the library's
-// recommended defaults (secp256k1_mpt.h): [0, 1_000_000]. High must be < UINT64_MAX.
+// [0, rangeHigh]; the search stops at the recovered value, so cost scales with
+// the amount, not the window. rangeHigh must be < UINT64_MAX (secp256k1_mpt.h).
 const DECRYPT_RANGE_LOW = 0n
-const DECRYPT_RANGE_HIGH = 1_000_000n
 
 /**
  * Generate a 32-byte blinding factor / ElGamal randomness scalar.
@@ -67,18 +65,22 @@ export async function encryptAmount(
 /**
  * Decrypt an ElGamal ciphertext with a private key.
  *
- * The amount is recovered by searching [DECRYPT_RANGE_LOW, DECRYPT_RANGE_HIGH]
- * (the library's recommended defaults); an amount outside that range fails.
+ * The amount is recovered by brute-forcing the discrete log over `[0, rangeHigh]`;
+ * cost is O(rangeHigh) (~3s per 1,000,000), so pass the tightest correct bound
+ * available (e.g. the issuance's confidential outstanding amount). An amount
+ * above `rangeHigh` cannot be recovered.
  *
  * @param ciphertext - The 66-byte hex ciphertext.
  * @param privateKey - The 32-byte hex private key.
+ * @param rangeHigh - Inclusive upper bound for the search; must be < 2^64 - 1.
  * @returns The decrypted integer amount.
- * @throws If inputs are malformed, the amount is outside the range, or the WASM
- * call fails.
+ * @throws If inputs are malformed, the amount is outside [0, rangeHigh], or the
+ * WASM call fails.
  */
 export async function decryptAmount(
   ciphertext: string,
   privateKey: string,
+  rangeHigh: bigint,
 ): Promise<bigint> {
   const ct = hexToBytes(ciphertext, 'ciphertext', ELGAMAL_TOTAL_SIZE)
   const priv = hexToBytes(privateKey, 'privateKey', PRIVKEY_SIZE)
@@ -92,7 +94,7 @@ export async function decryptAmount(
         privPtr,
         outPtr,
         DECRYPT_RANGE_LOW,
-        DECRYPT_RANGE_HIGH,
+        rangeHigh,
       ) !== 0
     ) {
       throw new Error('mpt_decrypt_amount failed')

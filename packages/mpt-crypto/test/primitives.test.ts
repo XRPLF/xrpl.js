@@ -27,7 +27,7 @@ describe('primitives', () => {
         const blinding = await generateBlindingFactor()
         const ciphertext = await encryptAmount(amount, PUBLIC_KEY, blinding)
         expect(ciphertext).toHaveLength(132)
-        expect(await decryptAmount(ciphertext, PRIVATE_KEY)).toBe(amount)
+        expect(await decryptAmount(ciphertext, PRIVATE_KEY, 1000n)).toBe(amount)
       }),
     )
   })

@@ -84,6 +84,7 @@ describe('ConfidentialMPTConvert', function () {
         await decryptAmount(
           token.ConfidentialBalanceInbox as string,
           holder.key.privateKey,
+          1_000_000n,
         ),
         1000n,
         'the inbox holds the converted amount',

@@ -87,6 +87,7 @@ describe('ConfidentialMPTSend', function () {
         await decryptAmount(
           destToken.ConfidentialBalanceInbox as string,
           dest.key.privateKey,
+          1_000_000n,
         ),
         300n,
         'destination inbox received the sent amount',
@@ -184,6 +185,7 @@ describe('ConfidentialMPTSend', function () {
         await decryptAmount(
           destToken.ConfidentialBalanceInbox as string,
           dest.key.privateKey,
+          1_000_000n,
         ),
         200n,
         'credentialed send reached the destination inbox',

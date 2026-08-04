@@ -7,6 +7,7 @@ import {
 
 import {
   accountIdHex,
+  decryptBound,
   fetchMPToken,
   fetchMPTokenIssuance,
   resolveSequence,
@@ -70,7 +71,11 @@ export async function prepareConfidentialSend(
   // full current balance, the range-proof witness linked to the on-ledger
   // `spending` ciphertext via the sender's private key.
   const [balance, txBlinding, rho, contextHash] = await Promise.all([
-    crypto.decryptAmount(spending, senderKeypair.privateKey),
+    crypto.decryptAmount(
+      spending,
+      senderKeypair.privateKey,
+      decryptBound(issuance),
+    ),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
     crypto.getSendContextHash(
@@ -177,7 +182,11 @@ export async function prepareConfidentialClawback(
   const issuerBalance = holderToken.IssuerEncryptedBalance
   const amount =
     params.amount ??
-    (await crypto.decryptAmount(issuerBalance, issuerKeypair.privateKey))
+    (await crypto.decryptAmount(
+      issuerBalance,
+      issuerKeypair.privateKey,
+      decryptBound(await fetchMPTokenIssuance(client, params.mptIssuanceID)),
+    ))
   const contextHash = await crypto.getClawbackContextHash(
     accountIdHex(params.account),
     params.mptIssuanceID,

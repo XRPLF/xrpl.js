@@ -61,7 +61,7 @@ describe('confidential/prepareConfidentialConvert', function () {
     assert.lengthOf(tx.ZKProof as string, 128)
     // end-to-end: the holder ciphertext the builder produced decrypts correctly
     assert.strictEqual(
-      await decryptAmount(tx.HolderEncryptedAmount, PRIVATE_KEY),
+      await decryptAmount(tx.HolderEncryptedAmount, PRIVATE_KEY, 10_000n),
       1000n,
     )
   })
@@ -110,7 +110,11 @@ describe('confidential/prepareConfidentialConvert', function () {
     const tx = await prepareConfidentialConvert(client, base)
     assert.isString(tx.AuditorEncryptedAmount)
     assert.strictEqual(
-      await decryptAmount(tx.AuditorEncryptedAmount as string, PRIVATE_KEY),
+      await decryptAmount(
+        tx.AuditorEncryptedAmount as string,
+        PRIVATE_KEY,
+        10_000n,
+      ),
       1000n,
     )
   })

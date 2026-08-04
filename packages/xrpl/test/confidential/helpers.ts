@@ -51,7 +51,16 @@ export function mockClient(fixtures: LedgerFixtures): Client {
       return { result: { account_data: { Sequence: fixtures.sequence ?? 1 } } }
     }
     if (req.mpt_issuance != null) {
-      return { result: { node: fixtures.issuance ?? {} } }
+      return {
+        result: {
+          // Default a confidential outstanding amount so the builders can derive
+          // a decrypt bound; callers may override it via `fixtures.issuance`.
+          node: {
+            ConfidentialOutstandingAmount: '1000000',
+            ...fixtures.issuance,
+          },
+        },
+      }
     }
     if (req.mptoken != null) {
       return { result: { node: fixtures.mptoken?.[req.mptoken.account] ?? {} } }

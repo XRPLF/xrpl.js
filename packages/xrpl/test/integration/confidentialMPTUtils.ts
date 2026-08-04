@@ -270,6 +270,7 @@ export async function auditorReads(
   return decryptAmount(
     token.AuditorEncryptedBalance as string,
     auditorKey.privateKey,
+    1_000_000n,
   )
 }
 

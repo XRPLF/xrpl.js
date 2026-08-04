@@ -114,7 +114,12 @@ describe('confidential/ledger', function () {
       const blinding = await generateBlindingFactor()
       const ciphertext = await encryptAmount(250n, PUBLIC_KEY, blinding)
       const client = fakeClient(() => ({
-        result: { node: { ConfidentialBalanceSpending: ciphertext } },
+        result: {
+          node: {
+            ConfidentialBalanceSpending: ciphertext,
+            ConfidentialOutstandingAmount: '1000000',
+          },
+        },
       }))
       const balance = await getConfidentialBalance(
         client,

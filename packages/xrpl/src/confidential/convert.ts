@@ -8,6 +8,7 @@ import {
 
 import {
   accountIdHex,
+  decryptBound,
   fetchMPToken,
   fetchMPTokenIssuance,
   resolveSequence,
@@ -145,7 +146,11 @@ export async function prepareConfidentialConvertBack(
   // ciphertexts. The proof links the on-ledger `spending` ciphertext via the
   // holder's private key.
   const [balance, blindingFactor, rho, contextHash] = await Promise.all([
-    crypto.decryptAmount(spending, holderKeypair.privateKey),
+    crypto.decryptAmount(
+      spending,
+      holderKeypair.privateKey,
+      decryptBound(issuance),
+    ),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
     crypto.getConvertBackContextHash(

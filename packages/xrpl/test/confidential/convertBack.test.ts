@@ -59,7 +59,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
     assert.lengthOf(tx.ZKProof, 1632)
     // the revealed-amount ciphertext decrypts back to the amount
     assert.strictEqual(
-      await decryptAmount(tx.HolderEncryptedAmount, KEY_A.privateKey),
+      await decryptAmount(tx.HolderEncryptedAmount, KEY_A.privateKey, 10_000n),
       200n,
     )
   })
@@ -80,6 +80,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
       await decryptAmount(
         tx.AuditorEncryptedAmount as string,
         KEY_A.privateKey,
+        10_000n,
       ),
       100n,
     )

@@ -2,6 +2,7 @@ import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { decodeAccountID } from 'ripple-address-codec'
 
 import { type Client } from '../client'
+import { XrplError } from '../errors'
 import { MPToken, MPTokenIssuance } from '../models/ledger'
 
 import { loadMptCrypto } from './loader'
@@ -97,6 +98,27 @@ export async function fetchMPTokenIssuance(
 }
 
 /**
+ * The tightest correct upper bound for brute-force decrypting a confidential
+ * balance: no holder can hold more than the issuance's confidential outstanding
+ * amount. Decryption cost is O(bound), so this keeps the search as small as
+ * correctness allows — never a fixed cap. `ConfidentialOutstandingAmount` is
+ * present whenever any confidential balance exists (its absence means there is
+ * nothing to decrypt), so we fail loudly rather than guess a bound.
+ *
+ * @param issuance - The MPTokenIssuance ledger entry.
+ * @returns The decrypt upper bound.
+ * @throws {XrplError} If the issuance carries no confidential outstanding amount.
+ */
+export function decryptBound(issuance: MPTokenIssuance): bigint {
+  if (issuance.ConfidentialOutstandingAmount == null) {
+    throw new XrplError(
+      'Cannot determine a confidential decrypt bound: the MPTokenIssuance has no ConfidentialOutstandingAmount.',
+    )
+  }
+  return BigInt(issuance.ConfidentialOutstandingAmount)
+}
+
+/**
  * Decrypt a holder's spendable confidential balance from the ledger.
  *
  * @param client - A connected Client.
@@ -116,6 +138,13 @@ export async function getConfidentialBalance(
   if (mptoken.ConfidentialBalanceSpending == null) {
     return BigInt(0)
   }
-  const crypto = await loadMptCrypto()
-  return crypto.decryptAmount(mptoken.ConfidentialBalanceSpending, privateKey)
+  const [issuance, crypto] = await Promise.all([
+    fetchMPTokenIssuance(client, mptIssuanceID),
+    loadMptCrypto(),
+  ])
+  return crypto.decryptAmount(
+    mptoken.ConfidentialBalanceSpending,
+    privateKey,
+    decryptBound(issuance),
+  )
 }
