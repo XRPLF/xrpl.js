@@ -5,8 +5,8 @@
  *
  * Every byte argument and return value is an uppercase, even-length hex string
  * (no `0x` prefix); integer amounts are `bigint`. The WASM module is loaded
- * lazily and cached on first use, so this package can be optionally depended on
- * and only pays its load cost when a confidential operation is actually invoked.
+ * lazily and cached on first use, so it only pays its load cost when a
+ * confidential operation is actually invoked.
  */
 
 export {
@@ -25,12 +25,7 @@ export {
 } from './constants'
 export { bytesToHex, hexToBytes } from './hex'
 export { loadWasmModule } from './module'
-export type {
-  Keypair,
-  Participant,
-  PedersenParams,
-  SendProofParams,
-} from './types'
+export type { Participant, PedersenParams, SendProofParams } from './types'
 
 export {
   generateBlindingFactor,

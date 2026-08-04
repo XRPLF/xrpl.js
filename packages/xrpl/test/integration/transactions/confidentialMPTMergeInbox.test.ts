@@ -57,7 +57,7 @@ describe('ConfidentialMPTMergeInbox', function () {
         await prepareConfidentialConvert(testContext.client, {
           account: holder.wallet.classicAddress,
           amount: 500n,
-          holder: holder.key,
+          holderKeypair: holder.key,
           mptIssuanceID: mptID,
         }),
         holder.wallet,

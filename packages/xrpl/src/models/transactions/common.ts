@@ -388,16 +388,6 @@ export function validateHexMetadata(
 }
 
 /**
- * Verify the form and type of a non-empty hex string at runtime.
- *
- * @param inp - The value to check the form and type of.
- * @returns Whether the value is a non-empty hex string.
- */
-export function isHexBlob(inp: unknown): inp is string {
-  return isString(inp) && isHex(inp)
-}
-
-/**
  * Build a type guard that checks the input is a hex string encoding exactly
  * `byteLength` bytes. Used by the Confidential MPT transactions to enforce
  * fixed-size cryptographic fields (EC points, ElGamal ciphertexts, scalars).

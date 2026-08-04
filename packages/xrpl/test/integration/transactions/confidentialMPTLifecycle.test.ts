@@ -85,7 +85,7 @@ describe('Confidential MPT 4-party lifecycle', function () {
           account: holder1.wallet.classicAddress,
           destination: holder2.wallet.classicAddress,
           amount: 300n,
-          sender: holder1.key,
+          senderKeypair: holder1.key,
           mptIssuanceID: mptID,
         }),
         holder1.wallet,
@@ -127,7 +127,7 @@ describe('Confidential MPT 4-party lifecycle', function () {
         await prepareConfidentialConvertBack(client, {
           account: holder1.wallet.classicAddress,
           amount: 200n,
-          holder: holder1.key,
+          holderKeypair: holder1.key,
           mptIssuanceID: mptID,
         }),
         holder1.wallet,
@@ -140,7 +140,7 @@ describe('Confidential MPT 4-party lifecycle', function () {
         await prepareConfidentialClawback(client, {
           account: issuer.classicAddress,
           holder: holder1.wallet.classicAddress,
-          issuer: issuerKey,
+          issuerKeypair: issuerKey,
           mptIssuanceID: mptID,
         }),
         issuer,

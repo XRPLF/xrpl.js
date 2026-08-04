@@ -172,7 +172,7 @@ export async function registerHolderKey(
   const convert = await prepareConfidentialConvert(client, {
     account: holder.wallet.classicAddress,
     amount: 0n,
-    holder: holder.key,
+    holderKeypair: holder.key,
     mptIssuanceID: mptID,
   })
   await testTransaction(client, convert, holder.wallet)
@@ -209,7 +209,7 @@ export async function holderWithBalance(
     await prepareConfidentialConvert(client, {
       account: holder.wallet.classicAddress,
       amount,
-      holder: holder.key,
+      holderKeypair: holder.key,
       mptIssuanceID: mptID,
     }),
     holder.wallet,

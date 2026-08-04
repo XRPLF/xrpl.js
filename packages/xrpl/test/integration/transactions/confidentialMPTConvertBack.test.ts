@@ -54,7 +54,7 @@ describe('ConfidentialMPTConvertBack', function () {
         await prepareConfidentialConvertBack(testContext.client, {
           account: holder.wallet.classicAddress,
           amount: 400n,
-          holder: holder.key,
+          holderKeypair: holder.key,
           mptIssuanceID: mptID,
         }),
         holder.wallet,

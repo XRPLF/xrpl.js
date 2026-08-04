@@ -23,7 +23,9 @@ import {
  * Build a ConfidentialMPTConvert transaction that moves a holder's public MPT
  * balance into their confidential balance. The amount is encrypted under the
  * holder, issuer, and (when registered) auditor keys with a shared blinding
- * factor, and a Schnorr proof attests ownership of the holder key.
+ * factor. On the holder's first Convert the holder key is registered and a
+ * Schnorr proof attests ownership of it; this is auto-detected from ledger state
+ * (see `registerKey`).
  *
  * @param client - A connected Client.
  * @param params - The conversion inputs.
@@ -35,9 +37,10 @@ export async function prepareConfidentialConvert(
   client: Client,
   params: ConfidentialConvertParams,
 ): Promise<ConfidentialMPTConvert> {
-  const [crypto, issuance, sequence] = await Promise.all([
+  const [crypto, issuance, mptoken, sequence] = await Promise.all([
     loadMptCrypto(),
     fetchMPTokenIssuance(client, params.mptIssuanceID),
+    fetchMPToken(client, params.account, params.mptIssuanceID),
     resolveSequence(client, params.account, params.sequence),
   ])
   if (issuance.IssuerEncryptionKey == null) {
@@ -45,7 +48,7 @@ export async function prepareConfidentialConvert(
       `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
     )
   }
-  const { amount, holder } = params
+  const { amount, holderKeypair } = params
 
   const [blindingFactor, contextHash] = await Promise.all([
     crypto.generateBlindingFactor(),
@@ -57,13 +60,17 @@ export async function prepareConfidentialConvert(
   ])
   const [holderEncryptedAmount, issuerEncryptedAmount, zkProof] =
     await Promise.all([
-      crypto.encryptAmount(amount, holder.publicKey, blindingFactor),
+      crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
       crypto.encryptAmount(
         amount,
         issuance.IssuerEncryptionKey,
         blindingFactor,
       ),
-      crypto.getConvertProof(holder.publicKey, holder.privateKey, contextHash),
+      crypto.getConvertProof(
+        holderKeypair.publicKey,
+        holderKeypair.privateKey,
+        contextHash,
+      ),
     ])
 
   const tx: ConfidentialMPTConvert = {
@@ -83,13 +90,16 @@ export async function prepareConfidentialConvert(
       blindingFactor,
     )
   }
-  // `HolderEncryptionKey` and `ZKProof` must be set together or omitted together:
-  // the ZKProof is a Schnorr proof of ownership of the holder key, so it is only
-  // meaningful when registering that key. rippled rejects a Convert carrying one
-  // without the other with `temMALFORMED`, so both are gated on `registerKey`
-  // (true only for the holder's first Convert on the issuance).
-  if (params.registerKey ?? true) {
-    tx.HolderEncryptionKey = holder.publicKey
+  // Register the holder key (with its Schnorr ownership proof) exactly when the
+  // ledger doesn't already carry one: rippled requires `HolderEncryptionKey` on
+  // the holder's first Convert (else `tecNO_PERMISSION`) and rejects it as
+  // `tecDUPLICATE` on every later one. That makes the correct value a function of
+  // ledger state, not caller intent, so it is derived here by default; an explicit
+  // `registerKey` still overrides. `HolderEncryptionKey` and `ZKProof` are always
+  // set or omitted together (rippled rejects one without the other, temMALFORMED).
+  const alreadyRegistered = mptoken.HolderEncryptionKey != null
+  if (params.registerKey ?? !alreadyRegistered) {
+    tx.HolderEncryptionKey = holderKeypair.publicKey
     tx.ZKProof = zkProof
   }
   return tx
@@ -126,7 +136,7 @@ export async function prepareConfidentialConvertBack(
       `Account ${params.account} has no confidential spending balance`,
     )
   }
-  const { amount, holder } = params
+  const { amount, holderKeypair } = params
   const spending = mptoken.ConfidentialBalanceSpending
   const version = mptoken.ConfidentialBalanceVersion ?? 0
 
@@ -135,7 +145,7 @@ export async function prepareConfidentialConvertBack(
   // ciphertexts. The proof links the on-ledger `spending` ciphertext via the
   // holder's private key.
   const [balance, blindingFactor, rho, contextHash] = await Promise.all([
-    crypto.decryptAmount(spending, holder.privateKey),
+    crypto.decryptAmount(spending, holderKeypair.privateKey),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
     crypto.getConvertBackContextHash(
@@ -148,15 +158,15 @@ export async function prepareConfidentialConvertBack(
   const balanceCommitment = await crypto.getPedersenCommitment(balance, rho)
   const [holderEncryptedAmount, issuerEncryptedAmount, zkProof] =
     await Promise.all([
-      crypto.encryptAmount(amount, holder.publicKey, blindingFactor),
+      crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
       crypto.encryptAmount(
         amount,
         issuance.IssuerEncryptionKey,
         blindingFactor,
       ),
       crypto.getConvertBackProof(
-        holder.privateKey,
-        holder.publicKey,
+        holderKeypair.privateKey,
+        holderKeypair.publicKey,
         contextHash,
         amount,
         {

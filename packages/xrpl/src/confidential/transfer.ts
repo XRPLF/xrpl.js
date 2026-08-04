@@ -59,7 +59,7 @@ export async function prepareConfidentialSend(
       `Destination ${params.destination} has no registered HolderEncryptionKey`,
     )
   }
-  const { amount, sender } = params
+  const { amount, senderKeypair } = params
   const destKey = destToken.HolderEncryptionKey
   const issuerKey = issuance.IssuerEncryptionKey
   const spending = senderToken.ConfidentialBalanceSpending
@@ -70,7 +70,7 @@ export async function prepareConfidentialSend(
   // full current balance, the range-proof witness linked to the on-ledger
   // `spending` ciphertext via the sender's private key.
   const [balance, txBlinding, rho, contextHash] = await Promise.all([
-    crypto.decryptAmount(spending, sender.privateKey),
+    crypto.decryptAmount(spending, senderKeypair.privateKey),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
     crypto.getSendContextHash(
@@ -85,14 +85,14 @@ export async function prepareConfidentialSend(
     await Promise.all([
       crypto.getPedersenCommitment(amount, txBlinding),
       crypto.getPedersenCommitment(balance, rho),
-      crypto.encryptAmount(amount, sender.publicKey, txBlinding),
+      crypto.encryptAmount(amount, senderKeypair.publicKey, txBlinding),
       crypto.encryptAmount(amount, destKey, txBlinding),
       crypto.encryptAmount(amount, issuerKey, txBlinding),
     ])
 
   // Proof participants are ordered sender, destination, issuer, [auditor].
   const participants: SendParticipant[] = [
-    { publicKey: sender.publicKey, ciphertext: senderCt },
+    { publicKey: senderKeypair.publicKey, ciphertext: senderCt },
     { publicKey: destKey, ciphertext: destCt },
     { publicKey: issuerKey, ciphertext: issuerCt },
   ]
@@ -121,8 +121,8 @@ export async function prepareConfidentialSend(
     AmountCommitment: amountCommitment,
     BalanceCommitment: balanceCommitment,
     ZKProof: await crypto.getConfidentialSendProof({
-      privateKey: sender.privateKey,
-      publicKey: sender.publicKey,
+      privateKey: senderKeypair.privateKey,
+      publicKey: senderKeypair.publicKey,
       amount,
       participants,
       txBlindingFactor: txBlinding,
@@ -173,11 +173,11 @@ export async function prepareConfidentialClawback(
       `Holder ${params.holder} has no issuer-encrypted confidential balance`,
     )
   }
-  const { issuer } = params
+  const { issuerKeypair } = params
   const issuerBalance = holderToken.IssuerEncryptedBalance
   const amount =
     params.amount ??
-    (await crypto.decryptAmount(issuerBalance, issuer.privateKey))
+    (await crypto.decryptAmount(issuerBalance, issuerKeypair.privateKey))
   const contextHash = await crypto.getClawbackContextHash(
     accountIdHex(params.account),
     params.mptIssuanceID,
@@ -193,8 +193,8 @@ export async function prepareConfidentialClawback(
     Holder: params.holder,
     MPTAmount: amount.toString(),
     ZKProof: await crypto.getClawbackProof(
-      issuer.privateKey,
-      issuer.publicKey,
+      issuerKeypair.privateKey,
+      issuerKeypair.publicKey,
       contextHash,
       amount,
       issuerBalance,

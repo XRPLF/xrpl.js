@@ -107,4 +107,47 @@ describe('ConfidentialMPTClawback', function () {
       'ConfidentialMPTClawback: invalid field ZKProof',
     )
   })
+
+  it(`throws w/ zero MPTAmount (clawback forbids zero)`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Holder: HOLDER,
+        MPTAmount: '0',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: MPTAmount out of range',
+    )
+  })
+
+  it(`throws w/ out-of-range MPTAmount`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Holder: HOLDER,
+        // One past the max uint64 MPT amount (9223372036854775807).
+        MPTAmount: '9223372036854775808',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: MPTAmount out of range',
+    )
+  })
+
+  it(`throws w/ non-numeric MPTAmount`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Holder: HOLDER,
+        MPTAmount: '1.5',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: Invalid MPTAmount',
+    )
+  })
 })

@@ -199,4 +199,61 @@ describe('ConfidentialMPTSend', function () {
       'ConfidentialMPTSend: invalid field DestinationTag',
     )
   })
+
+  it(`throws w/ wrong-length ZKProof`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Destination: DESTINATION,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        // A 64-byte proof where the fixed 946-byte send proof is required.
+        ZKProof: 'AB'.repeat(64),
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTSend: invalid field ZKProof',
+    )
+  })
+
+  it(`throws w/ non-array CredentialIDs`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Destination: DESTINATION,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+        CredentialIDs: CREDENTIAL_ID,
+      },
+      'ConfidentialMPTSend: Credentials must be an array',
+    )
+  })
+
+  it(`throws w/ non-string CredentialIDs element`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Destination: DESTINATION,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+        CredentialIDs: [12345],
+      },
+      'ConfidentialMPTSend: Invalid Credentials ID list format',
+    )
+  })
 })

@@ -5,15 +5,6 @@
  */
 
 /**
- * An ElGamal keypair: a 32-byte private key and the corresponding 33-byte
- * compressed secp256k1 public key, both hex-encoded.
- */
-export interface Keypair {
-  privateKey: string
-  publicKey: string
-}
-
-/**
  * A participant in a Confidential MPT proof — a 33-byte compressed public key
  * and the 66-byte ElGamal ciphertext encrypting the amount under that key.
  * Mirrors the C `mpt_confidential_participant` struct.

@@ -25,7 +25,7 @@ describe('confidential/prepareConfidentialClawback', function () {
     const tx = await prepareConfidentialClawback(client, {
       account: ADDR_A,
       holder: ADDR_B,
-      issuer: KEY_A,
+      issuerKeypair: KEY_A,
       mptIssuanceID: ISSUANCE_ID,
       sequence: 5,
     })
@@ -51,7 +51,7 @@ describe('confidential/prepareConfidentialClawback', function () {
     const tx = await prepareConfidentialClawback(client, {
       account: ADDR_A,
       holder: ADDR_B,
-      issuer: KEY_A,
+      issuerKeypair: KEY_A,
       amount: 250n,
       mptIssuanceID: ISSUANCE_ID,
       sequence: 5,
@@ -65,7 +65,7 @@ describe('confidential/prepareConfidentialClawback', function () {
       prepareConfidentialClawback(client, {
         account: ADDR_A,
         holder: ADDR_B,
-        issuer: KEY_A,
+        issuerKeypair: KEY_A,
         mptIssuanceID: ISSUANCE_ID,
         sequence: 5,
       }),

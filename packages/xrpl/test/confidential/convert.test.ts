@@ -13,14 +13,21 @@ const PRIVATE_KEY =
   '1ACAAEDECE405B2A958212629E16F2EB46B153EEE94CDD350FDEFF52795525B7'
 
 /**
- * A Client stub whose `ledger_entry` returns the given MPTokenIssuance node.
+ * A Client stub whose `ledger_entry` returns the given issuance and (optionally)
+ * holder-MPToken nodes, branching on which entry each request asks for.
  *
- * @param issuanceNode - The issuance fields to return as the ledger node.
- * @returns A Client stub returning `issuanceNode` from `request`.
+ * @param issuanceNode - The MPTokenIssuance fields to return.
+ * @param mptokenNode - The holder MPToken fields (default: none registered yet).
+ * @returns A Client stub returning the requested node from `request`.
  */
-function issuanceClient(issuanceNode: Record<string, unknown>): Client {
+function confidentialClient(
+  issuanceNode: Record<string, unknown>,
+  mptokenNode: Record<string, unknown> = {},
+): Client {
   return {
-    request: async () => ({ result: { node: issuanceNode } }),
+    request: async (req: { mptoken?: unknown }) => ({
+      result: { node: req.mptoken == null ? issuanceNode : mptokenNode },
+    }),
   } as unknown as Client
 }
 
@@ -30,13 +37,13 @@ describe('confidential/prepareConfidentialConvert', function () {
   const base = {
     account: ADDRESS,
     amount: 1000n,
-    holder,
+    holderKeypair: holder,
     mptIssuanceID: ISSUANCE_ID,
     sequence: 5,
   }
 
   it('assembles a Convert whose ciphertext decrypts back to the amount', async function () {
-    const client = issuanceClient({ IssuerEncryptionKey: PUBLIC_KEY })
+    const client = confidentialClient({ IssuerEncryptionKey: PUBLIC_KEY })
     const tx = await prepareConfidentialConvert(client, base)
 
     assert.strictEqual(tx.TransactionType, 'ConfidentialMPTConvert')
@@ -48,7 +55,7 @@ describe('confidential/prepareConfidentialConvert', function () {
     assert.lengthOf(tx.BlindingFactor, 64)
     assert.lengthOf(tx.HolderEncryptedAmount, 132)
     assert.lengthOf(tx.IssuerEncryptedAmount, 132)
-    // registerKey defaults to true → key + 64-byte Schnorr proof are attached
+    // no holder key on the ledger yet → the key + 64-byte Schnorr proof attach
     assert.strictEqual(tx.HolderEncryptionKey, PUBLIC_KEY)
     assert.isString(tx.ZKProof)
     assert.lengthOf(tx.ZKProof as string, 128)
@@ -60,7 +67,7 @@ describe('confidential/prepareConfidentialConvert', function () {
   })
 
   it('omits HolderEncryptionKey/ZKProof when registerKey is false', async function () {
-    const client = issuanceClient({ IssuerEncryptionKey: PUBLIC_KEY })
+    const client = confidentialClient({ IssuerEncryptionKey: PUBLIC_KEY })
     const tx = await prepareConfidentialConvert(client, {
       ...base,
       registerKey: false,
@@ -69,8 +76,34 @@ describe('confidential/prepareConfidentialConvert', function () {
     assert.isUndefined(tx.ZKProof)
   })
 
+  it('auto-omits HolderEncryptionKey/ZKProof when the key is already registered', async function () {
+    // Ledger already carries a holder key → a top-up Convert must not re-register
+    // it (rippled rejects the duplicate). No explicit registerKey needed.
+    const client = confidentialClient(
+      { IssuerEncryptionKey: PUBLIC_KEY },
+      { HolderEncryptionKey: PUBLIC_KEY },
+    )
+    const tx = await prepareConfidentialConvert(client, base)
+    assert.isUndefined(tx.HolderEncryptionKey)
+    assert.isUndefined(tx.ZKProof)
+  })
+
+  it('lets an explicit registerKey override the ledger-derived default', async function () {
+    // Force registration even though the ledger already has a key.
+    const client = confidentialClient(
+      { IssuerEncryptionKey: PUBLIC_KEY },
+      { HolderEncryptionKey: PUBLIC_KEY },
+    )
+    const tx = await prepareConfidentialConvert(client, {
+      ...base,
+      registerKey: true,
+    })
+    assert.strictEqual(tx.HolderEncryptionKey, PUBLIC_KEY)
+    assert.isString(tx.ZKProof)
+  })
+
   it('encrypts to the auditor when an AuditorEncryptionKey is registered', async function () {
-    const client = issuanceClient({
+    const client = confidentialClient({
       IssuerEncryptionKey: PUBLIC_KEY,
       AuditorEncryptionKey: PUBLIC_KEY,
     })
@@ -83,7 +116,7 @@ describe('confidential/prepareConfidentialConvert', function () {
   })
 
   it('throws when the issuer encryption key is not registered', async function () {
-    const client = issuanceClient({})
+    const client = confidentialClient({})
     let error: unknown
     try {
       await prepareConfidentialConvert(client, base)

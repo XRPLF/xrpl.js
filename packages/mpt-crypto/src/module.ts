@@ -117,7 +117,7 @@ let cached: Promise<WasmModule> | undefined
  * the `package.json` exports and `src/wasm.d.ts`.
  *
  * Provenance: `mpt_crypto.{js,mjs,wasm}` come from mpt-crypto's
- * `.github/scripts/build-wasm.sh`; release/checksum flow in `WASM_RELEASE_AND_NPM_PUBLISH.md`.
+ * `.github/scripts/build-wasm.sh` and are vendored by `scripts/fetch-wasm.sh`.
  *
  * @returns A promise resolving to the initialized WASM module.
  */

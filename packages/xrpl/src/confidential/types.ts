@@ -32,10 +32,12 @@ export interface ConfidentialConvertParams extends BaseConfidentialParams {
   /** The public MPT amount being moved into the confidential balance. */
   amount: bigint
   /** The holder's ElGamal keypair. */
-  holder: ConfidentialKeypair
+  holderKeypair: ConfidentialKeypair
   /**
-   * Whether to register the holder's encryption key on this transaction.
-   * Defaults to `true` (required on a holder's first conversion).
+   * Whether to register the holder's encryption key on this transaction. By
+   * default the builder registers it exactly when the ledger has no holder key
+   * yet — required on the first conversion, rejected as a duplicate on later
+   * ones — so this normally never needs to be set explicitly.
    */
   registerKey?: boolean
 }
@@ -47,7 +49,7 @@ export interface ConfidentialConvertBackParams extends BaseConfidentialParams {
   /** The public MPT amount being revealed from the confidential balance. */
   amount: bigint
   /** The holder's ElGamal keypair. */
-  holder: ConfidentialKeypair
+  holderKeypair: ConfidentialKeypair
 }
 
 /** Inputs for {@link prepareConfidentialSend}. */
@@ -59,7 +61,7 @@ export interface ConfidentialSendParams extends BaseConfidentialParams {
   /** The confidential MPT amount being transferred. */
   amount: bigint
   /** The sender's ElGamal keypair. */
-  sender: ConfidentialKeypair
+  senderKeypair: ConfidentialKeypair
   /** Optional destination tag. */
   destinationTag?: number
   /** Optional credential IDs to satisfy the destination's deposit auth. */
@@ -73,7 +75,7 @@ export interface ConfidentialClawbackParams extends BaseConfidentialParams {
   /** The holder whose confidential balance is being clawed back. */
   holder: string
   /** The issuer's ElGamal keypair. */
-  issuer: ConfidentialKeypair
+  issuerKeypair: ConfidentialKeypair
   /**
    * Optional explicit amount to claw back. When omitted the builder decrypts the
    * holder's issuer-encrypted balance to recover the full amount.

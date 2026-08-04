@@ -54,7 +54,7 @@ describe('ConfidentialMPTClawback', function () {
         await prepareConfidentialClawback(testContext.client, {
           account: issuer.classicAddress,
           holder: holder.wallet.classicAddress,
-          issuer: issuerKey,
+          issuerKeypair: issuerKey,
           mptIssuanceID: mptID,
         }),
         issuer,
@@ -87,7 +87,7 @@ describe('ConfidentialMPTClawback', function () {
         await prepareConfidentialClawback(testContext.client, {
           account: issuer.classicAddress,
           holder: holder.wallet.classicAddress,
-          issuer: issuerKey,
+          issuerKeypair: issuerKey,
           amount: 400n,
           mptIssuanceID: mptID,
         }),

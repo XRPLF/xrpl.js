@@ -45,7 +45,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
     const tx = await prepareConfidentialConvertBack(client, {
       account: ADDR_A,
       amount: 200n,
-      holder: KEY_A,
+      holderKeypair: KEY_A,
       mptIssuanceID: ISSUANCE_ID,
       sequence: 5,
     })
@@ -71,7 +71,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
     const tx = await prepareConfidentialConvertBack(client, {
       account: ADDR_A,
       amount: 100n,
-      holder: KEY_A,
+      holderKeypair: KEY_A,
       mptIssuanceID: ISSUANCE_ID,
       sequence: 5,
     })
@@ -99,7 +99,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
       prepareConfidentialConvertBack(client, {
         account: ADDR_A,
         amount: 100n,
-        holder: KEY_A,
+        holderKeypair: KEY_A,
         mptIssuanceID: ISSUANCE_ID,
         sequence: 5,
       }),
@@ -115,7 +115,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
       prepareConfidentialConvertBack(client, {
         account: ADDR_A,
         amount: 100n,
-        holder: KEY_A,
+        holderKeypair: KEY_A,
         mptIssuanceID: ISSUANCE_ID,
         sequence: 5,
       }),
@@ -130,7 +130,7 @@ describe('confidential/prepareConfidentialConvertBack', function () {
       prepareConfidentialConvertBack(client, {
         account: ADDR_A,
         amount: 1000n,
-        holder: KEY_A,
+        holderKeypair: KEY_A,
         mptIssuanceID: ISSUANCE_ID,
         sequence: 5,
       }),
