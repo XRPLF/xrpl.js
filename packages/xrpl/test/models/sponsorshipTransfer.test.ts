@@ -1,3 +1,4 @@
+import { SponsorFlags } from '../../src/models/transactions/common'
 import {
   SponsorshipTransferFlags,
   validateSponsorshipTransfer,
@@ -38,12 +39,14 @@ describe('SponsorshipTransfer', function () {
   it('verifies valid SponsorshipTransfer with tfSponsorshipCreate and Sponsor', function () {
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertValid(sponsorshipTransferTx)
   })
 
   it('verifies valid SponsorshipTransfer with tfSponsorshipReassign and Sponsor', function () {
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipReassign
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertValid(sponsorshipTransferTx)
   })
 
@@ -53,10 +56,37 @@ describe('SponsorshipTransfer', function () {
     assertValid(sponsorshipTransferTx)
   })
 
+  it('throws when tfSponsorshipCreate is missing SponsorFlags reserve bit', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorSignature = {
+      SigningPubKey:
+        '02356E89059A75438887F9FEE2056A2890DB82A68353BE9C0C0C8F89C0018B37FC',
+      TxnSignature:
+        '3045022100D184EB4AE5956FF600E7536EE459345C7BBCF097A84CC61A93B9AF7197EDB98702201E' +
+        'F0EBFB08929B1C1171B4D4B943774D6388B3B2F1F1E2F3E4F5F6F7F8F9FA',
+    }
+    assertInvalid(
+      sponsorshipTransferTx,
+      'SponsorshipTransfer: SponsorFlags must be present with the tfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+    )
+  })
+
+  it('throws when tfSponsorshipReassign has SponsorFlags without the reserve bit', function () {
+    sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipReassign
+    sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorFee
+    assertInvalid(
+      sponsorshipTransferTx,
+      'SponsorshipTransfer: SponsorFlags must be present with the tfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+    )
+  })
+
   it('throws when account-level tfSponsorshipCreate is missing SponsorSignature', function () {
     delete sponsorshipTransferTx.ObjectID
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertInvalid(
       sponsorshipTransferTx,
       'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
@@ -67,6 +97,7 @@ describe('SponsorshipTransfer', function () {
     delete sponsorshipTransferTx.ObjectID
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipReassign
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertInvalid(
       sponsorshipTransferTx,
       'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
@@ -77,6 +108,7 @@ describe('SponsorshipTransfer', function () {
     delete sponsorshipTransferTx.ObjectID
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     sponsorshipTransferTx.SponsorSignature = {
       SigningPubKey:
         '02356E89059A75438887F9FEE2056A2890DB82A68353BE9C0C0C8F89C0018B37FC',
@@ -90,6 +122,7 @@ describe('SponsorshipTransfer', function () {
   it('verifies valid object-level tfSponsorshipCreate without SponsorSignature', function () {
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertValid(sponsorshipTransferTx)
   })
 
@@ -149,6 +182,7 @@ describe('SponsorshipTransfer', function () {
     sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
     sponsorshipTransferTx.Sponsor =
       'XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi'
+    sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
     assertValid(sponsorshipTransferTx)
   })
 
@@ -213,6 +247,7 @@ describe('SponsorshipTransfer', function () {
     it('verifies valid SponsorshipTransfer with tfSponsorshipCreate flag and Sponsor', function () {
       sponsorshipTransferTx.Flags = SponsorshipTransferFlags.tfSponsorshipCreate
       sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
       assertValid(sponsorshipTransferTx)
     })
 
@@ -220,6 +255,7 @@ describe('SponsorshipTransfer', function () {
       sponsorshipTransferTx.Flags =
         SponsorshipTransferFlags.tfSponsorshipReassign
       sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
       assertValid(sponsorshipTransferTx)
     })
 
@@ -308,12 +344,14 @@ describe('SponsorshipTransfer', function () {
     it('verifies valid SponsorshipTransfer with boolean tfSponsorshipCreate flag', function () {
       sponsorshipTransferTx.Flags = { tfSponsorshipCreate: true }
       sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
       assertValid(sponsorshipTransferTx)
     })
 
     it('verifies valid SponsorshipTransfer with boolean tfSponsorshipReassign flag', function () {
       sponsorshipTransferTx.Flags = { tfSponsorshipReassign: true }
       sponsorshipTransferTx.Sponsor = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
+      sponsorshipTransferTx.SponsorFlags = SponsorFlags.tfSponsorReserve
       assertValid(sponsorshipTransferTx)
     })
   })

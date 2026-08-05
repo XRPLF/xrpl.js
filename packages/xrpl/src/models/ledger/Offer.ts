@@ -54,12 +54,6 @@ export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
    * Currently this field only applicable to hybrid offers.
    */
   AdditionalBooks?: Book[]
-  /**
-   * The account sponsoring the reserve for this Offer. If present, the sponsor
-   * is responsible for the reserve requirement of this object instead of the
-   * owner.
-   */
-  Sponsor?: string
 }
 
 export enum OfferFlags {

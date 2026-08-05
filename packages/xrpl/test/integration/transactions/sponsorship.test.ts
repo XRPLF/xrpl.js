@@ -88,7 +88,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: newSponsee.classicAddress,
-          FeeAmount: '10000',
+          FeeAmountDelta: '10000',
           MaxFee: '500',
         }
 
@@ -192,7 +192,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: sponseeWallet.classicAddress,
-          FeeAmount: '10000',
+          FeeAmountDelta: '10000',
           MaxFee: '500',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -261,7 +261,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: lowSponsee.classicAddress,
           // Very low amount
-          FeeAmount: '5',
+          FeeAmountDelta: '5',
           MaxFee: '1000',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -306,7 +306,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: maxFeeSponsee.classicAddress,
-          FeeAmount: '10000',
+          FeeAmountDelta: '10000',
           MaxFee: '20',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
@@ -764,7 +764,7 @@ describe('Sponsorship (XLS-68)', function () {
           TransactionType: 'SponsorshipSet',
           Account: sponsorWallet.classicAddress,
           Sponsee: combinedSponsee.classicAddress,
-          FeeAmount: '10000',
+          FeeAmountDelta: '10000',
           MaxFee: '1000',
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)

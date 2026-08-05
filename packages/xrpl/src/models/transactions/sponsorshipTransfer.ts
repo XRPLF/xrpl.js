@@ -7,6 +7,7 @@ import {
   isString,
   validateBaseTransaction,
   areAddressesEqual,
+  SponsorFlags,
 } from './common'
 
 /**
@@ -180,6 +181,22 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
     if (!isAccount(tx.Sponsor)) {
       throw new ValidationError(
         'SponsorshipTransfer: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  // tfSponsorshipCreate or tfSponsorshipReassign: SponsorFlags must be present
+  // with the tfSponsorReserve bit set (the new sponsor covers the reserve).
+  if (hasCreate || hasReassign) {
+    /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+    const hasReserveFlag =
+      typeof tx.SponsorFlags === 'number' &&
+      (tx.SponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+    /* eslint-enable no-bitwise */
+
+    if (!hasReserveFlag) {
+      throw new ValidationError(
+        'SponsorshipTransfer: SponsorFlags must be present with the tfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
       )
     }
   }

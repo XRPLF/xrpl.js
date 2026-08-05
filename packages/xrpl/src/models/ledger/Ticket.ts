@@ -23,10 +23,4 @@ export default interface Ticket extends BaseLedgerEntry, HasPreviousTxnID {
   OwnerNode: string
   /** The Sequence Number this Ticket sets aside. */
   TicketSequence: number
-  /**
-   * The account sponsoring the reserve for this Ticket. If present, the
-   * sponsor is responsible for the reserve requirement of this object instead
-   * of the owner.
-   */
-  Sponsor?: string
 }

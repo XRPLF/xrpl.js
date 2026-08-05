@@ -75,10 +75,4 @@ export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
    * type, so this value is always 0.
    */
   Flags: 0
-  /**
-   * (Optional) The account sponsoring the reserve for this AMM. If present,
-   * the sponsor is responsible for the reserve requirement of this object
-   * instead of the owner.
-   */
-  Sponsor?: string
 }
