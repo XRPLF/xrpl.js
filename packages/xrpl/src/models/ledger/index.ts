@@ -27,8 +27,8 @@ import {
   MPTokenIssuance,
   MPTokenIssuanceFlags,
   MPTokenIssuanceFlagsInterface,
-  MPTokenIssuanceMutableFlags,
-  MPTokenIssuanceMutableFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
 } from './MPTokenIssuance'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
@@ -76,8 +76,8 @@ export {
   MPTokenIssuance,
   MPTokenIssuanceFlags,
   MPTokenIssuanceFlagsInterface,
-  MPTokenIssuanceMutableFlags,
-  MPTokenIssuanceMutableFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
   MPToken,
   NFTokenOffer,
   NFTokenPage,
