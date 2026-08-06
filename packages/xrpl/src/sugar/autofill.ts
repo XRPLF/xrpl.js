@@ -313,42 +313,22 @@ async function fetchCounterPartySignersCount(
 }
 
 /**
- * Calculates additional fees for sponsor signatures.
+ * Calculates additional fees for a multisigned sponsor signature.
  *
- * Only adds sponsor signer fees when a SponsorSignature is present on the transaction.
- * Pre-funded sponsorships (which only have Sponsor and SponsorFlags without SponsorSignature)
- * do not require the sponsor to sign, so no additional signer fees are needed.
+ * Mirrors `signersCount`, which serves the same purpose for the transaction's own
+ * multisigning: a single sponsor signature costs nothing extra (like any single signer),
+ * and a multisigned SponsorSignature's signer count can't be reliably inferred at autofill
+ * time -- tx.SponsorSignature typically doesn't exist yet, since the sponsor only co-signs
+ * after the account has signed, and even when present its Signers array may not yet reflect
+ * every cosigner. So the caller must supply the expected count explicitly.
  *
- * @param tx - The transaction object.
  * @param netFeeDrops - The network fee in drops.
- * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
- * SponsorSignature. Mirrors `signersCount`, which serves the same purpose for the transaction's
- * own multisigning: at autofill time we can't reliably infer this, since
- * tx.SponsorSignature.Signers may not yet reflect every cosigner, and the sponsor's SignerList
- * only reflects its capability to sign, not a commitment to sign with a particular count. So the
- * caller must supply it explicitly.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature.
  * @returns The additional sponsor fee as a BigNumber.
  */
-function calculateSponsorFee(
-  tx: Transaction,
-  netFeeDrops: string,
-  sponsorSignersCount = 0,
-): BigNumber {
-  // Only add sponsor signer fees when SponsorSignature is present.
-  // Pre-funded sponsorships (tx.Sponsor without SponsorSignature) use an existing
-  // Sponsorship ledger object and don't require additional sponsor signatures,
-  // so they should not incur extra signer fees.
-  if (tx.SponsorSignature == null) {
-    return new BigNumber(0)
-  }
-
-  // A single-signed SponsorSignature always needs exactly one sponsor signature fee.
-  // A multisigned SponsorSignature relies on the caller-supplied sponsorSignersCount.
-  const effectiveSponsorSignersCount = tx.SponsorSignature.Signers
-    ? sponsorSignersCount
-    : 1
-
-  if (effectiveSponsorSignersCount <= 0) {
+function calculateSponsorFee(netFeeDrops: string, sponsorSignersCount = 0): BigNumber {
+  if (sponsorSignersCount <= 0) {
     return new BigNumber(0)
   }
 
@@ -356,7 +336,7 @@ function calculateSponsorFee(
   console.warn(
     `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
   )
-  return new BigNumber(scaleValue(netFeeDrops, effectiveSponsorSignersCount))
+  return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
 }
 
 /**
@@ -365,8 +345,9 @@ function calculateSponsorFee(
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
- * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
- * SponsorSignature (default is 0). Only used when SponsorSignature.Signers is present.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature (default is 0). Only used for a multisigned sponsor; a
+ * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
 // eslint-disable-next-line max-lines-per-function, max-params -- necessary to check for many transaction types.
@@ -436,7 +417,7 @@ async function calculateFeePerTransactionType(
   }
 
   // Add sponsor signature fees if applicable
-  const sponsorFee = calculateSponsorFee(tx, netFeeDrops, sponsorSignersCount)
+  const sponsorFee = calculateSponsorFee(netFeeDrops, sponsorSignersCount)
   baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
@@ -457,8 +438,9 @@ async function calculateFeePerTransactionType(
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
- * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's multisigned
- * SponsorSignature (default is 0). Only used when SponsorSignature.Signers is present.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature (default is 0). Only used for a multisigned sponsor; a
+ * single sponsor signature adds no fee.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
 // eslint-disable-next-line max-params -- mirrors calculateFeePerTransactionType

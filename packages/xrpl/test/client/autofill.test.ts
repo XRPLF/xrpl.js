@@ -695,9 +695,10 @@ describe('client.autofill', function () {
       assert.strictEqual(txResult.Fee, '12')
     })
 
-    it('calculates fee for co-signed sponsorship with single sponsor signature', async function () {
-      // Co-signed sponsorship: SponsorSignature is present, so the sponsor is
-      // actively signing the transaction and fees should include the signature.
+    it('does not add sponsor fees for a single-signed sponsor signature', async function () {
+      // A single sponsor signature costs nothing extra, the same as any single
+      // signer on a regular transaction -- only a multisigned sponsor (via an
+      // explicit sponsorSignersCount) adds fee.
       const tx: Payment = {
         TransactionType: 'Payment',
         Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
@@ -724,8 +725,42 @@ describe('client.autofill', function () {
 
       const txResult = await testContext.client.autofill(tx)
 
-      // Fee should include base fee (12) + sponsor signature fee (12) = 24
-      assert.strictEqual(txResult.Fee, '24')
+      // Fee should be base fee only (12) - a single sponsor signature adds no fee.
+      assert.strictEqual(txResult.Fee, '12')
+    })
+
+    it('adds sponsor fee based on sponsorSignersCount even without SponsorSignature present', async function () {
+      // The sponsor signer count is entirely caller-driven: it does not depend
+      // on tx.SponsorSignature existing at autofill time (it typically doesn't,
+      // since the sponsor only co-signs after the account has signed).
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(
+        tx,
+        undefined,
+        // sponsorSignersCount
+        2,
+      )
+
+      // Fee should include base fee (12) + 2 sponsor signatures (24) = 36
+      assert.strictEqual(txResult.Fee, '36')
     })
 
     it('calculates fee for co-signed sponsorship with multi-sig sponsor', async function () {

@@ -1,5 +1,5 @@
 import { AccountID } from './account-id'
-import { Amount } from './amount'
+import { Amount, SignedAmount } from './amount'
 import { Blob } from './blob'
 import { Currency } from './currency'
 import { Hash128 } from './hash-128'
@@ -34,6 +34,7 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Issue,
   Number: STNumber,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,
@@ -61,6 +62,7 @@ export {
   Hash256,
   Int32,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,

@@ -105,7 +105,7 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 34,
-        "type": "Amount"
+        "type": "SignedAmount"
       }
     ],
     [

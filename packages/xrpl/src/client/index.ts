@@ -676,9 +676,9 @@ class Client extends EventEmitter<EventTypes> {
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
-   * SponsorSignature. Only used when the transaction's SponsorSignature is itself multisigned
-   * (i.e. has a `Signers` array). Mirrors `signersCount`: this cannot be reliably inferred at
-   * autofill time, so the caller must supply it.
+   * SponsorSignature. Only used for a multisigned sponsor; a single sponsor signature adds no
+   * fee. Mirrors `signersCount`: this cannot be reliably inferred at autofill time (the
+   * SponsorSignature typically doesn't exist yet), so the caller must supply it.
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
@@ -905,7 +905,7 @@ class Client extends EventEmitter<EventTypes> {
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
    * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
-   * SponsorSignature. Only used when the transaction's SponsorSignature is itself multisigned.
+   * SponsorSignature. Only used for a multisigned sponsor; a single sponsor signature adds no fee.
    * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
