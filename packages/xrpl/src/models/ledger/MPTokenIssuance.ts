@@ -79,12 +79,13 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
   ReferenceHolding?: string
 
   /**
-   * A set of XLS-94D mutability flags (`lsmfMPT*`) indicating which capabilities
-   * or fields may still be enabled or modified via MPTokenIssuanceSet. Absent on
-   * issuances created without any mutable flags, and on objects that predate the
-   * DynamicMPT amendment.
+   * A set of XLS-94D immutability flags (`lsifMPT*`) indicating which capabilities
+   * or fields have been permanently made immutable and can no longer be enabled or
+   * modified via MPTokenIssuanceSet. Absent (equivalent to 0) on issuances where
+   * nothing has been made immutable, and on objects that predate the DynamicMPT
+   * amendment.
    */
-  MutableFlags?: number
+  ImmutableFlags?: number
   /**
    * (Optional) The account sponsoring the reserve for this MPTokenIssuance.
    * If present, the sponsor is responsible for the reserve requirement of
@@ -103,39 +104,43 @@ export interface MPTokenIssuanceFlagsInterface {
   lsfMPTCanClawback?: boolean
 }
 
-export interface MPTokenIssuanceMutableFlagsInterface {
+export interface MPTokenIssuanceImmutableFlagsInterface {
   /**
-   * Indicates flag lsfMPTCanLock can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTCanLock` immutable.
    */
-  lsmfMPTCanEnableCanLock?: boolean
+  lsifMPTCanLock?: boolean
   /**
-   * Indicates flag lsfMPTRequireAuth can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTRequireAuth` immutable.
    */
-  lsmfMPTCanEnableRequireAuth?: boolean
+  lsifMPTRequireAuth?: boolean
   /**
-   * Indicates flag lsfMPTCanEscrow can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTCanEscrow` immutable.
    */
-  lsmfMPTCanEnableCanEscrow?: boolean
+  lsifMPTCanEscrow?: boolean
   /**
-   * Indicates flag lsfMPTCanTrade can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTCanTrade` immutable.
    */
-  lsmfMPTCanEnableCanTrade?: boolean
+  lsifMPTCanTrade?: boolean
   /**
-   * Indicates flag lsfMPTCanTransfer can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTCanTransfer` immutable.
    */
-  lsmfMPTCanEnableCanTransfer?: boolean
+  lsifMPTCanTransfer?: boolean
   /**
-   * Indicates flag lsfMPTCanClawback can be enabled via MPTokenIssuanceSet
+   * Indicate flag `lsfMPTCanClawback` immutable.
    */
-  lsmfMPTCanEnableCanClawback?: boolean
+  lsifMPTCanClawback?: boolean
   /**
-   * Allows field MPTokenMetadata to be modified
+   * Indicate flag `lsfMPTCanHoldConfidentialBalance` immutable. (XLS-96 Confidential MPT)
    */
-  lsmfMPTCanMutateMetadata?: boolean
+  lsifMPTCanHoldConfidentialBalance?: boolean
   /**
-   * Allows field TransferFee to be modified
+   * Indicate field `MPTokenMetadata` immutable.
    */
-  lsmfMPTCanMutateTransferFee?: boolean
+  lsifMPTMetadata?: boolean
+  /**
+   * Indicate field `TransferFee` immutable.
+   */
+  lsifMPTTransferFee?: boolean
 }
 
 export enum MPTokenIssuanceFlags {
@@ -148,13 +153,14 @@ export enum MPTokenIssuanceFlags {
   lsfMPTCanClawback = 0x00000040,
 }
 
-export enum MPTokenIssuanceMutableFlags {
-  lsmfMPTCanEnableCanLock = 0x00000002,
-  lsmfMPTCanEnableRequireAuth = 0x00000004,
-  lsmfMPTCanEnableCanEscrow = 0x00000008,
-  lsmfMPTCanEnableCanTrade = 0x00000010,
-  lsmfMPTCanEnableCanTransfer = 0x00000020,
-  lsmfMPTCanEnableCanClawback = 0x00000040,
-  lsmfMPTCanMutateMetadata = 0x00010000,
-  lsmfMPTCanMutateTransferFee = 0x00020000,
+export enum MPTokenIssuanceImmutableFlags {
+  lsifMPTCanLock = 0x00000002,
+  lsifMPTRequireAuth = 0x00000004,
+  lsifMPTCanEscrow = 0x00000008,
+  lsifMPTCanTrade = 0x00000010,
+  lsifMPTCanTransfer = 0x00000020,
+  lsifMPTCanClawback = 0x00000040,
+  lsifMPTCanHoldConfidentialBalance = 0x00000080,
+  lsifMPTMetadata = 0x00010000,
+  lsifMPTTransferFee = 0x00020000,
 }
