@@ -6,9 +6,14 @@ import {
   PUBKEY_SIZE,
 } from './constants'
 import { bytesToHex, hexToBytes } from './hex'
+import { assertUint64, U64_MAX } from './internal'
 import { withModule } from './runtime'
 
 const U64_BYTES = 8
+
+// The C `mpt_decrypt_amount` rejects `range_high == UINT64_MAX` (secp256k1_mpt.h),
+// so the largest legal search bound is one less.
+const MAX_DECRYPT_RANGE_HIGH = U64_MAX - 1n
 
 // mpt-crypto decrypts an ElGamal amount by brute-forcing the discrete log over
 // [0, rangeHigh]; the search stops at the recovered value, so cost scales with
@@ -45,6 +50,7 @@ export async function encryptAmount(
   publicKey: string,
   blindingFactor: string,
 ): Promise<string> {
+  assertUint64(amount, 'amount')
   const pub = hexToBytes(publicKey, 'publicKey', PUBKEY_SIZE)
   const blinding = hexToBytes(
     blindingFactor,
@@ -82,6 +88,7 @@ export async function decryptAmount(
   privateKey: string,
   rangeHigh: bigint,
 ): Promise<bigint> {
+  assertUint64(rangeHigh, 'rangeHigh', MAX_DECRYPT_RANGE_HIGH)
   const ct = hexToBytes(ciphertext, 'ciphertext', ELGAMAL_TOTAL_SIZE)
   const priv = hexToBytes(privateKey, 'privateKey', PRIVKEY_SIZE)
   return withModule((mod, marshaller) => {
@@ -115,6 +122,7 @@ export async function getPedersenCommitment(
   amount: bigint,
   blindingFactor: string,
 ): Promise<string> {
+  assertUint64(amount, 'amount')
   const blinding = hexToBytes(
     blindingFactor,
     'blindingFactor',

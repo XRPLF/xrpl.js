@@ -12,7 +12,7 @@ import {
   SEND_PROOF_SIZE,
 } from './constants'
 import { bytesToHex, hexToBytes } from './hex'
-import { rawParticipant, rawPedersenParams } from './internal'
+import { assertUint64, rawParticipant, rawPedersenParams } from './internal'
 import { withModule } from './runtime'
 import { PedersenParams, SendProofParams } from './types'
 
@@ -65,6 +65,7 @@ export async function getClawbackProof(
   amount: bigint,
   ciphertext: string,
 ): Promise<string> {
+  assertUint64(amount, 'amount')
   const priv = hexToBytes(privateKey, 'privateKey', PRIVKEY_SIZE)
   const pub = hexToBytes(publicKey, 'publicKey', PUBKEY_SIZE)
   const ctx = hexToBytes(contextHash, 'contextHash', CONTEXT_HASH_SIZE)
@@ -109,6 +110,7 @@ export async function getConvertBackProof(
   amount: bigint,
   params: PedersenParams,
 ): Promise<string> {
+  assertUint64(amount, 'amount')
   const priv = hexToBytes(privateKey, 'privateKey', PRIVKEY_SIZE)
   const pub = hexToBytes(publicKey, 'publicKey', PUBKEY_SIZE)
   const ctx = hexToBytes(contextHash, 'contextHash', CONTEXT_HASH_SIZE)
@@ -145,6 +147,7 @@ export async function getConvertBackProof(
 export async function getConfidentialSendProof(
   params: SendProofParams,
 ): Promise<string> {
+  assertUint64(params.amount, 'amount')
   const priv = hexToBytes(params.privateKey, 'privateKey', PRIVKEY_SIZE)
   const pub = hexToBytes(params.publicKey, 'publicKey', PUBKEY_SIZE)
   const txBlinding = hexToBytes(

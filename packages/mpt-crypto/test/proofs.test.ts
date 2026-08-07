@@ -147,6 +147,51 @@ describe('proofs', () => {
     ).rejects.toThrow(/contextHash/u)
   })
 
+  // Each proof builder passes its `amount` straight to a WASM i64 param, which
+  // wraps silently on overflow — so an out-of-range amount is rejected up front.
+  it('getClawbackProof rejects an out-of-range amount', async () => {
+    await expect(
+      getClawbackProof(
+        PRIVATE_KEY,
+        PUBLIC_KEY,
+        CONTEXT_HASH,
+        2n ** 64n,
+        'CD'.repeat(66),
+      ),
+    ).rejects.toThrow(/amount/u)
+  })
+
+  it('getConvertBackProof rejects an out-of-range amount', async () => {
+    await expect(
+      getConvertBackProof(PRIVATE_KEY, PUBLIC_KEY, CONTEXT_HASH, 2n ** 64n, {
+        commitment: 'AB'.repeat(33),
+        amount: 100n,
+        ciphertext: 'CD'.repeat(66),
+        blindingFactor: 'EF'.repeat(32),
+      }),
+    ).rejects.toThrow(/amount/u)
+  })
+
+  it('getConfidentialSendProof rejects an out-of-range amount', async () => {
+    await expect(
+      getConfidentialSendProof({
+        privateKey: PRIVATE_KEY,
+        publicKey: PUBLIC_KEY,
+        amount: 2n ** 64n,
+        participants: [{ publicKey: PUBLIC_KEY, ciphertext: 'CD'.repeat(66) }],
+        txBlindingFactor: 'EF'.repeat(32),
+        contextHash: CONTEXT_HASH,
+        amountCommitment: 'AB'.repeat(33),
+        balanceParams: {
+          commitment: 'AB'.repeat(33),
+          amount: 1000n,
+          ciphertext: 'CD'.repeat(66),
+          blindingFactor: 'EF'.repeat(32),
+        },
+      }),
+    ).rejects.toThrow(/amount/u)
+  })
+
   it('rejects a send proof with a wrong-length amount commitment', async () => {
     const txBlinding = await generateBlindingFactor()
     const senderCt = await encryptAmount(100n, PUBLIC_KEY, txBlinding)

@@ -8,6 +8,32 @@ import { hexToBytes } from './hex'
 import { RawParticipant, RawPedersenParams } from './marshal'
 import { Participant, PedersenParams } from './types'
 
+/** Largest unsigned 64-bit integer — the width of the C `uint64_t` amounts. */
+export const U64_MAX = 2n ** 64n - 1n
+
+/**
+ * Assert that a bigint fits an unsigned 64-bit WASM parameter.
+ *
+ * Amounts and ranges are passed straight to WASM `i64` parameters, and the
+ * JS→WASM BigInt marshalling wraps modulo 2^64 *without throwing* — so e.g.
+ * `2n ** 64n` would be silently encoded as `0`. This guards that at the public
+ * API boundary instead.
+ *
+ * @param value - The value to check.
+ * @param label - A human-readable name used in error messages.
+ * @param max - Inclusive upper bound (defaults to {@link U64_MAX}).
+ * @throws If `value` is negative or greater than `max`.
+ */
+export function assertUint64(
+  value: bigint,
+  label: string,
+  max: bigint = U64_MAX,
+): void {
+  if (value < 0n || value > max) {
+    throw new Error(`${label} must be an integer in [0, ${max}] (got ${value})`)
+  }
+}
+
 /**
  * Decode a hex-encoded {@link Participant} into its byte-struct form.
  *

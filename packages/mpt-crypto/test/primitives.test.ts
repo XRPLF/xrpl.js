@@ -52,4 +52,31 @@ describe('primitives', () => {
       /publicKey/u,
     )
   })
+
+  it('rejects an amount outside the unsigned 64-bit range', async () => {
+    const blinding = await generateBlindingFactor()
+    // 2^64 would wrap to 0 when marshalled to the WASM i64 param, silently
+    // encrypting the wrong value; the wrapper rejects it instead.
+    await expect(
+      encryptAmount(2n ** 64n, PUBLIC_KEY, blinding),
+    ).rejects.toThrow(/amount/u)
+    await expect(encryptAmount(-1n, PUBLIC_KEY, blinding)).rejects.toThrow(
+      /amount/u,
+    )
+    await expect(getPedersenCommitment(2n ** 64n, blinding)).rejects.toThrow(
+      /amount/u,
+    )
+  })
+
+  it('rejects a decrypt rangeHigh at or above UINT64_MAX', async () => {
+    const blinding = await generateBlindingFactor()
+    const ciphertext = await encryptAmount(1n, PUBLIC_KEY, blinding)
+    // The C lib rejects range_high == UINT64_MAX (2^64 - 1); guard it early.
+    await expect(
+      decryptAmount(ciphertext, PRIVATE_KEY, 2n ** 64n - 1n),
+    ).rejects.toThrow(/rangeHigh/u)
+    await expect(decryptAmount(ciphertext, PRIVATE_KEY, -1n)).rejects.toThrow(
+      /rangeHigh/u,
+    )
+  })
 })
