@@ -77,8 +77,13 @@ export interface ConfidentialClawbackParams extends BaseConfidentialParams {
   /** The issuer's ElGamal keypair. */
   issuerKeypair: ConfidentialKeypair
   /**
-   * Optional explicit amount to claw back. When omitted the builder decrypts the
-   * holder's issuer-encrypted balance to recover the full amount.
+   * The holder's full confidential balance, supplied to skip the (potentially
+   * slow) on-ledger decryption. Confidential clawback is all-or-nothing: rippled
+   * always burns the holder's entire confidential balance and the proof binds
+   * this value to the issuer-encrypted balance ciphertext, so it MUST equal the
+   * full balance — a smaller value does not claw back a partial amount, it just
+   * produces a proof rippled rejects (tecBAD_PROOF). When omitted, the builder
+   * decrypts the issuer-encrypted balance to recover the full amount itself.
    */
   amount?: bigint
 }

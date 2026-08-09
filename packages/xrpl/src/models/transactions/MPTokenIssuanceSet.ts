@@ -287,6 +287,19 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
         `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
       )
     }
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    if (
+      tx.TransferFee > 0 &&
+      isFlagEnabled(
+        flagsNum,
+        MPTokenIssuanceSetFlags.tfMPTSetCanHoldConfidentialBalance,
+      )
+    ) {
+      throw new ValidationError(
+        'MPTokenIssuanceSet: TransferFee cannot be provided together with the tfMPTSetCanHoldConfidentialBalance flag',
+      )
+    }
   }
 
   // An empty MPTokenMetadata is valid on MPTokenIssuanceSet: per rippled it

@@ -59,6 +59,28 @@ describe('confidential/prepareConfidentialClawback', function () {
     assert.strictEqual(tx.MPTAmount, '250')
   })
 
+  it('throws when an explicit amount exceeds the MPT maximum', async function () {
+    const issuerBalance = await encryptAmount(
+      700n,
+      KEY_A.publicKey,
+      await generateBlindingFactor(),
+    )
+    const client = mockClient({
+      mptoken: { [ADDR_B]: { IssuerEncryptedBalance: issuerBalance } },
+    })
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialClawback(client, {
+        account: ADDR_A,
+        holder: ADDR_B,
+        issuerKeypair: KEY_A,
+        // One past MAX_MPT_AMOUNT (2^63 - 1).
+        amount: 9223372036854775808n,
+        mptIssuanceID: ISSUANCE_ID,
+        sequence: 5,
+      }),
+    )
+  })
+
   it('throws when the holder has no issuer-encrypted balance', async function () {
     const client = mockClient({ mptoken: { [ADDR_B]: {} } })
     await assertRejectsXrplError(async () =>

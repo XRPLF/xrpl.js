@@ -123,6 +123,33 @@ describe('confidential/prepareConfidentialConvertBack', function () {
     )
   })
 
+  it('throws on a zero amount (ConvertBack forbids zero)', async function () {
+    const client = await convertBackClient(500n)
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialConvertBack(client, {
+        account: ADDR_A,
+        amount: 0n,
+        holderKeypair: KEY_A,
+        mptIssuanceID: ISSUANCE_ID,
+        sequence: 5,
+      }),
+    )
+  })
+
+  it('throws when the amount exceeds the MPT maximum', async function () {
+    const client = await convertBackClient(500n)
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialConvertBack(client, {
+        account: ADDR_A,
+        // One past MAX_MPT_AMOUNT (2^63 - 1).
+        amount: 9223372036854775808n,
+        holderKeypair: KEY_A,
+        mptIssuanceID: ISSUANCE_ID,
+        sequence: 5,
+      }),
+    )
+  })
+
   it('refuses to reveal more than the balance (no overdraft)', async function () {
     // Revealing more than the balance would need a range proof over a negative
     // remainder; the WASM refuses to build it.

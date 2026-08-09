@@ -80,6 +80,20 @@ describe('ConfidentialMPTClawback', function () {
     )
   })
 
+  it(`throws w/ Holder equal to Account`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Holder: ACCOUNT,
+        MPTAmount: '100',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: Holder and Account must be different',
+    )
+  })
+
   it(`throws w/ invalid Holder`, function () {
     assertInvalid(
       {

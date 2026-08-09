@@ -346,6 +346,13 @@ export function validateMPTokenIssuanceCreate(
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
         : (flags.tfMPTCanTransfer ?? false)
+    const isTfMPTCanHoldConfidentialBalance =
+      typeof flags === 'number'
+        ? isFlagEnabled(
+            flags,
+            MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+          )
+        : (flags.tfMPTCanHoldConfidentialBalance ?? false)
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
@@ -356,6 +363,14 @@ export function validateMPTokenIssuanceCreate(
     if (tx.TransferFee && !isTfMPTCanTransfer) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+      )
+    }
+
+    // Confidential amounts are encrypted, so a transfer rate cannot be applied
+    // to them; rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    if (tx.TransferFee && isTfMPTCanHoldConfidentialBalance) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
       )
     }
   }

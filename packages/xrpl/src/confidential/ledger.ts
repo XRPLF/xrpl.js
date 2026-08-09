@@ -2,9 +2,40 @@ import { bytesToHex } from '@xrplf/isomorphic/utils'
 import { decodeAccountID } from 'ripple-address-codec'
 
 import { type Client } from '../client'
+import { XrplError } from '../errors'
 import { MPToken, MPTokenIssuance } from '../models/ledger'
+import { MAX_MPT_AMOUNT } from '../models/transactions/common'
 
 import { loadMptCrypto } from './loader'
+
+/**
+ * Guard a public MPT amount before it reaches the WASM crypto layer. The crypto
+ * marshalling only rejects values that would wrap a `uint64` (> 2^64 - 1), but
+ * MPT amounts are capped at 2^63 - 1 ({@link MAX_MPT_AMOUNT}); an amount between
+ * those bounds would assemble a valid-looking transaction that rippled then
+ * rejects with `temBAD_AMOUNT`. Fail fast here instead. Mirrors the model-level
+ * `validateConfidentialMPTAmount` for the builders' `bigint` inputs.
+ *
+ * @param amount - The public MPT amount to validate.
+ * @param allowZero - Whether zero is permitted (only ConfidentialMPTConvert and,
+ *   like rippled, ConfidentialMPTSend leave the amount unconstrained at zero).
+ * @throws {XrplError} If the amount is negative, above the max, or a disallowed zero.
+ */
+export function assertConfidentialAmount(
+  amount: bigint,
+  allowZero: boolean,
+): void {
+  if (
+    amount < BigInt(0) ||
+    amount > MAX_MPT_AMOUNT ||
+    (!allowZero && amount === BigInt(0))
+  ) {
+    const low = allowZero ? '0' : '1'
+    throw new XrplError(
+      `Confidential MPT amount out of range [${low}, ${MAX_MPT_AMOUNT.toString()}]: ${amount.toString()}`,
+    )
+  }
+}
 
 /**
  * Convert a classic XRPL address to its 20-byte AccountID as uppercase hex,

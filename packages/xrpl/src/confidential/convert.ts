@@ -8,6 +8,7 @@ import {
 
 import {
   accountIdHex,
+  assertConfidentialAmount,
   decryptBound,
   fetchMPToken,
   fetchMPTokenIssuance,
@@ -38,6 +39,8 @@ export async function prepareConfidentialConvert(
   client: Client,
   params: ConfidentialConvertParams,
 ): Promise<ConfidentialMPTConvert> {
+  // Convert may register the holder key with a zero amount, so zero is allowed.
+  assertConfidentialAmount(params.amount, true)
   const [crypto, issuance, mptoken, sequence] = await Promise.all([
     loadMptCrypto(),
     fetchMPTokenIssuance(client, params.mptIssuanceID),
@@ -121,6 +124,8 @@ export async function prepareConfidentialConvertBack(
   client: Client,
   params: ConfidentialConvertBackParams,
 ): Promise<ConfidentialMPTConvertBack> {
+  // rippled rejects a zero-amount ConvertBack with temBAD_AMOUNT.
+  assertConfidentialAmount(params.amount, false)
   const [crypto, issuance, mptoken, sequence] = await Promise.all([
     loadMptCrypto(),
     fetchMPTokenIssuance(client, params.mptIssuanceID),

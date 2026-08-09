@@ -145,6 +145,22 @@ describe('confidential/prepareConfidentialSend', function () {
     )
   })
 
+  it('throws when the amount exceeds the MPT maximum', async function () {
+    // A confidential balance can never exceed MAX_MPT_AMOUNT (2^63 - 1), so an
+    // amount above it is unspendable; reject before the crypto layer.
+    const client = await sendClient(1000n)
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialSend(client, {
+        account: ADDR_A,
+        destination: ADDR_B,
+        amount: 9223372036854775808n,
+        senderKeypair: KEY_A,
+        mptIssuanceID: ISSUANCE_ID,
+        sequence: 5,
+      }),
+    )
+  })
+
   it('refuses to send more than the spendable balance (no overdraft)', async function () {
     // The range proof for (balance - amount) can't be built when amount >
     // balance, so the WASM refuses — double-spend is prevented client-side.

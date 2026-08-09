@@ -7,6 +7,7 @@ import {
 
 import {
   accountIdHex,
+  assertConfidentialAmount,
   decryptBound,
   fetchMPToken,
   fetchMPTokenIssuance,
@@ -37,6 +38,10 @@ export async function prepareConfidentialSend(
   client: Client,
   params: ConfidentialSendParams,
 ): Promise<ConfidentialMPTSend> {
+  // A confidential balance can never exceed MAX_MPT_AMOUNT, so an amount above
+  // it (or negative) is unspendable; reject it before the crypto layer, which
+  // would otherwise accept anything up to 2^64 - 1.
+  assertConfidentialAmount(params.amount, true)
   const [crypto, issuance, senderToken, destToken, sequence] =
     await Promise.all([
       loadMptCrypto(),
@@ -168,6 +173,9 @@ export async function prepareConfidentialClawback(
   client: Client,
   params: ConfidentialClawbackParams,
 ): Promise<ConfidentialMPTClawback> {
+  if (params.amount != null) {
+    assertConfidentialAmount(params.amount, false)
+  }
   const [crypto, holderToken, sequence] = await Promise.all([
     loadMptCrypto(),
     fetchMPToken(client, params.holder, params.mptIssuanceID),

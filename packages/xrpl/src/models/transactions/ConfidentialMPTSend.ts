@@ -1,3 +1,5 @@
+import { ValidationError } from '../../errors'
+
 import {
   Account,
   BaseTransaction,
@@ -90,6 +92,11 @@ export function validateConfidentialMPTSend(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateRequiredField(tx, 'Destination', isAccount)
+  if (tx.Account === tx.Destination) {
+    throw new ValidationError(
+      'ConfidentialMPTSend: Destination and Account must be different',
+    )
+  }
   validateOptionalField(tx, 'DestinationTag', isNumber)
   validateRequiredField(tx, 'SenderEncryptedAmount', isCiphertext)
   validateRequiredField(tx, 'DestinationEncryptedAmount', isCiphertext)

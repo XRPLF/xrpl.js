@@ -1,3 +1,5 @@
+import { ValidationError } from '../../errors'
+
 import {
   Account,
   BaseTransaction,
@@ -47,6 +49,11 @@ export function validateConfidentialMPTClawback(
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateRequiredField(tx, 'Holder', isAccount)
+  if (tx.Account === tx.Holder) {
+    throw new ValidationError(
+      'ConfidentialMPTClawback: Holder and Account must be different',
+    )
+  }
   validateConfidentialMPTAmount(tx, false)
   validateRequiredField(
     tx,

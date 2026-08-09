@@ -161,6 +161,36 @@ describe('MPTokenIssuanceCreate', function () {
     )
   })
 
+  it(`throws w/ TransferFee and tfMPTCanHoldConfidentialBalance`, function () {
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        // Distinct flag bits, so addition is equivalent to a bitwise OR.
+        Flags:
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer +
+          MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
+    )
+
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        Flags: {
+          tfMPTCanTransfer: true,
+          tfMPTCanHoldConfidentialBalance: true,
+        },
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
+    )
+  })
+
   it(`throws w/ invalid ImmutableFlags value`, async () => {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',

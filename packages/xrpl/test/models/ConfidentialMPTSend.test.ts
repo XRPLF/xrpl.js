@@ -125,6 +125,24 @@ describe('ConfidentialMPTSend', function () {
     )
   })
 
+  it(`throws w/ Destination equal to Account`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: MPT_ISSUANCE_ID,
+        Destination: ACCOUNT,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTSend: Destination and Account must be different',
+    )
+  })
+
   it(`throws w/ invalid Destination`, function () {
     assertInvalid(
       {

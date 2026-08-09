@@ -129,4 +129,26 @@ describe('confidential/prepareConfidentialConvert', function () {
     }
     assert.instanceOf(error, XrplError)
   })
+
+  it('allows a zero amount (holder-key registration)', async function () {
+    const client = confidentialClient({ IssuerEncryptionKey: PUBLIC_KEY })
+    const tx = await prepareConfidentialConvert(client, { ...base, amount: 0n })
+    assert.strictEqual(tx.MPTAmount, '0')
+  })
+
+  it('throws when the amount exceeds the MPT maximum', async function () {
+    const client = confidentialClient({ IssuerEncryptionKey: PUBLIC_KEY })
+    let error: unknown
+    try {
+      // One past MAX_MPT_AMOUNT (2^63 - 1); the crypto layer would otherwise
+      // accept anything up to 2^64 - 1.
+      await prepareConfidentialConvert(client, {
+        ...base,
+        amount: 9223372036854775808n,
+      })
+    } catch (err) {
+      error = err
+    }
+    assert.instanceOf(error, XrplError)
+  })
 })
