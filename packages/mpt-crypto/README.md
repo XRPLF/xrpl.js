@@ -51,7 +51,10 @@ import {
 
 const blinding = await generateBlindingFactor()
 const ciphertext = await encryptAmount(1000n, publicKey, blinding)
-const amount = await decryptAmount(ciphertext, privateKey) // 1000n
+// `rangeHigh` bounds the discrete-log search; decryption recovers any amount in
+// [0, rangeHigh]. Pass the tightest correct bound you know (e.g. the issuance's
+// outstanding confidential amount) — cost scales with it.
+const amount = await decryptAmount(ciphertext, privateKey, 10_000n) // 1000n
 ```
 
 ## The vendored WASM
