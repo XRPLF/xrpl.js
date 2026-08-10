@@ -32,6 +32,12 @@ export interface SetFeePostAmendment extends BaseTransaction {
    * The incremental reserve, in drops
    */
   ReserveIncrementDrops: string
+
+  GasLimit?: number
+
+  BytecodeSizeLimit?: number
+
+  GasPrice?: number
 }
 
 /**

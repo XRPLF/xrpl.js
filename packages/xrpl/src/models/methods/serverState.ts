@@ -30,6 +30,11 @@ export interface ServerStateResponse extends BaseResponse {
         hash: string
         reserve_base: number
         reserve_inc: number
+
+        extension_compute: number
+        extension_size: number
+        gas_price: number
+
         seq: number
       }
       io_latency_ms: number
@@ -69,6 +74,11 @@ export interface ServerStateResponse extends BaseResponse {
         hash: string
         reserve_base: number
         reserve_inc: number
+
+        extension_compute: number
+        extension_size: number
+        gas_price: number
+
         seq: number
       }
       validation_quorum: number

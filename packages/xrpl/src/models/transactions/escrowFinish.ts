@@ -9,6 +9,7 @@ import {
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
+import type { TransactionMetadataBase } from './metadata'
 
 /**
  * Deliver XRP from a held payment to the recipient.
@@ -38,6 +39,14 @@ export interface EscrowFinish extends BaseTransaction {
    * The credentials included must not be expired.
    */
   CredentialIDs?: string[]
+
+  Gas?: number
+}
+
+export interface EscrowFinishMetadata extends TransactionMetadataBase {
+  // if Gas is present and the Smart Escrow runs
+  GasUsed?: number
+  VMReturnCode?: number
 }
 
 /**
