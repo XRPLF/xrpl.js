@@ -1999,6 +1999,16 @@
       }
     ],
     [
+      "FeeAmountDelta",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
+        "type": "Amount"
+      }
+    ],
+    [
       "PublicKey",
       {
         "isSerialized": true,
@@ -2899,12 +2909,22 @@
       }
     ],
     [
-      "VMReturnCode",
+      "RemainingOwnerCountDelta",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 2,
+        "type": "Int32"
+      }
+    ],
+    [
+      "VMReturnCode",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 3,
         "type": "Int32"
       }
     ],
@@ -3575,6 +3595,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 5,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "LEVersion",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 6,
         "type": "UInt8"
       }
     ],
@@ -5309,6 +5339,10 @@
       {
         "name": "Scale",
         "optionality": 2
+      },
+      {
+        "name": "LEVersion",
+        "optionality": 2
       }
     ],
     "XChainOwnedClaimID": [
@@ -5498,6 +5532,13 @@
     },
     "MPTokenIssuanceSet": {
       "tfMPTLock": 1,
+      "tfMPTSetCanClawback": 128,
+      "tfMPTSetCanEscrow": 16,
+      "tfMPTSetCanHoldConfidentialBalance": 256,
+      "tfMPTSetCanLock": 4,
+      "tfMPTSetCanTrade": 32,
+      "tfMPTSetCanTransfer": 64,
+      "tfMPTSetRequireAuth": 8,
       "tfMPTUnlock": 2
     },
     "NFTokenCreateOffer": {
@@ -6719,7 +6760,7 @@
         "optionality": 1
       },
       {
-        "name": "FeeAmount",
+        "name": "FeeAmountDelta",
         "optionality": 1
       },
       {
@@ -6727,7 +6768,7 @@
         "optionality": 1
       },
       {
-        "name": "RemainingOwnerCount",
+        "name": "RemainingOwnerCountDelta",
         "optionality": 1
       }
     ],
@@ -7468,5 +7509,5 @@
     "Vector256": 19,
     "XChainBridge": 25
   },
-  "hash": "4E54FC449DD5342CE87DA5C913998F2CC31C235BBCF1D7804E2C83FB6A9B680F"
+  "hash": "C85AAC609E9678310AD759AECDCA7B8E8EF86B996C136A33A6B4C4F18CF36F58"
 }
