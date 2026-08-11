@@ -327,7 +327,10 @@ async function fetchCounterPartySignersCount(
  * multisigned SponsorSignature.
  * @returns The additional sponsor fee as a BigNumber.
  */
-function calculateSponsorFee(netFeeDrops: string, sponsorSignersCount = 0): BigNumber {
+function calculateSponsorFee(
+  netFeeDrops: string,
+  sponsorSignersCount = 0,
+): BigNumber {
   if (sponsorSignersCount <= 0) {
     return new BigNumber(0)
   }

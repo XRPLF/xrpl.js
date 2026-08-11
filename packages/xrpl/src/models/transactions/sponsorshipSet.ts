@@ -166,12 +166,14 @@ function getSponsorshipSetFlags(tx: Record<string, unknown>): {
     if (flagsObj.tfDeleteObject) {
       flagsValue = SponsorshipSetFlags.tfDeleteObject
     }
+    /* eslint-disable @typescript-eslint/prefer-nullish-coalescing -- boolean OR; `??` would stop at an explicit `false` */
     hasModifyFlag = Boolean(
       flagsObj.tfSponsorshipSetRequireSignForFee ||
       flagsObj.tfSponsorshipClearRequireSignForFee ||
       flagsObj.tfSponsorshipSetRequireSignForReserve ||
       flagsObj.tfSponsorshipClearRequireSignForReserve,
     )
+    /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
   }
 
   /* eslint-disable-next-line no-bitwise -- bitwise operations required for flag validation */

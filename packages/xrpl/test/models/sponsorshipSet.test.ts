@@ -14,6 +14,7 @@ const assertInvalid = (tx: any, message: string): void =>
  *
  * Providing runtime verification testing for each specific transaction type.
  */
+// eslint-disable-next-line max-statements -- many scenarios to cover
 describe('SponsorshipSet', function () {
   let sponsorshipSetTx: any
 
