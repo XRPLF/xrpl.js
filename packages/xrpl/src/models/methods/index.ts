@@ -45,7 +45,6 @@ import {
 import {
   AccountSponsoringRequest,
   AccountSponsoringResponse,
-  SponsoredAccount,
 } from './accountSponsoring'
 import {
   AccountTxRequest,
@@ -560,7 +559,6 @@ export {
   AccountOffersResponse,
   AccountSponsoringRequest,
   AccountSponsoringResponse,
-  SponsoredAccount,
   AccountTxRequest,
   AccountTxResponse,
   AccountTxV1Response,

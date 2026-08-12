@@ -1,25 +1,7 @@
+import { LedgerEntry } from '../ledger'
+
 import { AccountObjectType } from './accountObjects'
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
-
-/**
- * Represents an account that is being sponsored by the requested account.
- *
- * @category Responses
- */
-export interface SponsoredAccount {
-  /** The address of the sponsored account. */
-  account: string
-  /**
-   * The number of ledger objects owned by this account that are sponsored
-   * by the requested account.
-   */
-  sponsored_owner_count?: number
-  /**
-   * Indicates whether the account's base reserve is being sponsored by the
-   * requested account.
-   */
-  account_reserve_sponsored?: boolean
-}
 
 /**
  * The account_sponsoring command returns information about accounts and ledger
@@ -70,10 +52,13 @@ export interface AccountSponsoringResponse extends BaseResponse {
     /** The address of the sponsor account from the request. */
     account: string
     /**
-     * Array of accounts and objects sponsored by this account. Each entry
-     * contains information about the sponsorship relationship.
+     * Array of ledger entries in this account's owner directory. This
+     * includes entries owned by this account and entries that are linked to
+     * this account but owned by someone else, such as escrows where this
+     * account is the destination. Each member is a ledger entry in its raw
+     * ledger format.
      */
-    sponsored_accounts: SponsoredAccount[]
+    sponsored_objects: LedgerEntry[]
     /**
      * The identifying hash of the ledger that was used to generate this
      * response.
