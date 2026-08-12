@@ -105,7 +105,10 @@ jobs:
             exit 1
           fi
 
-          if [[ "$TRIGGER_BRANCH" != "main" ]]; then
+          # TEMPORARY: relaxed to allow dispatch from this test branch too, so the
+          # reviewer-expansion/Slack changes can be exercised before merging to main.
+          # Revert this to the main-only check before merging.
+          if [[ "$TRIGGER_BRANCH" != "main" && "$TRIGGER_BRANCH" != "test-team-reviewer-expansion-xrplf" ]]; then
             echo "❌ Release pipeline can only be triggered from the 'main' branch. Current branch: '$TRIGGER_BRANCH'." >&2
             exit 1
           fi
@@ -266,7 +269,7 @@ jobs:
             -H "Authorization: Bearer ${SLACK_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel "#xrpl-js" \
+                  --arg channel "#test-alerts" \
                   --arg text "${MESSAGE}" \
                   '{channel: $channel, text: $text}')"
 
@@ -423,29 +426,60 @@ jobs:
 
           fetch_reviewers() {
             local env_name="$1"
-            local env_json reviewers
+            local env_json reviewer_entries org logins expanded=()
+
             env_json="$(curl -sSf \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$REPO/environments/$env_name")" || true
 
-            reviewers="$(printf '%s' "$env_json" | jq -r '
+            org="${REPO%%/*}"
+
+            # One line per reviewer: "User:<login>" or "Team:<slug>"
+            reviewer_entries="$(printf '%s' "$env_json" | jq -r '
               (.protection_rules // [])
               | map(select(.type=="required_reviewers") | .reviewers // [])
               | add // []
               | map(
-                  if .type=="User" then (.reviewer.login)
-                  elif .type=="Team" then (.reviewer.slug)
-                  else (.reviewer.login // .reviewer.slug // "unknown")
+                  if .type=="User" then "User:" + (.reviewer.login // "unknown")
+                  elif .type=="Team" then "Team:" + (.reviewer.slug // "unknown")
+                  else "User:" + (.reviewer.login // .reviewer.slug // "unknown")
                   end
                 )
               | unique
-              | join(", ")
+              | .[]
             ')"
-            if [ -z "$reviewers" ] || [ "$reviewers" = "null" ]; then
-              reviewers="(no required reviewers configured)"
+
+            if [ -z "$reviewer_entries" ]; then
+              printf '%s' "(no required reviewers configured)"
+              return
             fi
-            printf '%s' "$reviewers"
+
+            while IFS= read -r entry; do
+              [ -z "$entry" ] && continue
+              case "$entry" in
+                User:*)
+                  expanded+=("${entry#User:}")
+                  ;;
+                Team:*)
+                  local slug="${entry#Team:}"
+                  logins="$(curl -sSf \
+                    -H "Authorization: Bearer $GH_TOKEN" \
+                    -H "Accept: application/vnd.github+json" \
+                    "https://api.github.com/orgs/$org/teams/$slug/members" \
+                    | jq -r '.[].login' 2>/dev/null || true)"
+                  if [ -n "$logins" ]; then
+                    while IFS= read -r member; do
+                      [ -n "$member" ] && expanded+=("$member")
+                    done <<< "$logins"
+                  else
+                    expanded+=("@$org/$slug")
+                  fi
+                  ;;
+              esac
+            done <<< "$reviewer_entries"
+
+            printf '%s\n' "${expanded[@]}" | sort -u | paste -sd, - | sed 's/,/, /g'
           }
 
           # Get reviewer lists
@@ -497,7 +531,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          CHANNEL: "#xrpl-js"
+          CHANNEL: "#test-alerts"
           EXECUTOR: ${{ github.triggering_actor || github.actor }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           REPO: ${{ github.repository }}
@@ -558,7 +592,7 @@ jobs:
         shell: bash
         env:
           SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          CHANNEL: "#ripplex-security"
+          CHANNEL: "#test-alerts"
           EXECUTOR: ${{ github.triggering_actor || github.actor }}
           PKG_NAME: ${{ github.event.inputs.package_name }}
           PKG_VERSION: ${{ needs.get_version.outputs.package_version }}
@@ -705,7 +739,7 @@ jobs:
           curl -sS -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer ${SLACK_TOKEN}" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "$(jq -n --arg channel '#xrpl-js' --arg text "${text}" '{channel:$channel, text:$text}')"
+            -d "$(jq -n --arg channel '#test-alerts' --arg text "${text}" '{channel:$channel, text:$text}')"
 
   generate-documentation:
     name: Generate and Publish documentation for ${{ needs.get_version.outputs.package_version }}
@@ -769,6 +803,6 @@ jobs:
             -H "Authorization: Bearer $SLACK_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
-                  --arg channel '#xrpl-js' \
+                  --arg channel '#test-alerts' \
                   --arg text "${MESSAGE}" \
                   '{channel: $channel, text: $text}')"
