@@ -4,6 +4,7 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isRecord,
   isString,
   validateBaseTransaction,
   areAddressesEqual,
@@ -105,16 +106,12 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
     hasReassign =
       (tx.Flags & SponsorshipTransferFlags.tfSponsorshipReassign) !== 0
     /* eslint-enable no-bitwise */
-  } else if (typeof tx.Flags === 'object') {
+  } else if (isRecord(tx.Flags)) {
     // Handle boolean flags object
     const flagsObj = tx.Flags
-    hasEnd =
-      'tfSponsorshipEnd' in flagsObj && flagsObj.tfSponsorshipEnd === true
-    hasCreate =
-      'tfSponsorshipCreate' in flagsObj && flagsObj.tfSponsorshipCreate === true
-    hasReassign =
-      'tfSponsorshipReassign' in flagsObj &&
-      flagsObj.tfSponsorshipReassign === true
+    hasEnd = flagsObj.tfSponsorshipEnd === true
+    hasCreate = flagsObj.tfSponsorshipCreate === true
+    hasReassign = flagsObj.tfSponsorshipReassign === true
   }
 
   const scenarioCount =

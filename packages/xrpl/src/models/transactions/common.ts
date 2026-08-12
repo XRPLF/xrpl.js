@@ -737,14 +737,7 @@ function validateSponsorFlagsValue(
  */
 // eslint-disable-next-line max-lines-per-function -- necessary for validation
 export function validateSponsorFields(tx: Record<string, unknown>): void {
-  // Skip sponsor field validation for SponsorshipTransfer which uses the Sponsor field
-  // for a different purpose (the new reserve-payer, not fee sponsorship).
-  // SponsorshipSet does NOT use the Sponsor field for its own purposes, so it should
-  // still be validated for fee sponsorship fields.
   const transactionType = String(tx.TransactionType)
-  if (transactionType === 'SponsorshipTransfer') {
-    return
-  }
 
   const sponsor = tx.Sponsor
   const sponsorFlags = tx.SponsorFlags

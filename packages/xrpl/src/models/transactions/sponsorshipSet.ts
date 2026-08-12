@@ -147,20 +147,38 @@ export interface SponsorshipSet extends BaseTransaction {
  * the numeric and boolean-map forms of Flags.
  *
  * @param tx - A SponsorshipSet Transaction.
- * @returns Whether tfDeleteObject is set, and whether any of the
- * RequireSignForFee/RequireSignForReserve modify flags are set.
+ * @returns Whether tfDeleteObject is set, whether any of the
+ * RequireSignForFee/RequireSignForReserve modify flags are set, and whether
+ * the Set and Clear flag of either RequireSignFor pair are both present
+ * (which rippled's SponsorshipSet::preflight rejects with temINVALID_FLAG).
  */
+// eslint-disable-next-line max-lines-per-function -- necessary for flag validation
 function getSponsorshipSetFlags(tx: Record<string, unknown>): {
   isDelete: boolean
   hasModifyFlag: boolean
+  hasFeeSignConflict: boolean
+  hasReserveSignConflict: boolean
 } {
   let flagsValue = 0
   let hasModifyFlag = false
+  let hasFeeSignConflict = false
+  let hasReserveSignConflict = false
 
   if (typeof tx.Flags === 'number') {
     flagsValue = tx.Flags
-    /* eslint-disable-next-line no-bitwise -- bitwise operations required for flag validation */
+    /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
     hasModifyFlag = (tx.Flags & SPONSORSHIP_SET_MODIFY_FLAGS) !== 0
+    hasFeeSignConflict =
+      (tx.Flags & SponsorshipSetFlags.tfSponsorshipSetRequireSignForFee) !==
+        0 &&
+      (tx.Flags & SponsorshipSetFlags.tfSponsorshipClearRequireSignForFee) !== 0
+    hasReserveSignConflict =
+      (tx.Flags & SponsorshipSetFlags.tfSponsorshipSetRequireSignForReserve) !==
+        0 &&
+      (tx.Flags &
+        SponsorshipSetFlags.tfSponsorshipClearRequireSignForReserve) !==
+        0
+    /* eslint-enable no-bitwise */
   } else if (isRecord(tx.Flags)) {
     const flagsObj = tx.Flags
     if (flagsObj.tfDeleteObject) {
@@ -174,12 +192,20 @@ function getSponsorshipSetFlags(tx: Record<string, unknown>): {
       flagsObj.tfSponsorshipClearRequireSignForReserve,
     )
     /* eslint-enable @typescript-eslint/prefer-nullish-coalescing */
+    hasFeeSignConflict = Boolean(
+      flagsObj.tfSponsorshipSetRequireSignForFee &&
+      flagsObj.tfSponsorshipClearRequireSignForFee,
+    )
+    hasReserveSignConflict = Boolean(
+      flagsObj.tfSponsorshipSetRequireSignForReserve &&
+      flagsObj.tfSponsorshipClearRequireSignForReserve,
+    )
   }
 
   /* eslint-disable-next-line no-bitwise -- bitwise operations required for flag validation */
   const isDelete = (flagsValue & SponsorshipSetFlags.tfDeleteObject) !== 0
 
-  return { isDelete, hasModifyFlag }
+  return { isDelete, hasModifyFlag, hasFeeSignConflict, hasReserveSignConflict }
 }
 
 /**
@@ -253,7 +279,24 @@ export function validateSponsorshipSet(tx: Record<string, unknown>): void {
     }
   }
 
-  const { isDelete, hasModifyFlag } = getSponsorshipSetFlags(tx)
+  const {
+    isDelete,
+    hasModifyFlag,
+    hasFeeSignConflict,
+    hasReserveSignConflict,
+  } = getSponsorshipSetFlags(tx)
+
+  if (hasFeeSignConflict) {
+    throw new ValidationError(
+      'SponsorshipSet: cannot set both tfSponsorshipSetRequireSignForFee and tfSponsorshipClearRequireSignForFee',
+    )
+  }
+
+  if (hasReserveSignConflict) {
+    throw new ValidationError(
+      'SponsorshipSet: cannot set both tfSponsorshipSetRequireSignForReserve and tfSponsorshipClearRequireSignForReserve',
+    )
+  }
 
   // CounterpartySponsor identifies the sponsee submitting the transaction.
   // Only the sponsor (Account, i.e. no CounterpartySponsor) can create or

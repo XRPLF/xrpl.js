@@ -2,6 +2,7 @@ import { assert } from 'chai'
 
 import { Client } from '../../src/client'
 import type Sponsorship from '../../src/models/ledger/Sponsorship'
+import { SponsorshipFlags } from '../../src/models/ledger/Sponsorship'
 import type { LedgerEntryRequest } from '../../src/models/methods'
 import { SponsorFlags } from '../../src/models/transactions/common'
 import type { Payment } from '../../src/models/transactions/payment'
@@ -187,5 +188,133 @@ describe('validatePreFundedSponsorship', function () {
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'MaxFee')
+  })
+
+  it('rejects fee sponsorship when lsfSponsorshipRequireSignForFee is set', async function () {
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: SponsorshipFlags.lsfSponsorshipRequireSignForFee,
+          FeeAmount: '1000000',
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.tfSponsorFee,
+    }
+
+    const result = await validatePreFundedSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'lsfSponsorshipRequireSignForFee')
+  })
+
+  it('rejects reserve sponsorship when lsfSponsorshipRequireSignForReserve is set', async function () {
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: SponsorshipFlags.lsfSponsorshipRequireSignForReserve,
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.tfSponsorReserve,
+    }
+
+    const result = await validatePreFundedSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'lsfSponsorshipRequireSignForReserve')
+  })
+
+  it('looks up the Sponsorship object using Delegate as the sponsee when present', async function () {
+    let requestedSponsee: string | undefined
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rDelegateAccount11111111111111111111111',
+          Flags: 0,
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        const ledgerEntryReq = req as LedgerEntryRequest
+
+        const sponsorshipParam = (
+          ledgerEntryReq as unknown as {
+            sponsorship: { sponsor: string; sponsee: string }
+          }
+        ).sponsorship
+        requestedSponsee = sponsorshipParam.sponsee
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.tfSponsorReserve,
+      Delegate: 'rDelegateAccount11111111111111111111111',
+    }
+
+    const result = await validatePreFundedSponsorship(client, tx, '100')
+
+    assert.isTrue(result.valid)
+    assert.strictEqual(
+      requestedSponsee,
+      'rDelegateAccount11111111111111111111111',
+    )
   })
 })

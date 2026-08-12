@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import type { Client } from '../client'
 import { XrplError } from '../errors'
 import type Sponsorship from '../models/ledger/Sponsorship'
+import { SponsorshipFlags } from '../models/ledger/Sponsorship'
 import type { LedgerEntryRequest } from '../models/methods/ledgerEntry'
 import type { Transaction } from '../models/transactions'
 import { SponsorFlags } from '../models/transactions/common'
@@ -65,25 +66,59 @@ export async function validatePreFundedSponsorship(
 
   const fee = estimatedFee ?? tx.Fee ?? '0'
 
+  // For delegated transactions, rippled's Transactor::checkSponsor looks up the
+  // Sponsorship object between the sponsor and the delegate (STTx::getInitiator()
+  // returns sfDelegate when present), not the transaction's Account.
+  const sponsee = tx.Delegate ?? tx.Account
+
   try {
     // Query for the Sponsorship ledger entry
-    const sponsorship = await getSponsorshipEntry(
-      client,
-      tx.Sponsor,
-      tx.Account,
-    )
+    const sponsorship = await getSponsorshipEntry(client, tx.Sponsor, sponsee)
 
     if (!sponsorship) {
       return {
         valid: false,
-        error: `No Sponsorship ledger entry found for sponsor ${tx.Sponsor} and sponsee ${tx.Account}`,
+        error: `No Sponsorship ledger entry found for sponsor ${tx.Sponsor} and sponsee ${sponsee}`,
       }
     }
 
-    // Check if sponsorship is for fee payment
     /* eslint-disable no-bitwise -- bitwise operations required for flag checking */
     const isSponsoringFee = (tx.SponsorFlags & SponsorFlags.tfSponsorFee) !== 0
+    const isSponsoringReserve =
+      (tx.SponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
     /* eslint-enable no-bitwise */
+
+    // rippled's Transactor::checkSponsor rejects pre-funded (non-co-signed) sponsorship
+    // when the Sponsorship object requires the sponsee to sign for that category.
+    /* eslint-disable no-bitwise -- bitwise operations required for flag checking */
+    const requiresSignForFee =
+      (sponsorship.Flags & SponsorshipFlags.lsfSponsorshipRequireSignForFee) !==
+      0
+    const requiresSignForReserve =
+      (sponsorship.Flags &
+        SponsorshipFlags.lsfSponsorshipRequireSignForReserve) !==
+      0
+    /* eslint-enable no-bitwise */
+
+    if (isSponsoringFee && requiresSignForFee) {
+      return {
+        valid: false,
+        error:
+          'Sponsorship requires the sponsee to sign for fee sponsorship (lsfSponsorshipRequireSignForFee is set)',
+        sponsorship,
+        estimatedFee: fee,
+      }
+    }
+
+    if (isSponsoringReserve && requiresSignForReserve) {
+      return {
+        valid: false,
+        error:
+          'Sponsorship requires the sponsee to sign for reserve sponsorship (lsfSponsorshipRequireSignForReserve is set)',
+        sponsorship,
+        estimatedFee: fee,
+      }
+    }
 
     if (!isSponsoringFee) {
       // Only reserve sponsorship, no fee validation needed
