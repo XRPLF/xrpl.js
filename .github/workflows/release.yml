@@ -460,11 +460,9 @@ jobs:
                   ;;
                 Team:*)
                   local slug="${entry#Team:}"
-                  logins="$(curl -sSf \
-                    -H "Authorization: Bearer $GH_TOKEN" \
-                    -H "Accept: application/vnd.github+json" \
-                    "https://api.github.com/orgs/$org/teams/$slug/members" \
-                    | jq -r '.[].login' 2>/dev/null || true)"
+                  logins="$(GH_TOKEN="$GH_TOKEN" gh api --paginate \
+                    "orgs/$org/teams/$slug/members" \
+                    -q '.[].login' 2>/dev/null || true)"
                   if [ -n "$logins" ]; then
                     while IFS= read -r member; do
                       [ -n "$member" ] && expanded+=("$member")
