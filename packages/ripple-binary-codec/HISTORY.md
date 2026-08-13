@@ -4,6 +4,7 @@
 
 ### Added
 * Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96).
+* Add definitions for Sponsored Fees and Reserves (XLS-68).
 
 ### Changed
 * Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)). Tracks an unmerged rippled PR; the wire format may still change.
