@@ -38,6 +38,10 @@
     "type": "git",
     "url": "git@github.com:XRPLF/xrpl.js.git"
   },
+  "bugs": {
+    "url": "https://github.com/XRPLF/xrpl.js/issues"
+  },
+  "homepage": "https://github.com/XRPLF/xrpl.js/tree/main/packages/mpt-crypto#readme",
   "publishConfig": {
     "access": "public",
     "provenance": true
