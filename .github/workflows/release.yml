@@ -105,10 +105,7 @@ jobs:
             exit 1
           fi
 
-          # TEMPORARY: relaxed to allow dispatch from this test branch too, so the
-          # reviewer-expansion/Slack changes can be exercised before merging to main.
-          # Revert this to the main-only check before merging.
-          if [[ "$TRIGGER_BRANCH" != "main" && "$TRIGGER_BRANCH" != "team-reviewer-expansion" ]]; then
+          if [[ "$TRIGGER_BRANCH" != "main" ]]; then
             echo "❌ Release pipeline can only be triggered from the 'main' branch. Current branch: '$TRIGGER_BRANCH'." >&2
             exit 1
           fi
