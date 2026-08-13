@@ -473,7 +473,7 @@ jobs:
                       [ -n "$member" ] && expanded+=("$member")
                     done <<< "$logins"
                   else
-                    expanded+=("@$org/$slug")
+                    expanded+=("$slug (https://github.com/orgs/$org/teams/$slug)")
                   fi
                   ;;
               esac
