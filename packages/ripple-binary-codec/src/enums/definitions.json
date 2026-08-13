@@ -869,6 +869,66 @@
       }
     ],
     [
+      "ConfidentialBalanceVersion",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 69,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SponsoredOwnerCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 70,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SponsoringOwnerCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 71,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SponsoringAccountCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 72,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RemainingOwnerCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 73,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SponsorFlags",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 74,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1155,6 +1215,26 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 31,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "ConfidentialOutstandingAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 32,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "SponseeNode",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
         "type": "UInt64"
       }
     ],
@@ -1539,6 +1619,26 @@
       }
     ],
     [
+      "BlindingFactor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 40,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ObjectID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 41,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -1825,6 +1925,36 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 31,
+        "type": "Amount"
+      }
+    ],
+    [
+      "FeeAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 32,
+        "type": "Amount"
+      }
+    ],
+    [
+      "MaxFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
+        "type": "Amount"
+      }
+    ],
+    [
+      "FeeAmountDelta",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
         "type": "Amount"
       }
     ],
@@ -2129,6 +2259,156 @@
       }
     ],
     [
+      "ConfidentialBalanceInbox",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 32,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ConfidentialBalanceSpending",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 33,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerEncryptedBalance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 34,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerEncryptionKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 35,
+        "type": "Blob"
+      }
+    ],
+    [
+      "HolderEncryptionKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 36,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ZKProof",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 37,
+        "type": "Blob"
+      }
+    ],
+    [
+      "HolderEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 38,
+        "type": "Blob"
+      }
+    ],
+    [
+      "IssuerEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 39,
+        "type": "Blob"
+      }
+    ],
+    [
+      "SenderEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 40,
+        "type": "Blob"
+      }
+    ],
+    [
+      "DestinationEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 41,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorEncryptedBalance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 42,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorEncryptedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 43,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuditorEncryptionKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 44,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AmountCommitment",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 45,
+        "type": "Blob"
+      }
+    ],
+    [
+      "BalanceCommitment",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 46,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "isSerialized": true,
@@ -2339,6 +2619,56 @@
       }
     ],
     [
+      "Sponsor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 27,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "HighSponsor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 28,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "LowSponsor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 29,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "CounterpartySponsor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 30,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Sponsee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 31,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Number",
       {
         "isSerialized": true,
@@ -2515,6 +2845,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 1,
+        "type": "Int32"
+      }
+    ],
+    [
+      "RemainingOwnerCountDelta",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 2,
         "type": "Int32"
       }
     ],
@@ -2865,6 +3205,16 @@
         "isSigningField": false,
         "isVLEncoded": false,
         "nth": 37,
+        "type": "STObject"
+      }
+    ],
+    [
+      "SponsorSignature",
+      {
+        "isSerialized": true,
+        "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 38,
         "type": "STObject"
       }
     ],
@@ -3469,186 +3819,6 @@
       }
     ],
     [
-      "ConfidentialOutstandingAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 32,
-        "type": "UInt64"
-      }
-    ],
-    [
-      "ConfidentialBalanceVersion",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 69,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "BlindingFactor",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 40,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "ConfidentialBalanceInbox",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 32,
-        "type": "Blob"
-      }
-    ],
-    [
-      "ConfidentialBalanceSpending",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 33,
-        "type": "Blob"
-      }
-    ],
-    [
-      "IssuerEncryptedBalance",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 34,
-        "type": "Blob"
-      }
-    ],
-    [
-      "IssuerEncryptionKey",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 35,
-        "type": "Blob"
-      }
-    ],
-    [
-      "HolderEncryptionKey",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 36,
-        "type": "Blob"
-      }
-    ],
-    [
-      "ZKProof",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 37,
-        "type": "Blob"
-      }
-    ],
-    [
-      "HolderEncryptedAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 38,
-        "type": "Blob"
-      }
-    ],
-    [
-      "IssuerEncryptedAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 39,
-        "type": "Blob"
-      }
-    ],
-    [
-      "SenderEncryptedAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 40,
-        "type": "Blob"
-      }
-    ],
-    [
-      "DestinationEncryptedAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 41,
-        "type": "Blob"
-      }
-    ],
-    [
-      "AuditorEncryptedBalance",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 42,
-        "type": "Blob"
-      }
-    ],
-    [
-      "AuditorEncryptedAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 43,
-        "type": "Blob"
-      }
-    ],
-    [
-      "AuditorEncryptionKey",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 44,
-        "type": "Blob"
-      }
-    ],
-    [
-      "AmountCommitment",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 45,
-        "type": "Blob"
-      }
-    ],
-    [
-      "BalanceCommitment",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 46,
-        "type": "Blob"
-      }
-    ],
-    [
       "Metadata",
       {
         "isSerialized": false,
@@ -3697,6 +3867,7 @@
     "MPTokenIssuance": {
       "lsfMPTCanClawback": 64,
       "lsfMPTCanEscrow": 8,
+      "lsfMPTCanHoldConfidentialBalance": 128,
       "lsfMPTCanLock": 2,
       "lsfMPTCanTrade": 16,
       "lsfMPTCanTransfer": 32,
@@ -3726,6 +3897,10 @@
     },
     "SignerList": {
       "lsfOneOwnerCount": 65536
+    },
+    "Sponsorship": {
+      "lsfSponsorshipRequireSignForFee": 65536,
+      "lsfSponsorshipRequireSignForReserve": 131072
     },
     "Vault": {
       "lsfVaultPrivate": 65536
@@ -3854,6 +4029,18 @@
       {
         "name": "FirstNFTokenSequence",
         "optionality": 1
+      },
+      {
+        "name": "SponsoredOwnerCount",
+        "optionality": 2
+      },
+      {
+        "name": "SponsoringOwnerCount",
+        "optionality": 2
+      },
+      {
+        "name": "SponsoringAccountCount",
+        "optionality": 2
       },
       {
         "name": "AMMID",
@@ -4490,6 +4677,30 @@
       {
         "name": "PreviousTxnLgrSeq",
         "optionality": 0
+      },
+      {
+        "name": "ConfidentialBalanceInbox",
+        "optionality": 1
+      },
+      {
+        "name": "ConfidentialBalanceSpending",
+        "optionality": 1
+      },
+      {
+        "name": "ConfidentialBalanceVersion",
+        "optionality": 2
+      },
+      {
+        "name": "IssuerEncryptedBalance",
+        "optionality": 1
+      },
+      {
+        "name": "AuditorEncryptedBalance",
+        "optionality": 1
+      },
+      {
+        "name": "HolderEncryptionKey",
+        "optionality": 1
       }
     ],
     "MPTokenIssuance": [
@@ -4548,6 +4759,18 @@
       {
         "name": "ReferenceHolding",
         "optionality": 1
+      },
+      {
+        "name": "IssuerEncryptionKey",
+        "optionality": 1
+      },
+      {
+        "name": "AuditorEncryptionKey",
+        "optionality": 1
+      },
+      {
+        "name": "ConfidentialOutstandingAmount",
+        "optionality": 2
       }
     ],
     "NFTokenOffer": [
@@ -4856,6 +5079,14 @@
       {
         "name": "HighQualityOut",
         "optionality": 1
+      },
+      {
+        "name": "HighSponsor",
+        "optionality": 1
+      },
+      {
+        "name": "LowSponsor",
+        "optionality": 1
       }
     ],
     "SignerList": [
@@ -4885,6 +5116,44 @@
       },
       {
         "name": "PreviousTxnLgrSeq",
+        "optionality": 0
+      }
+    ],
+    "Sponsorship": [
+      {
+        "name": "PreviousTxnID",
+        "optionality": 0
+      },
+      {
+        "name": "PreviousTxnLgrSeq",
+        "optionality": 0
+      },
+      {
+        "name": "Owner",
+        "optionality": 0
+      },
+      {
+        "name": "Sponsee",
+        "optionality": 0
+      },
+      {
+        "name": "FeeAmount",
+        "optionality": 1
+      },
+      {
+        "name": "MaxFee",
+        "optionality": 1
+      },
+      {
+        "name": "RemainingOwnerCount",
+        "optionality": 2
+      },
+      {
+        "name": "OwnerNode",
+        "optionality": 0
+      },
+      {
+        "name": "SponseeNode",
         "optionality": 0
       }
     ],
@@ -5052,6 +5321,10 @@
       {
         "name": "Flags",
         "optionality": 0
+      },
+      {
+        "name": "Sponsor",
+        "optionality": 1
       }
     ]
   },
@@ -5083,6 +5356,7 @@
     "PermissionedDomain": 130,
     "RippleState": 114,
     "SignerList": 83,
+    "Sponsorship": 144,
     "Ticket": 84,
     "Vault": 132,
     "XChainOwnedClaimID": 113,
@@ -5146,6 +5420,7 @@
     "MPTokenIssuanceCreate": {
       "tfMPTCanClawback": 64,
       "tfMPTCanEscrow": 8,
+      "tfMPTCanHoldConfidentialBalance": 128,
       "tfMPTCanLock": 2,
       "tfMPTCanTrade": 16,
       "tfMPTCanTransfer": 32,
@@ -5153,6 +5428,13 @@
     },
     "MPTokenIssuanceSet": {
       "tfMPTLock": 1,
+      "tfMPTSetCanClawback": 128,
+      "tfMPTSetCanEscrow": 16,
+      "tfMPTSetCanHoldConfidentialBalance": 256,
+      "tfMPTSetCanLock": 4,
+      "tfMPTSetCanTrade": 32,
+      "tfMPTSetCanTransfer": 64,
+      "tfMPTSetRequireAuth": 8,
       "tfMPTUnlock": 2
     },
     "NFTokenCreateOffer": {
@@ -5174,11 +5456,24 @@
     "Payment": {
       "tfLimitQuality": 262144,
       "tfNoRippleDirect": 65536,
-      "tfPartialPayment": 131072
+      "tfPartialPayment": 131072,
+      "tfSponsorCreatedAccount": 524288
     },
     "PaymentChannelClaim": {
       "tfClose": 131072,
       "tfRenew": 65536
+    },
+    "SponsorshipSet": {
+      "tfDeleteObject": 1048576,
+      "tfSponsorshipClearRequireSignForFee": 131072,
+      "tfSponsorshipClearRequireSignForReserve": 524288,
+      "tfSponsorshipSetRequireSignForFee": 65536,
+      "tfSponsorshipSetRequireSignForReserve": 262144
+    },
+    "SponsorshipTransfer": {
+      "tfSponsorshipCreate": 131072,
+      "tfSponsorshipEnd": 65536,
+      "tfSponsorshipReassign": 262144
     },
     "TrustSet": {
       "tfClearDeepFreeze": 8388608,
@@ -5451,6 +5746,144 @@
       },
       {
         "name": "Holder",
+        "optionality": 1
+      }
+    ],
+    "ConfidentialMPTClawback": [
+      {
+        "name": "MPTokenIssuanceID",
+        "optionality": 0
+      },
+      {
+        "name": "Holder",
+        "optionality": 0
+      },
+      {
+        "name": "MPTAmount",
+        "optionality": 0
+      },
+      {
+        "name": "ZKProof",
+        "optionality": 0
+      }
+    ],
+    "ConfidentialMPTConvert": [
+      {
+        "name": "MPTokenIssuanceID",
+        "optionality": 0
+      },
+      {
+        "name": "MPTAmount",
+        "optionality": 0
+      },
+      {
+        "name": "HolderEncryptionKey",
+        "optionality": 1
+      },
+      {
+        "name": "HolderEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "IssuerEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "AuditorEncryptedAmount",
+        "optionality": 1
+      },
+      {
+        "name": "BlindingFactor",
+        "optionality": 0
+      },
+      {
+        "name": "ZKProof",
+        "optionality": 1
+      }
+    ],
+    "ConfidentialMPTConvertBack": [
+      {
+        "name": "MPTokenIssuanceID",
+        "optionality": 0
+      },
+      {
+        "name": "MPTAmount",
+        "optionality": 0
+      },
+      {
+        "name": "HolderEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "IssuerEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "AuditorEncryptedAmount",
+        "optionality": 1
+      },
+      {
+        "name": "BlindingFactor",
+        "optionality": 0
+      },
+      {
+        "name": "ZKProof",
+        "optionality": 0
+      },
+      {
+        "name": "BalanceCommitment",
+        "optionality": 0
+      }
+    ],
+    "ConfidentialMPTMergeInbox": [
+      {
+        "name": "MPTokenIssuanceID",
+        "optionality": 0
+      }
+    ],
+    "ConfidentialMPTSend": [
+      {
+        "name": "MPTokenIssuanceID",
+        "optionality": 0
+      },
+      {
+        "name": "Destination",
+        "optionality": 0
+      },
+      {
+        "name": "DestinationTag",
+        "optionality": 1
+      },
+      {
+        "name": "SenderEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "DestinationEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "IssuerEncryptedAmount",
+        "optionality": 0
+      },
+      {
+        "name": "AuditorEncryptedAmount",
+        "optionality": 1
+      },
+      {
+        "name": "ZKProof",
+        "optionality": 0
+      },
+      {
+        "name": "AmountCommitment",
+        "optionality": 0
+      },
+      {
+        "name": "BalanceCommitment",
+        "optionality": 0
+      },
+      {
+        "name": "CredentialIDs",
         "optionality": 1
       }
     ],
@@ -5853,6 +6286,14 @@
       {
         "name": "ImmutableFlags",
         "optionality": 1
+      },
+      {
+        "name": "IssuerEncryptionKey",
+        "optionality": 1
+      },
+      {
+        "name": "AuditorEncryptionKey",
+        "optionality": 1
       }
     ],
     "NFTokenAcceptOffer": [
@@ -6181,6 +6622,38 @@
         "optionality": 1
       }
     ],
+    "SponsorshipSet": [
+      {
+        "name": "CounterpartySponsor",
+        "optionality": 1
+      },
+      {
+        "name": "Sponsee",
+        "optionality": 1
+      },
+      {
+        "name": "FeeAmountDelta",
+        "optionality": 1
+      },
+      {
+        "name": "MaxFee",
+        "optionality": 1
+      },
+      {
+        "name": "RemainingOwnerCountDelta",
+        "optionality": 1
+      }
+    ],
+    "SponsorshipTransfer": [
+      {
+        "name": "ObjectID",
+        "optionality": 1
+      },
+      {
+        "name": "Sponsee",
+        "optionality": 1
+      }
+    ],
     "TicketCreate": [
       {
         "name": "TicketCount",
@@ -6263,6 +6736,10 @@
       {
         "name": "VaultID",
         "optionality": 0
+      },
+      {
+        "name": "MemoData",
+        "optionality": 1
       }
     ],
     "VaultDeposit": [
@@ -6567,6 +7044,18 @@
       {
         "name": "Delegate",
         "optionality": 1
+      },
+      {
+        "name": "Sponsor",
+        "optionality": 1
+      },
+      {
+        "name": "SponsorFlags",
+        "optionality": 1
+      },
+      {
+        "name": "SponsorSignature",
+        "optionality": 1
       }
     ]
   },
@@ -6620,6 +7109,7 @@
     "tecNO_LINE_REDUNDANT": 127,
     "tecNO_PERMISSION": 139,
     "tecNO_REGULAR_KEY": 131,
+    "tecNO_SPONSOR_PERMISSION": 200,
     "tecNO_SUITABLE_NFTOKEN_PAGE": 155,
     "tecNO_TARGET": 138,
     "tecOBJECT_NOT_FOUND": 160,
@@ -6659,6 +7149,7 @@
     "tefBAD_AUTH": -196,
     "tefBAD_AUTH_MASTER": -183,
     "tefBAD_LEDGER": -195,
+    "tefBAD_PATH_COUNT": -176,
     "tefBAD_QUORUM": -185,
     "tefBAD_SIGNATURE": -186,
     "tefCREATED": -194,
@@ -6672,6 +7163,7 @@
     "tefNFTOKEN_IS_NOT_TRANSFERABLE": -179,
     "tefNOT_MULTI_SIGNING": -184,
     "tefNO_AUTH_REQUIRED": -191,
+    "tefNO_DST_PARTIAL": -177,
     "tefNO_TICKET": -180,
     "tefPAST_SEQ": -190,
     "tefTOO_BIG": -181,
@@ -6755,6 +7247,7 @@
     "terNO_AUTH": -95,
     "terNO_DELEGATE_PERMISSION": -85,
     "terNO_LINE": -94,
+    "terNO_PERMISSION": -83,
     "terNO_RIPPLE": -90,
     "terOWNERS": -93,
     "terPRE_SEQ": -92,
@@ -6828,6 +7321,8 @@
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
+    "SponsorshipSet": 91,
+    "SponsorshipTransfer": 90,
     "TicketCreate": 10,
     "TrustSet": 20,
     "UNLModify": 102,
@@ -6879,5 +7374,5 @@
     "Vector256": 19,
     "XChainBridge": 25
   },
-  "hash": "C685734F5FEB756693B4BB978BBB3A158A65652E71EEB2977068B0D680689213"
+  "hash": "F3DCCAD774156538A6AB3E6003A41273D5AE394A90989204838AE52A006F245B"
 }
