@@ -2,6 +2,8 @@
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
 import { EventEmitter } from 'eventemitter3'
+import { XrplDefinitions, XrplDefinitionsBase } from 'ripple-binary-codec'
+import type { DefinitionsData } from 'ripple-binary-codec/dist/enums/xrpl-definitions-base'
 
 import {
   RippledError,
@@ -224,6 +226,12 @@ class Client extends EventEmitter<EventTypes> {
    *
    */
   public buildVersion: string | undefined
+
+  /**
+   * Custom rippled types to use instead of the default. Used for sidechains and amendments.
+   *
+   */
+  public definitions: XrplDefinitionsBase | undefined
 
   /**
    * API Version used by the server this client is connected to
@@ -632,6 +640,14 @@ class Client extends EventEmitter<EventTypes> {
     return this.connection.isConnected()
   }
 
+  public async getDefinitions(): Promise<void> {
+    const response = await this.request({
+      command: 'server_definitions',
+    })
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- response.result is the DefinitionsData
+    this.definitions = new XrplDefinitions(response.result as DefinitionsData)
+  }
+
   /**
    * Autofills fields in a transaction. This will set `Sequence`, `Fee`,
    * `lastLedgerSequence` according to the current state of the server this Client
@@ -791,8 +807,11 @@ class Client extends EventEmitter<EventTypes> {
       wallet?: Wallet
     },
   ): Promise<SubmitResponse> {
-    const signedTx = await getSignedTx(this, transaction, opts)
-    return submitRequest(this, signedTx, opts?.failHard)
+    const signedTx = await getSignedTx(this, transaction, {
+      ...opts,
+      definitions: this.definitions,
+    })
+    return submitRequest(this, signedTx, opts?.failHard, this.definitions)
   }
 
   /**
@@ -865,7 +884,10 @@ class Client extends EventEmitter<EventTypes> {
       wallet?: Wallet
     },
   ): Promise<TxResponse<T>> {
-    const signedTx = await getSignedTx(this, transaction, opts)
+    const signedTx = await getSignedTx(this, transaction, {
+      ...opts,
+      definitions: this.definitions,
+    })
 
     const lastLedger = getLastLedgerSequence(signedTx)
     if (lastLedger == null) {

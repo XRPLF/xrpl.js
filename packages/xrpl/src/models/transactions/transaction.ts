@@ -1,6 +1,8 @@
 /* eslint-disable max-lines -- need to work with a lot of transactions in a switch statement */
 /* eslint-disable max-lines-per-function -- need to work with a lot of Tx verifications */
 
+import { XrplDefinitionsBase } from 'ripple-binary-codec'
+
 import { ValidationError } from '../../errors'
 import { convertTxFlagsToNumber } from '../utils/flags'
 
@@ -252,14 +254,18 @@ export interface TransactionAndMetadata<
  * Encode/decode and individual type validation.
  *
  * @param transaction - A Transaction.
+ * @param customDefinitions - Optional parameter to validate against a custom definition.
  * @throws ValidationError When the Transaction is malformed.
  * @category Utilities
  */
-export function validate(transaction: Record<string, unknown>): void {
+export function validate(
+  transaction: Record<string, unknown>,
+  customDefinitions?: XrplDefinitionsBase,
+): void {
   const tx = { ...transaction }
 
   // should already be done in the tx-specific validation, but doesn't hurt to check again
-  validateBaseTransaction(tx)
+  validateBaseTransaction(tx, customDefinitions)
 
   Object.keys(tx).forEach((key) => {
     const standard_currency_code_len = 3
@@ -325,8 +331,11 @@ export function validate(transaction: Record<string, unknown>): void {
       // @ts-expect-error -- already checked
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- already checked above
       tx.RawTransactions.forEach((innerTx: Record<string, unknown>) => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
-        validate(innerTx.RawTransaction as Record<string, unknown>)
+        validate(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
+          innerTx.RawTransaction as Record<string, unknown>,
+          customDefinitions,
+        )
       })
       break
 
@@ -575,8 +584,10 @@ export function validate(transaction: Record<string, unknown>): void {
       break
 
     default:
-      throw new ValidationError(
-        `Invalid field TransactionType: ${tx.TransactionType}`,
-      )
+      if (!customDefinitions?.transactionNames.includes(tx.TransactionType)) {
+        throw new ValidationError(
+          `Invalid field TransactionType: ${tx.TransactionType}`,
+        )
+      }
   }
 }
