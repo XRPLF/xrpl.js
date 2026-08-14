@@ -33,7 +33,7 @@ interface SendParticipant {
  * @returns The assembled, unsigned ConfidentialMPTSend transaction.
  * @throws {XrplError} If a required encryption key or the sender balance is missing.
  */
-// eslint-disable-next-line max-lines-per-function, max-statements -- one cohesive proof-assembly flow
+// eslint-disable-next-line max-lines-per-function, max-statements, complexity -- one cohesive proof-assembly flow
 export async function prepareConfidentialSend(
   client: Client,
   params: ConfidentialSendParams,
@@ -55,11 +55,6 @@ export async function prepareConfidentialSend(
       `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
     )
   }
-  if (senderToken.ConfidentialBalanceSpending == null) {
-    throw new XrplError(
-      `Account ${params.account} has no confidential spending balance`,
-    )
-  }
   if (destToken.HolderEncryptionKey == null) {
     throw new XrplError(
       `Destination ${params.destination} has no registered HolderEncryptionKey`,
@@ -68,8 +63,21 @@ export async function prepareConfidentialSend(
   const { amount, senderKeypair } = params
   const destKey = destToken.HolderEncryptionKey
   const issuerKey = issuance.IssuerEncryptionKey
-  const spending = senderToken.ConfidentialBalanceSpending
-  const version = senderToken.ConfidentialBalanceVersion ?? 0
+  // `confidentialState` lets prepareConfidentialBatch build this proof against the
+  // balance/version a prior same-(account, token) inner leaves behind, rather than
+  // the stale on-ledger value; unset for a standalone send.
+  const spending =
+    params.confidentialState?.spending ??
+    senderToken.ConfidentialBalanceSpending
+  if (spending == null) {
+    throw new XrplError(
+      `Account ${params.account} has no confidential spending balance`,
+    )
+  }
+  const version =
+    params.confidentialState?.version ??
+    senderToken.ConfidentialBalanceVersion ??
+    0
 
   // `txBlinding` is the shared ElGamal randomness AND the amount-commitment
   // blinding; `rho` blinds the balance commitment. `balance` is the sender's
@@ -187,7 +195,11 @@ export async function prepareConfidentialClawback(
     )
   }
   const { issuerKeypair } = params
-  const issuerBalance = holderToken.IssuerEncryptedBalance
+  // `issuerEncryptedBalanceOverride` lets prepareConfidentialBatch build this proof
+  // against the issuer-encrypted balance a prior same-batch inner leaves behind;
+  // unset for a standalone clawback.
+  const issuerBalance =
+    params.issuerEncryptedBalanceOverride ?? holderToken.IssuerEncryptedBalance
   const amount =
     params.amount ??
     (await crypto.decryptAmount(

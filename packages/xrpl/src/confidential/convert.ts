@@ -137,14 +137,19 @@ export async function prepareConfidentialConvertBack(
       `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
     )
   }
-  if (mptoken.ConfidentialBalanceSpending == null) {
+  const { amount, holderKeypair } = params
+  // `confidentialState` lets prepareConfidentialBatch build this proof against the
+  // balance/version a prior same-(account, token) inner leaves behind, rather than
+  // the stale on-ledger value; unset for a standalone convert-back.
+  const spending =
+    params.confidentialState?.spending ?? mptoken.ConfidentialBalanceSpending
+  if (spending == null) {
     throw new XrplError(
       `Account ${params.account} has no confidential spending balance`,
     )
   }
-  const { amount, holderKeypair } = params
-  const spending = mptoken.ConfidentialBalanceSpending
-  const version = mptoken.ConfidentialBalanceVersion ?? 0
+  const version =
+    params.confidentialState?.version ?? mptoken.ConfidentialBalanceVersion ?? 0
 
   // `balance` is the full current balance (the range-proof witness); `rho`
   // blinds the balance commitment, `blindingFactor` the revealed-amount

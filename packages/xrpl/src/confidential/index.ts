@@ -34,11 +34,17 @@ export {
   prepareConfidentialSend,
 } from './transfer'
 
+export { prepareConfidentialBatch } from './batch'
+
 export type {
+  ConfidentialBatchInner,
+  ConfidentialBatchOp,
+  ConfidentialBatchParams,
   ConfidentialClawbackParams,
   ConfidentialConvertBackParams,
   ConfidentialConvertParams,
   ConfidentialKeypair,
   ConfidentialMergeInboxParams,
   ConfidentialSendParams,
+  ConfidentialSpendingState,
 } from './types'

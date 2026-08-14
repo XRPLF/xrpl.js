@@ -101,6 +101,35 @@ export interface WasmModule {
     outProof: number,
     outLen: number,
   ) => number
+
+  // Byte <-> secp256k1_pubkey bridge for homomorphic ciphertext arithmetic.
+  // `mpt_make_ec_pair` parses a 66-byte ciphertext (C1 || C2) into two pubkey
+  // structs; `mpt_serialize_ec_pair` writes two pubkey structs back to 66 bytes.
+  // A `secp256k1_pubkey` is a 64-byte opaque struct. Both return 1 on success.
+  _mpt_make_ec_pair: (buffer: number, out1: number, out2: number) => number
+  _mpt_serialize_ec_pair: (in1: number, in2: number, out: number) => number
+
+  // Homomorphic ElGamal add/subtract on parsed pubkey pairs (component-wise EC
+  // point ops on the two halves). Take the shared secp256k1 context and six
+  // pubkey-struct pointers; return 1 on success. See `homomorphic.ts`.
+  _secp256k1_elgamal_add: (
+    ctx: number,
+    sumC1: number,
+    sumC2: number,
+    aC1: number,
+    aC2: number,
+    bC1: number,
+    bC2: number,
+  ) => number
+  _secp256k1_elgamal_subtract: (
+    ctx: number,
+    diffC1: number,
+    diffC2: number,
+    aC1: number,
+    aC2: number,
+    bC1: number,
+    bC2: number,
+  ) => number
 }
 
 // eslint-disable-next-line @typescript-eslint/no-type-alias -- the Emscripten module factory's call signature

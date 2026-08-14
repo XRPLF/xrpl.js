@@ -4,6 +4,22 @@
  * amounts are `bigint` to losslessly carry the full `uint64_t` range.
  */
 
+import type { SubmittableTransaction } from '../models/transactions'
+
+/**
+ * A predicted confidential spending balance a proof is built against. Inside a
+ * Batch, an earlier balance-mutating inner for the same `(account, token)` leaves
+ * state the ledger does not yet reflect; {@link prepareConfidentialBatch} predicts
+ * it and threads it into the next proof-bearing builder via `confidentialState`.
+ * Standalone callers never set this — the builder reads live ledger state.
+ */
+export interface ConfidentialSpendingState {
+  /** The 66-byte hex `ConfidentialBalanceSpending` ciphertext to prove against. */
+  spending: string
+  /** The `ConfidentialBalanceVersion` the proof binds. */
+  version: number
+}
+
 /**
  * An ElGamal keypair used to encrypt to, and decrypt from, a confidential MPT
  * balance: a 32-byte hex private key and the matching 33-byte hex public key.
@@ -50,6 +66,12 @@ export interface ConfidentialConvertBackParams extends BaseConfidentialParams {
   amount: bigint
   /** The holder's ElGamal keypair. */
   holderKeypair: ConfidentialKeypair
+  /**
+   * Advanced: predicted spending balance + version to prove against, overriding
+   * live ledger state. Set by {@link prepareConfidentialBatch}; unset for a
+   * standalone convert-back.
+   */
+  confidentialState?: ConfidentialSpendingState
 }
 
 /** Inputs for {@link prepareConfidentialSend}. */
@@ -66,6 +88,12 @@ export interface ConfidentialSendParams extends BaseConfidentialParams {
   destinationTag?: number
   /** Optional credential IDs to satisfy the destination's deposit auth. */
   credentialIDs?: string[]
+  /**
+   * Advanced: predicted spending balance + version to prove against, overriding
+   * live ledger state. Set by {@link prepareConfidentialBatch} to chain multiple
+   * same-`(account, token)` transactions in one Batch; unset for a standalone send.
+   */
+  confidentialState?: ConfidentialSpendingState
 }
 
 /** Inputs for {@link prepareConfidentialClawback}. */
@@ -86,10 +114,61 @@ export interface ConfidentialClawbackParams extends BaseConfidentialParams {
    * decrypts the issuer-encrypted balance to recover the full amount itself.
    */
   amount?: bigint
+  /**
+   * Advanced: predicted issuer-encrypted balance to prove against, overriding live
+   * ledger state. Set by {@link prepareConfidentialBatch} when an earlier same-batch
+   * inner changed the holder's balance; unset for a standalone clawback.
+   */
+  issuerEncryptedBalanceOverride?: string
 }
 
 /** Inputs for {@link prepareConfidentialMergeInbox}. */
 export interface ConfidentialMergeInboxParams extends BaseConfidentialParams {
   /** The holder's classic XRPL address. */
   account: string
+}
+
+/**
+ * One confidential operation in a {@link ConfidentialBatchParams} inner list,
+ * discriminated by `op`. Each variant is the matching standalone builder's inputs
+ * minus the fields the assembler owns (`sequence` and the internal predicted-state
+ * overrides), so if you know `prepareConfidentialSend` you know `{ op: 'send', ... }`.
+ */
+export type ConfidentialBatchOp =
+  | ({ op: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
+  | ({ op: 'convertBack' } & Omit<
+      ConfidentialConvertBackParams,
+      'sequence' | 'confidentialState'
+    >)
+  | ({ op: 'send' } & Omit<
+      ConfidentialSendParams,
+      'sequence' | 'confidentialState'
+    >)
+  | ({ op: 'mergeInbox' } & Omit<ConfidentialMergeInboxParams, 'sequence'>)
+  | ({ op: 'clawback' } & Omit<
+      ConfidentialClawbackParams,
+      'sequence' | 'amount' | 'issuerEncryptedBalanceOverride'
+    >)
+
+/**
+ * A single inner of a confidential Batch: either a confidential operation spec
+ * (built and chained by the assembler) or a pre-built plain transaction (shaped as
+ * a Batch inner and sequence-assigned, then passed through verbatim).
+ */
+export type ConfidentialBatchInner =
+  | ConfidentialBatchOp
+  | SubmittableTransaction
+
+/** Inputs for {@link prepareConfidentialBatch}. */
+export interface ConfidentialBatchParams {
+  /** The account that signs and owns the outer Batch (pays the outer fee). */
+  account: string
+  /**
+   * The inner transactions in execution order. Array order is the on-ledger apply
+   * order: the assembler assigns each inner its position-derived sequence and threads
+   * predicted balance state through same-`(account, token)` operations.
+   */
+  inners: ConfidentialBatchInner[]
+  /** Outer Batch flags. Defaults to `tfAllOrNothing` (atomic). */
+  batchFlags?: number
 }

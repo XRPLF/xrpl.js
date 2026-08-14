@@ -34,6 +34,8 @@ export {
   getPedersenCommitment,
 } from './primitives'
 
+export { addCiphertexts, subtractCiphertexts } from './homomorphic'
+
 export {
   getConvertContextHash,
   getConvertBackContextHash,
