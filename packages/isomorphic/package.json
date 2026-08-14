@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@noble/hashes": "^2.0.1",
-    "eventemitter3": "5.0.1",
+    "eventemitter3": "5.0.4",
     "ws": "^8.20.0"
   },
   "devDependencies": {
