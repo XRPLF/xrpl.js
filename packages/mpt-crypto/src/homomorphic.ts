@@ -26,6 +26,7 @@ const WASM_OK = 1
  * @returns The 66-byte hex combined ciphertext.
  * @throws If either input is malformed or a WASM call fails.
  */
+/* eslint-disable max-lines-per-function -- one cohesive WASM marshalling flow; splitting obscures the pointer threading */
 async function combineCiphertexts(
   a: string,
   b: string,
@@ -67,6 +68,7 @@ async function combineCiphertexts(
     return bytesToHex(marshaller.readBytes(outPtr, ELGAMAL_TOTAL_SIZE))
   })
 }
+/* eslint-enable max-lines-per-function */
 
 /**
  * Homomorphic addition of two same-key ElGamal ciphertexts.
