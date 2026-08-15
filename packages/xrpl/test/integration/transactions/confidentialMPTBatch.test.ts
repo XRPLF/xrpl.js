@@ -3,6 +3,7 @@ import { assert } from 'chai'
 import { type Batch, type Client, type Wallet } from '../../../src'
 import {
   deriveConfidentialKeypair,
+  fetchMPToken,
   prepareConfidentialBatch,
   prepareConfidentialConvert,
   prepareConfidentialMergeInbox,
@@ -371,6 +372,93 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
       // her full remainder: the clawback proof only validates if it bound the
       // predicted post-send issuer-encrypted balance, not the stale on-ledger one.
       assert.strictEqual(await getSpendable(client, alice, setup.mptID), 0n)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'convertBack after a send: two different debit ops chain on one balance',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      const bob = await registerHolderKey(client, setup.mptID)
+
+      const batch = await prepareConfidentialBatch(client, {
+        account: alice.wallet.classicAddress,
+        inners: [
+          send(alice, bob, 30n, setup.mptID),
+          {
+            op: 'convertBack',
+            account: alice.wallet.classicAddress,
+            amount: 20n,
+            holderKeypair: alice.key,
+            mptIssuanceID: setup.mptID,
+          },
+        ],
+      })
+      await submitConfidentialBatch(client, batch, alice.wallet)
+
+      // Send debits spending via SenderEncryptedAmount, convertBack via
+      // HolderEncryptedAmount — the convertBack proof only validates if it bound
+      // the post-send balance (70), not the stale 100: 100 - 30 - 20 = 50.
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 50n)
+      // convertBack revealed 20 back to the public MPT balance, which was 0 after
+      // holderWithBalance converted alice's full 100 into her confidential balance.
+      const token = await fetchMPToken(
+        client,
+        alice.wallet.classicAddress,
+        setup.mptID,
+      )
+      assert.strictEqual(token.MPTAmount, '20')
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'mixes a plain XRP Payment with a confidential send in one Batch',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      const bob = await registerHolderKey(client, setup.mptID)
+      const carol = await generateFundedWallet(client)
+      const carolBefore = Number(
+        await client.getXrpBalance(carol.classicAddress),
+      )
+
+      const batch = await prepareConfidentialBatch(client, {
+        account: alice.wallet.classicAddress,
+        inners: [
+          send(alice, bob, 30n, setup.mptID),
+          {
+            TransactionType: 'Payment',
+            Account: alice.wallet.classicAddress,
+            Destination: carol.classicAddress,
+            Amount: '1000000',
+          },
+        ],
+      })
+      await submitConfidentialBatch(client, batch, alice.wallet)
+
+      // The confidential inner applied (spendable 100 -> 70)...
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 70n)
+      // ...and so did the plain XRP Payment (carol +1 XRP) in the same atomic
+      // Batch, proving regular and confidential inners interleave and sequence.
+      const carolAfter = Number(
+        await client.getXrpBalance(carol.classicAddress),
+      )
+      assert.strictEqual(carolAfter - carolBefore, 1)
     },
     TIMEOUT,
   )

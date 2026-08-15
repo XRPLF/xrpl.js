@@ -33,6 +33,11 @@ const TF_ALL_OR_NOTHING = 0x0001_0000
 // the re-randomization challenge; rippled reuses it to re-blind the destination's
 // inbox credit, so we reproduce that to predict the recipient's post-send inbox.
 const CHALLENGE_HEX_LEN = 64
+// rippled bounds a Batch to 2-8 inner transactions (Batch.cpp rejects <= 1;
+// STTx.cpp rejects > kMaxBatchTxCount = 8). Fail fast here rather than after
+// building every proof.
+const MIN_BATCH_INNERS = 2
+const MAX_BATCH_INNERS = 8
 
 /**
  * Predicted confidential state of one `(account, token)` MPToken, threaded through
@@ -232,6 +237,19 @@ async function loadSequences(
     next.set(account, account === batchAccount ? seq + 1 : seq)
   }
   return { outerSequence, next }
+}
+
+/**
+ * Consume an account's next inner sequence and advance its counter.
+ *
+ * @param next - The per-account next-sequence counter from {@link loadSequences}.
+ * @param account - The account consuming a sequence.
+ * @returns The sequence to assign to this inner.
+ */
+function nextSequence(next: Map<string, number>, account: string): number {
+  const sequence = mustGet(next, account, `sequence for ${account}`)
+  next.set(account, sequence + 1)
+  return sequence
 }
 
 /**
@@ -529,11 +547,16 @@ async function buildConfidentialInner(
  * the caller: `signMultiBatch` for each non-outer participant, then the outer
  * account signs.
  *
+ * A plain (non-confidential) inner that already carries its own `Sequence` or
+ * `TicketSequence` is passed through untouched; otherwise it is assigned a
+ * position-derived sequence, mirroring how `autofill` sequences a Batch.
+ *
  * @param client - A connected Client.
  * @param params - The batch account, ordered inners, and optional outer flags.
  * @returns The assembled, autofilled Batch.
- * @throws {XrplError} If `inners` is empty, or a chain reads a balance a prior
- * MergeInbox/Clawback reset (split those into separate Batches).
+ * @throws {XrplError} If `inners` has fewer than 2 or more than 8 entries (rippled's
+ * Batch bounds), or a chain reads a balance a prior MergeInbox/Clawback reset (split
+ * those into separate Batches).
  */
 // eslint-disable-next-line max-lines-per-function -- one linear assemble loop; splitting would obscure the sequence threading
 export async function prepareConfidentialBatch(
@@ -541,8 +564,11 @@ export async function prepareConfidentialBatch(
   params: ConfidentialBatchParams,
 ): Promise<Batch> {
   const { account, inners, batchFlags } = params
-  if (inners.length === 0) {
-    throw new XrplError('prepareConfidentialBatch: inners must not be empty')
+  if (inners.length < MIN_BATCH_INNERS || inners.length > MAX_BATCH_INNERS) {
+    throw new XrplError(
+      `prepareConfidentialBatch: a Batch requires between ${MIN_BATCH_INNERS} and ` +
+        `${MAX_BATCH_INNERS} inner transactions, got ${inners.length}`,
+    )
   }
   const ops = inners.filter(isConfidentialOp)
   const [crypto, states, sequencing] = await Promise.all([
@@ -555,19 +581,24 @@ export async function prepareConfidentialBatch(
   const rawTransactions: Array<{ RawTransaction: SubmittableTransaction }> = []
   for (const inner of inners) {
     const acct = innerAccount(inner)
-    const sequence = mustGet(sequencing.next, acct, `sequence for ${acct}`)
-    sequencing.next.set(acct, sequence + 1)
     if (isConfidentialOp(inner)) {
+      const sequence = nextSequence(sequencing.next, acct)
       // eslint-disable-next-line no-await-in-loop -- an ordered chain; state must thread in sequence
       const built = await buildConfidentialInner(ctx, inner, sequence)
       for (const [key, newState] of built.updates) {
         states.set(key, newState)
       }
       rawTransactions.push({ RawTransaction: built.tx })
-    } else {
+    } else if (inner.Sequence == null && inner.TicketSequence == null) {
+      // Mirror autofillBatchTxn: assign a position-derived Sequence only to a plain
+      // inner that has neither its own Sequence nor a TicketSequence; a caller-set
+      // Sequence or a ticketed inner is passed through as-is.
+      const sequence = nextSequence(sequencing.next, acct)
       rawTransactions.push({
         RawTransaction: shapeInner({ ...inner, Sequence: sequence }),
       })
+    } else {
+      rawTransactions.push({ RawTransaction: shapeInner(inner) })
     }
   }
 

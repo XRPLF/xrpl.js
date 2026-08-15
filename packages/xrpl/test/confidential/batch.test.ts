@@ -323,4 +323,70 @@ describe('confidential/prepareConfidentialBatch', function () {
       }),
     )
   })
+
+  it('rejects a Batch with fewer than 2 or more than 8 inners', async function () {
+    const payment: SubmittableTransaction = {
+      TransactionType: 'Payment',
+      Account: ADDR_A,
+      Destination: ADDR_B,
+      Amount: '1',
+    }
+    // The bound check runs before any ledger access, so a bare client is enough.
+    // Below the minimum of 2 (rippled rejects <= 1)...
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialBatch(batchClient({}), {
+        account: ADDR_A,
+        inners: [payment],
+      }),
+    )
+    // ...and above the maximum of 8 (kMaxBatchTxCount).
+    await assertRejectsXrplError(async () =>
+      prepareConfidentialBatch(batchClient({}), {
+        account: ADDR_A,
+        inners: Array.from({ length: 9 }, () => payment),
+      }),
+    )
+  })
+
+  it('preserves a plain inner that sets its own Sequence or TicketSequence', async function () {
+    const client = batchClient({
+      [ADDR_A]: await sender(100n, 10),
+      [ADDR_B]: await destination(KEY_B.publicKey),
+    })
+    const batch = await prepareConfidentialBatch(client, {
+      account: ADDR_A,
+      inners: [
+        {
+          op: 'send',
+          account: ADDR_A,
+          destination: ADDR_B,
+          amount: 30n,
+          senderKeypair: KEY_A,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+        {
+          TransactionType: 'Payment',
+          Account: ADDR_A,
+          Destination: ADDR_B,
+          Amount: '1',
+          Sequence: 999,
+        },
+        {
+          TransactionType: 'Payment',
+          Account: ADDR_A,
+          Destination: ADDR_B,
+          Amount: '2',
+          TicketSequence: 7,
+        },
+      ],
+    })
+    const [send, presetSeq, ticketed] = inners(batch)
+    // The confidential send consumes the outer account's current + 1...
+    assert.strictEqual(send.Sequence, 11)
+    // ...a caller-set Sequence is respected, not overwritten by the counter...
+    assert.strictEqual(presetSeq.Sequence, 999)
+    // ...and a ticketed inner keeps its ticket with no assigned Sequence.
+    assert.strictEqual(ticketed.Sequence, undefined)
+    assert.strictEqual(ticketed.TicketSequence, 7)
+  })
 })
