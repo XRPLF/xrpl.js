@@ -10,8 +10,12 @@ import { decode, encode } from 'ripple-binary-codec'
 import { ValidationError, XrplError } from '../../errors'
 import { APIVersion } from '../../models'
 import { LedgerEntry } from '../../models/ledger'
-import { LedgerVersionMap } from '../../models/ledger/Ledger'
-import { Transaction, TransactionMetadata } from '../../models/transactions'
+import {
+  LedgerVersionMap,
+  LedgerTransactionExpandedV1,
+  LedgerTransactionExpandedV2,
+} from '../../models/ledger/Ledger'
+import { Transaction } from '../../models/transactions'
 import { GlobalFlags } from '../../models/transactions/common'
 import { hasFlag } from '../../models/utils'
 
@@ -125,14 +129,13 @@ export function hashLedgerHeader(
 
 /**
  * Compute the root hash of the SHAMap containing all transactions.
+ * Transactions must be in v1 flat format (fields directly on object with metaData field).
  *
- * @param transactions - List of Transactions.
+ * @param transactions - List of v1 flat formatted Transactions.
  * @returns The root hash of the SHAMap.
  * @category Utilities
  */
-export function hashTxTree(
-  transactions: Array<Transaction & { metaData?: TransactionMetadata }>,
-): string {
+export function hashTxTree(transactions: LedgerTransactionExpandedV1[]): string {
   const shamap = new SHAMap()
   for (const txJSON of transactions) {
     const txBlobHex = encode(txJSON)
@@ -163,6 +166,33 @@ export function hashStateTree(entries: LedgerEntry[]): string {
   return shamap.hash
 }
 
+/**
+ * Normalize a transaction to v1 flat format.
+ * Converts v2 wrapped format (tx_json + meta) to v1 flat format (fields directly on object with metaData).
+ *
+ * @param tx - The transaction to normalize (can be v1 flat or v2 wrapped).
+ * @returns The normalized v1 flat transaction.
+ */
+function normalizeToV1(
+  tx: LedgerTransactionExpandedV1 | LedgerTransactionExpandedV2,
+): LedgerTransactionExpandedV1 {
+  if ('tx_json' in tx) {
+    // v2 wrapped format: extract tx_json and meta, convert to v1 flat
+    // Transaction union type cannot be spread directly (TS2698), so we
+    // widen to a plain record first.
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required to spread Transaction union
+    const txJson = tx.tx_json as Record<string, unknown>
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- narrowing back after merge
+    return {
+      ...txJson,
+      hash: tx.hash,
+      metaData: tx.meta,
+    } as LedgerTransactionExpandedV1
+  }
+  // already v1 flat format
+  return tx
+}
+
 function computeTransactionHash(
   ledger: LedgerVersionMap<APIVersion>,
   options: HashLedgerHeaderOptions,
@@ -177,7 +207,19 @@ function computeTransactionHash(
     throw new ValidationError('transactions is missing from the ledger')
   }
 
-  const transactionHash = hashTxTree(ledger.transactions)
+  // Normalize transactions to v1 flat format expected by hashTxTree.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger is a version union
+  const txs = ledger.transactions as Array<
+    string | LedgerTransactionExpandedV1 | LedgerTransactionExpandedV2
+  >
+  const normalizedTransactions = txs
+    .filter(
+      (tx): tx is LedgerTransactionExpandedV1 | LedgerTransactionExpandedV2 =>
+        typeof tx !== 'string',
+    )
+    .map(normalizeToV1)
+
+  const transactionHash = hashTxTree(normalizedTransactions)
 
   if (transaction_hash !== transactionHash) {
     throw new ValidationError(

@@ -17,7 +17,13 @@ import FeeSettings, {
   FeeSettingsPostAmendmentFields,
   FEE_SETTINGS_ID,
 } from './FeeSettings'
-import { Ledger, LedgerV1 } from './Ledger'
+import {
+  Ledger,
+  LedgerV1,
+  LedgerTransactionExpanded,
+  LedgerTransactionExpandedV1,
+  LedgerTransactionExpandedV2,
+} from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import Loan, { LoanFlags } from './Loan'
@@ -64,6 +70,9 @@ export {
   FeeSettingsPostAmendmentFields,
   Ledger,
   LedgerV1,
+  LedgerTransactionExpanded,
+  LedgerTransactionExpandedV1,
+  LedgerTransactionExpandedV2,
   LedgerEntryFilter,
   LedgerEntry,
   LedgerHashes,

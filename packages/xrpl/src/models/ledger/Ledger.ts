@@ -54,20 +54,38 @@ interface BaseLedger {
   total_coins: string
   /** Hash of the transaction information included in this ledger, as hex. */
   transaction_hash: string
-  /**
-   * Transactions applied in this ledger version. By default, members are the
-   * transactions' identifying Hash strings. If the request specified expand as
-   * true, members are full representations of the transactions instead, in
-   * either JSON or binary depending on whether the request specified binary
-   * as true.
-   */
-  transactions?: Array<
-    Transaction & {
-      hash: string
-      metaData?: TransactionMetadata
-    }
-  >
 }
+
+/**
+ * Expanded transaction format in API version 1.
+ * Transactions are returned as flat objects with the transaction fields
+ * directly on the object, plus `hash` and `metaData`.
+ */
+export type LedgerTransactionExpandedV1 = Transaction & {
+  hash: string
+  metaData?: TransactionMetadata
+}
+
+/**
+ * Expanded transaction format in API version 2.
+ * Transactions are wrapped in an object with `tx_json` and `meta` fields.
+ */
+export interface LedgerTransactionExpandedV2 {
+  tx_json: Transaction
+  meta: TransactionMetadata
+  hash: string
+  validated: boolean
+  ledger_index: number
+  close_time_iso: string
+  ledger_hash: string
+}
+
+/**
+ * @deprecated Use LedgerTransactionExpandedV2 instead. The old name was backwards:
+ * "Expanded" referred to API v2 (wrapped), while "ExpandedV1" was actually the v1 format (flat).
+ * For clarity: LedgerTransactionExpandedV1 = API v1 flat format, LedgerTransactionExpandedV2 = API v2 wrapped format.
+ */
+export type LedgerTransactionExpanded = LedgerTransactionExpandedV2
 
 /**
  * A ledger is a block of transactions and shared state data. It has a unique
@@ -80,6 +98,12 @@ export interface Ledger extends BaseLedger {
    * The ledger index of the ledger. Represented as a number.
    */
   ledger_index: number
+  /**
+   * Transactions applied in this ledger version. When expanded, members are
+   * full representations of the transactions wrapped in objects with
+   * `tx_json` and `meta` fields.
+   */
+  transactions?: Array<string | LedgerTransactionExpandedV2>
 }
 
 /**
@@ -95,6 +119,12 @@ export interface LedgerV1 extends BaseLedger {
    * integer; some display it as a number.
    */
   ledger_index: string
+  /**
+   * Transactions applied in this ledger version. When expanded, members are
+   * full representations of the transactions as flat objects with the
+   * transaction fields directly on the object, plus `hash` and `metaData`.
+   */
+  transactions?: Array<string | LedgerTransactionExpandedV1>
 }
 
 /**
