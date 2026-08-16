@@ -32,6 +32,14 @@ You can manually trigger the release workflow from the [GitHub Actions UI](https
    ```
 3. Run `npm i` to refresh `package-lock.json` and commit it.
 
+### **Extra step for `@xrplf/mpt-crypto`**
+
+This package ships a prebuilt WASM module vendored from the
+[`XRPLF/mpt-crypto`](https://github.com/XRPLF/mpt-crypto) GitHub release, pinned in
+`packages/mpt-crypto/MPT_CRYPTO_VERSION`. Before releasing it, set that file to the
+`XRPLF/mpt-crypto` release tag you want to ship (e.g. `1.0.4`) and commit it — the
+release pipeline vendors the matching WASM from that pin automatically.
+
 ### **Triggering a Release**
 
 1. Go to **GitHub → Actions → Release Pipeline → Run workflow** (must be triggered from `main`).

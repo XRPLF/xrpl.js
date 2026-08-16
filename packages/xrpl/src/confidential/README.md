@@ -28,14 +28,13 @@ import {
 ## Keys
 
 A confidential balance is encrypted under an **ElGamal keypair** (a secp256k1
-key: 32-byte hex private scalar, 33-byte hex compressed public key). This is
-**distinct from the account's signing key** — derive it with
-`deriveConfidentialKeypair()`:
+key: 32-byte hex private scalar, 33-byte hex compressed public key), **distinct
+from the account's signing key**. Derive one with `deriveConfidentialKeypair()`:
 
 ```ts
 // No argument: generates a fresh, dedicated secp256k1 key. Persist its
 // `privateKey` — it is the only thing that can decrypt the balance.
-const holderKey = deriveConfidentialKeypair()
+const aliceKey = deriveConfidentialKeypair()
 ```
 
 If you would rather back up a *seed* than a raw private key, generate a dedicated
@@ -45,7 +44,7 @@ seed yourself and re-derive from it — the keypair is deterministic in the seed
 import { generateSeed } from 'ripple-keypairs'
 
 const seed = generateSeed({ algorithm: 'ecdsa-secp256k1' }) // store this
-const holderKey = deriveConfidentialKeypair(seed)
+const aliceKey = deriveConfidentialKeypair(seed)
 ```
 
 - **Persist the private key (or the seed).** It is the only thing that can
@@ -76,44 +75,44 @@ import {
 const client = new Client('wss://...')
 await client.connect()
 
-// Assumes `holder1` and `holder2` are funded `Wallet`s and `mptID` is an
+// Assumes `alice` and `bob` are funded `Wallet`s and `mptIssuanceID` is an
 // existing MPT issuance created with the confidential-balance flag enabled.
 
-// ElGamal keypairs — distinct from signing keys; persist the private keys.
-const holder1Key = deriveConfidentialKeypair()
+// ElGamal keypair — distinct from the signing key; persist the private key.
+const aliceKey = deriveConfidentialKeypair()
 
-// 1. Convert 1000 public MPT into holder1's confidential balance.
+// 1. Convert 1000 public MPT into alice's confidential balance.
 const convert = await prepareConfidentialConvert(client, {
-  account: holder1.classicAddress,
+  account: alice.classicAddress,
   amount: 1000n,
-  holderKeypair: holder1Key,
-  mptIssuanceID: mptID,
+  holderKeypair: aliceKey,
+  mptIssuanceID,
 })
-await client.submitAndWait(convert, { wallet: holder1 })
+await client.submitAndWait(convert, { wallet: alice })
 
-// 2. Send 300 confidentially to holder2.
+// 2. Send 300 confidentially to bob (who must already have a registered key).
 const send = await prepareConfidentialSend(client, {
-  account: holder1.classicAddress,
-  destination: holder2.classicAddress,
+  account: alice.classicAddress,
+  destination: bob.classicAddress,
   amount: 300n,
-  senderKeypair: holder1Key,
-  mptIssuanceID: mptID,
+  senderKeypair: aliceKey,
+  mptIssuanceID,
 })
-await client.submitAndWait(send, { wallet: holder1 })
+await client.submitAndWait(send, { wallet: alice })
 
-// 3. holder2 folds the received amount from its inbox into its spendable balance.
+// 3. bob folds the amount received in its inbox into its spendable balance.
 const merge = await prepareConfidentialMergeInbox(client, {
-  account: holder2.classicAddress,
-  mptIssuanceID: mptID,
+  account: bob.classicAddress,
+  mptIssuanceID,
 })
-await client.submitAndWait(merge, { wallet: holder2 })
+await client.submitAndWait(merge, { wallet: bob })
 
 // Read a confidential balance back (needs the private key to decrypt).
 const spendable = await getConfidentialBalance(
   client,
-  holder1.classicAddress,
-  mptID,
-  holder1Key.privateKey,
+  alice.classicAddress,
+  mptIssuanceID,
+  aliceKey.privateKey,
 ) // 700n
 
 // ConvertBack (reveal to public) and Clawback (issuer) follow the same
@@ -125,7 +124,7 @@ const spendable = await getConfidentialBalance(
 | Builder | Actor | Purpose |
 | --- | --- | --- |
 | `prepareConfidentialConvert` | holder | Move public MPT into the holder's confidential balance. Registers the holder's encryption key on the first conversion. |
-| `prepareConfidentialSend` | holder | Transfer a confidential amount to another holder's inbox, encrypted under sender, destination, issuer, and (if registered) auditor keys. |
+| `prepareConfidentialSend` | holder | Transfer a confidential amount to another holder's inbox, encrypted under the sender, destination, issuer, and (if registered) auditor keys. |
 | `prepareConfidentialMergeInbox` | holder | Fold pending inbox amounts into the spendable balance. Requires no crypto material. |
 | `prepareConfidentialConvertBack` | holder | Reveal a confidential amount back to a public MPT balance. |
 | `prepareConfidentialClawback` | issuer | Burn a holder's **entire** confidential balance (all-or-nothing). |
@@ -134,15 +133,16 @@ Parameter shapes for each are in [`types.ts`](./types.ts).
 
 ## Batching
 
-`prepareConfidentialBatch` assembles a Batch (XLS-56) whose inner transactions
-include Confidential MPT operations, mixed freely with plain transactions. It
-exists because a confidential proof binds the transaction's **`Sequence`** — and,
-for `send`/`convertBack`, the live `ConfidentialBalanceSpending` +
-`ConfidentialBalanceVersion` — at build time. Inside a Batch each inner's sequence
-is position-dependent, so the proof must be built with the final value (`autofill`
-can't re-derive a proof afterward); and when several balance-mutating operations
-for the same `(account, token)` share one Batch, each proof must bind the balance
-the previous one leaves behind. The assembler owns all of that.
+`prepareConfidentialBatch` (the assembler) builds a Batch (XLS-56) whose inner
+transactions include Confidential MPT operations, mixed freely with plain
+transactions. It exists because a confidential proof binds the transaction's
+**`Sequence`** — and, for `send`/`convertBack`, the live
+`ConfidentialBalanceSpending` + `ConfidentialBalanceVersion` — at build time.
+Inside a Batch each inner's sequence is position-dependent, so the proof must be
+built with the final value (`autofill` can't re-derive a proof afterward); and
+when several balance-mutating operations for the same `(account, token)` share one
+Batch, each proof must bind the balance the previous one leaves behind. The
+assembler owns all of that.
 
 Pass the outer Batch account and an ordered list of inners — each either a
 confidential op-spec (the matching builder's params minus `sequence`, plus an `op`
@@ -151,23 +151,45 @@ tag) or a pre-built plain transaction. Array order is on-ledger execution order.
 ```ts
 import { prepareConfidentialBatch } from 'xrpl/confidential'
 
-// Atomic multi-send: Alice pays two recipients confidentially in one Batch.
+// Atomic multi-send: alice pays two recipients confidentially in one Batch.
 const batch = await prepareConfidentialBatch(client, {
   account: alice.classicAddress,
   inners: [
-    { op: 'send', account: alice.classicAddress, destination: bob, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
-    { op: 'send', account: alice.classicAddress, destination: carol, amount: 50n, senderKeypair: aliceKey, mptIssuanceID },
+    { op: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
+    { op: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 50n, senderKeypair: aliceKey, mptIssuanceID },
   ],
 })
-const { tx_blob } = aliceWallet.sign(batch)
+const { tx_blob } = alice.sign(batch)
+await client.submit(tx_blob)
+```
+
+Inners mix confidential ops with plain transactions freely: a confidential op-spec
+is a *recipe* (`op`-tagged, camelCase — it mirrors the builder's params), while a
+plain transaction is the normal wire model (`TransactionType`, PascalCase). The
+assembler builds and proves the op-specs and shapes the plain ones as Batch inners:
+
+```ts
+const batch = await prepareConfidentialBatch(client, {
+  account: alice.classicAddress,
+  inners: [
+    // a confidential op-spec — the assembler builds the tx + proof from it
+    { op: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
+    // a plain transaction — shaped as a Batch inner and passed through
+    { TransactionType: 'Payment', Account: alice.classicAddress, Destination: carol.classicAddress, Amount: '1000000' },
+  ],
+})
+const { tx_blob } = alice.sign(batch)
 await client.submit(tx_blob)
 ```
 
 Op types are `send`, `convert`, `convertBack`, `mergeInbox`, and `clawback` — the
 same actors as the [Builders](#builders) above.
 
-The assembler returns a fully-assembled, autofilled Batch; **signing stays with
-you**. When inners span several accounts, each non-outer account calls
+The assembler returns a **fully-assembled, autofilled Batch — sign and submit it
+as-is.** Its inner sequences are pinned to the values the proofs bind, so don't
+overwrite or re-derive them (a second `client.autofill` is harmless — it preserves
+already-set sequences — but there's no reason to call it). **Signing stays with
+you:** when inners span several accounts, each non-outer account calls
 `signMultiBatch` (combine two or more with `combineBatchSigners`), then the outer
 account signs and submits:
 
@@ -177,25 +199,19 @@ import { signMultiBatch } from 'xrpl'
 const batch = await prepareConfidentialBatch(client, {
   account: alice.classicAddress, // owns + signs the outer Batch
   inners: [
-    { op: 'send', account: alice.classicAddress, destination: carol, amount: 10n, senderKeypair: aliceKey, mptIssuanceID },
-    { op: 'send', account: bob.classicAddress, destination: carol, amount: 20n, senderKeypair: bobKey, mptIssuanceID },
+    { op: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 10n, senderKeypair: aliceKey, mptIssuanceID },
+    { op: 'send', account: bob.classicAddress, destination: carol.classicAddress, amount: 20n, senderKeypair: bobKey, mptIssuanceID },
   ],
 })
-signMultiBatch(bobWallet, batch) // each non-outer participant authorizes its inner
-const { tx_blob } = aliceWallet.sign(batch)
+signMultiBatch(bob, batch) // each non-outer participant authorizes its inner
+const { tx_blob } = alice.sign(batch)
 await client.submit(tx_blob)
 ```
 
-It handles every account/token combination uniformly — assigning each account its
-position-derived inner sequences (mirroring `autofill`), threading predicted
-balance state through repeated same-`(account, token)` operations, shaping each
-inner (`tfInnerBatchTxn`, `Fee: '0'`), and autofilling the outer fee.
-
-**Limitation:** a `mergeInbox` resets the inbox, and a `clawback` resets all of a
-holder's balances, to a canonical encrypted zero the client cannot reproduce. If a
-*later* inner in the same Batch needs to read such a reset value (e.g. two
-`mergeInbox` for one token), the assembler throws rather than emit a proof rippled
-would reject — split those into separate Batches.
+The assembler handles every account/token combination uniformly — assigning each
+account its position-derived inner sequences (mirroring `autofill`), threading
+predicted balance state through repeated same-`(account, token)` operations,
+shaping each inner (`tfInnerBatchTxn`, `Fee: '0'`), and autofilling the outer fee.
 
 ## Helpers
 

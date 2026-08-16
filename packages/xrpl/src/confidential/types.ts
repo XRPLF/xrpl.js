@@ -156,10 +156,12 @@ export interface ConfidentialMergeInboxParams extends BaseConfidentialParams {
 }
 
 /**
- * One confidential operation in a {@link ConfidentialBatchParams} inner list,
- * discriminated by `op`. Each variant is the matching standalone builder's inputs
- * minus the fields the assembler owns (`sequence` and the internal predicted-state
- * overrides), so if you know `prepareConfidentialSend` you know `{ op: 'send', ... }`.
+ * One confidential operation in a {@link ConfidentialBatchParams} inner list: a
+ * build *recipe*, not a transaction — the assembler builds the ciphertexts and
+ * zero-knowledge proof from it. Discriminated by `op`; each variant is the matching
+ * standalone builder's inputs minus the fields the assembler owns (`sequence` and
+ * the internal predicted-state overrides), so if you know `prepareConfidentialSend`
+ * you know `{ op: 'send', ... }`.
  */
 export type ConfidentialBatchOp =
   | ({ op: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
@@ -181,9 +183,20 @@ export type ConfidentialBatchOp =
     >)
 
 /**
- * A single inner of a confidential Batch: either a confidential operation spec
- * (built and chained by the assembler) or a pre-built plain transaction (shaped as
- * a Batch inner and sequence-assigned, then passed through verbatim).
+ * A single inner of a confidential Batch, in one of two intentionally distinct
+ * shapes:
+ *
+ * - a **confidential op-spec** ({@link ConfidentialBatchOp}) — a *recipe* the
+ *   assembler builds into a transaction and proof. `op`-tagged and camelCase
+ *   because it mirrors a builder's parameters (e.g. `senderKeypair`), not a
+ *   serialized transaction.
+ * - a **ready-made transaction** (a {@link SubmittableTransaction}) — already
+ *   the wire model, so `TransactionType`-tagged and PascalCase. The assembler only
+ *   shapes it as a Batch inner (`tfInnerBatchTxn`, `Fee: '0'`, a sequence) and
+ *   passes it through.
+ *
+ * The two read differently on purpose: `op` means "build this for me",
+ * `TransactionType` means "here is a finished transaction".
  */
 export type ConfidentialBatchInner =
   | ConfidentialBatchOp
