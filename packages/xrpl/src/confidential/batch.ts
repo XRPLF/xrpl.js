@@ -253,6 +253,25 @@ function nextSequence(next: Map<string, number>, account: string): number {
 }
 
 /**
+ * Sum the Convert amounts per token — the most its `ConfidentialOutstandingAmount`
+ * can rise within the batch. Threaded into each spend's decrypt bound so a balance
+ * topped up by an in-batch Convert stays decryptable against the pre-batch total.
+ *
+ * @param ops - The confidential ops in the batch.
+ * @returns A map from MPTokenIssuanceID to total in-batch Convert amount.
+ */
+function sumConvertsByToken(ops: ConfidentialBatchOp[]): Map<string, bigint> {
+  const totals = new Map<string, bigint>()
+  for (const op of ops) {
+    if (op.op === 'convert') {
+      const prior = totals.get(op.mptIssuanceID) ?? BigInt(0)
+      totals.set(op.mptIssuanceID, prior + op.amount)
+    }
+  }
+  return totals
+}
+
+/**
  * Debit a spender's balances (Send/ConvertBack): subtract the encrypted amount
  * from spending, issuer-encrypted, and (if present) auditor-encrypted balances,
  * and bump the version.
@@ -398,6 +417,8 @@ interface AssembleContext {
   client: Client
   crypto: MptCryptoModule
   states: Map<string, TokenState>
+  /** Sum of in-batch Convert amounts per token, added to each decrypt bound. */
+  convertTotals: Map<string, bigint>
 }
 
 /** A built inner plus the state updates it implies, keyed by state key. */
@@ -423,7 +444,7 @@ async function buildConfidentialInner(
   op: ConfidentialBatchOp,
   sequence: number,
 ): Promise<BuiltInner> {
-  const { client, crypto, states } = ctx
+  const { client, crypto, states, convertTotals } = ctx
   switch (op.op) {
     case 'send': {
       const { op: _op, ...params } = op
@@ -441,6 +462,7 @@ async function buildConfidentialInner(
         // A prior same-batch Convert may have registered the destination's key;
         // use the predicted value so we encrypt to it before it lands on-ledger.
         destinationKey: dest.holderKey,
+        outstandingDelta: convertTotals.get(op.mptIssuanceID),
       })
       const debit: Debit = {
         spend: tx.SenderEncryptedAmount,
@@ -466,6 +488,7 @@ async function buildConfidentialInner(
           spending: readBalance(state.spending, `${op.account} spending`),
           version: state.version,
         },
+        outstandingDelta: convertTotals.get(op.mptIssuanceID),
       })
       const debit: Debit = {
         spend: tx.HolderEncryptedAmount,
@@ -527,6 +550,7 @@ async function buildConfidentialInner(
           holder.issuerEnc,
           `${op.holder} issuer-encrypted balance`,
         ),
+        outstandingDelta: convertTotals.get(op.mptIssuanceID),
       })
       return {
         tx: shapeInner(tx),
@@ -584,7 +608,12 @@ export async function prepareConfidentialBatch(
     loadStates(client, ops),
     loadSequences(client, account, inners),
   ])
-  const ctx: AssembleContext = { client, crypto, states }
+  const ctx: AssembleContext = {
+    client,
+    crypto,
+    states,
+    convertTotals: sumConvertsByToken(ops),
+  }
 
   const rawTransactions: Array<{ RawTransaction: SubmittableTransaction }> = []
   for (const inner of inners) {

@@ -507,4 +507,57 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'converts, merges, then spends the topped-up balance in one atomic Batch',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      const bob = await registerHolderKey(client, setup.mptID)
+      // Fresh public MPT for alice to convert inside the Batch.
+      await testTransaction(
+        client,
+        {
+          TransactionType: 'Payment',
+          Account: setup.issuer.classicAddress,
+          Destination: alice.wallet.classicAddress,
+          Amount: { mpt_issuance_id: setup.mptID, value: '100' },
+        },
+        setup.issuer,
+      )
+
+      const batch = await prepareConfidentialBatch(client, {
+        account: alice.wallet.classicAddress,
+        inners: [
+          {
+            op: 'convert',
+            account: alice.wallet.classicAddress,
+            amount: 100n,
+            holderKeypair: alice.key,
+            mptIssuanceID: setup.mptID,
+          },
+          {
+            op: 'mergeInbox',
+            account: alice.wallet.classicAddress,
+            mptIssuanceID: setup.mptID,
+          },
+          send(alice, bob, 150n, setup.mptID),
+        ],
+      })
+      await submitConfidentialBatch(client, batch, alice.wallet)
+
+      // Convert (+100) and merge lift alice 100 -> 200, then she sends 150 -> 50.
+      // The send's decrypt bound is raised by the in-batch Convert amount, so its
+      // predicted balance (200) is recoverable even though the pre-batch outstanding
+      // was only 100 — no second holder needed for headroom.
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 50n)
+    },
+    TIMEOUT,
+  )
 })

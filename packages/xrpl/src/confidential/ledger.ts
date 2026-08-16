@@ -138,11 +138,21 @@ export async function fetchMPTokenIssuance(
  * back). An absent value therefore means the total is 0, so every balance is 0
  * and a bound of `0n` is exactly right — the zero ciphertext still decrypts.
  *
+ * `outstandingDelta` raises the bound by confidential value a caller knows will be
+ * added but the ledger does not yet reflect. {@link prepareConfidentialBatch} passes
+ * the sum of in-batch Convert amounts, so a Send/ConvertBack/Clawback touching a
+ * balance topped up earlier in the same Batch still searches a wide-enough range —
+ * the fetched outstanding is pre-batch and would otherwise be too low.
+ *
  * @param issuance - The MPTokenIssuance ledger entry.
+ * @param outstandingDelta - Extra headroom added to the bound (default 0).
  * @returns The decrypt upper bound.
  */
-export function decryptBound(issuance: MPTokenIssuance): bigint {
-  return BigInt(issuance.ConfidentialOutstandingAmount ?? 0)
+export function decryptBound(
+  issuance: MPTokenIssuance,
+  outstandingDelta = BigInt(0),
+): bigint {
+  return BigInt(issuance.ConfidentialOutstandingAmount ?? 0) + outstandingDelta
 }
 
 /**

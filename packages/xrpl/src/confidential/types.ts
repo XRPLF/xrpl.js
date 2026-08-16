@@ -72,6 +72,13 @@ export interface ConfidentialConvertBackParams extends BaseConfidentialParams {
    * standalone convert-back.
    */
   confidentialState?: ConfidentialSpendingState
+  /**
+   * Advanced: extra headroom for the balance-decrypt search bound over the
+   * issuance's on-ledger `ConfidentialOutstandingAmount`. Set by
+   * {@link prepareConfidentialBatch} to the in-batch Convert total, so a balance
+   * topped up earlier in the same Batch stays decryptable; unset otherwise.
+   */
+  outstandingDelta?: bigint
 }
 
 /** Inputs for {@link prepareConfidentialSend}. */
@@ -101,6 +108,13 @@ export interface ConfidentialSendParams extends BaseConfidentialParams {
    * for a standalone send, which reads it from the destination's MPToken.
    */
   destinationKey?: string
+  /**
+   * Advanced: extra headroom for the balance-decrypt search bound over the
+   * issuance's on-ledger `ConfidentialOutstandingAmount`. Set by
+   * {@link prepareConfidentialBatch} to the in-batch Convert total, so a balance
+   * topped up earlier in the same Batch stays decryptable; unset otherwise.
+   */
+  outstandingDelta?: bigint
 }
 
 /** Inputs for {@link prepareConfidentialClawback}. */
@@ -127,6 +141,12 @@ export interface ConfidentialClawbackParams extends BaseConfidentialParams {
    * inner changed the holder's balance; unset for a standalone clawback.
    */
   issuerEncryptedBalanceOverride?: string
+  /**
+   * Advanced: extra headroom for the balance-decrypt search bound over the
+   * issuance's on-ledger `ConfidentialOutstandingAmount`. Set by
+   * {@link prepareConfidentialBatch} to the in-batch Convert total; unset otherwise.
+   */
+  outstandingDelta?: bigint
 }
 
 /** Inputs for {@link prepareConfidentialMergeInbox}. */
@@ -145,16 +165,19 @@ export type ConfidentialBatchOp =
   | ({ op: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
   | ({ op: 'convertBack' } & Omit<
       ConfidentialConvertBackParams,
-      'sequence' | 'confidentialState'
+      'sequence' | 'confidentialState' | 'outstandingDelta'
     >)
   | ({ op: 'send' } & Omit<
       ConfidentialSendParams,
-      'sequence' | 'confidentialState' | 'destinationKey'
+      'sequence' | 'confidentialState' | 'destinationKey' | 'outstandingDelta'
     >)
   | ({ op: 'mergeInbox' } & Omit<ConfidentialMergeInboxParams, 'sequence'>)
   | ({ op: 'clawback' } & Omit<
       ConfidentialClawbackParams,
-      'sequence' | 'amount' | 'issuerEncryptedBalanceOverride'
+      | 'sequence'
+      | 'amount'
+      | 'issuerEncryptedBalanceOverride'
+      | 'outstandingDelta'
     >)
 
 /**

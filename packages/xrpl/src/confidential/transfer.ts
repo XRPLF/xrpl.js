@@ -90,7 +90,7 @@ export async function prepareConfidentialSend(
     crypto.decryptAmount(
       spending,
       senderKeypair.privateKey,
-      decryptBound(issuance),
+      decryptBound(issuance, params.outstandingDelta),
     ),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
@@ -208,7 +208,10 @@ export async function prepareConfidentialClawback(
     (await crypto.decryptAmount(
       issuerBalance,
       issuerKeypair.privateKey,
-      decryptBound(await fetchMPTokenIssuance(client, params.mptIssuanceID)),
+      decryptBound(
+        await fetchMPTokenIssuance(client, params.mptIssuanceID),
+        params.outstandingDelta,
+      ),
     ))
   const contextHash = await crypto.getClawbackContextHash(
     accountIdHex(params.account),

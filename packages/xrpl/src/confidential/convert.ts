@@ -159,7 +159,7 @@ export async function prepareConfidentialConvertBack(
     crypto.decryptAmount(
       spending,
       holderKeypair.privateKey,
-      decryptBound(issuance),
+      decryptBound(issuance, params.outstandingDelta),
     ),
     crypto.generateBlindingFactor(),
     crypto.generateBlindingFactor(),
