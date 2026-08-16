@@ -7,6 +7,7 @@ import { MPToken, MPTokenIssuance } from '../models/ledger'
 import { MAX_MPT_AMOUNT } from '../models/transactions/common'
 
 import { loadMptCrypto } from './loader'
+import type { ConfidentialSpendingState } from './types'
 
 /**
  * Guard a public MPT amount before it reaches the WASM crypto layer. The crypto
@@ -184,4 +185,54 @@ export async function getConfidentialBalance(
     privateKey,
     decryptBound(issuance),
   )
+}
+
+/**
+ * Read the issuer's registered ElGamal encryption key, throwing if the issuance
+ * has none (Convert/Send/ConvertBack all encrypt the amount to it).
+ *
+ * @param issuance - The MPTokenIssuance ledger entry.
+ * @param mptIssuanceID - The issuance ID, for the error message.
+ * @returns The issuer's 33-byte hex public key.
+ * @throws {XrplError} If no issuer encryption key is registered.
+ */
+export function requireIssuerKey(
+  issuance: MPTokenIssuance,
+  mptIssuanceID: string,
+): string {
+  if (issuance.IssuerEncryptionKey == null) {
+    throw new XrplError(
+      `Issuance ${mptIssuanceID} has no registered IssuerEncryptionKey`,
+    )
+  }
+  return issuance.IssuerEncryptionKey
+}
+
+/**
+ * Resolve the spending balance + version a Send/ConvertBack proof binds:
+ * {@link prepareConfidentialBatch}'s predicted `override` when given, else the
+ * account's live on-ledger values. Inside a Batch an earlier same-`(account, token)`
+ * inner leaves state the ledger does not yet reflect, so the override wins.
+ *
+ * @param token - The account's MPToken ledger entry.
+ * @param account - The account's classic address, for the error message.
+ * @param override - Predicted spending state, or `undefined` for a standalone build.
+ * @returns The spending ciphertext and version to prove against.
+ * @throws {XrplError} If the account has no confidential spending balance.
+ */
+export function resolveSpendingState(
+  token: MPToken,
+  account: string,
+  override?: ConfidentialSpendingState,
+): { spending: string; version: number } {
+  const spending = override?.spending ?? token.ConfidentialBalanceSpending
+  if (spending == null) {
+    throw new XrplError(
+      `Account ${account} has no confidential spending balance`,
+    )
+  }
+  return {
+    spending,
+    version: override?.version ?? token.ConfidentialBalanceVersion ?? 0,
+  }
 }

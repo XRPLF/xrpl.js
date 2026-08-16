@@ -7,8 +7,8 @@ import { withModule } from './runtime'
 // 66-byte (C1 || C2) wire ciphertext via _mpt_make_ec_pair / _mpt_serialize_ec_pair.
 const PUBKEY_STRUCT_SIZE = 64
 
-// The WASM `mpt_*`/`secp256k1_elgamal_*` helpers in this path return 1 on success
-// (bool true / secp256k1 convention), unlike the `mpt_*` primitives that return 0.
+// The EC-pair bridge and elgamal add/subtract return 1 on success (secp256k1's
+// bool convention), unlike the encrypt/decrypt/proof primitives, which return 0.
 const WASM_OK = 1
 
 /**

@@ -1,5 +1,4 @@
 import { type Client } from '../client'
-import { XrplError } from '../errors'
 import {
   ConfidentialMPTConvert,
   ConfidentialMPTConvertBack,
@@ -12,7 +11,9 @@ import {
   decryptBound,
   fetchMPToken,
   fetchMPTokenIssuance,
+  requireIssuerKey,
   resolveSequence,
+  resolveSpendingState,
 } from './ledger'
 import { loadMptCrypto } from './loader'
 import {
@@ -47,11 +48,7 @@ export async function prepareConfidentialConvert(
     fetchMPToken(client, params.account, params.mptIssuanceID),
     resolveSequence(client, params.account, params.sequence),
   ])
-  if (issuance.IssuerEncryptionKey == null) {
-    throw new XrplError(
-      `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
-    )
-  }
+  const issuerKey = requireIssuerKey(issuance, params.mptIssuanceID)
   const { amount, holderKeypair } = params
 
   const [blindingFactor, contextHash] = await Promise.all([
@@ -65,11 +62,7 @@ export async function prepareConfidentialConvert(
   const [holderEncryptedAmount, issuerEncryptedAmount, zkProof] =
     await Promise.all([
       crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
-      crypto.encryptAmount(
-        amount,
-        issuance.IssuerEncryptionKey,
-        blindingFactor,
-      ),
+      crypto.encryptAmount(amount, issuerKey, blindingFactor),
       crypto.getConvertProof(
         holderKeypair.publicKey,
         holderKeypair.privateKey,
@@ -132,24 +125,13 @@ export async function prepareConfidentialConvertBack(
     fetchMPToken(client, params.account, params.mptIssuanceID),
     resolveSequence(client, params.account, params.sequence),
   ])
-  if (issuance.IssuerEncryptionKey == null) {
-    throw new XrplError(
-      `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
-    )
-  }
+  const issuerKey = requireIssuerKey(issuance, params.mptIssuanceID)
   const { amount, holderKeypair } = params
-  // `confidentialState` lets prepareConfidentialBatch build this proof against the
-  // balance/version a prior same-(account, token) inner leaves behind, rather than
-  // the stale on-ledger value; unset for a standalone convert-back.
-  const spending =
-    params.confidentialState?.spending ?? mptoken.ConfidentialBalanceSpending
-  if (spending == null) {
-    throw new XrplError(
-      `Account ${params.account} has no confidential spending balance`,
-    )
-  }
-  const version =
-    params.confidentialState?.version ?? mptoken.ConfidentialBalanceVersion ?? 0
+  const { spending, version } = resolveSpendingState(
+    mptoken,
+    params.account,
+    params.confidentialState,
+  )
 
   // `balance` is the full current balance (the range-proof witness); `rho`
   // blinds the balance commitment, `blindingFactor` the revealed-amount
@@ -174,11 +156,7 @@ export async function prepareConfidentialConvertBack(
   const [holderEncryptedAmount, issuerEncryptedAmount, zkProof] =
     await Promise.all([
       crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
-      crypto.encryptAmount(
-        amount,
-        issuance.IssuerEncryptionKey,
-        blindingFactor,
-      ),
+      crypto.encryptAmount(amount, issuerKey, blindingFactor),
       crypto.getConvertBackProof(
         holderKeypair.privateKey,
         holderKeypair.publicKey,

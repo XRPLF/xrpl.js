@@ -3,7 +3,7 @@ import { type Client } from '../client'
 import { XrplError } from '../errors'
 import {
   Batch,
-  ConfidentialMPTConvert,
+  BatchFlags,
   ConfidentialMPTSend,
   SubmittableTransaction,
 } from '../models/transactions'
@@ -27,8 +27,8 @@ import type {
 } from './types'
 
 const TF_INNER_BATCH_TXN = GlobalFlags.tfInnerBatchTxn
-// XLS-56 Batch flag: every inner applies or the whole Batch fails (atomic).
-const TF_ALL_OR_NOTHING = 0x0001_0000
+// Default outer-Batch mode (XLS-56): all inners apply, or the whole Batch fails.
+const TF_ALL_OR_NOTHING = BatchFlags.tfAllOrNothing
 // A confidential proof binds the first 32 bytes (64 hex chars) of its ZKProof as
 // the re-randomization challenge; rippled reuses it to re-blind the destination's
 // inbox credit, so we reproduce that to predict the recipient's post-send inbox.
@@ -504,13 +504,10 @@ async function buildConfidentialInner(
       const { op: _op, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
-      const tx: ConfidentialMPTConvert = await prepareConfidentialConvert(
-        client,
-        {
-          ...params,
-          sequence,
-        },
-      )
+      const tx = await prepareConfidentialConvert(client, {
+        ...params,
+        sequence,
+      })
       const credit: Credit = {
         inbox: tx.HolderEncryptedAmount,
         issuer: tx.IssuerEncryptedAmount,
