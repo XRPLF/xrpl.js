@@ -55,13 +55,16 @@ export async function prepareConfidentialSend(
       `Issuance ${params.mptIssuanceID} has no registered IssuerEncryptionKey`,
     )
   }
-  if (destToken.HolderEncryptionKey == null) {
+  const { amount, senderKeypair } = params
+  // The destination's ElGamal key: prefer a supplied value —
+  // prepareConfidentialBatch passes it when an earlier same-batch Convert
+  // registers the destination before it is on-ledger — else the on-ledger MPToken.
+  const destKey = params.destinationKey ?? destToken.HolderEncryptionKey
+  if (destKey == null) {
     throw new XrplError(
       `Destination ${params.destination} has no registered HolderEncryptionKey`,
     )
   }
-  const { amount, senderKeypair } = params
-  const destKey = destToken.HolderEncryptionKey
   const issuerKey = issuance.IssuerEncryptionKey
   // `confidentialState` lets prepareConfidentialBatch build this proof against the
   // balance/version a prior same-(account, token) inner leaves behind, rather than

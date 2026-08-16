@@ -17,6 +17,7 @@ import {
   holderWithBalance,
   registerHolderKey,
   setupConfidentialClient,
+  setupHolder,
   teardownConfidential,
   type ConfidentialContext,
   type Holder,
@@ -459,6 +460,50 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
         await client.getXrpBalance(carol.classicAddress),
       )
       assert.strictEqual(carolAfter - carolBefore, 1)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'registers a destination key via Convert and sends to it in the same Batch',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      // bob is authorized but has NOT registered his ElGamal key on-ledger yet.
+      const bob = await setupHolder(client, setup.mptID)
+
+      const batch = await prepareConfidentialBatch(client, {
+        account: alice.wallet.classicAddress,
+        inners: [
+          // bob registers his key (0-amount Convert)...
+          {
+            op: 'convert',
+            account: bob.wallet.classicAddress,
+            amount: 0n,
+            holderKeypair: bob.key,
+            mptIssuanceID: setup.mptID,
+          },
+          // ...and alice sends to bob, whose key is only registered in this Batch.
+          send(alice, bob, 30n, setup.mptID),
+        ],
+      })
+      await submitConfidentialBatch(client, batch, alice.wallet, [bob.wallet])
+
+      // The send applied only because it encrypted to bob's key, threaded from the
+      // in-batch Convert before it was queryable on-ledger.
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 70n)
+      const bobToken = await fetchMPToken(
+        client,
+        bob.wallet.classicAddress,
+        setup.mptID,
+      )
+      assert.isString(bobToken.HolderEncryptionKey)
     },
     TIMEOUT,
   )

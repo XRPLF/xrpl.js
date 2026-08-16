@@ -94,6 +94,13 @@ export interface ConfidentialSendParams extends BaseConfidentialParams {
    * same-`(account, token)` transactions in one Batch; unset for a standalone send.
    */
   confidentialState?: ConfidentialSpendingState
+  /**
+   * Advanced: the destination's ElGamal public key, overriding the on-ledger
+   * lookup. Set by {@link prepareConfidentialBatch} when an earlier same-batch
+   * Convert registers the destination's key (so it is not yet on-ledger); unset
+   * for a standalone send, which reads it from the destination's MPToken.
+   */
+  destinationKey?: string
 }
 
 /** Inputs for {@link prepareConfidentialClawback}. */
@@ -142,7 +149,7 @@ export type ConfidentialBatchOp =
     >)
   | ({ op: 'send' } & Omit<
       ConfidentialSendParams,
-      'sequence' | 'confidentialState'
+      'sequence' | 'confidentialState' | 'destinationKey'
     >)
   | ({ op: 'mergeInbox' } & Omit<ConfidentialMergeInboxParams, 'sequence'>)
   | ({ op: 'clawback' } & Omit<

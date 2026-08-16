@@ -429,6 +429,8 @@ async function buildConfidentialInner(
       const { op: _op, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
+      const destKey = stateKey(op.destination, op.mptIssuanceID)
+      const dest = mustGet(states, destKey, `state for ${destKey}`)
       const tx = await prepareConfidentialSend(client, {
         ...params,
         sequence,
@@ -436,9 +438,10 @@ async function buildConfidentialInner(
           spending: readBalance(state.spending, `${op.account} spending`),
           version: state.version,
         },
+        // A prior same-batch Convert may have registered the destination's key;
+        // use the predicted value so we encrypt to it before it lands on-ledger.
+        destinationKey: dest.holderKey,
       })
-      const destKey = stateKey(op.destination, op.mptIssuanceID)
-      const dest = mustGet(states, destKey, `state for ${destKey}`)
       const debit: Debit = {
         spend: tx.SenderEncryptedAmount,
         issuer: tx.IssuerEncryptedAmount,
@@ -490,9 +493,14 @@ async function buildConfidentialInner(
         issuer: tx.IssuerEncryptedAmount,
         auditor: tx.AuditorEncryptedAmount,
       }
+      const credited = await applyConvertCredit(crypto, state, credit)
       return {
         tx: shapeInner(tx),
-        updates: [[key, await applyConvertCredit(crypto, state, credit)]],
+        // A Convert publishes the holder's ElGamal key; record it so a later
+        // same-batch Send to this holder can encrypt to it before it is on-ledger.
+        updates: [
+          [key, { ...credited, holderKey: op.holderKeypair.publicKey }],
+        ],
       }
     }
     case 'mergeInbox': {

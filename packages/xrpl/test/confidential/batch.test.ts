@@ -1,4 +1,8 @@
-import { encryptAmount, generateBlindingFactor } from '@xrplf/mpt-crypto'
+import {
+  decryptAmount,
+  encryptAmount,
+  generateBlindingFactor,
+} from '@xrplf/mpt-crypto'
 import { assert } from 'chai'
 
 import { type Client } from '../../src'
@@ -388,5 +392,50 @@ describe('confidential/prepareConfidentialBatch', function () {
     // ...and a ticketed inner keeps its ticket with no assigned Sequence.
     assert.strictEqual(ticketed.Sequence, undefined)
     assert.strictEqual(ticketed.TicketSequence, 7)
+  })
+
+  it('resolves a destination key registered by an earlier same-batch Convert', async function () {
+    const client = batchClient({
+      [ADDR_A]: await sender(100n, 5),
+      // bob: authorized, but has NOT registered a HolderEncryptionKey on-ledger yet
+      [ADDR_B]: {},
+    })
+    const batch = await prepareConfidentialBatch(client, {
+      account: ADDR_A,
+      inners: [
+        // bob registers his key in this batch...
+        {
+          op: 'convert',
+          account: ADDR_B,
+          amount: 0n,
+          holderKeypair: KEY_B,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+        // ...then alice sends 30 to bob in the same batch.
+        {
+          op: 'send',
+          account: ADDR_A,
+          destination: ADDR_B,
+          amount: 30n,
+          senderKeypair: KEY_A,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+      ],
+    })
+    // Without the fix this threw "Destination ... has no registered
+    // HolderEncryptionKey". Decrypting the destination ciphertext with bob's key
+    // recovers the sent amount, proving the send used the key threaded from the
+    // Convert rather than the (absent) on-ledger one.
+    const [, send] = inners(batch)
+    assert.strictEqual(send.TransactionType, 'ConfidentialMPTSend')
+    if (send.TransactionType !== 'ConfidentialMPTSend') {
+      throw new Error('expected a ConfidentialMPTSend inner')
+    }
+    const decrypted = await decryptAmount(
+      send.DestinationEncryptedAmount,
+      KEY_B.privateKey,
+      100n,
+    )
+    assert.strictEqual(decrypted, 30n)
   })
 })
