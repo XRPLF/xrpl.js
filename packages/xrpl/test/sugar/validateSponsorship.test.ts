@@ -81,6 +81,7 @@ describe('validatePreFundedSponsorship', function () {
           Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
           Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
           Flags: 0,
+          RemainingOwnerCount: 1,
         } as Sponsorship,
       },
     }
@@ -108,6 +109,83 @@ describe('validatePreFundedSponsorship', function () {
 
     assert.isTrue(result.valid)
     assert.isDefined(result.sponsorship)
+  })
+
+  it('rejects reserve-only sponsorship when RemainingOwnerCount is missing', async function () {
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: 0,
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorReserve,
+    }
+
+    const result = await validatePreFundedSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'RemainingOwnerCount')
+  })
+
+  it('rejects reserve-only sponsorship when RemainingOwnerCount is 0', async function () {
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: 0,
+          RemainingOwnerCount: 0,
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorReserve,
+    }
+
+    const result = await validatePreFundedSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'RemainingOwnerCount')
   })
 
   it('rejects when FeeAmount is insufficient', async function () {
@@ -278,6 +356,7 @@ describe('validatePreFundedSponsorship', function () {
           Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
           Sponsee: 'rDelegateAccount11111111111111111111111',
           Flags: 0,
+          RemainingOwnerCount: 1,
         } as Sponsorship,
       },
     }

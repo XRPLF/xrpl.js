@@ -29,6 +29,12 @@ export interface SponsorshipValidationResult {
  * This helper should be called before submitting a transaction that uses pre-funded
  * sponsorship (i.e., has Sponsor and SponsorFlags but no SponsorSignature).
  *
+ * For reserve sponsorship, this only checks that `RemainingOwnerCount` is at
+ * least 1 (i.e. the transaction consumes exactly one reserve unit, matching
+ * rippled's `checkReserve`). It does not account for transactions that may
+ * consume more than one reserve unit, nor does it check the sponsor account's
+ * own XRP balance against its own reserve requirement.
+ *
  * @param client - The XRPL client to use for querying the ledger.
  * @param tx - The transaction to validate sponsorship for.
  * @param estimatedFee - Optional estimated fee in drops. If not provided, uses tx.Fee.
@@ -121,7 +127,21 @@ export async function validatePreFundedSponsorship(
     }
 
     if (!isSponsoringFee) {
-      // Only reserve sponsorship, no fee validation needed
+      // Only reserve sponsorship - validate the sponsor has budget for the
+      // reserve unit this transaction will consume (rippled's checkReserve
+      // requires RemainingOwnerCount >= the tx's ownerCountDelta).
+      if (
+        sponsorship.RemainingOwnerCount == null ||
+        sponsorship.RemainingOwnerCount < 1
+      ) {
+        return {
+          valid: false,
+          error: `Sponsorship RemainingOwnerCount (${String(sponsorship.RemainingOwnerCount)}) is insufficient to cover this reserve-sponsored transaction`,
+          sponsorship,
+          estimatedFee: fee,
+        }
+      }
+
       return {
         valid: true,
         sponsorship,
