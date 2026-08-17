@@ -38,7 +38,7 @@ export { prepareConfidentialBatch } from './batch'
 
 export type {
   ConfidentialBatchInner,
-  ConfidentialBatchOp,
+  ConfidentialBatchOperation,
   ConfidentialBatchParams,
   ConfidentialClawbackParams,
   ConfidentialConvertBackParams,

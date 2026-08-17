@@ -145,8 +145,8 @@ Batch, each proof must bind the balance the previous one leaves behind. The
 assembler owns all of that.
 
 Pass the outer Batch account and an ordered list of inners — each either a
-confidential op-spec (the matching builder's params minus `sequence`, plus an `op`
-tag) or a pre-built plain transaction. Array order is on-ledger execution order.
+confidential operation spec (the matching builder's params minus `sequence`, plus an
+`operation` tag) or a pre-built plain transaction. Array order is on-ledger execution order.
 
 ```ts
 import { prepareConfidentialBatch } from 'xrpl/confidential'
@@ -155,25 +155,26 @@ import { prepareConfidentialBatch } from 'xrpl/confidential'
 const batch = await prepareConfidentialBatch(client, {
   account: alice.classicAddress,
   inners: [
-    { op: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
-    { op: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 50n, senderKeypair: aliceKey, mptIssuanceID },
+    { operation: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
+    { operation: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 50n, senderKeypair: aliceKey, mptIssuanceID },
   ],
 })
 const { tx_blob } = alice.sign(batch)
 await client.submit(tx_blob)
 ```
 
-Inners mix confidential ops with plain transactions freely: a confidential op-spec
-is a *recipe* (`op`-tagged, camelCase — it mirrors the builder's params), while a
+Inners mix confidential operations with plain transactions freely: a confidential
+operation spec is a *recipe* (`operation`-tagged, camelCase — it mirrors the builder's
+params), while a
 plain transaction is the normal wire model (`TransactionType`, PascalCase). The
-assembler builds and proves the op-specs and shapes the plain ones as Batch inners:
+assembler builds and proves the operation specs and shapes the plain ones as Batch inners:
 
 ```ts
 const batch = await prepareConfidentialBatch(client, {
   account: alice.classicAddress,
   inners: [
-    // a confidential op-spec — the assembler builds the tx + proof from it
-    { op: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
+    // a confidential operation spec — the assembler builds the tx + proof from it
+    { operation: 'send', account: alice.classicAddress, destination: bob.classicAddress, amount: 100n, senderKeypair: aliceKey, mptIssuanceID },
     // a plain transaction — shaped as a Batch inner and passed through
     { TransactionType: 'Payment', Account: alice.classicAddress, Destination: carol.classicAddress, Amount: '1000000' },
   ],
@@ -182,7 +183,7 @@ const { tx_blob } = alice.sign(batch)
 await client.submit(tx_blob)
 ```
 
-Op types are `send`, `convert`, `convertBack`, `mergeInbox`, and `clawback` — the
+Operation types are `send`, `convert`, `convertBack`, `mergeInbox`, and `clawback` — the
 same actors as the [Builders](#builders) above.
 
 The assembler returns a **fully-assembled, autofilled Batch — sign and submit it
@@ -199,8 +200,8 @@ import { signMultiBatch } from 'xrpl'
 const batch = await prepareConfidentialBatch(client, {
   account: alice.classicAddress, // owns + signs the outer Batch
   inners: [
-    { op: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 10n, senderKeypair: aliceKey, mptIssuanceID },
-    { op: 'send', account: bob.classicAddress, destination: carol.classicAddress, amount: 20n, senderKeypair: bobKey, mptIssuanceID },
+    { operation: 'send', account: alice.classicAddress, destination: carol.classicAddress, amount: 10n, senderKeypair: aliceKey, mptIssuanceID },
+    { operation: 'send', account: bob.classicAddress, destination: carol.classicAddress, amount: 20n, senderKeypair: bobKey, mptIssuanceID },
   ],
 })
 signMultiBatch(bob, batch) // each non-outer participant authorizes its inner

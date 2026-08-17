@@ -22,7 +22,7 @@ import {
 } from './transfer'
 import type {
   ConfidentialBatchInner,
-  ConfidentialBatchOp,
+  ConfidentialBatchOperation,
   ConfidentialBatchParams,
 } from './types'
 
@@ -81,16 +81,16 @@ function stateKey(account: string, token: string): string {
 }
 
 /**
- * Distinguish a confidential op-spec (carries an `op` discriminator) from a
+ * Distinguish a confidential operation spec (carries an `operation` discriminator) from a
  * pre-built plain transaction.
  *
  * @param inner - A batch inner.
- * @returns Whether `inner` is a confidential op-spec.
+ * @returns Whether `inner` is a confidential operation spec.
  */
-function isConfidentialOp(
+function isConfidentialOperation(
   inner: ConfidentialBatchInner,
-): inner is ConfidentialBatchOp {
-  return 'op' in inner
+): inner is ConfidentialBatchOperation {
+  return 'operation' in inner
 }
 
 /**
@@ -100,7 +100,7 @@ function isConfidentialOp(
  * @returns The submitting account's classic address.
  */
 function innerAccount(inner: ConfidentialBatchInner): string {
-  return isConfidentialOp(inner) ? inner.account : inner.Account
+  return isConfidentialOperation(inner) ? inner.account : inner.Account
 }
 
 /**
@@ -158,16 +158,16 @@ function shapeInner(tx: SubmittableTransaction): SubmittableTransaction {
  * @param ops - The confidential ops in the batch.
  * @returns The set of state keys to load.
  */
-function collectStateKeys(ops: ConfidentialBatchOp[]): Set<string> {
+function collectStateKeys(ops: ConfidentialBatchOperation[]): Set<string> {
   const keys = new Set<string>()
   for (const op of ops) {
-    if (op.op === 'clawback') {
+    if (op.operation === 'clawback') {
       // The issuer (op.account) holds no MPToken; it is the holder's balance that
       // the clawback reads and burns.
       keys.add(stateKey(op.holder, op.mptIssuanceID))
     } else {
       keys.add(stateKey(op.account, op.mptIssuanceID))
-      if (op.op === 'send') {
+      if (op.operation === 'send') {
         keys.add(stateKey(op.destination, op.mptIssuanceID))
       }
     }
@@ -184,7 +184,7 @@ function collectStateKeys(ops: ConfidentialBatchOp[]): Set<string> {
  */
 async function loadStates(
   client: Client,
-  ops: ConfidentialBatchOp[],
+  ops: ConfidentialBatchOperation[],
 ): Promise<Map<string, TokenState>> {
   const states = new Map<string, TokenState>()
   await Promise.all(
@@ -260,10 +260,12 @@ function nextSequence(next: Map<string, number>, account: string): number {
  * @param ops - The confidential ops in the batch.
  * @returns A map from MPTokenIssuanceID to total in-batch Convert amount.
  */
-function sumConvertsByToken(ops: ConfidentialBatchOp[]): Map<string, bigint> {
+function sumConvertsByToken(
+  ops: ConfidentialBatchOperation[],
+): Map<string, bigint> {
   const totals = new Map<string, bigint>()
   for (const op of ops) {
-    if (op.op === 'convert') {
+    if (op.operation === 'convert') {
       const prior = totals.get(op.mptIssuanceID) ?? BigInt(0)
       totals.set(op.mptIssuanceID, prior + op.amount)
     }
@@ -433,7 +435,7 @@ interface BuiltInner {
  * the shared map).
  *
  * @param ctx - The assembler context (client, crypto, current states).
- * @param op - The confidential op-spec.
+ * @param op - The confidential operation spec.
  * @param sequence - The sequence to pin the inner to.
  * @returns The shaped inner and the `(key, newState)` updates it implies.
  * @throws {XrplError} If a needed balance was reset by an earlier inner.
@@ -441,13 +443,13 @@ interface BuiltInner {
 // eslint-disable-next-line max-lines-per-function, max-statements -- one op-dispatch switch; each arm is short
 async function buildConfidentialInner(
   ctx: AssembleContext,
-  op: ConfidentialBatchOp,
+  op: ConfidentialBatchOperation,
   sequence: number,
 ): Promise<BuiltInner> {
   const { client, crypto, states, convertTotals } = ctx
-  switch (op.op) {
+  switch (op.operation) {
     case 'send': {
-      const { op: _op, ...params } = op
+      const { operation: _operation, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
       const destKey = stateKey(op.destination, op.mptIssuanceID)
@@ -478,7 +480,7 @@ async function buildConfidentialInner(
       }
     }
     case 'convertBack': {
-      const { op: _op, ...params } = op
+      const { operation: _operation, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
       const tx = await prepareConfidentialConvertBack(client, {
@@ -501,7 +503,7 @@ async function buildConfidentialInner(
       }
     }
     case 'convert': {
-      const { op: _op, ...params } = op
+      const { operation: _operation, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
       const tx = await prepareConfidentialConvert(client, {
@@ -524,7 +526,7 @@ async function buildConfidentialInner(
       }
     }
     case 'mergeInbox': {
-      const { op: _op, ...params } = op
+      const { operation: _operation, ...params } = op
       const key = stateKey(op.account, op.mptIssuanceID)
       const state = mustGet(states, key, `state for ${key}`)
       const tx = await prepareConfidentialMergeInbox(client, {
@@ -537,7 +539,7 @@ async function buildConfidentialInner(
       }
     }
     case 'clawback': {
-      const { op: _op, ...params } = op
+      const { operation: _operation, ...params } = op
       const holderKey = stateKey(op.holder, op.mptIssuanceID)
       const holder = mustGet(states, holderKey, `state for ${holderKey}`)
       const tx = await prepareConfidentialClawback(client, {
@@ -599,7 +601,7 @@ export async function prepareConfidentialBatch(
         `${MAX_BATCH_INNERS} inner transactions, got ${inners.length}`,
     )
   }
-  const ops = inners.filter(isConfidentialOp)
+  const ops = inners.filter(isConfidentialOperation)
   const [crypto, states, sequencing] = await Promise.all([
     loadMptCrypto(),
     loadStates(client, ops),
@@ -615,7 +617,7 @@ export async function prepareConfidentialBatch(
   const rawTransactions: Array<{ RawTransaction: SubmittableTransaction }> = []
   for (const inner of inners) {
     const acct = innerAccount(inner)
-    if (isConfidentialOp(inner)) {
+    if (isConfidentialOperation(inner)) {
       const sequence = nextSequence(sequencing.next, acct)
       // eslint-disable-next-line no-await-in-loop -- an ordered chain; state must thread in sequence
       const built = await buildConfidentialInner(ctx, inner, sequence)

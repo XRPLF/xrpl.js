@@ -158,23 +158,26 @@ export interface ConfidentialMergeInboxParams extends BaseConfidentialParams {
 /**
  * One confidential operation in a {@link ConfidentialBatchParams} inner list: a
  * build *recipe*, not a transaction — the assembler builds the ciphertexts and
- * zero-knowledge proof from it. Discriminated by `op`; each variant is the matching
+ * zero-knowledge proof from it. Discriminated by `operation`; each variant is the matching
  * standalone builder's inputs minus the fields the assembler owns (`sequence` and
  * the internal predicted-state overrides), so if you know `prepareConfidentialSend`
- * you know `{ op: 'send', ... }`.
+ * you know `{ operation: 'send', ... }`.
  */
-export type ConfidentialBatchOp =
-  | ({ op: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
-  | ({ op: 'convertBack' } & Omit<
+export type ConfidentialBatchOperation =
+  | ({ operation: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
+  | ({ operation: 'convertBack' } & Omit<
       ConfidentialConvertBackParams,
       'sequence' | 'confidentialState' | 'outstandingDelta'
     >)
-  | ({ op: 'send' } & Omit<
+  | ({ operation: 'send' } & Omit<
       ConfidentialSendParams,
       'sequence' | 'confidentialState' | 'destinationKey' | 'outstandingDelta'
     >)
-  | ({ op: 'mergeInbox' } & Omit<ConfidentialMergeInboxParams, 'sequence'>)
-  | ({ op: 'clawback' } & Omit<
+  | ({ operation: 'mergeInbox' } & Omit<
+      ConfidentialMergeInboxParams,
+      'sequence'
+    >)
+  | ({ operation: 'clawback' } & Omit<
       ConfidentialClawbackParams,
       | 'sequence'
       | 'amount'
@@ -186,8 +189,8 @@ export type ConfidentialBatchOp =
  * A single inner of a confidential Batch, in one of two intentionally distinct
  * shapes:
  *
- * - a **confidential op-spec** ({@link ConfidentialBatchOp}) — a *recipe* the
- *   assembler builds into a transaction and proof. `op`-tagged and camelCase
+ * - a **confidential operation spec** ({@link ConfidentialBatchOperation}) — a *recipe*
+ *   the assembler builds into a transaction and proof. `operation`-tagged and camelCase
  *   because it mirrors a builder's parameters (e.g. `senderKeypair`), not a
  *   serialized transaction.
  * - a **ready-made transaction** (a {@link SubmittableTransaction}) — already
@@ -195,11 +198,11 @@ export type ConfidentialBatchOp =
  *   shapes it as a Batch inner (`tfInnerBatchTxn`, `Fee: '0'`, a sequence) and
  *   passes it through.
  *
- * The two read differently on purpose: `op` means "build this for me",
+ * The two read differently on purpose: `operation` means "build this for me",
  * `TransactionType` means "here is a finished transaction".
  */
 export type ConfidentialBatchInner =
-  | ConfidentialBatchOp
+  | ConfidentialBatchOperation
   | SubmittableTransaction
 
 /** Inputs for {@link prepareConfidentialBatch}. */

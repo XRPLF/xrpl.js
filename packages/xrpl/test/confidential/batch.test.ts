@@ -162,7 +162,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       account: ADDR_A,
       inners: [
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 30n,
@@ -203,7 +203,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       account: ADDR_A,
       inners: [
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 30n,
@@ -211,7 +211,7 @@ describe('confidential/prepareConfidentialBatch', function () {
           mptIssuanceID: ISSUANCE_ID,
         },
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 20n,
@@ -239,7 +239,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       prepareConfidentialBatch(client, {
         account: ADDR_A,
         inners: [30n, 30n].map((amount) => ({
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount,
@@ -271,7 +271,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       account: ADDR_A,
       inners: [
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 10n,
@@ -279,7 +279,7 @@ describe('confidential/prepareConfidentialBatch', function () {
           mptIssuanceID: ISSUANCE_ID,
         },
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_B,
           destination: ADDR_A,
           amount: 20n,
@@ -320,7 +320,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       prepareConfidentialBatch(client, {
         account: ADDR_A,
         inners: [ISSUANCE_ID, ISSUANCE_ID].map(() => ({
-          op: 'mergeInbox',
+          operation: 'mergeInbox',
           account: ADDR_A,
           mptIssuanceID: ISSUANCE_ID,
         })),
@@ -361,7 +361,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       account: ADDR_A,
       inners: [
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 30n,
@@ -405,7 +405,7 @@ describe('confidential/prepareConfidentialBatch', function () {
       inners: [
         // bob registers his key in this batch...
         {
-          op: 'convert',
+          operation: 'convert',
           account: ADDR_B,
           amount: 0n,
           holderKeypair: KEY_B,
@@ -413,7 +413,7 @@ describe('confidential/prepareConfidentialBatch', function () {
         },
         // ...then alice sends 30 to bob in the same batch.
         {
-          op: 'send',
+          operation: 'send',
           account: ADDR_A,
           destination: ADDR_B,
           amount: 30n,

@@ -42,13 +42,13 @@ async function freshSetup(
 }
 
 /**
- * Build a confidential send op-spec for a batch inner.
+ * Build a confidential send operation spec for a batch inner.
  *
  * @param from - The sending holder.
  * @param to - The receiving holder.
  * @param amount - The confidential amount to send.
  * @param mptID - The MPTokenIssuanceID.
- * @returns The `send` op-spec for prepareConfidentialBatch.
+ * @returns The `send` operation spec for prepareConfidentialBatch.
  */
 // eslint-disable-next-line max-params -- (from, to, amount, token) test tuple
 function send(
@@ -57,7 +57,7 @@ function send(
   amount: bigint,
   mptID: string,
 ): {
-  op: 'send'
+  operation: 'send'
   account: string
   destination: string
   amount: bigint
@@ -65,7 +65,7 @@ function send(
   mptIssuanceID: string
 } {
   return {
-    op: 'send',
+    operation: 'send',
     account: from.wallet.classicAddress,
     destination: to.wallet.classicAddress,
     amount,
@@ -170,7 +170,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   afterAll(async () => teardownConfidential(context))
 
   it(
-    'combo 1: chains two same-(account,token) sends in one atomic Batch',
+    'chains two same-account, same-token sends in one atomic Batch',
     async () => {
       const { client } = context
       const setup = await freshSetup(client)
@@ -200,45 +200,38 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   )
 
   it(
-    'trap case: Send -> recipient MergeInbox -> recipient Send in one Batch',
+    'sends two different tokens from one account in one Batch',
     async () => {
       const { client } = context
-      const setup = await freshSetup(client)
-      const alice = await holderWithBalance(
-        client,
-        setup.issuer,
-        setup.mptID,
-        100n,
-      )
-      // Bob needs an established balance (spending + inbox) for MergeInbox; a small
-      // nonzero start (a Payment of 0 MPT is temBAD_AMOUNT).
-      const bob = await holderWithBalance(client, setup.issuer, setup.mptID, 5n)
-      const carol = await registerHolderKey(client, setup.mptID)
+      const tokenA = await freshSetup(client)
+      const tokenB = await freshSetup(client)
+      const alice: Holder = {
+        wallet: await generateFundedWallet(client),
+        key: deriveConfidentialKeypair(),
+      }
+      await fundHolderOnToken(client, tokenA.issuer, alice, tokenA.mptID, 100n)
+      await fundHolderOnToken(client, tokenB.issuer, alice, tokenB.mptID, 100n)
+      const r1 = await registerHolderKey(client, tokenA.mptID)
+      const r2 = await registerHolderKey(client, tokenB.mptID)
 
       const batch = await prepareConfidentialBatch(client, {
         account: alice.wallet.classicAddress,
         inners: [
-          send(alice, bob, 40n, setup.mptID),
-          {
-            op: 'mergeInbox',
-            account: bob.wallet.classicAddress,
-            mptIssuanceID: setup.mptID,
-          },
-          send(bob, carol, 15n, setup.mptID),
+          send(alice, r1, 30n, tokenA.mptID),
+          send(alice, r2, 40n, tokenB.mptID),
         ],
       })
-      await submitConfidentialBatch(client, batch, alice.wallet, [bob.wallet])
+      await submitConfidentialBatch(client, batch, alice.wallet)
 
-      // Proves the deterministic re-randomized inbox credit is predictable: bob
-      // spent 15 from (his 5 + the 40 he received and merged) in the same batch.
-      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 60n)
-      assert.strictEqual(await getSpendable(client, bob, setup.mptID), 30n)
+      // Same account, independent per-token balances, one shared sequence counter.
+      assert.strictEqual(await getSpendable(client, alice, tokenA.mptID), 70n)
+      assert.strictEqual(await getSpendable(client, alice, tokenB.mptID), 60n)
     },
     TIMEOUT,
   )
 
   it(
-    'combo 3: two accounts each send the same token (multi-sign)',
+    'sends the same token from two different accounts (multi-sign)',
     async () => {
       const { client } = context
       const setup = await freshSetup(client)
@@ -273,38 +266,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   )
 
   it(
-    'combo 2: one account sends two different tokens in one Batch',
-    async () => {
-      const { client } = context
-      const tokenA = await freshSetup(client)
-      const tokenB = await freshSetup(client)
-      const alice: Holder = {
-        wallet: await generateFundedWallet(client),
-        key: deriveConfidentialKeypair(),
-      }
-      await fundHolderOnToken(client, tokenA.issuer, alice, tokenA.mptID, 100n)
-      await fundHolderOnToken(client, tokenB.issuer, alice, tokenB.mptID, 100n)
-      const r1 = await registerHolderKey(client, tokenA.mptID)
-      const r2 = await registerHolderKey(client, tokenB.mptID)
-
-      const batch = await prepareConfidentialBatch(client, {
-        account: alice.wallet.classicAddress,
-        inners: [
-          send(alice, r1, 30n, tokenA.mptID),
-          send(alice, r2, 40n, tokenB.mptID),
-        ],
-      })
-      await submitConfidentialBatch(client, batch, alice.wallet)
-
-      // Same account, independent per-token balances, one shared sequence counter.
-      assert.strictEqual(await getSpendable(client, alice, tokenA.mptID), 70n)
-      assert.strictEqual(await getSpendable(client, alice, tokenB.mptID), 60n)
-    },
-    TIMEOUT,
-  )
-
-  it(
-    'combo 4: two accounts send two different tokens in one Batch',
+    'sends two different tokens from two different accounts in one Batch',
     async () => {
       const { client } = context
       const tokenA = await freshSetup(client)
@@ -341,7 +303,45 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   )
 
   it(
-    'clawback after the holder sends in the same Batch (issuer-balance prediction)',
+    'lets a recipient re-spend funds it received earlier in the same Batch',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      // Bob needs an established balance (spending + inbox) for MergeInbox; a small
+      // nonzero start (a Payment of 0 MPT is temBAD_AMOUNT).
+      const bob = await holderWithBalance(client, setup.issuer, setup.mptID, 5n)
+      const carol = await registerHolderKey(client, setup.mptID)
+
+      const batch = await prepareConfidentialBatch(client, {
+        account: alice.wallet.classicAddress,
+        inners: [
+          send(alice, bob, 40n, setup.mptID),
+          {
+            operation: 'mergeInbox',
+            account: bob.wallet.classicAddress,
+            mptIssuanceID: setup.mptID,
+          },
+          send(bob, carol, 15n, setup.mptID),
+        ],
+      })
+      await submitConfidentialBatch(client, batch, alice.wallet, [bob.wallet])
+
+      // Proves the deterministic re-randomized inbox credit is predictable: bob
+      // spent 15 from (his 5 + the 40 he received and merged) in the same batch.
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 60n)
+      assert.strictEqual(await getSpendable(client, bob, setup.mptID), 30n)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'claws back a holder immediately after it sends in the same Batch',
     async () => {
       const { client } = context
       const setup = await freshSetup(client)
@@ -359,7 +359,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
         inners: [
           send(alice, bob, 30n, setup.mptID),
           {
-            op: 'clawback',
+            operation: 'clawback',
             account: setup.issuer.classicAddress,
             holder: alice.wallet.classicAddress,
             issuerKeypair: setup.issuerKey,
@@ -378,7 +378,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   )
 
   it(
-    'convertBack after a send: two different debit ops chain on one balance',
+    'chains a send and a convert-back as two debits on one balance',
     async () => {
       const { client } = context
       const setup = await freshSetup(client)
@@ -395,7 +395,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
         inners: [
           send(alice, bob, 30n, setup.mptID),
           {
-            op: 'convertBack',
+            operation: 'convertBack',
             account: alice.wallet.classicAddress,
             amount: 20n,
             holderKeypair: alice.key,
@@ -483,7 +483,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
         inners: [
           // bob registers his key (0-amount Convert)...
           {
-            op: 'convert',
+            operation: 'convert',
             account: bob.wallet.classicAddress,
             amount: 0n,
             holderKeypair: bob.key,
@@ -536,14 +536,14 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
         account: alice.wallet.classicAddress,
         inners: [
           {
-            op: 'convert',
+            operation: 'convert',
             account: alice.wallet.classicAddress,
             amount: 100n,
             holderKeypair: alice.key,
             mptIssuanceID: setup.mptID,
           },
           {
-            op: 'mergeInbox',
+            operation: 'mergeInbox',
             account: alice.wallet.classicAddress,
             mptIssuanceID: setup.mptID,
           },
