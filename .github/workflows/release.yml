@@ -423,29 +423,58 @@ jobs:
 
           fetch_reviewers() {
             local env_name="$1"
-            local env_json reviewers
+            local env_json reviewer_entries org logins expanded=()
+
             env_json="$(curl -sSf \
               -H "Authorization: Bearer $GH_TOKEN" \
               -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/$REPO/environments/$env_name")" || true
 
-            reviewers="$(printf '%s' "$env_json" | jq -r '
+            org="${REPO%%/*}"
+
+            # One line per reviewer: "User:<login>" or "Team:<slug>"
+            reviewer_entries="$(printf '%s' "$env_json" | jq -r '
               (.protection_rules // [])
               | map(select(.type=="required_reviewers") | .reviewers // [])
               | add // []
               | map(
-                  if .type=="User" then (.reviewer.login)
-                  elif .type=="Team" then (.reviewer.slug)
-                  else (.reviewer.login // .reviewer.slug // "unknown")
+                  if .type=="User" then "User:" + (.reviewer.login // "unknown")
+                  elif .type=="Team" then "Team:" + (.reviewer.slug // "unknown")
+                  else "User:" + (.reviewer.login // .reviewer.slug // "unknown")
                   end
                 )
               | unique
-              | join(", ")
+              | .[]
             ')"
-            if [ -z "$reviewers" ] || [ "$reviewers" = "null" ]; then
-              reviewers="(no required reviewers configured)"
+
+            if [ -z "$reviewer_entries" ]; then
+              printf '%s' "(no required reviewers configured)"
+              return
             fi
-            printf '%s' "$reviewers"
+
+            while IFS= read -r entry; do
+              [ -z "$entry" ] && continue
+              case "$entry" in
+                User:*)
+                  expanded+=("${entry#User:}")
+                  ;;
+                Team:*)
+                  local slug="${entry#Team:}"
+                  logins="$(GH_TOKEN="$GH_TOKEN" gh api --paginate \
+                    "orgs/$org/teams/$slug/members" \
+                    -q '.[].login' 2>/dev/null || true)"
+                  if [ -n "$logins" ]; then
+                    while IFS= read -r member; do
+                      [ -n "$member" ] && expanded+=("$member")
+                    done <<< "$logins"
+                  else
+                    expanded+=("$slug (https://github.com/orgs/$org/teams/$slug)")
+                  fi
+                  ;;
+              esac
+            done <<< "$reviewer_entries"
+
+            printf '%s\n' "${expanded[@]}" | sort -u | paste -sd, - | sed 's/,/, /g'
           }
 
           # Get reviewer lists
