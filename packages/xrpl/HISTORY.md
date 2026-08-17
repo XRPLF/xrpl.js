@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 
 ### Added
+* Add XLS-68 Sponsorship support: `SponsorshipSet`/`SponsorshipTransfer` transactions, `Sponsorship` ledger entry, `signAsSponsor`/`combineSponsorSigners`/`addPreFundedSponsor` wallet helpers, `account_sponsoring` RPC method, and sponsor-fee/reserve fields on `Payment` and other transactions.
 * Support Dynamic MPTs (XLS-94d) based on latest spec change [XRPL-Standards#583](https://github.com/XRPLF/XRPL-Standards/pull/583).
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
 * Add XLS-56 Batch V1_1 support to `signMultiBatch` and `combineBatchSigners` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).

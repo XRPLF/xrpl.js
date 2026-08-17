@@ -183,17 +183,17 @@ export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
   }
 
   // tfSponsorshipCreate or tfSponsorshipReassign: SponsorFlags must be present
-  // with the tfSponsorReserve bit set (the new sponsor covers the reserve).
+  // with the spfSponsorReserve bit set (the new sponsor covers the reserve).
   if (hasCreate || hasReassign) {
     /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
     const hasReserveFlag =
       typeof tx.SponsorFlags === 'number' &&
-      (tx.SponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+      (tx.SponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
     /* eslint-enable no-bitwise */
 
     if (!hasReserveFlag) {
       throw new ValidationError(
-        'SponsorshipTransfer: SponsorFlags must be present with the tfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+        'SponsorshipTransfer: SponsorFlags must be present with the spfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
       )
     }
   }

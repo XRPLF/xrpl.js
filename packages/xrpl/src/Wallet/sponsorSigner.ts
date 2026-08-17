@@ -54,7 +54,10 @@ export function signAsSponsor(
   if (tx.SponsorSignature) {
     throw new ValidationError('Transaction is already signed by the sponsor.')
   }
-  if (tx.TxnSignature == null || tx.SigningPubKey == null) {
+  if (
+    (tx.TxnSignature == null || tx.SigningPubKey == null) &&
+    (tx.Signers == null || tx.Signers.length === 0)
+  ) {
     throw new ValidationError(
       'Transaction must be first signed by the account.',
     )
@@ -82,7 +85,10 @@ export function signAsSponsor(
   }
 
   // For single-signing, validate that the Sponsor field matches the wallet
-  if (!multisignAddress && tx.Sponsor !== wallet.classicAddress) {
+  if (
+    !multisignAddress &&
+    !areAddressesEqual(tx.Sponsor, wallet.classicAddress)
+  ) {
     throw new ValidationError(
       `Transaction Sponsor field (${tx.Sponsor}) does not match the signing wallet address (${wallet.classicAddress}).`,
     )
@@ -254,7 +260,7 @@ function getTransactionWithAllSponsorSigners(
  * @param sponsorAddress - The address of the sponsor account (must match an
  *                         existing Sponsorship object on the ledger).
  * @param sponsorFlags - Flags indicating what the sponsor is paying for
- *                       (tfSponsorFee = 0x00000001, tfSponsorReserve = 0x00000002).
+ *                       (spfSponsorFee = 0x00000001, spfSponsorReserve = 0x00000002).
  * @returns A new transaction object with Sponsor and SponsorFlags fields added.
  *
  * @throws {ValidationError} If:
@@ -268,7 +274,7 @@ function getTransactionWithAllSponsorSigners(
  * const sponsoredTx = addPreFundedSponsor(
  *   payment,
  *   'rSponsorAddress123...',
- *   SponsorFlags.tfSponsorFee
+ *   SponsorFlags.spfSponsorFee
  * )
  * ```
  */
@@ -290,7 +296,7 @@ export function addPreFundedSponsor(
   }
 
   /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
-  const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+  const validFlags = SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
   if ((sponsorFlags & ~validFlags) !== 0) {
     throw new ValidationError(
       'addPreFundedSponsor: SponsorFlags contains invalid flags',

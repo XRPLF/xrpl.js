@@ -301,7 +301,7 @@ describe('sponsorSigner', function () {
       }
 
       const sponsorAddress = 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un'
-      const sponsorFlags = SponsorFlags.tfSponsorFee
+      const sponsorFlags = SponsorFlags.spfSponsorFee
 
       const result = addPreFundedSponsor(payment, sponsorAddress, sponsorFlags)
 
@@ -326,13 +326,13 @@ describe('sponsorSigner', function () {
       const sponsorAddress = 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un'
       /* eslint-disable no-bitwise -- combining sponsor flags */
       const sponsorFlags =
-        SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+        SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
       /* eslint-enable no-bitwise */
 
       const result = addPreFundedSponsor(payment, sponsorAddress, sponsorFlags)
 
       assert.equal(result.SponsorFlags, sponsorFlags)
-      // Combined flags: tfSponsorFee (1) + tfSponsorReserve (2) = 3
+      // Combined flags: spfSponsorFee (1) + spfSponsorReserve (2) = 3
       assert.equal(result.SponsorFlags, 3)
     })
 
@@ -348,7 +348,7 @@ describe('sponsorSigner', function () {
 
       // Same as Account (self-sponsorship test)
       const sponsorAddress = payment.Account
-      const sponsorFlags = SponsorFlags.tfSponsorFee
+      const sponsorFlags = SponsorFlags.spfSponsorFee
 
       assert.throws(() => {
         addPreFundedSponsor(payment, sponsorAddress, sponsorFlags)
@@ -385,7 +385,7 @@ describe('sponsorSigner', function () {
 
       const originalPayment = { ...payment }
       const sponsorAddress = 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un'
-      const sponsorFlags = SponsorFlags.tfSponsorFee
+      const sponsorFlags = SponsorFlags.spfSponsorFee
 
       addPreFundedSponsor(payment, sponsorAddress, sponsorFlags)
 
@@ -409,12 +409,12 @@ describe('sponsorSigner', function () {
       }
 
       const sponsorAddress = 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un'
-      const sponsorFlags = SponsorFlags.tfSponsorReserve
+      const sponsorFlags = SponsorFlags.spfSponsorReserve
 
       const result = addPreFundedSponsor(trustSet, sponsorAddress, sponsorFlags)
 
       assert.equal(result.Sponsor, sponsorAddress)
-      assert.equal(result.SponsorFlags, SponsorFlags.tfSponsorReserve)
+      assert.equal(result.SponsorFlags, SponsorFlags.spfSponsorReserve)
       assert.equal(result.TransactionType, 'TrustSet')
     })
   })

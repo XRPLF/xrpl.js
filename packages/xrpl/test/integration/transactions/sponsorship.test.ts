@@ -209,7 +209,7 @@ describe('Sponsorship (XLS-68)', function () {
         payment = addPreFundedSponsor(
           payment,
           sponsorWallet.classicAddress,
-          SponsorFlags.tfSponsorFee,
+          SponsorFlags.spfSponsorFee,
         ) as Payment
 
         // Validate sponsorship before submitting
@@ -277,7 +277,7 @@ describe('Sponsorship (XLS-68)', function () {
         payment = addPreFundedSponsor(
           payment,
           sponsorWallet.classicAddress,
-          SponsorFlags.tfSponsorFee,
+          SponsorFlags.spfSponsorFee,
         ) as Payment
 
         const prepared = await testContext.client.autofill(payment)
@@ -321,7 +321,7 @@ describe('Sponsorship (XLS-68)', function () {
         payment = addPreFundedSponsor(
           payment,
           sponsorWallet.classicAddress,
-          SponsorFlags.tfSponsorFee,
+          SponsorFlags.spfSponsorFee,
         ) as Payment
 
         const prepared = await testContext.client.autofill(payment)
@@ -355,7 +355,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           Amount: '100',
           Sponsor: sponsorWallet.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorFee,
+          SponsorFlags: SponsorFlags.spfSponsorFee,
         }
 
         // Sponsee signs first
@@ -396,7 +396,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           Amount: '100',
           Sponsor: sponsor1.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorFee,
+          SponsorFlags: SponsorFlags.spfSponsorFee,
         }
 
         // Sponsee signs first
@@ -451,7 +451,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           SendMax: '1000000',
           Sponsor: sponsorWallet.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorReserve,
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
         }
 
         // Sponsee signs, then sponsor co-signs
@@ -574,7 +574,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           SendMax: '1000000',
           Sponsor: originalSponsor.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorReserve,
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
         }
         const preparedCheck = await testContext.client.autofill(checkTx)
         const sponseeSignedCheck = reassignSponsee.sign(preparedCheck)
@@ -629,7 +629,7 @@ describe('Sponsorship (XLS-68)', function () {
 
   describe('Reserve Sponsorship', function () {
     it(
-      'sponsors reserve for CheckCreate with tfSponsorReserve',
+      'sponsors reserve for CheckCreate with spfSponsorReserve',
       async () => {
         const reserveSponsee = await generateFundedWallet(testContext.client)
 
@@ -657,7 +657,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           SendMax: '1000000',
           Sponsor: sponsorWallet.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorReserve,
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
         }
 
         const prepared = await testContext.client.autofill(checkTx)
@@ -700,7 +700,7 @@ describe('Sponsorship (XLS-68)', function () {
     )
 
     it(
-      'sponsors reserve for EscrowCreate with tfSponsorReserve',
+      'sponsors reserve for EscrowCreate with spfSponsorReserve',
       async () => {
         const escrowSponsee = await generateFundedWallet(testContext.client)
 
@@ -728,7 +728,7 @@ describe('Sponsorship (XLS-68)', function () {
           Amount: '10000',
           FinishAfter: closeTime + 60,
           Sponsor: sponsorWallet.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorReserve,
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
         }
 
         const prepared = await testContext.client.autofill(escrowTx)
@@ -778,7 +778,7 @@ describe('Sponsorship (XLS-68)', function () {
           Sponsor: sponsorWallet.classicAddress,
           /* eslint-disable no-bitwise -- combining sponsor flags */
           SponsorFlags:
-            SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve,
+            SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve,
           /* eslint-enable no-bitwise */
         }
 
@@ -851,7 +851,7 @@ describe('Sponsorship (XLS-68)', function () {
           Destination: sponsorWallet.classicAddress,
           SendMax: '1000000',
           Sponsor: countSponsor.classicAddress,
-          SponsorFlags: SponsorFlags.tfSponsorReserve,
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
         }
 
         const prepared = await testContext.client.autofill(checkTx)

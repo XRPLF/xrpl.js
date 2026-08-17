@@ -83,9 +83,9 @@ export async function validatePreFundedSponsorship(
     }
 
     /* eslint-disable no-bitwise -- bitwise operations required for flag checking */
-    const isSponsoringFee = (tx.SponsorFlags & SponsorFlags.tfSponsorFee) !== 0
+    const isSponsoringFee = (tx.SponsorFlags & SponsorFlags.spfSponsorFee) !== 0
     const isSponsoringReserve =
-      (tx.SponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+      (tx.SponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
     /* eslint-enable no-bitwise */
 
     // rippled's Transactor::checkSponsor rejects pre-funded (non-co-signed) sponsorship
@@ -134,7 +134,7 @@ export async function validatePreFundedSponsorship(
       return {
         valid: false,
         error:
-          'Sponsorship FeeAmount is required when tfSponsorFee flag is set',
+          'Sponsorship FeeAmount is required when spfSponsorFee flag is set',
         sponsorship,
         estimatedFee: fee,
       }

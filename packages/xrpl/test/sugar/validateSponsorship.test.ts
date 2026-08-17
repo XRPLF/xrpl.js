@@ -57,7 +57,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorFee,
+      SponsorFlags: SponsorFlags.spfSponsorFee,
       SponsorSignature: {
         SigningPubKey:
           '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
@@ -101,7 +101,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorReserve,
+      SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
     const result = await validatePreFundedSponsorship(client, tx, '100')
@@ -141,7 +141,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorFee,
+      SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
     const result = await validatePreFundedSponsorship(client, tx, '100')
@@ -181,7 +181,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorFee,
+      SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
     const result = await validatePreFundedSponsorship(client, tx, '100')
@@ -220,7 +220,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorFee,
+      SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
     const result = await validatePreFundedSponsorship(client, tx, '100')
@@ -258,7 +258,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorReserve,
+      SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
     const result = await validatePreFundedSponsorship(client, tx, '100')
@@ -305,7 +305,7 @@ describe('validatePreFundedSponsorship', function () {
       Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
       Amount: '1000000',
       Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
-      SponsorFlags: SponsorFlags.tfSponsorReserve,
+      SponsorFlags: SponsorFlags.spfSponsorReserve,
       Delegate: 'rDelegateAccount11111111111111111111111',
     }
 

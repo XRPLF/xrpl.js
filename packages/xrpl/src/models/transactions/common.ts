@@ -84,11 +84,33 @@ function isSigner(obj: unknown): obj is Signer {
  * Verify the form and type of a SponsorSignature at runtime.
  *
  * @param obj - The object to check the form and type of.
+ * @param isInnerBatchTxn - Whether the enclosing transaction carries the
+ * `tfInnerBatchTxn` flag.
  * @returns Whether the SponsorSignature is properly formed.
  */
-function isSponsorSignature(obj: unknown): obj is SponsorSignature {
+function isSponsorSignature(
+  obj: unknown,
+  isInnerBatchTxn: boolean,
+): obj is SponsorSignature {
   if (!isRecord(obj)) {
     return false
+  }
+
+  if (isInnerBatchTxn) {
+    /*
+     * Inner batch transactions are never individually signed - the whole
+     * Batch is authorized together via the outer transaction's
+     * BatchSigners. rippled's Batch::preflight requires a sponsored inner
+     * txn's SponsorSignature to carry the same empty placeholder shape as
+     * the inner txn's own signature fields (SigningPubKey: '', no
+     * TxnSignature, no Signers); the sponsor's real authorization is
+     * supplied via a BatchSigners entry on the outer Batch transaction.
+     */
+    return (
+      obj.SigningPubKey === '' &&
+      obj.TxnSignature === undefined &&
+      obj.Signers === undefined
+    )
   }
 
   const hasSigningPubKey = obj.SigningPubKey !== undefined
@@ -543,9 +565,9 @@ export interface GlobalFlagsInterface {
  */
 export enum SponsorFlags {
   /** Sponsor is paying the transaction fee */
-  tfSponsorFee = 0x00000001,
+  spfSponsorFee = 0x00000001,
   /** Sponsor is paying reserves for objects created in the transaction */
-  tfSponsorReserve = 0x00000002,
+  spfSponsorReserve = 0x00000002,
 }
 
 /**
@@ -645,7 +667,7 @@ export interface BaseTransaction extends Record<string, unknown> {
 /**
  * Transaction types explicitly allow-listed by rippled for reserve sponsorship
  * (see `isReserveSponsorAllowed` in rippled's SponsorHelpers.cpp). Only these
- * transaction types may use the tfSponsorReserve flag; all others are
+ * transaction types may use the spfSponsorReserve flag; all others are
  * rejected server-side with temINVALID_FLAG.
  */
 const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
@@ -677,21 +699,44 @@ const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
 ])
 
 /**
+ * Whether a transaction carries the `tfInnerBatchTxn` flag, without pulling
+ * in `models/utils`' `hasFlag` (which itself imports from this file and
+ * would create a circular dependency).
+ *
+ * @param tx - The transaction to check.
+ * @returns Whether the transaction is an inner Batch transaction.
+ */
+function isInnerBatchTransaction(tx: Record<string, unknown>): boolean {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag check */
+  if (typeof tx.Flags === 'number') {
+    return (tx.Flags & GlobalFlags.tfInnerBatchTxn) !== 0
+  }
+  /* eslint-enable no-bitwise */
+  if (isRecord(tx.Flags)) {
+    return tx.Flags.tfInnerBatchTxn === true
+  }
+  return false
+}
+
+/**
  * Validate that SponsorFlags contains only valid flag values, and that reserve
- * sponsorship (tfSponsorReserve) is only used where rippled allows it.
+ * sponsorship (spfSponsorReserve) is only used where rippled allows it.
  *
  * @param sponsorFlags - The SponsorFlags value to validate.
  * @param transactionType - The transaction type to validate flags against.
  * @param hasDelegate - Whether the transaction also carries a Delegate field.
+ * @param isInnerBatchTxn - Whether the transaction carries the `tfInnerBatchTxn` flag.
  * @throws ValidationError if flags are invalid.
  */
+// eslint-disable-next-line max-params -- each param maps to a distinct rippled rejection rule
 function validateSponsorFlagsValue(
   sponsorFlags: number,
   transactionType: string | undefined,
   hasDelegate: boolean,
+  isInnerBatchTxn: boolean,
 ): void {
   /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
-  const validFlags = SponsorFlags.tfSponsorFee | SponsorFlags.tfSponsorReserve
+  const validFlags = SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
   if ((sponsorFlags & ~validFlags) !== 0) {
     throw new ValidationError(
       'Transaction: SponsorFlags contains invalid flags',
@@ -704,7 +749,8 @@ function validateSponsorFlagsValue(
     )
   }
 
-  const hasReserveFlag = (sponsorFlags & SponsorFlags.tfSponsorReserve) !== 0
+  const hasReserveFlag = (sponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
+  const hasFeeFlag = (sponsorFlags & SponsorFlags.spfSponsorFee) !== 0
   /* eslint-enable no-bitwise */
 
   // Validate that reserve sponsorship is only used for the rippled allow-listed transaction types
@@ -714,16 +760,25 @@ function validateSponsorFlagsValue(
     !RESERVE_SPONSORABLE_TRANSACTIONS.has(transactionType)
   ) {
     throw new ValidationError(
-      `Transaction: ${transactionType} cannot use tfSponsorReserve flag (does not create ledger objects)`,
+      `Transaction: ${transactionType} cannot use spfSponsorReserve flag (does not create ledger objects)`,
     )
   }
 
   // Reserve sponsorship is disallowed under permissioned delegation (rippled's
-  // Transactor::checkSponsor rejects Delegate + tfSponsorReserve with temINVALID).
+  // Transactor::checkSponsor rejects Delegate + spfSponsorReserve with temINVALID).
   if (hasReserveFlag && hasDelegate) {
     throw new ValidationError(
-      'Transaction: SponsorFlags.tfSponsorReserve cannot be combined with Delegate ' +
+      'Transaction: SponsorFlags.spfSponsorReserve cannot be combined with Delegate ' +
         '(reserve sponsorship under permissioned delegation is disallowed)',
+    )
+  }
+
+  // Fee sponsorship is disallowed on inner Batch transactions - rippled's
+  // Batch::preflight rejects spfSponsorFee on inner txns with temINVALID_FLAG,
+  // since only the outer Batch transaction pays a fee.
+  if (hasFeeFlag && isInnerBatchTxn) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
     )
   }
 }
@@ -738,6 +793,7 @@ function validateSponsorFlagsValue(
 // eslint-disable-next-line max-lines-per-function -- necessary for validation
 export function validateSponsorFields(tx: Record<string, unknown>): void {
   const transactionType = String(tx.TransactionType)
+  const isInnerBatchTxn = isInnerBatchTransaction(tx)
 
   const sponsor = tx.Sponsor
   const sponsorFlags = tx.SponsorFlags
@@ -777,11 +833,15 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
       sponsorFlags,
       transactionType,
       tx.Delegate !== undefined,
+      isInnerBatchTxn,
     )
   }
 
   /* Validate SponsorSignature field */
-  if (hasSponsorSignature && !isSponsorSignature(sponsorSignature)) {
+  if (
+    hasSponsorSignature &&
+    !isSponsorSignature(sponsorSignature, isInnerBatchTxn)
+  ) {
     throw new ValidationError('Transaction: invalid SponsorSignature')
   }
 
