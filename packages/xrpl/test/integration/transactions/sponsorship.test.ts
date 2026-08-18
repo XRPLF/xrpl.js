@@ -51,6 +51,10 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: sponseeWallet.classicAddress,
           MaxFee: '1000',
+          // rippled requires a new Sponsorship to be created with some positive
+          // budget (FeeAmountDelta and/or RemainingOwnerCountDelta) -- MaxFee
+          // alone is just a cap, not a budget.
+          RemainingOwnerCountDelta: 1,
         }
 
         const result = await testTransaction(
@@ -161,6 +165,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: tempSponsee.classicAddress,
           MaxFee: '500',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, createTx, sponsorWallet)
 
@@ -441,6 +446,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: transferSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
 
@@ -526,6 +532,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: newSponsor.classicAddress,
           Sponsee: createSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, newSponsor)
 
@@ -564,6 +571,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: originalSponsor.classicAddress,
           Sponsee: reassignSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, originalSponsor)
 
@@ -599,6 +607,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: newSponsor.classicAddress,
           Sponsee: reassignSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, newSetupTx, newSponsor)
 
@@ -639,6 +648,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: reserveSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
 
@@ -710,6 +720,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: sponsorWallet.classicAddress,
           Sponsee: escrowSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
 
@@ -766,6 +777,9 @@ describe('Sponsorship (XLS-68)', function () {
           Sponsee: combinedSponsee.classicAddress,
           FeeAmountDelta: '10000',
           MaxFee: '1000',
+          // Also needed since this sponsorship covers spfSponsorReserve too --
+          // checkReserve gates on RemainingOwnerCount independent of FeeAmount.
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, sponsorWallet)
 
@@ -841,6 +855,7 @@ describe('Sponsorship (XLS-68)', function () {
           Account: countSponsor.classicAddress,
           Sponsee: countSponsee.classicAddress,
           MaxFee: '1000',
+          RemainingOwnerCountDelta: 1,
         }
         await testTransaction(testContext.client, setupTx, countSponsor)
 
