@@ -24,7 +24,7 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import { generateFundedWallet, testTransaction, ledgerAccept } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 30000
@@ -33,6 +33,27 @@ describe('Sponsorship (XLS-68)', function () {
   let testContext: XrplIntegrationTestContext
   let sponsorWallet: Wallet
   let sponseeWallet: Wallet
+
+  /*
+   * rippled runs standalone in CI, so ledgers only close on an explicit
+   * ledger_accept. submitAndWait polls until the transaction validates, which
+   * never happens on its own -- so every submitAndWait must be raced with a
+   * ledger accept, the same way test/integration/submitAndWait.test.ts does it.
+   */
+  async function delayedLedgerAccept(): Promise<unknown> {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 1000)
+    })
+    return ledgerAccept(testContext.client)
+  }
+
+  async function submitAndAccept(
+    blob: string,
+  ): ReturnType<typeof testContext.client.submitAndWait> {
+    const submission = testContext.client.submitAndWait(blob)
+    const [res] = await Promise.all([submission, delayedLedgerAccept()])
+    return res
+  }
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
@@ -374,9 +395,7 @@ describe('Sponsorship (XLS-68)', function () {
         )
 
         // Submit with both signatures
-        const result = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
 
         // Verify transaction has both signatures
@@ -468,9 +487,7 @@ describe('Sponsorship (XLS-68)', function () {
           sponseeSigned.tx_blob,
         )
 
-        const checkResult = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const checkResult = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(checkResult.result.validated, true)
 
         // Get the Check object ID from account_objects
@@ -542,6 +559,9 @@ describe('Sponsorship (XLS-68)', function () {
           Account: createSponsee.classicAddress,
           ObjectID: objectId,
           Sponsor: newSponsor.classicAddress,
+          // rippled's SponsorshipTransfer::preflight requires
+          // spfSponsorReserve alongside Sponsor for this flag.
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
           Flags: SponsorshipTransferFlags.tfSponsorshipCreate,
         }
 
@@ -550,9 +570,7 @@ describe('Sponsorship (XLS-68)', function () {
         const sponseeSigned = createSponsee.sign(prepared)
         const sponsorSigned = signAsSponsor(newSponsor, sponseeSigned.tx_blob)
 
-        const result = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
       },
       TIMEOUT,
@@ -590,7 +608,7 @@ describe('Sponsorship (XLS-68)', function () {
           originalSponsor,
           sponseeSignedCheck.tx_blob,
         )
-        await testContext.client.submitAndWait(originalSponsorSigned.tx_blob)
+        await submitAndAccept(originalSponsorSigned.tx_blob)
 
         // Get the Check object ID
         const accountObjects = await testContext.client.request({
@@ -617,6 +635,9 @@ describe('Sponsorship (XLS-68)', function () {
           Account: reassignSponsee.classicAddress,
           ObjectID: objectId,
           Sponsor: newSponsor.classicAddress,
+          // rippled's SponsorshipTransfer::preflight requires
+          // spfSponsorReserve alongside Sponsor for this flag.
+          SponsorFlags: SponsorFlags.spfSponsorReserve,
           Flags: SponsorshipTransferFlags.tfSponsorshipReassign,
         }
 
@@ -627,9 +648,7 @@ describe('Sponsorship (XLS-68)', function () {
           sponseeSigned.tx_blob,
         )
 
-        const result = await testContext.client.submitAndWait(
-          newSponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(newSponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
       },
       TIMEOUT,
@@ -677,9 +696,7 @@ describe('Sponsorship (XLS-68)', function () {
           sponseeSigned.tx_blob,
         )
 
-        const result = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
 
         // Verify Check was created
@@ -698,12 +715,17 @@ describe('Sponsorship (XLS-68)', function () {
           },
         )
         const finalOwnerCount = finalInfo.result.account_data.OwnerCount
+        const finalSponsored =
+          finalInfo.result.account_data.SponsoredOwnerCount ?? 0
 
-        // OwnerCount should remain the same since reserve is sponsored
+        // rippled increments OwnerCount unconditionally and offsets the reserve
+        // through SponsoredOwnerCount -- the reserve requirement is computed as
+        // (owner - sponsored + sponsoring), so it is the sponsee's *effective*
+        // owner count that must stay flat, not OwnerCount itself.
         assert.equal(
-          finalOwnerCount,
-          initialOwnerCount,
-          'OwnerCount should not increase when reserve is sponsored',
+          Number(finalOwnerCount) - Number(finalSponsored),
+          Number(initialOwnerCount),
+          'effective owner count should not increase when reserve is sponsored',
         )
       },
       TIMEOUT,
@@ -749,9 +771,7 @@ describe('Sponsorship (XLS-68)', function () {
           sponseeSigned.tx_blob,
         )
 
-        const result = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
 
         // Verify Escrow was created
@@ -803,9 +823,7 @@ describe('Sponsorship (XLS-68)', function () {
           sponseeSigned.tx_blob,
         )
 
-        const result = await testContext.client.submitAndWait(
-          sponsorSigned.tx_blob,
-        )
+        const result = await submitAndAccept(sponsorSigned.tx_blob)
         assert.equal(result.result.validated, true)
 
         // Verify Check was created
@@ -873,7 +891,7 @@ describe('Sponsorship (XLS-68)', function () {
         const sponseeSigned = countSponsee.sign(prepared)
         const sponsorSigned = signAsSponsor(countSponsor, sponseeSigned.tx_blob)
 
-        await testContext.client.submitAndWait(sponsorSigned.tx_blob)
+        await submitAndAccept(sponsorSigned.tx_blob)
 
         // Verify SponsoredOwnerCount increased on sponsee
         const sponseeInfo: AccountInfoResponse =
