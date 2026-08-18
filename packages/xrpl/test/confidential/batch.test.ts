@@ -24,6 +24,8 @@ import {
 jest.setTimeout(60_000)
 
 const TF_INNER_BATCH_TXN = 0x4000_0000
+// A third valid classic address, for the issuer (clawback account / outer Batch).
+const ADDR_ISSUER = 'rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH'
 
 /** Per-account ledger fixture: encrypted balances + a starting sequence. */
 interface AccountFixture {
@@ -130,13 +132,20 @@ async function sender(
 }
 
 /**
- * A destination fixture: a registered holder key + an (empty) inbox.
+ * A destination fixture: a registered holder key, an (empty) inbox, and an (empty)
+ * issuer-encrypted balance. A real send destination always carries the last one
+ * (rippled requires it), and a Send credits it — its issuer mirror — alongside the
+ * inbox, so the predictor reads it.
  *
  * @param publicKey - The destination's 33-byte hex holder key.
  * @returns The account fixture.
  */
 async function destination(publicKey: string): Promise<AccountFixture> {
-  return { holderKey: publicKey, inbox: await ciphertext(BigInt(0), publicKey) }
+  return {
+    holderKey: publicKey,
+    inbox: await ciphertext(BigInt(0), publicKey),
+    issuerEnc: await ciphertext(BigInt(0), KEY_A.publicKey),
+  }
 }
 
 /**
@@ -437,5 +446,48 @@ describe('confidential/prepareConfidentialBatch', function () {
       100n,
     )
     assert.strictEqual(decrypted, 30n)
+  })
+
+  it('credits the destination issuer balance so a same-batch recipient clawback is predicted', async function () {
+    const client = batchClient({
+      [ADDR_A]: await sender(100n, 10),
+      // bob (recipient): a registered holder key + inbox, and an issuer mirror of 50
+      // (the issuer's encrypted view of bob's balance, under the issuer key KEY_A).
+      [ADDR_B]: {
+        holderKey: KEY_B.publicKey,
+        inbox: await ciphertext(BigInt(0), KEY_B.publicKey),
+        issuerEnc: await ciphertext(50n, KEY_A.publicKey),
+      },
+      [ADDR_ISSUER]: { sequence: 20 },
+    })
+    const batch = await prepareConfidentialBatch(client, {
+      account: ADDR_ISSUER,
+      inners: [
+        {
+          operation: 'send',
+          account: ADDR_A,
+          destination: ADDR_B,
+          amount: 30n,
+          senderKeypair: KEY_A,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+        {
+          operation: 'clawback',
+          account: ADDR_ISSUER,
+          holder: ADDR_B,
+          issuerKeypair: KEY_A,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+      ],
+    })
+    const [, clawback] = inners(batch)
+    assert.strictEqual(clawback.TransactionType, 'ConfidentialMPTClawback')
+    if (clawback.TransactionType !== 'ConfidentialMPTClawback') {
+      throw new Error('expected a ConfidentialMPTClawback inner')
+    }
+    // The send credits bob's issuer mirror 50 -> 80; the clawback must reveal that
+    // predicted post-send total. Without the mirror credit it would read the stale
+    // 50 and rippled would reject the proof (tecBAD_PROOF).
+    assert.strictEqual(clawback.MPTAmount, '80')
   })
 })

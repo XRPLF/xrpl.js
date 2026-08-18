@@ -378,6 +378,52 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
   )
 
   it(
+    'claws back the recipient after a same-batch send (destination issuer-mirror)',
+    async () => {
+      const { client } = context
+      const setup = await freshSetup(client)
+      const alice = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        100n,
+      )
+      // bob holds a balance too, so the clawback burns a nonzero amount.
+      const bob = await holderWithBalance(
+        client,
+        setup.issuer,
+        setup.mptID,
+        50n,
+      )
+
+      const batch = await prepareConfidentialBatch(client, {
+        // the issuer owns the outer Batch; alice authorizes her send inner
+        account: setup.issuer.classicAddress,
+        inners: [
+          send(alice, bob, 30n, setup.mptID),
+          {
+            operation: 'clawback',
+            account: setup.issuer.classicAddress,
+            holder: bob.wallet.classicAddress,
+            issuerKeypair: setup.issuerKey,
+            mptIssuanceID: setup.mptID,
+          },
+        ],
+      })
+      await submitConfidentialBatch(client, batch, setup.issuer, [alice.wallet])
+
+      // The send credits bob's issuer-encrypted balance (50 -> 80) on-ledger — the
+      // destination issuer-mirror the predictor must track. The clawback proof only
+      // validates if it bound that predicted post-send total, not the stale 50; it
+      // then burns bob's entire balance.
+      assert.strictEqual(await getSpendable(client, bob, setup.mptID), 0n)
+      // alice's send still applied.
+      assert.strictEqual(await getSpendable(client, alice, setup.mptID), 70n)
+    },
+    TIMEOUT,
+  )
+
+  it(
     'chains a send and a convert-back as two debits on one balance',
     async () => {
       const { client } = context

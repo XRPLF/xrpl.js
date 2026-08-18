@@ -14,7 +14,12 @@ import {
   prepareConfidentialConvertBack,
   prepareConfidentialMergeInbox,
 } from './convert'
-import { fetchMPToken, getAccountSequence } from './ledger'
+import {
+  fetchMPToken,
+  fetchMPTokenIssuance,
+  getAccountSequence,
+  requireIssuerKey,
+} from './ledger'
 import { loadMptCrypto, type MptCryptoModule } from './loader'
 import {
   prepareConfidentialClawback,
@@ -385,33 +390,100 @@ function applyClawback(state: TokenState): TokenState {
   }
 }
 
+/** A Send's outputs needed to credit the destination's balances. */
+interface InboxCredit {
+  tx: ConfidentialMPTSend
+  /** The issuance's issuer ElGamal key (the issuer mirror is encrypted under it). */
+  issuerKey: string
+  /** The issuance's auditor ElGamal key, or undefined if the token has no auditor. */
+  auditorKey?: string
+}
+
 /**
- * Predict a destination's inbox after a Send credits it. rippled re-blinds the
- * credit deterministically with the proof's challenge, so reproduce it:
- * `inbox += DestinationEncryptedAmount + enc(0, destKey, challenge)`.
+ * Predict a destination's balances after a Send credits it. rippled credits three
+ * of the recipient's balances — inbox, issuer-encrypted, and (with an auditor)
+ * auditor-encrypted — each re-randomized with the proof challenge (an added
+ * encryption of zero under the target key) and keyed on the recipient, issuer, and
+ * auditor respectively; reproduce all three. The recipient's version is left
+ * unchanged (rippled bumps only the sender's on an incoming send).
  *
  * @param crypto - The confidential crypto module.
  * @param dest - The destination's current predicted state.
- * @param tx - The built ConfidentialMPTSend.
- * @returns The destination's state after the inbox credit.
- * @throws {XrplError} If the destination key or inbox was reset/absent.
+ * @param credit - The Send's ciphertexts and the issuer/auditor keys to credit under.
+ * @returns The destination's state after the credits.
+ * @throws {XrplError} If the destination key or a credited balance was reset/absent.
  */
 async function applyInboxCredit(
   crypto: MptCryptoModule,
   dest: TokenState,
-  tx: ConfidentialMPTSend,
+  credit: InboxCredit,
 ): Promise<TokenState> {
-  const destKey = readBalance(dest.holderKey, 'destination holder key')
+  const { tx, issuerKey, auditorKey } = credit
   const challenge = tx.ZKProof.slice(0, CHALLENGE_HEX_LEN)
-  const reblinded = await crypto.addCiphertexts(
-    tx.DestinationEncryptedAmount,
-    await crypto.encryptAmount(BigInt(0), destKey, challenge),
-  )
+  // rippled re-randomizes each credited ciphertext with the send challenge — adding
+  // an encryption of zero under the target key — before the homomorphic add.
+  async function rerandomize(ciphertext: string, key: string): Promise<string> {
+    return crypto.addCiphertexts(
+      ciphertext,
+      await crypto.encryptAmount(BigInt(0), key, challenge),
+    )
+  }
+
+  const destKey = readBalance(dest.holderKey, 'destination holder key')
   const inbox = await crypto.addCiphertexts(
     readBalance(dest.inbox, 'destination inbox balance'),
-    reblinded,
+    await rerandomize(tx.DestinationEncryptedAmount, destKey),
   )
-  return { ...dest, inbox }
+  const issuerEnc = await crypto.addCiphertexts(
+    readBalance(dest.issuerEnc, 'destination issuer-encrypted balance'),
+    await rerandomize(tx.IssuerEncryptedAmount, issuerKey),
+  )
+  let { auditorEnc } = dest
+  if (tx.AuditorEncryptedAmount != null && auditorKey != null) {
+    auditorEnc = await crypto.addCiphertexts(
+      readBalance(auditorEnc, 'destination auditor-encrypted balance'),
+      await rerandomize(tx.AuditorEncryptedAmount, auditorKey),
+    )
+  }
+  return { ...dest, inbox, issuerEnc, auditorEnc }
+}
+
+/** The issuer and optional auditor ElGamal keys for one issuance. */
+interface MirrorKeys {
+  issuerKey: string
+  auditorKey?: string
+}
+
+/**
+ * Fetch the issuer (and auditor) ElGamal keys for each token that has a Send. A
+ * Send credits the destination's issuer/auditor mirror balances re-blinded under
+ * these keys; {@link applyInboxCredit} needs them to predict that credit.
+ *
+ * @param client - A connected Client.
+ * @param ops - The confidential operation specs in the batch.
+ * @returns A map from MPTokenIssuanceID to its issuer and optional auditor key.
+ */
+async function loadIssuerKeys(
+  client: Client,
+  ops: ConfidentialBatchOperation[],
+): Promise<Map<string, MirrorKeys>> {
+  const tokens = new Set<string>()
+  for (const op of ops) {
+    if (op.operation === 'send') {
+      tokens.add(op.mptIssuanceID)
+    }
+  }
+  const keys = new Map<string, MirrorKeys>()
+  await Promise.all(
+    Array.from(tokens, async (token) => {
+      const issuance = await fetchMPTokenIssuance(client, token)
+      keys.set(token, {
+        issuerKey: requireIssuerKey(issuance, token),
+        auditorKey: issuance.AuditorEncryptionKey,
+      })
+    }),
+  )
+  return keys
 }
 
 /** The confidential builders + shared context threaded through the assembler. */
@@ -421,6 +493,8 @@ interface AssembleContext {
   states: Map<string, TokenState>
   /** Sum of in-batch Convert amounts per token, added to each decrypt bound. */
   convertTotals: Map<string, bigint>
+  /** Issuer/auditor keys per token, for predicting a Send's mirror-balance credits. */
+  issuerKeys: Map<string, MirrorKeys>
 }
 
 /** A built inner plus the state updates it implies, keyed by state key. */
@@ -446,7 +520,7 @@ async function buildConfidentialInner(
   op: ConfidentialBatchOperation,
   sequence: number,
 ): Promise<BuiltInner> {
-  const { client, crypto, states, convertTotals } = ctx
+  const { client, crypto, states, convertTotals, issuerKeys } = ctx
   switch (op.operation) {
     case 'send': {
       const { operation: _operation, ...params } = op
@@ -454,6 +528,11 @@ async function buildConfidentialInner(
       const state = mustGet(states, key, `state for ${key}`)
       const destKey = stateKey(op.destination, op.mptIssuanceID)
       const dest = mustGet(states, destKey, `state for ${destKey}`)
+      const { issuerKey, auditorKey } = mustGet(
+        issuerKeys,
+        op.mptIssuanceID,
+        `issuer keys for ${op.mptIssuanceID}`,
+      )
       const tx = await prepareConfidentialSend(client, {
         ...params,
         sequence,
@@ -475,7 +554,10 @@ async function buildConfidentialInner(
         tx: shapeInner(tx),
         updates: [
           [key, await applyDebit(crypto, state, debit)],
-          [destKey, await applyInboxCredit(crypto, dest, tx)],
+          [
+            destKey,
+            await applyInboxCredit(crypto, dest, { tx, issuerKey, auditorKey }),
+          ],
         ],
       }
     }
@@ -602,16 +684,18 @@ export async function prepareConfidentialBatch(
     )
   }
   const ops = inners.filter(isConfidentialOperation)
-  const [crypto, states, sequencing] = await Promise.all([
+  const [crypto, states, sequencing, issuerKeys] = await Promise.all([
     loadMptCrypto(),
     loadStates(client, ops),
     loadSequences(client, account, inners),
+    loadIssuerKeys(client, ops),
   ])
   const ctx: AssembleContext = {
     client,
     crypto,
     states,
     convertTotals: sumConvertsByToken(ops),
+    issuerKeys,
   }
 
   const rawTransactions: Array<{ RawTransaction: SubmittableTransaction }> = []
