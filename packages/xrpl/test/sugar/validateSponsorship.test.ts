@@ -51,6 +51,23 @@ describe('validateSponsorship', function () {
     assert.include(result.error ?? '', 'Sponsor and SponsorFlags')
   })
 
+  it('rejects when no fee is available to validate against', async function () {
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorFee,
+    }
+
+    // Neither estimatedFee nor tx.Fee is provided.
+    const result = await validateSponsorship(client, tx)
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'No fee available')
+  })
+
   it('propagates a rippled error whose message happens to mention entryNotFound but whose structured code does not match', async function () {
     // Regression test: entryNotFound detection must key off the structured
     // rippled error code (error.data.error), not a substring match on the

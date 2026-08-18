@@ -65,7 +65,14 @@ class SignedAmount extends Amount {
       }
     }
 
-    const number = BigInt(value)
+    let number: bigint
+    try {
+      number = BigInt(value)
+    } catch (_err) {
+      // BigNumber accepts scientific notation (e.g. '1e5') that BigInt rejects,
+      // so this can still throw even after the checks above.
+      throw new Error(`${value} is an illegal amount`)
+    }
     const isNegative = number < BigInt(0)
     const magnitude = isNegative ? -number : number
 

@@ -70,6 +70,13 @@ export async function validateSponsorship(
     }
   }
 
+  if (!estimatedFee && !tx.Fee) {
+    return {
+      valid: false,
+      error: 'No fee available to validate -- pass estimatedFee or set tx.Fee',
+    }
+  }
+
   const fee = estimatedFee ?? tx.Fee ?? '0'
   const isCoSigned = tx.SponsorSignature != null
 

@@ -352,17 +352,19 @@ describe('Sponsorship (XLS-68)', function () {
 
         const prepared = await testContext.client.autofill(payment)
 
-        // If autofill fee exceeds MaxFee, validation should fail
-        if (Number(prepared.Fee) > 20) {
-          const validation = await validateSponsorship(
-            testContext.client,
-            prepared,
-            prepared.Fee,
-          )
+        // Force a fee that deterministically exceeds the sponsorship's MaxFee
+        // (20), rather than relying on whatever autofill happens to compute --
+        // otherwise this assertion silently never runs.
+        prepared.Fee = String(Number(setupTx.MaxFee) + 1)
 
-          assert.isFalse(validation.valid)
-          assert.include(validation.error ?? '', 'MaxFee')
-        }
+        const validation = await validateSponsorship(
+          testContext.client,
+          prepared,
+          prepared.Fee,
+        )
+
+        assert.isFalse(validation.valid)
+        assert.include(validation.error ?? '', 'MaxFee')
       },
       TIMEOUT,
     )

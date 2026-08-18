@@ -85,6 +85,22 @@ describe('SponsorshipSet', function () {
     )
   })
 
+  it('throws when FeeAmountDelta has a leading zero', function () {
+    sponsorshipSetTx.FeeAmountDelta = '007'
+    assertInvalid(
+      sponsorshipSetTx,
+      'SponsorshipSet: FeeAmountDelta must be a numeric string',
+    )
+  })
+
+  it('throws when FeeAmountDelta is negative with a leading zero', function () {
+    sponsorshipSetTx.FeeAmountDelta = '-007'
+    assertInvalid(
+      sponsorshipSetTx,
+      'SponsorshipSet: FeeAmountDelta must be a numeric string',
+    )
+  })
+
   it('verifies valid SponsorshipSet with tfDeleteObject flag', function () {
     delete sponsorshipSetTx.RemainingOwnerCountDelta
     sponsorshipSetTx.Flags = SponsorshipSetFlags.tfDeleteObject

@@ -16,7 +16,7 @@ import {
  * scientific notation, decimals, or leading zeros other than "0" itself).
  * Used for FeeAmountDelta, which is a signed delta rather than an absolute amount.
  */
-const SIGNED_INTEGER_SANITY_CHECK = /^-?[0-9]+$/u
+const SIGNED_INTEGER_SANITY_CHECK = /^-?(?:0|[1-9][0-9]*)$/u
 
 /**
  * Flags for the SponsorshipSet transaction.
