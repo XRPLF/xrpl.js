@@ -259,7 +259,13 @@ async function getSponsorshipEntry(
 
     return null
   } catch (error) {
-    if (error instanceof XrplError && error.message.includes('entryNotFound')) {
+    if (
+      error instanceof XrplError &&
+      typeof error.data === 'object' &&
+      error.data !== null &&
+      'error' in error.data &&
+      error.data.error === 'entryNotFound'
+    ) {
       return null
     }
     throw error

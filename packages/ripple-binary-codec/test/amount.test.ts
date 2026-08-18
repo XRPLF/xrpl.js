@@ -168,4 +168,8 @@ describe('SignedAmount', function () {
   it('does not affect the base Amount type, which still rejects negative XRP', function () {
     expect(() => Amount.from('-1000000')).toThrow()
   })
+
+  it('rejects a malformed string that BigNumber parses as NaN instead of throwing', function () {
+    expect(() => SignedAmount.from('abc')).toThrow('abc is an illegal amount')
+  })
 })

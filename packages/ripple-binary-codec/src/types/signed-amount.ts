@@ -55,6 +55,9 @@ class SignedAmount extends Amount {
     } catch (_err) {
       throw new Error(`${value} is an illegal amount`)
     }
+    if (decimal.isNaN()) {
+      throw new Error(`${value} is an illegal amount`)
+    }
     if (!decimal.isZero()) {
       const magnitude = decimal.abs()
       if (magnitude.lt(MIN_XRP) || magnitude.gt(MAX_DROPS)) {

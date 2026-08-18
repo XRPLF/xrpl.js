@@ -51,6 +51,39 @@ describe('validateSponsorship', function () {
     assert.include(result.error ?? '', 'Sponsor and SponsorFlags')
   })
 
+  it('propagates a rippled error whose message happens to mention entryNotFound but whose structured code does not match', async function () {
+    // Regression test: entryNotFound detection must key off the structured
+    // rippled error code (error.data.error), not a substring match on the
+    // message, which could false-positive on unrelated errors.
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        throw new XrplError(
+          'some other failure mentioning entryNotFound in passing',
+          {
+            error: 'someOtherError',
+          },
+        )
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorFee,
+    }
+
+    const result = await validateSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'some other failure')
+  })
+
   it('validates co-signed sponsorship when no Sponsorship object exists', async function () {
     // A co-signed transaction is fully authorized by the sponsor signature
     // alone when there is no persistent Sponsorship object -- rippled's
@@ -59,7 +92,7 @@ describe('validateSponsorship', function () {
     const originalRequest = client.request.bind(client)
     const mockFn: MockRequestFnInterface = async (req) => {
       if (req.command === 'ledger_entry') {
-        throw new XrplError('entryNotFound')
+        throw new XrplError('entryNotFound', { error: 'entryNotFound' })
       }
       return originalRequest(req as LedgerEntryRequest)
     }
