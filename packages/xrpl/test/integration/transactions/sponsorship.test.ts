@@ -14,7 +14,7 @@ import {
   signAsSponsor,
   combineSponsorSigners,
   addPreFundedSponsor,
-  validatePreFundedSponsorship,
+  validateSponsorship,
 } from '../../../src'
 import type Sponsorship from '../../../src/models/ledger/Sponsorship'
 import type { AccountInfoResponse } from '../../../src/models/methods'
@@ -214,7 +214,7 @@ describe('Sponsorship (XLS-68)', function () {
 
         // Validate sponsorship before submitting
         const prepared = await testContext.client.autofill(payment)
-        const validation = await validatePreFundedSponsorship(
+        const validation = await validateSponsorship(
           testContext.client,
           prepared,
           prepared.Fee,
@@ -283,7 +283,7 @@ describe('Sponsorship (XLS-68)', function () {
         const prepared = await testContext.client.autofill(payment)
 
         // Validation should fail - requesting higher fee than available
-        const validation = await validatePreFundedSponsorship(
+        const validation = await validateSponsorship(
           testContext.client,
           prepared,
           '100',
@@ -328,7 +328,7 @@ describe('Sponsorship (XLS-68)', function () {
 
         // If autofill fee exceeds MaxFee, validation should fail
         if (Number(prepared.Fee) > 20) {
-          const validation = await validatePreFundedSponsorship(
+          const validation = await validateSponsorship(
             testContext.client,
             prepared,
             prepared.Fee,

@@ -5,7 +5,7 @@ export * from './models'
 export * from './utils'
 
 export {
-  validatePreFundedSponsorship,
+  validateSponsorship,
   SponsorshipValidationResult,
 } from './sugar/validateSponsorship'
 

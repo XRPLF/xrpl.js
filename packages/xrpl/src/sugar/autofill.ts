@@ -12,7 +12,7 @@ import {
   LedgerEntryRequest,
 } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
-import { Account } from '../models/transactions/common'
+import { Account, areAddressesEqual } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -497,28 +497,62 @@ export async function setLatestValidatedLedgerSequence(
  * @param tx - The transaction object.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary to check for all AccountDelete blockers
 export async function checkAccountDeleteBlockers(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: AccountObjectsRequest = {
+  const objectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
     ledger_index: 'validated',
     deletion_blockers_only: true,
   }
-  const response = await client.request(request)
-  return new Promise((resolve, reject) => {
-    if (response.result.account_objects.length > 0) {
-      reject(
-        new XrplError(
-          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, Checks, or Sponsorships associated with the account.`,
-          response.result.account_objects,
-        ),
-      )
-    }
-    resolve()
-  })
+  const infoRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account: tx.Account,
+    ledger_index: 'validated',
+  }
+  const [objectsResponse, infoResponse] = await Promise.all([
+    client.request(objectsRequest),
+    client.request(infoRequest),
+  ])
+
+  if (objectsResponse.result.account_objects.length > 0) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, Checks, or Sponsorships associated with the account.`,
+      objectsResponse.result.account_objects,
+    )
+  }
+
+  const accountRoot = infoResponse.result.account_data
+
+  // rippled's AccountDelete::preclaim blocks deletion outright if the account
+  // is sponsoring any reserve or fee obligations of its own, since those
+  // can't be resolved by the deletion.
+  if (
+    accountRoot.SponsoringOwnerCount != null ||
+    accountRoot.SponsoringAccountCount != null
+  ) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; it has outstanding sponsorship obligations (SponsoringOwnerCount/SponsoringAccountCount).`,
+    )
+  }
+
+  // rippled's AccountDelete::preclaim also requires that, if this account is
+  // itself a sponsored account, the AccountDelete's Destination match its
+  // Sponsor -- the sponsor must be the one to receive the deleted account's
+  // remaining balance.
+  if (
+    accountRoot.Sponsor != null &&
+    'Destination' in tx &&
+    typeof tx.Destination === 'string' &&
+    !areAddressesEqual(accountRoot.Sponsor, tx.Destination)
+  ) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; its Sponsor (${accountRoot.Sponsor}) does not match the AccountDelete Destination (${tx.Destination}).`,
+    )
+  }
 }
 
 /**

@@ -349,6 +349,106 @@ describe('client.autofill', function () {
     await assertRejects(testContext.client.autofill(tx), XrplError)
   })
 
+  it('should throw error if account being deleted has outstanding sponsorship obligations', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          SponsoringOwnerCount: 1,
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    await assertRejects(testContext.client.autofill(tx), XrplError)
+  })
+
+  it('should throw error if account being deleted has a Sponsor that does not match the AccountDelete Destination', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          Sponsor: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    await assertRejects(testContext.client.autofill(tx), XrplError)
+  })
+
+  it('should autofill an AccountDelete when the account Sponsor matches the Destination', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          Sponsor: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    const txResult = await testContext.client.autofill(tx)
+    assert.strictEqual(txResult.TransactionType, 'AccountDelete')
+  })
+
   describe('when autofill Fee is missing', function () {
     it('should autofill Fee of a Transaction', async function () {
       const tx: Transaction = {

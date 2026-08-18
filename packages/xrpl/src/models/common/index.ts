@@ -68,6 +68,17 @@ export type SponsorSignature =
       /** Array of sponsor signatures (for multi-signing) */
       Signers: Signer[]
     }
+  | {
+      /**
+       * Placeholder shape for a sponsored inner-Batch transaction's
+       * SponsorSignature. rippled's Batch::preflight only requires that
+       * sfSigningPubKey be empty; the sponsor's real authorization is
+       * supplied via a BatchSigners entry on the outer Batch transaction.
+       */
+      SigningPubKey: ''
+      TxnSignature?: never
+      Signers?: never
+    }
 
 export interface Memo {
   Memo: {

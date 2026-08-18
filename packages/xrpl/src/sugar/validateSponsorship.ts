@@ -23,17 +23,26 @@ export interface SponsorshipValidationResult {
 }
 
 /**
- * Validates that a pre-funded Sponsorship ledger entry exists and has sufficient
- * balance to cover the sponsored transaction.
+ * Validates a transaction's sponsorship (`Sponsor` + `SponsorFlags`) against any
+ * Sponsorship ledger entry between the sponsor and sponsee.
  *
- * This helper should be called before submitting a transaction that uses pre-funded
- * sponsorship (i.e., has Sponsor and SponsorFlags but no SponsorSignature).
+ * This should be called before submitting any sponsored transaction, whether
+ * pre-funded (no `SponsorSignature`) or co-signed by the sponsor. Whenever a
+ * Sponsorship ledger entry exists for the sponsor/sponsee pair, rippled's
+ * `checkReserve`/`getFeePayer` always validate against its budget -- `FeeAmount`,
+ * `MaxFee`, `RemainingOwnerCount` -- regardless of whether the transaction is
+ * also co-signed (XLS-68 section 8.3.2/8.3.3; rippled's `Transactor::checkSponsor`
+ * only skips the *existence* check for a co-signed transaction, not the budget
+ * checks in `checkReserve`/`getFeePayer`). If no Sponsorship entry exists, a
+ * sponsor signature alone is sufficient authorization (matching rippled), and
+ * this only validates that one is present.
  *
  * For reserve sponsorship, this only checks that `RemainingOwnerCount` is at
  * least 1 (i.e. the transaction consumes exactly one reserve unit, matching
  * rippled's `checkReserve`). It does not account for transactions that may
  * consume more than one reserve unit, nor does it check the sponsor account's
- * own XRP balance against its own reserve requirement.
+ * own XRP balance against its own reserve requirement (rippled checks that too,
+ * but only server-side).
  *
  * @param client - The XRPL client to use for querying the ledger.
  * @param tx - The transaction to validate sponsorship for.
@@ -42,19 +51,18 @@ export interface SponsorshipValidationResult {
  *
  * @example
  * ```typescript
- * const result = await validatePreFundedSponsorship(client, payment, '100')
+ * const result = await validateSponsorship(client, payment, '100')
  * if (!result.valid) {
  *   console.error(`Sponsorship validation failed: ${result.error}`)
  * }
  * ```
  */
 // eslint-disable-next-line max-lines-per-function, complexity, max-statements -- necessary for validation
-export async function validatePreFundedSponsorship(
+export async function validateSponsorship(
   client: Client,
   tx: Transaction,
   estimatedFee?: string,
 ): Promise<SponsorshipValidationResult> {
-  // Only validate if transaction has Sponsor and SponsorFlags but no SponsorSignature
   if (!tx.Sponsor || !tx.SponsorFlags) {
     return {
       valid: false,
@@ -62,15 +70,8 @@ export async function validatePreFundedSponsorship(
     }
   }
 
-  if (tx.SponsorSignature) {
-    return {
-      valid: false,
-      error:
-        'Transaction has SponsorSignature - this validation is only for pre-funded sponsorships',
-    }
-  }
-
   const fee = estimatedFee ?? tx.Fee ?? '0'
+  const isCoSigned = tx.SponsorSignature != null
 
   // For delegated transactions, rippled's Transactor::checkSponsor looks up the
   // Sponsorship object between the sponsor and the delegate (STTx::getInitiator()
@@ -82,9 +83,19 @@ export async function validatePreFundedSponsorship(
     const sponsorship = await getSponsorshipEntry(client, tx.Sponsor, sponsee)
 
     if (!sponsorship) {
+      // rippled's Transactor::checkSponsor only requires a Sponsorship object
+      // to exist for pre-funded (non-co-signed) sponsorship -- a sponsor
+      // signature alone is sufficient authorization otherwise.
+      if (!isCoSigned) {
+        return {
+          valid: false,
+          error: `No Sponsorship ledger entry found for sponsor ${tx.Sponsor} and sponsee ${sponsee}`,
+        }
+      }
+
       return {
-        valid: false,
-        error: `No Sponsorship ledger entry found for sponsor ${tx.Sponsor} and sponsee ${sponsee}`,
+        valid: true,
+        estimatedFee: fee,
       }
     }
 
@@ -96,40 +107,48 @@ export async function validatePreFundedSponsorship(
 
     // rippled's Transactor::checkSponsor rejects pre-funded (non-co-signed) sponsorship
     // when the Sponsorship object requires the sponsee to sign for that category.
-    /* eslint-disable no-bitwise -- bitwise operations required for flag checking */
-    const requiresSignForFee =
-      (sponsorship.Flags & SponsorshipFlags.lsfSponsorshipRequireSignForFee) !==
-      0
-    const requiresSignForReserve =
-      (sponsorship.Flags &
-        SponsorshipFlags.lsfSponsorshipRequireSignForReserve) !==
-      0
-    /* eslint-enable no-bitwise */
+    // A sponsor signature, when present, always satisfies this requirement.
+    if (!isCoSigned) {
+      /* eslint-disable no-bitwise -- bitwise operations required for flag checking */
+      const requiresSignForFee =
+        (sponsorship.Flags &
+          SponsorshipFlags.lsfSponsorshipRequireSignForFee) !==
+        0
+      const requiresSignForReserve =
+        (sponsorship.Flags &
+          SponsorshipFlags.lsfSponsorshipRequireSignForReserve) !==
+        0
+      /* eslint-enable no-bitwise */
 
-    if (isSponsoringFee && requiresSignForFee) {
-      return {
-        valid: false,
-        error:
-          'Sponsorship requires the sponsee to sign for fee sponsorship (lsfSponsorshipRequireSignForFee is set)',
-        sponsorship,
-        estimatedFee: fee,
+      if (isSponsoringFee && requiresSignForFee) {
+        return {
+          valid: false,
+          error:
+            'Sponsorship requires the sponsee to sign for fee sponsorship (lsfSponsorshipRequireSignForFee is set)',
+          sponsorship,
+          estimatedFee: fee,
+        }
+      }
+
+      if (isSponsoringReserve && requiresSignForReserve) {
+        return {
+          valid: false,
+          error:
+            'Sponsorship requires the sponsee to sign for reserve sponsorship (lsfSponsorshipRequireSignForReserve is set)',
+          sponsorship,
+          estimatedFee: fee,
+        }
       }
     }
 
-    if (isSponsoringReserve && requiresSignForReserve) {
-      return {
-        valid: false,
-        error:
-          'Sponsorship requires the sponsee to sign for reserve sponsorship (lsfSponsorshipRequireSignForReserve is set)',
-        sponsorship,
-        estimatedFee: fee,
-      }
-    }
-
-    if (!isSponsoringFee) {
-      // Only reserve sponsorship - validate the sponsor has budget for the
-      // reserve unit this transaction will consume (rippled's checkReserve
-      // requires RemainingOwnerCount >= the tx's ownerCountDelta).
+    // Whenever a Sponsorship object exists, rippled's checkReserve/getFeePayer
+    // always validate against its budget, even when the transaction is also
+    // co-signed by the sponsor (XLS-68 section 8.3.2/8.3.3).
+    if (isSponsoringReserve) {
+      // Validate the sponsor has budget for the reserve unit this
+      // transaction will consume (rippled's checkReserve requires
+      // RemainingOwnerCount >= the tx's ownerCountDelta), regardless of
+      // whether fee sponsorship is also requested.
       if (
         sponsorship.RemainingOwnerCount == null ||
         sponsorship.RemainingOwnerCount < 1
@@ -141,7 +160,9 @@ export async function validatePreFundedSponsorship(
           estimatedFee: fee,
         }
       }
+    }
 
+    if (!isSponsoringFee) {
       return {
         valid: true,
         sponsorship,

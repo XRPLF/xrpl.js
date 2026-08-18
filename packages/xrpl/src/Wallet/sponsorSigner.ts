@@ -180,7 +180,10 @@ export function combineSponsorSigners(
       throw new ValidationError('SponsorSignature must have Signers.')
     }
 
-    if (tx.TxnSignature == null || tx.SigningPubKey == null) {
+    if (
+      (tx.TxnSignature == null || tx.SigningPubKey == null) &&
+      (tx.Signers == null || tx.Signers.length === 0)
+    ) {
       throw new ValidationError(
         'Transaction must be first signed by the account.',
       )

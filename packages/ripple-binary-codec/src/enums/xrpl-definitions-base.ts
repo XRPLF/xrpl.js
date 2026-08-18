@@ -18,6 +18,18 @@ interface DefinitionsData {
 }
 
 /**
+ * Fields rippled's server_definitions reports as "Amount" but which may carry
+ * a negative native XRP magnitude (a signed delta rather than a balance).
+ * These share Amount's wire type code, so only the serialize/deserialize
+ * class needs to change -- the field's wire type ordinal from
+ * definitions.json is left untouched. definitions.json is generated
+ * directly from rippled's server_definitions response and can't be
+ * hand-edited to introduce a "SignedAmount" wire type, so this override is
+ * applied here in code instead, after types are associated.
+ */
+const SIGNED_AMOUNT_FIELD_OVERRIDES = ['FeeAmountDelta']
+
+/**
  * Stores the various types and fields for rippled to be used to encode/decode information later on.
  * XrplDefinitions should be instantiated instead of this class.
  */
@@ -132,6 +144,12 @@ class XrplDefinitionsBase {
     if (this.field['PermissionValue']) {
       this.field['PermissionValue'].associatedType = this.delegatablePermissions
     }
+
+    SIGNED_AMOUNT_FIELD_OVERRIDES.forEach((name) => {
+      if (this.field[name] && this.dataTypes['SignedAmount']) {
+        this.field[name].associatedType = this.dataTypes['SignedAmount']
+      }
+    })
   }
 
   public getAssociatedTypes(): Record<string, typeof SerializedType> {

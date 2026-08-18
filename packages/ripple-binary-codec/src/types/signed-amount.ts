@@ -26,14 +26,25 @@ class SignedAmount extends Amount {
   static from<T extends Amount | AmountObject | string>(
     value: T,
   ): SignedAmount {
-    if (value instanceof SignedAmount) {
-      return value
+    if (value instanceof Amount) {
+      // Covers both a SignedAmount instance and a plain Amount instance --
+      // the latter shows up when re-serializing a value that was just read
+      // via Amount.fromParser (inherited unchanged by SignedAmount, since
+      // decoding a signed native amount is no different from decoding a
+      // regular one). The wire bytes are already correct in both cases.
+      return value instanceof SignedAmount
+        ? value
+        : new SignedAmount(value.toBytes())
     }
 
     if (typeof value !== 'string') {
       throw new Error('SignedAmount only supports native XRP string values')
     }
 
+    return SignedAmount.fromString(value)
+  }
+
+  private static fromString(value: string): SignedAmount {
     if (value.indexOf('.') !== -1) {
       throw new Error(`${value} is an illegal amount`)
     }

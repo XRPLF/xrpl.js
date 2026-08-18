@@ -1,12 +1,13 @@
 import { assert } from 'chai'
 
 import { Client } from '../../src/client'
+import { XrplError } from '../../src/errors'
 import type Sponsorship from '../../src/models/ledger/Sponsorship'
 import { SponsorshipFlags } from '../../src/models/ledger/Sponsorship'
 import type { LedgerEntryRequest } from '../../src/models/methods'
 import { SponsorFlags } from '../../src/models/transactions/common'
 import type { Payment } from '../../src/models/transactions/payment'
-import { validatePreFundedSponsorship } from '../../src/sugar/validateSponsorship'
+import { validateSponsorship } from '../../src/sugar/validateSponsorship'
 import serverUrl from '../integration/serverUrl'
 
 interface MockRequest {
@@ -23,7 +24,7 @@ interface MockRequestFnInterface {
   (req: MockRequest): Promise<MockResponse>
 }
 
-describe('validatePreFundedSponsorship', function () {
+describe('validateSponsorship', function () {
   let client: Client
 
   beforeEach(async function () {
@@ -44,13 +45,26 @@ describe('validatePreFundedSponsorship', function () {
       Amount: '1000000',
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'Sponsor and SponsorFlags')
   })
 
-  it('rejects transaction with SponsorSignature', async function () {
+  it('validates co-signed sponsorship when no Sponsorship object exists', async function () {
+    // A co-signed transaction is fully authorized by the sponsor signature
+    // alone when there is no persistent Sponsorship object -- rippled's
+    // Transactor::checkSponsor only requires the object to exist for
+    // pre-funded (non-co-signed) sponsorship.
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        throw new XrplError('entryNotFound')
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
     const tx: Payment = {
       TransactionType: 'Payment',
       Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
@@ -65,10 +79,103 @@ describe('validatePreFundedSponsorship', function () {
       },
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
+
+    assert.isTrue(result.valid)
+    assert.isUndefined(result.sponsorship)
+  })
+
+  it('still validates against the Sponsorship object budget when co-signed', async function () {
+    // Per XLS-68 8.3.2/8.3.3 and rippled's checkReserve/getFeePayer, an
+    // existing Sponsorship object's budget always governs, even when the
+    // transaction also carries a SponsorSignature.
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: 0,
+          // Only 50 drops available
+          FeeAmount: '50',
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorFee,
+      SponsorSignature: {
+        SigningPubKey:
+          '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
+        TxnSignature: '3045...',
+      },
+    }
+
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
-    assert.include(result.error ?? '', 'pre-funded')
+    assert.include(result.error ?? '', 'insufficient')
+  })
+
+  it('ignores lsfSponsorshipRequireSignFor* flags when co-signed', async function () {
+    // These flags gate pre-funded (non-co-signed) use only; a sponsor
+    // signature already satisfies the "must sign" requirement they express.
+    const mockResponse = {
+      status: 'success',
+      type: 'response',
+      result: {
+        node: {
+          LedgerEntryType: 'Sponsorship',
+          Owner: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          Sponsee: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+          Flags: SponsorshipFlags.lsfSponsorshipRequireSignForFee,
+          FeeAmount: '1000000',
+        } as Sponsorship,
+      },
+    }
+
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return mockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorFee,
+      SponsorSignature: {
+        SigningPubKey:
+          '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
+        TxnSignature: '3045...',
+      },
+    }
+
+    const result = await validateSponsorship(client, tx, '100')
+
+    assert.isTrue(result.valid)
   })
 
   it('validates reserve-only sponsorship without fee checks', async function () {
@@ -105,7 +212,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isTrue(result.valid)
     assert.isDefined(result.sponsorship)
@@ -143,7 +250,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'RemainingOwnerCount')
@@ -182,7 +289,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'RemainingOwnerCount')
@@ -222,7 +329,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'insufficient')
@@ -262,7 +369,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'MaxFee')
@@ -301,7 +408,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorFee,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'lsfSponsorshipRequireSignForFee')
@@ -339,7 +446,7 @@ describe('validatePreFundedSponsorship', function () {
       SponsorFlags: SponsorFlags.spfSponsorReserve,
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isFalse(result.valid)
     assert.include(result.error ?? '', 'lsfSponsorshipRequireSignForReserve')
@@ -388,7 +495,7 @@ describe('validatePreFundedSponsorship', function () {
       Delegate: 'rDelegateAccount11111111111111111111111',
     }
 
-    const result = await validatePreFundedSponsorship(client, tx, '100')
+    const result = await validateSponsorship(client, tx, '100')
 
     assert.isTrue(result.valid)
     assert.strictEqual(
