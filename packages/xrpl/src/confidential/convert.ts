@@ -12,6 +12,7 @@ import {
   fetchMPToken,
   fetchMPTokenIssuance,
   requireIssuerKey,
+  resolveLedgerIndex,
   resolveSequence,
   resolveSpendingState,
 } from './ledger'
@@ -42,33 +43,31 @@ export async function prepareConfidentialConvert(
 ): Promise<ConfidentialMPTConvert> {
   // Convert may register the holder key with a zero amount, so zero is allowed.
   assertConfidentialAmount(params.amount, true)
-  const [crypto, issuance, mptoken, sequence] = await Promise.all([
+  const [crypto, ledgerIndex] = await Promise.all([
     loadMptCrypto(),
-    fetchMPTokenIssuance(client, params.mptIssuanceID),
-    fetchMPToken(client, params.account, params.mptIssuanceID),
+    resolveLedgerIndex(client, params.ledgerIndex),
+  ])
+  const [issuance, mptoken, sequence] = await Promise.all([
+    fetchMPTokenIssuance(client, params.mptIssuanceID, ledgerIndex),
+    fetchMPToken(client, params.account, params.mptIssuanceID, ledgerIndex),
     resolveSequence(client, params.account, params.sequence),
   ])
   const issuerKey = requireIssuerKey(issuance, params.mptIssuanceID)
   const { amount, holderKeypair } = params
 
-  const [blindingFactor, contextHash] = await Promise.all([
-    crypto.generateBlindingFactor(),
-    crypto.getConvertContextHash(
-      accountIdHex(params.account),
-      params.mptIssuanceID,
-      sequence,
-    ),
+  // Register the holder key exactly when the ledger doesn't already carry one:
+  // rippled requires `HolderEncryptionKey` on the holder's first Convert (else
+  // `tecNO_PERMISSION`) and rejects it as `tecDUPLICATE` on every later one, so the
+  // correct value is a function of ledger state, not caller intent; derive it by
+  // default and let an explicit `registerKey` override.
+  const shouldRegister =
+    params.registerKey ?? mptoken.HolderEncryptionKey == null
+
+  const blindingFactor = await crypto.generateBlindingFactor()
+  const [holderEncryptedAmount, issuerEncryptedAmount] = await Promise.all([
+    crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
+    crypto.encryptAmount(amount, issuerKey, blindingFactor),
   ])
-  const [holderEncryptedAmount, issuerEncryptedAmount, zkProof] =
-    await Promise.all([
-      crypto.encryptAmount(amount, holderKeypair.publicKey, blindingFactor),
-      crypto.encryptAmount(amount, issuerKey, blindingFactor),
-      crypto.getConvertProof(
-        holderKeypair.publicKey,
-        holderKeypair.privateKey,
-        contextHash,
-      ),
-    ])
 
   const tx: ConfidentialMPTConvert = {
     TransactionType: 'ConfidentialMPTConvert',
@@ -87,17 +86,22 @@ export async function prepareConfidentialConvert(
       blindingFactor,
     )
   }
-  // Register the holder key (with its Schnorr ownership proof) exactly when the
-  // ledger doesn't already carry one: rippled requires `HolderEncryptionKey` on
-  // the holder's first Convert (else `tecNO_PERMISSION`) and rejects it as
-  // `tecDUPLICATE` on every later one. That makes the correct value a function of
-  // ledger state, not caller intent, so it is derived here by default; an explicit
-  // `registerKey` still overrides. `HolderEncryptionKey` and `ZKProof` are always
-  // set or omitted together (rippled rejects one without the other, temMALFORMED).
-  const alreadyRegistered = mptoken.HolderEncryptionKey != null
-  if (params.registerKey ?? !alreadyRegistered) {
+  // The Schnorr key-ownership proof is only meaningful when registering, and it is a
+  // WASM call — so compute it (and its context hash) solely on that path, not on the
+  // common top-up Convert. `HolderEncryptionKey` and `ZKProof` are always set or
+  // omitted together (rippled rejects one without the other, temMALFORMED).
+  if (shouldRegister) {
+    const contextHash = await crypto.getConvertContextHash(
+      accountIdHex(params.account),
+      params.mptIssuanceID,
+      sequence,
+    )
     tx.HolderEncryptionKey = holderKeypair.publicKey
-    tx.ZKProof = zkProof
+    tx.ZKProof = await crypto.getConvertProof(
+      holderKeypair.publicKey,
+      holderKeypair.privateKey,
+      contextHash,
+    )
   }
   return tx
 }
@@ -119,10 +123,13 @@ export async function prepareConfidentialConvertBack(
 ): Promise<ConfidentialMPTConvertBack> {
   // rippled rejects a zero-amount ConvertBack with temBAD_AMOUNT.
   assertConfidentialAmount(params.amount, false)
-  const [crypto, issuance, mptoken, sequence] = await Promise.all([
+  const [crypto, ledgerIndex] = await Promise.all([
     loadMptCrypto(),
-    fetchMPTokenIssuance(client, params.mptIssuanceID),
-    fetchMPToken(client, params.account, params.mptIssuanceID),
+    resolveLedgerIndex(client, params.ledgerIndex),
+  ])
+  const [issuance, mptoken, sequence] = await Promise.all([
+    fetchMPTokenIssuance(client, params.mptIssuanceID, ledgerIndex),
+    fetchMPToken(client, params.account, params.mptIssuanceID, ledgerIndex),
     resolveSequence(client, params.account, params.sequence),
   ])
   const issuerKey = requireIssuerKey(issuance, params.mptIssuanceID)

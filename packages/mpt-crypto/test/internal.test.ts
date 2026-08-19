@@ -1,7 +1,9 @@
 import {
+  assertUint32,
   assertUint64,
   rawParticipant,
   rawPedersenParams,
+  U32_MAX,
   U64_MAX,
 } from '../src/internal'
 
@@ -33,6 +35,27 @@ describe('assertUint64', () => {
     const max = U64_MAX - 1n
     expect(() => assertUint64(max, 'rangeHigh', max)).not.toThrow()
     expect(() => assertUint64(max + 1n, 'rangeHigh', max)).toThrow(/rangeHigh/u)
+  })
+})
+
+describe('assertUint32', () => {
+  it('accepts the full unsigned 32-bit range endpoints', () => {
+    expect(() => assertUint32(0, 'sequence')).not.toThrow()
+    expect(() => assertUint32(U32_MAX, 'sequence')).not.toThrow()
+  })
+
+  it('rejects a negative value with a labeled error', () => {
+    expect(() => assertUint32(-1, 'sequence')).toThrow(
+      /sequence must be an integer/u,
+    )
+  })
+
+  it('rejects a value above 2^32 - 1 (would wrap when marshalled)', () => {
+    expect(() => assertUint32(U32_MAX + 1, 'sequence')).toThrow(/sequence/u)
+  })
+
+  it('rejects a fractional value', () => {
+    expect(() => assertUint32(1.5, 'version')).toThrow(/version/u)
   })
 })
 

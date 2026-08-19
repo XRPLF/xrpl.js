@@ -29,6 +29,7 @@ interface LedgerFixtures {
   issuance?: Record<string, unknown>
   mptoken?: Record<string, Record<string, unknown>>
   sequence?: number
+  ledgerIndex?: number
 }
 
 interface StubRequest {
@@ -40,10 +41,12 @@ interface StubRequest {
 /**
  * A Client stub that dispatches `request` to canned ledger fixtures:
  * `account_info` → `sequence`; `ledger_entry {mpt_issuance}` → the issuance
- * node; `ledger_entry {mptoken}` → the per-account MPToken node.
+ * node; `ledger_entry {mptoken}` → the per-account MPToken node. `getLedgerIndex`
+ * returns `ledgerIndex` (the builders resolve one to pin their state reads).
  *
- * @param fixtures - Issuance/MPToken nodes and the account sequence to serve.
- * @returns A Client whose `request` returns the fixtures.
+ * @param fixtures - Issuance/MPToken nodes, the account sequence, and the ledger
+ *   index to serve.
+ * @returns A Client whose `request`/`getLedgerIndex` return the fixtures.
  */
 export function mockClient(fixtures: LedgerFixtures): Client {
   const request = async (req: StubRequest): Promise<unknown> => {
@@ -67,7 +70,9 @@ export function mockClient(fixtures: LedgerFixtures): Client {
     }
     throw new Error(`unexpected request: ${JSON.stringify(req)}`)
   }
-  return { request } as unknown as Client
+  const getLedgerIndex = async (): Promise<number> =>
+    fixtures.ledgerIndex ?? 100
+  return { request, getLedgerIndex } as unknown as Client
 }
 
 /**

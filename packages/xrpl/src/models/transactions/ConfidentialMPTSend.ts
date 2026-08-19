@@ -4,6 +4,7 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isMPTIssuer,
   isHexWithByteLength,
   isNumber,
   isString,
@@ -67,8 +68,8 @@ export interface ConfidentialMPTSend extends BaseTransaction {
    */
   AmountCommitment: string
   /**
-   * The Pedersen commitment to the sender's remaining confidential balance
-   * (33-byte EC point).
+   * The Pedersen commitment to the sender's current spendable confidential
+   * balance — the witness the range proof is built against (33-byte EC point).
    */
   BalanceCommitment: string
   /**
@@ -84,6 +85,7 @@ export interface ConfidentialMPTSend extends BaseTransaction {
  * @param tx - A ConfidentialMPTSend Transaction.
  * @throws When the ConfidentialMPTSend is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- one cohesive field-validation sequence
 export function validateConfidentialMPTSend(tx: Record<string, unknown>): void {
   const isCiphertext = isHexWithByteLength(
     CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
@@ -95,6 +97,18 @@ export function validateConfidentialMPTSend(tx: Record<string, unknown>): void {
   if (tx.Account === tx.Destination) {
     throw new ValidationError(
       'ConfidentialMPTSend: Destination and Account must be different',
+    )
+  }
+  // rippled forbids the issuer from being either party on a Send (temMALFORMED):
+  // a Send moves value issuer -> holder then holder -> holder, never to/from itself.
+  if (isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTSend: the issuer cannot be the sender',
+    )
+  }
+  if (isMPTIssuer(tx.Destination, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTSend: the issuer cannot be the destination',
     )
   }
   validateOptionalField(tx, 'DestinationTag', isNumber)

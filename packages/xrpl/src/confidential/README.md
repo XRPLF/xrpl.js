@@ -1,4 +1,4 @@
-# xrpl/confidential
+# Confidential MPT
 
 High-level builders for **Confidential MPT (XLS-0096)** — the flow that replaces
 a public MPT balance with on-ledger EC-ElGamal ciphertexts and zero-knowledge
@@ -9,12 +9,10 @@ Each builder queries the ledger state it needs, generates the ciphertexts,
 commitments, and the ordered zero-knowledge proof, and returns an **unsigned**
 transaction — so you never hand-build cryptographic material. The crypto itself
 lives in the [`@xrplf/mpt-crypto`](../../../mpt-crypto) dependency, reached only
-through a dynamic `import`, so a bundler code-splits its ~2 MB WASM into a
-separate chunk and apps that never assemble a confidential transaction never
-load it.
+through a dynamic `import`, so its ~2 MB WASM loads lazily on the first confidential
+transaction you assemble — an app that never assembles one never loads it.
 
-Nothing here is re-exported from `xrpl`'s main entry point; import from the
-subpath:
+These builders are exported from `xrpl`'s main entry point:
 
 ```ts
 import {
@@ -22,7 +20,7 @@ import {
   prepareConfidentialConvert,
   prepareConfidentialSend,
   // ...
-} from 'xrpl/confidential'
+} from 'xrpl'
 ```
 
 ## Keys
@@ -70,7 +68,7 @@ import {
   prepareConfidentialSend,
   prepareConfidentialMergeInbox,
   getConfidentialBalance,
-} from 'xrpl/confidential'
+} from 'xrpl'
 
 const client = new Client('wss://...')
 await client.connect()
@@ -149,7 +147,7 @@ confidential operation spec (the matching builder's params minus `sequence`, plu
 `operation` tag) or a pre-built plain transaction. Array order is on-ledger execution order.
 
 ```ts
-import { prepareConfidentialBatch } from 'xrpl/confidential'
+import { prepareConfidentialBatch } from 'xrpl'
 
 // Atomic multi-send: alice pays two recipients confidentially in one Batch.
 const batch = await prepareConfidentialBatch(client, {

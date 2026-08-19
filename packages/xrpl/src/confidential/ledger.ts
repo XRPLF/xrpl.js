@@ -3,6 +3,7 @@ import { decodeAccountID } from 'ripple-address-codec'
 
 import { type Client } from '../client'
 import { XrplError } from '../errors'
+import { LedgerIndex } from '../models/common'
 import { MPToken, MPTokenIssuance } from '../models/ledger'
 import { MAX_MPT_AMOUNT } from '../models/transactions/common'
 
@@ -86,22 +87,54 @@ export async function resolveSequence(
 }
 
 /**
+ * Resolve the ledger to read confidential state from: the caller's explicit
+ * index when given, otherwise the latest validated ledger. A builder resolves
+ * this once and passes it to every state read ({@link fetchMPToken} and
+ * {@link fetchMPTokenIssuance}) so the balance, version, and issuer/auditor keys
+ * a single proof is built from all come from one coherent ledger — rather than
+ * risking a straddle if a ledger closes between otherwise-parallel reads.
+ *
+ * The account sequence is intentionally *not* pinned here: it must be the
+ * account's next usable sequence (a `current`-ledger notion), and the proof
+ * binds it to the transaction by construction (`tx.Sequence` equals the value
+ * the context hash is built with), so it needs no coherence with the state
+ * reads. This mirrors `autofill`, which reads state at `validated` but the
+ * sequence at `current`.
+ *
+ * @param client - A connected Client.
+ * @param ledgerIndex - An explicit ledger index, or `undefined` for the latest
+ *   validated ledger.
+ * @returns The resolved ledger index.
+ */
+export async function resolveLedgerIndex(
+  client: Client,
+  ledgerIndex?: LedgerIndex,
+): Promise<LedgerIndex> {
+  return ledgerIndex ?? (await client.getLedgerIndex())
+}
+
+/**
  * Fetch a single MPToken ledger object for a (holder, issuance) pair.
  *
  * @param client - A connected Client.
  * @param account - The classic XRPL address of the token holder.
  * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @param ledgerIndex - Ledger to read at (see {@link resolveLedgerIndex}); the
+ *   server default (current) when omitted.
  * @returns The holder's MPToken ledger entry.
  * @throws {RippledError} If the MPToken does not exist.
  */
+// eslint-disable-next-line max-params -- a connected client plus the (account, issuance) lookup and its ledger
 export async function fetchMPToken(
   client: Client,
   account: string,
   mptIssuanceID: string,
+  ledgerIndex?: LedgerIndex,
 ): Promise<MPToken> {
   const response = await client.request({
     command: 'ledger_entry',
     mptoken: { mpt_issuance_id: mptIssuanceID, account },
+    ledger_index: ledgerIndex,
   })
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger_entry returns the requested entry type
   return response.result.node as unknown as MPToken
@@ -113,16 +146,20 @@ export async function fetchMPToken(
  *
  * @param client - A connected Client.
  * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @param ledgerIndex - Ledger to read at (see {@link resolveLedgerIndex}); the
+ *   server default (current) when omitted.
  * @returns The MPTokenIssuance ledger entry.
  * @throws {RippledError} If the MPTokenIssuance does not exist.
  */
 export async function fetchMPTokenIssuance(
   client: Client,
   mptIssuanceID: string,
+  ledgerIndex?: LedgerIndex,
 ): Promise<MPTokenIssuance> {
   const response = await client.request({
     command: 'ledger_entry',
     mpt_issuance: mptIssuanceID,
+    ledger_index: ledgerIndex,
   })
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger_entry returns the requested entry type
   return response.result.node as unknown as MPTokenIssuance
@@ -172,12 +209,21 @@ export async function getConfidentialBalance(
   mptIssuanceID: string,
   privateKey: string,
 ): Promise<bigint> {
-  const mptoken = await fetchMPToken(client, account, mptIssuanceID)
+  // Pin both reads to one ledger so the decrypt bound (from the issuance's
+  // outstanding total) can never come from an earlier ledger than the balance
+  // it must cover, which would make the bound too small and the decrypt fail.
+  const ledgerIndex = await client.getLedgerIndex()
+  const mptoken = await fetchMPToken(
+    client,
+    account,
+    mptIssuanceID,
+    ledgerIndex,
+  )
   if (mptoken.ConfidentialBalanceSpending == null) {
     return BigInt(0)
   }
   const [issuance, crypto] = await Promise.all([
-    fetchMPTokenIssuance(client, mptIssuanceID),
+    fetchMPTokenIssuance(client, mptIssuanceID, ledgerIndex),
     loadMptCrypto(),
   ])
   return crypto.decryptAmount(

@@ -1,6 +1,11 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import { bytesToHex, HEX_REGEX } from '@xrplf/isomorphic/utils'
+import {
+  decodeAccountID,
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -494,18 +499,52 @@ export function validateConfidentialMPTAmount(
   allowZero: boolean,
 ): void {
   validateRequiredField(tx, 'MPTAmount', isString)
-  if (typeof tx.MPTAmount === 'string') {
-    if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
-      throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
-    }
-    const amount = BigInt(tx.MPTAmount)
-    if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
-      throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
-    }
+  if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
+    throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
+  }
+  const amount = BigInt(tx.MPTAmount)
+  if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
+    throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
   }
 }
 
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
+
+/**
+ * An MPTokenIssuanceID is a 4-byte sequence (8 hex chars) followed by the
+ * 20-byte issuer AccountID, so the issuer begins after this many hex chars.
+ */
+const MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN = 8
+
+/**
+ * Whether `account` is the issuer encoded in `mptIssuanceID`.
+ *
+ * An MPTokenIssuanceID is a 4-byte sequence followed by the 20-byte issuer
+ * AccountID, so the issuer is its last 40 hex characters — the same derivation
+ * rippled uses (`MPTIssue::getIssuer`). The comparison is on decoded AccountIDs,
+ * so it holds whether `account` is given as a classic or an X-address. Returns
+ * `false` (rather than throwing) for a non-string or non-address input, leaving
+ * the field-level validators to report those.
+ *
+ * @param account - The classic or X-address to test.
+ * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @returns Whether `account` decodes to the issuer AccountID in `mptIssuanceID`.
+ */
+export function isMPTIssuer(account: unknown, mptIssuanceID: unknown): boolean {
+  if (!isString(account) || !isString(mptIssuanceID)) {
+    return false
+  }
+  const classicAddress = isValidXAddress(account)
+    ? xAddressToClassicAddress(account).classicAddress
+    : account
+  if (!isValidClassicAddress(classicAddress)) {
+    return false
+  }
+  return (
+    bytesToHex(decodeAccountID(classicAddress)).toUpperCase() ===
+    mptIssuanceID.slice(MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN).toUpperCase()
+  )
+}
 
 export enum GlobalFlags {
   tfInnerBatchTxn = 0x40000000,

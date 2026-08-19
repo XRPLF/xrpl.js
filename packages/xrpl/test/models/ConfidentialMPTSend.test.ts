@@ -9,6 +9,10 @@ const assertInvalid = (tx: any, message: string): void =>
 const ACCOUNT = 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm'
 const DESTINATION = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
 const MPT_ISSUANCE_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
+// An issuance whose embedded issuer IS ACCOUNT (the sender) — issuer may not send.
+const SENDER_ISSUER_MPT_ID = '000004C40596915CFDEEE3A695B3EFD6BDA9AC788A368B7B'
+// An issuance whose embedded issuer IS DESTINATION — issuer may not receive.
+const DEST_ISSUER_MPT_ID = '000004C449FF0C73CA6AF9733DA805F76CA2C37776B7C46B'
 // 33-byte compressed EC point (Pedersen commitment).
 const EC_POINT = `02${'AB'.repeat(32)}`
 // 66-byte ElGamal ciphertext (two compressed points).
@@ -55,6 +59,42 @@ describe('ConfidentialMPTSend', function () {
       AmountCommitment: EC_POINT,
       BalanceCommitment: EC_POINT,
     })
+  })
+
+  it(`throws when the issuer is the sender`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: SENDER_ISSUER_MPT_ID,
+        Destination: DESTINATION,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTSend: the issuer cannot be the sender',
+    )
+  })
+
+  it(`throws when the issuer is the destination`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: DEST_ISSUER_MPT_ID,
+        Destination: DESTINATION,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTSend: the issuer cannot be the destination',
+    )
   })
 
   it(`throws w/ missing Destination`, function () {

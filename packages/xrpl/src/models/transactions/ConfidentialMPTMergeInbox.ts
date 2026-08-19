@@ -1,5 +1,8 @@
+import { ValidationError } from '../../errors'
+
 import {
   BaseTransaction,
+  isMPTIssuer,
   isString,
   validateBaseTransaction,
   validateRequiredField,
@@ -30,4 +33,10 @@ export function validateConfidentialMPTMergeInbox(
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  // rippled forbids the issuer from merging its own issuance (temMALFORMED).
+  if (isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTMergeInbox: the issuer cannot merge its own issuance',
+    )
+  }
 }

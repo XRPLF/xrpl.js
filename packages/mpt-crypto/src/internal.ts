@@ -34,6 +34,28 @@ export function assertUint64(
   }
 }
 
+/** Largest unsigned 32-bit integer — the width of the C `uint32_t` sequence/version. */
+export const U32_MAX = 0xffff_ffff
+
+/**
+ * Assert that a number fits an unsigned 32-bit WASM parameter.
+ *
+ * Sequence and version are passed straight to WASM `i32` parameters, where a
+ * negative, fractional, or out-of-range value would be silently truncated or
+ * wrapped rather than rejected. This guards that at the public API boundary.
+ *
+ * @param value - The value to check.
+ * @param label - A human-readable name used in error messages.
+ * @throws If `value` is not an integer in [0, 2^32 - 1].
+ */
+export function assertUint32(value: number, label: string): void {
+  if (!Number.isInteger(value) || value < 0 || value > U32_MAX) {
+    throw new Error(
+      `${label} must be an integer in [0, ${U32_MAX}] (got ${value})`,
+    )
+  }
+}
+
 /**
  * Decode a hex-encoded {@link Participant} into its byte-struct form.
  *

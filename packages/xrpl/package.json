@@ -15,17 +15,6 @@
   "unpkg": "build/xrpl-latest-min.js",
   "jsdelivr": "build/xrpl-latest-min.js",
   "types": "dist/npm/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/npm/index.d.ts",
-      "default": "./dist/npm/index.js"
-    },
-    "./confidential": {
-      "types": "./dist/npm/confidential/index.d.ts",
-      "default": "./dist/npm/confidential/index.js"
-    },
-    "./dist/npm/*": "./dist/npm/*"
-  },
   "directories": {
     "test": "test"
   },

@@ -38,6 +38,8 @@ export async function getConvertProof(
   return withModule((mod, marshaller) => {
     const pubPtr = marshaller.allocBytes(pub)
     const privPtr = marshaller.allocBytes(priv)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    priv.fill(0)
     const ctxPtr = marshaller.allocBytes(ctx)
     const outPtr = marshaller.alloc(CONVERT_PROOF_SIZE)
     if (mod._mpt_get_convert_proof(pubPtr, privPtr, ctxPtr, outPtr) !== 0) {
@@ -72,6 +74,8 @@ export async function getClawbackProof(
   const ct = hexToBytes(ciphertext, 'ciphertext', ELGAMAL_TOTAL_SIZE)
   return withModule((mod, marshaller) => {
     const privPtr = marshaller.allocBytes(priv)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    priv.fill(0)
     const pubPtr = marshaller.allocBytes(pub)
     const ctxPtr = marshaller.allocBytes(ctx)
     const ctPtr = marshaller.allocBytes(ct)
@@ -117,6 +121,8 @@ export async function getConvertBackProof(
   const rawParams = rawPedersenParams(params, 'params')
   return withModule((mod, marshaller) => {
     const privPtr = marshaller.allocBytes(priv)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    priv.fill(0)
     const pubPtr = marshaller.allocBytes(pub)
     const ctxPtr = marshaller.allocBytes(ctx)
     const paramsPtr = marshaller.allocPedersenParams(rawParams)
@@ -148,6 +154,9 @@ export async function getConfidentialSendProof(
   params: SendProofParams,
 ): Promise<string> {
   assertUint64(params.amount, 'amount')
+  if (params.participants.length === 0) {
+    throw new Error('getConfidentialSendProof: participants must not be empty')
+  }
   const priv = hexToBytes(params.privateKey, 'privateKey', PRIVKEY_SIZE)
   const pub = hexToBytes(params.publicKey, 'publicKey', PUBKEY_SIZE)
   const txBlinding = hexToBytes(
@@ -167,6 +176,8 @@ export async function getConfidentialSendProof(
   const balanceParams = rawPedersenParams(params.balanceParams, 'balanceParams')
   return withModule((mod, marshaller) => {
     const privPtr = marshaller.allocBytes(priv)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    priv.fill(0)
     const pubPtr = marshaller.allocBytes(pub)
     const participantsPtr = marshaller.allocParticipants(participants)
     const txBlindingPtr = marshaller.allocBytes(txBlinding)
@@ -193,8 +204,12 @@ export async function getConfidentialSendProof(
     ) {
       throw new Error('mpt_get_confidential_send_proof failed')
     }
-    return bytesToHex(
-      marshaller.readBytes(outPtr, marshaller.readU32(outLenPtr)),
-    )
+    const outLen = marshaller.readU32(outLenPtr)
+    if (outLen > SEND_PROOF_SIZE) {
+      throw new Error(
+        'mpt_get_confidential_send_proof wrote more than the allocated buffer',
+      )
+    }
+    return bytesToHex(marshaller.readBytes(outPtr, outLen))
   })
 }

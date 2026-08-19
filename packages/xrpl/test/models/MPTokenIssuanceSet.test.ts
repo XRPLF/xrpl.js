@@ -191,6 +191,19 @@ describe('MPTokenIssuanceSet', function () {
     )
   })
 
+  it(`throws w/ Holder and confidential encryption keys`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        IssuerEncryptionKey: `02${'AB'.repeat(32)}`,
+        Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      } as any,
+      'MPTokenIssuanceSet: Holder field is not allowed when registering confidential encryption keys.',
+    )
+  })
+
   it(`Throws w/ invalid type of TransferFee`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',

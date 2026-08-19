@@ -1,10 +1,11 @@
-/* eslint-disable max-params -- context-hash builders mirror the C ABI argument lists */
+/* eslint-disable max-params, max-lines-per-function -- context-hash builders mirror the C ABI argument lists */
 import {
   ACCOUNT_ID_SIZE,
   CONTEXT_HASH_SIZE,
   ISSUANCE_ID_SIZE,
 } from './constants'
 import { bytesToHex, hexToBytes } from './hex'
+import { assertUint32 } from './internal'
 import { withModule } from './runtime'
 
 /**
@@ -21,6 +22,7 @@ export async function getConvertContextHash(
   issuance: string,
   sequence: number,
 ): Promise<string> {
+  assertUint32(sequence, 'sequence')
   const acc = hexToBytes(account, 'account', ACCOUNT_ID_SIZE)
   const iss = hexToBytes(issuance, 'issuance', ISSUANCE_ID_SIZE)
   return withModule((mod, marshaller) => {
@@ -52,6 +54,8 @@ export async function getConvertBackContextHash(
   sequence: number,
   version: number,
 ): Promise<string> {
+  assertUint32(sequence, 'sequence')
+  assertUint32(version, 'version')
   const acc = hexToBytes(account, 'account', ACCOUNT_ID_SIZE)
   const iss = hexToBytes(issuance, 'issuance', ISSUANCE_ID_SIZE)
   return withModule((mod, marshaller) => {
@@ -91,6 +95,8 @@ export async function getSendContextHash(
   destination: string,
   version: number,
 ): Promise<string> {
+  assertUint32(sequence, 'sequence')
+  assertUint32(version, 'version')
   const acc = hexToBytes(account, 'account', ACCOUNT_ID_SIZE)
   const iss = hexToBytes(issuance, 'issuance', ISSUANCE_ID_SIZE)
   const dest = hexToBytes(destination, 'destination', ACCOUNT_ID_SIZE)
@@ -131,6 +137,7 @@ export async function getClawbackContextHash(
   sequence: number,
   holder: string,
 ): Promise<string> {
+  assertUint32(sequence, 'sequence')
   const acc = hexToBytes(account, 'account', ACCOUNT_ID_SIZE)
   const iss = hexToBytes(issuance, 'issuance', ISSUANCE_ID_SIZE)
   const hold = hexToBytes(holder, 'holder', ACCOUNT_ID_SIZE)

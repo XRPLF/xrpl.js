@@ -10,6 +10,7 @@ import {
   fetchMPTokenIssuance,
   getAccountSequence,
   getConfidentialBalance,
+  resolveLedgerIndex,
   resolveSequence,
 } from '../../src/confidential/ledger'
 
@@ -32,6 +33,7 @@ function fakeClient(
   return {
     request: async (request: { command: string } & Record<string, unknown>) =>
       respond(request),
+    getLedgerIndex: async () => 100,
   } as unknown as Client
 }
 
@@ -69,6 +71,21 @@ describe('confidential/ledger', function () {
     })
   })
 
+  describe('resolveLedgerIndex', function () {
+    it('prefers an explicit ledger index without querying', async function () {
+      const client = fakeClient(() => {
+        throw new Error('resolveLedgerIndex must not query when given an index')
+      })
+      assert.strictEqual(await resolveLedgerIndex(client, 123), 123)
+    })
+
+    it('falls back to the latest validated ledger index', async function () {
+      // fakeClient.getLedgerIndex resolves to 100.
+      const client = fakeClient(() => ({}))
+      assert.strictEqual(await resolveLedgerIndex(client), 100)
+    })
+  })
+
   describe('fetchMPToken / fetchMPTokenIssuance', function () {
     it('returns the MPToken node for a (holder, issuance) pair', async function () {
       const client = fakeClient((request) => {
@@ -95,6 +112,17 @@ describe('confidential/ledger', function () {
       })
       const issuance = await fetchMPTokenIssuance(client, ISSUANCE_ID)
       assert.strictEqual(issuance.IssuerEncryptionKey, PUBLIC_KEY)
+    })
+
+    it('pins both reads to an explicit ledger index when given one', async function () {
+      const seen: Array<number | string | undefined> = []
+      const client = fakeClient((request) => {
+        seen.push(request.ledger_index as number | string | undefined)
+        return { result: { node: {} } }
+      })
+      await fetchMPToken(client, ADDRESS, ISSUANCE_ID, 777)
+      await fetchMPTokenIssuance(client, ISSUANCE_ID, 777)
+      assert.deepEqual(seen, [777, 777])
     })
   })
 

@@ -11,9 +11,10 @@ let cached: Promise<MptCryptoModule> | undefined
 
 /**
  * Lazily import the `@xrplf/mpt-crypto` dependency, caching the resolved module
- * so the WASM binary is only loaded once. The import is dynamic on purpose:
- * bundlers code-split the ~2 MB WASM into its own chunk, so apps that never
- * touch `xrpl/confidential` never load it even though it ships with `xrpl`.
+ * so the WASM binary is only loaded once. The import is dynamic on purpose: the
+ * ~2 MB WASM is fetched and instantiated only on this call, so apps that never
+ * invoke a confidential builder never load it, even though the builders are
+ * exported from `xrpl`.
  *
  * @returns The resolved `@xrplf/mpt-crypto` module.
  * @throws {XrplError} If the module fails to load.

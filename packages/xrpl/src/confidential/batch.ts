@@ -152,7 +152,12 @@ function readBalance(value: string | undefined, what: string): string {
  * @returns The shaped inner transaction.
  */
 function shapeInner(tx: SubmittableTransaction): SubmittableTransaction {
-  return { ...tx, Flags: TF_INNER_BATCH_TXN, Fee: '0' }
+  // Merge the inner-batch flag with any numeric flags a plain inner already carries
+  // (the confidential builders set none) rather than overwriting them; inner Batch
+  // flags are numeric, not flag objects.
+  const flags = typeof tx.Flags === 'number' ? tx.Flags : 0
+  // eslint-disable-next-line no-bitwise -- combine the inner-batch flag with caller flags
+  return { ...tx, Flags: flags | TF_INNER_BATCH_TXN, Fee: '0' }
 }
 
 /**
@@ -185,17 +190,19 @@ function collectStateKeys(ops: ConfidentialBatchOperation[]): Set<string> {
  *
  * @param client - A connected Client.
  * @param ops - The confidential ops in the batch.
+ * @param ledgerIndex - The validated ledger to read every MPToken at.
  * @returns A map from state key to that MPToken's initial confidential state.
  */
 async function loadStates(
   client: Client,
   ops: ConfidentialBatchOperation[],
+  ledgerIndex: number,
 ): Promise<Map<string, TokenState>> {
   const states = new Map<string, TokenState>()
   await Promise.all(
     Array.from(collectStateKeys(ops), async (key) => {
       const [account, token] = key.split(':')
-      const mptoken = await fetchMPToken(client, account, token)
+      const mptoken = await fetchMPToken(client, account, token, ledgerIndex)
       states.set(key, {
         spending: mptoken.ConfidentialBalanceSpending,
         inbox: mptoken.ConfidentialBalanceInbox,
@@ -461,11 +468,13 @@ interface MirrorKeys {
  *
  * @param client - A connected Client.
  * @param ops - The confidential operation specs in the batch.
+ * @param ledgerIndex - The validated ledger to read every issuance at.
  * @returns A map from MPTokenIssuanceID to its issuer and optional auditor key.
  */
 async function loadIssuerKeys(
   client: Client,
   ops: ConfidentialBatchOperation[],
+  ledgerIndex: number,
 ): Promise<Map<string, MirrorKeys>> {
   const tokens = new Set<string>()
   for (const op of ops) {
@@ -476,7 +485,7 @@ async function loadIssuerKeys(
   const keys = new Map<string, MirrorKeys>()
   await Promise.all(
     Array.from(tokens, async (token) => {
-      const issuance = await fetchMPTokenIssuance(client, token)
+      const issuance = await fetchMPTokenIssuance(client, token, ledgerIndex)
       keys.set(token, {
         issuerKey: requireIssuerKey(issuance, token),
         auditorKey: issuance.AuditorEncryptionKey,
@@ -495,6 +504,8 @@ interface AssembleContext {
   convertTotals: Map<string, bigint>
   /** Issuer/auditor keys per token, for predicting a Send's mirror-balance credits. */
   issuerKeys: Map<string, MirrorKeys>
+  /** The validated ledger every inner reads state at, for one coherent snapshot. */
+  ledgerIndex: number
 }
 
 /** A built inner plus the state updates it implies, keyed by state key. */
@@ -520,7 +531,7 @@ async function buildConfidentialInner(
   op: ConfidentialBatchOperation,
   sequence: number,
 ): Promise<BuiltInner> {
-  const { client, crypto, states, convertTotals, issuerKeys } = ctx
+  const { client, crypto, states, convertTotals, issuerKeys, ledgerIndex } = ctx
   switch (op.operation) {
     case 'send': {
       const { operation: _operation, ...params } = op
@@ -536,6 +547,7 @@ async function buildConfidentialInner(
       const tx = await prepareConfidentialSend(client, {
         ...params,
         sequence,
+        ledgerIndex,
         confidentialState: {
           spending: readBalance(state.spending, `${op.account} spending`),
           version: state.version,
@@ -568,6 +580,7 @@ async function buildConfidentialInner(
       const tx = await prepareConfidentialConvertBack(client, {
         ...params,
         sequence,
+        ledgerIndex,
         confidentialState: {
           spending: readBalance(state.spending, `${op.account} spending`),
           version: state.version,
@@ -591,6 +604,7 @@ async function buildConfidentialInner(
       const tx = await prepareConfidentialConvert(client, {
         ...params,
         sequence,
+        ledgerIndex,
       })
       const credit: Credit = {
         inbox: tx.HolderEncryptedAmount,
@@ -627,6 +641,7 @@ async function buildConfidentialInner(
       const tx = await prepareConfidentialClawback(client, {
         ...params,
         sequence,
+        ledgerIndex,
         issuerEncryptedBalanceOverride: readBalance(
           holder.issuerEnc,
           `${op.holder} issuer-encrypted balance`,
@@ -684,11 +699,16 @@ export async function prepareConfidentialBatch(
     )
   }
   const ops = inners.filter(isConfidentialOperation)
+  // Resolve one validated ledger up front and read all confidential state from it,
+  // so every inner's proof binds a single coherent snapshot — a ledger closing
+  // mid-assembly cannot split the reads across ledgers. Sequences are read
+  // separately (at `current`); see `resolveLedgerIndex`.
+  const ledgerIndex = await client.getLedgerIndex()
   const [crypto, states, sequencing, issuerKeys] = await Promise.all([
     loadMptCrypto(),
-    loadStates(client, ops),
+    loadStates(client, ops, ledgerIndex),
     loadSequences(client, account, inners),
-    loadIssuerKeys(client, ops),
+    loadIssuerKeys(client, ops, ledgerIndex),
   ])
   const ctx: AssembleContext = {
     client,
@@ -696,6 +716,7 @@ export async function prepareConfidentialBatch(
     states,
     convertTotals: sumConvertsByToken(ops),
     issuerKeys,
+    ledgerIndex,
   }
 
   const rawTransactions: Array<{ RawTransaction: SubmittableTransaction }> = []

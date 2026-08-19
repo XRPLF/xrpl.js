@@ -28,6 +28,7 @@ function confidentialClient(
     request: async (req: { mptoken?: unknown }) => ({
       result: { node: req.mptoken == null ? issuanceNode : mptokenNode },
     }),
+    getLedgerIndex: async () => 100,
   } as unknown as Client
 }
 

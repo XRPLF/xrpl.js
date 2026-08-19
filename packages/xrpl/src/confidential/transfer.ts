@@ -12,6 +12,7 @@ import {
   fetchMPToken,
   fetchMPTokenIssuance,
   requireIssuerKey,
+  resolveLedgerIndex,
   resolveSequence,
   resolveSpendingState,
 } from './ledger'
@@ -44,14 +45,16 @@ export async function prepareConfidentialSend(
   // it (or negative) is unspendable; reject it before the crypto layer, which
   // would otherwise accept anything up to 2^64 - 1.
   assertConfidentialAmount(params.amount, true)
-  const [crypto, issuance, senderToken, destToken, sequence] =
-    await Promise.all([
-      loadMptCrypto(),
-      fetchMPTokenIssuance(client, params.mptIssuanceID),
-      fetchMPToken(client, params.account, params.mptIssuanceID),
-      fetchMPToken(client, params.destination, params.mptIssuanceID),
-      resolveSequence(client, params.account, params.sequence),
-    ])
+  const [crypto, ledgerIndex] = await Promise.all([
+    loadMptCrypto(),
+    resolveLedgerIndex(client, params.ledgerIndex),
+  ])
+  const [issuance, senderToken, destToken, sequence] = await Promise.all([
+    fetchMPTokenIssuance(client, params.mptIssuanceID, ledgerIndex),
+    fetchMPToken(client, params.account, params.mptIssuanceID, ledgerIndex),
+    fetchMPToken(client, params.destination, params.mptIssuanceID, ledgerIndex),
+    resolveSequence(client, params.account, params.sequence),
+  ])
   const issuerKey = requireIssuerKey(issuance, params.mptIssuanceID)
   const { amount, senderKeypair } = params
   // The destination's ElGamal key: prefer a supplied value —
@@ -174,29 +177,33 @@ export async function prepareConfidentialClawback(
   if (params.amount != null) {
     assertConfidentialAmount(params.amount, false)
   }
-  const [crypto, holderToken, sequence] = await Promise.all([
+  const [crypto, ledgerIndex] = await Promise.all([
     loadMptCrypto(),
-    fetchMPToken(client, params.holder, params.mptIssuanceID),
+    resolveLedgerIndex(client, params.ledgerIndex),
+  ])
+  const [holderToken, sequence] = await Promise.all([
+    fetchMPToken(client, params.holder, params.mptIssuanceID, ledgerIndex),
     resolveSequence(client, params.account, params.sequence),
   ])
-  if (holderToken.IssuerEncryptedBalance == null) {
+  const { issuerKeypair } = params
+  // `issuerEncryptedBalanceOverride` lets prepareConfidentialBatch build this proof
+  // against the issuer-encrypted balance a prior same-batch inner leaves behind — e.g.
+  // a Convert then Clawback in one Batch, where the on-ledger balance is still absent —
+  // so resolve it before the null-check; a standalone clawback needs the on-ledger one.
+  const issuerBalance =
+    params.issuerEncryptedBalanceOverride ?? holderToken.IssuerEncryptedBalance
+  if (issuerBalance == null) {
     throw new XrplError(
       `Holder ${params.holder} has no issuer-encrypted confidential balance`,
     )
   }
-  const { issuerKeypair } = params
-  // `issuerEncryptedBalanceOverride` lets prepareConfidentialBatch build this proof
-  // against the issuer-encrypted balance a prior same-batch inner leaves behind;
-  // unset for a standalone clawback.
-  const issuerBalance =
-    params.issuerEncryptedBalanceOverride ?? holderToken.IssuerEncryptedBalance
   const amount =
     params.amount ??
     (await crypto.decryptAmount(
       issuerBalance,
       issuerKeypair.privateKey,
       decryptBound(
-        await fetchMPTokenIssuance(client, params.mptIssuanceID),
+        await fetchMPTokenIssuance(client, params.mptIssuanceID, ledgerIndex),
         params.outstandingDelta,
       ),
     ))

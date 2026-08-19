@@ -1,5 +1,8 @@
+import { ValidationError } from '../../errors'
+
 import {
   BaseTransaction,
+  isMPTIssuer,
   isString,
   isHexWithByteLength,
   validateBaseTransaction,
@@ -53,8 +56,8 @@ export interface ConfidentialMPTConvertBack extends BaseTransaction {
    */
   ZKProof: string
   /**
-   * The Pedersen commitment to the holder's remaining confidential balance
-   * (33-byte EC point).
+   * The Pedersen commitment to the holder's current spendable confidential
+   * balance — the witness the range proof is built against (33-byte EC point).
    */
   BalanceCommitment: string
 }
@@ -65,11 +68,18 @@ export interface ConfidentialMPTConvertBack extends BaseTransaction {
  * @param tx - A ConfidentialMPTConvertBack Transaction.
  * @throws When the ConfidentialMPTConvertBack is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- one cohesive field-validation sequence
 export function validateConfidentialMPTConvertBack(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  // rippled forbids the issuer from converting back its own issuance (temMALFORMED).
+  if (isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTConvertBack: the issuer cannot convert back its own issuance',
+    )
+  }
   validateConfidentialMPTAmount(tx, false)
   validateRequiredField(
     tx,

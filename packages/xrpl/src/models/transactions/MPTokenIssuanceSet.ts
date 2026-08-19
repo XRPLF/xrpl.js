@@ -275,6 +275,14 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 
+  // Registering issuer/auditor encryption keys is issuance-wide; rippled rejects it
+  // paired with a per-holder target (temMALFORMED).
+  if (isSetConfidentialKeys && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder field is not allowed when registering confidential encryption keys.',
+    )
+  }
+
   if (isMutate && (isTfMPTLock || isTfMPTUnlock)) {
     throw new ValidationError(
       'MPTokenIssuanceSet: Can not lock/unlock while mutating MPTokenIssuance.',

@@ -24,6 +24,9 @@ import {
 jest.setTimeout(60_000)
 
 const TF_INNER_BATCH_TXN = 0x4000_0000
+// A Payment flag, used to prove a plain inner's own flags are preserved (OR-ed with
+// the inner-batch flag), not overwritten, when shaped as a Batch inner.
+const TF_PARTIAL_PAYMENT = 0x0002_0000
 // A third valid classic address, for the issuer (clawback account / outer Batch).
 const ADDR_ISSUER = 'rN7n7otQDd6FczFgLdSqtcsAUxDkw6fzRH'
 
@@ -110,7 +113,8 @@ function batchClient(accounts: Record<string, AccountFixture>): Client {
     throw new Error(`unexpected request: ${JSON.stringify(req)}`)
   }
   const autofill = async (tx: unknown): Promise<unknown> => tx
-  return { request, autofill } as unknown as Client
+  const getLedgerIndex = async (): Promise<number> => 100
+  return { request, autofill, getLedgerIndex } as unknown as Client
 }
 
 /**
@@ -183,6 +187,7 @@ describe('confidential/prepareConfidentialBatch', function () {
           Account: ADDR_A,
           Destination: ADDR_B,
           Amount: '1000000',
+          Flags: TF_PARTIAL_PAYMENT,
         },
       ],
     })
@@ -196,9 +201,13 @@ describe('confidential/prepareConfidentialBatch', function () {
     assert.strictEqual(send.Sequence, 11)
     assert.strictEqual(pay.Sequence, 12)
     for (const inner of [send, pay]) {
-      assert.strictEqual(inner.Flags, TF_INNER_BATCH_TXN)
       assert.strictEqual(inner.Fee, '0')
     }
+    // The confidential send carries no other flags; the plain inner's own flag is
+    // preserved (OR-ed with the inner-batch flag — disjoint bits, so OR equals the
+    // sum), not overwritten.
+    assert.strictEqual(send.Flags, TF_INNER_BATCH_TXN)
+    assert.strictEqual(pay.Flags, TF_INNER_BATCH_TXN + TF_PARTIAL_PAYMENT)
     assert.strictEqual(send.TransactionType, 'ConfidentialMPTSend')
     assert.strictEqual(pay.TransactionType, 'Payment')
   })

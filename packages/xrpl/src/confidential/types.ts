@@ -4,6 +4,7 @@
  * amounts are `bigint` to losslessly carry the full `uint64_t` range.
  */
 
+import type { LedgerIndex } from '../models/common'
 import type { SubmittableTransaction } from '../models/transactions'
 
 /**
@@ -39,6 +40,14 @@ interface BaseConfidentialParams {
    * must be submitted without re-deriving the sequence (the proof is bound to it).
    */
   sequence?: number
+  /**
+   * Advanced: the ledger index to read confidential state (balance, version,
+   * issuer/auditor keys) from, so a single proof is built from one coherent
+   * ledger snapshot. Defaults to the latest validated ledger.
+   * {@link prepareConfidentialBatch} sets it so every inner shares one ledger;
+   * standalone callers normally omit it.
+   */
+  ledgerIndex?: LedgerIndex
 }
 
 /** Inputs for {@link prepareConfidentialConvert}. */
@@ -164,22 +173,30 @@ export interface ConfidentialMergeInboxParams extends BaseConfidentialParams {
  * you know `{ operation: 'send', ... }`.
  */
 export type ConfidentialBatchOperation =
-  | ({ operation: 'convert' } & Omit<ConfidentialConvertParams, 'sequence'>)
+  | ({ operation: 'convert' } & Omit<
+      ConfidentialConvertParams,
+      'sequence' | 'ledgerIndex'
+    >)
   | ({ operation: 'convertBack' } & Omit<
       ConfidentialConvertBackParams,
-      'sequence' | 'confidentialState' | 'outstandingDelta'
+      'sequence' | 'ledgerIndex' | 'confidentialState' | 'outstandingDelta'
     >)
   | ({ operation: 'send' } & Omit<
       ConfidentialSendParams,
-      'sequence' | 'confidentialState' | 'destinationKey' | 'outstandingDelta'
+      | 'sequence'
+      | 'ledgerIndex'
+      | 'confidentialState'
+      | 'destinationKey'
+      | 'outstandingDelta'
     >)
   | ({ operation: 'mergeInbox' } & Omit<
       ConfidentialMergeInboxParams,
-      'sequence'
+      'sequence' | 'ledgerIndex'
     >)
   | ({ operation: 'clawback' } & Omit<
       ConfidentialClawbackParams,
       | 'sequence'
+      | 'ledgerIndex'
       | 'amount'
       | 'issuerEncryptedBalanceOverride'
       | 'outstandingDelta'

@@ -8,7 +8,11 @@ const assertInvalid = (tx: any, message: string): void =>
 
 const ACCOUNT = 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm'
 const HOLDER = 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy'
-const MPT_ISSUANCE_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
+// Clawback requires the submitter to be the issuer, so this MPTokenIssuanceID
+// embeds ACCOUNT's AccountID as its issuer (the trailing 20 bytes).
+const MPT_ISSUANCE_ID = '000004C40596915CFDEEE3A695B3EFD6BDA9AC788A368B7B'
+// An issuance whose embedded issuer is a different account (not ACCOUNT).
+const NON_ISSUER_MPT_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
 const PROOF = 'AB'.repeat(64)
 
 /**
@@ -26,6 +30,20 @@ describe('ConfidentialMPTClawback', function () {
       MPTAmount: '100',
       ZKProof: PROOF,
     })
+  })
+
+  it(`throws when Account is not the issuer`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: NON_ISSUER_MPT_ID,
+        Holder: HOLDER,
+        MPTAmount: '100',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: Account must be the issuer of the MPTokenIssuanceID',
+    )
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {

@@ -2,6 +2,7 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
+  isMPTIssuer,
   isString,
   isHexWithByteLength,
   validateBaseTransaction,
@@ -83,11 +84,18 @@ function validateHolderKeyProofPairing(tx: Record<string, unknown>): void {
  * @param tx - A ConfidentialMPTConvert Transaction.
  * @throws When the ConfidentialMPTConvert is malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- one cohesive field-validation sequence
 export function validateConfidentialMPTConvert(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  // rippled forbids the issuer from converting its own issuance (temMALFORMED).
+  if (isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTConvert: the issuer cannot convert its own issuance',
+    )
+  }
   validateConfidentialMPTAmount(tx, true)
   validateOptionalField(
     tx,

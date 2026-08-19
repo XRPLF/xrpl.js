@@ -8,6 +8,8 @@ const assertInvalid = (tx: any, message: string): void =>
 
 const ACCOUNT = 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm'
 const MPT_ISSUANCE_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
+// An issuance whose embedded issuer IS ACCOUNT — the issuer may not convert.
+const ISSUER_MPT_ID = '000004C40596915CFDEEE3A695B3EFD6BDA9AC788A368B7B'
 // 33-byte compressed EC point (encryption key).
 const EC_POINT = `02${'AB'.repeat(32)}`
 // 66-byte ElGamal ciphertext (two compressed points).
@@ -47,6 +49,21 @@ describe('ConfidentialMPTConvert', function () {
       IssuerEncryptedAmount: CIPHERTEXT,
       BlindingFactor: BLINDING,
     })
+  })
+
+  it(`throws when the issuer converts its own issuance`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvert',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: ISSUER_MPT_ID,
+        MPTAmount: '100',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+      },
+      'ConfidentialMPTConvert: the issuer cannot convert its own issuance',
+    )
   })
 
   it(`throws w/ missing MPTokenIssuanceID`, function () {

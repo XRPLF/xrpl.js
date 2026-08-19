@@ -213,4 +213,24 @@ describe('proofs', () => {
       }),
     ).rejects.toThrow(/amountCommitment/u)
   })
+
+  it('getConfidentialSendProof rejects an empty participants list', async () => {
+    await expect(
+      getConfidentialSendProof({
+        privateKey: PRIVATE_KEY,
+        publicKey: PUBLIC_KEY,
+        amount: 100n,
+        participants: [],
+        txBlindingFactor: 'EF'.repeat(32),
+        contextHash: CONTEXT_HASH,
+        amountCommitment: 'AB'.repeat(33),
+        balanceParams: {
+          commitment: 'AB'.repeat(33),
+          amount: 1000n,
+          ciphertext: 'CD'.repeat(66),
+          blindingFactor: 'EF'.repeat(32),
+        },
+      }),
+    ).rejects.toThrow(/participants/u)
+  })
 })

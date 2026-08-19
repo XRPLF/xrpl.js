@@ -4,6 +4,7 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isMPTIssuer,
   isHexWithByteLength,
   isString,
   validateBaseTransaction,
@@ -48,6 +49,12 @@ export function validateConfidentialMPTClawback(
 ): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  // rippled requires the submitter to be the issuer of the MPToken (temMALFORMED).
+  if (!isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
+    throw new ValidationError(
+      'ConfidentialMPTClawback: Account must be the issuer of the MPTokenIssuanceID',
+    )
+  }
   validateRequiredField(tx, 'Holder', isAccount)
   if (tx.Account === tx.Holder) {
     throw new ValidationError(

@@ -81,7 +81,8 @@ describe('confidential/prepareConfidentialClawback', function () {
     )
   })
 
-  it('throws when the holder has no issuer-encrypted balance', async function () {
+  it('requires an issuer-encrypted balance unless an override is supplied', async function () {
+    // No on-ledger issuer-encrypted balance: a standalone clawback throws.
     const client = mockClient({ mptoken: { [ADDR_B]: {} } })
     await assertRejectsXrplError(async () =>
       prepareConfidentialClawback(client, {
@@ -92,5 +93,24 @@ describe('confidential/prepareConfidentialClawback', function () {
         sequence: 5,
       }),
     )
+
+    // But prepareConfidentialBatch can pass the balance a prior same-batch inner
+    // leaves behind via issuerEncryptedBalanceOverride (e.g. Convert then Clawback in
+    // one Batch). It is resolved before the null-check, so the clawback builds against
+    // the override even though the on-ledger balance is absent.
+    const override = await encryptAmount(
+      300n,
+      KEY_A.publicKey,
+      await generateBlindingFactor(),
+    )
+    const tx = await prepareConfidentialClawback(client, {
+      account: ADDR_A,
+      holder: ADDR_B,
+      issuerKeypair: KEY_A,
+      mptIssuanceID: ISSUANCE_ID,
+      sequence: 5,
+      issuerEncryptedBalanceOverride: override,
+    })
+    assert.strictEqual(tx.MPTAmount, '300')
   })
 })

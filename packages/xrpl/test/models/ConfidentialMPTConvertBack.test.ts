@@ -8,6 +8,8 @@ const assertInvalid = (tx: any, message: string): void =>
 
 const ACCOUNT = 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm'
 const MPT_ISSUANCE_ID = '000004C463C52827307480341125DA0577DEFC38405B0E3E'
+// An issuance whose embedded issuer IS ACCOUNT — the issuer may not convert back.
+const ISSUER_MPT_ID = '000004C40596915CFDEEE3A695B3EFD6BDA9AC788A368B7B'
 // 33-byte compressed EC point (Pedersen commitment).
 const EC_POINT = `02${'AB'.repeat(32)}`
 // 66-byte ElGamal ciphertext (two compressed points).
@@ -49,6 +51,23 @@ describe('ConfidentialMPTConvertBack', function () {
       ZKProof: PROOF,
       BalanceCommitment: EC_POINT,
     })
+  })
+
+  it(`throws when the issuer converts back its own issuance`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvertBack',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: ISSUER_MPT_ID,
+        MPTAmount: '100',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+        ZKProof: PROOF,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTConvertBack: the issuer cannot convert back its own issuance',
+    )
   })
 
   it(`throws w/ zero MPTAmount`, function () {

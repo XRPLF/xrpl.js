@@ -94,6 +94,8 @@ export async function decryptAmount(
   return withModule((mod, marshaller) => {
     const ctPtr = marshaller.allocBytes(ct)
     const privPtr = marshaller.allocBytes(priv)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    priv.fill(0)
     const outPtr = marshaller.alloc(U64_BYTES)
     if (
       mod._mpt_decrypt_amount(
