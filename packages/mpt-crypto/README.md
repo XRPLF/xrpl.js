@@ -61,9 +61,10 @@ const amount = await decryptAmount(ciphertext, privateKey, 10_000n) // 1000n
 
 `wasm/mpt_crypto.{js,mjs,wasm}` is an Emscripten build of the reference
 `mpt-crypto` C library ([`XRPLF/mpt-crypto`](https://github.com/XRPLF/mpt-crypto)),
-the same library `rippled` links. A single `.wasm` is wrapped by two glues built
-from it — `mpt_crypto.js` (CommonJS, for Node / `require`) and `mpt_crypto.mjs`
-(ES module, for bundlers / `import`) — so the module loads in every environment.
+the same library `rippled` links. A single `.wasm` is wrapped by three glues built
+from it — `mpt_crypto.js` (CommonJS, for Node / `require`), `mpt_crypto.mjs` (ES
+module, for Node / `import`), and `mpt_crypto.web.mjs` (ES module with no `node:`
+imports, for bundlers / browsers) — so the module loads in every environment.
 
 The exact `mpt-crypto` release these are built from is pinned in
 [`MPT_CRYPTO_VERSION`](./MPT_CRYPTO_VERSION). The npm release pipeline downloads

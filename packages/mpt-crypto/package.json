@@ -19,7 +19,7 @@
       "default": "./dist/index.js"
     },
     "./wasm": {
-      "browser": "./wasm/mpt_crypto.mjs",
+      "browser": "./wasm/mpt_crypto.web.mjs",
       "import": "./wasm/mpt_crypto.mjs",
       "require": "./wasm/mpt_crypto.js",
       "default": "./wasm/mpt_crypto.js"

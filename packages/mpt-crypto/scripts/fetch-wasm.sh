@@ -3,7 +3,7 @@
 #
 # Reads MPT_CRYPTO_VERSION, downloads the matching `mpt-crypto-wasm-<tag>.tar.gz`
 # asset from the XRPLF/mpt-crypto GitHub release, verifies its checksums, and
-# copies mpt_crypto.{js,mjs,wasm} into wasm/. The xrpl.js release pipeline runs
+# copies mpt_crypto.{js,mjs,web.mjs,wasm} into wasm/. The xrpl.js release pipeline runs
 # this before packing so the published npm tarball carries the exact WASM built
 # from that mpt-crypto release — never fetched at the consumer's `npm install`.
 #
@@ -112,8 +112,12 @@ fi
 # ---------------------------------------------------------------------------
 # 6. Vendor the glue + wasm into wasm/
 # ---------------------------------------------------------------------------
+# mpt_crypto.web.mjs is the `node:`-free browser glue the package's `./wasm` "browser"
+# export resolves to, so browser bundlers avoid the Node-only import in mpt_crypto.mjs;
+# Node keeps the full mpt_crypto.mjs/.js. The release must ship all four artifacts — a
+# missing one fails loudly below.
 mkdir -p wasm
-for f in mpt_crypto.js mpt_crypto.mjs mpt_crypto.wasm; do
+for f in mpt_crypto.js mpt_crypto.mjs mpt_crypto.web.mjs mpt_crypto.wasm; do
   src="$(find "${TMP}/extract" -name "${f}" -type f | head -n1 || true)"
   if [[ -z "${src}" ]]; then
     err "expected file '${f}' was not found inside ${ASSET}."
@@ -125,6 +129,6 @@ for f in mpt_crypto.js mpt_crypto.mjs mpt_crypto.wasm; do
 done
 
 info "Vendored mpt-crypto WASM (${TAG}) into ${PKG_DIR}/wasm/:"
-for f in mpt_crypto.js mpt_crypto.mjs mpt_crypto.wasm; do
+for f in mpt_crypto.js mpt_crypto.mjs mpt_crypto.web.mjs mpt_crypto.wasm; do
   info "  wasm/${f} ($(wc -c <"wasm/${f}") bytes)"
 done

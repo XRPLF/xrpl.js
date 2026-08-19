@@ -197,9 +197,10 @@ export async function loadWithRetry(
  * Load (once) and return the vendored WASM module.
  *
  * The glue is imported via this package's own `./wasm` subpath export so one line
- * serves both builds: `require`/Jest get the CJS glue, bundlers/browsers the ESM
- * glue (whose `new URL(import.meta.url)` lets them emit the wasm as an asset). See
- * the `package.json` exports and `src/wasm.d.ts`.
+ * serves every target: `require`/Jest get the CJS glue, Node `import` the full ESM
+ * glue, and bundlers/browsers a Node-free ESM glue (`mpt_crypto.web.mjs`). All three
+ * wrap the same `.wasm`; both ESM glues use `new URL(import.meta.url)` so bundlers
+ * emit it as an asset. See the `package.json` exports and `src/wasm.d.ts`.
  *
  * A transient load failure is retried automatically; if every attempt still
  * fails the rejection is not cached, so a later call retries afresh rather than
