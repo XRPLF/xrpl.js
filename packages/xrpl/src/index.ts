@@ -4,6 +4,11 @@ export * from './models'
 
 export * from './utils'
 
+export {
+  validateSponsorship,
+  SponsorshipValidationResult,
+} from './sugar/validateSponsorship'
+
 export { default as ECDSA } from './ECDSA'
 
 export * from './errors'

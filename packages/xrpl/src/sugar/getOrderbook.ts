@@ -17,6 +17,7 @@ function sortOffers(offers: BookOffer[]): BookOffer[] {
     const qualityA = offerA.quality ?? 0
     const qualityB = offerB.quality ?? 0
 
+    // comparedTo returns null when comparing with NaN; treat as equal (0)
     return new BigNumber(qualityA).comparedTo(qualityB) ?? 0
   })
 }

@@ -92,6 +92,12 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    * amendment.
    */
   ImmutableFlags?: number
+  /**
+   * (Optional) The account sponsoring the reserve for this MPTokenIssuance.
+   * If present, the sponsor is responsible for the reserve requirement of
+   * this object instead of the owner.
+   */
+  Sponsor?: string
 }
 
 export interface MPTokenIssuanceFlagsInterface {

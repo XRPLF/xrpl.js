@@ -19,4 +19,10 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   AuditorEncryptedBalance?: string
   /** The holder's registered compressed ElGamal encryption key. */
   HolderEncryptionKey?: string
+  /**
+   * (Optional) The account sponsoring the reserve for this MPToken. If
+   * present, the sponsor is responsible for the reserve requirement of this
+   * object instead of the owner.
+   */
+  Sponsor?: string
 }
