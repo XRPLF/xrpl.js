@@ -256,11 +256,12 @@ async function getSponsorshipEntry(
     const response = await client.request(request)
     const entry = response.result.node
 
-    if (
-      typeof entry === 'object' &&
-      'LedgerEntryType' in entry &&
-      entry.LedgerEntryType === 'Sponsorship'
-    ) {
+    // `node` is typed as always-present, but rippled can still omit or null
+    // it at runtime; optional chaining keeps this safe for both cases instead
+    // of `typeof entry === 'object'`, which lets a null node reach the
+    // property access below (typeof null === 'object').
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- defends against the type being wrong at runtime
+    if (entry?.LedgerEntryType === 'Sponsorship') {
       return entry
     }
 

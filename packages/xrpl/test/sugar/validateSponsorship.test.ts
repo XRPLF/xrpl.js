@@ -68,6 +68,37 @@ describe('validateSponsorship', function () {
     assert.include(result.error ?? '', 'No fee available')
   })
 
+  it('treats a null ledger_entry node as no Sponsorship rather than crashing', async function () {
+    // Regression test: `typeof null === 'object'`, so a null node would reach
+    // the `in` operator and throw a TypeError without an explicit null guard.
+    const originalRequest = client.request.bind(client)
+    const mockFn: MockRequestFnInterface = async (req) => {
+      if (req.command === 'ledger_entry') {
+        return {
+          status: 'success',
+          type: 'response',
+          result: { node: null },
+        } as unknown as MockResponse
+      }
+      return originalRequest(req as LedgerEntryRequest)
+    }
+    client.request = mockFn as typeof client.request
+
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Amount: '1000000',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SponsorFlags: SponsorFlags.spfSponsorFee,
+    }
+
+    const result = await validateSponsorship(client, tx, '100')
+
+    assert.isFalse(result.valid)
+    assert.include(result.error ?? '', 'No Sponsorship ledger entry found')
+  })
+
   it('propagates a rippled error whose message happens to mention entryNotFound but whose structured code does not match', async function () {
     // Regression test: entryNotFound detection must key off the structured
     // rippled error code (error.data.error), not a substring match on the
