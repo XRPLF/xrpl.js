@@ -126,6 +126,8 @@ export async function getConvertBackProof(
     const pubPtr = marshaller.allocBytes(pub)
     const ctxPtr = marshaller.allocBytes(ctx)
     const paramsPtr = marshaller.allocPedersenParams(rawParams)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    rawParams.blindingFactor.fill(0)
     const outPtr = marshaller.alloc(CONVERT_BACK_PROOF_SIZE)
     if (
       mod._mpt_get_convert_back_proof(
@@ -181,9 +183,13 @@ export async function getConfidentialSendProof(
     const pubPtr = marshaller.allocBytes(pub)
     const participantsPtr = marshaller.allocParticipants(participants)
     const txBlindingPtr = marshaller.allocBytes(txBlinding)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    txBlinding.fill(0)
     const ctxPtr = marshaller.allocBytes(ctx)
     const amountCommitmentPtr = marshaller.allocBytes(amountCommitment)
     const balancePtr = marshaller.allocPedersenParams(balanceParams)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    balanceParams.blindingFactor.fill(0)
     const outPtr = marshaller.alloc(SEND_PROOF_SIZE)
     const outLenPtr = marshaller.alloc(SIZE_T_BYTES)
     marshaller.writeU32(outLenPtr, SEND_PROOF_SIZE)

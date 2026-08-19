@@ -60,6 +60,8 @@ export async function encryptAmount(
   return withModule((mod, marshaller) => {
     const pubPtr = marshaller.allocBytes(pub)
     const blindingPtr = marshaller.allocBytes(blinding)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    blinding.fill(0)
     const outPtr = marshaller.alloc(ELGAMAL_TOTAL_SIZE)
     if (mod._mpt_encrypt_amount(amount, pubPtr, blindingPtr, outPtr) !== 0) {
       throw new Error('mpt_encrypt_amount failed')
@@ -132,6 +134,8 @@ export async function getPedersenCommitment(
   )
   return withModule((mod, marshaller) => {
     const blindingPtr = marshaller.allocBytes(blinding)
+    // Wipe the transient JS copy; WASM scratch is zeroed on dispose().
+    blinding.fill(0)
     const outPtr = marshaller.alloc(PEDERSEN_COMMIT_SIZE)
     if (mod._mpt_get_pedersen_commitment(amount, blindingPtr, outPtr) !== 0) {
       throw new Error('mpt_get_pedersen_commitment failed')
