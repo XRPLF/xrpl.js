@@ -457,6 +457,53 @@ describe('confidential/prepareConfidentialBatch', function () {
     assert.strictEqual(decrypted, 30n)
   })
 
+  it('does not re-register the holder key on a second same-(account,token) Convert', async function () {
+    const client = batchClient({
+      // outer Batch account (signs it; not a Convert party here)
+      [ADDR_A]: await sender(100n, 5),
+      // holder with no on-ledger key — a first-time Convert
+      [ADDR_B]: {},
+    })
+    const batch = await prepareConfidentialBatch(client, {
+      account: ADDR_A,
+      inners: [
+        {
+          operation: 'convert',
+          account: ADDR_B,
+          amount: 100n,
+          holderKeypair: KEY_B,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+        {
+          operation: 'convert',
+          account: ADDR_B,
+          amount: 50n,
+          holderKeypair: KEY_B,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+      ],
+    })
+    // The first Convert registers bob's key; the second must NOT re-register it. The
+    // builder auto-detects from on-ledger state, which wouldn't see the first in-batch
+    // Convert — so both would emit HolderEncryptionKey and the second fail tecDUPLICATE.
+    const [first, second] = inners(batch)
+    if (
+      first.TransactionType !== 'ConfidentialMPTConvert' ||
+      second.TransactionType !== 'ConfidentialMPTConvert'
+    ) {
+      throw new Error('expected two ConfidentialMPTConvert inners')
+    }
+    assert.ok(
+      first.HolderEncryptionKey != null,
+      'first Convert registers the holder key',
+    )
+    assert.strictEqual(
+      second.HolderEncryptionKey,
+      undefined,
+      'second Convert must not re-register the holder key',
+    )
+  })
+
   it('credits the destination issuer balance so a same-batch recipient clawback is predicted', async function () {
     const client = batchClient({
       [ADDR_A]: await sender(100n, 10),

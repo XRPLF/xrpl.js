@@ -94,6 +94,10 @@ export function rawPedersenParams(
   params: PedersenParams,
   label: string,
 ): RawPedersenParams {
+  // The witness amount is written to a WASM i64 by allocPedersenParams (which
+  // wraps silently on overflow); each caller asserts its own top-level amount
+  // but not this balance amount, so guard it here at the marshalling boundary.
+  assertUint64(params.amount, `${label}.amount`)
   return {
     commitment: hexToBytes(
       params.commitment,

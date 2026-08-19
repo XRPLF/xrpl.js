@@ -119,5 +119,21 @@ describe('internal marshalling helpers', () => {
         ),
       ).toThrow(/balanceParams\.blindingFactor must be 32 bytes/u)
     })
+
+    it('rejects an out-of-range amount with a labeled error', () => {
+      // The amount is written to a WASM i64 that wraps silently on overflow, so
+      // the balance witness amount is guarded here rather than in each caller.
+      expect(() =>
+        rawPedersenParams(
+          {
+            commitment: COMMITMENT,
+            amount: U64_MAX + 1n,
+            ciphertext: CIPHERTEXT,
+            blindingFactor: BLINDING,
+          },
+          'balanceParams',
+        ),
+      ).toThrow(/balanceParams\.amount must be an integer/u)
+    })
   })
 })

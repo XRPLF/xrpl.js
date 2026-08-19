@@ -605,6 +605,12 @@ async function buildConfidentialInner(
         ...params,
         sequence,
         ledgerIndex,
+        // Register the holder key only when the predicted state has none yet. The
+        // builder's own auto-detect reads on-ledger state, which would miss an
+        // earlier same-batch Convert that already registered it — two first-time
+        // Converts for one (account, token) would both emit HolderEncryptionKey and
+        // the second would fail.
+        registerKey: op.registerKey ?? state.holderKey == null,
       })
       const credit: Credit = {
         inbox: tx.HolderEncryptedAmount,
