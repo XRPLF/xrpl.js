@@ -79,36 +79,6 @@
       }
     ],
     [
-      "FeeAmount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 32,
-        "type": "Amount"
-      }
-    ],
-    [
-      "MaxFee",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 33,
-        "type": "Amount"
-      }
-    ],
-    [
-      "FeeAmountDelta",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 34,
-        "type": "SignedAmount"
-      }
-    ],
-    [
       "LedgerEntryType",
       {
         "isSerialized": true,
