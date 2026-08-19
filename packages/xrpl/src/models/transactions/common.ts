@@ -1,6 +1,10 @@
 /* eslint-disable max-lines -- common utility file */
 import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import {
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -14,6 +18,7 @@ import {
   MPTAmount,
   Memo,
   Signer,
+  SponsorSignature,
   XChainBridge,
 } from '../common'
 import { isHex, onlyHasFields } from '../utils'
@@ -73,6 +78,76 @@ function isSigner(obj: unknown): obj is Signer {
     isString(signer.TxnSignature) &&
     isString(signer.SigningPubKey)
   )
+}
+
+/**
+ * Verify the form and type of a SponsorSignature at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @param isInnerBatchTxn - Whether the enclosing transaction carries the
+ * `tfInnerBatchTxn` flag.
+ * @returns Whether the SponsorSignature is properly formed.
+ */
+function isSponsorSignature(
+  obj: unknown,
+  isInnerBatchTxn: boolean,
+): obj is SponsorSignature {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  if (isInnerBatchTxn) {
+    /*
+     * Inner batch transactions are never individually signed - the whole
+     * Batch is authorized together via the outer transaction's
+     * BatchSigners. rippled's Batch::preflight requires a sponsored inner
+     * txn's SponsorSignature to carry the same empty placeholder shape as
+     * the inner txn's own signature fields (SigningPubKey: '', no
+     * TxnSignature, no Signers); the sponsor's real authorization is
+     * supplied via a BatchSigners entry on the outer Batch transaction.
+     */
+    return (
+      obj.SigningPubKey === '' &&
+      obj.TxnSignature === undefined &&
+      obj.Signers === undefined
+    )
+  }
+
+  const hasSigningPubKey = obj.SigningPubKey !== undefined
+  const hasTxnSignature = obj.TxnSignature !== undefined
+  const hasSigners = obj.Signers !== undefined
+
+  /*
+   * Must have either (SigningPubKey + TxnSignature) OR Signers, but not both
+   */
+  const hasSingleSig = hasSigningPubKey && hasTxnSignature
+  const hasMultiSig = hasSigners
+
+  if (hasSingleSig && hasMultiSig) {
+    /* Cannot have both single-sig and multi-sig */
+    return false
+  }
+
+  if (!hasSingleSig && !hasMultiSig) {
+    /* Must have at least one signing method */
+    return false
+  }
+
+  // Validate single-sig fields
+  if (hasSingleSig) {
+    if (!isString(obj.SigningPubKey) || !isString(obj.TxnSignature)) {
+      return false
+    }
+  }
+
+  // Validate multi-sig fields
+  if (hasMultiSig) {
+    if (!isArray(obj.Signers) || !obj.Signers.every(isSigner)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 // Currency object sizes
@@ -289,6 +364,34 @@ export function isAccount(account: unknown): account is Account {
 }
 
 /**
+ * Normalizes an address to its classic format.
+ * If the address is an X-address, converts it to a classic address.
+ * If the address is already a classic address, returns it as-is.
+ *
+ * @param address - The address to normalize (classic or X-address format).
+ * @returns The classic address format.
+ */
+function toClassicAddress(address: string): string {
+  if (isValidXAddress(address)) {
+    return xAddressToClassicAddress(address).classicAddress
+  }
+  return address
+}
+
+/**
+ * Compares two addresses for equality, normalizing both to classic address format.
+ * This handles the case where one address might be an X-address and the other
+ * a classic address, but they refer to the same account.
+ *
+ * @param address1 - The first address to compare.
+ * @param address2 - The second address to compare.
+ * @returns True if the addresses refer to the same account, false otherwise.
+ */
+export function areAddressesEqual(address1: string, address2: string): boolean {
+  return toClassicAddress(address1) === toClassicAddress(address2)
+}
+
+/**
  * Verify the form and type of an Amount at runtime.
  *
  * @param amount - The object to check the form and type of.
@@ -457,6 +560,17 @@ export interface GlobalFlagsInterface {
 }
 
 /**
+ * Sponsor flags for transaction common fields.
+ * These flags indicate what type of sponsorship is being used in a transaction.
+ */
+export enum SponsorFlags {
+  /** Sponsor is paying the transaction fee */
+  spfSponsorFee = 0x00000001,
+  /** Sponsor is paying reserves for objects created in the transaction */
+  spfSponsorReserve = 0x00000002,
+}
+
+/**
  * Every transaction has the same set of common fields.
  */
 export interface BaseTransaction extends Record<string, unknown> {
@@ -534,6 +648,214 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The account sponsoring this transaction (paying fees and/or reserves).
+   */
+  Sponsor?: string
+  /**
+   * Flags indicating sponsorship type (fee and/or reserve).
+   * Must be included if Sponsor field is present.
+   */
+  SponsorFlags?: number
+  /**
+   * Sponsor's signature information.
+   * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
+   */
+  SponsorSignature?: SponsorSignature
+}
+
+/**
+ * Transaction types explicitly allow-listed by rippled for reserve sponsorship
+ * (see `isReserveSponsorAllowed` in rippled's SponsorHelpers.cpp). Only these
+ * transaction types may use the spfSponsorReserve flag; all others are
+ * rejected server-side with temINVALID_FLAG.
+ */
+const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
+  'DelegateSet',
+  'DepositPreauth',
+  'Payment',
+  'SignerListSet',
+  'CheckCancel',
+  'CheckCash',
+  'CheckCreate',
+  'EscrowCancel',
+  'EscrowCreate',
+  'EscrowFinish',
+  'PaymentChannelClaim',
+  'PaymentChannelCreate',
+  'PaymentChannelFund',
+  'Clawback',
+  'MPTokenAuthorize',
+  'MPTokenIssuanceCreate',
+  'MPTokenIssuanceDestroy',
+  'MPTokenIssuanceSet',
+  'TrustSet',
+  'CredentialAccept',
+  'CredentialCreate',
+  'CredentialDelete',
+  'AccountSet',
+  'SetRegularKey',
+  'SponsorshipTransfer',
+])
+
+/**
+ * Whether a transaction carries the `tfInnerBatchTxn` flag, without pulling
+ * in `models/utils`' `hasFlag` (which itself imports from this file and
+ * would create a circular dependency).
+ *
+ * @param tx - The transaction to check.
+ * @returns Whether the transaction is an inner Batch transaction.
+ */
+function isInnerBatchTransaction(tx: Record<string, unknown>): boolean {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag check */
+  if (typeof tx.Flags === 'number') {
+    return (tx.Flags & GlobalFlags.tfInnerBatchTxn) !== 0
+  }
+  /* eslint-enable no-bitwise */
+  if (isRecord(tx.Flags)) {
+    return tx.Flags.tfInnerBatchTxn === true
+  }
+  return false
+}
+
+/**
+ * Validate that SponsorFlags contains only valid flag values, and that reserve
+ * sponsorship (spfSponsorReserve) is only used where rippled allows it.
+ *
+ * @param sponsorFlags - The SponsorFlags value to validate.
+ * @param transactionType - The transaction type to validate flags against.
+ * @param hasDelegate - Whether the transaction also carries a Delegate field.
+ * @param isInnerBatchTxn - Whether the transaction carries the `tfInnerBatchTxn` flag.
+ * @throws ValidationError if flags are invalid.
+ */
+// eslint-disable-next-line max-params -- each param maps to a distinct rippled rejection rule
+function validateSponsorFlagsValue(
+  sponsorFlags: number,
+  transactionType: string | undefined,
+  hasDelegate: boolean,
+  isInnerBatchTxn: boolean,
+): void {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+  const validFlags = SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
+  if ((sponsorFlags & ~validFlags) !== 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags contains invalid flags',
+    )
+  }
+
+  if (sponsorFlags === 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags must have at least one flag set',
+    )
+  }
+
+  const hasReserveFlag = (sponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
+  const hasFeeFlag = (sponsorFlags & SponsorFlags.spfSponsorFee) !== 0
+  /* eslint-enable no-bitwise */
+
+  // Validate that reserve sponsorship is only used for the rippled allow-listed transaction types
+  if (
+    hasReserveFlag &&
+    transactionType &&
+    !RESERVE_SPONSORABLE_TRANSACTIONS.has(transactionType)
+  ) {
+    throw new ValidationError(
+      `Transaction: ${transactionType} cannot use spfSponsorReserve flag (does not create ledger objects)`,
+    )
+  }
+
+  // Reserve sponsorship is disallowed under permissioned delegation (rippled's
+  // Transactor::checkSponsor rejects Delegate + spfSponsorReserve with temINVALID).
+  if (hasReserveFlag && hasDelegate) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorReserve cannot be combined with Delegate ' +
+        '(reserve sponsorship under permissioned delegation is disallowed)',
+    )
+  }
+
+  // Fee sponsorship is disallowed on inner Batch transactions - rippled's
+  // Batch::preflight rejects spfSponsorFee on inner txns with temINVALID_FLAG,
+  // since only the outer Batch transaction pays a fee.
+  if (hasFeeFlag && isInnerBatchTxn) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  }
+}
+
+/**
+ * Validate sponsor-related fields in a transaction.
+ * This is a helper function for validateBaseTransaction.
+ *
+ * @param tx - The transaction to validate sponsor fields for.
+ * @throws ValidationError if sponsor fields are invalid.
+ */
+// eslint-disable-next-line max-lines-per-function -- necessary for validation
+export function validateSponsorFields(tx: Record<string, unknown>): void {
+  const transactionType = String(tx.TransactionType)
+  const isInnerBatchTxn = isInnerBatchTransaction(tx)
+
+  const sponsor = tx.Sponsor
+  const sponsorFlags = tx.SponsorFlags
+  const sponsorSignature = tx.SponsorSignature
+
+  const hasSponsor = sponsor !== undefined
+  const hasSponsorFlags = sponsorFlags !== undefined
+  const hasSponsorSignature = sponsorSignature !== undefined
+
+  /* If any sponsor field is present, Sponsor and SponsorFlags must be present */
+  if (hasSponsor || hasSponsorFlags || hasSponsorSignature) {
+    if (!hasSponsor || !hasSponsorFlags) {
+      throw new ValidationError(
+        'Transaction: Sponsor and SponsorFlags must both be present for sponsored transactions',
+      )
+    }
+  }
+
+  /* Validate Sponsor field */
+  if (hasSponsor) {
+    if (!isString(sponsor)) {
+      throw new ValidationError('Transaction: Sponsor must be a string')
+    }
+    if (!isAccount(sponsor)) {
+      throw new ValidationError(
+        'Transaction: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  /* Validate SponsorFlags field */
+  if (hasSponsorFlags) {
+    if (!isNumber(sponsorFlags)) {
+      throw new ValidationError('Transaction: SponsorFlags must be a number')
+    }
+    validateSponsorFlagsValue(
+      sponsorFlags,
+      transactionType,
+      tx.Delegate !== undefined,
+      isInnerBatchTxn,
+    )
+  }
+
+  /* Validate SponsorSignature field */
+  if (
+    hasSponsorSignature &&
+    !isSponsorSignature(sponsorSignature, isInnerBatchTxn)
+  ) {
+    throw new ValidationError('Transaction: invalid SponsorSignature')
+  }
+
+  /* Validate no self-sponsorship */
+  if (
+    hasSponsor &&
+    isString(sponsor) &&
+    isString(tx.Account) &&
+    areAddressesEqual(sponsor, tx.Account)
+  ) {
+    throw new ValidationError(
+      'Transaction: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
+    )
+  }
 }
 
 /**
@@ -605,11 +927,19 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'Delegate', isAccount)
 
   const delegate = common.Delegate
-  if (delegate != null && delegate === common.Account) {
+  if (
+    delegate != null &&
+    isString(delegate) &&
+    isString(common.Account) &&
+    areAddressesEqual(delegate, common.Account)
+  ) {
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   }
+
+  // Validate sponsor fields using helper function
+  validateSponsorFields(common)
 }
 
 /**
