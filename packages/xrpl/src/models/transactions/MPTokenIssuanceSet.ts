@@ -19,6 +19,8 @@ import {
   GlobalFlagsInterface,
   isNumber,
   isDomainID,
+  isHexWithByteLength,
+  CONFIDENTIAL_EC_POINT_BYTES,
 } from './common'
 import {
   MAX_TRANSFER_FEE,
@@ -135,6 +137,16 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    * If omitted, this transaction will apply to all any accounts holding MPTs.
    */
   Holder?: Account
+  /**
+   * The issuer's compressed ElGamal encryption key (33-byte EC point),
+   * registered so confidential amounts can be encrypted to the issuer.
+   */
+  IssuerEncryptionKey?: string
+  /**
+   * The auditor's compressed ElGamal encryption key (33-byte EC point),
+   * registered so confidential amounts can be encrypted to an auditor.
+   */
+  AuditorEncryptionKey?: string
   Flags?: number | MPTokenIssuanceSetFlagsInterface
 
   /**
@@ -179,6 +191,21 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
   validateRequiredField(tx, 'MPTokenIssuanceID', isString)
   validateOptionalField(tx, 'Holder', isAccount)
+  validateOptionalField(
+    tx,
+    'IssuerEncryptionKey',
+    isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES),
+  )
+  validateOptionalField(
+    tx,
+    'AuditorEncryptionKey',
+    isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES),
+  )
+  if (tx.AuditorEncryptionKey != null && tx.IssuerEncryptionKey == null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: AuditorEncryptionKey requires IssuerEncryptionKey',
+    )
+  }
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'ImmutableFlags', isNumber)
@@ -228,8 +255,15 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     tx.MPTokenMetadata != null ||
     tx.TransferFee != null ||
     tx.ImmutableFlags != null
+  const isSetConfidentialKeys =
+    tx.IssuerEncryptionKey != null || tx.AuditorEncryptionKey != null
 
-  if (flagsNum === 0 && tx.DomainID == null && !isMutate) {
+  if (
+    flagsNum === 0 &&
+    tx.DomainID == null &&
+    !isMutate &&
+    !isSetConfidentialKeys
+  ) {
     throw new ValidationError(
       'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
     )
@@ -238,6 +272,14 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   if (isMutate && tx.Holder != null) {
     throw new ValidationError(
       'MPTokenIssuanceSet: Holder field is not allowed when mutating MPTokenIssuance.',
+    )
+  }
+
+  // Registering issuer/auditor encryption keys is issuance-wide; rippled rejects it
+  // paired with a per-holder target (temMALFORMED).
+  if (isSetConfidentialKeys && tx.Holder != null) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: Holder field is not allowed when registering confidential encryption keys.',
     )
   }
 
@@ -251,6 +293,19 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
         `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+      )
+    }
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    if (
+      tx.TransferFee > 0 &&
+      isFlagEnabled(
+        flagsNum,
+        MPTokenIssuanceSetFlags.tfMPTSetCanHoldConfidentialBalance,
+      )
+    ) {
+      throw new ValidationError(
+        'MPTokenIssuanceSet: TransferFee cannot be provided together with the tfMPTSetCanHoldConfidentialBalance flag',
       )
     }
   }

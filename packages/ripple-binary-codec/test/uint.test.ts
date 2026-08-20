@@ -194,6 +194,22 @@ it('UInt64 is parsed as base 10 for MPT amounts', () => {
   const decodedToken = decode(mptokenEntryBinary)
   expect(typeof decodedToken.MPTAmount).toBe('string')
   expect(decodedToken.MPTAmount).toBe('100')
+
+  // ConfidentialOutstandingAmount (XLS-0096) is a base-10 UInt64 like the other MPT
+  // amounts: a decimal value must survive an encode -> decode round-trip. Without the
+  // base-10 mapping it is mis-read as hex (this 19-digit value would even fail to
+  // encode, as hex tops out at 16 chars).
+  const confidentialIssuance = {
+    ...mptIssuanceEntryJson,
+    ConfidentialOutstandingAmount: '1234567890123456789',
+  }
+  const decodedConfidential = decode(encode(confidentialIssuance))
+  expect(typeof decodedConfidential.ConfidentialOutstandingAmount).toBe(
+    'string',
+  )
+  expect(decodedConfidential.ConfidentialOutstandingAmount).toBe(
+    '1234567890123456789',
+  )
 })
 
 describe('UInt decimal validation', () => {
