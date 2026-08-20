@@ -234,4 +234,17 @@ export interface ConfidentialBatchParams {
   inners: ConfidentialBatchInner[]
   /** Outer Batch flags. Defaults to `tfAllOrNothing` (atomic). */
   batchFlags?: number
+  /**
+   * Extra signatures the outer fee must cover, forwarded to `client.autofill`: the
+   * outer account's own multisign signers, plus one for each co-signing participant
+   * (or that participant's signer count when multisigned). Omit for a
+   * single-signed, single-account Batch.
+   */
+  signersCount?: number
+  /**
+   * Extra signatures the outer fee must cover for a multisigned sponsor, forwarded
+   * to `client.autofill`: the signer count of the outer Batch's `SponsorSignature`.
+   * Omit when not sponsored, or when the sponsor signs with a single key.
+   */
+  sponsorSignersCount?: number
 }

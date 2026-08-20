@@ -6,7 +6,10 @@ import {
 import { assert } from 'chai'
 
 import { type Client } from '../../src'
-import { prepareConfidentialBatch } from '../../src/confidential'
+import {
+  type ConfidentialBatchInner,
+  prepareConfidentialBatch,
+} from '../../src/confidential'
 import type { SubmittableTransaction } from '../../src/models/transactions'
 
 import {
@@ -84,9 +87,14 @@ function mptNode(fixture: AccountFixture): Record<string, unknown> {
  * real outer-fee autofill is exercised by the integration tests).
  *
  * @param accounts - Per-account fixtures keyed by classic address.
+ * @param onAutofill - Optional spy invoked with the signer counts the assembler
+ * forwards to `client.autofill`.
  * @returns A Client whose request/autofill serve the fixtures.
  */
-function batchClient(accounts: Record<string, AccountFixture>): Client {
+function batchClient(
+  accounts: Record<string, AccountFixture>,
+  onAutofill?: (signersCount?: number, sponsorSignersCount?: number) => void,
+): Client {
   const request = async (req: {
     command?: string
     account?: string
@@ -112,7 +120,14 @@ function batchClient(accounts: Record<string, AccountFixture>): Client {
     }
     throw new Error(`unexpected request: ${JSON.stringify(req)}`)
   }
-  const autofill = async (tx: unknown): Promise<unknown> => tx
+  const autofill = async (
+    tx: unknown,
+    signersCount?: number,
+    sponsorSignersCount?: number,
+  ): Promise<unknown> => {
+    onAutofill?.(signersCount, sponsorSignersCount)
+    return tx
+  }
   const getLedgerIndex = async (): Promise<number> => 100
   return { request, autofill, getLedgerIndex } as unknown as Client
 }
@@ -502,6 +517,55 @@ describe('confidential/prepareConfidentialBatch', function () {
       undefined,
       'second Convert must not re-register the holder key',
     )
+  })
+
+  it('forwards signersCount and sponsorSignersCount to the outer autofill', async function () {
+    const accounts = {
+      [ADDR_A]: await sender(100n, 5),
+      [ADDR_B]: {},
+    }
+    const innerSpecs: ConfidentialBatchInner[] = [
+      {
+        operation: 'convert',
+        account: ADDR_B,
+        amount: 100n,
+        holderKeypair: KEY_B,
+        mptIssuanceID: ISSUANCE_ID,
+      },
+      {
+        operation: 'convert',
+        account: ADDR_B,
+        amount: 50n,
+        holderKeypair: KEY_B,
+        mptIssuanceID: ISSUANCE_ID,
+      },
+    ]
+
+    // Explicit counts are forwarded verbatim (parity with client.autofill) so the
+    // outer fee can cover a multisigned or multi-account Batch's extra signatures.
+    let provided: [number?, number?] = [-1, -1]
+    await prepareConfidentialBatch(
+      batchClient(accounts, (signersCount, sponsorSignersCount) => {
+        provided = [signersCount, sponsorSignersCount]
+      }),
+      {
+        account: ADDR_A,
+        inners: innerSpecs,
+        signersCount: 3,
+        sponsorSignersCount: 2,
+      },
+    )
+    assert.deepEqual(provided, [3, 2])
+
+    // Omitted, they forward as undefined so autofill applies its own defaults.
+    let omitted: [number?, number?] = [-1, -1]
+    await prepareConfidentialBatch(
+      batchClient(accounts, (signersCount, sponsorSignersCount) => {
+        omitted = [signersCount, sponsorSignersCount]
+      }),
+      { account: ADDR_A, inners: innerSpecs },
+    )
+    assert.deepEqual(omitted, [undefined, undefined])
   })
 
   it('credits the destination issuer balance so a same-batch recipient clawback is predicted', async function () {

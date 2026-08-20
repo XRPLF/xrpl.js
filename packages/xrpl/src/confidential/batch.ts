@@ -677,8 +677,10 @@ async function buildConfidentialInner(
  * be built with the final value — `autofill` cannot fix a proof afterward), threads
  * predicted balance state through repeated same-`(account, token)` operations (each
  * proof binds the balance the previous inner leaves behind), shapes every inner
- * (`tfInnerBatchTxn`, `Fee: '0'`), and autofills the outer fee. Signing stays with
- * the caller: `signMultiBatch` for each non-outer participant, then the outer
+ * (`tfInnerBatchTxn`, `Fee: '0'`), and autofills the outer fee — pass `signersCount`/
+ * `sponsorSignersCount` for a multisigned or multi-account Batch so that fee also
+ * covers the extra signatures (see {@link ConfidentialBatchParams}). Signing stays
+ * with the caller: `signMultiBatch` for each non-outer participant, then the outer
  * account signs.
  *
  * A plain (non-confidential) inner that already carries its own `Sequence` or
@@ -686,7 +688,8 @@ async function buildConfidentialInner(
  * position-derived sequence, mirroring how `autofill` sequences a Batch.
  *
  * @param client - A connected Client.
- * @param params - The batch account, ordered inners, and optional outer flags.
+ * @param params - The batch account, ordered inners, optional outer flags, and the
+ * optional signer/sponsor counts the outer fee must cover.
  * @returns The assembled, autofilled Batch.
  * @throws {XrplError} If `inners` has fewer than 2 or more than 8 entries (rippled's
  * Batch bounds), or a chain reads a balance a prior MergeInbox/Clawback reset (split
@@ -697,7 +700,8 @@ export async function prepareConfidentialBatch(
   client: Client,
   params: ConfidentialBatchParams,
 ): Promise<Batch> {
-  const { account, inners, batchFlags } = params
+  const { account, inners, batchFlags, signersCount, sponsorSignersCount } =
+    params
   if (inners.length < MIN_BATCH_INNERS || inners.length > MAX_BATCH_INNERS) {
     throw new XrplError(
       `prepareConfidentialBatch: a Batch requires between ${MIN_BATCH_INNERS} and ` +
@@ -756,5 +760,5 @@ export async function prepareConfidentialBatch(
     Flags: batchFlags ?? TF_ALL_OR_NOTHING,
     RawTransactions: rawTransactions,
   }
-  return client.autofill(batch)
+  return client.autofill(batch, signersCount, sponsorSignersCount)
 }
