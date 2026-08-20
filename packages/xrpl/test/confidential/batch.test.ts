@@ -227,6 +227,37 @@ describe('confidential/prepareConfidentialBatch', function () {
     assert.strictEqual(pay.TransactionType, 'Payment')
   })
 
+  it('normalizes a plain inner that carries object-form Flags instead of dropping them', async function () {
+    const client = batchClient({
+      [ADDR_A]: await sender(1000n, 10),
+      [ADDR_B]: await destination(KEY_B.publicKey),
+    })
+    const batch = await prepareConfidentialBatch(client, {
+      account: ADDR_A,
+      inners: [
+        {
+          operation: 'send',
+          account: ADDR_A,
+          destination: ADDR_B,
+          amount: 30n,
+          senderKeypair: KEY_A,
+          mptIssuanceID: ISSUANCE_ID,
+        },
+        {
+          TransactionType: 'Payment',
+          Account: ADDR_A,
+          Destination: ADDR_B,
+          Amount: '1',
+          Flags: { tfPartialPayment: true },
+        },
+      ],
+    })
+    // The object flag is converted to its number and OR-ed with the inner-batch flag,
+    // not silently coerced to 0 (which would strip the caller's tfPartialPayment).
+    const [, pay] = inners(batch)
+    assert.strictEqual(pay.Flags, TF_INNER_BATCH_TXN + TF_PARTIAL_PAYMENT)
+  })
+
   it('chains two same-(account,token) sends against the predicted balance', async function () {
     const client = batchClient({
       [ADDR_A]: await sender(50n, 5),

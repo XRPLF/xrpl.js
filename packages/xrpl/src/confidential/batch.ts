@@ -8,6 +8,7 @@ import {
   SubmittableTransaction,
 } from '../models/transactions'
 import { GlobalFlags } from '../models/transactions/common'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 
 import {
   prepareConfidentialConvert,
@@ -152,10 +153,10 @@ function readBalance(value: string | undefined, what: string): string {
  * @returns The shaped inner transaction.
  */
 function shapeInner(tx: SubmittableTransaction): SubmittableTransaction {
-  // Merge the inner-batch flag with any numeric flags a plain inner already carries
-  // (the confidential builders set none) rather than overwriting them; inner Batch
-  // flags are numeric, not flag objects.
-  const flags = typeof tx.Flags === 'number' ? tx.Flags : 0
+  // Merge the inner-batch flag with any flags the inner already carries (confidential
+  // builders set none; a plain inner may set its own), normalizing object-form flags
+  // to a number rather than silently dropping them.
+  const flags = convertTxFlagsToNumber(tx)
   // eslint-disable-next-line no-bitwise -- combine the inner-batch flag with caller flags
   return { ...tx, Flags: flags | TF_INNER_BATCH_TXN, Fee: '0' }
 }

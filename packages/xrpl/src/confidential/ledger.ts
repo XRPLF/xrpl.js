@@ -200,7 +200,9 @@ export function decryptBound(
  * @param account - The classic XRPL address of the token holder.
  * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
  * @param privateKey - The holder's 32-byte hex ElGamal private key.
- * @returns The decrypted spendable balance, or `0n` if none is set.
+ * @returns The decrypted spendable balance, or `0n` if the MPToken exists but has no
+ * confidential spending balance set.
+ * @throws {RippledError} If the account holds no MPToken for the issuance.
  */
 // eslint-disable-next-line max-params -- a connected client plus the (account, issuance, key) lookup tuple
 export async function getConfidentialBalance(
