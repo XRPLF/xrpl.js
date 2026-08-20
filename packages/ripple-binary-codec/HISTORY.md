@@ -5,8 +5,8 @@
 ## 2.10.0 (2026-08-20)
 
 ### Added
-* Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96): new transaction types (`ConfidentialMPTClawback`, `ConfidentialMPTConvert`, `ConfidentialMPTConvertBack`, `ConfidentialMPTMergeInbox`, `ConfidentialMPTSend`), related fields, and flags.
-* Add definitions for Sponsored Fees and Reserves (XLS-68): new `Sponsorship` ledger entry type, transaction types (`SponsorshipSet`, `SponsorshipTransfer`), related fields, flags, and transaction result codes.
+* Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96): new transaction types, related fields, and the `lsfMPTCanHoldConfidentialBalance` / `tfMPTSetCanHoldConfidentialBalance` flags.
+* Add definitions for Sponsored Fees and Reserves (XLS-68): new ledger entry type `Sponsorship`, transaction types `SponsorshipSet` and `SponsorshipTransfer`, related fields, and associated flags and transaction result codes.
 
 ## 2.9.0 (2026-08-13)
 
