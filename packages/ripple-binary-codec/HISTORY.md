@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.9.0 (2026-08-13)
+
 ### Added
 * Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96).
 * Add definitions for Sponsored Fees and Reserves (XLS-68).
