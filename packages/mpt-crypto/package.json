@@ -1,0 +1,60 @@
+{
+  "name": "@xrplf/mpt-crypto",
+  "version": "0.1.0",
+  "description": "Confidential MPT (XLS-0096) cryptographic primitives for the XRP Ledger, compiled to WebAssembly",
+  "files": [
+    "dist/*",
+    "wasm/*",
+    "src/*",
+    "MPT_CRYPTO_VERSION"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "browser": "./dist/esm/index.js",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./wasm": {
+      "browser": "./wasm/mpt_crypto.web.mjs",
+      "import": "./wasm/mpt_crypto.mjs",
+      "require": "./wasm/mpt_crypto.js",
+      "default": "./wasm/mpt_crypto.js"
+    }
+  },
+  "license": "ISC",
+  "keywords": [
+    "ripple",
+    "xrp",
+    "xrp ledger",
+    "xrpl",
+    "mpt",
+    "confidential"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:XRPLF/xrpl.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/XRPLF/xrpl.js/issues"
+  },
+  "homepage": "https://github.com/XRPLF/xrpl.js/tree/main/packages/mpt-crypto#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsc --build tsconfig.build.json && tsc -p tsconfig.esm.json && node scripts/finalize-esm.js",
+    "fetch:wasm": "bash scripts/fetch-wasm.sh",
+    "test": "jest --passWithNoTests --verbose false --silent=false ./test/*.test.ts",
+    "lint": "eslint . --max-warnings 0",
+    "clean": "rm -rf ./dist ./coverage tsconfig.build.tsbuildinfo"
+  },
+  "prettier": "@xrplf/prettier-config",
+  "engines": {
+    "node": ">= 18"
+  }
+}

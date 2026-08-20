@@ -371,6 +371,16 @@ jobs:
           echo "✅ lerna.json updated:"
           cat lerna.json
 
+      # @xrplf/mpt-crypto ships a prebuilt WASM module. Vendor it from the pinned
+      # XRPLF/mpt-crypto GitHub release (packages/mpt-crypto/MPT_CRYPTO_VERSION)
+      # so the published tarball carries the exact WASM for that release — never
+      # fetched at the consumer's install time.
+      - name: Vendor mpt-crypto WASM from its GitHub release
+        if: ${{ github.event.inputs.package_name == 'mpt-crypto' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash packages/mpt-crypto/scripts/fetch-wasm.sh
+
       - name: Pack tarball
         run: |
           set -euo pipefail

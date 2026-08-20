@@ -26,6 +26,17 @@ const LEDGER_OFFSET = 20
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
 
+// Confidential MPT (XLS-0096) transactions are charged this many extra base
+// fees on top of the standard base fee (rippled kCONFIDENTIAL_FEE_MULTIPLIER).
+const CONFIDENTIAL_FEE_MULTIPLIER = 9
+const CONFIDENTIAL_MPT_TRANSACTION_TYPES = [
+  'ConfidentialMPTConvert',
+  'ConfidentialMPTConvertBack',
+  'ConfidentialMPTSend',
+  'ConfidentialMPTClawback',
+  'ConfidentialMPTMergeInbox',
+]
+
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
  * Example usage: isNotLaterRippledVersion('1.10.0', '1.11.0') returns true.
@@ -353,7 +364,7 @@ function calculateSponsorFee(
  * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function, max-params -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -393,6 +404,16 @@ async function calculateFeePerTransactionType(
       Promise.resolve(new BigNumber(0)),
     )
     baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
+  } else if (CONFIDENTIAL_MPT_TRANSACTION_TYPES.includes(tx.TransactionType)) {
+    /*
+     * Confidential MPT Transaction
+     * rippled charges kCONFIDENTIAL_FEE_MULTIPLIER (9) extra base fees on top of
+     * the standard base fee, so the total before signers is baseFee × 10.
+     */
+    baseFee = BigNumber.sum(
+      baseFee,
+      scaleValue(netFeeDrops, CONFIDENTIAL_FEE_MULTIPLIER),
+    )
   }
 
   /*

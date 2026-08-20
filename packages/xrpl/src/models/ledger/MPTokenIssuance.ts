@@ -66,6 +66,12 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    * across all holders via Escrow or PaymentChannel.
    */
   LockedAmount?: string
+  /** The issuer's registered compressed ElGamal encryption key. */
+  IssuerEncryptionKey?: string
+  /** The auditor's registered compressed ElGamal encryption key. */
+  AuditorEncryptionKey?: string
+  /** The total confidential (encrypted) outstanding amount for this issuance. */
+  ConfidentialOutstandingAmount?: string
   /**
    * The PermissionedDomain object ID that gates who may hold
    * this MPT.
@@ -102,6 +108,7 @@ export interface MPTokenIssuanceFlagsInterface {
   lsfMPTCanTrade?: boolean
   lsfMPTCanTransfer?: boolean
   lsfMPTCanClawback?: boolean
+  lsfMPTCanHoldConfidentialBalance?: boolean
 }
 
 export interface MPTokenIssuanceImmutableFlagsInterface {
@@ -151,6 +158,7 @@ export enum MPTokenIssuanceFlags {
   lsfMPTCanTrade = 0x00000010,
   lsfMPTCanTransfer = 0x00000020,
   lsfMPTCanClawback = 0x00000040,
+  lsfMPTCanHoldConfidentialBalance = 0x00000080,
 }
 
 export enum MPTokenIssuanceImmutableFlags {

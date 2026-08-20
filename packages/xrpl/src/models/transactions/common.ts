@@ -1,6 +1,7 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
+import { bytesToHex, HEX_REGEX } from '@xrplf/isomorphic/utils'
 import {
+  decodeAccountID,
   isValidClassicAddress,
   isValidXAddress,
   xAddressToClassicAddress,
@@ -21,13 +22,30 @@ import {
   SponsorSignature,
   XChainBridge,
 } from '../common'
-import { isHex, onlyHasFields } from '../utils'
+import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 const SHA_512_HALF_LENGTH = 64
+
+// Confidential MPT (XLS-0096) fixed field byte lengths.
+// A compressed secp256k1 point (encryption keys and Pedersen commitments).
+export const CONFIDENTIAL_EC_POINT_BYTES = 33
+// An ElGamal ciphertext is two compressed points.
+export const CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES = 66
+// A scalar blinding factor (Hash256).
+export const CONFIDENTIAL_BLINDING_FACTOR_BYTES = 32
+// ZKProof byte lengths, fixed per transaction type by the mpt-crypto proof system.
+// Convert/Clawback are a compact Schnorr proof; ConvertBack and Send add a
+// (double) bulletproof range proof.
+export const CONFIDENTIAL_CONVERT_PROOF_BYTES = 64
+export const CONFIDENTIAL_CLAWBACK_PROOF_BYTES = 64
+export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
+export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
+// Max MPT amount: 2^63 - 1.
+export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -473,6 +491,23 @@ export function validateHexMetadata(
   )
 }
 
+/**
+ * Build a type guard that checks the input is a hex string encoding exactly
+ * `byteLength` bytes. Used by the Confidential MPT transactions to enforce
+ * fixed-size cryptographic fields (EC points, ElGamal ciphertexts, scalars).
+ *
+ * @param byteLength - The exact number of bytes the hex string must encode.
+ * @returns A type guard validating a hex string of the given byte length.
+ */
+export function isHexWithByteLength(
+  byteLength: number,
+): (inp: unknown) => inp is string {
+  // eslint-disable-next-line func-style -- returning a type guard
+  const check = (inp: unknown): inp is string =>
+    isString(inp) && isHex(inp) && inp.length === byteLength * 2
+  return check
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -549,7 +584,66 @@ export function validateOptionalField<
   }
 }
 
+/**
+ * Validate a Confidential MPT `MPTAmount`: a required non-negative uint64 string.
+ * ConfidentialMPTConvert permits zero (a zero-amount convert registers the holder
+ * key); ConfidentialMPTConvertBack and ConfidentialMPTClawback forbid zero.
+ *
+ * @param tx - The transaction to validate.
+ * @param allowZero - Whether a zero amount is permitted.
+ * @throws ValidationError if MPTAmount is missing, malformed, or out of range.
+ */
+export function validateConfidentialMPTAmount(
+  tx: Record<string, unknown>,
+  allowZero: boolean,
+): void {
+  validateRequiredField(tx, 'MPTAmount', isString)
+  if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
+    throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
+  }
+  const amount = BigInt(tx.MPTAmount)
+  if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
+    throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
+  }
+}
+
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
+
+/**
+ * An MPTokenIssuanceID is a 4-byte sequence (8 hex chars) followed by the
+ * 20-byte issuer AccountID, so the issuer begins after this many hex chars.
+ */
+const MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN = 8
+
+/**
+ * Whether `account` is the issuer encoded in `mptIssuanceID`.
+ *
+ * An MPTokenIssuanceID is a 4-byte sequence followed by the 20-byte issuer
+ * AccountID, so the issuer is its last 40 hex characters — the same derivation
+ * rippled uses (`MPTIssue::getIssuer`). The comparison is on decoded AccountIDs,
+ * so it holds whether `account` is given as a classic or an X-address. Returns
+ * `false` (rather than throwing) for a non-string or non-address input, leaving
+ * the field-level validators to report those.
+ *
+ * @param account - The classic or X-address to test.
+ * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @returns Whether `account` decodes to the issuer AccountID in `mptIssuanceID`.
+ */
+export function isMPTIssuer(account: unknown, mptIssuanceID: unknown): boolean {
+  if (!isString(account) || !isString(mptIssuanceID)) {
+    return false
+  }
+  const classicAddress = isValidXAddress(account)
+    ? xAddressToClassicAddress(account).classicAddress
+    : account
+  if (!isValidClassicAddress(classicAddress)) {
+    return false
+  }
+  return (
+    bytesToHex(decodeAccountID(classicAddress)).toUpperCase() ===
+    mptIssuanceID.slice(MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN).toUpperCase()
+  )
+}
 
 export enum GlobalFlags {
   tfInnerBatchTxn = 0x40000000,
