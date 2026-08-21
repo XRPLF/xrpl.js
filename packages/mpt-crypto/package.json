@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/mpt-crypto",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Confidential MPT (XLS-0096) cryptographic primitives for the XRP Ledger, compiled to WebAssembly",
   "files": [
     "dist/*",
