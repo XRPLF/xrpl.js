@@ -4,7 +4,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### BREAKING CHANGES
+## 5.1.0 (2026-08-24)
 
 ### Added
 * Add XLS-68 Sponsorship support: `SponsorshipSet`/`SponsorshipTransfer` transactions, `Sponsorship` ledger entry, `signAsSponsor`/`combineSponsorSigners`/`addPreFundedSponsor` wallet helpers, `account_sponsoring` RPC method, and sponsor-fee/reserve fields on `Payment` and other transactions.
