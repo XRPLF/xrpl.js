@@ -5,6 +5,7 @@ import {
   AccountDelete,
   EscrowFinish,
   Payment,
+  SponsorshipSet,
   Transaction,
   Batch,
   VaultCreate,
@@ -25,6 +26,7 @@ const Fee = '10'
 const Sequence = 1432
 const LastLedgerSequence = 2908734
 
+/* eslint-disable max-statements -- test file with many test cases */
 describe('client.autofill', function () {
   let testContext: XrplTestContext
   const AMOUNT = '1234'
@@ -228,6 +230,78 @@ describe('client.autofill', function () {
     )
   })
 
+  it('converts Sponsee X-address to classic address in SponsorshipSet', async function () {
+    const tx: SponsorshipSet = {
+      TransactionType: 'SponsorshipSet',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Sponsee: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee: '12',
+    }
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.Sponsee, 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59')
+  })
+
+  it('converts CounterpartySponsor X-address to classic address in SponsorshipSet', async function () {
+    const tx: SponsorshipSet = {
+      TransactionType: 'SponsorshipSet',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Sponsee: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      CounterpartySponsor: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee: '12',
+    }
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(
+      txResult.CounterpartySponsor,
+      'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
+    )
+  })
+
+  it('converts Sponsor X-address to classic address in Payment with sponsor', async function () {
+    const tx: Payment = {
+      TransactionType: 'Payment',
+      Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+      Amount: '1234',
+      Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      Sponsor: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      SponsorFlags: 1,
+    }
+    testContext.mockRippled!.addResponse(
+      'account_info',
+      rippled.account_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+    const txResult = await testContext.client.autofill(tx)
+
+    assert.strictEqual(txResult.Sponsor, 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59')
+  })
+
   it("should autofill Sequence when it's missing", async function () {
     const tx: Transaction = {
       TransactionType: 'DepositPreauth',
@@ -275,6 +349,106 @@ describe('client.autofill', function () {
     }
 
     await assertRejects(testContext.client.autofill(tx), XrplError)
+  })
+
+  it('should throw error if account being deleted has outstanding sponsorship obligations', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          SponsoringOwnerCount: 1,
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    await assertRejects(testContext.client.autofill(tx), XrplError)
+  })
+
+  it('should throw error if account being deleted has a Sponsor that does not match the AccountDelete Destination', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          Sponsor: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'X7AcgcsBL6XDcUb289X4mJ8djcdyKaB5hJDWMArnXr61cqZ',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    await assertRejects(testContext.client.autofill(tx), XrplError)
+  })
+
+  it('should autofill an AccountDelete when the account Sponsor matches the Destination', async function () {
+    testContext.mockRippled!.addResponse('account_info', {
+      ...rippled.account_info.normal,
+      result: {
+        ...rippled.account_info.normal.result,
+        account_data: {
+          ...rippled.account_info.normal.result.account_data,
+          Sponsor: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        },
+      },
+    })
+    testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    testContext.mockRippled!.addResponse(
+      'server_info',
+      rippled.server_info.normal,
+    )
+    testContext.mockRippled!.addResponse(
+      'account_objects',
+      rippled.account_objects.empty,
+    )
+
+    const tx: AccountDelete = {
+      Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+      TransactionType: 'AccountDelete',
+      Destination: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+
+    const txResult = await testContext.client.autofill(tx)
+    assert.strictEqual(txResult.TransactionType, 'AccountDelete')
   })
 
   describe('when autofill Fee is missing', function () {
@@ -399,6 +573,48 @@ describe('client.autofill', function () {
       const txResult = await testContext.client.autofill(tx, 4)
 
       assert.strictEqual(txResult.Fee, '447')
+    })
+
+    it('should autofill Fee of a confidential MPT transaction', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'ConfidentialMPTMergeInbox',
+        MPTokenIssuanceID: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx)
+      // base (12) × kCONFIDENTIAL_FEE_MULTIPLIER-plus-one (10) = 120.
+      assert.strictEqual(txResult.Fee, '120')
+    })
+
+    it('should autofill Fee of a confidential MPT transaction with signersCount', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'ConfidentialMPTMergeInbox',
+        MPTokenIssuanceID: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx, 4)
+      // base (12) × (10 + signersCount 4) = 168.
+      assert.strictEqual(txResult.Fee, '168')
     })
   })
 
@@ -616,4 +832,191 @@ describe('client.autofill', function () {
     // base_fee + 3 * base_fee
     assert.strictEqual(txResult.Fee, '48')
   })
+
+  describe('Sponsorship autofill', function () {
+    it('does not add sponsor fees for pre-funded sponsorship (Sponsor without SponsorSignature)', async function () {
+      // Pre-funded sponsorship: Sponsor field is present but no SponsorSignature.
+      // The sponsor uses a pre-existing Sponsorship ledger object, so no additional
+      // sponsor signature is required and no extra fees should be added.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(tx)
+
+      // Fee should be base fee only (12) - no sponsor signature fees for pre-funded sponsorship
+      assert.strictEqual(txResult.Fee, '12')
+    })
+
+    it('does not add sponsor fees for a single-signed sponsor signature', async function () {
+      // A single sponsor signature costs nothing extra, the same as any single
+      // signer on a regular transaction -- only a multisigned sponsor (via an
+      // explicit sponsorSignersCount) adds fee.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+        SponsorSignature: {
+          SigningPubKey:
+            '02FE9932A9C4AA2AC9F0ED0F2B89302DE7C2C95F91D782DA3CF06E64E1C1216449',
+          TxnSignature: '3045...',
+        },
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(tx)
+
+      // Fee should be base fee only (12) - a single sponsor signature adds no fee.
+      assert.strictEqual(txResult.Fee, '12')
+    })
+
+    it('adds sponsor fee based on sponsorSignersCount even without SponsorSignature present', async function () {
+      // The sponsor signer count is entirely caller-driven: it does not depend
+      // on tx.SponsorSignature existing at autofill time (it typically doesn't,
+      // since the sponsor only co-signs after the account has signed).
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(
+        tx,
+        undefined,
+        // sponsorSignersCount
+        2,
+      )
+
+      // Fee should include base fee (12) + 2 sponsor signatures (24) = 36
+      assert.strictEqual(txResult.Fee, '36')
+    })
+
+    it('calculates fee for co-signed sponsorship with multi-sig sponsor', async function () {
+      // Co-signed sponsorship with multiple sponsor signers. At autofill time
+      // the sponsor's cosigners may not have all signed yet, and the sponsor's
+      // own SignerList only reflects its capability to sign, not a commitment
+      // to sign with a particular count. So, mirroring `signersCount` for the
+      // transaction's own multisigning, the caller must explicitly supply the
+      // expected sponsor signer count via `sponsorSignersCount`.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+        SponsorSignature: {
+          Signers: [
+            {
+              Signer: {
+                Account: 'rSigner1',
+                SigningPubKey: '02AAAA...',
+                TxnSignature: '3045...',
+              },
+            },
+          ],
+        },
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(
+        tx,
+        undefined,
+        // sponsorSignersCount
+        3,
+      )
+
+      // Fee should include base fee (12) + 3 sponsor signatures (36) = 48,
+      // based on the caller-supplied sponsorSignersCount, not Signers.length (1).
+      assert.strictEqual(txResult.Fee, '48')
+    })
+
+    it('does not add sponsor fees for a multi-sig sponsor when sponsorSignersCount is omitted', async function () {
+      // Mirrors the existing behavior for the transaction's own multisigning:
+      // if the caller doesn't supply a signer count, no additional fee is added.
+      const tx: Payment = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Amount: '1234',
+        Destination: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        Sponsor: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+        SponsorFlags: 1,
+        SponsorSignature: {
+          Signers: [
+            {
+              Signer: {
+                Account: 'rSigner1',
+                SigningPubKey: '02AAAA...',
+                TxnSignature: '3045...',
+              },
+            },
+          ],
+        },
+      }
+
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+
+      const txResult = await testContext.client.autofill(tx)
+
+      // Fee should be base fee only (12) - no sponsorSignersCount was supplied.
+      assert.strictEqual(txResult.Fee, '12')
+    })
+  })
 })
+/* eslint-enable max-statements */

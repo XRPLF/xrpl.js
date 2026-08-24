@@ -230,4 +230,136 @@ describe('BaseTransaction', function () {
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   })
+
+  it(`Allows spfSponsorReserve on a rippled-allow-listed transaction type`, function () {
+    const validReserveSponsorship = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertValid(validReserveSponsorship)
+  })
+
+  it(`Rejects spfSponsorReserve on a transaction type not on rippled's allow-list`, function () {
+    const invalidReserveSponsorship = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'OfferCreate',
+      Sponsor: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertInvalid(
+      invalidReserveSponsorship,
+      'Transaction: OfferCreate cannot use spfSponsorReserve flag',
+    )
+  })
+
+  it(`Rejects spfSponsorReserve combined with Delegate`, function () {
+    const invalidReserveSponsorshipWithDelegate = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Delegate: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+    }
+    assertInvalid(
+      invalidReserveSponsorshipWithDelegate,
+      'Transaction: SponsorFlags.spfSponsorReserve cannot be combined with Delegate',
+    )
+  })
+
+  it(`Allows spfSponsorFee combined with Delegate`, function () {
+    const validFeeSponsorshipWithDelegate = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Delegate: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorFee
+      SponsorFlags: 0x00000001,
+    }
+    assertValid(validFeeSponsorshipWithDelegate)
+  })
+
+  it(`Rejects spfSponsorFee on an inner Batch transaction`, function () {
+    const invalidFeeSponsorshipOnInnerBatchTxn = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorFee
+      SponsorFlags: 0x00000001,
+      // tfInnerBatchTxn
+      Flags: 0x40000000,
+    }
+    assertInvalid(
+      invalidFeeSponsorshipOnInnerBatchTxn,
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  })
+
+  it(`Rejects spfSponsorFee on an inner Batch transaction (Flags as object)`, function () {
+    const invalidFeeSponsorshipOnInnerBatchTxn = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorFee
+      SponsorFlags: 0x00000001,
+      Flags: { tfInnerBatchTxn: true },
+    }
+    assertInvalid(
+      invalidFeeSponsorshipOnInnerBatchTxn,
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  })
+
+  it(`Allows spfSponsorReserve on an inner Batch transaction`, function () {
+    const validReserveSponsorshipOnInnerBatchTxn = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+      // tfInnerBatchTxn
+      Flags: 0x40000000,
+    }
+    assertValid(validReserveSponsorshipOnInnerBatchTxn)
+  })
+
+  it(`Allows the empty placeholder SponsorSignature on an inner Batch transaction`, function () {
+    const validSponsorSignatureOnInnerBatchTxn = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+      // tfInnerBatchTxn
+      Flags: 0x40000000,
+      SponsorSignature: {
+        SigningPubKey: '',
+      },
+    }
+    assertValid(validSponsorSignatureOnInnerBatchTxn)
+  })
+
+  it(`Rejects a fully-signed SponsorSignature on an inner Batch transaction`, function () {
+    const invalidSponsorSignatureOnInnerBatchTxn = {
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      TransactionType: 'Payment',
+      Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+      // spfSponsorReserve
+      SponsorFlags: 0x00000002,
+      // tfInnerBatchTxn
+      Flags: 0x40000000,
+      SponsorSignature: {
+        SigningPubKey: 'hex-string',
+        TxnSignature: 'DEADBEEF',
+      },
+    }
+    assertInvalid(
+      invalidSponsorSignatureOnInnerBatchTxn,
+      'Transaction: invalid SponsorSignature',
+    )
+  })
 })
