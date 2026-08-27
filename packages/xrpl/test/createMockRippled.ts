@@ -10,9 +10,37 @@ import type {
 
 import { destroyServer, getFreePort } from './testUtils'
 
+interface RawMockFrame {
+  payload: string | Buffer
+  binary?: boolean
+}
+
+type MockResponse =
+  | BaseResponse
+  | ErrorResponse
+  | Record<string, unknown>
+  | RawMockFrame
+
+function isRawMockFrame(response: MockResponse): response is RawMockFrame {
+  return typeof response === 'object' && 'payload' in response
+}
+
+function sendResponse(
+  conn: WebSocket,
+  request: { id: number | string },
+  response: MockResponse,
+): void {
+  if (isRawMockFrame(response)) {
+    conn.send(response.payload, { binary: response.binary })
+    return
+  }
+
+  conn.send(createResponse(request, response))
+}
+
 export function createResponse(
   request: { id: number | string },
-  response: Record<string, unknown>,
+  response: BaseResponse | ErrorResponse | Record<string, unknown>,
 ): string {
   if (!('type' in response) && !('error' in response)) {
     throw new XrplError(
@@ -24,7 +52,7 @@ export function createResponse(
   return JSON.stringify({ ...response, id: request.id })
 }
 
-function ping(conn, request): void {
+function ping(conn: WebSocket, request: { id: number | string }): void {
   setTimeout(() => {
     conn.send(
       createResponse(request, {
@@ -49,18 +77,14 @@ export interface PortResponse extends BaseResponse {
 
 export type MockedWebSocketServer = WebSocketServer &
   EventEmitter & {
-    responses: Record<string, unknown>
+    responses: Record<string, MockResponse | ((r: Request) => MockResponse)>
     suppressOutput: boolean
     socket: WebSocket
     addResponse: (
       command: string,
-      response:
-        | BaseResponse
-        | ErrorResponse
-        | ((r: Request) => Response | ErrorResponse | Record<string, unknown>)
-        | Record<string, unknown>,
+      response: MockResponse | ((r: Request) => MockResponse),
     ) => void
-    getResponse: (request: Request) => Record<string, unknown>
+    getResponse: (request: Request) => MockResponse
     testCommand: (
       conn: WebSocket,
       request: {
@@ -108,7 +132,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
         } else if (request.command === 'test_command') {
           mock.testCommand(conn, request)
         } else if (request.command in mock.responses) {
-          conn.send(createResponse(request, mock.getResponse(request)))
+          sendResponse(conn, request, mock.getResponse(request))
         } else {
           throw new XrplError(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- We know it's there
@@ -148,6 +172,7 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
     }
     if (
       typeof response === 'object' &&
+      !isRawMockFrame(response) &&
       !('type' in response) &&
       !('error' in response)
     ) {
@@ -160,15 +185,15 @@ export default function createMockRippled(port: number): MockedWebSocketServer {
     mock.responses[command] = response
   }
 
-  mock.getResponse = (request): Record<string, unknown> => {
+  mock.getResponse = (request): MockResponse => {
     if (!(request.command in mock.responses)) {
       throw new XrplError(`No handler for ${request.command}`)
     }
     const functionOrObject = mock.responses[request.command]
     if (typeof functionOrObject === 'function') {
-      return functionOrObject(request) as Record<string, unknown>
+      return functionOrObject(request)
     }
-    return functionOrObject as Record<string, unknown>
+    return functionOrObject
   }
 
   mock.testCommand = function testCommand(conn, request): void {
