@@ -1,13 +1,18 @@
 import { assert } from 'chai'
 
-import type { LedgerEntryRequest } from '../../../src'
+import {
+  LedgerEntryRequest,
+  LedgerEntryResponse,
+  TicketCreate,
+} from '../../../src'
+import type Ticket from '../../../src/models/ledger/Ticket'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet } from '../utils'
+import { generateFundedWallet, testTransaction } from '../utils'
 
 // how long before each test case times out
 const TIMEOUT = 20000
@@ -106,6 +111,48 @@ describe('ledger_entry', function () {
       // @ts-expect-error - node is not present in the response
       assert.isUndefined(ledgerEntryResponse.result.node)
       assert.isDefined(ledgerEntryResponse.result.node_binary)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'fetches a Ticket object',
+    async () => {
+      const accountInfoResponse = await testContext.client.request({
+        command: 'account_info',
+        account: testContext.wallet.classicAddress,
+      })
+      const accSeq = accountInfoResponse.result.account_data.Sequence
+      const ticketSeq = accSeq + 1
+
+      const ticketCreate: TicketCreate = {
+        TransactionType: 'TicketCreate',
+        Account: testContext.wallet.classicAddress,
+        TicketCount: 1,
+        Sequence: accSeq,
+      }
+      await testTransaction(testContext.client, ticketCreate, testContext.wallet)
+
+      const ledgerEntryRequest: LedgerEntryRequest = {
+        command: 'ledger_entry',
+        ticket: {
+          account: testContext.wallet.classicAddress,
+          ticket_seq: ticketSeq,
+        },
+      }
+      const ledgerEntryResponse: LedgerEntryResponse<Ticket> =
+        await testContext.client.request(ledgerEntryRequest)
+
+      assert.equal(ledgerEntryResponse.type, 'response')
+      assert.equal(ledgerEntryResponse.result.node?.LedgerEntryType, 'Ticket')
+      assert.equal(
+        ledgerEntryResponse.result.node?.Account,
+        testContext.wallet.classicAddress,
+      )
+      assert.equal(
+        ledgerEntryResponse.result.node?.TicketSequence,
+        ticketSeq,
+      )
     },
     TIMEOUT,
   )
