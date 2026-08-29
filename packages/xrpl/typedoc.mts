@@ -25,7 +25,7 @@ export function load(app: Application) {
       JSX.Fragment,
       null,
       JSX.createElement('script', {
-        src: 'https://cmp.osano.com/AzyjT6TIZMlgyLyy8/ad2447d5-f101-40df-b92e-d6452b5ecac0/osano.js',
+        src: 'https://cmp.osano.com/SXt7r81ogd/410d1eb2-0ebf-40b5-9444-bee536d25b61/osano.js',
       }),
       JSX.createElement(
         'script',
