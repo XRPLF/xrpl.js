@@ -39,7 +39,7 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-array-func": "^5.1.1",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsdoc": "^52.0.4",
+    "eslint-plugin-jsdoc": "^63.0.10",
     "eslint-plugin-n": "^17.24.0",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-tsdoc": "^0.5.2",
