@@ -443,7 +443,7 @@ async function calculateFeePerTransactionType(
   baseFee = BigNumber.sum(baseFee, sponsorFee)
 
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
-  // For special transactions (AccountDelete, AMMCreate, VaultCreate), the fee cap is bypassed.
+  // For special transactions (AccountDelete, AMMCreate), the fee cap is bypassed.
   // This means sponsor fees are also not subject to the cap for these transactions.
   // For normal transactions, the total fee (base + sponsor) is capped at maxFeeXRP.
   const totalFee = isSpecialTxCost
