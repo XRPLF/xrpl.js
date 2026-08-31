@@ -2,10 +2,13 @@
 
 ## Unreleased
 
+### Added
+* Add definitions for `LendingProtocolV1_1`.
+
 ## 2.10.0 (2026-08-20)
 
 ### Added
-* New SignedAmount type to support negative values 
+* New SignedAmount type to support negative values
 * FeeAmountDelta remapped to SignedAmount wire type
 
 ## 2.9.0 (2026-08-13)

@@ -86,6 +86,29 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
    * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
    */
   Scale?: number
+
+  /**
+   * (LendingProtocolV1_1) The internal version of the ledger object's structure.
+   */
+  LEVersion?: number
+
+  /**
+   * (XLS-587) The kind of Vault: 0 for an open-ended vault or 1 for a
+   * close-ended vault.
+   */
+  VaultKind?: number
+
+  /**
+   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, up to which deposits into the Vault are accepted.
+   */
+  SubscriptionDate?: number
+
+  /**
+   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, at which shares may begin to be redeemed from the Vault.
+   */
+  RedemptionDate?: number
 }
 
 export enum VaultFlags {

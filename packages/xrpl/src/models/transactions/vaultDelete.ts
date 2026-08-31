@@ -1,8 +1,13 @@
+import { ValidationError } from '../../errors'
+import { isHex } from '../utils'
+
 import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
+  validateOptionalField,
   isString,
+  VAULT_DATA_MAX_BYTE_LENGTH,
 } from './common'
 
 /**
@@ -17,6 +22,12 @@ export interface VaultDelete extends BaseTransaction {
    * The ID of the vault to be deleted.
    */
   VaultID: string
+
+  /**
+   * (LendingProtocolV1_1) Arbitrary metadata attached to the deletion, in hex
+   * format, limited to 256 bytes.
+   */
+  MemoData?: string
 }
 
 /**
@@ -29,4 +40,19 @@ export function validateVaultDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'VaultID', isString)
+  validateOptionalField(tx, 'MemoData', isString)
+
+  if (tx.MemoData !== undefined) {
+    const memoData = tx.MemoData
+    if (!isHex(memoData)) {
+      throw new ValidationError(
+        'VaultDelete: MemoData must be a valid hex string',
+      )
+    }
+    if (memoData.length / 2 > VAULT_DATA_MAX_BYTE_LENGTH) {
+      throw new ValidationError(
+        `VaultDelete: MemoData must be less than ${VAULT_DATA_MAX_BYTE_LENGTH} bytes`,
+      )
+    }
+  }
 }

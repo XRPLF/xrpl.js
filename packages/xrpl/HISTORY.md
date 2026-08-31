@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add `LendingProtocolV1_1` support.
+
 ## 5.1.0 (2026-08-24)
 
 ### Added

@@ -929,6 +929,26 @@
       }
     ],
     [
+      "SubscriptionDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 75,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RedemptionDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 76,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -3529,6 +3549,16 @@
       }
     ],
     [
+      "LEVersion",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 6,
+        "type": "UInt8"
+      }
+    ],
+    [
       "TickSize",
       {
         "isSerialized": true,
@@ -3575,6 +3605,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 20,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "VaultKind",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 22,
         "type": "UInt8"
       }
     ],
@@ -5239,6 +5279,22 @@
       {
         "name": "Scale",
         "optionality": 2
+      },
+      {
+        "name": "LEVersion",
+        "optionality": 2
+      },
+      {
+        "name": "VaultKind",
+        "optionality": 2
+      },
+      {
+        "name": "SubscriptionDate",
+        "optionality": 1
+      },
+      {
+        "name": "RedemptionDate",
+        "optionality": 1
       }
     ],
     "XChainOwnedClaimID": [
@@ -6090,6 +6146,10 @@
       {
         "name": "DestinationTag",
         "optionality": 1
+      },
+      {
+        "name": "CredentialIDs",
+        "optionality": 1
       }
     ],
     "LoanBrokerDelete": [
@@ -6730,6 +6790,18 @@
       {
         "name": "Scale",
         "optionality": 1
+      },
+      {
+        "name": "VaultKind",
+        "optionality": 1
+      },
+      {
+        "name": "SubscriptionDate",
+        "optionality": 1
+      },
+      {
+        "name": "RedemptionDate",
+        "optionality": 1
       }
     ],
     "VaultDelete": [
@@ -6785,6 +6857,10 @@
       },
       {
         "name": "DestinationTag",
+        "optionality": 1
+      },
+      {
+        "name": "CredentialIDs",
         "optionality": 1
       }
     ],
