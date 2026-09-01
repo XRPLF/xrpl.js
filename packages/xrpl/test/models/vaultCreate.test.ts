@@ -4,6 +4,7 @@ import { MPTokenMetadata } from '../../src'
 import {
   VaultCreate,
   VaultCreateFlags,
+  VaultKind,
   VaultWithdrawalPolicy,
 } from '../../src/models/transactions'
 import { validateVaultCreate } from '../../src/models/transactions/vaultCreate'
@@ -197,6 +198,128 @@ describe('VaultCreate', function () {
         issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       }
       assertValid(tx)
+    })
+  })
+
+  describe('close-ended vault validation (XLS-587)', function () {
+    it('allows a close-ended vault with both dates', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 810000000
+      assertValid(tx)
+    })
+
+    it('allows an open-ended vault (VaultKind=0) with no dates', function () {
+      tx.VaultKind = VaultKind.vaultKindOpen
+      assertValid(tx)
+    })
+
+    it('allows the minimum investment period boundary (180s)', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 800000180
+      assertValid(tx)
+    })
+
+    it('throws w/ close-ended vault missing RedemptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      assertInvalid(
+        tx,
+        'VaultCreate: A close-ended vault requires both SubscriptionDate and RedemptionDate',
+      )
+    })
+
+    it('throws w/ close-ended vault missing SubscriptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.RedemptionDate = 810000000
+      assertInvalid(
+        tx,
+        'VaultCreate: A close-ended vault requires both SubscriptionDate and RedemptionDate',
+      )
+    })
+
+    it('throws w/ dates set on an open-ended vault', function () {
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 810000000
+      assertInvalid(
+        tx,
+        'VaultCreate: SubscriptionDate and RedemptionDate can only be set on a close-ended vault (VaultKind=1)',
+      )
+    })
+
+    it('throws w/ investment period below the minimum (180s)', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 800000179
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
+      )
+    })
+
+    it('throws w/ RedemptionDate before SubscriptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 810000000
+      tx.RedemptionDate = 800000000
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
+      )
+    })
+
+    it('throws w/ investment period at the exclusive maximum', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 0
+      tx.RedemptionDate = 946708560
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
+      )
+    })
+
+    it('throws w/ non-number VaultKind', function () {
+      // @ts-expect-error for test
+      tx.VaultKind = 'invalid'
+      assertInvalid(tx, 'VaultCreate: invalid field VaultKind')
+    })
+
+    it('throws w/ an unsupported numeric VaultKind', function () {
+      tx.VaultKind = 2
+      assertInvalid(
+        tx,
+        'VaultCreate: VaultKind must be 0 (open-ended) or 1 (close-ended)',
+      )
+    })
+
+    it('throws w/ a NaN SubscriptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = NaN
+      tx.RedemptionDate = 810000000
+      assertInvalid(
+        tx,
+        'VaultCreate: SubscriptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
+    })
+
+    it('throws w/ a NaN RedemptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = NaN
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
+    })
+
+    it('throws w/ a non-integer RedemptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 810000000.5
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
     })
   })
 })

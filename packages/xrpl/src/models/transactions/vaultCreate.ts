@@ -24,10 +24,37 @@ import {
 const MAX_SCALE = 18
 
 /**
+ * (XLS-587) Minimum length, in seconds, of a close-ended vault's investment
+ * period (`RedemptionDate - SubscriptionDate`). 180s is the smallest window
+ * that can still fit a minimum-interval loan plus the 60s redemption buffer
+ * enforced by LoanSet (see rippled `kMinInvestmentPeriod`).
+ */
+const MIN_INVESTMENT_PERIOD = 180
+
+/**
+ * (XLS-587) Exclusive upper bound, in seconds, on a close-ended vault's
+ * investment period (30 Gregorian years).
+ */
+const MAX_INVESTMENT_PERIOD = 946708560
+
+/**
  * Enum representing withdrawal strategies for a Vault.
  */
 export enum VaultWithdrawalPolicy {
   vaultStrategyFirstComeFirstServe = 0x0001,
+}
+
+/**
+ * Enum representing the kind of a Vault (XLS-587, close-ended vaults).
+ */
+export enum VaultKind {
+  /** An open-ended vault: shares can be redeemed at any time. */
+  vaultKindOpen = 0,
+  /**
+   * A close-ended vault: deposits and redemptions are restricted to the
+   * subscription and redemption periods respectively.
+   */
+  vaultKindClosed = 1,
 }
 
 /**
@@ -99,6 +126,24 @@ export interface VaultCreate extends BaseTransaction {
    * Valid values are between 0 and 18 inclusive. For XRP and MPT, this must not be provided.
    */
   Scale?: number
+
+  /**
+   * (XLS-587) The kind of Vault: 0 for an open-ended vault (the default) or 1
+   * for a close-ended vault. Can only be set at Vault creation. See {@link VaultKind}.
+   */
+  VaultKind?: number
+
+  /**
+   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, up to which deposits into the Vault are accepted.
+   */
+  SubscriptionDate?: number
+
+  /**
+   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, at which shares may begin to be redeemed from the Vault.
+   */
+  RedemptionDate?: number
 }
 
 /* eslint-disable max-lines-per-function -- Not needed to reduce function */
@@ -119,6 +164,37 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
   validateOptionalField(tx, 'DomainID', isString)
   validateOptionalField(tx, 'Scale', isNumber)
+  validateOptionalField(tx, 'VaultKind', isNumber)
+  validateOptionalField(tx, 'SubscriptionDate', isNumber)
+  validateOptionalField(tx, 'RedemptionDate', isNumber)
+
+  // `isNumber` accepts any JavaScript number, so guard against unsupported
+  // VaultKind values and non-finite dates (e.g. NaN) that would otherwise slip
+  // past the close-ended branching below.
+  if (
+    tx.VaultKind !== undefined &&
+    tx.VaultKind !== VaultKind.vaultKindOpen &&
+    tx.VaultKind !== VaultKind.vaultKindClosed
+  ) {
+    throw new ValidationError(
+      `VaultCreate: VaultKind must be ${VaultKind.vaultKindOpen} (open-ended) or ${VaultKind.vaultKindClosed} (close-ended)`,
+    )
+  }
+
+  if (
+    tx.SubscriptionDate !== undefined &&
+    !Number.isInteger(tx.SubscriptionDate)
+  ) {
+    throw new ValidationError(
+      'VaultCreate: SubscriptionDate must be an integer number of seconds since the Ripple Epoch',
+    )
+  }
+
+  if (tx.RedemptionDate !== undefined && !Number.isInteger(tx.RedemptionDate)) {
+    throw new ValidationError(
+      'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+    )
+  }
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
@@ -180,6 +256,36 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
         )
       }
     }
+  }
+
+  // XLS-587 close-ended vault rules. A close-ended vault (VaultKind === 1)
+  // requires both a subscription and a redemption date; an open-ended vault
+  // (the default) must not carry either date.
+  const isClosedEnded = tx.VaultKind === VaultKind.vaultKindClosed
+  const hasSubscription = tx.SubscriptionDate !== undefined
+  const hasRedemption = tx.RedemptionDate !== undefined
+  if (isClosedEnded) {
+    if (
+      typeof tx.SubscriptionDate !== 'number' ||
+      typeof tx.RedemptionDate !== 'number'
+    ) {
+      throw new ValidationError(
+        'VaultCreate: A close-ended vault requires both SubscriptionDate and RedemptionDate',
+      )
+    }
+    const investmentPeriod = tx.RedemptionDate - tx.SubscriptionDate
+    if (
+      investmentPeriod < MIN_INVESTMENT_PERIOD ||
+      investmentPeriod >= MAX_INVESTMENT_PERIOD
+    ) {
+      throw new ValidationError(
+        `VaultCreate: RedemptionDate - SubscriptionDate must be within [${MIN_INVESTMENT_PERIOD}, ${MAX_INVESTMENT_PERIOD}) seconds`,
+      )
+    }
+  } else if (hasSubscription || hasRedemption) {
+    throw new ValidationError(
+      'VaultCreate: SubscriptionDate and RedemptionDate can only be set on a close-ended vault (VaultKind=1)',
+    )
   }
 
   if (tx.MPTokenMetadata != null) {
