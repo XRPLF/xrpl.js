@@ -25,9 +25,11 @@ const MAX_SCALE = 18
 
 /**
  * (XLS-587) Minimum length, in seconds, of a close-ended vault's investment
- * period (`RedemptionDate - SubscriptionDate`).
+ * period (`RedemptionDate - SubscriptionDate`). 180s is the smallest window
+ * that can still fit a minimum-interval loan plus the 60s redemption buffer
+ * enforced by LoanSet (see rippled `kMinInvestmentPeriod`).
  */
-const MIN_INVESTMENT_PERIOD = 60
+const MIN_INVESTMENT_PERIOD = 180
 
 /**
  * (XLS-587) Exclusive upper bound, in seconds, on a close-ended vault's

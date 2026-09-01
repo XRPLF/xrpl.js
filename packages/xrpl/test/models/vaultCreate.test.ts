@@ -214,10 +214,10 @@ describe('VaultCreate', function () {
       assertValid(tx)
     })
 
-    it('allows the minimum investment period boundary (60s)', function () {
+    it('allows the minimum investment period boundary (180s)', function () {
       tx.VaultKind = VaultKind.vaultKindClosed
       tx.SubscriptionDate = 800000000
-      tx.RedemptionDate = 800000060
+      tx.RedemptionDate = 800000180
       assertValid(tx)
     })
 
@@ -248,13 +248,13 @@ describe('VaultCreate', function () {
       )
     })
 
-    it('throws w/ investment period below the minimum (60s)', function () {
+    it('throws w/ investment period below the minimum (180s)', function () {
       tx.VaultKind = VaultKind.vaultKindClosed
       tx.SubscriptionDate = 800000000
-      tx.RedemptionDate = 800000030
+      tx.RedemptionDate = 800000179
       assertInvalid(
         tx,
-        'VaultCreate: RedemptionDate - SubscriptionDate must be within [60, 946708560) seconds',
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
       )
     })
 
@@ -264,7 +264,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = 800000000
       assertInvalid(
         tx,
-        'VaultCreate: RedemptionDate - SubscriptionDate must be within [60, 946708560) seconds',
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
       )
     })
 
@@ -274,7 +274,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = 946708560
       assertInvalid(
         tx,
-        'VaultCreate: RedemptionDate - SubscriptionDate must be within [60, 946708560) seconds',
+        'VaultCreate: RedemptionDate - SubscriptionDate must be within [180, 946708560) seconds',
       )
     })
 
