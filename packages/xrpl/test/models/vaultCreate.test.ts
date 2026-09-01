@@ -283,6 +283,44 @@ describe('VaultCreate', function () {
       tx.VaultKind = 'invalid'
       assertInvalid(tx, 'VaultCreate: invalid field VaultKind')
     })
+
+    it('throws w/ an unsupported numeric VaultKind', function () {
+      tx.VaultKind = 2
+      assertInvalid(
+        tx,
+        'VaultCreate: VaultKind must be 0 (open-ended) or 1 (close-ended)',
+      )
+    })
+
+    it('throws w/ a NaN SubscriptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = NaN
+      tx.RedemptionDate = 810000000
+      assertInvalid(
+        tx,
+        'VaultCreate: SubscriptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
+    })
+
+    it('throws w/ a NaN RedemptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = NaN
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
+    })
+
+    it('throws w/ a non-integer RedemptionDate', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.SubscriptionDate = 800000000
+      tx.RedemptionDate = 810000000.5
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+      )
+    })
   })
 })
 

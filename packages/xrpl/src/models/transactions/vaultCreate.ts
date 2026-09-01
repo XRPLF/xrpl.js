@@ -166,6 +166,34 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'SubscriptionDate', isNumber)
   validateOptionalField(tx, 'RedemptionDate', isNumber)
 
+  // `isNumber` accepts any JavaScript number, so guard against unsupported
+  // VaultKind values and non-finite dates (e.g. NaN) that would otherwise slip
+  // past the close-ended branching below.
+  if (
+    tx.VaultKind !== undefined &&
+    tx.VaultKind !== VaultKind.vaultKindOpen &&
+    tx.VaultKind !== VaultKind.vaultKindClosed
+  ) {
+    throw new ValidationError(
+      `VaultCreate: VaultKind must be ${VaultKind.vaultKindOpen} (open-ended) or ${VaultKind.vaultKindClosed} (close-ended)`,
+    )
+  }
+
+  if (
+    tx.SubscriptionDate !== undefined &&
+    !Number.isInteger(tx.SubscriptionDate)
+  ) {
+    throw new ValidationError(
+      'VaultCreate: SubscriptionDate must be an integer number of seconds since the Ripple Epoch',
+    )
+  }
+
+  if (tx.RedemptionDate !== undefined && !Number.isInteger(tx.RedemptionDate)) {
+    throw new ValidationError(
+      'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+    )
+  }
+
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
     if (!isHex(dataHex)) {
