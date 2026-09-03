@@ -83,7 +83,9 @@ If a failure persists after investigation and you cannot identify a fix, roll ba
 
 ## Step 4: Generate Outputs
 
-Do NOT commit or create a PR. Instead, generate the following outputs for the human to use:
+Do NOT commit or create a PR. Instead, generate the following outputs for the human to use.
+
+**Formatting for every generated markdown file:** one line per paragraph and one line per list item — never hard-wrap prose mid-sentence. Editors soft-wrap it anyway, and mid-paragraph breaks make later diffs noisy. Blank line between blocks, no trailing whitespace.
 
 1. **Code changes note** — write a markdown file (`.claude/skills/batch-deps-upgrade/code-changes.md`) documenting every non-package.json source code change, explaining what broke, why, and the minimal fix applied.
 
@@ -120,7 +122,7 @@ ORDER BY rank
 
 **Take the package name from the summary, not the description** — a description may list several packages sharing one advisory (e.g. DGE-8019), so it picks the wrong one. Take the fix version, severity and CVE/GHSA link from the description. Wording varies, so read for intent rather than matching labels literally.
 
-Keep tickets naming a package and a fix version; drop the rest. If nothing survives, that is a parsing failure — stop rather than report no work. A ticket becomes a row whether or not a Dependabot PR proposes that package; a ticket is reason enough on its own.
+Keep tickets naming a package and a fix version; drop the rest. If tickets came back but none of them could be parsed, that is a parsing failure — stop. If the query returned nothing, or nothing was in scope, there is simply no Semgrep work this quarter: record zero and carry on with the Dependabot batch. A ticket becomes a row whether or not a Dependabot PR proposes that package; a ticket is reason enough on its own.
 
 ### Picking the target and matching results (Step 2)
 
@@ -137,19 +139,21 @@ Classify from the Step 2.5 diff, not from which PR did what: a parent bump carri
 Write `close-list.md` — the closing run's input, so keep it parseable, one item per line:
 
 1. **Close** — every Upgraded and No-op ticket and PR. Tickets: key, package, version evidence, comment to post. PRs: number, package, version proposed, comment to post.
+
+   Every comment must reference the batch PR, which does not exist yet at this point. Write that reference as the literal token `<PR>`; the closing run substitutes the merged PR's URL. Use a URL rather than `#1234`, which JIRA renders as plain text.
 2. **Left open** — every Skipped one, with its reason. Each is a security fix that did not land, so this is worth reading. Skipped PRs stay open for Dependabot to keep rebasing.
 
 **Do NOT commit `close-list.md`** — local scratch, like `code-changes.md` and `pr-description.md`.
 
-So the PR body is the durable record and the closing run's fallback. In `pr-description.md`, add a **"Semgrep tickets"** section listing every ticket with its status, and give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions.
+So the PR body is the durable record and the closing run's fallback. In `pr-description.md`, add a **"Semgrep tickets"** table carrying per ticket its key, package, required version and status — the same fields the closing run needs, because status alone cannot be verified against `main`. Give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions.
 
 ### Closing run (`/batch-deps-upgrade close`)
 
-No discovery, no bumps, no validation. Read section 1 of `close-list.md`; if it is missing, fall back to the merged PR body's lists. Identify the batch PR from an argument or `gh pr list --repo XRPLF/xrpl.js --state merged --head <branch>`; every comment must name it.
+No discovery, no bumps, no validation. Read section 1 of `close-list.md`; if it is missing, fall back to the merged PR body's lists. Identify the batch PR from an argument or `gh pr list --repo XRPLF/xrpl.js --state merged --head <branch>`, and replace the `<PR>` token in every comment with its URL. **Check that no comment still contains `<PR>` before posting anything** — if one does, the substitution failed, so stop rather than post a placeholder onto dozens of tickets.
 
 1. **Verify each item against the current `main`** and skip anything not genuinely satisfied — a reviewer may have had an upgrade reverted. This is what makes the run safe whether or not the batch has merged.
 2. **Close everything that verified.** Do not ask for approval; the engineer reviewed both lists on the PR, and step 1 is the real check.
-   - **JIRA tickets** — post the comment, then transition to `Done` (transition id `31`).
+   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting: query the issue's available transitions and take the one whose destination status is `Done`. Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
    - **Dependabot PRs** — `gh pr close <n> --repo XRPLF/xrpl.js --comment "<comment>"`.
 3. Report in this shape:
 
@@ -157,8 +161,8 @@ No discovery, no bumps, no validation. Read section 1 of `close-list.md`; if it 
    Closed <n> JIRA tickets, <n> Dependabot PRs.
 
    Skipped — not satisfied on main @ <sha> (<n>):
-     <TICKET-KEY>  <pkg> needs <version>, main has <version>
-     #<PR>         <pkg> <version> never applied (<reason from close-list>)
+     <TICKET-KEY>   <pkg> needs <version>, main has <version>
+     #<pr-number>   <pkg> <version> never applied (<reason from close-list>)
    ```
 
    If nothing was skipped, say so rather than omitting the section.
