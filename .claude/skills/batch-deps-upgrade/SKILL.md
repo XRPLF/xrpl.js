@@ -10,10 +10,11 @@ Batch all open Dependabot dependency upgrade PRs into a single PR for this repos
 
 Within that scope, the two inputs are independent. Every in-scope ticket gets fixed whether or not a Dependabot PR happens to propose that upgrade. Where no open Dependabot PR covers an impacted package, this PR adds the upgrade itself.
 
-Two modes:
+**Two modes — decide which before doing anything else.** The invocation argument arrives as `ARGUMENTS`:
 
-- **Default** (`/batch-deps-upgrade`) — Steps 1-4 below. Writes nothing to JIRA or GitHub; it changes the working tree and writes local files only.
-- **`close`** (`/batch-deps-upgrade close`) — skip Steps 1-4 entirely and run only **Closing run** under "Semgrep tickets" below. Normally used after the batch PR merges.
+- **empty** (`/batch-deps-upgrade`) — run Steps 1-4, then **stop**. Do not continue into "Closing run" even though it appears further down; this mode writes nothing to JIRA or GitHub, only the working tree and local files.
+- **`close`** (`/batch-deps-upgrade close`) — run **only** "Closing run" at the bottom. No discovery, no branch, no install, no tests. Normally used after the batch PR merges.
+- **anything else** — stop and ask which was meant. Do not guess.
 
 Requires `gh auth login` and, for the Semgrep parts, the Atlassian MCP.
 
@@ -96,14 +97,32 @@ Do NOT commit or create a PR. Instead, generate the following outputs for the hu
    - For "Type of Change", determine dynamically:
      - Check "Breaking change" ONLY if the upgrade visibly changes the library's public API (e.g., error messages, return types, removed functions). This aligns with whether a `HISTORY.md` entry was added in Step 2.6.
      - Otherwise, do not check any Type of Change — dependency upgrades are maintenance and don't fit "Refactor" (which means restructuring code without behavior change). Note in the PR body that the upgrade is maintenance.
-   - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, To, Status, MajorVersionUpgrade
-     - Status values: Upgraded, No-op (reason), Skipped (peer dep conflict / CI failure: error)
+   - Include a "Superseded Dependabot PRs" section with a table: PR (linked), Package, From, Asked for, Resolved, Status, MajorVersionUpgrade. The **Semgrep tickets** table uses these same columns, with the first headed `Ticket` — one shape for both artifacts.
+     - `From` is the version on `main`; `Asked for` is what the PR proposed or the ticket requires (`≥ x.y.z`); `Resolved` is what the lockfile actually holds after the batch. Keep them in separate columns: the three routinely differ (a PR proposing 22.7.8 can resolve to 23.2.0), and burying the real version in Status prose makes the table unverifiable.
+     - Status values: Upgraded, No-op (reason), Skipped (peer dep conflict / CI failure: error) — a status and its reason, never a version number.
      - MajorVersionUpgrade: `No` if the major version number did not change. Otherwise `Yes` plus a link for each major version crossed. For example, 7.x → 9.x yields `Yes ([v8](url), [v9](url))`. Each link should point to the package's release notes or changelog for that major version. Verify each link returns HTTP 200 and has meaningful content (e.g., `curl -sL -o /dev/null -w "%{http_code}" <url>`); if a package doesn't publish per-version GitHub releases (e.g., TypeScript sometimes skips `x.0.0`/`x.0.1` tags, bignumber.js puts details in CHANGELOG.md), fall back to the CHANGELOG.md file or the closest valid release tag.
    - Closing instructions with two paragraphs:
      1. "After merging, run `/batch-deps-upgrade close` to close the superseded PRs and the resolved Semgrep tickets." Follow it with the list of Upgraded and No-op PRs (#X, #Y, #Z) as a record, so the PR documents what will be closed even if the skill isn't used.
      2. "The following PRs were Skipped and should remain open: #A (package-a), #B (package-b), ..." — annotate each with the package name. These stay open so Dependabot keeps rebasing them.
+   - Include a **"Semgrep tickets"** table with the same columns, the first headed `Ticket`. Status alone cannot be verified against `main`, so `Asked for` and `Resolved` must be their own columns. Because `close-list.md` is not committed, this table is the closing run's fallback.
+   - Give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions.
+   - Call out separately, in the overview, any **major** bump taken to unblock a ticket: no PR or ticket asked for it, so a reviewer will not be expecting it and must see it flagged rather than buried in a table.
 
-4. **Semgrep close list** — write `close-list.md` per **Outputs** under "Semgrep tickets" below.
+4. **Close list** — write a markdown file (`.claude/skills/batch-deps-upgrade/close-list.md`) recording every ticket and Dependabot PR the batch makes closable. This is the input to the closing run.
+
+   1. **Close** — every Upgraded and No-op ticket and PR, in one shape for both so a single parser handles them:
+
+      ```
+      <ticket-key or #pr> | <package> | installed <resolved> (<asked for>) | Comment: "<text>"
+      ```
+
+      The third field must carry the **resolved** version, not the proposed one — that is what step 1 of the closing run checks against `main`, and a proposed version cannot be verified.
+
+      Every comment must reference the batch PR, which does not exist yet at this point. Write that reference as the literal token `<PR>`; the closing run substitutes the merged PR's URL. Use a URL rather than `#1234`, which JIRA renders as plain text.
+   2. **Left open** — every Skipped one, with its reason. Each is a security fix that did not land, so this is worth reading. Skipped PRs stay open for Dependabot to keep rebasing.
+
+   **Do NOT commit `close-list.md`** — local scratch, like `code-changes.md` and `pr-description.md`. That is why the PR body must carry the same lists (item 3): it is the closing run's fallback when this file is gone.
+
 
 ## Semgrep tickets
 
@@ -135,26 +154,23 @@ Where a ticket and a PR both want the same install, the target is the **highest*
 
 Classify from the Step 2.5 diff, not from which PR did what: a parent bump carries along a dependency it pins exactly, so a ticket can come out Upgraded with no PR naming its package (`nx` pins `axios`).
 
-### Outputs (Step 4)
-
 Write `close-list.md` — the closing run's input, so keep it parseable, one item per line:
 
-1. **Close** — every Upgraded and No-op ticket and PR. Tickets: key, package, version evidence, comment to post. PRs: number, package, version proposed, comment to post.
 
-   Every comment must reference the batch PR, which does not exist yet at this point. Write that reference as the literal token `<PR>`; the closing run substitutes the merged PR's URL. Use a URL rather than `#1234`, which JIRA renders as plain text.
-2. **Left open** — every Skipped one, with its reason. Each is a security fix that did not land, so this is worth reading. Skipped PRs stay open for Dependabot to keep rebasing.
 
-**Do NOT commit `close-list.md`** — local scratch, like `code-changes.md` and `pr-description.md`.
+### Non-goal
 
-So the PR body is the durable record and the closing run's fallback. In `pr-description.md`, add a **"Semgrep tickets"** table carrying per ticket its key, package, required version and status — the same fields the closing run needs, because status alone cannot be verified against `main`. Give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions. Call out separately, in the overview, any **major** bump taken to unblock a ticket: no PR or ticket asked for it, so a reviewer will not be expecting it and must see it flagged rather than buried in a table.
+Never remove a dependency to resolve a finding. A transitive dep leaves only when its parent stops depending on it; a direct dep with no published fix needs whatever imported it rewritten, which belongs in a human-authored PR.
 
-### Closing run (`/batch-deps-upgrade close`)
+## Closing run (`/batch-deps-upgrade close`)
+
+> **Runs only when `ARGUMENTS` is `close`.** If you reached this section by reading past Step 4 during a default run, stop here — everything below comments on and closes real JIRA tickets and real public PRs.
 
 Runs none of Steps 1-4: no ticket discovery, no bumps, and none of Step 3's build/test chain. That exclusion does **not** cover the per-item check in step 1 below — that one always runs, and it is the safeguard against closing something whose fix was reverted. Read section 1 of `close-list.md`; if it is missing, fall back to the merged PR body's lists. Identify the batch PR from an argument or `gh pr list --repo XRPLF/xrpl.js --state merged --head <branch>`, and replace the `<PR>` token in every comment with its URL. **Check that no comment still contains `<PR>` before posting anything** — if one does, the substitution failed, so stop rather than post a placeholder onto dozens of tickets.
 
 1. **Verify each item against the current `main`** and skip anything not genuinely satisfied — a reviewer may have had an upgrade reverted. This is what makes the run safe whether or not the batch has merged.
 2. **Close everything that verified.** Do not ask for approval; the engineer reviewed both lists on the PR, and step 1 is the real check.
-   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting (id `31` in the DGE workflow today; confirm it against the issue's available transitions). Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
+   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting: query the issue's available transitions and take the one whose destination status is `Done`. Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
    - **Dependabot PRs** — `gh pr close <n> --repo XRPLF/xrpl.js --comment "<comment>"`.
 3. Report in this shape:
 
@@ -167,7 +183,3 @@ Runs none of Steps 1-4: no ticket discovery, no bumps, and none of Step 3's buil
    ```
 
    If nothing was skipped, say so rather than omitting the section.
-
-### Non-goal
-
-Never remove a dependency to resolve a finding. A transitive dep leaves only when its parent stops depending on it; a direct dep with no published fix needs whatever imported it rewritten, which belongs in a human-authored PR.
