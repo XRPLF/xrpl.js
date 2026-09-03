@@ -36,7 +36,8 @@ Also fetch the Semgrep tickets per **Where the list comes from** under "Semgrep 
 3. For each remaining upgrade, determine if it's a direct dep (listed in a package.json) or transitive dep (only in package-lock.json):
    - Direct deps: update the version in the relevant package.json file(s)
    - Transitive deps: run `npm update <pkg>` to update within semver range
-   - Never add `overrides` or widen a parent's declared range to force a resolution — that risks breaking a parent which never declared support for the new version. An install that can't reach its target within range is Skipped, naming the blocking parent.
+   - Never add `overrides` or widen a parent's declared range to force a resolution — that risks breaking a parent which never declared support for the new version.
+   - When an install can't reach its target, find the parent blocking it. If that parent is a **direct** dep we declare, bumping *it* is an ordinary upgrade rather than an override — try that, even across a major, and let Step 3 validate. Nothing else will surface it: a security ticket names the vulnerable package, never the parent pinning it, and Dependabot may have no PR open for it. Observed with `lerna` pinning `tar` and `js-yaml` at exact versions. Mark Skipped only when the blocker is transitive, or when bumping it fails validation.
 4. Run `npm install` to update package-lock.json. **Do NOT delete package-lock.json and regenerate from scratch** — this can change hoisted dependency resolution and break builds even when no versions changed.
 5. Diff package.json and package-lock.json against main to classify each Dependabot PR **and each Semgrep ticket** as:
    - Upgraded: version changed
@@ -129,7 +130,7 @@ Keep tickets naming a package and a fix version; drop the rest. If tickets came 
 Where a ticket and a PR both want the same install, the target is the **highest** version either wants. Three matching rules — get them wrong and you close tickets whose vulnerability is still installed:
 
 - Compare with semver, never as strings — lexically `"7.5.9" > "7.5.21"`.
-- Check the install the ticket means. One package can resolve at several versions at once (`brace-expansion`), so "any install ≥ target" can answer yes off an unrelated major line. Match the install on the ticket's own major line.
+- Check the install the ticket means. One package can resolve at several versions at once (`brace-expansion`), so "any install ≥ target" can answer yes off an unrelated major line. Match the install on the ticket's own major line. If that line is gone because the package moved to a **higher** major, the ticket is satisfied — the vulnerable line is no longer installed — provided the advisory's affected range does not extend into the new major.
 - Match per ticket, not per package. Tickets sharing one install can want different versions (`tar`). Never conclude "we upgraded X, so close the X tickets".
 
 Classify from the Step 2.5 diff, not from which PR did what: a parent bump carries along a dependency it pins exactly, so a ticket can come out Upgraded with no PR naming its package (`nx` pins `axios`).
@@ -145,7 +146,7 @@ Write `close-list.md` — the closing run's input, so keep it parseable, one ite
 
 **Do NOT commit `close-list.md`** — local scratch, like `code-changes.md` and `pr-description.md`.
 
-So the PR body is the durable record and the closing run's fallback. In `pr-description.md`, add a **"Semgrep tickets"** table carrying per ticket its key, package, required version and status — the same fields the closing run needs, because status alone cannot be verified against `main`. Give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions.
+So the PR body is the durable record and the closing run's fallback. In `pr-description.md`, add a **"Semgrep tickets"** table carrying per ticket its key, package, required version and status — the same fields the closing run needs, because status alone cannot be verified against `main`. Give ticket-driven upgrades that no Dependabot PR proposed their own table naming the motivating ticket — they are additions, not supersessions. Call out separately, in the overview, any **major** bump taken to unblock a ticket: no PR or ticket asked for it, so a reviewer will not be expecting it and must see it flagged rather than buried in a table.
 
 ### Closing run (`/batch-deps-upgrade close`)
 
@@ -153,7 +154,7 @@ No discovery, no bumps, no validation. Read section 1 of `close-list.md`; if it 
 
 1. **Verify each item against the current `main`** and skip anything not genuinely satisfied — a reviewer may have had an upgrade reverted. This is what makes the run safe whether or not the batch has merged.
 2. **Close everything that verified.** Do not ask for approval; the engineer reviewed both lists on the PR, and step 1 is the real check.
-   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting: query the issue's available transitions and take the one whose destination status is `Done`. Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
+   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting (id `31` in the DGE workflow today; confirm it against the issue's available transitions). Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
    - **Dependabot PRs** — `gh pr close <n> --repo XRPLF/xrpl.js --comment "<comment>"`.
 3. Report in this shape:
 
