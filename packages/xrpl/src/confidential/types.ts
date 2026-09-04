@@ -219,8 +219,7 @@ export type ConfidentialBatchOperation =
  * `TransactionType` means "here is a finished transaction".
  */
 export type ConfidentialBatchInner =
-  | ConfidentialBatchOperation
-  | SubmittableTransaction
+  ConfidentialBatchOperation | SubmittableTransaction
 
 /** Inputs for {@link prepareConfidentialBatch}. */
 export interface ConfidentialBatchParams {
