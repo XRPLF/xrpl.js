@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["es2020", "dom"],
+    "outDir": "./dist",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "preserveConstEnums": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "strictNullChecks": true
+  },
+  "files": [],
+  "include": ["src/**/*.ts"]
+}

@@ -1,30 +1,60 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: "en-US"
+
+# Short steer toward useful feedback for open-source contributors; skip style nits (max 250 chars).
+tone_instructions: "Be concise and encouraging to open-source contributors. Flag correctness, security, and API-contract issues; skip style and formatting nits."
+
 reviews:
-  # Set the profile for reviews. Assertive profile yields more feedback, that may be considered nitpicky.
+  # chill = fewer, higher-signal comments (assertive is nitpicky).
   profile: "chill"
-  # Approve the review once CodeRabbit's comments are resolved. Note: In GitLab, all discussions must be resolved.
+  # Keep the bot's review non-blocking; don't gate a contributor's merge on nitpicks.
   request_changes_workflow: false
-  # Generate a high level summary of the changes in the PR/MR description.
+  # Don't let the bot append a summary to the contributor's PR description.
   high_level_summary: false
-  # Generate a poem in the walkthrough comment.
-  poem: true
-  # Post review details on each review. Additionally, post a review status when a review is skipped in certain cases.
+  # poem is noise.
+  poem: false
+  # "Fortune" text while reviewing is noise.
+  in_progress_fortune: false
+  # Post a status note (incl. when a review is skipped).
   review_status: true
-  # Generate walkthrough in a markdown collapsible section.
+  # Walkthrough shown expanded.
   collapse_walkthrough: false
   # Generate sequence diagrams in the walkthrough.
   sequence_diagrams: false
-  # Abort the in-progress review if the pull request is closed or merged.
+  # Cancel an in-progress review if the PR closes/merges.
   abort_on_close: true
-  auto_review:
-    # Automatic Review | Automatic code review
+  # Flag spam / low-effort PRs on public repos.
+  slop_detection:
     enabled: true
-    # Review draft PRs/MRs.
+  auto_review:
+    # Auto-review every PR.
+    enabled: true
+    # Don't review drafts contributors are still iterating on.
     drafts: false
-    # Ignore reviewing if the title of the pull request contains any of these keywords (case-insensitive).
+    # Skip dependency/release bumps.
     ignore_title_keywords:
-      - build(
+      - "build("
+    # Skip dependency-bump bots regardless of title convention (exact, case-sensitive match).
+    ignore_usernames:
+      - "dependabot[bot]"
+  tools:
+    # Grammar/spell nits on comments and prose are false-positive noise.
+    languagetool:
+      enabled: false
+
 chat:
-  # Enable the bot to reply automatically without requiring the user to tag it.
+  # Let contributors ask follow-ups without @-mentioning the bot.
   auto_reply: true
+  # No ASCII/emoji art.
+  art: false
+  # Required for external (non-org) contributors to interact with the bot.
+  allow_non_org_members: true
+
+knowledge_base:
+  # Give the bot our XRPL-specific review grounding.
+  # applyTo: "**" makes .ai-review/instructions.md apply repo-wide (a guideline file
+  # otherwise scopes only to its own directory).
+  code_guidelines:
+    filePatterns:
+      - files: ".ai-review/instructions.md"
+        applyTo: "**"
