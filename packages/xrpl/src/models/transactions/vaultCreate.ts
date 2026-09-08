@@ -24,7 +24,7 @@ import {
 const MAX_SCALE = 18
 
 /**
- * (XLS-587) Minimum length, in seconds, of a close-ended vault's investment
+ * (LendingProtocolV1_1) Minimum length, in seconds, of a close-ended vault's investment
  * period (`RedemptionDate - SubscriptionDate`). 180s is the smallest window
  * that can still fit a minimum-interval loan plus the 60s redemption buffer
  * enforced by LoanSet (see rippled `kMinInvestmentPeriod`).
@@ -32,7 +32,7 @@ const MAX_SCALE = 18
 const MIN_INVESTMENT_PERIOD = 180
 
 /**
- * (XLS-587) Exclusive upper bound, in seconds, on a close-ended vault's
+ * (LendingProtocolV1_1) Exclusive upper bound, in seconds, on a close-ended vault's
  * investment period (30 Gregorian years).
  */
 const MAX_INVESTMENT_PERIOD = 946708560
@@ -45,7 +45,7 @@ export enum VaultWithdrawalPolicy {
 }
 
 /**
- * Enum representing the kind of a Vault (XLS-587, close-ended vaults).
+ * Enum representing the kind of a Vault (LendingProtocolV1_1, close-ended vaults).
  */
 export enum VaultKind {
   /** An open-ended vault: shares can be redeemed at any time. */
@@ -128,19 +128,19 @@ export interface VaultCreate extends BaseTransaction {
   Scale?: number
 
   /**
-   * (XLS-587) The kind of Vault: 0 for an open-ended vault (the default) or 1
+   * (LendingProtocolV1_1) The kind of Vault: 0 for an open-ended vault (the default) or 1
    * for a close-ended vault. Can only be set at Vault creation. See {@link VaultKind}.
    */
   VaultKind?: number
 
   /**
-   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
    * Epoch, up to which deposits into the Vault are accepted.
    */
   SubscriptionDate?: number
 
   /**
-   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
    * Epoch, at which shares may begin to be redeemed from the Vault.
    */
   RedemptionDate?: number
@@ -198,8 +198,12 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data
-    if (!isHex(dataHex)) {
-      throw new ValidationError('VaultCreate: Data must be a valid hex string')
+    // `isHex` accepts odd-length strings, which are not valid byte blobs and
+    // fail to serialize, so require an even number of hex characters.
+    if (!isHex(dataHex) || dataHex.length % 2 !== 0) {
+      throw new ValidationError(
+        'VaultCreate: Data must be a hex string with an even number of characters',
+      )
     }
     const dataByteLength = dataHex.length / 2
     if (dataByteLength > VAULT_DATA_MAX_BYTE_LENGTH) {
@@ -258,7 +262,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     }
   }
 
-  // XLS-587 close-ended vault rules. A close-ended vault (VaultKind === 1)
+  // LendingProtocolV1_1 close-ended vault rules. A close-ended vault (VaultKind === 1)
   // requires both a subscription and a redemption date; an open-ended vault
   // (the default) must not carry either date.
   const isClosedEnded = tx.VaultKind === VaultKind.vaultKindClosed

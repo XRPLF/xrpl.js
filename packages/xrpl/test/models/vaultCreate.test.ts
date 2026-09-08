@@ -64,7 +64,18 @@ describe('VaultCreate', function () {
 
   it('throws w/ Data field not hex', function () {
     tx.Data = 'zznothex'
-    assertInvalid(tx, 'VaultCreate: Data must be a valid hex string')
+    assertInvalid(
+      tx,
+      'VaultCreate: Data must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ Data field of odd length', function () {
+    tx.Data = 'ABC'
+    assertInvalid(
+      tx,
+      'VaultCreate: Data must be a hex string with an even number of characters',
+    )
   })
 
   it('throws w/ Data field too large', function () {
@@ -201,7 +212,7 @@ describe('VaultCreate', function () {
     })
   })
 
-  describe('close-ended vault validation (XLS-587)', function () {
+  describe('close-ended vault validation (LendingProtocolV1_1)', function () {
     it('allows a close-ended vault with both dates', function () {
       tx.VaultKind = VaultKind.vaultKindClosed
       tx.SubscriptionDate = 800000000

@@ -44,14 +44,16 @@ export function validateVaultDelete(tx: Record<string, unknown>): void {
 
   if (tx.MemoData !== undefined) {
     const memoData = tx.MemoData
-    if (!isHex(memoData)) {
+    // `isHex` accepts odd-length strings, which are not valid byte blobs and
+    // fail to serialize, so require an even number of hex characters.
+    if (!isHex(memoData) || memoData.length % 2 !== 0) {
       throw new ValidationError(
-        'VaultDelete: MemoData must be a valid hex string',
+        'VaultDelete: MemoData must be a hex string with an even number of characters',
       )
     }
     if (memoData.length / 2 > VAULT_DATA_MAX_BYTE_LENGTH) {
       throw new ValidationError(
-        `VaultDelete: MemoData must be less than ${VAULT_DATA_MAX_BYTE_LENGTH} bytes`,
+        `VaultDelete: MemoData must not exceed ${VAULT_DATA_MAX_BYTE_LENGTH} bytes`,
       )
     }
   }

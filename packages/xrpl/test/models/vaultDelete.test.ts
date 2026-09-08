@@ -47,12 +47,23 @@ describe('VaultDelete', function () {
 
   it('throws w/ MemoData not hex', function () {
     tx.MemoData = 'zznothex'
-    assertInvalid(tx, 'VaultDelete: MemoData must be a valid hex string')
+    assertInvalid(
+      tx,
+      'VaultDelete: MemoData must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ MemoData of odd length', function () {
+    tx.MemoData = 'ABC'
+    assertInvalid(
+      tx,
+      'VaultDelete: MemoData must be a hex string with an even number of characters',
+    )
   })
 
   it('throws w/ MemoData too large', function () {
     tx.MemoData = stringToHex('A'.repeat(257))
-    assertInvalid(tx, 'VaultDelete: MemoData must be less than 256 bytes')
+    assertInvalid(tx, 'VaultDelete: MemoData must not exceed 256 bytes')
   })
 
   it('throws w/ non-string MemoData', function () {

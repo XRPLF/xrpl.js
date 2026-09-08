@@ -93,19 +93,19 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   LEVersion?: number
 
   /**
-   * (XLS-587) The kind of Vault: 0 for an open-ended vault or 1 for a
+   * (LendingProtocolV1_1) The kind of Vault: 0 for an open-ended vault or 1 for a
    * close-ended vault.
    */
   VaultKind?: number
 
   /**
-   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
    * Epoch, up to which deposits into the Vault are accepted.
    */
   SubscriptionDate?: number
 
   /**
-   * (XLS-587, close-ended vaults only) The time, in seconds since the Ripple
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
    * Epoch, at which shares may begin to be redeemed from the Vault.
    */
   RedemptionDate?: number
