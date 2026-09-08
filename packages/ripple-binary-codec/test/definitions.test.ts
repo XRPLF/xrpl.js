@@ -186,4 +186,24 @@ describe('encode and decode using new types as a parameter', function () {
 
     expect(decoded).toEqual(tx)
   })
+
+  it('encodes and decodes a negative FeeAmountDelta (SignedAmount) via the field name', function () {
+    // Regression test: definitions.json used to carry two "FeeAmountDelta"
+    // FIELDS entries (one typed "Amount", one typed "SignedAmount"), and
+    // FieldLookup's forEach overwrote by name in array order, so the
+    // "Amount" entry silently won and negative deltas threw on encode.
+    // The type override now lives in code (xrpl-definitions-base.ts) so
+    // this must work against the single "Amount"-typed entry rippled
+    // actually generates.
+    const tx = {
+      ...txJson,
+      TransactionType: 'SponsorshipSet',
+      FeeAmountDelta: '-1000',
+    }
+
+    const encoded = encode(tx)
+    const decoded = decode(encoded)
+
+    expect(decoded.FeeAmountDelta).toEqual('-1000')
+  })
 })
