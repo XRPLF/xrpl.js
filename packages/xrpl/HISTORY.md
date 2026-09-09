@@ -5,7 +5,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Changed
-* Support the `fixCleanup3_4_0` signing prefixes: `signLoanSetByCounterparty` and `signAsSponsor` now sign counterparty and sponsor signatures with their role-specific prefixes so they validate on networks with the amendment enabled.
+* Support the `fixCleanup3_4_0` signing prefixes.
 
 ## 5.1.0 (2026-08-24)
 
