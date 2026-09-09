@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+* Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
+
+### Changed
+* Regenerate `definitions.json` from rippled 3.4.0 (`server_definitions`). Hook definitions are removed as Hooks is no longer supported.
+
 ## 2.10.0 (2026-08-20)
 
 ### Added
