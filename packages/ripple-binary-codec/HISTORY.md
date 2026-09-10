@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 2.11.0-beta.0 (2026-09-10)
+
+### Added
+* Add definitions for `LendingProtocolV1_1`.
+
 ## 2.10.0 (2026-08-20)
 
 ### Added
