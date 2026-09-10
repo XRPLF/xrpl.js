@@ -69,6 +69,16 @@ describe('api', () => {
       }),
     ).toThrow('entropy must be a Uint8Array')
   })
+  // The guard used to test `!options.entropy` while the value was consumed
+  // with `??`, so falsy-but-present values skipped both asserts and reached
+  // encodeSeed as an opaque TypeError.
+  it('generateSeed - refuses falsy non-nullish entropy', () => {
+    for (const value of [0, '', false, NaN]) {
+      expect(() =>
+        generateSeed({ entropy: value as unknown as Uint8Array }),
+      ).toThrow('entropy must be a Uint8Array')
+    }
+  })
   /* eslint-enable @typescript-eslint/consistent-type-assertions */
 
   it('generateSeed - secp256k1, deterministic', () => {

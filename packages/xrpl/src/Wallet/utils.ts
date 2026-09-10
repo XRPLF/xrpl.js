@@ -116,8 +116,32 @@ const MAX_BYTE_VALUE = 255
 export function isUint8Array(value: unknown): value is Uint8Array {
   return (
     value instanceof Uint8Array ||
+    // The tag check alone would also admit other single-byte views, so
+    // require the element size too.
     (ArrayBuffer.isView(value) &&
+      'BYTES_PER_ELEMENT' in value &&
+      value.BYTES_PER_ELEMENT === 1 &&
       Object.prototype.toString.call(value) === '[object Uint8Array]')
+  )
+}
+
+/**
+ * Builds the error for entropy of the wrong length.
+ *
+ * Extra bytes cannot be stored, but truncating them is the caller's decision
+ * to make, not ours: if their input varies past the cut, truncating collapses
+ * distinct inputs onto one wallet, while hashing preserves the difference.
+ *
+ * @param received - The number of bytes the caller supplied.
+ * @returns The error to throw.
+ */
+function entropyLengthError(received: number): ValidationError {
+  return new ValidationError(
+    `entropy must be exactly ${ENTROPY_LENGTH_BYTES} bytes, received ${received}. ` +
+      `A seed holds ${ENTROPY_LENGTH_BYTES} bytes, so extra bytes cannot be stored. ` +
+      `If all of your input is meaningful, hash it down to ${ENTROPY_LENGTH_BYTES} ` +
+      `bytes rather than truncating, which would discard the difference between ` +
+      `inputs that share their first ${ENTROPY_LENGTH_BYTES} bytes.`,
   )
 }
 
@@ -125,18 +149,33 @@ export function isUint8Array(value: unknown): value is Uint8Array {
  * Converts caller-supplied entropy into exactly ENTROPY_LENGTH_BYTES bytes,
  * rejecting anything that is not already a sequence of bytes.
  *
- * This must not use a bare `Uint8Array.from()`, which accepts any iterable and
- * so silently coerces a string: every character is run through `Number()`, and
- * a letter becomes `NaN`, which stores as 0. That turned `fromEntropy('...')`
- * into a spendable wallet derived from mostly (or entirely) zero bytes, with no
- * error, because the bytes reaching generateSeed were well-formed.
+ * The conversion happens up front, and validation runs on the converted copy.
+ * Validating the caller's object and then re-reading it to build the result
+ * lets the two reads disagree, which is how the original bug worked: a bare
+ * `Uint8Array.from()` accepts any iterable, so a string was coerced with
+ * `Number()`, every letter became `NaN`, and it stored as 0 — producing a
+ * spendable wallet from zero bytes with no error, because the bytes reaching
+ * generateSeed were well-formed. A sparse array is the same failure by another
+ * route: `Array.prototype.every` skips holes, so per-element checks pass
+ * vacuously, and the holes read back as zero bytes.
  *
  * @param entropy - Caller-supplied entropy.
  * @returns The entropy as a byte array of exactly ENTROPY_LENGTH_BYTES bytes.
  * @throws ValidationError if entropy is not exactly ENTROPY_LENGTH_BYTES bytes.
  */
 export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
-  if (!isUint8Array(entropy) && !Array.isArray(entropy)) {
+  if (isUint8Array(entropy)) {
+    // The Uint8Array constructor copies using the source's internal length, so
+    // neither a shadowed `length` nor a replaced @@iterator can make the copy
+    // we validate differ from the copy we return.
+    const bytes = new Uint8Array(entropy)
+    if (bytes.length !== ENTROPY_LENGTH_BYTES) {
+      throw entropyLengthError(bytes.length)
+    }
+    return bytes
+  }
+
+  if (!Array.isArray(entropy)) {
     throw new ValidationError(
       `entropy must be a Uint8Array or an array of byte values, received ${typeof entropy}. ` +
         `If you have a hex string, convert it to bytes first (for example with hexToBytes) ` +
@@ -144,23 +183,25 @@ export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
     )
   }
 
-  if (entropy.length !== ENTROPY_LENGTH_BYTES) {
-    throw new ValidationError(
-      `entropy must be exactly ${ENTROPY_LENGTH_BYTES} bytes, received ${entropy.length}.`,
-    )
+  // Materialize first, then validate what was materialized. The array iterator
+  // yields `undefined` for holes rather than skipping them, so a sparse array
+  // becomes an array of `undefined` that the byte check below rejects.
+  const values = Array.from(entropy)
+
+  if (values.length !== ENTROPY_LENGTH_BYTES) {
+    throw entropyLengthError(values.length)
   }
 
-  // A Uint8Array already guarantees byte-valued elements; a plain array does not.
   if (
-    Array.isArray(entropy) &&
-    !entropy.every(
+    !values.every(
       (byte) => Number.isInteger(byte) && byte >= 0 && byte <= MAX_BYTE_VALUE,
     )
   ) {
     throw new ValidationError(
-      `entropy must contain only integers between 0 and ${MAX_BYTE_VALUE}.`,
+      `entropy must contain only integers between 0 and ${MAX_BYTE_VALUE}, ` +
+        `with no missing or empty positions.`,
     )
   }
 
-  return Uint8Array.from(entropy)
+  return Uint8Array.from(values)
 }

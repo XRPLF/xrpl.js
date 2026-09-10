@@ -32,7 +32,11 @@ const SEED_ENTROPY_LENGTH_BYTES = 16
 function isUint8Array(value: unknown): value is Uint8Array {
   return (
     value instanceof Uint8Array ||
+    // The tag check alone would also admit other single-byte views, so
+    // require the element size too.
     (ArrayBuffer.isView(value) &&
+      'BYTES_PER_ELEMENT' in value &&
+      value.BYTES_PER_ELEMENT === 1 &&
       Object.prototype.toString.call(value) === '[object Uint8Array]')
   )
 }
@@ -57,11 +61,12 @@ function generateSeed(
   // silently discards the caller's extra bytes, and accepting a non-byte-array
   // lets a coerced value (a string, say) through as well-formed zero bytes.
   assert.ok(
-    !options.entropy || isUint8Array(options.entropy),
+    options.entropy == null || isUint8Array(options.entropy),
     'entropy must be a Uint8Array',
   )
   assert.ok(
-    !options.entropy || options.entropy.length === SEED_ENTROPY_LENGTH_BYTES,
+    options.entropy == null ||
+      options.entropy.length === SEED_ENTROPY_LENGTH_BYTES,
     `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
   )
   const entropy = options.entropy ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)

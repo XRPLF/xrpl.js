@@ -550,6 +550,46 @@ describe('Wallet', function () {
       assert.throws(() => Wallet.fromEntropy(nan), ValidationError)
     })
 
+    // Array.prototype.every skips holes, so a sparse array passed the
+    // per-element check vacuously and then read back as zero bytes.
+    // new Array(16).map(...) is the common way to hit this by accident:
+    // map skips holes too, so the "random" values are never written.
+    it('throws when entropy is a sparse array', function () {
+      assert.throws(() => Wallet.fromEntropy(new Array(16)), ValidationError)
+      assert.throws(
+        () => Wallet.fromEntropy(new Array(16).map(() => 1)),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy is short but length-padded', function () {
+      const padded = [1, 2, 3]
+      padded.length = 16
+      assert.throws(() => Wallet.fromEntropy(padded), ValidationError)
+    })
+
+    // The whole point of the validation: no malformed input should reach the
+    // all-zero wallet by coercion.
+    it('never derives the zero-entropy wallet from malformed input', function () {
+      const zeroAddress = 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7'
+      const malformed = [
+        'abcdefghijklmnop',
+        new Array(16),
+        new Array(16).map(() => 1),
+        [],
+      ]
+      malformed.forEach((input) => {
+        let derived: string | undefined
+        try {
+          const wallet = Wallet.fromEntropy(input as unknown as Uint8Array)
+          derived = wallet.classicAddress
+        } catch {
+          derived = undefined
+        }
+        assert.notEqual(derived, zeroAddress)
+      })
+    })
+
     it('throws when entropy is null or undefined', function () {
       assert.throws(
         () => Wallet.fromEntropy(null as unknown as Uint8Array),
