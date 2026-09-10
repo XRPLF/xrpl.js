@@ -20,6 +20,23 @@ import {
 import secp256k1 from './signing-schemes/secp256k1'
 import ed25519 from './signing-schemes/ed25519'
 
+const SEED_ENTROPY_LENGTH_BYTES = 16
+
+/**
+ * Checks whether a value is a Uint8Array, including subclasses such as Buffer
+ * and instances from another realm, which fail a plain `instanceof` check.
+ *
+ * @param value - The value to test.
+ * @returns Whether the value is a Uint8Array.
+ */
+function isUint8Array(value: unknown): value is Uint8Array {
+  return (
+    value instanceof Uint8Array ||
+    (ArrayBuffer.isView(value) &&
+      Object.prototype.toString.call(value) === '[object Uint8Array]')
+  )
+}
+
 function getSigningScheme(algorithm: Algorithm): SigningScheme {
   const schemes = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return schemes[algorithm]
@@ -36,13 +53,18 @@ function generateSeed(
     !options.algorithm || VALID_ALGORITHMS.includes(options.algorithm),
     `Unsupported algorithm: ${options.algorithm}. Use one of: ${VALID_ALGORITHMS.join(', ')}`,
   )
+  // Entropy must be refused, not resized. Truncating over-length entropy
+  // silently discards the caller's extra bytes, and accepting a non-byte-array
+  // lets a coerced value (a string, say) through as well-formed zero bytes.
   assert.ok(
-    !options.entropy || options.entropy.length >= 16,
-    'entropy too short',
+    !options.entropy || isUint8Array(options.entropy),
+    'entropy must be a Uint8Array',
   )
-  const entropy = options.entropy
-    ? options.entropy.slice(0, 16)
-    : randomBytes(16)
+  assert.ok(
+    !options.entropy || options.entropy.length === SEED_ENTROPY_LENGTH_BYTES,
+    `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
+  )
+  const entropy = options.entropy ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)
   const type = options.algorithm === 'ecdsa-secp256k1' ? 'secp256k1' : 'ed25519'
   return encodeSeed(entropy, type)
 }

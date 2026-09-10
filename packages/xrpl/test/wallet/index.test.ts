@@ -8,6 +8,7 @@ import {
   walletFromSecretNumbers,
 } from '../../src'
 import ECDSA from '../../src/ECDSA'
+import { ValidationError } from '../../src/errors'
 import { Wallet } from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -474,6 +475,90 @@ describe('Wallet', function () {
       assert.equal(wallet.publicKey, entropyPublicKeyED25519)
       assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
       assert.equal(wallet.classicAddress, masterAddress)
+    })
+
+    it('derives a wallet using a Uint8Array', function () {
+      const wallet = Wallet.fromEntropy(new Uint8Array(16).fill(0))
+
+      assert.equal(wallet.publicKey, entropyPublicKeyED25519)
+      assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
+    })
+
+    // A string is iterable, so Uint8Array.from() used to coerce it: every
+    // letter became NaN and stored as 0, minting a spendable wallet from
+    // mostly-zero entropy with no error at all.
+    it('throws when entropy is a string rather than bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy('abcdefghijklmnop' as unknown as Uint8Array),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy is a 32-character hex string', function () {
+      assert.throws(
+        () =>
+          Wallet.fromEntropy(
+            'a3f5c1d9e8b7460213fdca9876543210' as unknown as Uint8Array,
+          ),
+        ValidationError,
+      )
+    })
+
+    it('does not derive the zero-entropy wallet from a string', function () {
+      // r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7 is the address every all-letters
+      // string used to collapse to. Nothing should reach it by coercion.
+      const strings = [
+        'abcdefghijklmnop',
+        'zyxwvutsrqponmlk',
+        'pppppppppppppppp',
+      ]
+      for (const input of strings) {
+        assert.throws(
+          () => Wallet.fromEntropy(input as unknown as Uint8Array),
+          ValidationError,
+        )
+      }
+    })
+
+    it('throws when entropy is shorter than 16 bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(new Uint8Array(15).fill(1)),
+        ValidationError,
+      )
+    })
+
+    // Previously sliced to the first 16 bytes, so distinct entropy of
+    // different lengths could derive the same wallet.
+    it('throws when entropy is longer than 16 bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(new Uint8Array(32).fill(7)),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy contains non-byte values', function () {
+      const outOfRange = new Array(16).fill(0)
+      outOfRange[0] = 256
+      assert.throws(() => Wallet.fromEntropy(outOfRange), ValidationError)
+
+      const notAnInteger = new Array(16).fill(0)
+      notAnInteger[0] = 1.5
+      assert.throws(() => Wallet.fromEntropy(notAnInteger), ValidationError)
+
+      const nan = new Array(16).fill(0)
+      nan[0] = NaN
+      assert.throws(() => Wallet.fromEntropy(nan), ValidationError)
+    })
+
+    it('throws when entropy is null or undefined', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(null as unknown as Uint8Array),
+        ValidationError,
+      )
+      assert.throws(
+        () => Wallet.fromEntropy(undefined as unknown as Uint8Array),
+        ValidationError,
+      )
     })
   })
 

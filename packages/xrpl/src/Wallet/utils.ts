@@ -13,6 +13,7 @@ import {
 } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
+import { ValidationError } from '../errors'
 import { Transaction } from '../models'
 
 /**
@@ -99,4 +100,67 @@ export function computeSignature(
     return sign(encodeForMultisigning(tx, classicAddress), privateKey)
   }
   return sign(encodeForSigning(tx), privateKey)
+}
+
+const ENTROPY_LENGTH_BYTES = 16
+const MAX_BYTE_VALUE = 255
+
+/**
+ * Checks whether a value is a Uint8Array, including subclasses such as Buffer
+ * and instances created in another realm (iframe, worker, vm context), which
+ * fail a plain `instanceof` check.
+ *
+ * @param value - The value to test.
+ * @returns Whether the value is a Uint8Array.
+ */
+export function isUint8Array(value: unknown): value is Uint8Array {
+  return (
+    value instanceof Uint8Array ||
+    (ArrayBuffer.isView(value) &&
+      Object.prototype.toString.call(value) === '[object Uint8Array]')
+  )
+}
+
+/**
+ * Converts caller-supplied entropy into exactly ENTROPY_LENGTH_BYTES bytes,
+ * rejecting anything that is not already a sequence of bytes.
+ *
+ * This must not use a bare `Uint8Array.from()`, which accepts any iterable and
+ * so silently coerces a string: every character is run through `Number()`, and
+ * a letter becomes `NaN`, which stores as 0. That turned `fromEntropy('...')`
+ * into a spendable wallet derived from mostly (or entirely) zero bytes, with no
+ * error, because the bytes reaching generateSeed were well-formed.
+ *
+ * @param entropy - Caller-supplied entropy.
+ * @returns The entropy as a byte array of exactly ENTROPY_LENGTH_BYTES bytes.
+ * @throws ValidationError if entropy is not exactly ENTROPY_LENGTH_BYTES bytes.
+ */
+export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
+  if (!isUint8Array(entropy) && !Array.isArray(entropy)) {
+    throw new ValidationError(
+      `entropy must be a Uint8Array or an array of byte values, received ${typeof entropy}. ` +
+        `If you have a hex string, convert it to bytes first (for example with hexToBytes) ` +
+        `rather than passing the string directly.`,
+    )
+  }
+
+  if (entropy.length !== ENTROPY_LENGTH_BYTES) {
+    throw new ValidationError(
+      `entropy must be exactly ${ENTROPY_LENGTH_BYTES} bytes, received ${entropy.length}.`,
+    )
+  }
+
+  // A Uint8Array already guarantees byte-valued elements; a plain array does not.
+  if (
+    Array.isArray(entropy) &&
+    !entropy.every(
+      (byte) => Number.isInteger(byte) && byte >= 0 && byte <= MAX_BYTE_VALUE,
+    )
+  ) {
+    throw new ValidationError(
+      `entropy must contain only integers between 0 and ${MAX_BYTE_VALUE}.`,
+    )
+  }
+
+  return Uint8Array.from(entropy)
 }
