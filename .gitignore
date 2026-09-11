@@ -72,3 +72,8 @@ testCompiledForWeb
 
 # lerna debug
 lerna-debug.log
+
+# batch-deps-upgrade skill scratch outputs (local only, never committed)
+.claude/skills/batch-deps-upgrade/code-changes.md
+.claude/skills/batch-deps-upgrade/pr-description.md
+.claude/skills/batch-deps-upgrade/close-list.md
