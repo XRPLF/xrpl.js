@@ -154,9 +154,7 @@ Where a ticket and a PR both want the same install, the target is the **highest*
 
 Classify from the Step 2.5 diff, not from which PR did what: a parent bump carries along a dependency it pins exactly, so a ticket can come out Upgraded with no PR naming its package (`nx` pins `axios`).
 
-Write `close-list.md` — the closing run's input, so keep it parseable, one item per line:
-
-
+Write `close-list.md` — the closing run's input, so keep it parseable, one item per line.
 
 ### Non-goal
 
