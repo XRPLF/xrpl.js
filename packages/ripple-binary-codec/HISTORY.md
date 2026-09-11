@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.11.0 (2026-09-11)
+
 ### Added
 * Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
 
