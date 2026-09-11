@@ -505,8 +505,6 @@ describe('Wallet', function () {
     })
 
     it('does not derive the zero-entropy wallet from a string', function () {
-      // r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7 is the address every all-letters
-      // string used to collapse to. Nothing should reach it by coercion.
       const strings = [
         'abcdefghijklmnop',
         'zyxwvutsrqponmlk',
@@ -527,8 +525,6 @@ describe('Wallet', function () {
       )
     })
 
-    // Previously sliced to the first 16 bytes, so distinct entropy of
-    // different lengths could derive the same wallet.
     it('throws when entropy is longer than 16 bytes', function () {
       assert.throws(
         () => Wallet.fromEntropy(new Uint8Array(32).fill(7)),
@@ -550,10 +546,8 @@ describe('Wallet', function () {
       assert.throws(() => Wallet.fromEntropy(nan), ValidationError)
     })
 
-    // Array.prototype.every skips holes, so a sparse array passed the
-    // per-element check vacuously and then read back as zero bytes.
-    // new Array(16).map(...) is the common way to hit this by accident:
-    // map skips holes too, so the "random" values are never written.
+    // A sparse array reports a length but holds no values at its positions.
+    // `Array(n).map()` produces one, since map skips holes.
     it('throws when entropy is a sparse array', function () {
       assert.throws(() => Wallet.fromEntropy(new Array(16)), ValidationError)
       assert.throws(
@@ -568,10 +562,10 @@ describe('Wallet', function () {
       assert.throws(() => Wallet.fromEntropy(padded), ValidationError)
     })
 
-    // The whole point of the validation: no malformed input should reach the
-    // all-zero wallet by coercion.
-    it('never derives the zero-entropy wallet from malformed input', function () {
-      const zeroAddress = 'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7'
+    // Malformed input must be rejected outright, never quietly turned into
+    // all-zero bytes.
+    it('never derives an all-zero wallet from malformed input', function () {
+      const zeroAddress = Wallet.fromEntropy(new Uint8Array(16)).classicAddress
       const malformed = [
         'abcdefghijklmnop',
         new Array(16),
@@ -590,9 +584,8 @@ describe('Wallet', function () {
       })
     })
 
-    // Materializing through the caller's @@iterator let a hostile array report
-    // one set of values to validation and another to derivation, and an
-    // iterator that never ends exhausted memory. Entropy is read by index now.
+    // Entropy is read by index, so an @@iterator on the caller's array cannot
+    // change which bytes are used, and cannot make the read unbounded.
     it('ignores a caller-supplied @@iterator', function () {
       const lying = new Array(16).fill(200)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Hostile object under test.
@@ -608,7 +601,7 @@ describe('Wallet', function () {
       )
       assert.notEqual(
         wallet.classicAddress,
-        'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
+        Wallet.fromEntropy(new Uint8Array(16)).classicAddress,
       )
     })
 

@@ -165,10 +165,6 @@ export function isUint8Array(value: unknown): value is Uint8Array {
 /**
  * Builds the error for entropy of the wrong length.
  *
- * Extra bytes cannot be stored, but truncating them is the caller's decision
- * to make, not ours: if their input varies past the cut, truncating collapses
- * distinct inputs onto one wallet, while hashing preserves the difference.
- *
  * @param received - The number of bytes the caller supplied.
  * @returns The error to throw.
  */
@@ -183,28 +179,21 @@ function entropyLengthError(received: number): ValidationError {
 }
 
 /**
- * Converts caller-supplied entropy into exactly ENTROPY_LENGTH_BYTES bytes,
- * rejecting anything that is not already a sequence of bytes.
+ * Converts caller-supplied entropy into exactly ENTROPY_LENGTH_BYTES bytes.
  *
- * The conversion happens up front, and validation runs on the converted copy.
- * Validating the caller's object and then re-reading it to build the result
- * lets the two reads disagree, which is how the original bug worked: a bare
- * `Uint8Array.from()` accepts any iterable, so a string was coerced with
- * `Number()`, every letter became `NaN`, and it stored as 0 — producing a
- * spendable wallet from zero bytes with no error, because the bytes reaching
- * generateSeed were well-formed. A sparse array is the same failure by another
- * route: `Array.prototype.every` skips holes, so per-element checks pass
- * vacuously, and the holes read back as zero bytes.
+ * Only a Uint8Array or an array of byte values is accepted; anything else is
+ * rejected rather than coerced. The caller's input is read once and validated
+ * as read, so the bytes checked here are always the bytes returned.
  *
  * @param entropy - Caller-supplied entropy.
  * @returns The entropy as a byte array of exactly ENTROPY_LENGTH_BYTES bytes.
- * @throws ValidationError if entropy is not exactly ENTROPY_LENGTH_BYTES bytes.
+ * @throws ValidationError if entropy is not exactly ENTROPY_LENGTH_BYTES bytes
+ * of byte-valued data.
  */
 export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
   if (isUint8Array(entropy)) {
-    // The Uint8Array constructor copies using the source's internal length, so
-    // neither a shadowed `length` nor a replaced @@iterator can make the copy
-    // we validate differ from the copy we return.
+    // Copy via the constructor, which uses the source's internal length. A
+    // `length` or @@iterator defined on the source cannot affect the result.
     const bytes = new Uint8Array(entropy)
     if (bytes.length !== ENTROPY_LENGTH_BYTES) {
       throw entropyLengthError(bytes.length)
@@ -224,10 +213,9 @@ export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
     throw entropyLengthError(entropy.length)
   }
 
-  // Read by index rather than iterating. A caller-supplied @@iterator could
-  // yield values that disagree with the array's own contents, or never
-  // terminate; indexed reads are bounded and use the values an array actually
-  // holds. Holes read back as `undefined`, which the byte check below rejects.
+  // Read by index, not by iteration: indexed reads are bounded and reflect
+  // what the array holds. Holes read back as `undefined` and are rejected by
+  // the byte check below.
   const values = Array.from(
     { length: ENTROPY_LENGTH_BYTES },
     (_unused, index) => entropy[index],

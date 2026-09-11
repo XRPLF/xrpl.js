@@ -57,12 +57,11 @@ function generateSeed(
     !options.algorithm || VALID_ALGORITHMS.includes(options.algorithm),
     `Unsupported algorithm: ${options.algorithm}. Use one of: ${VALID_ALGORITHMS.join(', ')}`,
   )
-  // Entropy must be refused, not resized. Truncating over-length entropy
-  // silently discards the caller's extra bytes, and accepting a non-byte-array
-  // lets a coerced value (a string, say) through as well-formed zero bytes.
-  // Only an omitted value means "generate randomness for me". An explicit
-  // null is a caller bug, and silently returning a random seed would hand back
-  // a wallet they cannot re-derive.
+  // Entropy is refused rather than resized: a seed holds exactly
+  // SEED_ENTROPY_LENGTH_BYTES bytes, and trimming or padding to fit would
+  // change which wallet the caller derives.
+  // Only an omitted value means "generate randomness for me". Any other value,
+  // including null, is validated rather than replaced with randomness.
   const supplied = options.entropy
   assert.ok(
     supplied === undefined || isUint8Array(supplied),

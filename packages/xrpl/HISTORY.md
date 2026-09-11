@@ -5,7 +5,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### BREAKING CHANGES
-* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Strings were previously coerced through `Uint8Array.from()` into mostly zero bytes, and over-length entropy was truncated to the first 16 bytes. Convert hex strings before passing them: `Wallet.fromEntropy(hexToBytes(hex))`.
+* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it: `Wallet.fromEntropy(hexToBytes(hex))`.
+
 ### Changed
 * Support the `fixCleanup3_4_0` signing prefixes.
 

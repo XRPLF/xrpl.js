@@ -41,7 +41,7 @@ describe('api', () => {
     expect(bytes.length).toEqual(16)
   })
 
-  it('generateSeed - refuses over-length entropy instead of truncating', () => {
+  it('generateSeed - refuses over-length entropy', () => {
     const tooLong = new Uint8Array(32).fill(7)
     expect(() => generateSeed({ entropy: tooLong })).toThrow(
       new Error('entropy must be exactly 16 bytes'),
@@ -69,9 +69,8 @@ describe('api', () => {
       }),
     ).toThrow(new Error('entropy must be a Uint8Array'))
   })
-  // The guard used to test `!options.entropy` while the value was consumed
-  // with `??`, so falsy-but-present values skipped both asserts and reached
-  // encodeSeed as an opaque TypeError.
+  // Only an omitted entropy is replaced with randomness; falsy values are
+  // validated like any other input.
   it('generateSeed - refuses falsy non-nullish entropy', () => {
     for (const value of [0, '', false, NaN]) {
       expect(() =>
@@ -79,9 +78,6 @@ describe('api', () => {
       ).toThrow(new Error('entropy must be a Uint8Array'))
     }
   })
-  // An omitted entropy means "generate randomness". An explicit null used to
-  // mean the same thing, silently returning a wallet the caller cannot
-  // re-derive from the entropy they thought they passed.
   it('generateSeed - refuses explicit null entropy', () => {
     expect(() =>
       generateSeed({ entropy: null as unknown as Uint8Array }),
