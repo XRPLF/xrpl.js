@@ -44,14 +44,14 @@ describe('api', () => {
   it('generateSeed - refuses over-length entropy instead of truncating', () => {
     const tooLong = new Uint8Array(32).fill(7)
     expect(() => generateSeed({ entropy: tooLong })).toThrow(
-      'entropy must be exactly 16 bytes',
+      new Error('entropy must be exactly 16 bytes'),
     )
   })
 
   it('generateSeed - refuses under-length entropy', () => {
     const tooShort = new Uint8Array(15).fill(7)
     expect(() => generateSeed({ entropy: tooShort })).toThrow(
-      'entropy must be exactly 16 bytes',
+      new Error('entropy must be exactly 16 bytes'),
     )
   })
 
@@ -62,12 +62,12 @@ describe('api', () => {
       generateSeed({
         entropy: 'a3f5c1d9e8b7460213fdca9876543210' as unknown as Uint8Array,
       }),
-    ).toThrow('entropy must be a Uint8Array')
+    ).toThrow(new Error('entropy must be a Uint8Array'))
     expect(() =>
       generateSeed({
         entropy: new Array(16).fill(0) as unknown as Uint8Array,
       }),
-    ).toThrow('entropy must be a Uint8Array')
+    ).toThrow(new Error('entropy must be a Uint8Array'))
   })
   // The guard used to test `!options.entropy` while the value was consumed
   // with `??`, so falsy-but-present values skipped both asserts and reached
@@ -76,7 +76,7 @@ describe('api', () => {
     for (const value of [0, '', false, NaN]) {
       expect(() =>
         generateSeed({ entropy: value as unknown as Uint8Array }),
-      ).toThrow('entropy must be a Uint8Array')
+      ).toThrow(new Error('entropy must be a Uint8Array'))
     }
   })
   /* eslint-enable @typescript-eslint/consistent-type-assertions */
