@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Add `LendingProtocolV1_1` support.
+
 ### Changed
 * Support the `fixCleanup3_4_0` signing prefixes.
 

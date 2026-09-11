@@ -144,6 +144,7 @@ export {
   VaultCreate,
   VaultCreateFlags,
   VaultCreateFlagsInterface,
+  VaultKind,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
 export { VaultDelete } from './vaultDelete'

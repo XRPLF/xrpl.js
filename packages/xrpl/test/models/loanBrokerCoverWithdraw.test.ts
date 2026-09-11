@@ -49,4 +49,21 @@ describe('unit test LoanBrokerCoverWithdraw', () => {
     delete tx.Amount
     assertInvalid(tx, 'LoanBrokerCoverWithdraw: missing field Amount')
   })
+
+  test('valid tx with CredentialIDs', () => {
+    tx.CredentialIDs = [
+      '0F0B70F4F4C5B27E39D62D4D69E9DF3D0BC0AC29B8FE7CD5AF1AC8C15F1D2E3B',
+    ]
+    assertValid(tx)
+  })
+
+  test('duplicate CredentialIDs', () => {
+    const credentialId =
+      '0F0B70F4F4C5B27E39D62D4D69E9DF3D0BC0AC29B8FE7CD5AF1AC8C15F1D2E3B'
+    tx.CredentialIDs = [credentialId, credentialId]
+    assertInvalid(
+      tx,
+      'LoanBrokerCoverWithdraw: Credentials cannot contain duplicate elements',
+    )
+  })
 })

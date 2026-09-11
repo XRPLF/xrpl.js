@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+* Add definitions for `LendingProtocolV1_1`.
 * Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
 
 ### Changed
