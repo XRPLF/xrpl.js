@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Changed
+* Support the `fixCleanup3_4_0` signing prefixes.
+
 ## 5.1.0 (2026-08-24)
 
 ### Added

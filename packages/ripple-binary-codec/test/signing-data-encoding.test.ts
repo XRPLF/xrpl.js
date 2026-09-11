@@ -3,6 +3,10 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningCounterparty,
+  encodeForMultisigningCounterparty,
+  encodeForSigningSponsor,
+  encodeForMultisigningSponsor,
   encodeForSigningBatch,
 } from '../src'
 
@@ -376,6 +380,49 @@ describe('Signing data', function () {
         'B5F762798A53D543A014CAF8B297CFF8F2F937E8',
       ].join(''),
     )
+  })
+
+  it('counterparty single-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const base = encodeForSigning(tx_json)
+    const actual = encodeForSigningCounterparty(tx_json)
+    // Same signing payload, only the 4-byte prefix differs: STX -> CPT.
+    expect(base.slice(0, 8)).toBe('53545800')
+    expect(actual.slice(0, 8)).toBe('43505400')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('sponsor single-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const base = encodeForSigning(tx_json)
+    const actual = encodeForSigningSponsor(tx_json)
+    // Same signing payload, only the 4-byte prefix differs: STX -> SPN.
+    expect(base.slice(0, 8)).toBe('53545800')
+    expect(actual.slice(0, 8)).toBe('53504E00')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('counterparty multi-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
+    const signingJson = { ...tx_json, SigningPubKey: '' }
+    const base = encodeForMultisigning(signingJson, signingAccount)
+    const actual = encodeForMultisigningCounterparty(
+      signingJson,
+      signingAccount,
+    )
+    // Same signing payload (incl. AccountID suffix), only the prefix differs: SMT -> CPM.
+    expect(base.slice(0, 8)).toBe('534D5400')
+    expect(actual.slice(0, 8)).toBe('43504D00')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('sponsor multi-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
+    const signingJson = { ...tx_json, SigningPubKey: '' }
+    const base = encodeForMultisigning(signingJson, signingAccount)
+    const actual = encodeForMultisigningSponsor(signingJson, signingAccount)
+    // Same signing payload (incl. AccountID suffix), only the prefix differs: SMT -> SPM.
+    expect(base.slice(0, 8)).toBe('534D5400')
+    expect(actual.slice(0, 8)).toBe('53504D00')
+    expect(actual.slice(8)).toBe(base.slice(8))
   })
 
   it('encodeForSigningBatch fails on non-object', function () {
