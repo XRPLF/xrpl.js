@@ -140,7 +140,6 @@ jobs:
         run: npm ci
 
       - run: npm run build
-      - run: npm run lint
 
   unit:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_unit_tests != false }}

@@ -1,0 +1,31 @@
+name: Check PR description
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - main
+
+jobs:
+  check_description:
+    if: ${{ github.event.pull_request.draft != true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Write PR body to file
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printenv PR_BODY >pr_body.md
+
+      - name: Check PR description differs from template
+        run: |
+          python3 .github/scripts/check-pr-description.py \
+              --template-file .github/pull_request_template.md \
+              --pr-body-file pr_body.md
