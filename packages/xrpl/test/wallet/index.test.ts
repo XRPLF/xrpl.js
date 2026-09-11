@@ -562,10 +562,9 @@ describe('Wallet', function () {
       assert.throws(() => Wallet.fromEntropy(padded), ValidationError)
     })
 
-    // Malformed input must be rejected outright, never quietly turned into
-    // all-zero bytes.
-    it('never derives an all-zero wallet from malformed input', function () {
-      const zeroAddress = Wallet.fromEntropy(new Uint8Array(16)).classicAddress
+    // Malformed input must be rejected outright. Returning any wallet at all,
+    // whatever its address, is a failure.
+    it('rejects every malformed input', function () {
       const malformed = [
         'abcdefghijklmnop',
         new Array(16),
@@ -573,14 +572,10 @@ describe('Wallet', function () {
         [],
       ]
       malformed.forEach((input) => {
-        let derived: string | undefined
-        try {
-          const wallet = Wallet.fromEntropy(input as unknown as Uint8Array)
-          derived = wallet.classicAddress
-        } catch {
-          derived = undefined
-        }
-        assert.notEqual(derived, zeroAddress)
+        assert.throws(
+          () => Wallet.fromEntropy(input as unknown as Uint8Array),
+          ValidationError,
+        )
       })
     })
 
