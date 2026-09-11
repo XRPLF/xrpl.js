@@ -4,6 +4,10 @@
 
 ### Added
 * Add definitions for `LendingProtocolV1_1`.
+* Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
+
+### Changed
+* Regenerate `definitions.json` from rippled 3.4.0: adds new fields (e.g. `VaultKind`, `SubscriptionDate`, `RedemptionDate`) and **removes Hook/Emit field definitions**, as Hooks is no longer supported. `decode()` of a blob containing a Hook field now throws on the unknown field.
 
 ## 2.10.0 (2026-08-20)
 

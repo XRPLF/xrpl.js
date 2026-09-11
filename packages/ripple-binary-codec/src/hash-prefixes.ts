@@ -29,6 +29,14 @@ const HashPrefix: Record<string, Uint8Array> = {
   transactionSig: bytes(0x53545800),
   // inner transaction to sign
   transactionMultiSig: bytes(0x534d5400),
+  // inner transaction to sign as the counterparty (fixCleanup3_4_0)
+  counterpartyTransactionSig: bytes(0x43505400),
+  // inner transaction to multi-sign as the counterparty (fixCleanup3_4_0)
+  counterpartyTransactionMultiSig: bytes(0x43504d00),
+  // inner transaction to sign as the sponsor (fixCleanup3_4_0)
+  sponsorTransactionSig: bytes(0x53504e00),
+  // inner transaction to multi-sign as the sponsor (fixCleanup3_4_0)
+  sponsorTransactionMultiSig: bytes(0x53504d00),
   // validation for signing
   validation: bytes(0x56414c00),
   // proposal for signing

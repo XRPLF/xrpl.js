@@ -603,11 +603,12 @@ describe('Lending Protocol IT', () => {
       )
 
       // Advance the ledger past the loan's first payment due date so the loan
-      // becomes overdue. Under LendingProtocolV1_1 (fixCleanup3_4_0) a loan can
-      // only be impaired once a payment is late (parentCloseTime >
-      // NextPaymentDueDate), and the late-payment LoanPay below requires the
-      // same. Overshoot the due date by a comfortable margin so the effective
-      // (close-time-resolution-rounded) parentCloseTime is safely past it.
+      // becomes overdue. Under fixCleanup3_4_0 a loan can only be impaired once a
+      // payment is late (parentCloseTime > NextPaymentDueDate), and the
+      // late-payment LoanPay below requires the same; otherwise LoanManage and
+      // LoanPay return tecTOO_SOON. Overshoot the due date by a comfortable
+      // margin so the effective (close-time-resolution-rounded) parentCloseTime
+      // is safely past it.
       await waitForAndForceProgressLedgerTime(
         testContext.client,
         loanObject.NextPaymentDueDate + 200,
@@ -636,7 +637,7 @@ describe('Lending Protocol IT', () => {
 
       // Test LoanPay. The loan is now overdue, so the payment must set the
       // late-payment flag; a normal LoanPay on an overdue loan returns
-      // tecEXPIRED under LendingProtocolV1_1.
+      // tecEXPIRED under fixCleanup3_4_0.
       const loanPayTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
