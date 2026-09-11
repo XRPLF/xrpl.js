@@ -590,6 +590,40 @@ describe('Wallet', function () {
       })
     })
 
+    // Materializing through the caller's @@iterator let a hostile array report
+    // one set of values to validation and another to derivation, and an
+    // iterator that never ends exhausted memory. Entropy is read by index now.
+    it('ignores a caller-supplied @@iterator', function () {
+      const lying = new Array(16).fill(200)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Hostile object under test.
+      ;(lying as any)[Symbol.iterator] = function* fake(): Generator<number> {
+        for (let index = 0; index < 16; index++) {
+          yield 0
+        }
+      }
+      const wallet = Wallet.fromEntropy(lying)
+      assert.equal(
+        wallet.classicAddress,
+        Wallet.fromEntropy(new Array(16).fill(200)).classicAddress,
+      )
+      assert.notEqual(
+        wallet.classicAddress,
+        'r9zRhGr7b6xPekLvT6wP4qNdWMryaumZS7',
+      )
+    })
+
+    it('does not hang on a non-terminating @@iterator', function () {
+      const eternal = new Array(15).fill(1)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Hostile object under test.
+      ;(eternal as any)[Symbol.iterator] =
+        function* forever(): Generator<number> {
+          for (;;) {
+            yield 1
+          }
+        }
+      assert.throws(() => Wallet.fromEntropy(eternal), ValidationError)
+    })
+
     it('throws when entropy is null or undefined', function () {
       assert.throws(
         () => Wallet.fromEntropy(null as unknown as Uint8Array),

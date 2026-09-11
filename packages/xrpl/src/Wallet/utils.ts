@@ -220,14 +220,18 @@ export function validateEntropy(entropy: Uint8Array | number[]): Uint8Array {
     )
   }
 
-  // Materialize first, then validate what was materialized. The array iterator
-  // yields `undefined` for holes rather than skipping them, so a sparse array
-  // becomes an array of `undefined` that the byte check below rejects.
-  const values = Array.from(entropy)
-
-  if (values.length !== ENTROPY_LENGTH_BYTES) {
-    throw entropyLengthError(values.length)
+  if (entropy.length !== ENTROPY_LENGTH_BYTES) {
+    throw entropyLengthError(entropy.length)
   }
+
+  // Read by index rather than iterating. A caller-supplied @@iterator could
+  // yield values that disagree with the array's own contents, or never
+  // terminate; indexed reads are bounded and use the values an array actually
+  // holds. Holes read back as `undefined`, which the byte check below rejects.
+  const values = Array.from(
+    { length: ENTROPY_LENGTH_BYTES },
+    (_unused, index) => entropy[index],
+  )
 
   if (
     !values.every(

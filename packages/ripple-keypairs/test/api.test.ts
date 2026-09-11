@@ -79,6 +79,15 @@ describe('api', () => {
       ).toThrow(new Error('entropy must be a Uint8Array'))
     }
   })
+  // An omitted entropy means "generate randomness". An explicit null used to
+  // mean the same thing, silently returning a wallet the caller cannot
+  // re-derive from the entropy they thought they passed.
+  it('generateSeed - refuses explicit null entropy', () => {
+    expect(() =>
+      generateSeed({ entropy: null as unknown as Uint8Array }),
+    ).toThrow(new Error('entropy must be a Uint8Array'))
+  })
+
   /* eslint-enable @typescript-eslint/consistent-type-assertions */
 
   it('generateSeed - secp256k1, deterministic', () => {

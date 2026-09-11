@@ -60,16 +60,19 @@ function generateSeed(
   // Entropy must be refused, not resized. Truncating over-length entropy
   // silently discards the caller's extra bytes, and accepting a non-byte-array
   // lets a coerced value (a string, say) through as well-formed zero bytes.
+  // Only an omitted value means "generate randomness for me". An explicit
+  // null is a caller bug, and silently returning a random seed would hand back
+  // a wallet they cannot re-derive.
+  const supplied = options.entropy
   assert.ok(
-    options.entropy == null || isUint8Array(options.entropy),
+    supplied === undefined || isUint8Array(supplied),
     'entropy must be a Uint8Array',
   )
   assert.ok(
-    options.entropy == null ||
-      options.entropy.length === SEED_ENTROPY_LENGTH_BYTES,
+    supplied === undefined || supplied.length === SEED_ENTROPY_LENGTH_BYTES,
     `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
   )
-  const entropy = options.entropy ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)
+  const entropy = supplied ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)
   const type = options.algorithm === 'ecdsa-secp256k1' ? 'secp256k1' : 'ed25519'
   return encodeSeed(entropy, type)
 }
