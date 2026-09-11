@@ -395,6 +395,7 @@ describe('Signing data', function () {
     const base = encodeForSigning(tx_json)
     const actual = encodeForSigningSponsor(tx_json)
     // Same signing payload, only the 4-byte prefix differs: STX -> SPN.
+    expect(base.slice(0, 8)).toBe('53545800')
     expect(actual.slice(0, 8)).toBe('53504E00')
     expect(actual.slice(8)).toBe(base.slice(8))
   })
@@ -419,6 +420,7 @@ describe('Signing data', function () {
     const base = encodeForMultisigning(signingJson, signingAccount)
     const actual = encodeForMultisigningSponsor(signingJson, signingAccount)
     // Same signing payload (incl. AccountID suffix), only the prefix differs: SMT -> SPM.
+    expect(base.slice(0, 8)).toBe('534D5400')
     expect(actual.slice(0, 8)).toBe('53504D00')
     expect(actual.slice(8)).toBe(base.slice(8))
   })
