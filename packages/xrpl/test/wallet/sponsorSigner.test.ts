@@ -44,7 +44,7 @@ describe('sponsorSigner', function () {
         SigningPubKey:
           'EDD184F5FE58EC1375AB1CF17A3C5A12A8DEE89DD5228772D69E28EE37438FE59E',
         TxnSignature:
-          '8F13B45F365C9362F06A0DE63F544B7B9D87EE6F10180E5DC997D8184B4666E2158D4AA870DEDDCBB21D405F901EBC332B1F8139EC1672291629DF65D112960B',
+          'D78B844CCC7FCE1E3F983CD89783E2A8465AF10B38928F6A076EA4B4E833158E08B5F4FA16D06DEF443081EE3B7574A1F48EBC83B147F7F0CF41F93C294A7F0C',
       },
     }
 
@@ -98,7 +98,9 @@ describe('sponsorSigner', function () {
       signedPayment as Payment,
     )
 
-    // Verify structure and key fields (signatures are non-deterministic)
+    // Verify structure and key fields. Signatures are deterministic
+    // (Ed25519), so the sponsor signature is pinned exactly below to catch any
+    // regression in the fixCleanup3_4_0 sponsor signing prefix.
     assert.equal(
       sponsorSignedTx.TransactionType,
       expectedPayment.TransactionType,
@@ -122,9 +124,10 @@ describe('sponsorSigner', function () {
       sponsorSig.SigningPubKey,
       expectedPayment.SponsorSignature.SigningPubKey,
     )
-    // TxnSignature is 128 hex chars for Ed25519 (64 bytes)
-    assert.equal(sponsorSig.TxnSignature.length, 128)
-    assert.match(sponsorSig.TxnSignature, /^[0-9A-F]+$/u)
+    assert.equal(
+      sponsorSig.TxnSignature,
+      expectedPayment.SponsorSignature.TxnSignature,
+    )
   })
 
   it('multi sign', function () {
@@ -167,7 +170,7 @@ describe('sponsorSigner', function () {
               SigningPubKey:
                 'EDD184F5FE58EC1375AB1CF17A3C5A12A8DEE89DD5228772D69E28EE37438FE59E',
               TxnSignature:
-                'CEC3A0F14AC5E9E9984F9E8B07182DBC783BC6F0F3D7AC0DF24B974AF1F302AEBB0583A4DF410BFC50E1E01A69731737C95D6BC0D7F2226492A888F026275E08',
+                'E983F7BED3E129E93F3001567006FD12AA8E6B180DFD18E2293D998080E80F133E1D7142A36C30BCDDB67339EEE02449937A4DEA1500BF06E2803E29C1B76A05',
             },
           },
           {
@@ -176,7 +179,7 @@ describe('sponsorSigner', function () {
               SigningPubKey:
                 'ED121AF03981F6496E47854955F65FC8763232D74EBF73877889514137BB72720A',
               TxnSignature:
-                'F1F1E791B6C89631C13BC2605CF0EA0983612F13956F90958C00F922AEB69236650D560EEA14A40AD15108D05C5FBCB11570745C239EF9C7DB7548A5F9204107',
+                'D20FCEBBD96956CED0D34A3B720280C34E92C5CE94288E2FA61FFD30BAECAD0F76CC38D9ECE504DCA8F586B06CEA6A3D1966474541ED338EE569515860DA4800',
             },
           },
         ],
@@ -216,7 +219,7 @@ describe('sponsorSigner', function () {
             SigningPubKey:
               'EDD184F5FE58EC1375AB1CF17A3C5A12A8DEE89DD5228772D69E28EE37438FE59E',
             TxnSignature:
-              'CEC3A0F14AC5E9E9984F9E8B07182DBC783BC6F0F3D7AC0DF24B974AF1F302AEBB0583A4DF410BFC50E1E01A69731737C95D6BC0D7F2226492A888F026275E08',
+              'E983F7BED3E129E93F3001567006FD12AA8E6B180DFD18E2293D998080E80F133E1D7142A36C30BCDDB67339EEE02449937A4DEA1500BF06E2803E29C1B76A05',
           },
         } as Payment,
       ])
@@ -239,7 +242,9 @@ describe('sponsorSigner', function () {
       tx2 as Payment,
     ])
 
-    // Verify structure (signatures are non-deterministic)
+    // Verify structure. Signatures are deterministic (Ed25519), so each
+    // sponsor signer's signature is pinned exactly below to catch any
+    // regression in the fixCleanup3_4_0 sponsor multi-signing prefix.
     assert.equal(
       combinedTx.TransactionType,
       expectedMultiSignedPayment.TransactionType,
@@ -282,10 +287,22 @@ describe('sponsorSigner', function () {
     )
     assert.sameMembers(actualSigners, expectedSigners)
 
-    // Verify signatures are valid hex strings of correct length
+    // Pin each signer's exact signature (matched by account, since
+    // combineSponsorSigners sorts the Signers array).
     for (const signerEntry of sponsorSig.Signers) {
-      assert.equal(signerEntry.Signer.TxnSignature.length, 128)
-      assert.match(signerEntry.Signer.TxnSignature, /^[0-9A-F]+$/u)
+      const expectedSigner =
+        expectedMultiSignedPayment.SponsorSignature.Signers.find(
+          (entry) => entry.Signer.Account === signerEntry.Signer.Account,
+        )
+      assert.exists(expectedSigner)
+      assert.equal(
+        signerEntry.Signer.SigningPubKey,
+        expectedSigner.Signer.SigningPubKey,
+      )
+      assert.equal(
+        signerEntry.Signer.TxnSignature,
+        expectedSigner.Signer.TxnSignature,
+      )
     }
   })
 

@@ -9,7 +9,11 @@ import {
   decode,
   encode,
   encodeForMultisigning,
+  encodeForMultisigningCounterparty,
+  encodeForMultisigningSponsor,
   encodeForSigning,
+  encodeForSigningCounterparty,
+  encodeForSigningSponsor,
 } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
@@ -79,27 +83,60 @@ export function getDecodedTransaction(
 }
 
 /**
+ * The role a signature plays on a transaction. Under `fixCleanup3_4_0` each role
+ * covers a distinct signing prefix so a signature cannot be replayed in another
+ * role (see rippled `signingPrefix`).
+ */
+export type SignatureRole = 'transaction' | 'counterparty' | 'sponsor'
+
+const SIGNING_ENCODERS: Record<
+  SignatureRole,
+  {
+    single: (tx: Transaction) => string
+    multi: (tx: Transaction, signAs: string) => string
+  }
+> = {
+  transaction: {
+    single: (tx) => encodeForSigning(tx),
+    multi: (tx, signAs) => encodeForMultisigning(tx, signAs),
+  },
+  counterparty: {
+    single: (tx) => encodeForSigningCounterparty(tx),
+    multi: (tx, signAs) => encodeForMultisigningCounterparty(tx, signAs),
+  },
+  sponsor: {
+    single: (tx) => encodeForSigningSponsor(tx),
+    multi: (tx, signAs) => encodeForMultisigningSponsor(tx, signAs),
+  },
+}
+
+/**
  * Signs a transaction with the proper signing encoding.
  *
  * @param tx - A transaction to sign.
  * @param privateKey - A key to sign the transaction with.
  * @param signAs - Multisign only. An account address to include in the Signer field.
  * Can be either a classic address or an XAddress.
+ * @param role - Which signature role to sign for. Defaults to `transaction`.
+ * `counterparty` / `sponsor` use their `fixCleanup3_4_0` signing prefixes.
  * @returns A signed transaction in the proper format.
  */
+// eslint-disable-next-line max-params -- role selects the fixCleanup3_4_0 signing prefix
 export function computeSignature(
   tx: Transaction,
   privateKey: string,
   signAs?: string,
+  role: SignatureRole = 'transaction',
 ): string {
+  const encoders = SIGNING_ENCODERS[role]
   if (signAs) {
     const classicAddress = isValidXAddress(signAs)
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encodeForMultisigning(tx, classicAddress), privateKey)
+    return sign(encoders.multi(tx, classicAddress), privateKey)
   }
-  return sign(encodeForSigning(tx), privateKey)
+  return sign(encoders.single(tx), privateKey)
 }
 
 const ENTROPY_LENGTH_BYTES = 16
