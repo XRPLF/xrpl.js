@@ -105,7 +105,9 @@ jobs:
             exit 1
           fi
 
-          if [[ "$TRIGGER_BRANCH" != "main" ]]; then
+          # TEMPORARY: relaxed for testing on test/team-reviewer-lookup-404-slack-test.
+          # Revert this before merging anything from this branch.
+          if [[ "$TRIGGER_BRANCH" != "main" && "$TRIGGER_BRANCH" != "test/team-reviewer-lookup-404-slack-test" ]]; then
             echo "❌ Release pipeline can only be triggered from the 'main' branch. Current branch: '$TRIGGER_BRANCH'." >&2
             exit 1
           fi
