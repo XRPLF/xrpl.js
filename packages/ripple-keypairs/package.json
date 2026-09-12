@@ -19,7 +19,7 @@
     "test": "test"
   },
   "dependencies": {
-    "@noble/curves": "^2.0.1",
+    "@noble/curves": "^2.2.0",
     "@xrplf/isomorphic": "^1.0.2",
     "ripple-address-codec": "^5.0.1"
   },
