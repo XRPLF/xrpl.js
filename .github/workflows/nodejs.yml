@@ -142,6 +142,33 @@ jobs:
       - run: npm run build
       - run: npm run lint
 
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        node-version: [24.x]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.GIT_REF }}
+          fetch-depth: 0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Setup npm version 10
+        run: |
+          npm i -g npm@10 --registry=https://registry.npmjs.org
+
+      # Fail the build on any high or critical npm advisory. Moderate/low are
+      # reported but do not block. Runs from package-lock.json (no install
+      # needed).
+      - name: Audit dependencies (high and critical)
+        run: npm audit --audit-level=high --registry=https://registry.npmjs.org
+
   unit:
     if: ${{ github.event_name != 'workflow_dispatch' || inputs.run_unit_tests != false }}
     runs-on: ubuntu-latest
