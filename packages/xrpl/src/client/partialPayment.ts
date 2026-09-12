@@ -28,7 +28,16 @@ const WARN_PARTIAL_PAYMENT_CODE = 2001
 
 /* eslint-disable complexity -- check different token types */
 /* eslint-disable @typescript-eslint/consistent-type-assertions -- known currency type */
-function amountsEqual(
+/**
+ * Returns true when two transaction amounts represent the same on-ledger value.
+ *
+ * Handles all three amount shapes (XRP string, IOU object, MPT object) and uses
+ * `BigNumber` for the numeric `value` field so `"1.0"` and `"1"` compare equal.
+ * Exported so callers outside this module (notably `handleDeliverMax` in
+ * `sugar/autofill.ts`) can avoid reference-equality bugs on IOU/MPT objects —
+ * see issue #3313.
+ */
+export function amountsEqual(
   amt1: Amount | MPTAmount,
   amt2: Amount | MPTAmount,
 ): boolean {
