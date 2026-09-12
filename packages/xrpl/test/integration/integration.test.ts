@@ -1,8 +1,8 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { Client, SubmitResponse } from '../../src'
 import { AccountSet, SignerListSet } from '../../src/models/transactions'
-import { convertStringToHex } from '../../src/utils'
 import { multisign } from '../../src/Wallet/signer'
 
 import serverUrl from './serverUrl'
@@ -74,7 +74,7 @@ describe('integration tests', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const accountSetTx = await client.autofill(accountSet, 2)
       const { tx_blob: tx_blob1 } = signerWallet1.sign(accountSetTx, true)
