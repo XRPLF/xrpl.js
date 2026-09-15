@@ -114,6 +114,7 @@ export function signAsSponsor(
               tx,
               wallet.privateKey,
               multisignAddress,
+              'sponsor',
             ),
           },
         },
@@ -122,7 +123,12 @@ export function signAsSponsor(
   } else {
     tx.SponsorSignature = {
       SigningPubKey: wallet.publicKey,
-      TxnSignature: computeSignature(tx, wallet.privateKey),
+      TxnSignature: computeSignature(
+        tx,
+        wallet.privateKey,
+        undefined,
+        'sponsor',
+      ),
     }
   }
 

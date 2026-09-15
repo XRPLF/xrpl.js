@@ -469,11 +469,22 @@ jobs:
                   expanded+=("${entry#User:}")
                   ;;
                 Team:*)
-                  local slug="${entry#Team:}"
-                  logins="$(GH_TOKEN="$GH_TOKEN" gh api --paginate \
-                    "orgs/$org/teams/$slug/members" \
-                    -q '.[].login' 2>/dev/null || true)"
-                  if [ -n "$logins" ]; then
+                  local slug="${entry#Team:}" team_json team_ok
+                  # NOTE: reading org team membership needs a token with org-read
+                  # access (e.g. a PAT/fine-grained token with org "Members" read
+                  # permission). The default GITHUB_TOKEN does not have this, so this
+                  # will fail here and fall through to the team-URL fallback below.
+                  if team_json="$(curl -sSf \
+                    -H "Authorization: Bearer $GH_TOKEN" \
+                    -H "Accept: application/vnd.github+json" \
+                    "https://api.github.com/orgs/$org/teams/$slug/members")"; then
+                    team_ok=true
+                  else
+                    team_ok=false
+                    team_json=""
+                  fi
+                  logins="$(printf '%s' "$team_json" | jq -r '.[].login' 2>/dev/null || true)"
+                  if [ "$team_ok" = true ] && [ -n "$logins" ]; then
                     while IFS= read -r member; do
                       [ -n "$member" ] && expanded+=("$member")
                     done <<< "$logins"

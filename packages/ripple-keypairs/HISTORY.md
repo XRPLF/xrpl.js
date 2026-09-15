@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-09-11)
+
+### BREAKING CHANGES
+- `generateSeed` now requires `options.entropy` to be a `Uint8Array` of exactly 16 bytes and throws otherwise. Other lengths and types are no longer accepted.
+
 ## 3.0.0 (2026-06-05)
 
 ### BREAKING CHANGES

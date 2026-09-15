@@ -40,7 +40,11 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  generateFundedWallet,
+  testTransaction,
+  waitForAndForceProgressLedgerTime,
+} from '../utils'
 
 interface VaultObject {
   mptIssuanceId: string
@@ -561,6 +565,19 @@ describe('Lending Protocol IT', () => {
         ).toString(),
       )
 
+      // Advance the ledger past the loan's first payment due date so the loan
+      // becomes overdue. Under fixCleanup3_4_0 a loan can only be impaired once a
+      // payment is late (parentCloseTime > NextPaymentDueDate), and the
+      // late-payment LoanPay below requires the same; otherwise LoanManage and
+      // LoanPay return tecTOO_SOON. Overshoot the due date by a comfortable
+      // margin so the effective (close-time-resolution-rounded) parentCloseTime
+      // is safely past it.
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        loanObject.NextPaymentDueDate + 200,
+        400,
+      )
+
       // Test LoanManage - Mark loan as impaired
       const loanManageTx: LoanManage = {
         TransactionType: 'LoanManage',
@@ -581,7 +598,9 @@ describe('Lending Protocol IT', () => {
       ) as Loan
       assert.equal(loanObject.Flags, LoanFlags.lsfLoanImpaired)
 
-      // Test LoanPay
+      // Test LoanPay. The loan is now overdue, so the payment must set the
+      // late-payment flag; a normal LoanPay on an overdue loan returns
+      // tecEXPIRED under fixCleanup3_4_0.
       const loanPayTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -589,6 +608,9 @@ describe('Lending Protocol IT', () => {
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '100000',
+        },
+        Flags: {
+          tfLoanLatePayment: true,
         },
       }
       await testTransaction(testContext.client, loanPayTx, borrowerWallet)

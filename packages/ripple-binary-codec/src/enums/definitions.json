@@ -149,46 +149,6 @@
       }
     ],
     [
-      "HookStateChangeCount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 17,
-        "type": "UInt16"
-      }
-    ],
-    [
-      "HookEmitCount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 18,
-        "type": "UInt16"
-      }
-    ],
-    [
-      "HookExecutionIndex",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 19,
-        "type": "UInt16"
-      }
-    ],
-    [
-      "HookApiVersion",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 20,
-        "type": "UInt16"
-      }
-    ],
-    [
       "LedgerFixType",
       {
         "isSerialized": true,
@@ -649,26 +609,6 @@
       }
     ],
     [
-      "HookStateCount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 45,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "EmitGeneration",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 46,
-        "type": "UInt32"
-      }
-    ],
-    [
       "VoteWeight",
       {
         "isSerialized": true,
@@ -929,6 +869,66 @@
       }
     ],
     [
+      "SubscriptionDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 75,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RedemptionDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 76,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "IssuerKeyEpoch",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 77,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "AuditorKeyEpoch",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 78,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "IssuerKeyMirrorEpoch",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 79,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "AuditorKeyMirrorEpoch",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 80,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1055,36 +1055,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 13,
-        "type": "UInt64"
-      }
-    ],
-    [
-      "HookOn",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 16,
-        "type": "UInt64"
-      }
-    ],
-    [
-      "HookInstructionCount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 17,
-        "type": "UInt64"
-      }
-    ],
-    [
-      "HookReturnCode",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 18,
         "type": "UInt64"
       }
     ],
@@ -1515,46 +1485,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 29,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "HookStateKey",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 30,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "HookHash",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 31,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "HookNamespace",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 32,
-        "type": "Hash256"
-      }
-    ],
-    [
-      "HookSetTxnID",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 33,
         "type": "Hash256"
       }
     ],
@@ -2159,46 +2089,6 @@
       }
     ],
     [
-      "HookStateData",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 22,
-        "type": "Blob"
-      }
-    ],
-    [
-      "HookReturnString",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 23,
-        "type": "Blob"
-      }
-    ],
-    [
-      "HookParameterName",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 24,
-        "type": "Blob"
-      }
-    ],
-    [
-      "HookParameterValue",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 25,
-        "type": "Blob"
-      }
-    ],
-    [
       "DIDDocument",
       {
         "isSerialized": true,
@@ -2515,16 +2405,6 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 12,
-        "type": "AccountID"
-      }
-    ],
-    [
-      "HookAccount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": true,
-        "nth": 16,
         "type": "AccountID"
       }
     ],
@@ -2979,16 +2859,6 @@
       }
     ],
     [
-      "Hook",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 14,
-        "type": "STObject"
-      }
-    ],
-    [
       "Permission",
       {
         "isSerialized": true,
@@ -3025,56 +2895,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 19,
-        "type": "STObject"
-      }
-    ],
-    [
-      "EmittedTxn",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 20,
-        "type": "STObject"
-      }
-    ],
-    [
-      "HookExecution",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 21,
-        "type": "STObject"
-      }
-    ],
-    [
-      "HookDefinition",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 22,
-        "type": "STObject"
-      }
-    ],
-    [
-      "HookParameter",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 23,
-        "type": "STObject"
-      }
-    ],
-    [
-      "HookGrant",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 24,
         "type": "STObject"
       }
     ],
@@ -3299,16 +3119,6 @@
       }
     ],
     [
-      "Hooks",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 11,
-        "type": "STArray"
-      }
-    ],
-    [
       "VoteSlots",
       {
         "isSerialized": true,
@@ -3345,36 +3155,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 17,
-        "type": "STArray"
-      }
-    ],
-    [
-      "HookExecutions",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 18,
-        "type": "STArray"
-      }
-    ],
-    [
-      "HookParameters",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 19,
-        "type": "STArray"
-      }
-    ],
-    [
-      "HookGrants",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 20,
         "type": "STArray"
       }
     ],
@@ -3529,6 +3309,16 @@
       }
     ],
     [
+      "LEVersion",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 6,
+        "type": "UInt8"
+      }
+    ],
+    [
       "TickSize",
       {
         "isSerialized": true,
@@ -3549,16 +3339,6 @@
       }
     ],
     [
-      "HookResult",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 18,
-        "type": "UInt8"
-      }
-    ],
-    [
       "WasLockingChainSend",
       {
         "isSerialized": true,
@@ -3575,6 +3355,26 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 20,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "ContractResult",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 21,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "VaultKind",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 22,
         "type": "UInt8"
       }
     ],
@@ -4769,6 +4569,14 @@
         "optionality": 1
       },
       {
+        "name": "IssuerKeyEpoch",
+        "optionality": 1
+      },
+      {
+        "name": "AuditorKeyEpoch",
+        "optionality": 1
+      },
+      {
         "name": "ConfidentialOutstandingAmount",
         "optionality": 2
       }
@@ -5239,6 +5047,22 @@
       {
         "name": "Scale",
         "optionality": 2
+      },
+      {
+        "name": "LEVersion",
+        "optionality": 2
+      },
+      {
+        "name": "VaultKind",
+        "optionality": 2
+      },
+      {
+        "name": "SubscriptionDate",
+        "optionality": 1
+      },
+      {
+        "name": "RedemptionDate",
+        "optionality": 1
       }
     ],
     "XChainOwnedClaimID": [
@@ -6090,6 +5914,10 @@
       {
         "name": "DestinationTag",
         "optionality": 1
+      },
+      {
+        "name": "CredentialIDs",
+        "optionality": 1
       }
     ],
     "LoanBrokerDelete": [
@@ -6730,6 +6558,18 @@
       {
         "name": "Scale",
         "optionality": 1
+      },
+      {
+        "name": "VaultKind",
+        "optionality": 1
+      },
+      {
+        "name": "SubscriptionDate",
+        "optionality": 1
+      },
+      {
+        "name": "RedemptionDate",
+        "optionality": 1
       }
     ],
     "VaultDelete": [
@@ -6785,6 +6625,10 @@
       },
       {
         "name": "DestinationTag",
+        "optionality": 1
+      },
+      {
+        "name": "CredentialIDs",
         "optionality": 1
       }
     ],
@@ -7374,5 +7218,5 @@
     "Vector256": 19,
     "XChainBridge": 25
   },
-  "hash": "F3DCCAD774156538A6AB3E6003A41273D5AE394A90989204838AE52A006F245B"
+  "hash": "0F89957938A9185335A2ACD799EDDF3965F349E2E482A0CDD97094A1E4DB9FE7"
 }

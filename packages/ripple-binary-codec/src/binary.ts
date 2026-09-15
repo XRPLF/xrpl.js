@@ -163,17 +163,15 @@ function signingClaimData(claim: ClaimObject): Uint8Array {
 function multiSigningData(
   transaction: JsonObject,
   signingAccount: string | AccountID,
-  opts: { definitions: XrplDefinitionsBase } = {
-    definitions: DEFAULT_DEFINITIONS,
-  },
+  opts: { definitions?: XrplDefinitionsBase; prefix?: Uint8Array } = {},
 ): Uint8Array {
-  const prefix = HashPrefix.transactionMultiSig
+  const prefix = opts.prefix ?? HashPrefix.transactionMultiSig
   const suffix = coreTypes.AccountID.from(signingAccount).toBytes()
   return serializeObject(transaction, {
     prefix,
     suffix,
     signingFieldsOnly: true,
-    definitions: opts.definitions,
+    definitions: opts.definitions ?? DEFAULT_DEFINITIONS,
   })
 }
 
