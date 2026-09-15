@@ -168,7 +168,7 @@ Runs none of Steps 1-4: no ticket discovery, no bumps, and none of Step 3's buil
 
 1. **Verify each item against the current `main`** and skip anything not genuinely satisfied — a reviewer may have had an upgrade reverted. This is what makes the run safe whether or not the batch has merged.
 2. **Close everything that verified.** Do not ask for approval; the engineer reviewed both lists on the PR, and step 1 is the real check.
-   - **JIRA tickets** — resolve the ticket's `Done` transition **before** commenting: query the issue's available transitions and take the one whose destination status is `Done`. Then post the comment and transition. Resolving first avoids the half-state where a ticket is commented on but left open.
+   - **JIRA tickets** — complete the `Done` transition first (query available transitions, take the one to `Done`), then post the comment. This avoids open-but-commented tickets if transition fails.
    - **Dependabot PRs** — `gh pr close <n> --repo XRPLF/xrpl.js --comment "<comment>"`.
 3. Report in this shape:
 
