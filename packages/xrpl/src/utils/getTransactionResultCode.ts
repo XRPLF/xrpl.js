@@ -43,7 +43,10 @@ export default function getTransactionResultCode(
 
   const decodedMeta = ensureDecodedMeta(meta)
 
-  if (!decodedMeta.TransactionResult) {
+  if (
+    !decodedMeta.TransactionResult ||
+    typeof decodedMeta.TransactionResult !== 'string'
+  ) {
     throw new TypeError(
       'Cannot get the transaction result code from an un-validated transaction',
     )

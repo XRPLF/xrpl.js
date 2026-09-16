@@ -40,4 +40,15 @@ describe('getTransactionResultCode', function () {
       getTransactionResultCode({ AffectedNodes: [], TransactionIndex: 0 })
     }, /Cannot get the transaction result code from an un-validated transaction/u)
   })
+
+  it('throws when TransactionResult is a truthy non-string value', function () {
+    assert.throws(() => {
+      getTransactionResultCode({
+        AffectedNodes: [],
+        TransactionIndex: 0,
+        // @ts-expect-error -- on purpose, to check the error
+        TransactionResult: 105,
+      })
+    }, /Cannot get the transaction result code from an un-validated transaction/u)
+  })
 })
