@@ -33,6 +33,7 @@ import { Transaction } from '../models/transactions/transaction'
 import { deriveKeypair, deriveAddress, deriveXAddress } from './derive'
 import getBalanceChanges from './getBalanceChanges'
 import getNFTokenID from './getNFTokenID'
+import getTransactionResultCode from './getTransactionResultCode'
 import getXChainClaimID from './getXChainClaimID'
 import {
   hashSignedTx,
@@ -51,6 +52,7 @@ import {
   hashLoanBroker,
   hashLoan,
 } from './hashes'
+import isTesSuccess from './isTesSuccess'
 import parseNFTokenID from './parseNFTokenID'
 import {
   percentToTransferRate,
@@ -247,4 +249,6 @@ export {
   getNFTokenID,
   parseNFTokenID,
   getXChainClaimID,
+  getTransactionResultCode,
+  isTesSuccess,
 }
