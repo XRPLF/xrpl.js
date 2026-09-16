@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@scure/bip32": "^2.0.1",
-    "@scure/bip39": "^2.0.1",
+    "@scure/bip39": "^2.2.0",
     "@xrplf/isomorphic": "^1.0.2",
     "@xrplf/mpt-crypto": "^0.1.1",
     "@xrplf/secret-numbers": "^3.0.0",
