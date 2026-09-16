@@ -6,6 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * Add `LendingProtocolV1_1` support.
+* Add `getTransactionResultCode` and `isTesSuccess` utility functions to make it easier to check whether a transaction succeeded, since `submitAndWait` resolves normally for transactions that reached a validated ledger even when they failed on-ledger (e.g. `tec*` results).
 ## 5.2.0 (2026-09-11)
 
 ### BREAKING CHANGES
