@@ -220,11 +220,11 @@ npm uninstall abbrev -w xrpl
 ## Updating the Docker container for CI
 
 In order to test the library, we need to enable the latest amendments in the docker container.
-This requires updating the `/.ci-config/xrpld.cfg` file with the hashes and names of new amendments.
+This requires updating the `.ci-config/xrpld.cfg` file with the hashes and names of new amendments.
 
 In order to update the list, follow these steps from the top level of the library:
 1. Run `node ./.ci-config/getNewAmendments.js`
-2. If there are any new amendment hashes, add a comment to the end of `/.ci-config/xrpld.cfg` with the date
+2. If there are any new amendment hashes, add a comment to the end of `.ci-config/xrpld.cfg` with the date
    - `Ex. "# Added August 9th, 2023"`
 3. For each hash printed out by the script, add the hash and name to the config file.
    - Ex. `B2A4DB846F0891BF2C76AB2F2ACC8F5B4EC64437135C6E56F3F859DE5FFD5856 ExpandedSignerList`
