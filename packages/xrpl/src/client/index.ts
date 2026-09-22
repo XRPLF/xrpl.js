@@ -1,6 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc -- Request has many aliases, but they don't need unique docs */
 
 /* eslint-disable max-lines -- Client is a large file w/ lots of imports/exports */
+import BigNumber from 'bignumber.js'
 import { EventEmitter } from 'eventemitter3'
 
 import {
@@ -936,7 +937,9 @@ class Client extends EventEmitter<EventTypes> {
    * @param [options] - Additional options for fetching the balance (optional).
    * @param [options.ledger_hash] - The hash of the ledger to retrieve the balance from (optional).
    * @param [options.ledger_index] - The index of the ledger to retrieve the balance from (optional).
-   * @returns A promise that resolves with the XRP balance as a number.
+   * @returns A promise that resolves with the XRP balance as a `BigNumber`.
+   * Call `.toString()` for a decimal string or `.toNumber()` to convert to a
+   * JavaScript number (may lose precision for very large amounts).
    */
   public async getXrpBalance(
     address: string,
@@ -944,7 +947,7 @@ class Client extends EventEmitter<EventTypes> {
       ledger_hash?: string
       ledger_index?: LedgerIndex
     } = {},
-  ): Promise<number> {
+  ): Promise<BigNumber> {
     const xrpRequest: AccountInfoRequest = {
       command: 'account_info',
       account: address,
@@ -1018,7 +1021,7 @@ class Client extends EventEmitter<EventTypes> {
     const balances: Balance[] = []
 
     // get XRP balance
-    let xrpPromise: Promise<number> = Promise.resolve(0)
+    let xrpPromise: Promise<BigNumber> = Promise.resolve(new BigNumber(0))
     if (!options.peer) {
       xrpPromise = this.getXrpBalance(address, {
         ledger_hash: options.ledger_hash,
@@ -1043,7 +1046,7 @@ class Client extends EventEmitter<EventTypes> {
         const accountLinesBalance = linesResponses.flatMap((response) =>
           formatBalances(response.result.lines),
         )
-        if (xrpBalance !== 0) {
+        if (!xrpBalance.isZero()) {
           balances.push({ currency: 'XRP', value: xrpBalance.toString() })
         }
         balances.push(...accountLinesBalance)
@@ -1250,9 +1253,9 @@ class Client extends EventEmitter<EventTypes> {
     let startingBalance = 0
     if (existingWallet) {
       try {
-        startingBalance = Number(
-          await this.getXrpBalance(walletToFund.classicAddress),
-        )
+        startingBalance = (
+          await this.getXrpBalance(walletToFund.classicAddress)
+        ).toNumber()
       } catch {
         /* startingBalance remains what it was previously */
       }

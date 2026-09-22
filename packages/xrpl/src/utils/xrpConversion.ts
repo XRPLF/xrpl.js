@@ -10,12 +10,21 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
 /**
  * Convert Drops to XRP.
  *
+ * Returns a `BigNumber` (rather than a JavaScript `number`) so that the full
+ * precision of the drops value is preserved across the conversion. For
+ * amounts approaching the XRP supply (~10^17 drops), an IEEE-754 double
+ * cannot represent every drop exactly, which silently lost up to one drop
+ * on each `xrpToDrops(dropsToXrp(value))` round-trip. See xrpl.js issue
+ * #3316.
+ *
  * @param dropsToConvert - Drops to convert to XRP. This can be a string, number, or BigNumber.
- * @returns Amount in XRP.
+ * @returns Amount in XRP, as a `BigNumber`. Call `.toString()` for a decimal
+ * string or `.toNumber()` to convert to a JavaScript number (may lose
+ * precision for very large amounts).
  * @throws When drops amount is invalid.
  * @category Utilities
  */
-export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
+export function dropsToXrp(dropsToConvert: BigNumber.Value): BigNumber {
   /*
    * Converting to BigNumber and then back to string should remove any
    * decimal point followed by zeros, e.g. '1.00'.
@@ -50,7 +59,13 @@ export function dropsToXrp(dropsToConvert: BigNumber.Value): number {
     )
   }
 
-  return new BigNumber(drops).dividedBy(DROPS_PER_XRP).toNumber()
+  /*
+   * Return a `BigNumber` rather than calling `.toNumber()` so that the
+   * result preserves the full precision of the input. Drops are at most 6
+   * decimal places of XRP, so the division terminates exactly within
+   * BigNumber's default precision.
+   */
+  return new BigNumber(drops).dividedBy(DROPS_PER_XRP)
 }
 
 /**
