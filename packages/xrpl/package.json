@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
