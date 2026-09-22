@@ -110,6 +110,14 @@ export function signMultiBatch(
     if (typeof counterparty === 'string') {
       involvedAccounts.add(counterparty)
     }
+    // A sponsored inner transaction carries an empty placeholder
+    // SponsorSignature; the sponsor authorizes it with a BatchSigners entry on
+    // the outer Batch, so it is a required signer. A pre-funded sponsorship
+    // (no SponsorSignature) needs no signature.
+    const sponsor = raw.RawTransaction.Sponsor
+    if (sponsor != null && raw.RawTransaction.SponsorSignature != null) {
+      involvedAccounts.add(sponsor)
+    }
   })
   if (!involvedAccounts.has(batchAccount)) {
     throw new ValidationError(
