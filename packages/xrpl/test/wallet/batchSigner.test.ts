@@ -89,7 +89,7 @@ describe('Wallet batch operations', function () {
             SigningPubKey:
               '02691AC5AE1C4C333AE5DF8A93BDC495F0EEBFC6DB0DA7EB6EF808F3AFC006E3FE',
             TxnSignature:
-              '304402207E8238D3D2B24B98BA925D69DDAFA3E7D07F85C8ABF1C040B3D1BEBE2C36E92B02200C122F7F3F86AB8FF89207539CAFB4613D665FF336796F99283ED94C66FB3094',
+              '304502210098890858AA57D6515D7C523FE076FA97BFA87DA666A87B4A7CF44249181DC1DC02201B90E513FE2F45D41FB31850F463C0ECBA8F5126B1AF431B67C4004CA0DD8042',
           },
         },
       ]
@@ -109,7 +109,7 @@ describe('Wallet batch operations', function () {
             SigningPubKey:
               'ED3CC3D14FD80C213BC92A98AFE13A405A030F845EDCFD5E395286A6E9E62BA638',
             TxnSignature:
-              '744FF09C11399F3AC1484F909A92F2D836EA979CB7655BC8F6BC3793F18892F92A16FE41C60EDCD6C2B757FF85D179F1589824ECA397EEA208B94C9D108CDF0A',
+              '27B496F0C1F2C4789A0E6CF25265069980190C786053CF5D6C066C07E21D632A6EB87C56275109A8542EEDE782FDC5591EA51FAF28C3FCFCF35BCE960F1D8601',
           },
         },
       ]
@@ -131,7 +131,7 @@ describe('Wallet batch operations', function () {
             SigningPubKey:
               'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
             TxnSignature:
-              'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+              '046315C731DF089E08EB6662251F12B22938ED462F66BC561A847A87DF6B3C9AC811D9EC5971EDEC2BA96C959BDE883CD838B7EF6460A47AD9B71518F1A2A00B',
           },
         },
       ]
@@ -158,7 +158,7 @@ describe('Wallet batch operations', function () {
                   SigningPubKey:
                     'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
                   TxnSignature:
-                    'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+                    '8FCA6C1056C2146DC13F4D10BA297335A82F562D837FA3C65D75DCDC87540F61428B7370FCC1DE4D83B6FA1A00A18CD9283E7B08089091ED84CC3E4A8B43F00F',
                 },
               },
             ],
@@ -188,7 +188,7 @@ describe('Wallet batch operations', function () {
                   SigningPubKey:
                     'ED37D3F048B7F1E680B0A97F70C7843160B9F25D6398D07E68B9A2C83AA8E1B156',
                   TxnSignature:
-                    'E53E2821CE46C98638E46CA0E6DB712CE45CEC45A697830A5028873D2BA51E1FA008F20526AC16B609401E2F1F8938AE60603223BC9D82A0221CFA5E58C90807',
+                    'D80D4195BF67D5CB12CA225D04DA4D00AC77250803671E09DF61F1695A831FAD6BF820F335DD2D8CFE16DA55CFC2E64AEC8A1429524E6CDB6C36B7AEA717C700',
                 },
               },
             ],
@@ -199,6 +199,26 @@ describe('Wallet batch operations', function () {
       assert.strictEqual(
         JSON.stringify(transaction.BatchSigners),
         JSON.stringify(expected),
+      )
+    })
+
+    it('requires the delegate, not the account, to sign a delegated inner transaction', function () {
+      // Delegate the first inner transaction to regkeyWallet.
+      transaction.RawTransactions[0].RawTransaction.Delegate =
+        regkeyWallet.address
+
+      // The inner account holder (edWallet) is no longer a required signer.
+      assert.throws(
+        () => signMultiBatch(edWallet, transaction),
+        ValidationError,
+        'Must be signing for an address submitting a transaction in the Batch.',
+      )
+
+      // The delegate can sign on its behalf.
+      signMultiBatch(regkeyWallet, transaction)
+      assert.strictEqual(
+        transaction.BatchSigners?.[0].BatchSigner.Account,
+        regkeyWallet.address,
       )
     })
 
@@ -365,7 +385,25 @@ describe('Wallet batch operations', function () {
       assert.throws(
         () => combineBatchSigners([tx1, badTx2]),
         ValidationError,
-        'Flags and transaction hashes are not the same for all provided transactions.',
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
+      )
+    })
+
+    it('fails with different outer Account signed', function () {
+      const badTx2 = { ...tx2, Account: 'rJy554HmWFFJQGnRfZuoo8nV97XSMq77h7' }
+      assert.throws(
+        () => combineBatchSigners([tx1, badTx2]),
+        ValidationError,
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
+      )
+    })
+
+    it('fails with different Sequence signed', function () {
+      const badTx2 = { ...tx2, Sequence: 216 }
+      assert.throws(
+        () => combineBatchSigners([tx1, badTx2]),
+        ValidationError,
+        'Account, sequence, flags, and transaction hashes must be the same for all provided transactions.',
       )
     })
   })

@@ -48,6 +48,38 @@ export interface Signer {
   }
 }
 
+/**
+ * SponsorSignature object containing sponsor's signing information.
+ * Used in transactions to provide sponsor authorization for fee and/or reserve sponsorship.
+ *
+ * Must contain either single-sign fields (SigningPubKey + TxnSignature) OR multi-sign field (Signers).
+ */
+export type SponsorSignature =
+  | {
+      /** The sponsor's public key (for single-signing) */
+      SigningPubKey: string
+      /** The sponsor's signature (for single-signing) */
+      TxnSignature: string
+      Signers?: never
+    }
+  | {
+      SigningPubKey?: never
+      TxnSignature?: never
+      /** Array of sponsor signatures (for multi-signing) */
+      Signers: Signer[]
+    }
+  | {
+      /**
+       * Placeholder shape for a sponsored inner-Batch transaction's
+       * SponsorSignature. rippled's Batch::preflight only requires that
+       * sfSigningPubKey be empty; the sponsor's real authorization is
+       * supplied via a BatchSigners entry on the outer Batch transaction.
+       */
+      SigningPubKey: ''
+      TxnSignature?: never
+      Signers?: never
+    }
+
 export interface Memo {
   Memo: {
     MemoData?: string

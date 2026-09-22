@@ -3,6 +3,10 @@ import {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningCounterparty,
+  encodeForMultisigningCounterparty,
+  encodeForSigningSponsor,
+  encodeForMultisigningSponsor,
   encodeForSigningBatch,
 } from '../src'
 
@@ -306,18 +310,27 @@ describe('Signing data', function () {
     )
   })
 
-  it('can create batch blob', function () {
-    const flags = 1
-    const txIDs = [
-      'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
-      '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
-    ]
-    const json = { flags, txIDs }
+  it('can create batch blob for a single-signed BatchSigner', function () {
+    const json = {
+      account: 'rNCFjv8Ek5oDrNiMJ3pw6eLLFtMjZLJnf2',
+      sequence: 5,
+      flags: 1,
+      txIDs: [
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+      ],
+      // The BatchSigner.Account the signature is bound to (XLS-56 V1_1).
+      batchAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+    }
     const actual = encodeForSigningBatch(json)
     expect(actual).toBe(
       [
         // hash prefix
         '42434800',
+        // outer account
+        '95F14B0E44F78A264E41713C64B5F89242540EE2',
+        // outer sequence
+        '00000005',
         // flags
         '00000001',
         // txIds length
@@ -325,8 +338,91 @@ describe('Signing data', function () {
         // txIds
         'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
         '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+        // batch signer account
+        'C1D81FB31C42392BA1570431F1CBCBEEBBEF50E1',
       ].join(''),
     )
+  })
+
+  it('can create batch blob for a multi-signed BatchSigner', function () {
+    const json = {
+      account: 'rNCFjv8Ek5oDrNiMJ3pw6eLLFtMjZLJnf2',
+      sequence: 5,
+      flags: 1,
+      txIDs: [
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+      ],
+      // The BatchSigner.Account the signature is bound to.
+      batchAccount: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',
+      // The inner Signers entry account for a multi-signed BatchSigner.
+      signerAccount: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+    }
+    const actual = encodeForSigningBatch(json)
+    expect(actual).toBe(
+      [
+        // hash prefix
+        '42434800',
+        // outer account
+        '95F14B0E44F78A264E41713C64B5F89242540EE2',
+        // outer sequence
+        '00000005',
+        // flags
+        '00000001',
+        // txIds length
+        '00000002',
+        // txIds
+        'ABE4871E9083DF66727045D49DEEDD3A6F166EB7F8D1E92FE868F02E76B2C5CA',
+        '795AAC88B59E95C3497609749127E69F12958BC016C600C770AEEB1474C840B4',
+        // batch signer account
+        'C1D81FB31C42392BA1570431F1CBCBEEBBEF50E1',
+        // inner signer account
+        'B5F762798A53D543A014CAF8B297CFF8F2F937E8',
+      ].join(''),
+    )
+  })
+
+  it('counterparty single-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const base = encodeForSigning(tx_json)
+    const actual = encodeForSigningCounterparty(tx_json)
+    // Same signing payload, only the 4-byte prefix differs: STX -> CPT.
+    expect(base.slice(0, 8)).toBe('53545800')
+    expect(actual.slice(0, 8)).toBe('43505400')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('sponsor single-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const base = encodeForSigning(tx_json)
+    const actual = encodeForSigningSponsor(tx_json)
+    // Same signing payload, only the 4-byte prefix differs: STX -> SPN.
+    expect(base.slice(0, 8)).toBe('53545800')
+    expect(actual.slice(0, 8)).toBe('53504E00')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('counterparty multi-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
+    const signingJson = { ...tx_json, SigningPubKey: '' }
+    const base = encodeForMultisigning(signingJson, signingAccount)
+    const actual = encodeForMultisigningCounterparty(
+      signingJson,
+      signingAccount,
+    )
+    // Same signing payload (incl. AccountID suffix), only the prefix differs: SMT -> CPM.
+    expect(base.slice(0, 8)).toBe('534D5400')
+    expect(actual.slice(0, 8)).toBe('43504D00')
+    expect(actual.slice(8)).toBe(base.slice(8))
+  })
+
+  it('sponsor multi-signing swaps only the prefix (fixCleanup3_4_0)', function () {
+    const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
+    const signingJson = { ...tx_json, SigningPubKey: '' }
+    const base = encodeForMultisigning(signingJson, signingAccount)
+    const actual = encodeForMultisigningSponsor(signingJson, signingAccount)
+    // Same signing payload (incl. AccountID suffix), only the prefix differs: SMT -> SPM.
+    expect(base.slice(0, 8)).toBe('534D5400')
+    expect(actual.slice(0, 8)).toBe('53504D00')
+    expect(actual.slice(8)).toBe(base.slice(8))
   })
 
   it('encodeForSigningBatch fails on non-object', function () {

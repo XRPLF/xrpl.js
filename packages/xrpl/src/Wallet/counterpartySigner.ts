@@ -85,6 +85,7 @@ export function signLoanSetByCounterparty(
               tx,
               wallet.privateKey,
               multisignAddress,
+              'counterparty',
             ),
           },
         },
@@ -93,7 +94,12 @@ export function signLoanSetByCounterparty(
   } else {
     tx.CounterpartySignature = {
       SigningPubKey: wallet.publicKey,
-      TxnSignature: computeSignature(tx, wallet.privateKey),
+      TxnSignature: computeSignature(
+        tx,
+        wallet.privateKey,
+        undefined,
+        'counterparty',
+      ),
     }
   }
 

@@ -34,6 +34,8 @@ function webpackForTest(testFileName, basePath) {
               loader: "ts-loader",
               options: {
                 compilerOptions: {
+                  // es2020 so BigInt literals (used by Confidential MPT) compile
+                  target: "es2020",
                   lib: ["esnext", "dom"],
                   composite: false,
                   declaration: false,

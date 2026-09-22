@@ -3,6 +3,7 @@ export {
   GlobalFlags,
   GlobalFlagsInterface,
   isMPTAmount,
+  SponsorFlags,
 } from './common'
 export {
   validate,
@@ -43,6 +44,11 @@ export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
 export { Clawback } from './clawback'
+export { ConfidentialMPTClawback } from './ConfidentialMPTClawback'
+export { ConfidentialMPTConvert } from './ConfidentialMPTConvert'
+export { ConfidentialMPTConvertBack } from './ConfidentialMPTConvertBack'
+export { ConfidentialMPTMergeInbox } from './ConfidentialMPTMergeInbox'
+export { ConfidentialMPTSend } from './ConfidentialMPTSend'
 export { CredentialAccept } from './CredentialAccept'
 export { CredentialCreate } from './CredentialCreate'
 export { CredentialDelete } from './CredentialDelete'
@@ -76,6 +82,8 @@ export {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
+  MPTokenIssuanceCreateImmutableFlags,
+  MPTokenIssuanceCreateImmutableFlagsInterface,
 } from './MPTokenIssuanceCreate'
 export { MPTokenIssuanceDestroy } from './MPTokenIssuanceDestroy'
 export {
@@ -118,6 +126,16 @@ export { PermissionedDomainDelete } from './permissionedDomainDelete'
 export { SetFee, SetFeePreAmendment, SetFeePostAmendment } from './setFee'
 export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
+export {
+  SponsorshipSet,
+  SponsorshipSetFlags,
+  SponsorshipSetFlagsInterface,
+} from './sponsorshipSet'
+export {
+  SponsorshipTransfer,
+  SponsorshipTransferFlags,
+  SponsorshipTransferFlagsInterface,
+} from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
@@ -126,6 +144,7 @@ export {
   VaultCreate,
   VaultCreateFlags,
   VaultCreateFlagsInterface,
+  VaultKind,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
 export { VaultDelete } from './vaultDelete'

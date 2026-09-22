@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled } from '../utils'
+import { isHex, INTEGER_SANITY_CHECK, isFlagEnabled, hasFlag } from '../utils'
 import {
   MAX_MPT_META_BYTE_LENGTH,
   MPT_META_WARNING_HEADER,
@@ -13,12 +13,13 @@ import {
   validateOptionalField,
   isString,
   isNumber,
+  isDomainID,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
 // 2^63 - 1
 const MAX_AMT = '9223372036854775807'
-const MAX_TRANSFER_FEE = 50000
+export const MAX_TRANSFER_FEE = 50000
 
 /**
  * Transaction Flags for an MPTokenIssuanceCreate Transaction.
@@ -55,7 +56,76 @@ export enum MPTokenIssuanceCreateFlags {
    * to clawback value from individual holders.
    */
   tfMPTCanClawback = 0x00000040,
+  /**
+   * If set, indicates that holders may hold confidential (encrypted) balances
+   * of this token and use the Confidential MPT transactions.
+   */
+  tfMPTCanHoldConfidentialBalance = 0x00000080,
 }
+
+/**
+ * ImmutableFlags for an MPTokenIssuanceCreate transaction (XLS-94D DynamicMPT).
+ *
+ * By default `MPTokenMetadata`, `TransferFee`, and the MPT issuance flags below
+ * are mutable via MPTokenIssuanceSet. Setting a bit here permanently makes the
+ * corresponding field or flag immutable. These transaction-level `tif*` bits
+ * share the same numeric values as the on-ledger `lsif*` bits recorded in
+ * {@link MPTokenIssuanceImmutableFlags}.
+ *
+ * @category Transaction Flags
+ */
+export enum MPTokenIssuanceCreateImmutableFlags {
+  /**
+   * Make flag `lsfMPTCanLock` immutable.
+   */
+  tifMPTCanLock = 0x00000002,
+  /**
+   * Make flag `lsfMPTRequireAuth` immutable.
+   */
+  tifMPTRequireAuth = 0x00000004,
+  /**
+   * Make flag `lsfMPTCanEscrow` immutable.
+   */
+  tifMPTCanEscrow = 0x00000008,
+  /**
+   * Make flag `lsfMPTCanTrade` immutable.
+   */
+  tifMPTCanTrade = 0x00000010,
+  /**
+   * Make flag `lsfMPTCanTransfer` immutable.
+   */
+  tifMPTCanTransfer = 0x00000020,
+  /**
+   * Make flag `lsfMPTCanClawback` immutable.
+   */
+  tifMPTCanClawback = 0x00000040,
+  /**
+   * Make flag `lsfMPTCanHoldConfidentialBalance` immutable. (XLS-96 Confidential MPT)
+   */
+  tifMPTCanHoldConfidentialBalance = 0x00000080,
+  /**
+   * Make field `MPTokenMetadata` immutable.
+   */
+  tifMPTMetadata = 0x00010000,
+  /**
+   * Make field `TransferFee` immutable.
+   */
+  tifMPTTransferFee = 0x00020000,
+}
+
+/* eslint-disable no-bitwise -- Need bitwise operations to replicate rippled behavior */
+export const tifMPTokenIssuanceImmutableMask = ~(
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanLock |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTRequireAuth |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanEscrow |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanTrade |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanTransfer |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanClawback |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTCanHoldConfidentialBalance |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTMetadata |
+  MPTokenIssuanceCreateImmutableFlags.tifMPTTransferFee
+)
+/* eslint-enable no-bitwise */
 
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceCreate} transaction
@@ -66,11 +136,74 @@ export enum MPTokenIssuanceCreateFlags {
 // eslint-disable-next-line max-len -- Disable for interface declaration.
 export interface MPTokenIssuanceCreateFlagsInterface extends GlobalFlagsInterface {
   tfMPTCanLock?: boolean
+  /**
+   * If set, indicates that individual holders must be authorized.
+   * This enables issuers to limit who can hold their assets.
+   */
   tfMPTRequireAuth?: boolean
+  /**
+   * If set, indicates that individual holders can place their balances into an escrow.
+   */
   tfMPTCanEscrow?: boolean
+  /**
+   * If set, indicates that individual holders can trade their balances
+   *  using the XRP Ledger DEX or AMM.
+   */
   tfMPTCanTrade?: boolean
+  /**
+   * If set, indicates that tokens may be transferred to other accounts
+   *  that are not the issuer.
+   */
   tfMPTCanTransfer?: boolean
+  /**
+   * If set, indicates that the issuer may use the Clawback transaction
+   * to clawback value from individual holders.
+   */
   tfMPTCanClawback?: boolean
+  /**
+   * If set, indicates that holders may hold confidential (encrypted) balances
+   * of this token and use the Confidential MPT transactions.
+   */
+  tfMPTCanHoldConfidentialBalance?: boolean
+}
+
+export interface MPTokenIssuanceCreateImmutableFlagsInterface {
+  /**
+   * Make flag `lsfMPTCanLock` immutable.
+   */
+  tifMPTCanLock?: boolean
+  /**
+   * Make flag `lsfMPTRequireAuth` immutable.
+   */
+  tifMPTRequireAuth?: boolean
+  /**
+   * Make flag `lsfMPTCanEscrow` immutable.
+   */
+  tifMPTCanEscrow?: boolean
+  /**
+   * Make flag `lsfMPTCanTrade` immutable.
+   */
+  tifMPTCanTrade?: boolean
+  /**
+   * Make flag `lsfMPTCanTransfer` immutable.
+   */
+  tifMPTCanTransfer?: boolean
+  /**
+   * Make flag `lsfMPTCanClawback` immutable.
+   */
+  tifMPTCanClawback?: boolean
+  /**
+   * Make flag `lsfMPTCanHoldConfidentialBalance` immutable. (XLS-96 Confidential MPT)
+   */
+  tifMPTCanHoldConfidentialBalance?: boolean
+  /**
+   * Make field `MPTokenMetadata` immutable.
+   */
+  tifMPTMetadata?: boolean
+  /**
+   * Make field `TransferFee` immutable.
+   */
+  tifMPTTransferFee?: boolean
 }
 
 /**
@@ -121,13 +254,25 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
   MPTokenMetadata?: string
 
   Flags?: number | MPTokenIssuanceCreateFlagsInterface
+
+  /**
+   * A bitmask of {@link MPTokenIssuanceCreateImmutableFlags} (`tif*`) that
+   * permanently makes the corresponding fields or MPT issuance flags immutable.
+   * By default `MPTokenMetadata`, `TransferFee`, and the MPT issuance flags
+   * remain mutable via MPTokenIssuanceSet; setting a bit here opts out of that
+   * mutability for the life of the issuance. (XLS-94D)
+   */
+  ImmutableFlags?: number
+
+  /* The domainID that governs admissibility pertaining to the MPToken. */
+  DomainID?: string
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
   mpt_issuance_id?: string
 }
 
-/* eslint-disable max-lines-per-function -- Not needed to reduce function */
+/* eslint-disable max-lines-per-function, max-statements -- Not needed to reduce function */
 /**
  * Verify the form and type of an MPTokenIssuanceCreate at runtime.
  *
@@ -142,6 +287,32 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'AssetScale', isNumber)
+  validateOptionalField(tx, 'ImmutableFlags', isNumber)
+  validateOptionalField(tx, 'DomainID', isDomainID)
+
+  if (
+    tx.DomainID != null &&
+    !hasFlag(
+      tx,
+      MPTokenIssuanceCreateFlags.tfMPTRequireAuth,
+      'tfMPTRequireAuth',
+    )
+  ) {
+    throw new ValidationError(
+      'MPTokenIssuanceCreate: Cannot set DomainID unless tfMPTRequireAuth flag is set.',
+    )
+  }
+
+  if (typeof tx.ImmutableFlags === 'number') {
+    // eslint-disable-next-line no-bitwise -- Need bitwise operations to replicate rippled behavior
+    const invalidBits = tx.ImmutableFlags & tifMPTokenIssuanceImmutableMask
+    // rippled rejects a present-but-zero ImmutableFlags, as well as out-of-mask bits.
+    if (tx.ImmutableFlags === 0 || invalidBits !== 0) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
+      )
+    }
+  }
 
   if (
     typeof tx.MPTokenMetadata === 'string' &&
@@ -158,7 +329,7 @@ export function validateMPTokenIssuanceCreate(
       throw new ValidationError('MPTokenIssuanceCreate: Invalid MaximumAmount')
     } else if (
       BigInt(tx.MaximumAmount) > BigInt(MAX_AMT) ||
-      BigInt(tx.MaximumAmount) < BigInt(`0`)
+      BigInt(tx.MaximumAmount) <= BigInt(`0`)
     ) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: MaximumAmount out of range',
@@ -175,6 +346,13 @@ export function validateMPTokenIssuanceCreate(
       typeof flags === 'number'
         ? isFlagEnabled(flags, MPTokenIssuanceCreateFlags.tfMPTCanTransfer)
         : (flags.tfMPTCanTransfer ?? false)
+    const isTfMPTCanHoldConfidentialBalance =
+      typeof flags === 'number'
+        ? isFlagEnabled(
+            flags,
+            MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+          )
+        : (flags.tfMPTCanHoldConfidentialBalance ?? false)
 
     if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
       throw new ValidationError(
@@ -185,6 +363,14 @@ export function validateMPTokenIssuanceCreate(
     if (tx.TransferFee && !isTfMPTCanTransfer) {
       throw new ValidationError(
         'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+      )
+    }
+
+    // Confidential amounts are encrypted, so a transfer rate cannot be applied
+    // to them; rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    if (tx.TransferFee && isTfMPTCanHoldConfidentialBalance) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
       )
     }
   }
@@ -203,4 +389,4 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 }
-/* eslint-enable max-lines-per-function */
+/* eslint-enable max-lines-per-function, max-statements */

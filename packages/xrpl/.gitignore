@@ -1,3 +1,4 @@
 # Replaced by root README during the prepare lifecycle phase because npm does not allow symlinking README files
 # https://docs.npmjs.com/cli/v7/using-npm/scripts#npm-publish
-README.md
+# Anchored to the package root so it only ignores this generated file, not nested docs READMEs (e.g. src/confidential).
+/README.md

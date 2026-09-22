@@ -38,6 +38,12 @@ export default interface SignerList extends BaseLedgerEntry, HasPreviousTxnID {
    * weights sum to this value or more.
    */
   SignerQuorum: number
+  /**
+   * (Optional) The account sponsoring the reserve for this SignerList. If
+   * present, the sponsor is responsible for the reserve requirement of this
+   * object instead of the owner.
+   */
+  Sponsor?: string
 }
 
 export enum SignerListFlags {

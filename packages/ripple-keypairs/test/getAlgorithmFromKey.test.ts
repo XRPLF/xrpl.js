@@ -46,18 +46,21 @@ describe('getAlgorithmFromKey', () => {
   it('should throw error for invalid private key format', () => {
     // Invalid tag and length
     const privateKey = `ff${hexData(60)}`
+    let thrown: Error | undefined
     try {
       getAlgorithmFromKey(privateKey, 'private')
     } catch (error: unknown) {
       if (error instanceof Error) {
+        thrown = error
+        expect(error.message).not.toContain(privateKey)
         expect(dedent(error.message)).toEqual(
           dedent(`invalid_key:
-  
+
         Type: private
-        Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        Prefix: 0xff 
+        Key: [redacted]
+        Prefix: [redacted]
         Length: 31 bytes
-  
+
         Acceptable private formats are:
         ecdsa-secp256k1   - Prefix: None   Length: 32 bytes
         ecdsa-secp256k1   - Prefix: 0x00   Length: 33 bytes
@@ -66,6 +69,7 @@ describe('getAlgorithmFromKey', () => {
         )
       }
     }
+    expect(thrown).toBeDefined()
   })
 
   it('should throw error for invalid public key format', () => {
@@ -80,7 +84,7 @@ describe('getAlgorithmFromKey', () => {
 
       Type: public
       Key: ffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      Prefix: 0xff 
+      Prefix: 0xff
       Length: 31 bytes
 
       Acceptable public formats are:
@@ -93,4 +97,55 @@ describe('getAlgorithmFromKey', () => {
       }
     }
   })
+
+  it('should redact private key material in error messages but not public keys', () => {
+    const invalidPrivateKey = `ff${hexData(60)}`
+    let privateThrown: Error | undefined
+    try {
+      getAlgorithmFromKey(invalidPrivateKey, 'private')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        privateThrown = error
+      }
+    }
+    expect(privateThrown).toBeDefined()
+    expect(privateThrown?.message).toContain('Key: [redacted]')
+    expect(privateThrown?.message).not.toContain(invalidPrivateKey)
+
+    const invalidPublicKey = `ff${hexData(60)}`
+    let publicThrown: Error | undefined
+    try {
+      getAlgorithmFromKey(invalidPublicKey, 'public')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        publicThrown = error
+      }
+    }
+    expect(publicThrown).toBeDefined()
+    expect(publicThrown?.message).toContain(`Key: ${invalidPublicKey}`)
+  })
+
+  const nonStandardLengthCases: Array<[string, string]> = [
+    ['empty string', ''],
+    ['odd-length hex', `ff${hexData(61)}`],
+    ['oversized hex string', hexData(200)],
+  ]
+  for (const [label, invalidPrivateKey] of nonStandardLengthCases) {
+    it(`should redact private key material for non-standard length: ${label}`, () => {
+      let thrown: Error | undefined
+      try {
+        getAlgorithmFromKey(invalidPrivateKey, 'private')
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          thrown = error
+        }
+      }
+      expect(thrown).toBeDefined()
+      expect(thrown?.message).toContain('Key: [redacted]')
+      expect(thrown?.message).toContain('Prefix: [redacted]')
+      if (invalidPrivateKey.length > 0) {
+        expect(thrown?.message).not.toContain(invalidPrivateKey)
+      }
+    })
+  }
 })
