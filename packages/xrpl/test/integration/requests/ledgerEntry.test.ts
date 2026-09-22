@@ -131,7 +131,11 @@ describe('ledger_entry', function () {
         TicketCount: 1,
         Sequence: accSeq,
       }
-      await testTransaction(testContext.client, ticketCreate, testContext.wallet)
+      await testTransaction(
+        testContext.client,
+        ticketCreate,
+        testContext.wallet,
+      )
 
       const ledgerEntryRequest: LedgerEntryRequest = {
         command: 'ledger_entry',
@@ -149,10 +153,7 @@ describe('ledger_entry', function () {
         ledgerEntryResponse.result.node?.Account,
         testContext.wallet.classicAddress,
       )
-      assert.equal(
-        ledgerEntryResponse.result.node?.TicketSequence,
-        ticketSeq,
-      )
+      assert.equal(ledgerEntryResponse.result.node?.TicketSequence, ticketSeq)
     },
     TIMEOUT,
   )
