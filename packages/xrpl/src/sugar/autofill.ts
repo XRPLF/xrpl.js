@@ -380,7 +380,7 @@ function calculateSponsorFee(
  * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params, max-statements, complexity -- checks many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
