@@ -28,7 +28,8 @@ const REQUIRED_NETWORKID_VERSION = '1.11.0'
 
 const MICRO_DROPS_PER_DROP = 1_000_000
 
-const WASM_FIXED_UPLOAD_COST = 100
+// Extra base fees for an EscrowCreate with Bytecode (rippled charges 10 in total).
+const WASM_EXTRA_BASE_FEES = 9
 const WASM_DROPS_PER_BYTE = 5
 
 // Confidential MPT (XLS-0096) transactions are charged this many extra base
@@ -400,7 +401,7 @@ async function calculateFeePerTransactionType(
   // EscrowCreate transaction with Bytecode
   if (tx.TransactionType === 'EscrowCreate' && tx.Bytecode != null) {
     baseFee = baseFee
-      .plus(WASM_FIXED_UPLOAD_COST)
+      .plus(netFeeDrops.multipliedBy(WASM_EXTRA_BASE_FEES))
       .plus((WASM_DROPS_PER_BYTE * tx.Bytecode.length) / 2)
   } else if (tx.TransactionType === 'EscrowFinish') {
     // EscrowFinish Transaction with Fulfillment/Gas
@@ -414,9 +415,11 @@ async function calculateFeePerTransactionType(
     }
     if (tx.Gas != null) {
       const gasPrice = await fetchGasPrice(client)
+      // rippled rounds down, then adds 1 drop
       const extraFee: BigNumber = gasPrice
         .multipliedBy(tx.Gas)
-        .dividedBy(MICRO_DROPS_PER_DROP)
+        .dividedToIntegerBy(MICRO_DROPS_PER_DROP)
+        .plus(1)
       baseFee = baseFee.plus(extraFee)
     }
   } else if (tx.TransactionType === 'Batch') {

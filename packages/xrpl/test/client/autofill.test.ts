@@ -491,6 +491,58 @@ describe('client.autofill', function () {
       assert.strictEqual(txResult.Fee, '399')
     })
 
+    it('should autofill Fee of an EscrowCreate transaction with Bytecode', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'EscrowCreate',
+        Amount: '10000',
+        Destination: 'rpJRsmzjTEKsDqXFa2hLBdRKRmb5PBUi1E',
+        CancelAfter: 843469034,
+        Bytecode: '0061736d',
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx)
+      // 10 base fees (12 drops each) + 5 drops per Bytecode byte (4 bytes)
+      assert.strictEqual(txResult.Fee, '140')
+    })
+
+    it('should autofill Fee of an EscrowFinish transaction with Gas', async function () {
+      const tx: Transaction = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'EscrowFinish',
+        Owner: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        OfferSequence: 7,
+        Gas: 1000000,
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse('server_state', {
+        status: 'success',
+        type: 'response',
+        result: { state: { validated_ledger: { gas_price: 1 } } },
+      })
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx)
+      // base fee (12) + floor(1000000 * 1 / 1000000) + 1
+      assert.strictEqual(txResult.Fee, '14')
+    })
+
     it('should autofill Fee of an AccountDelete transaction', async function () {
       const tx: AccountDelete = {
         Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
