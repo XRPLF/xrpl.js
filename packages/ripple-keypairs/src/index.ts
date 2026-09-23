@@ -20,6 +20,27 @@ import {
 import secp256k1 from './signing-schemes/secp256k1'
 import ed25519 from './signing-schemes/ed25519'
 
+const SEED_ENTROPY_LENGTH_BYTES = 16
+
+/**
+ * Checks whether a value is a Uint8Array, including subclasses such as Buffer
+ * and instances from another realm, which fail a plain `instanceof` check.
+ *
+ * @param value - The value to test.
+ * @returns Whether the value is a Uint8Array.
+ */
+function isUint8Array(value: unknown): value is Uint8Array {
+  return (
+    value instanceof Uint8Array ||
+    // The tag check alone would also admit other single-byte views, so
+    // require the element size too.
+    (ArrayBuffer.isView(value) &&
+      'BYTES_PER_ELEMENT' in value &&
+      value.BYTES_PER_ELEMENT === 1 &&
+      Object.prototype.toString.call(value) === '[object Uint8Array]')
+  )
+}
+
 function getSigningScheme(algorithm: Algorithm): SigningScheme {
   const schemes = { 'ecdsa-secp256k1': secp256k1, ed25519 }
   return schemes[algorithm]
@@ -36,13 +57,21 @@ function generateSeed(
     !options.algorithm || VALID_ALGORITHMS.includes(options.algorithm),
     `Unsupported algorithm: ${options.algorithm}. Use one of: ${VALID_ALGORITHMS.join(', ')}`,
   )
+  // Entropy is refused rather than resized: a seed holds exactly
+  // SEED_ENTROPY_LENGTH_BYTES bytes, and trimming or padding to fit would
+  // change which wallet the caller derives.
+  // Only an omitted value means "generate randomness for me". Any other value,
+  // including null, is validated rather than replaced with randomness.
+  const supplied = options.entropy
   assert.ok(
-    !options.entropy || options.entropy.length >= 16,
-    'entropy too short',
+    supplied === undefined || isUint8Array(supplied),
+    'entropy must be a Uint8Array',
   )
-  const entropy = options.entropy
-    ? options.entropy.slice(0, 16)
-    : randomBytes(16)
+  assert.ok(
+    supplied === undefined || supplied.length === SEED_ENTROPY_LENGTH_BYTES,
+    `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
+  )
+  const entropy = supplied ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)
   const type = options.algorithm === 'ecdsa-secp256k1' ? 'secp256k1' : 'ed25519'
   return encodeSeed(entropy, type)
 }

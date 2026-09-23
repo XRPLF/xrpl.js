@@ -4,12 +4,27 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### BREAKING CHANGES
+## 5.3.0 (2026-09-16)
 
 ### Added
+* Add `LendingProtocolV1_1` support.
+
+## 5.2.0 (2026-09-11)
+
+### BREAKING CHANGES
+* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it: `Wallet.fromEntropy(hexToBytes(hex))`.
+
+### Changed
+* Support the `fixCleanup3_4_0` signing prefixes.
+
+## 5.1.0 (2026-08-24)
+
+### Added
+* Add XLS-68 Sponsorship support: `SponsorshipSet`/`SponsorshipTransfer` transactions, `Sponsorship` ledger entry, `signAsSponsor`/`combineSponsorSigners`/`addPreFundedSponsor` wallet helpers, `account_sponsoring` RPC method, and sponsor-fee/reserve fields on `Payment` and other transactions.
 * Support Dynamic MPTs (XLS-94d) based on latest spec change [XRPL-Standards#583](https://github.com/XRPLF/XRPL-Standards/pull/583).
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
 * Add XLS-56 Batch V1_1 support to `signMultiBatch` and `combineBatchSigners` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
+* Add support for Confidential Transfers for Multi-Purpose Tokens (XLS-0096).
 
 ### Fixed
 * Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.

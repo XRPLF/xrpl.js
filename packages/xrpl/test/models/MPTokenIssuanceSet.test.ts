@@ -1,3 +1,4 @@
+/* eslint-disable max-statements -- many validation cases in one describe block */
 import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenIssuanceSetFlags } from '../../src'
@@ -152,6 +153,57 @@ describe('MPTokenIssuanceSet', function () {
     assertInvalid(invalid, 'MPTokenIssuanceSet: flag conflict')
   })
 
+  it(`verifies valid MPTokenIssuanceSet w/ confidential encryption keys`, function () {
+    // 33-byte compressed EC point.
+    const EC_POINT = `02${'AB'.repeat(32)}`
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      IssuerEncryptionKey: EC_POINT,
+      AuditorEncryptionKey: EC_POINT,
+    } as any)
+  })
+
+  it(`throws w/ AuditorEncryptionKey but no IssuerEncryptionKey`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        AuditorEncryptionKey: `02${'AB'.repeat(32)}`,
+      } as any,
+      'MPTokenIssuanceSet: AuditorEncryptionKey requires IssuerEncryptionKey',
+    )
+  })
+
+  it(`throws w/ wrong-length IssuerEncryptionKey`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        // 32-byte value where a 33-byte EC point is required.
+        IssuerEncryptionKey: 'AB'.repeat(32),
+      } as any,
+      'MPTokenIssuanceSet: invalid field IssuerEncryptionKey',
+    )
+  })
+
+  it(`throws w/ Holder and confidential encryption keys`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        IssuerEncryptionKey: `02${'AB'.repeat(32)}`,
+        Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      } as any,
+      'MPTokenIssuanceSet: Holder field is not allowed when registering confidential encryption keys.',
+    )
+  })
+
   it(`Throws w/ invalid type of TransferFee`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceSet',
@@ -188,6 +240,32 @@ describe('MPTokenIssuanceSet', function () {
     assertInvalid(
       invalid,
       `MPTokenIssuanceSet: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+    )
+  })
+
+  it(`throws w/ TransferFee and tfMPTSetCanHoldConfidentialBalance`, function () {
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        TransferFee: 100,
+        Flags: MPTokenIssuanceSetFlags.tfMPTSetCanHoldConfidentialBalance,
+      } as any,
+      'MPTokenIssuanceSet: TransferFee cannot be provided together with the tfMPTSetCanHoldConfidentialBalance flag',
+    )
+
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: TOKEN_ID,
+        TransferFee: 100,
+        Flags: { tfMPTSetCanHoldConfidentialBalance: true },
+      } as any,
+      'MPTokenIssuanceSet: TransferFee cannot be provided together with the tfMPTSetCanHoldConfidentialBalance flag',
     )
   })
 

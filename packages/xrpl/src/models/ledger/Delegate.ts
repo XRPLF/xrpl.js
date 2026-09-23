@@ -36,4 +36,11 @@ export default interface Delegate extends BaseLedgerEntry, HasPreviousTxnID {
    * type, so this value is always 0.
    */
   Flags: 0
+
+  /**
+   * (Optional) The account sponsoring the reserve for this Delegate object.
+   * If present, the sponsor is responsible for the reserve requirement of
+   * this object instead of the owner.
+   */
+  Sponsor?: string
 }

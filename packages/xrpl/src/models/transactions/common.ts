@@ -1,6 +1,11 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import { bytesToHex, HEX_REGEX } from '@xrplf/isomorphic/utils'
+import {
+  decodeAccountID,
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -14,15 +19,33 @@ import {
   MPTAmount,
   Memo,
   Signer,
+  SponsorSignature,
   XChainBridge,
 } from '../common'
-import { isHex, onlyHasFields } from '../utils'
+import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
 const SHA_512_HALF_LENGTH = 64
+
+// Confidential MPT (XLS-0096) fixed field byte lengths.
+// A compressed secp256k1 point (encryption keys and Pedersen commitments).
+export const CONFIDENTIAL_EC_POINT_BYTES = 33
+// An ElGamal ciphertext is two compressed points.
+export const CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES = 66
+// A scalar blinding factor (Hash256).
+export const CONFIDENTIAL_BLINDING_FACTOR_BYTES = 32
+// ZKProof byte lengths, fixed per transaction type by the mpt-crypto proof system.
+// Convert/Clawback are a compact Schnorr proof; ConvertBack and Send add a
+// (double) bulletproof range proof.
+export const CONFIDENTIAL_CONVERT_PROOF_BYTES = 64
+export const CONFIDENTIAL_CLAWBACK_PROOF_BYTES = 64
+export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
+export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
+// Max MPT amount: 2^63 - 1.
+export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -73,6 +96,76 @@ function isSigner(obj: unknown): obj is Signer {
     isString(signer.TxnSignature) &&
     isString(signer.SigningPubKey)
   )
+}
+
+/**
+ * Verify the form and type of a SponsorSignature at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @param isInnerBatchTxn - Whether the enclosing transaction carries the
+ * `tfInnerBatchTxn` flag.
+ * @returns Whether the SponsorSignature is properly formed.
+ */
+function isSponsorSignature(
+  obj: unknown,
+  isInnerBatchTxn: boolean,
+): obj is SponsorSignature {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  if (isInnerBatchTxn) {
+    /*
+     * Inner batch transactions are never individually signed - the whole
+     * Batch is authorized together via the outer transaction's
+     * BatchSigners. rippled's Batch::preflight requires a sponsored inner
+     * txn's SponsorSignature to carry the same empty placeholder shape as
+     * the inner txn's own signature fields (SigningPubKey: '', no
+     * TxnSignature, no Signers); the sponsor's real authorization is
+     * supplied via a BatchSigners entry on the outer Batch transaction.
+     */
+    return (
+      obj.SigningPubKey === '' &&
+      obj.TxnSignature === undefined &&
+      obj.Signers === undefined
+    )
+  }
+
+  const hasSigningPubKey = obj.SigningPubKey !== undefined
+  const hasTxnSignature = obj.TxnSignature !== undefined
+  const hasSigners = obj.Signers !== undefined
+
+  /*
+   * Must have either (SigningPubKey + TxnSignature) OR Signers, but not both
+   */
+  const hasSingleSig = hasSigningPubKey && hasTxnSignature
+  const hasMultiSig = hasSigners
+
+  if (hasSingleSig && hasMultiSig) {
+    /* Cannot have both single-sig and multi-sig */
+    return false
+  }
+
+  if (!hasSingleSig && !hasMultiSig) {
+    /* Must have at least one signing method */
+    return false
+  }
+
+  // Validate single-sig fields
+  if (hasSingleSig) {
+    if (!isString(obj.SigningPubKey) || !isString(obj.TxnSignature)) {
+      return false
+    }
+  }
+
+  // Validate multi-sig fields
+  if (hasMultiSig) {
+    if (!isArray(obj.Signers) || !obj.Signers.every(isSigner)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 // Currency object sizes
@@ -289,6 +382,34 @@ export function isAccount(account: unknown): account is Account {
 }
 
 /**
+ * Normalizes an address to its classic format.
+ * If the address is an X-address, converts it to a classic address.
+ * If the address is already a classic address, returns it as-is.
+ *
+ * @param address - The address to normalize (classic or X-address format).
+ * @returns The classic address format.
+ */
+function toClassicAddress(address: string): string {
+  if (isValidXAddress(address)) {
+    return xAddressToClassicAddress(address).classicAddress
+  }
+  return address
+}
+
+/**
+ * Compares two addresses for equality, normalizing both to classic address format.
+ * This handles the case where one address might be an X-address and the other
+ * a classic address, but they refer to the same account.
+ *
+ * @param address1 - The first address to compare.
+ * @param address2 - The second address to compare.
+ * @returns True if the addresses refer to the same account, false otherwise.
+ */
+export function areAddressesEqual(address1: string, address2: string): boolean {
+  return toClassicAddress(address1) === toClassicAddress(address2)
+}
+
+/**
  * Verify the form and type of an Amount at runtime.
  *
  * @param amount - The object to check the form and type of.
@@ -370,6 +491,23 @@ export function validateHexMetadata(
   )
 }
 
+/**
+ * Build a type guard that checks the input is a hex string encoding exactly
+ * `byteLength` bytes. Used by the Confidential MPT transactions to enforce
+ * fixed-size cryptographic fields (EC points, ElGamal ciphertexts, scalars).
+ *
+ * @param byteLength - The exact number of bytes the hex string must encode.
+ * @returns A type guard validating a hex string of the given byte length.
+ */
+export function isHexWithByteLength(
+  byteLength: number,
+): (inp: unknown) => inp is string {
+  // eslint-disable-next-line func-style -- returning a type guard
+  const check = (inp: unknown): inp is string =>
+    isString(inp) && isHex(inp) && inp.length === byteLength * 2
+  return check
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -446,7 +584,66 @@ export function validateOptionalField<
   }
 }
 
+/**
+ * Validate a Confidential MPT `MPTAmount`: a required non-negative uint64 string.
+ * ConfidentialMPTConvert permits zero (a zero-amount convert registers the holder
+ * key); ConfidentialMPTConvertBack and ConfidentialMPTClawback forbid zero.
+ *
+ * @param tx - The transaction to validate.
+ * @param allowZero - Whether a zero amount is permitted.
+ * @throws ValidationError if MPTAmount is missing, malformed, or out of range.
+ */
+export function validateConfidentialMPTAmount(
+  tx: Record<string, unknown>,
+  allowZero: boolean,
+): void {
+  validateRequiredField(tx, 'MPTAmount', isString)
+  if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
+    throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
+  }
+  const amount = BigInt(tx.MPTAmount)
+  if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
+    throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
+  }
+}
+
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
+
+/**
+ * An MPTokenIssuanceID is a 4-byte sequence (8 hex chars) followed by the
+ * 20-byte issuer AccountID, so the issuer begins after this many hex chars.
+ */
+const MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN = 8
+
+/**
+ * Whether `account` is the issuer encoded in `mptIssuanceID`.
+ *
+ * An MPTokenIssuanceID is a 4-byte sequence followed by the 20-byte issuer
+ * AccountID, so the issuer is its last 40 hex characters — the same derivation
+ * rippled uses (`MPTIssue::getIssuer`). The comparison is on decoded AccountIDs,
+ * so it holds whether `account` is given as a classic or an X-address. Returns
+ * `false` (rather than throwing) for a non-string or non-address input, leaving
+ * the field-level validators to report those.
+ *
+ * @param account - The classic or X-address to test.
+ * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @returns Whether `account` decodes to the issuer AccountID in `mptIssuanceID`.
+ */
+export function isMPTIssuer(account: unknown, mptIssuanceID: unknown): boolean {
+  if (!isString(account) || !isString(mptIssuanceID)) {
+    return false
+  }
+  const classicAddress = isValidXAddress(account)
+    ? xAddressToClassicAddress(account).classicAddress
+    : account
+  if (!isValidClassicAddress(classicAddress)) {
+    return false
+  }
+  return (
+    bytesToHex(decodeAccountID(classicAddress)).toUpperCase() ===
+    mptIssuanceID.slice(MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN).toUpperCase()
+  )
+}
 
 export enum GlobalFlags {
   tfInnerBatchTxn = 0x40000000,
@@ -454,6 +651,17 @@ export enum GlobalFlags {
 
 export interface GlobalFlagsInterface {
   tfInnerBatchTxn?: boolean
+}
+
+/**
+ * Sponsor flags for transaction common fields.
+ * These flags indicate what type of sponsorship is being used in a transaction.
+ */
+export enum SponsorFlags {
+  /** Sponsor is paying the transaction fee */
+  spfSponsorFee = 0x00000001,
+  /** Sponsor is paying reserves for objects created in the transaction */
+  spfSponsorReserve = 0x00000002,
 }
 
 /**
@@ -534,6 +742,214 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The account sponsoring this transaction (paying fees and/or reserves).
+   */
+  Sponsor?: string
+  /**
+   * Flags indicating sponsorship type (fee and/or reserve).
+   * Must be included if Sponsor field is present.
+   */
+  SponsorFlags?: number
+  /**
+   * Sponsor's signature information.
+   * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
+   */
+  SponsorSignature?: SponsorSignature
+}
+
+/**
+ * Transaction types explicitly allow-listed by rippled for reserve sponsorship
+ * (see `isReserveSponsorAllowed` in rippled's SponsorHelpers.cpp). Only these
+ * transaction types may use the spfSponsorReserve flag; all others are
+ * rejected server-side with temINVALID_FLAG.
+ */
+const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
+  'DelegateSet',
+  'DepositPreauth',
+  'Payment',
+  'SignerListSet',
+  'CheckCancel',
+  'CheckCash',
+  'CheckCreate',
+  'EscrowCancel',
+  'EscrowCreate',
+  'EscrowFinish',
+  'PaymentChannelClaim',
+  'PaymentChannelCreate',
+  'PaymentChannelFund',
+  'Clawback',
+  'MPTokenAuthorize',
+  'MPTokenIssuanceCreate',
+  'MPTokenIssuanceDestroy',
+  'MPTokenIssuanceSet',
+  'TrustSet',
+  'CredentialAccept',
+  'CredentialCreate',
+  'CredentialDelete',
+  'AccountSet',
+  'SetRegularKey',
+  'SponsorshipTransfer',
+])
+
+/**
+ * Whether a transaction carries the `tfInnerBatchTxn` flag, without pulling
+ * in `models/utils`' `hasFlag` (which itself imports from this file and
+ * would create a circular dependency).
+ *
+ * @param tx - The transaction to check.
+ * @returns Whether the transaction is an inner Batch transaction.
+ */
+function isInnerBatchTransaction(tx: Record<string, unknown>): boolean {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag check */
+  if (typeof tx.Flags === 'number') {
+    return (tx.Flags & GlobalFlags.tfInnerBatchTxn) !== 0
+  }
+  /* eslint-enable no-bitwise */
+  if (isRecord(tx.Flags)) {
+    return tx.Flags.tfInnerBatchTxn === true
+  }
+  return false
+}
+
+/**
+ * Validate that SponsorFlags contains only valid flag values, and that reserve
+ * sponsorship (spfSponsorReserve) is only used where rippled allows it.
+ *
+ * @param sponsorFlags - The SponsorFlags value to validate.
+ * @param transactionType - The transaction type to validate flags against.
+ * @param hasDelegate - Whether the transaction also carries a Delegate field.
+ * @param isInnerBatchTxn - Whether the transaction carries the `tfInnerBatchTxn` flag.
+ * @throws ValidationError if flags are invalid.
+ */
+// eslint-disable-next-line max-params -- each param maps to a distinct rippled rejection rule
+function validateSponsorFlagsValue(
+  sponsorFlags: number,
+  transactionType: string | undefined,
+  hasDelegate: boolean,
+  isInnerBatchTxn: boolean,
+): void {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+  const validFlags = SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
+  if ((sponsorFlags & ~validFlags) !== 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags contains invalid flags',
+    )
+  }
+
+  if (sponsorFlags === 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags must have at least one flag set',
+    )
+  }
+
+  const hasReserveFlag = (sponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
+  const hasFeeFlag = (sponsorFlags & SponsorFlags.spfSponsorFee) !== 0
+  /* eslint-enable no-bitwise */
+
+  // Validate that reserve sponsorship is only used for the rippled allow-listed transaction types
+  if (
+    hasReserveFlag &&
+    transactionType &&
+    !RESERVE_SPONSORABLE_TRANSACTIONS.has(transactionType)
+  ) {
+    throw new ValidationError(
+      `Transaction: ${transactionType} cannot use spfSponsorReserve flag (does not create ledger objects)`,
+    )
+  }
+
+  // Reserve sponsorship is disallowed under permissioned delegation (rippled's
+  // Transactor::checkSponsor rejects Delegate + spfSponsorReserve with temINVALID).
+  if (hasReserveFlag && hasDelegate) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorReserve cannot be combined with Delegate ' +
+        '(reserve sponsorship under permissioned delegation is disallowed)',
+    )
+  }
+
+  // Fee sponsorship is disallowed on inner Batch transactions - rippled's
+  // Batch::preflight rejects spfSponsorFee on inner txns with temINVALID_FLAG,
+  // since only the outer Batch transaction pays a fee.
+  if (hasFeeFlag && isInnerBatchTxn) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  }
+}
+
+/**
+ * Validate sponsor-related fields in a transaction.
+ * This is a helper function for validateBaseTransaction.
+ *
+ * @param tx - The transaction to validate sponsor fields for.
+ * @throws ValidationError if sponsor fields are invalid.
+ */
+// eslint-disable-next-line max-lines-per-function -- necessary for validation
+export function validateSponsorFields(tx: Record<string, unknown>): void {
+  const transactionType = String(tx.TransactionType)
+  const isInnerBatchTxn = isInnerBatchTransaction(tx)
+
+  const sponsor = tx.Sponsor
+  const sponsorFlags = tx.SponsorFlags
+  const sponsorSignature = tx.SponsorSignature
+
+  const hasSponsor = sponsor !== undefined
+  const hasSponsorFlags = sponsorFlags !== undefined
+  const hasSponsorSignature = sponsorSignature !== undefined
+
+  /* If any sponsor field is present, Sponsor and SponsorFlags must be present */
+  if (hasSponsor || hasSponsorFlags || hasSponsorSignature) {
+    if (!hasSponsor || !hasSponsorFlags) {
+      throw new ValidationError(
+        'Transaction: Sponsor and SponsorFlags must both be present for sponsored transactions',
+      )
+    }
+  }
+
+  /* Validate Sponsor field */
+  if (hasSponsor) {
+    if (!isString(sponsor)) {
+      throw new ValidationError('Transaction: Sponsor must be a string')
+    }
+    if (!isAccount(sponsor)) {
+      throw new ValidationError(
+        'Transaction: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  /* Validate SponsorFlags field */
+  if (hasSponsorFlags) {
+    if (!isNumber(sponsorFlags)) {
+      throw new ValidationError('Transaction: SponsorFlags must be a number')
+    }
+    validateSponsorFlagsValue(
+      sponsorFlags,
+      transactionType,
+      tx.Delegate !== undefined,
+      isInnerBatchTxn,
+    )
+  }
+
+  /* Validate SponsorSignature field */
+  if (
+    hasSponsorSignature &&
+    !isSponsorSignature(sponsorSignature, isInnerBatchTxn)
+  ) {
+    throw new ValidationError('Transaction: invalid SponsorSignature')
+  }
+
+  /* Validate no self-sponsorship */
+  if (
+    hasSponsor &&
+    isString(sponsor) &&
+    isString(tx.Account) &&
+    areAddressesEqual(sponsor, tx.Account)
+  ) {
+    throw new ValidationError(
+      'Transaction: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
+    )
+  }
 }
 
 /**
@@ -605,11 +1021,19 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'Delegate', isAccount)
 
   const delegate = common.Delegate
-  if (delegate != null && delegate === common.Account) {
+  if (
+    delegate != null &&
+    isString(delegate) &&
+    isString(common.Account) &&
+    areAddressesEqual(delegate, common.Account)
+  ) {
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   }
+
+  // Validate sponsor fields using helper function
+  validateSponsorFields(common)
 }
 
 /**

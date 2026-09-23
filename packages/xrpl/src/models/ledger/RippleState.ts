@@ -61,6 +61,18 @@ export default interface RippleState extends BaseLedgerEntry, HasPreviousTxnID {
    * equivalent to 1 billion, or face value.
    */
   HighQualityOut?: number
+  /**
+   * The account sponsoring the reserve for the low account's side of this
+   * trust line. If present, indicates that another account is paying the
+   * reserve for the low account's participation in this trust line.
+   */
+  LowSponsor?: string
+  /**
+   * The account sponsoring the reserve for the high account's side of this
+   * trust line. If present, indicates that another account is paying the
+   * reserve for the high account's participation in this trust line.
+   */
+  HighSponsor?: string
 }
 
 export enum RippleStateFlags {

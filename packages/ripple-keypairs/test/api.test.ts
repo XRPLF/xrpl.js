@@ -41,6 +41,51 @@ describe('api', () => {
     expect(bytes.length).toEqual(16)
   })
 
+  it('generateSeed - refuses over-length entropy', () => {
+    const tooLong = new Uint8Array(32).fill(7)
+    expect(() => generateSeed({ entropy: tooLong })).toThrow(
+      new Error('entropy must be exactly 16 bytes'),
+    )
+  })
+
+  it('generateSeed - refuses under-length entropy', () => {
+    const tooShort = new Uint8Array(15).fill(7)
+    expect(() => generateSeed({ entropy: tooShort })).toThrow(
+      new Error('entropy must be exactly 16 bytes'),
+    )
+  })
+
+  /* eslint-disable @typescript-eslint/consistent-type-assertions --
+     Deliberately passing wrongly-typed entropy to assert it is rejected. */
+  it('generateSeed - refuses entropy that is not a Uint8Array', () => {
+    expect(() =>
+      generateSeed({
+        entropy: 'a3f5c1d9e8b7460213fdca9876543210' as unknown as Uint8Array,
+      }),
+    ).toThrow(new Error('entropy must be a Uint8Array'))
+    expect(() =>
+      generateSeed({
+        entropy: new Array(16).fill(0) as unknown as Uint8Array,
+      }),
+    ).toThrow(new Error('entropy must be a Uint8Array'))
+  })
+  // Only an omitted entropy is replaced with randomness; falsy values are
+  // validated like any other input.
+  it('generateSeed - refuses falsy non-nullish entropy', () => {
+    for (const value of [0, '', false, NaN]) {
+      expect(() =>
+        generateSeed({ entropy: value as unknown as Uint8Array }),
+      ).toThrow(new Error('entropy must be a Uint8Array'))
+    }
+  })
+  it('generateSeed - refuses explicit null entropy', () => {
+    expect(() =>
+      generateSeed({ entropy: null as unknown as Uint8Array }),
+    ).toThrow(new Error('entropy must be a Uint8Array'))
+  })
+
+  /* eslint-enable @typescript-eslint/consistent-type-assertions */
+
   it('generateSeed - secp256k1, deterministic', () => {
     expect(generateSeed({ entropy, algorithm: 'ecdsa-secp256k1' })).toEqual(
       fixtures.secp256k1.seed,

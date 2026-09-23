@@ -46,6 +46,20 @@ describe('MPTokenIssuanceCreate', function () {
     assertValid(validMPTokenIssuanceCreate)
   })
 
+  it(`verifies valid MPTokenIssuanceCreate w/ tfMPTCanHoldConfidentialBalance`, function () {
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+    } as any)
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: { tfMPTCanHoldConfidentialBalance: true },
+    } as any)
+  })
+
   it(`throws w/ MPTokenMetadata being an empty string`, function () {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
@@ -144,6 +158,36 @@ describe('MPTokenIssuanceCreate', function () {
     assertInvalid(
       invalid,
       'MPTokenIssuanceCreate: TransferFee cannot be provided without enabling tfMPTCanTransfer flag',
+    )
+  })
+
+  it(`throws w/ TransferFee and tfMPTCanHoldConfidentialBalance`, function () {
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        // Distinct flag bits, so addition is equivalent to a bitwise OR.
+        Flags:
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer +
+          MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
+    )
+
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        Flags: {
+          tfMPTCanTransfer: true,
+          tfMPTCanHoldConfidentialBalance: true,
+        },
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
     )
   })
 
