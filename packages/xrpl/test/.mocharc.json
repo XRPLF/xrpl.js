@@ -1,6 +1,11 @@
 {
   "diff": true,
-  "spec": ["./test/*.test.ts", "./test/models/**/*.test.ts", "./test/utils/**/*.test.ts", "./test/wallet/**/*.test.ts"],
+  "spec": [
+    "./test/*.test.ts",
+    "./test/models/**/*.test.ts",
+    "./test/utils/**/*.test.ts",
+    "./test/wallet/**/*.test.ts"
+  ],
   "extension": ["ts"],
   "package": "../package.json",
   "require": "ts-node/register",
@@ -10,12 +15,6 @@
   "recursive": true,
   "file": [],
   "ui": "bdd",
-  "watch-files": [
-    "src/**/*.ts",
-    "test/**/*.test.ts"
-  ],
-  "watch-ignore": [
-    "test/node_modules/**/*",
-    "test/vendor/**/*"
-  ]
+  "watch-files": ["src/**/*.ts", "test/**/*.test.ts"],
+  "watch-ignore": ["test/node_modules/**/*", "test/vendor/**/*"]
 }

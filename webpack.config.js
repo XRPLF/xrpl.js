@@ -57,7 +57,7 @@ module.exports = {
             new BundleAnalyzerPlugin({
               analyzerPort: `auto`,
               analyzerMode: "static",
-            })
+            }),
           );
         }
         return localConfig;

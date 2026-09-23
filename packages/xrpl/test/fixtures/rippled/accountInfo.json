@@ -32,17 +32,20 @@
                 "Account": "rpHit3GvUR1VSGh2PXcaaZKEEUnCVxWU2i",
                 "SignerWeight": 1
               }
-            }, {
+            },
+            {
               "SignerEntry": {
                 "Account": "rN4oCm1c6BQz6nru83H52FBSpNbC9VQcRc",
                 "SignerWeight": 1
               }
-            }, {
+            },
+            {
               "SignerEntry": {
                 "Account": "rJ8KhCi67VgbapiKCQN3r1ZA6BMUxUvvnD",
                 "SignerWeight": 1
+              }
             }
-          }],
+          ],
           "SignerListID": 0,
           "SignerQuorum": 3,
           "index": "5A9373E02D1DEF7EC9204DEB4819BA42D6AA6BCD878DC8C853062E9DD9708D11"

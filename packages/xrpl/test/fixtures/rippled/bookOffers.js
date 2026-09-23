@@ -2,10 +2,10 @@
 'use strict'
 const _ = require('lodash')
 
-module.exports.requestBookOffersBidsResponse = function(request) {
+module.exports.requestBookOffersBidsResponse = function (request) {
   const options = {
     gets: request.taker_gets,
-    pays: request.taker_pays
+    pays: request.taker_pays,
   }
 
   return {
@@ -30,17 +30,17 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.2849323720855092'
+            value: '0.2849323720855092',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '93.030522464522'
+            value: '93.030522464522',
           },
           index:
             '8092033091034D94219BC1131AF7A6B469D790D81831CB479AB6F67A32BE4E13',
           owner_funds: '31.77682120227525',
-          quality: '326.5003614141928'
+          quality: '326.5003614141928',
         },
         {
           Account: 'rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1',
@@ -57,17 +57,17 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.00302447007930511'
+            value: '0.00302447007930511',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '1'
+            value: '1',
           },
           index:
             '8DB3520FF9CB16A0EA955056C49115F8CFB03A587D0A4AFC844F1D220EFCE0B9',
           owner_funds: '0.0670537912615556',
-          quality: '330.6364334177034'
+          quality: '330.6364334177034',
         },
         {
           Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',
@@ -85,17 +85,17 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.3'
+            value: '0.3',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '99.34014894048333'
+            value: '99.34014894048333',
           },
           index:
             '9ECDFD31B28643FD3A54658398C5715D6DAD574F83F04529CB24765770F9084D',
           owner_funds: '4.021116654525635',
-          quality: '331.1338298016111'
+          quality: '331.1338298016111',
         },
         {
           Account: 'rPyYxUGK8L4dgEvjPs3aRc1B1jEiLr3Hx5',
@@ -112,12 +112,12 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.8095'
+            value: '0.8095',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '268.754'
+            value: '268.754',
           },
           index:
             '18B136E08EF50F0DEE8521EA22D16A950CD8B6DDF5F6E07C35F7FDDBBB09718D',
@@ -126,13 +126,13 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.8078974385735969'
+            value: '0.8078974385735969',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '268.2219496064341'
-          }
+            value: '268.2219496064341',
+          },
         },
         {
           Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',
@@ -150,16 +150,16 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.4499999999999999'
+            value: '0.4499999999999999',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '152.0098333185607'
+            value: '152.0098333185607',
           },
           index:
             '9F380E0B39E2AF8AA9608C3E39A5A8628E6D0F44385C6D12BE06F4FEC8D83351',
-          quality: '337.7996295968016'
+          quality: '337.7996295968016',
         },
         {
           Account: 'rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83',
@@ -176,17 +176,17 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.003768001830745216'
+            value: '0.003768001830745216',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '1.308365894430151'
+            value: '1.308365894430151',
           },
           index:
             'B971769686CE1B9139502770158A4E7C011CFF8E865E5AAE5428E23AAA0E146D',
           owner_funds: '0.2229210189326514',
-          quality: '347.2306949944844'
+          quality: '347.2306949944844',
         },
         {
           Account: 'rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE',
@@ -204,17 +204,17 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.5'
+            value: '0.5',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '176.3546101589987'
+            value: '176.3546101589987',
           },
           index:
             'D2CB71038AD0ECAF4B5FF0A953AD1257225D0071E6F3AF9ADE67F05590B45C6E',
           owner_funds: '6.617688680663627',
-          quality: '352.7092203179974'
+          quality: '352.7092203179974',
         },
         {
           Account: 'rN6jbxx4H6NxcnmkzBxQnbCWLECNKrgSSf',
@@ -231,12 +231,12 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.5'
+            value: '0.5',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '179.48'
+            value: '179.48',
           },
           index:
             'DA853913C8013C9471957349EDAEE4DF4846833B8CCB92008E2A8994E37BEF0D',
@@ -245,13 +245,13 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.499001996007984'
+            value: '0.499001996007984',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '179.1217564870259'
-          }
+            value: '179.1217564870259',
+          },
         },
         {
           Account: 'rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE',
@@ -269,16 +269,16 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.8'
+            value: '0.8',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '288.7710263794967'
+            value: '288.7710263794967',
           },
           index:
             'B89AD580E908F7337CCBB47A0BAAC6417EF13AC3465E34E8B7DD3BED016EA833',
-          quality: '360.9637829743709'
+          quality: '360.9637829743709',
         },
         {
           Account: 'rUeCeioKJkbYhv4mRGuAbZpPcqkMCoYq6N',
@@ -295,12 +295,12 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.5'
+            value: '0.5',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '182.9814890090516'
+            value: '182.9814890090516',
           },
           index:
             'D652DCE4B19C6CB43912651D3A975371D3B2A16A034EDF07BC11BF721AEF94A4',
@@ -309,33 +309,33 @@ module.exports.requestBookOffersBidsResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.2254411038203033'
+            value: '0.2254411038203033',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '82.50309772176658'
-          }
-        }
+            value: '82.50309772176658',
+          },
+        },
       ],
-      validated: false
-    }
+      validated: false,
+    },
   }
 }
 
-module.exports.requestBookOffersBidsPartialFundedResponse = function(
+module.exports.requestBookOffersBidsPartialFundedResponse = function (
   request,
-  options = {}
+  options = {},
 ) {
   _.defaults(options, {
     gets: {
       currency: 'BTC',
-      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
     },
     pays: {
       currency: 'USD',
-      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-    }
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+    },
   })
 
   return {
@@ -360,12 +360,12 @@ module.exports.requestBookOffersBidsPartialFundedResponse = function(
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '310'
+            value: '310',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '1'
+            value: '1',
           },
           index:
             '861D15BECDA5DCA1327CF4D8080C181425F043AC969A992C5FAE5D12813785D0',
@@ -374,32 +374,32 @@ module.exports.requestBookOffersBidsPartialFundedResponse = function(
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '259.2084637415302'
+            value: '259.2084637415302',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0.8361563346500974'
-          }
-        }
-      ]
-    }
+            value: '0.8361563346500974',
+          },
+        },
+      ],
+    },
   }
 }
 
-module.exports.requestBookOffersAsksPartialFundedResponse = function(
+module.exports.requestBookOffersAsksPartialFundedResponse = function (
   request,
-  options = {}
+  options = {},
 ) {
   _.defaults(options, {
     gets: {
       currency: 'BTC',
-      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
     },
     pays: {
       currency: 'USD',
-      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B'
-    }
+      issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+    },
   })
 
   return {
@@ -424,12 +424,12 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.8095'
+            value: '0.8095',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '268.754'
+            value: '268.754',
           },
           index:
             '18B136E08EF50F0DEE8521EA22D16A950CD8B6DDF5F6E07C35F7FDDBBB09718D',
@@ -438,23 +438,23 @@ module.exports.requestBookOffersAsksPartialFundedResponse = function(
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0.8078974385735969'
+            value: '0.8078974385735969',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '268.2219496064341'
-          }
-        }
-      ]
-    }
+            value: '268.2219496064341',
+          },
+        },
+      ],
+    },
   }
 }
 
-module.exports.requestBookOffersAsksResponse = function(request) {
+module.exports.requestBookOffersAsksResponse = function (request) {
   const options = {
     gets: request.taker_gets,
-    pays: request.taker_pays
+    pays: request.taker_pays,
   }
 
   return {
@@ -477,17 +477,17 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '3205.1'
+            value: '3205.1',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '10'
+            value: '10',
           },
           index:
             'CE457115A4ADCC8CB351B3E35A0851E48DE16605C23E305017A9B697B156DE5A',
           owner_funds: '41952.95917199965',
-          quality: '0.003120027456241615'
+          quality: '0.003120027456241615',
         },
         {
           Account: 'rDYCRhpahKEhCFV25xScg67Bwf4W9sTYAm',
@@ -504,17 +504,17 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '1599.063669386278'
+            value: '1599.063669386278',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '4.99707396683212'
+            value: '4.99707396683212',
           },
           index:
             'BF14FBB305159DBCAEA91B7E848408F5B559A91B160EBCB6D244958A6A16EA6B',
           owner_funds: '3169.910902910102',
-          quality: '0.003125'
+          quality: '0.003125',
         },
         {
           Account: 'raudnGKfTK23YKfnS7ixejHrqGERTYNFXk',
@@ -532,12 +532,12 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '143.1050962074379'
+            value: '143.1050962074379',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0.4499999999999999'
+            value: '0.4499999999999999',
           },
           index:
             '67924B0EAA15784CC00CCD5FDD655EE2D6D2AE40341776B5F14E52341E7FC73E',
@@ -546,13 +546,13 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0'
+            value: '0',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0'
-          }
+            value: '0',
+          },
         },
         {
           Account: 'rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE',
@@ -570,12 +570,12 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '254.329207354604'
+            value: '254.329207354604',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0.8'
+            value: '0.8',
           },
           index:
             '567BF2825173E3FB28FC94E436B6EB30D9A415FC2335E6D25CDE1BE47B25D120',
@@ -584,13 +584,13 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0'
+            value: '0',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0'
-          }
+            value: '0',
+          },
         },
         {
           Account: 'rwBYyfufTzk77zUSKEu4MvixfarC35av1J',
@@ -607,17 +607,17 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '390.4979'
+            value: '390.4979',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '1.23231134568807'
+            value: '1.23231134568807',
           },
           index:
             '8CA23E55BF9F46AC7E803D3DB40FD03225EFCA66650D4CF0CBDD28A7CCDC8400',
           owner_funds: '5704.824764087842',
-          quality: '0.003155743848271834'
+          quality: '0.003155743848271834',
         },
         {
           Account: 'rwjsRktX1eguUr1pHTffyHnC4uyrvX58V1',
@@ -634,17 +634,17 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '1'
+            value: '1',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0.003160328237957649'
+            value: '0.003160328237957649',
           },
           index:
             '7206866E39D9843623EE79E570242753DEE3C597F3856AEFB4631DD5AD8B0557',
           owner_funds: '45.55665106096075',
-          quality: '0.003160328237957649'
+          quality: '0.003160328237957649',
         },
         {
           Account: 'r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ',
@@ -661,16 +661,16 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '4725'
+            value: '4725',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '15'
+            value: '15',
           },
           index:
             '42894809370C7E6B23498EF8E22AD4B05F02B94F08E6983357A51EA96A95FF7F',
-          quality: '0.003174603174603175'
+          quality: '0.003174603174603175',
         },
         {
           Account: 'rDbsCJr5m8gHDCNEHCZtFxcXHsD4S9jH83',
@@ -687,17 +687,17 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '1.24252537879871'
+            value: '1.24252537879871',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.gets.issuer,
-            value: '0.003967400879423823'
+            value: '0.003967400879423823',
           },
           index:
             'F4404D6547149419D3607F81D7080979FBB3AFE2661F9A933E2F6C07AC1D1F6D',
           owner_funds: '73.52163803897041',
-          quality: '0.003193013959408667'
+          quality: '0.003193013959408667',
         },
         {
           Account: 'rDVBvAQScXrGRGnzrxRrcJPeNLeLeUTAqE',
@@ -715,12 +715,12 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '496.5429474010489'
+            value: '496.5429474010489',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '1.6'
+            value: '1.6',
           },
           index:
             '50CAA04E81D0009115B61C132FC9887FA9E5336E0CB8A2E7D3280ADBF6ABC043',
@@ -728,13 +728,13 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           taker_gets_funded: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '0'
+            value: '0',
           },
           taker_pays_funded: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '0'
-          }
+            value: '0',
+          },
         },
         {
           Account: 'r49y2xKuKVG2dPkNHgWQAV61cjxk8gryjQ',
@@ -751,26 +751,26 @@ module.exports.requestBookOffersAsksResponse = function(request) {
           TakerGets: {
             currency: options.gets.currency,
             issuer: options.gets.issuer,
-            value: '3103'
+            value: '3103',
           },
           TakerPays: {
             currency: options.pays.currency,
             issuer: options.pays.issuer,
-            value: '10'
+            value: '10',
           },
           index:
             '8A319A496288228AD9CAD74375E32FA81805C56A9AD84798A26756A8B3F9EE23',
-          quality: '0.003222687721559781'
-        }
+          quality: '0.003222687721559781',
+        },
       ],
-      validated: false
+      validated: false,
     },
     status: 'success',
-    type: 'response'
+    type: 'response',
   }
 }
 
-module.exports.requestBookOffersXRPBaseResponse = function(request) {
+module.exports.requestBookOffersXRPBaseResponse = function (request) {
   return {
     id: request.id,
     status: 'success',
@@ -793,7 +793,7 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '577.9185501389138'
+            value: '577.9185501389138',
           },
           TakerPays: '27623954214',
           index:
@@ -803,9 +803,9 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           taker_gets_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '576.7592525061912'
+            value: '576.7592525061912',
           },
-          taker_pays_funded: '27568540895'
+          taker_pays_funded: '27568540895',
         },
         {
           Account: 'rEiUs9rEiGHmpaprkYDNyXnJYg4ANxWLy9',
@@ -822,7 +822,7 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '578.129773249599'
+            value: '578.129773249599',
           },
           TakerPays: '27634326809',
           index:
@@ -831,9 +831,9 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           taker_gets_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '0'
+            value: '0',
           },
-          taker_pays_funded: '0'
+          taker_pays_funded: '0',
         },
         {
           Account: 'rsvZ4ucGpMvfSYFQXB4nFaQhxiW5CUy2zx',
@@ -850,13 +850,13 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '265.0254187774191'
+            value: '265.0254187774191',
           },
           TakerPays: '12668215016',
           index:
             'A9AC351832B9A17FDA35650B6EE32C0A48F6AC661730E9855CC47498C171860C',
           owner_funds: '2676.502797501436',
-          quality: '47800000'
+          quality: '47800000',
         },
         {
           Account: 'rfCFLzNJYvvnoGHWQYACmJpTgkLUaugLEw',
@@ -874,13 +874,13 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '193'
+            value: '193',
           },
           TakerPays: '9264052522',
           index:
             '67C79EAA9F4EB638E2FC8F569C29E9E02F79F38BB136B66FD13857EB60432913',
           owner_funds: '3962.913768867934',
-          quality: '48000272.13471502'
+          quality: '48000272.13471502',
         },
         {
           Account: 'rM3X3QSr8icjTGpaF52dozhbT2BZSXJQYM',
@@ -897,13 +897,13 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '161.8304886'
+            value: '161.8304886',
           },
           TakerPays: '7771132207',
           index:
             'A9696EDF0D7AC89ACBAF62E3CEDCD14DE82B441046CC748FE92A1DEB90D40A4A',
           owner_funds: '2673.609970934654',
-          quality: '48020198.63023511'
+          quality: '48020198.63023511',
         },
         {
           Account: 'r4rCiFc9jpMeCpKioVJUMbT1hU4kj3XiSt',
@@ -920,13 +920,13 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '605.341293717861'
+            value: '605.341293717861',
           },
           TakerPays: '29075779685',
           index:
             'F38F7F427823927F3870AB66E9C01529DDA7567CE62F9687992729B8F14E7937',
           owner_funds: '637.5308256246498',
-          quality: '48032044.04976825'
+          quality: '48032044.04976825',
         },
         {
           Account: 'rNEib8Z73zSTYTi1WqzU4b1BQMXxnpYg1s',
@@ -943,7 +943,7 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '166.647580164238'
+            value: '166.647580164238',
           },
           TakerPays: '8004519725',
           index:
@@ -953,9 +953,9 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           taker_gets_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '166.3150500641094'
+            value: '166.3150500641094',
           },
-          taker_pays_funded: '7988547433'
+          taker_pays_funded: '7988547433',
         },
         {
           Account: 'rPCFVxAqP2XdaPmih1ZSjmCPNxoyMiy2ne',
@@ -972,13 +972,13 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '792.5367174829754'
+            value: '792.5367174829754',
           },
           TakerPays: '38067615332',
           index:
             'EFF326D799C5D722F4367250DC3C9E3DADB300D4E96D634A58E1F4B534F754C7',
           owner_funds: '816.6776190772376',
-          quality: '48032620.43542826'
+          quality: '48032620.43542826',
         },
         {
           Account: 'rEiUs9rEiGHmpaprkYDNyXnJYg4ANxWLy9',
@@ -995,7 +995,7 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '732.679143498934'
+            value: '732.679143498934',
           },
           TakerPays: '35199960104',
           index:
@@ -1004,9 +1004,9 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           taker_gets_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '0'
+            value: '0',
           },
-          taker_pays_funded: '0'
+          taker_pays_funded: '0',
         },
         {
           Account: 'rEiUs9rEiGHmpaprkYDNyXnJYg4ANxWLy9',
@@ -1023,7 +1023,7 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           TakerGets: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '732.679143498934'
+            value: '732.679143498934',
           },
           TakerPays: '35200312104',
           index:
@@ -1032,17 +1032,17 @@ module.exports.requestBookOffersXRPBaseResponse = function(request) {
           taker_gets_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '0'
+            value: '0',
           },
-          taker_pays_funded: '0'
-        }
+          taker_pays_funded: '0',
+        },
       ],
-      validated: true
-    }
+      validated: true,
+    },
   }
 }
 
-module.exports.requestBookOffersXRPCounterResponse = function(request) {
+module.exports.requestBookOffersXRPCounterResponse = function (request) {
   return {
     id: request.id,
     status: 'success',
@@ -1066,12 +1066,12 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '20.9779'
+            value: '20.9779',
           },
           index:
             'CE14A7A75F12FDD166FDFBE446CF737CE0D467F6F11299E69DA10EDFD9C984EB',
           owner_funds: '1037828768',
-          quality: '0.0000000209779'
+          quality: '0.0000000209779',
         },
         {
           Account: 'rLVCrkavabdvHiNtcMedN3BAmz3AUc2L5j',
@@ -1089,12 +1089,12 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '1468.6'
+            value: '1468.6',
           },
           index:
             '9D7D345AC880071453B18F78BB2CDD8DB98B38025F4C6DC8A9CDA7ECDD7229C1',
           owner_funds: '189998700393',
-          quality: '0.00000002098'
+          quality: '0.00000002098',
         },
         {
           Account: 'rL5916QJwSMnUqcCv9savsXA7Xtq83fhzS',
@@ -1112,12 +1112,12 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '2100'
+            value: '2100',
           },
           index:
             '307CE6343140915231E11E0FE993D2A256DEC18092A2B546EFA0B4214139FAFC',
           owner_funds: '663185088622',
-          quality: '0.000000021'
+          quality: '0.000000021',
         },
         {
           Account: 'rGPmoJKzmocGgJoWUmU4KYxig2RUC7cESo',
@@ -1135,7 +1135,7 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '1223.364'
+            value: '1223.364',
           },
           index:
             '8BFFF54B164E52C4B66EE193829D589EA03F0FAD86A585EB3208C3D2FDEE2CAF',
@@ -1145,8 +1145,8 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           taker_pays_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '1223.35870296'
-          }
+            value: '1223.35870296',
+          },
         },
         {
           Account: 'rfCFLzNJYvvnoGHWQYACmJpTgkLUaugLEw',
@@ -1165,12 +1165,12 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '181'
+            value: '181',
           },
           index:
             'B2247E0118DAF88318EBB495A03F54C115FC9420AF85499D95D208912B059A86',
           owner_funds: '412756265349',
-          quality: '0.0000000210724996998106'
+          quality: '0.0000000210724996998106',
         },
         {
           Account: 'rn7Dk7YcNRmUb9q9WUVX1oh9Kp1Dkuy9xE',
@@ -1188,7 +1188,7 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '41.79532441712259'
+            value: '41.79532441712259',
           },
           index:
             'AC3E2571C15C4A405D19DD0665B798AAACE843D87849544237DA7B29541990AB',
@@ -1198,8 +1198,8 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           taker_pays_funded: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '0'
-          }
+            value: '0',
+          },
         },
         {
           Account: 'rLVCrkavabdvHiNtcMedN3BAmz3AUc2L5j',
@@ -1217,11 +1217,11 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '1266'
+            value: '1266',
           },
           index:
             '4ED8112E78F86DB75E5A14A6C2EE45F3EA9CBC5644EAFA81F970F688F0CC04D7',
-          quality: '0.0000000211'
+          quality: '0.0000000211',
         },
         {
           Account: 'rN24WWiyC6q1yWmm6b3Z6yMycohvnutLUQ',
@@ -1239,12 +1239,12 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '168.8'
+            value: '168.8',
           },
           index:
             '7B1F18E506BA7B06C18B10A4D0F45FA6213F94B5ACA1912B0C4A3C9F899862D5',
           owner_funds: '16601355477',
-          quality: '0.0000000211'
+          quality: '0.0000000211',
         },
         {
           Account: 'rfCFLzNJYvvnoGHWQYACmJpTgkLUaugLEw',
@@ -1263,11 +1263,11 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '1810'
+            value: '1810',
           },
           index:
             'C63B614E60EB46FAA4F9F5E3B6D5535E18F909F936788514280F59EDB6C899BD',
-          quality: '0.00000002113950760685067'
+          quality: '0.00000002113950760685067',
         },
         {
           Account: 'rHRC9cBUYwEnrDZce6SkAkDTo8P9G1un3U',
@@ -1285,15 +1285,15 @@ module.exports.requestBookOffersXRPCounterResponse = function(request) {
           TakerPays: {
             currency: 'USD',
             issuer: 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
-            value: '2130.918721932529'
+            value: '2130.918721932529',
           },
           index:
             '72F31EC2BDE26A721CC78EB8D42B2BC4A3E36DCF6E7D4B73C53D4A40F4728A88',
           owner_funds: '4517636158733',
-          quality: '0.00000002115'
-        }
+          quality: '0.00000002115',
+        },
       ],
-      validated: true
-    }
+      validated: true,
+    },
   }
 }

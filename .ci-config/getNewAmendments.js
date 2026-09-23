@@ -37,7 +37,7 @@ async function main() {
 
   if (newAmendments.length > 0) {
     console.log(
-      "New Amendment Hashes - Look up their names on https://xrpl.org/known-amendments.html"
+      "New Amendment Hashes - Look up their names on https://xrpl.org/known-amendments.html",
     );
     newAmendments.forEach((amendment) => {
       console.log(amendment);
@@ -46,7 +46,7 @@ async function main() {
     console.log(
       `No new amendments to add!
 Looking at network: ${networkToEmulate}.
-Path to config: ${filePath}`
+Path to config: ${filePath}`,
     );
   }
 

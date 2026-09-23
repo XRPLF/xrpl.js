@@ -81,14 +81,14 @@ const {Account, Utils} = require('@xrplf/secret-numbers')
 
 Some Utils methods (that you may want to use in your UI / ... before using the Account constructor):
 
- - To calculate the 6th decimal for a group of 5 digits:  
+ - To calculate the 6th decimal for a group of 5 digits:
    `calculateChecksum(position: number, value: number)`: number
- - To check a checksum (either sliced or the 6th char of a string containing numbers:  
+ - To check a checksum (either sliced or the 6th char of a string containing numbers:
    `checkChecksum(position: number, value: number | string, checksum?: number)`: Boolean
 
 ## Development
 
-Run `npm run prepublish` to clean, lint, test and build. Or just run `npm run build`, `npm run test` or `npm run lint`. 
+Run `npm run prepublish` to clean, lint, test and build. Or just run `npm run build`, `npm run test` or `npm run lint`.
 
 Tests are in `./test/`
 

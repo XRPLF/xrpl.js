@@ -22,7 +22,9 @@ module.exports = {
       },
     ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base)/)"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base)/)",
+  ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   verbose: true,
