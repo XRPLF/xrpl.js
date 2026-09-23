@@ -1,6 +1,6 @@
 {
   "name": "xrpl",
-  "version": "5.1.0-smartescrow.1",
+  "version": "5.4.0-smartescrow.0",
   "license": "ISC",
   "description": "A TypeScript/JavaScript API for interacting with the XRP Ledger in Node.js and the browser",
   "files": [
@@ -31,7 +31,7 @@
     "eventemitter3": "^5.0.4",
     "fast-json-stable-stringify": "^2.1.0",
     "ripple-address-codec": "^5.0.1",
-    "ripple-binary-codec": "^2.9.0-smartescrow.1",
+    "ripple-binary-codec": "^2.12.0-smartescrow.0",
     "ripple-keypairs": "^3.1.0"
   },
   "devDependencies": {
