@@ -1,10 +1,7 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import {
-  convertStringToHex,
-  AccountNFTsRequest,
-  NFTokenMint,
-} from '../../../src'
+import { AccountNFTsRequest, NFTokenMint } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -28,7 +25,7 @@ describe('account_nfts', function () {
       const mintTx: NFTokenMint = {
         TransactionType: 'NFTokenMint',
         Account: testContext.wallet.address,
-        URI: convertStringToHex(uri),
+        URI: stringToHex(uri),
         NFTokenTaxon: 0,
       }
       // eslint-disable-next-line no-await-in-loop -- Sequential minting required for test setup
