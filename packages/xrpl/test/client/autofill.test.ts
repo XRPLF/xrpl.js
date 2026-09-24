@@ -8,6 +8,8 @@ import {
   SponsorshipSet,
   Transaction,
   Batch,
+  VaultCreate,
+  VaultWithdrawalPolicy,
   type LoanSet,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
@@ -524,6 +526,29 @@ describe('client.autofill', function () {
       const txResult = await testContext.client.autofill(tx)
 
       assert.strictEqual(txResult.Fee, '2000000')
+    })
+
+    it('should autofill the network Fee of a VaultCreate transaction', async function () {
+      const tx: VaultCreate = {
+        Account: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        TransactionType: 'VaultCreate',
+        Asset: { currency: 'XRP' },
+        WithdrawalPolicy:
+          VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
+      }
+      testContext.mockRippled!.addResponse(
+        'account_info',
+        rippled.account_info.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+      testContext.mockRippled!.addResponse(
+        'server_info',
+        rippled.server_info.normal,
+      )
+
+      const txResult = await testContext.client.autofill(tx)
+
+      assert.strictEqual(txResult.Fee, '12')
     })
 
     it('should autofill Fee of an EscrowFinish transaction with signersCount', async function () {
