@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES
+* The object form of `LedgerEntryRequest.ticket` now uses `account` and `ticket_seq` instead of `owner` and `ticket_sequence`, matching the `ledger_entry` API. The old names never matched the API, so requests built from them were rejected by the server; rename the properties to compile against the corrected type.
+
 ## 5.3.0 (2026-09-16)
 
 ### Added
