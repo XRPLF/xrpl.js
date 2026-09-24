@@ -4,6 +4,11 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES
+* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it.
+
+  Backported from xrpl 5.2.0. Previously, a string was coerced element-by-element and every letter became `0`, so `Wallet.fromEntropy('abcdefghijklmnop')` silently returned a spendable wallet derived from 16 zero bytes.
+
 ## 2.14.1 (2024-02-01)
 
 ### Fixed

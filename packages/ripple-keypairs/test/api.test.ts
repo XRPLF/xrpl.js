@@ -35,6 +35,70 @@ describe('api', () => {
     assert(bytes.length === 16)
   })
 
+  it('generateSeed - refuses over-length entropy', () => {
+    const tooLong = new Uint8Array(32).fill(7)
+    assert.throws(
+      () => api.generateSeed({ entropy: tooLong }),
+      /entropy must be exactly 16 bytes/u,
+    )
+  })
+
+  it('generateSeed - refuses under-length entropy', () => {
+    const tooShort = new Uint8Array(15).fill(7)
+    assert.throws(
+      () => api.generateSeed({ entropy: tooShort }),
+      /entropy must be exactly 16 bytes/u,
+    )
+  })
+
+  /* eslint-disable @typescript-eslint/consistent-type-assertions --
+     Deliberately passing wrongly-typed entropy to assert it is rejected. */
+  it('generateSeed - refuses entropy that is not a Uint8Array', () => {
+    assert.throws(
+      () =>
+        api.generateSeed({
+          entropy: 'a3f5c1d9e8b7460213fdca9876543210' as unknown as Uint8Array,
+        }),
+      /entropy must be a Uint8Array/u,
+    )
+    assert.throws(
+      () =>
+        api.generateSeed({
+          entropy: new Array(16).fill(0) as unknown as Uint8Array,
+        }),
+      /entropy must be a Uint8Array/u,
+    )
+  })
+
+  // Only an omitted entropy is replaced with randomness; falsy values are
+  // validated like any other input.
+  it('generateSeed - refuses falsy non-nullish entropy', () => {
+    for (const value of [0, '', false, NaN]) {
+      assert.throws(
+        () => api.generateSeed({ entropy: value as unknown as Uint8Array }),
+        /entropy must be a Uint8Array/u,
+      )
+    }
+  })
+
+  it('generateSeed - refuses explicit null entropy', () => {
+    assert.throws(
+      () => api.generateSeed({ entropy: null as unknown as Uint8Array }),
+      /entropy must be a Uint8Array/u,
+    )
+  })
+
+  /* eslint-enable @typescript-eslint/consistent-type-assertions */
+
+  // A Buffer is a Uint8Array subclass, and callers on this line commonly pass
+  // one. It must keep working.
+  it('generateSeed - accepts a 16-byte Buffer', () => {
+    assert.strictEqual(
+      api.generateSeed({ entropy: Buffer.from(entropy) }),
+      fixtures.secp256k1.seed,
+    )
+  })
+
   it('deriveKeypair - secp256k1', () => {
     const keypair = api.deriveKeypair(fixtures.secp256k1.seed)
     assert.deepEqual(keypair, fixtures.secp256k1.keypair)
