@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### BREAKING CHANGES
+- `generateSeed` now requires `options.entropy` to be a `Uint8Array` of exactly 16 bytes and throws otherwise. Other lengths and types are no longer accepted.
+
+  Backported from ripple-keypairs 3.1.0. Previously, entropy longer than 16 bytes was truncated to its first 16 bytes, so two different inputs sharing a prefix derived the same wallet.
+
 ## 2.0.0 (2024-02-01)
 
 ### BREAKING CHANGES
