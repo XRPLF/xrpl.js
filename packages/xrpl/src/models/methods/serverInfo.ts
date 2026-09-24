@@ -78,6 +78,11 @@ export interface ServerInfoResponse extends BaseResponse {
         hash: string
         reserve_base_xrp: number
         reserve_inc_xrp: number
+
+        extension_compute: number
+        extension_size: number
+        gas_price: number
+
         seq: number
       }
       /**
@@ -245,6 +250,10 @@ export interface ServerInfoResponse extends BaseResponse {
          * object an account owns in the ledger.
          */
         reserve_inc_xrp: number
+
+        extension_compute: number
+        extension_size: number
+        gas_price: number
         /** The ledger index of the latest validated ledger. */
         seq: number
       }

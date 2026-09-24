@@ -44,6 +44,16 @@ describe('Get Faucet host ', function () {
     )
   })
 
+  it('returns the correct faucetPath for WasmDevnet host', function () {
+    const expectedFaucetPath = faucetNetworkPaths[FaucetNetwork.WasmDevnet]
+    testContext.client.networkID = 2002
+
+    assert.strictEqual(
+      getFaucetPath(getFaucetHost(testContext.client)),
+      expectedFaucetPath,
+    )
+  })
+
   it('returns the correct faucetPath for undefined host', function () {
     const expectedFaucetPath = '/accounts'
 

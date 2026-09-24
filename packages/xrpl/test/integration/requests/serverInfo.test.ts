@@ -91,6 +91,9 @@ describe('server_info (rippled)', function () {
               reserve_base_xrp: 200,
               reserve_inc_xrp: 50,
               seq: 1906,
+              extension_compute: 0,
+              extension_size: 0,
+              gas_price: 0,
             },
             validation_quorum: 0,
             validator_list: {
