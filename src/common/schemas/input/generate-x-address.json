@@ -9,6 +9,8 @@
       "properties": {
         "entropy": {
           "type": "array",
+          "minItems": 16,
+          "maxItems": 16,
           "items": {
             "type": "integer",
             "minimum": 0,

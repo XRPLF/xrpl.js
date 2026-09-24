@@ -4,6 +4,16 @@
 
 This library (ripple-lib 1.x) has been deprecated in favor of [xrpl.js version 2+](https://github.com/XRPLF/xrpl.js).
 
+## Unreleased
+
+### BREAKING CHANGES
+
+* `generateAddress` and `generateXAddress` now require `entropy` to be exactly 16 bytes and throw `ValidationError` otherwise. Entropy of any other length, and entropy with missing or empty positions, is no longer accepted.
+
+  Backported from xrpl 5.2.0 and ripple-keypairs 3.1.0. Previously, entropy longer than 16 bytes was truncated to its first 16 bytes, so two different inputs sharing a prefix derived the same wallet; and a sparse array such as `new Array(16)` passed validation and derived the publicly known zero-entropy wallet.
+
+  Entropy that is too short previously threw `UnexpectedError`; it now throws `ValidationError`, like every other invalid input to these methods.
+
 ## 1.10.1 (2022-05-31)
 
 * Fix bug in parseSettings: AffectedNodes can contain CreatedNode and DeletedNode ([#1907](https://github.com/XRPLF/xrpl.js/pull/1907))
