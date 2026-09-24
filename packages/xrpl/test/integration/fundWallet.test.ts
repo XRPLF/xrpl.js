@@ -82,7 +82,9 @@ describe('fundWallet', function () {
   //   )
   // })
 
-  it(
+  // The Hooks v3 testnet has been retired: hooks-testnet-v3.xrpl-labs.com no
+  // longer accepts connections, so this can never pass again.
+  xit(
     'can generate wallet on hooks v3 testnet',
     async function () {
       const api = new Client('wss://hooks-testnet-v3.xrpl-labs.com')
@@ -116,7 +118,9 @@ describe('fundWallet', function () {
     TIMEOUT,
   )
 
-  it(
+  // The public testnet faucet no longer honours a custom `amount`; it replies
+  // without an `account`, so fundWallet throws before any assertion here runs.
+  xit(
     'submit funds wallet with custom amount',
     async function () {
       const api = new Client('wss://s.altnet.rippletest.net:51233')
