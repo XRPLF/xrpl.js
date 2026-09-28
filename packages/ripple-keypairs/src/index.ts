@@ -13,17 +13,52 @@ const Secp256k1 = elliptic.ec('secp256k1')
 const { hexToBytes } = utils
 const { bytesToHex } = utils
 
+const SEED_ENTROPY_LENGTH_BYTES = 16
+
+/**
+ * Checks whether a value is a Uint8Array, including subclasses such as Buffer
+ * and instances from another realm, which fail a plain `instanceof` check.
+ *
+ * @param value - The value to test.
+ * @returns Whether the value is a Uint8Array.
+ */
+function isUint8Array(value: unknown): value is Uint8Array {
+  return (
+    value instanceof Uint8Array ||
+    // The tag check alone would also admit other single-byte views, so
+    // require the element size too.
+    (ArrayBuffer.isView(value) &&
+      'BYTES_PER_ELEMENT' in value &&
+      // `in` does not narrow ArrayBufferView on this TypeScript version.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- See above.
+      (value as ArrayBufferView & { BYTES_PER_ELEMENT: number })
+        .BYTES_PER_ELEMENT === 1 &&
+      Object.prototype.toString.call(value) === '[object Uint8Array]')
+  )
+}
+
 function generateSeed(
   options: {
     entropy?: Uint8Array
     algorithm?: 'ed25519' | 'ecdsa-secp256k1'
   } = {},
 ): string {
+  // Entropy is refused rather than resized: a seed holds exactly
+  // SEED_ENTROPY_LENGTH_BYTES bytes, and trimming or padding to fit would
+  // change which wallet the caller derives.
+  // Only an omitted value means "generate randomness for me". Any other value,
+  // including null, is validated rather than replaced with randomness.
+  const supplied = options.entropy
   assert.ok(
-    !options.entropy || options.entropy.length >= 16,
-    'entropy too short',
+    supplied === undefined || isUint8Array(supplied),
+    'entropy must be a Uint8Array',
   )
-  const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16)
+  assert.ok(
+    supplied === undefined || supplied.length === SEED_ENTROPY_LENGTH_BYTES,
+    `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
+  )
+  const entropy =
+    supplied === undefined ? brorand(SEED_ENTROPY_LENGTH_BYTES) : supplied
   const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1'
   return addressCodec.encodeSeed(Buffer.from(entropy), type)
 }
