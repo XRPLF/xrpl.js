@@ -4,7 +4,14 @@
 name: Node.js CI
 
 env:
-  RIPPLED_DOCKER_IMAGE: rippleci/rippled:develop
+  # Pinned to the develop build current when this branch was cut, rather than
+  # floating on `develop`. Two things have since changed in that tag: it is now
+  # built to run as the non-root `xrpld` user, so the `mkdir -p
+  # /var/lib/rippled/db/` below fails with "Permission denied" and the container
+  # exits before rippled starts; and `server_definitions` gained top-level keys
+  # that test/integration/requests/serverDefinitions.test.ts does not expect.
+  # A frozen branch needs a frozen server.
+  RIPPLED_DOCKER_IMAGE: rippleci/rippled:24cbaf76
   GIT_REF: ${{ inputs.git_ref || github.ref }}
 
 on:
@@ -42,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         node-version: [24.x]
 
@@ -86,6 +94,7 @@ jobs:
     timeout-minutes: 10
 
     strategy:
+      fail-fast: false
       matrix:
         node-version: [20.x, 22.x, 24.x]
 
@@ -130,6 +139,7 @@ jobs:
     timeout-minutes: 10
 
     strategy:
+      fail-fast: false
       matrix:
         node-version: [20.x, 22.x, 24.x]
 
@@ -185,6 +195,7 @@ jobs:
     timeout-minutes: 10
 
     strategy:
+      fail-fast: false
       matrix:
         node-version: [24.x]
 
