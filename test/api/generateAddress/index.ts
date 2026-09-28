@@ -35,9 +35,56 @@ export default <TestSuite>{
       // WHEN generating an address
       api.generateAddress({entropy: random()})
 
-      // THEN an UnexpectedError is thrown
-      // because 16 bytes of entropy are required
-    }, api.errors.UnexpectedError)
+      // THEN a ValidationError is thrown
+      // because exactly 16 bytes of entropy are required
+    }, api.errors.ValidationError)
+  },
+
+  // Entropy longer than 16 bytes used to be truncated to its first 16 bytes,
+  // so two different inputs sharing a prefix derived the same wallet.
+  'generateAddress rejects over-length entropy': async (api) => {
+    assert.throws(
+      () => api.generateAddress({entropy: new Array(32).fill(7)}),
+      api.errors.ValidationError
+    )
+    assert.throws(
+      () => api.generateAddress({entropy: new Array(17).fill(7)}),
+      api.errors.ValidationError
+    )
+  },
+
+  // A sparse array reports a length of 16 and passes JSON-schema validation,
+  // because the schema skips holes. It used to read back as 16 zero bytes and
+  // derive the well-known zero-entropy wallet.
+  'generateAddress rejects a sparse array': async (api) => {
+    assert.throws(
+      () => api.generateAddress({entropy: new Array(16)}),
+      api.errors.ValidationError
+    )
+    assert.throws(
+      () => api.generateAddress({entropy: new Array(16).map(() => 1)}),
+      api.errors.ValidationError
+    )
+
+    const padded = [1, 2, 3]
+    padded.length = 16
+    assert.throws(
+      () => api.generateAddress({entropy: padded}),
+      api.errors.ValidationError
+    )
+  },
+
+  'generateAddress rejects entropy that is not an array of bytes': async (
+    api
+  ) => {
+    assert.throws(
+      () => api.generateAddress({entropy: 'abcdefghijklmnop' as any}),
+      api.errors.ValidationError
+    )
+    assert.throws(
+      () => api.generateAddress({entropy: new Array(16).fill(256)}),
+      api.errors.ValidationError
+    )
   },
 
   'generateAddress with no options object': async (api) => {

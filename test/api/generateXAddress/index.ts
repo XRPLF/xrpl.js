@@ -34,9 +34,23 @@ export default <TestSuite>{
       // WHEN generating an X-address
       api.generateXAddress({entropy: random()})
 
-      // THEN an UnexpectedError is thrown
-      // because 16 bytes of entropy are required
-    }, api.errors.UnexpectedError)
+      // THEN a ValidationError is thrown
+      // because exactly 16 bytes of entropy are required
+    }, api.errors.ValidationError)
+  },
+
+  'generateXAddress rejects over-length entropy': async (api) => {
+    assert.throws(
+      () => api.generateXAddress({entropy: new Array(32).fill(7)}),
+      api.errors.ValidationError
+    )
+  },
+
+  'generateXAddress rejects a sparse array': async (api) => {
+    assert.throws(
+      () => api.generateXAddress({entropy: new Array(16)}),
+      api.errors.ValidationError
+    )
   },
 
   'generateXAddress with no options object': async (api) => {
