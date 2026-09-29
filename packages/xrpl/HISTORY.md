@@ -4,8 +4,14 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Fixed
+* Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
+
+## 5.3.0 (2026-09-16)
+
 ### Added
 * Add `LendingProtocolV1_1` support.
+
 ## 5.2.0 (2026-09-11)
 
 ### BREAKING CHANGES
