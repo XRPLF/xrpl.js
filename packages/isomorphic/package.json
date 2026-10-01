@@ -30,7 +30,7 @@
   "dependencies": {
     "@noble/hashes": "^2.2.0",
     "eventemitter3": "5.0.4",
-    "ws": "^8.21.0"
+    "ws": "^8.22.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",
