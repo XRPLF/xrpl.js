@@ -26,6 +26,12 @@ const LEDGER_OFFSET = 20
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
 
+const MICRO_DROPS_PER_DROP = 1_000_000
+
+// Extra base fees for an EscrowCreate with Bytecode (rippled charges 10 in total).
+const WASM_EXTRA_BASE_FEES = 9
+const WASM_DROPS_PER_BYTE = 5
+
 // Confidential MPT (XLS-0096) transactions are charged this many extra base
 // fees on top of the standard base fee (rippled kCONFIDENTIAL_FEE_MULTIPLIER).
 const CONFIDENTIAL_FEE_MULTIPLIER = 9
@@ -279,6 +285,17 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
   return new BigNumber(fee)
 }
 
+async function fetchGasPrice(client: Client): Promise<BigNumber> {
+  const response = await client.request({ command: 'server_state' })
+  const gasPrice = response.result.state.validated_ledger?.gas_price
+
+  if (gasPrice == null) {
+    return Promise.reject(new Error('Could not fetch Owner Reserve.'))
+  }
+
+  return new BigNumber(gasPrice)
+}
+
 /**
  * Fetches the total number of signers for the counterparty of a LoanSet transaction.
  *
@@ -339,7 +356,7 @@ async function fetchCounterPartySignersCount(
  * @returns The additional sponsor fee as a BigNumber.
  */
 function calculateSponsorFee(
-  netFeeDrops: string,
+  netFeeDrops: BigNumber,
   sponsorSignersCount = 0,
 ): BigNumber {
   if (sponsorSignersCount <= 0) {
@@ -350,7 +367,7 @@ function calculateSponsorFee(
   console.warn(
     `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
   )
-  return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
+  return netFeeDrops.multipliedBy(sponsorSignersCount)
 }
 
 /**
@@ -364,7 +381,7 @@ function calculateSponsorFee(
  * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params, max-statements, complexity -- checks many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -372,23 +389,37 @@ async function calculateFeePerTransactionType(
   sponsorSignersCount = 0,
 ): Promise<BigNumber> {
   const netFeeXRP = await getFeeXrp(client)
-  const netFeeDrops = xrpToDrops(netFeeXRP)
-  let baseFee = new BigNumber(netFeeDrops)
+  const netFeeDrops = new BigNumber(xrpToDrops(netFeeXRP))
+  let baseFee = netFeeDrops
 
   const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
     tx.TransactionType,
   )
 
-  // EscrowFinish Transaction with Fulfillment
-  if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
-    const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
-    // BaseFee × (33 + (Fulfillment size in bytes / 16))
-    baseFee = new BigNumber(
-      // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
-      scaleValue(netFeeDrops, 33 + fulfillmentBytesSize / 16),
-    )
-  } else if (isSpecialTxCost) {
-    baseFee = await fetchOwnerReserveFee(client)
+  // EscrowCreate transaction with Bytecode
+  if (tx.TransactionType === 'EscrowCreate' && tx.Bytecode != null) {
+    baseFee = baseFee
+      .plus(netFeeDrops.multipliedBy(WASM_EXTRA_BASE_FEES))
+      .plus((WASM_DROPS_PER_BYTE * tx.Bytecode.length) / 2)
+  } else if (tx.TransactionType === 'EscrowFinish') {
+    // EscrowFinish Transaction with Fulfillment/Gas
+    if (tx.Fulfillment != null) {
+      const fulfillmentBytesSize: number = Math.ceil(tx.Fulfillment.length / 2)
+      // BaseFee × (33 + (Fulfillment size in bytes / 16))
+      baseFee = netFeeDrops.multipliedBy(
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers -- expected use of magic numbers
+        33 + fulfillmentBytesSize / 16,
+      )
+    }
+    if (tx.Gas != null) {
+      const gasPrice = await fetchGasPrice(client)
+      // rippled rounds down, then adds 1 drop
+      const extraFee: BigNumber = gasPrice
+        .multipliedBy(tx.Gas)
+        .dividedToIntegerBy(MICRO_DROPS_PER_DROP)
+        .plus(1)
+      baseFee = baseFee.plus(extraFee)
+    }
   } else if (tx.TransactionType === 'Batch') {
     const rawTxFees = await tx.RawTransactions.reduce(
       async (acc, rawTxn) => {
@@ -402,6 +433,8 @@ async function calculateFeePerTransactionType(
       Promise.resolve(new BigNumber(0)),
     )
     baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
+  } else if (isSpecialTxCost) {
+    baseFee = await fetchOwnerReserveFee(client)
   } else if (CONFIDENTIAL_MPT_TRANSACTION_TYPES.includes(tx.TransactionType)) {
     /*
      * Confidential MPT Transaction
@@ -410,7 +443,7 @@ async function calculateFeePerTransactionType(
      */
     baseFee = BigNumber.sum(
       baseFee,
-      scaleValue(netFeeDrops, CONFIDENTIAL_FEE_MULTIPLIER),
+      netFeeDrops.multipliedBy(CONFIDENTIAL_FEE_MULTIPLIER),
     )
   }
 
@@ -419,7 +452,7 @@ async function calculateFeePerTransactionType(
    * BaseFee × (1 + Number of Signatures Provided)
    */
   if (signersCount > 0) {
-    baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, signersCount))
+    baseFee = BigNumber.sum(baseFee, netFeeDrops.multipliedBy(signersCount))
   }
 
   // LoanSet transactions have additional fees based on the number of signers for the counterparty.
@@ -430,7 +463,7 @@ async function calculateFeePerTransactionType(
     )
     baseFee = BigNumber.sum(
       baseFee,
-      scaleValue(netFeeDrops, counterPartySignersCount),
+      netFeeDrops.multipliedBy(counterPartySignersCount),
     )
     // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
     console.warn(
@@ -480,17 +513,6 @@ export async function getTransactionFee(
   )
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
-}
-
-/**
- * Scales the given value by multiplying it with the provided multiplier.
- *
- * @param value - The value to be scaled.
- * @param multiplier - The multiplier to scale the value.
- * @returns The scaled value as a string.
- */
-function scaleValue(value, multiplier): string {
-  return new BigNumber(value).times(multiplier).toString()
 }
 
 /**
