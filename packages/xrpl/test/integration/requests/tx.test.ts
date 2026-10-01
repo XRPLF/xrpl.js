@@ -4,7 +4,6 @@ import {
   AccountSet,
   hashes,
   SubmitResponse,
-  TxRequest,
   TxResponse,
   TxV1Response,
 } from '../../../src'
@@ -29,7 +28,7 @@ describe('tx', function () {
   afterEach(async () => teardownClient(testContext))
 
   it(
-    'base',
+    'uses api_version 2 (default)',
     async () => {
       const account = testContext.wallet.classicAddress
       const accountSet: AccountSet = {
@@ -51,6 +50,14 @@ describe('tx', function () {
         transaction: hash,
       })
 
+      assert.isDefined(txResponse.result.tx_json)
+      // meta is undefined since not validated tx
+      assert.isUndefined(txResponse.result.meta)
+      // @ts-expect-error: tx_blob is only defined for binary responses
+      assert.isUndefined(txResponse.result.tx_blob)
+      // @ts-expect-error: meta_blob is only defined for binary responses
+      assert.isUndefined(txResponse.result.meta_blob)
+
       const expectedResponse: TxResponse = {
         api_version: 2,
         id: txResponse.id,
@@ -71,6 +78,22 @@ describe('tx', function () {
       }
 
       assert.deepEqual(txResponse, expectedResponse)
+
+      // test with binary response
+      const txBinaryResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: hash,
+        binary: true,
+      })
+      assert.isDefined(txBinaryResponse.result.tx_blob)
+      // meta_blob is undefined since not validated tx
+      assert.isUndefined(txBinaryResponse.result.meta_blob)
+      // @ts-expect-error: tx is not defined for binary responses V2
+      assert.isUndefined(txBinaryResponse.result.tx)
+      // @ts-expect-error: tx_json is not defined for binary responses
+      assert.isUndefined(txBinaryResponse.result.tx_json)
+      // @ts-expect-error: meta is not defined for binary responses
+      assert.isUndefined(txBinaryResponse.result.meta)
     },
     TIMEOUT,
   )
@@ -93,11 +116,18 @@ describe('tx', function () {
       )
 
       const hash = hashSignedTx(response.result.tx_blob)
-      const txV1Response = await testContext.client.request<TxRequest, 1>({
+      const txV1Response = await testContext.client.request({
         command: 'tx',
         transaction: hash,
         api_version: 1,
       })
+
+      // meta is undefined since not validated tx
+      assert.isUndefined(txV1Response.result.meta)
+      // @ts-expect-error: tx_json is not defined for api_version 1 responses
+      assert.isUndefined(txV1Response.result.tx_json)
+      // @ts-expect-error: meta_blob is only defined for binary responses
+      assert.isUndefined(txV1Response.result.meta_blob)
 
       const expectedResponse: TxV1Response = {
         api_version: 1,
@@ -117,6 +147,23 @@ describe('tx', function () {
       }
 
       assert.deepEqual(txV1Response, expectedResponse)
+
+      // test with binary response
+      const txBinaryResponse = await testContext.client.request({
+        command: 'tx',
+        transaction: hash,
+        api_version: 1,
+        binary: true,
+      })
+      assert.isDefined(txBinaryResponse.result.tx)
+      // meta is undefined since not validated tx
+      assert.isUndefined(txBinaryResponse.result.meta)
+      // @ts-expect-error: tx_json is not defined for binary responses
+      assert.isUndefined(txBinaryResponse.result.tx_json)
+      // @ts-expect-error: tx_blob is not defined for binary responses V1
+      assert.isUndefined(txBinaryResponse.result.tx_blob)
+      // @ts-expect-error: meta_blob is not defined for binary responses V1
+      assert.isUndefined(txBinaryResponse.result.meta_blob)
     },
     TIMEOUT,
   )
