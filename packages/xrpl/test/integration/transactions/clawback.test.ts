@@ -10,7 +10,6 @@ import {
   MPTokenIssuanceCreateFlags,
   MPTokenAuthorize,
   TransactionMetadata,
-  LedgerEntryResponse,
 } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
@@ -162,17 +161,15 @@ describe('Clawback', function () {
 
       await testTransaction(testContext.client, paymentTx, testContext.wallet)
 
-      let ledgerEntryResponse: LedgerEntryResponse =
-        await testContext.client.request({
-          command: 'ledger_entry',
-          mptoken: {
-            mpt_issuance_id: mptID!,
-            account: wallet2.classicAddress,
-          },
-        })
+      let ledgerEntryResponse = await testContext.client.request({
+        command: 'ledger_entry',
+        mptoken: {
+          mpt_issuance_id: mptID!,
+          account: wallet2.classicAddress,
+        },
+      })
 
       assert.equal(
-        // @ts-expect-error: Known issue with unknown object type
         ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775807',
       )
@@ -198,7 +195,6 @@ describe('Clawback', function () {
       })
 
       assert.equal(
-        // @ts-expect-error: Known issue with unknown object type
         ledgerEntryResponse.result.node.MPTAmount,
         '9223372036854775307',
       )
