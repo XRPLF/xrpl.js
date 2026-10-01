@@ -1,6 +1,6 @@
 {
   "name": "ripple-lib",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "license": "ISC",
   "description": "Deprecated - consider migrating to xrpl.js: https://xrpl.org/xrpljs2-migration-guide.html",
   "files": [
