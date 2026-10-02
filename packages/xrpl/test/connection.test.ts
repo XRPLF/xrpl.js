@@ -903,6 +903,125 @@ describe('Connection', function () {
     TIMEOUT,
   )
 
+  // Server messages whose `type` collides with a reserved internal event
+  // name (`connected`, `disconnected`, `error`, `reconnect`, `reconnecting`)
+  // must not be forwarded as that internal event. Otherwise a rogue server
+  // could spoof connection state. For `error` specifically, we also verify
+  // the raw spoofed payload object never reaches 'error' listeners — only
+  // the synthesized `('error', 'badMessage', ...)` emission is allowed.
+  it.each(['connected', 'disconnected', 'reconnect', 'reconnecting', 'error'])(
+    'drops server message with reserved internal event type "%s"',
+    async (reservedType) => {
+      const spoofedPayload = { type: reservedType, error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        // For non-'error' reserved events, a direct listener on that event
+        // must never fire from a server message. (We can't attach this for
+        // 'error' because the fix itself emits 'error' to surface badMessage.)
+        if (reservedType !== 'error') {
+          clientContext.client.connection.on(reservedType, () => {
+            reject(
+              new XrplError(
+                `Reserved internal event "${reservedType}" was emitted from a server message`,
+              ),
+            )
+          })
+        }
+
+        clientContext.client.connection.on(
+          'error',
+          (errorCodeOrPayload, errorMessage) => {
+            // The fix's emission: emit('error', 'badMessage', '<msg>', rawJson).
+            if (
+              errorCodeOrPayload === 'badMessage' &&
+              typeof errorMessage === 'string' &&
+              errorMessage.includes(reservedType)
+            ) {
+              resolve()
+              return
+            }
+            // If the raw spoofed payload object reaches 'error' listeners,
+            // the type:"error" spoof bug has regressed.
+            if (
+              errorCodeOrPayload != null &&
+              typeof errorCodeOrPayload === 'object' &&
+              (errorCodeOrPayload as { type?: unknown }).type === reservedType
+            ) {
+              reject(
+                new XrplError(
+                  'Spoofed server payload was forwarded to error listeners',
+                ),
+              )
+              return
+            }
+            // Any other 'error' emission is unexpected — fail fast instead of
+            // waiting for the test to time out.
+            reject(
+              new XrplError(
+                `Unexpected 'error' emission: ${JSON.stringify(errorCodeOrPayload)}`,
+              ),
+            )
+          },
+        )
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
+  // A non-string `type` must never be used as an event name. Arrays are the
+  // dangerous case: `{"type":["error"]}` fails the RESERVED_INTERNAL_EVENTS
+  // Set check (an array is never === a string) but coerces to the string
+  // "error" when passed to `emit`, which would otherwise re-open the spoofing
+  // hole the reserved-event guard closes. All non-string types are dropped and
+  // surfaced as `badMessage`.
+  it.each([
+    ['connected', ['connected']],
+    ['disconnected', ['disconnected']],
+    ['reconnect', [['reconnect']]],
+    ['reconnecting', ['reconnecting']],
+    ['error', ['error']],
+  ])(
+    'drops server message whose non-string type coerces to "%s"',
+    async (coercesTo, spoofedType) => {
+      const spoofedPayload = { type: spoofedType, error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        // Regression guard: the event the non-string type coerces to must never
+        // receive the raw server payload. Keying off the forwarded payload
+        // object (rather than the event merely firing) lets this same check
+        // cover the `error` case, where the event is also the channel the fix
+        // uses to report `badMessage`.
+        clientContext.client.connection.on(coercesTo, (forwarded) => {
+          if (forwarded != null && typeof forwarded === 'object') {
+            reject(
+              new XrplError(
+                `Non-string server type was forwarded as internal event "${coercesTo}"`,
+              ),
+            )
+          }
+        })
+
+        // Success: the message is dropped and surfaced as a badMessage error.
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await clientContext.client.disconnect()
   //   // fail on connection
