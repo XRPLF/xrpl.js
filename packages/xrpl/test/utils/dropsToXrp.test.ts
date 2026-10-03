@@ -1,77 +1,84 @@
 import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { dropsToXrp } from '../../src/utils'
+import { dropsToXrp, xrpToDrops } from '../../src/utils'
 
 describe('dropsToXrp', function () {
   it('works with a typical amount', function () {
     const xrp = dropsToXrp('2000000')
-    assert.strictEqual(xrp, 2, '2 million drops equals 2 XRP')
+    assert.isTrue(xrp.isEqualTo('2'), '2 million drops equals 2 XRP')
   })
 
   it('works with fractions', function () {
     let xrp = dropsToXrp('3456789')
-    assert.strictEqual(xrp, 3.456789, '3,456,789 drops equals 3.456789 XRP')
+    assert.isTrue(
+      xrp.isEqualTo('3.456789'),
+      '3,456,789 drops equals 3.456789 XRP',
+    )
 
     xrp = dropsToXrp('3400000')
-    assert.strictEqual(xrp, 3.4, '3,400,000 drops equals 3.4 XRP')
+    assert.isTrue(xrp.isEqualTo('3.4'), '3,400,000 drops equals 3.4 XRP')
 
     xrp = dropsToXrp('1')
-    assert.strictEqual(xrp, 0.000001, '1 drop equals 0.000001 XRP')
+    assert.isTrue(xrp.isEqualTo('0.000001'), '1 drop equals 0.000001 XRP')
 
     xrp = dropsToXrp('1.0')
-    assert.strictEqual(xrp, 0.000001, '1.0 drops equals 0.000001 XRP')
+    assert.isTrue(xrp.isEqualTo('0.000001'), '1.0 drops equals 0.000001 XRP')
 
     xrp = dropsToXrp('1.00')
-    assert.strictEqual(xrp, 0.000001, '1.00 drops equals 0.000001 XRP')
+    assert.isTrue(xrp.isEqualTo('0.000001'), '1.00 drops equals 0.000001 XRP')
   })
 
   it('works with zero', function () {
     let xrp = dropsToXrp('0')
-    assert.strictEqual(xrp, 0, '0 drops equals 0 XRP')
+    assert.isTrue(xrp.isZero(), '0 drops equals 0 XRP')
 
     // negative zero is equivalent to zero
     xrp = dropsToXrp('-0')
-    assert.strictEqual(xrp, 0, '-0 drops equals 0 XRP')
+    assert.isTrue(xrp.isZero(), '-0 drops equals 0 XRP')
 
     xrp = dropsToXrp('0.00')
-    assert.strictEqual(xrp, 0, '0.00 drops equals 0 XRP')
+    assert.isTrue(xrp.isZero(), '0.00 drops equals 0 XRP')
 
     xrp = dropsToXrp('000000000')
-    assert.strictEqual(xrp, 0, '000000000 drops equals 0 XRP')
+    assert.isTrue(xrp.isZero(), '000000000 drops equals 0 XRP')
   })
 
   it('works with a negative value', function () {
     const xrp = dropsToXrp('-2000000')
-    assert.strictEqual(xrp, -2, '-2 million drops equals -2 XRP')
+    assert.isTrue(xrp.isEqualTo('-2'), '-2 million drops equals -2 XRP')
   })
 
   it('works with a value ending with a decimal point', function () {
     let xrp = dropsToXrp('2000000.')
-    assert.strictEqual(xrp, 2, '2000000. drops equals 2 XRP')
+    assert.isTrue(xrp.isEqualTo('2'), '2000000. drops equals 2 XRP')
 
     xrp = dropsToXrp('-2000000.')
-    assert.strictEqual(xrp, -2, '-2000000. drops equals -2 XRP')
+    assert.isTrue(xrp.isEqualTo('-2'), '-2000000. drops equals -2 XRP')
   })
 
   it('works with BigNumber objects', function () {
     let xrp = dropsToXrp(new BigNumber(2000000))
-    assert.strictEqual(xrp, 2, '(BigNumber) 2 million drops equals 2 XRP')
+    assert.isTrue(
+      xrp.isEqualTo('2'),
+      '(BigNumber) 2 million drops equals 2 XRP',
+    )
 
     xrp = dropsToXrp(new BigNumber(-2000000))
-    assert.strictEqual(xrp, -2, '(BigNumber) -2 million drops equals -2 XRP')
+    assert.isTrue(
+      xrp.isEqualTo('-2'),
+      '(BigNumber) -2 million drops equals -2 XRP',
+    )
 
     xrp = dropsToXrp(new BigNumber(2345678))
-    assert.strictEqual(
-      xrp,
-      2.345678,
+    assert.isTrue(
+      xrp.isEqualTo('2.345678'),
       '(BigNumber) 2,345,678 drops equals 2.345678 XRP',
     )
 
     xrp = dropsToXrp(new BigNumber(-2345678))
-    assert.strictEqual(
-      xrp,
-      -2.345678,
+    assert.isTrue(
+      xrp.isEqualTo('-2.345678'),
       '(BigNumber) -2,345,678 drops equals -2.345678 XRP',
     )
   })
@@ -79,16 +86,18 @@ describe('dropsToXrp', function () {
   it('works with a number', function () {
     // This is not recommended. Use strings or BigNumber objects to avoid precision errors.
     let xrp = dropsToXrp(2000000)
-    assert.strictEqual(xrp, 2, '(number) 2 million drops equals 2 XRP')
+    assert.isTrue(xrp.isEqualTo('2'), '(number) 2 million drops equals 2 XRP')
     xrp = dropsToXrp(-2000000)
-    assert.strictEqual(xrp, -2, '(number) -2 million drops equals -2 XRP')
+    assert.isTrue(
+      xrp.isEqualTo('-2'),
+      '(number) -2 million drops equals -2 XRP',
+    )
   })
 
   it('works with scientific notation', function () {
     const xrp = dropsToXrp('1e6')
-    assert.strictEqual(
-      xrp,
-      1,
+    assert.isTrue(
+      xrp.isEqualTo('1'),
       '(scientific notation string) 1e6 drops equals 1 XRP',
     )
   })
@@ -129,5 +138,20 @@ describe('dropsToXrp', function () {
     assert.throws(() => {
       dropsToXrp('...')
     }, /dropsToXrp: invalid value '\.\.\.'/u)
+  })
+
+  // Regression test for xrpl.js#3316: dropsToXrp previously returned a JS
+  // number, which silently lost precision for amounts approaching the XRP
+  // supply (~10^17 drops). The round-trip xrpToDrops(dropsToXrp(d)) should
+  // return exactly `d` for every valid drops amount.
+  it('round-trips large amounts without precision loss (issue #3316)', function () {
+    const drops = '9999999999999999'
+    const xrp = dropsToXrp(drops)
+    assert.isTrue(
+      xrp.isEqualTo('9999999999.999999'),
+      'large drops amounts are converted without losing the trailing drop',
+    )
+    const roundTripped = xrpToDrops(xrp)
+    assert.strictEqual(roundTripped, drops)
   })
 })
