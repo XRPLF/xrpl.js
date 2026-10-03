@@ -17,6 +17,7 @@ const ledgerSpaces = {
   offer: 'o',
   // Directory of things owned by an account.
   ownerDir: 'O',
+  oracle: 'R',
   // Directory of order books.
   bookDir: 'B',
   contract: 'c',
