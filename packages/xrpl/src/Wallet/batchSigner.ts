@@ -4,6 +4,7 @@ import { sign } from 'ripple-keypairs'
 import { ValidationError } from '../errors'
 import { Batch, Transaction, validate } from '../models'
 import { BatchSigner, validateBatch } from '../models/transactions/batch'
+import { areAddressesEqual } from '../models/transactions/common'
 import { hashSignedTx } from '../utils/hashes'
 
 import { compareSigners, getDecodedTransaction } from './utils'
@@ -95,8 +96,8 @@ export function signMultiBatch(
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
   validate(transaction as unknown as Record<string, unknown>)
 
-  // An account must sign the Batch if it authorizes an inner transaction or is
-  // the `Counterparty` of one.
+  // An account must sign the Batch if it authorizes an inner transaction, is
+  // the `Counterparty` of one, or is the Sponsor of a co-signed one.
   const involvedAccounts = new Set<string>()
   transaction.RawTransactions.forEach((raw) => {
     // A delegated inner transaction is authorized by the delegate, not the
@@ -109,6 +110,21 @@ export function signMultiBatch(
       .Counterparty
     if (typeof counterparty === 'string') {
       involvedAccounts.add(counterparty)
+    }
+    /*
+     * A sponsored inner transaction carries an empty placeholder
+     * SponsorSignature; the sponsor authorizes it with a BatchSigners entry on
+     * the outer Batch, so it is a required signer. A pre-funded sponsorship
+     * (no SponsorSignature) needs no signature, and the outer account signs the
+     * Batch itself -- a BatchSigners entry for it is temBAD_SIGNER.
+     */
+    const sponsor = raw.RawTransaction.Sponsor
+    if (
+      sponsor != null &&
+      raw.RawTransaction.SponsorSignature != null &&
+      !areAddressesEqual(sponsor, transaction.Account)
+    ) {
+      involvedAccounts.add(sponsor)
     }
   })
   if (!involvedAccounts.has(batchAccount)) {
