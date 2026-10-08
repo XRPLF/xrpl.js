@@ -100,7 +100,7 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The number of seconds after the Payment Due Date that the Loan can be Defaulted.
    */
-  GracePeriod: number
+  GracePeriod?: number
 
   /**
    * The timestamp of when the previous payment was made in Ripple Epoch.
@@ -110,22 +110,22 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The timestamp of when the next payment is due in Ripple Epoch.
    */
-  NextPaymentDueDate: number
+  NextPaymentDueDate?: number
 
   /**
    * The number of payments remaining on the Loan.
    */
-  PaymentRemaining: number
+  PaymentRemaining?: number
 
   /**
    * The total outstanding value of the Loan, including all fees and interest.
    */
-  TotalValueOutstanding: XRPLNumber
+  TotalValueOutstanding?: XRPLNumber
 
   /**
    * The principal amount requested by the Borrower.
    */
-  PrincipalOutstanding: XRPLNumber
+  PrincipalOutstanding?: XRPLNumber
 
   /**
    * The remaining Management Fee owed to the LoanBroker.
