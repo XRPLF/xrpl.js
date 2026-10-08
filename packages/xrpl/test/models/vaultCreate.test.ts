@@ -105,6 +105,20 @@ describe('VaultCreate', function () {
     assertInvalid(tx, 'VaultCreate: invalid field WithdrawalPolicy')
   })
 
+  it('throws w/ an unsupported numeric WithdrawalPolicy', function () {
+    tx.WithdrawalPolicy = 2
+    assertInvalid(
+      tx,
+      'VaultCreate: WithdrawalPolicy must be 1 (first come, first served)',
+    )
+
+    tx.WithdrawalPolicy = 0
+    assertInvalid(
+      tx,
+      'VaultCreate: WithdrawalPolicy must be 1 (first come, first served)',
+    )
+  })
+
   it('allows DomainID when tfVaultPrivate flag set', function () {
     tx.DomainID = 'ABCDEF1234567890'
     tx.Flags = VaultCreateFlags.tfVaultPrivate

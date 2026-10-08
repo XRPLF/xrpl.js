@@ -12,6 +12,7 @@ import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
 import { GlobalFlags } from '../models/transactions/common'
 import { hasFlag } from '../models/utils'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -412,6 +413,10 @@ export class Wallet {
     }
 
     const txToSignAndEncode = { ...tx }
+    // Flags given as an object (e.g. { tfPartialPayment: true }) must be encoded as a number
+    if (typeof txToSignAndEncode.Flags === 'object') {
+      txToSignAndEncode.Flags = convertTxFlagsToNumber(tx)
+    }
 
     if (multisignAddress) {
       txToSignAndEncode.SigningPubKey = ''

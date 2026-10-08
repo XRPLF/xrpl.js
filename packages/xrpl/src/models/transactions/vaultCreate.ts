@@ -182,6 +182,16 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   }
 
   if (
+    tx.WithdrawalPolicy !== undefined &&
+    tx.WithdrawalPolicy !==
+      VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe
+  ) {
+    throw new ValidationError(
+      `VaultCreate: WithdrawalPolicy must be ${VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe} (first come, first served)`,
+    )
+  }
+
+  if (
     tx.SubscriptionDate !== undefined &&
     !Number.isInteger(tx.SubscriptionDate)
   ) {
