@@ -3,6 +3,7 @@ import { assert } from 'chai'
 import { AMMVote } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
+import { AMM } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,
@@ -83,5 +84,35 @@ describe('AMMVote', function () {
     assert.equal(afterTradingFee, expectedTradingFee)
     assert.equal(afterDiscountedFee, expectedDiscountedFee)
     assert.equal(vote_slots.length - preVoteSlots.length, 1)
+  })
+
+  it('omits the DEFAULT fee fields once every vote is 0', async function () {
+    const { asset, asset2, lpWallet, testWallet } = ammPool
+
+    for (const wallet of [lpWallet, testWallet]) {
+      const ammVoteTx: AMMVote = {
+        TransactionType: 'AMMVote',
+        Account: wallet.classicAddress,
+        Asset: asset,
+        Asset2: asset2,
+        TradingFee: 0,
+      }
+      // eslint-disable-next-line no-await-in-loop -- votes are submitted in order
+      await testTransaction(testContext.client, ammVoteTx, wallet)
+    }
+
+    const amm = (
+      await testContext.client.request({
+        command: 'ledger_entry',
+        amm: { asset, asset2 },
+      })
+    ).result.node as AMM
+
+    assert.isUndefined(amm.TradingFee)
+    assert.isUndefined(amm.AuctionSlot?.DiscountedFee)
+    assert.isNotEmpty(amm.VoteSlots)
+    amm.VoteSlots?.forEach((voteSlot) => {
+      assert.isUndefined(voteSlot.VoteEntry.TradingFee)
+    })
   })
 })
