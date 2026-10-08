@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`. Batch inner LoanSets are not affected.
 
 ## 5.3.0 (2026-09-16)
 
