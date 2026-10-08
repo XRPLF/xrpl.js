@@ -2,8 +2,11 @@ import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
 import {
+  LoanSet,
+  LoanSetFlags,
   NFTokenMint,
   Payment,
+  PaymentFlags,
   Transaction,
   walletFromSecretNumbers,
 } from '../../src'
@@ -849,6 +852,41 @@ describe('Wallet', function () {
         `Flags = ${JSON.stringify(decoded.Flags)}, should be undefined`,
       )
       assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds when given flags as an object', async function () {
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '20000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfPartialPayment: true },
+      }
+      const loanSet: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        LoanBrokerID:
+          '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+        PrincipalRequested: '5000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfLoanOverpayment: true },
+      }
+
+      assert.strictEqual(
+        decode(wallet.sign(payment).tx_blob).Flags,
+        PaymentFlags.tfPartialPayment,
+      )
+      assert.strictEqual(
+        decode(wallet.sign(loanSet).tx_blob).Flags,
+        LoanSetFlags.tfLoanOverpayment,
+      )
+      assert.deepEqual(
+        wallet.sign(payment),
+        wallet.sign({ ...payment, Flags: PaymentFlags.tfPartialPayment }),
+      )
     })
 
     it('sign succeeds with source.amount/destination.minAmount', async function () {
