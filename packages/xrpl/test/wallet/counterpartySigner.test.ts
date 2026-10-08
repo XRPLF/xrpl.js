@@ -1,8 +1,14 @@
 // Add one test for single signing and one test for multi-signing
 
 import { assert } from 'chai'
+import {
+  decode,
+  encodeForMultisigningCounterparty,
+  encodeForSigningCounterparty,
+} from 'ripple-binary-codec'
+import { verify } from 'ripple-keypairs'
 
-import { LoanSet, Wallet } from '../../src'
+import { LoanSet, multisign, Wallet } from '../../src'
 import {
   combineLoanSetCounterpartySigners,
   signLoanSetByCounterparty,
@@ -167,5 +173,118 @@ describe('counterpartySigner', function () {
     ])
 
     assert.deepEqual(combinedSignedTx, expectedLoanSet as LoanSet)
+  })
+
+  describe('with a multisigned Account', function () {
+    const accountSigner1 = Wallet.fromSeed('sEdT2fq1MdpXJdosNRZ1tuHk4qU3V2m')
+    const accountSigner2 = Wallet.fromSeed('sEdVYtgZDoV2YX48M2tUf8WHknNmuYK')
+    const borrowerWallet = Wallet.fromSeed('sEd7FqVHfNZ2UdGAwjssxPev2ujwJoT')
+    const borrowerSigner1 = Wallet.fromSeed('sEdSyBUScyy9msTU36wdR68XkskQky5')
+    const borrowerSigner2 = Wallet.fromSeed('sEdT8LubWzQv3VAx1JQqctv78N28zLA')
+
+    const unsignedLoanSet: LoanSet = {
+      TransactionType: 'LoanSet',
+      Flags: 0,
+      Sequence: 1702,
+      LastLedgerSequence: 1725,
+      PaymentTotal: 1,
+      LoanBrokerID:
+        '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+      Fee: '480',
+      Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+      Counterparty: borrowerWallet.address,
+      PrincipalRequested: '5000000',
+    }
+    const multisignedLoanSet = multisign([
+      accountSigner1.sign(unsignedLoanSet, true).tx_blob,
+      accountSigner2.sign(unsignedLoanSet, true).tx_blob,
+    ])
+    const accountSigners = (decode(multisignedLoanSet) as unknown as LoanSet)
+      .Signers
+
+    it('single sign', function () {
+      const { tx } = signLoanSetByCounterparty(
+        borrowerWallet,
+        multisignedLoanSet,
+      )
+
+      assert.equal(tx.SigningPubKey, '')
+      assert.deepEqual(tx.Signers, accountSigners)
+      assert.equal(
+        tx.CounterpartySignature?.SigningPubKey,
+        borrowerWallet.publicKey,
+      )
+      assert.isTrue(
+        verify(
+          encodeForSigningCounterparty(tx),
+          tx.CounterpartySignature?.TxnSignature ?? '',
+          borrowerWallet.publicKey,
+        ),
+      )
+    })
+
+    it('multi sign', function () {
+      const { tx: signer1SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+      const { tx: signer2SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner2,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+
+      const { tx } = combineLoanSetCounterpartySigners([
+        signer1SignedTx,
+        signer2SignedTx,
+      ])
+
+      assert.equal(tx.SigningPubKey, '')
+      assert.deepEqual(tx.Signers, accountSigners)
+      const counterpartySigners = tx.CounterpartySignature?.Signers ?? []
+      assert.lengthOf(counterpartySigners, 2)
+      counterpartySigners.forEach(({ Signer: signer }) => {
+        assert.isTrue(
+          verify(
+            encodeForMultisigningCounterparty(tx, signer.Account),
+            signer.TxnSignature,
+            signer.SigningPubKey,
+          ),
+        )
+      })
+    })
+
+    it('throws if the Account has not signed', function () {
+      assert.throws(() => {
+        signLoanSetByCounterparty(borrowerWallet, {
+          ...unsignedLoanSet,
+          SigningPubKey: '',
+        })
+      }, 'Transaction must be first signed by first party.')
+
+      assert.throws(() => {
+        signLoanSetByCounterparty(borrowerWallet, {
+          ...unsignedLoanSet,
+          SigningPubKey: '',
+          Signers: [],
+        })
+      }, 'Transaction must be first signed by first party.')
+
+      const { tx: counterpartySignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+      assert.throws(() => {
+        combineLoanSetCounterpartySigners([
+          {
+            ...counterpartySignedTx,
+            SigningPubKey: undefined,
+            Signers: undefined,
+          },
+        ])
+      }, 'Transaction must be first signed by first party.')
+    })
   })
 })
