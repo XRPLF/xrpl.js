@@ -43,6 +43,11 @@ export enum PaymentFlags {
    * details.
    */
   tfLimitQuality = 0x00040000,
+  /**
+   * Indicates that the payment is creating a new account and the account's
+   * reserve is being sponsored. Used in conjunction with XLS-68 sponsorship.
+   */
+  tfSponsorCreatedAccount = 0x00080000,
 }
 
 /**
@@ -105,6 +110,11 @@ export interface PaymentFlagsInterface extends GlobalFlagsInterface {
    * details.
    */
   tfLimitQuality?: boolean
+  /**
+   * Indicates that the payment is creating a new account and the account's
+   * reserve is being sponsored. Used in conjunction with XLS-68 sponsorship.
+   */
+  tfSponsorCreatedAccount?: boolean
 }
 
 /**
@@ -226,6 +236,59 @@ export function validatePayment(tx: Record<string, unknown>): void {
   }
 
   checkPartialPayment(tx)
+  checkSponsorCreatedAccount(tx)
+}
+
+/**
+ * tfSponsorCreatedAccount marks a Payment that funds a new account whose reserve is
+ * sponsored. rippled rejects it combined with tfNoRippleDirect/tfPartialPayment/
+ * tfLimitQuality, with SendMax or Paths, or with a non-XRP Amount.
+ *
+ * @param tx - A Payment Transaction.
+ * @throws When tfSponsorCreatedAccount is combined with an incompatible field or flag.
+ */
+function checkSponsorCreatedAccount(tx: Record<string, unknown>): void {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Only used by JS
+  const flags = (tx.Flags ?? 0) as number | PaymentFlagsInterface
+  const isTfSponsorCreatedAccount =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, PaymentFlags.tfSponsorCreatedAccount)
+      : (flags.tfSponsorCreatedAccount ?? false)
+
+  if (!isTfSponsorCreatedAccount) {
+    return
+  }
+
+  const isTfNoRippleDirect =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, PaymentFlags.tfNoRippleDirect)
+      : (flags.tfNoRippleDirect ?? false)
+  const isTfPartialPayment =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, PaymentFlags.tfPartialPayment)
+      : (flags.tfPartialPayment ?? false)
+  const isTfLimitQuality =
+    typeof flags === 'number'
+      ? isFlagEnabled(flags, PaymentFlags.tfLimitQuality)
+      : (flags.tfLimitQuality ?? false)
+
+  if (isTfNoRippleDirect || isTfPartialPayment || isTfLimitQuality) {
+    throw new ValidationError(
+      'PaymentTransaction: tfSponsorCreatedAccount cannot be combined with tfNoRippleDirect, tfPartialPayment, or tfLimitQuality',
+    )
+  }
+
+  if (tx.SendMax !== undefined || tx.Paths !== undefined) {
+    throw new ValidationError(
+      'PaymentTransaction: tfSponsorCreatedAccount cannot be combined with SendMax or Paths',
+    )
+  }
+
+  if (typeof tx.Amount !== 'string') {
+    throw new ValidationError(
+      'PaymentTransaction: tfSponsorCreatedAccount requires a native XRP Amount',
+    )
+  }
 }
 
 function checkPartialPayment(tx: Record<string, unknown>): void {

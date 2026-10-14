@@ -67,7 +67,7 @@ npm install
 docker run \
   --detach \
   --publish 6006:6006 \
-  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --volume "$PWD/.ci-config:/etc/xrpld/" \
   --name xrpld-service \
   rippleci/xrpld:develop --standalone
 npm run build
@@ -77,10 +77,14 @@ npm run test:integration
 Breaking down the command:
 * `--detach` runs the container in the background so the terminal stays free.
 * `--publish 6006:6006` exposes the admin WebSocket port on the host.
-* `--volume "$PWD/.ci-config:/etc/opt/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
+* `--volume "$PWD/.ci-config:/etc/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
 * `--name xrpld-service` names the container — this is the label shown by `docker ps` / `docker stats`.
 * `rippleci/xrpld:develop` is the image, regularly rebuilt from the `develop` branch of `rippled`. Omitting the tag resolves to `:latest`.
 * `--standalone` is passed to the image's entrypoint (`xrpld`) to start the node in standalone mode.
+
+Maintainers can run integration and browser tests against a private xrpld image by committing a version to `.github/xrpld-image.env`. Set `XRPLD_PRIVATE_VERSION` to the version without the `private-` prefix (for example, `XRPLD_PRIVATE_VERSION=3.3.0-rc2`); every workflow run triggered afterwards — including pull request runs — pulls `registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private:private-<version>`. Leave the value empty to use the default public image `rippleci/xrpld:develop`.
+
+Private image access requires the repository variable `GITLAB_REGISTRY_USERNAME` and repository secret `GITLAB_REGISTRY_TOKEN`, configured with a GitLab deploy token that has `read_registry` access. These credentials are not exposed to fork pull requests, so a private version must be tested from a branch in this repository; a fork pull request with a private version set will fail fast rather than silently fall back.
 
 Note to Contributors: When you're done, stop and remove the container with `docker stop xrpld-service && docker rm xrpld-service`.
 
@@ -115,7 +119,7 @@ npm run build
 docker run \
   --detach \
   --publish 6006:6006 \
-  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --volume "$PWD/.ci-config:/etc/xrpld/" \
   --name xrpld-service \
   rippleci/xrpld:develop --standalone
 npm run test:browser
@@ -177,11 +181,10 @@ This updates `docs/` at the top level, where GitHub Pages looks for the docs.
 
 ## Updating `definitions.json`
 
-This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js) - if the output needs manual intervention afterwards, consider updating the script instead.
+> **Note:** The previous workflow that generated definitions from rippled source files is deprecated. The generation script is being updated to use the `server_definitions` WebSocket command against a running rippled node instead. Until that work is complete, update definitions.json manually:
 
-1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
-2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
-3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
+1. Start a rippled node from the develop branch.
+2. Send the `server_definitions` command via WebSocket and copy the response `result` into `packages/ripple-binary-codec/src/enums/definitions.json`.
 
 ## Adding and removing packages
 

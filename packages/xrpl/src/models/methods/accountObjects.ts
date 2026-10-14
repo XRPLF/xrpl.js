@@ -30,6 +30,12 @@ export interface AccountObjectsRequest
    */
   deletion_blockers_only?: boolean
   /**
+   * (Optional) Filter results based on sponsorship status. If true, returns only
+   * sponsored objects. If false, returns only non-sponsored objects. If omitted,
+   * returns all objects regardless of sponsorship status.
+   */
+  sponsored?: boolean
+  /**
    * The maximum number of objects to include in the results. Must be within
    * the inclusive range 10 to 400 on non-admin connections. The default is 200.
    */

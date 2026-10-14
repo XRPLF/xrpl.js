@@ -1,6 +1,6 @@
 {
   "name": "@xrplf/isomorphic",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A collection of isomorphic and tree-shakeable crypto hashes and utils for xrpl.js",
   "keywords": [
     "crypto",
@@ -28,9 +28,9 @@
     "test": "test"
   },
   "dependencies": {
-    "@noble/hashes": "^2.0.1",
-    "eventemitter3": "5.0.1",
-    "ws": "^8.20.0"
+    "@noble/hashes": "^2.2.0",
+    "eventemitter3": "5.0.4",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/node": "^18.18.38",

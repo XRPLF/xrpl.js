@@ -6,7 +6,8 @@
     "packages/ripple-keypairs",
     "packages/ripple-address-codec",
     "packages/isomorphic",
-    "packages/secret-numbers"
+    "packages/secret-numbers",
+    "packages/mpt-crypto"
   ],
   "npmClient": "npm",
   "$schema": "node_modules/lerna/schemas/lerna-schema.json"

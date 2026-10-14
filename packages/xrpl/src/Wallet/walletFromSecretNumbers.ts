@@ -6,14 +6,16 @@ import { Wallet } from '.'
 
 /**
  * Derives a wallet from secret numbers.
- * NOTE: This uses a default encoding algorithm of secp256k1 to match the popular wallet
- * [Xumm (aka Xaman)](https://xumm.app/)'s behavior.
- * This may be different from the DEFAULT_ALGORITHM for other ways to generate a Wallet.
+ * NOTE: This uses a default algorithm of secp256k1 to match the popular wallet
+ * [Xumm (aka Xaman)](https://xumm.app/)'s behavior. Other Wallet factories such
+ * as `Wallet.fromSeed` infer the algorithm from the seed prefix instead, so the
+ * default here intentionally differs from those.
  *
  * @param secretNumbers - A string consisting of 8 times 6 numbers (whitespace delimited) used to derive a wallet.
  * @param opts - (Optional) Options to derive a Wallet.
  * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
- * @param opts.algorithm - The digital signature algorithm to generate an address for.
+ * @param opts.algorithm - The digital signature algorithm to generate an address for. Defaults to
+ *                         `ECDSA.secp256k1` to remain compatible with Xaman-issued secret numbers.
  * @returns A Wallet derived from secret numbers.
  * @throws ValidationError if unable to derive private key from secret number input.
  */

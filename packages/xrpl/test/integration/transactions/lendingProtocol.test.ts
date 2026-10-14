@@ -25,11 +25,13 @@ import {
   type MPTAmount,
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
+  VaultKind,
 } from '../../../src'
 import {
   LoanFlags,
   type Loan,
   type LoanBroker,
+  type Vault,
 } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
@@ -39,7 +41,12 @@ import {
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  generateFundedWallet,
+  getLedgerCloseTime,
+  testTransaction,
+  waitForAndForceProgressLedgerTime,
+} from '../utils'
 
 interface VaultObject {
   mptIssuanceId: string
@@ -71,7 +78,15 @@ describe('Lending Protocol IT', () => {
       const loanBrokerWallet = vaultOwnerWallet
 
       // ========== STEP 1: Create Vault ==========
-      // The vault is the pool of funds that the loan broker will lend from
+      // The vault is the pool of funds that the loan broker will lend from.
+      // Under LendingProtocolV1_1 a LoanBroker can only be attached to a
+      // close-ended vault, which requires both a SubscriptionDate and a
+      // RedemptionDate. These are ledger close times, so derive them from the
+      // latest validated ledger (the standalone clock is not in sync with the
+      // local system clock).
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const redemptionDate = subscriptionDate + 86400
       const vaultCreateTx: VaultCreate = {
         TransactionType: 'VaultCreate',
         Asset: {
@@ -79,6 +94,9 @@ describe('Lending Protocol IT', () => {
         },
         Account: vaultOwnerWallet.address,
         AssetsMaximum: '1e17',
+        VaultKind: VaultKind.vaultKindClosed,
+        SubscriptionDate: subscriptionDate,
+        RedemptionDate: redemptionDate,
       }
 
       const vaultCreateResp = await testTransaction(
@@ -139,7 +157,44 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
+      // ========== Verify pseudo-account AccountRoot designators ==========
+      // The Vault and LoanBroker each own a pseudo-account whose AccountRoot
+      // carries a back-pointer to the owning object (VaultID / LoanBrokerID).
+      const vaultLedgerEntry = await testContext.client.request({
+        command: 'ledger_entry',
+        index: vaultObjectId,
+      })
+      const vaultPseudoAccount = (vaultLedgerEntry.result.node as Vault).Account
+
+      const vaultPseudoAccountInfo = await testContext.client.request({
+        command: 'account_info',
+        account: vaultPseudoAccount,
+      })
+      assert.equal(
+        vaultPseudoAccountInfo.result.account_data.VaultID,
+        vaultObjectId,
+        "Vault pseudo-account's AccountRoot should carry VaultID",
+      )
+
+      const loanBrokerPseudoAccountInfo = await testContext.client.request({
+        command: 'account_info',
+        account: loanBrokerObject.Account,
+      })
+      assert.equal(
+        loanBrokerPseudoAccountInfo.result.account_data.LoanBrokerID,
+        loanBrokerObjectId,
+        "LoanBroker pseudo-account's AccountRoot should carry LoanBrokerID",
+      )
+
       // ========== STEP 4: Create Loan ==========
+      // Advance the ledger into the vault's Investment phase before creating the
+      // loan. LendingProtocolV1_1 only accepts a LoanSet while the close-ended
+      // vault is in its Investment phase (subscriptionDate < closeTime < redemptionDate).
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
+
       // The loan broker initiates a loan for the borrower
       // This requires dual signatures: broker and borrower
       let loanSetTx: LoanSet = {
@@ -292,11 +347,19 @@ describe('Lending Protocol IT', () => {
       // The Vault Owner and Loan Broker must be on the same account.
       const loanBrokerWallet = vaultOwnerWallet
 
-      // Create a vault
+      // Create a close-ended vault. The SubscriptionDate / RedemptionDate are
+      // ledger close times, so derive them from the latest validated ledger
+      // (the standalone clock is not in sync with the local system clock).
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const redemptionDate = subscriptionDate + 86400
+
       const vaultObj: VaultObject = await createSingleAssetVault(
         testContext,
         vaultOwnerWallet,
         mptIssuerWallet,
+        subscriptionDate,
+        redemptionDate,
       )
 
       // Depositor Authorizes to hold MPT
@@ -393,6 +456,14 @@ describe('Lending Protocol IT', () => {
       // Assert LoanBroker object exists in objects tracked by Lender.
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
+
+      // Advance the ledger into the vault's Investment phase before creating the
+      // loan. LendingProtocolV1_1 only accepts a LoanSet while the close-ended
+      // vault is in its Investment phase (subscriptionDate < closeTime < redemptionDate).
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
 
       // Create a Loan object
       let loanSetTx: LoanSet = {
@@ -531,6 +602,19 @@ describe('Lending Protocol IT', () => {
         ).toString(),
       )
 
+      // Advance the ledger past the loan's first payment due date so the loan
+      // becomes overdue. Under fixCleanup3_4_0 a loan can only be impaired once a
+      // payment is late (parentCloseTime > NextPaymentDueDate), and the
+      // late-payment LoanPay below requires the same; otherwise LoanManage and
+      // LoanPay return tecTOO_SOON. Overshoot the due date by a comfortable
+      // margin so the effective (close-time-resolution-rounded) parentCloseTime
+      // is safely past it.
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        loanObject.NextPaymentDueDate + 200,
+        400,
+      )
+
       // Test LoanManage - Mark loan as impaired
       const loanManageTx: LoanManage = {
         TransactionType: 'LoanManage',
@@ -551,7 +635,9 @@ describe('Lending Protocol IT', () => {
       ) as Loan
       assert.equal(loanObject.Flags, LoanFlags.lsfLoanImpaired)
 
-      // Test LoanPay
+      // Test LoanPay. The loan is now overdue, so the payment must set the
+      // late-payment flag; a normal LoanPay on an overdue loan returns
+      // tecEXPIRED under fixCleanup3_4_0.
       const loanPayTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -559,6 +645,9 @@ describe('Lending Protocol IT', () => {
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '100000',
+        },
+        Flags: {
+          tfLoanLatePayment: true,
         },
       }
       await testTransaction(testContext.client, loanPayTx, borrowerWallet)
@@ -642,19 +731,28 @@ describe('Lending Protocol IT', () => {
   )
 })
 
+// eslint-disable-next-line max-params -- close-ended vault dates are required
 async function createSingleAssetVault(
   testContext: XrplIntegrationTestContext,
   vaultOwnerWallet: Wallet,
   mptIssuerWallet: Wallet,
+  subscriptionDate: number,
+  redemptionDate: number,
 ): Promise<VaultObject> {
   const mptIssuanceId = await createMPToken(testContext, mptIssuerWallet)
 
+  // Under LendingProtocolV1_1 a LoanBroker can only be attached to a
+  // close-ended vault, so create the vault with a SubscriptionDate and
+  // RedemptionDate.
   const vaultCreateTx: VaultCreate = {
     TransactionType: 'VaultCreate',
     Asset: {
       mpt_issuance_id: mptIssuanceId,
     },
     Account: vaultOwnerWallet.address,
+    VaultKind: VaultKind.vaultKindClosed,
+    SubscriptionDate: subscriptionDate,
+    RedemptionDate: redemptionDate,
   }
 
   const vaultCreateResp = await testTransaction(
