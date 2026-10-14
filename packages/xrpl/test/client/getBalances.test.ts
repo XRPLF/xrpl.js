@@ -1,3 +1,6 @@
+import { assert } from 'chai'
+import cloneDeep from 'lodash/cloneDeep'
+
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import rippledAccountLines from '../fixtures/rippled/accountLines'
@@ -35,6 +38,22 @@ describe('client.getBalances', function () {
         testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const result = await testContext.client.getBalances(testcase.address)
         assertResultMatch(result, responses.getBalances, 'getBalances')
+      })
+
+      it('getBalances - large XRP balance keeps every drop', async function () {
+        const accountInfo = cloneDeep(rippled.account_info.normal)
+        accountInfo.result.account_data.Balance = '9999999999999999'
+        testContext.mockRippled!.addResponse('account_info', accountInfo)
+        testContext.mockRippled!.addResponse(
+          'account_lines',
+          rippledAccountLines.normal,
+        )
+        testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+        const result = await testContext.client.getBalances(testcase.address)
+        assert.deepEqual(result[0], {
+          currency: 'XRP',
+          value: '9999999999.999999',
+        })
       })
 
       it('getBalances - limit', async function () {
