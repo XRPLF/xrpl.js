@@ -1,14 +1,62 @@
+const fs = require('fs')
+const path = require('path')
+
 const baseKarmaConfig = require('../../karma.config')
 const webpackConfig = require('./test/webpack.config')
 delete webpackConfig.entry
 
+// The @xrplf/mpt-crypto ESM glue locates its wasm via new URL(import.meta.url),
+// so webpack emits mpt_crypto.wasm as a hashed asset that karma's static file
+// server doesn't know to serve (404). Stream any *.wasm from the webpack output
+// dir at request time so the confidential specs can load the crypto in-browser.
+const WASM_OUTPUT_DIR = path.join(__dirname, 'test', 'testCompiledForWeb')
+function createWasmMiddleware() {
+  return function wasmMiddleware(req, res, next) {
+    const url = req.url.split('?')[0]
+    if (url.endsWith('.wasm')) {
+      const file = path.join(WASM_OUTPUT_DIR, path.basename(url))
+      if (fs.existsSync(file)) {
+        res.setHeader('Content-Type', 'application/wasm')
+        fs.createReadStream(file).pipe(res)
+        return
+      }
+    }
+    next()
+  }
+}
+
 module.exports = function (config) {
+  // Apply the shared base first: it sets `plugins`, which the override below
+  // extends with the wasm middleware.
+  baseKarmaConfig(config)
+
   config.set({
     webpack: webpackConfig,
-
-    // list of files / patterns to load in the browser
     files: ['build/xrpl-latest.js', 'test/integration/**/*.test.ts'],
-  })
 
-  baseKarmaConfig(config)
+    // The confidential MPT 4-party lifecycle test drives the whole flow (all
+    // five transaction types + auditor disclosure) in a single it() that runs
+    // ~90s on CI (proof generation is ~2.3x slower there) and emits nothing
+    // mid-run. Keep karma's no-activity window above that spec's own 180s
+    // jasmine timeout so jasmine — not karma — fails a genuinely stuck run
+    // (karma's default is 30s, which disconnects mid-spec).
+    browserNoActivityTimeout: 210000,
+
+    // Each confidential proof is a synchronous CPU-bound WASM call that blocks
+    // the browser's main thread. Measured: the longest single block is ~3.7s
+    // locally, ~8.5s on CI (proof-gen ~2.3x slower) — which exceeds karma's
+    // default socket.io pong wait (pingTimeout 5s), so the heartbeat declares the
+    // connection dead mid-spec ("Disconnected ... ping timeout"). Widen it to ~7x
+    // that worst-case block; a truly stuck spec is still caught by the 180s
+    // jasmine / 210s no-activity timeouts above.
+    pingTimeout: 60000,
+
+    plugins: [
+      'karma-webpack',
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      { 'middleware:wasm': ['factory', createWasmMiddleware] },
+    ],
+    beforeMiddleware: ['wasm'],
+  })
 }

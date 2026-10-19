@@ -99,10 +99,6 @@ function validateBatchInnerTransaction(
     paramName: `RawTransactions[${index}].RawTransaction.Signers`,
     txType: 'Batch',
   })
-  validateOptionalField(tx, 'LastLedgerSequence', isNull, {
-    paramName: `RawTransactions[${index}].RawTransaction.LastLedgerSequence`,
-    txType: 'Batch',
-  })
 }
 
 /**
