@@ -641,4 +641,55 @@ describe('confidential/prepareConfidentialBatch', function () {
     // 50 and rippled would reject the proof (tecBAD_PROOF).
     assert.strictEqual(clawback.MPTAmount, '80')
   })
+
+  describe('a Send to a holder clawed back earlier in the same Batch', function () {
+    async function fixtures(): Promise<Record<string, AccountFixture>> {
+      return {
+        [ADDR_A]: await sender(100n, 10),
+        // bob holds 50 (the issuer's mirror of it is what the clawback reveals)
+        [ADDR_B]: {
+          holderKey: KEY_B.publicKey,
+          inbox: await ciphertext(BigInt(0), KEY_B.publicKey),
+          spending: await ciphertext(50n, KEY_B.publicKey),
+          issuerEnc: await ciphertext(50n, KEY_A.publicKey),
+        },
+        [ADDR_ISSUER]: { sequence: 20 },
+      }
+    }
+
+    const clawbackBob: ConfidentialBatchInner = {
+      operation: 'clawback',
+      account: ADDR_ISSUER,
+      holder: ADDR_B,
+      issuerKeypair: KEY_A,
+      mptIssuanceID: ISSUANCE_ID,
+    }
+    const sendToBob: ConfidentialBatchInner = {
+      operation: 'send',
+      account: ADDR_A,
+      destination: ADDR_B,
+      amount: 25n,
+      senderKeypair: KEY_A,
+      mptIssuanceID: ISSUANCE_ID,
+    }
+
+    it('is built: the Send proof does not depend on the destination balances', async function () {
+      const batch = await prepareConfidentialBatch(
+        batchClient(await fixtures()),
+        { account: ADDR_ISSUER, inners: [clawbackBob, sendToBob] },
+      )
+      const [clawback, send] = inners(batch)
+      assert.strictEqual(clawback.TransactionType, 'ConfidentialMPTClawback')
+      assert.strictEqual(send.TransactionType, 'ConfidentialMPTSend')
+    })
+
+    it('still rejects a later inner that needs the destination balance it left unpredictable', async function () {
+      await assertRejectsXrplError(async () =>
+        prepareConfidentialBatch(batchClient(await fixtures()), {
+          account: ADDR_ISSUER,
+          inners: [clawbackBob, sendToBob, clawbackBob],
+        }),
+      )
+    })
+  })
 })
