@@ -643,6 +643,12 @@ describe('confidential/prepareConfidentialBatch', function () {
   })
 
   describe('a Send to a holder clawed back earlier in the same Batch', function () {
+    /**
+     * Ledger state for the clawback + send scenarios: alice (sender), bob (holds 50,
+     * the clawback target) and the issuer (outer Batch account).
+     *
+     * @returns The per-account fixtures keyed by classic address.
+     */
     async function fixtures(): Promise<Record<string, AccountFixture>> {
       return {
         [ADDR_A]: await sender(100n, 10),

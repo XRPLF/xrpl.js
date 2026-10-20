@@ -448,8 +448,14 @@ async function applyInboxCredit(
 ): Promise<TokenState> {
   const { tx, issuerKey, auditorKey } = credit
   const challenge = tx.ZKProof.slice(0, CHALLENGE_HEX_LEN)
-  // rippled re-randomizes each credited ciphertext with the send challenge — adding
-  // an encryption of zero under the target key — before the homomorphic add.
+  /**
+   * Re-randomize a Send ciphertext the way rippled does before crediting it: add an
+   * encryption of zero under the target key, blinded with the send challenge.
+   *
+   * @param ciphertext - The Send's ciphertext for one balance.
+   * @param key - The ElGamal key that balance is encrypted under.
+   * @returns The re-randomized ciphertext.
+   */
   async function rerandomize(ciphertext: string, key: string): Promise<string> {
     return crypto.addCiphertexts(
       ciphertext,
