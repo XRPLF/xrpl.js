@@ -425,6 +425,39 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, regularKeyPair.privateKey)
       assert.equal(wallet.classicAddress, masterAddress)
     })
+
+    it('produces a secp256k1-family seed restorable via Wallet.fromSeed', function () {
+      // Regression test: the family seed's prefix must match the derived
+      // keypair's algorithm, otherwise Wallet.fromSeed (which infers the
+      // algorithm from the seed prefix) restores a different address.
+      const wallet = walletFromSecretNumbers(secretNumbersString)
+
+      assert.equal(wallet.seed, knownSecret)
+      const restored = Wallet.fromSeed(wallet.seed as string)
+      assert.equal(restored.classicAddress, wallet.classicAddress)
+      assert.equal(restored.publicKey, publicKey)
+      assert.equal(restored.privateKey, privateKey)
+    })
+
+    it('restores via Wallet.fromSeed when algorithm is explicitly secp256k1', function () {
+      const wallet = walletFromSecretNumbers(secretNumbersString, {
+        algorithm: ECDSA.secp256k1,
+      })
+
+      const restored = Wallet.fromSeed(wallet.seed as string)
+      assert.equal(restored.classicAddress, wallet.classicAddress)
+    })
+
+    it('restores via Wallet.fromSeed when algorithm is explicitly ed25519', function () {
+      const wallet = walletFromSecretNumbers(secretNumbersString, {
+        algorithm: ECDSA.ed25519,
+      })
+
+      const restored = Wallet.fromSeed(wallet.seed as string)
+      assert.equal(restored.classicAddress, wallet.classicAddress)
+      assert.equal(restored.publicKey, publicKeyED25519)
+      assert.equal(restored.privateKey, privateKeyED25519)
+    })
   })
 
   describe('fromEntropy', function () {
