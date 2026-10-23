@@ -7,6 +7,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 * `dropsToXrp()` now returns a `BigNumber` instead of a JavaScript `number`, and `Client.getXrpBalance()` returns `Promise<BigNumber>` instead of `Promise<number>`. The previous implementation called `.toNumber()`, which silently dropped precision for amounts approaching the XRP supply (~10^17 drops): `xrpToDrops(dropsToXrp('9999999999999999'))` returned `'9999999999999998'`, losing one drop on the round-trip. Callers can call `.toString()` for a decimal string or `.toNumber()` for a JS number (only safe for amounts well below the supply). ([#3316](https://github.com/XRPLF/xrpl.js/issues/3316))
 
+### Deprecated
+* Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
+
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
