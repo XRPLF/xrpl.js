@@ -5,6 +5,8 @@ import { assert } from 'chai'
 
 import {
   DepositPreauth,
+  LoanSet,
+  LoanSetFlags,
   OfferCreate,
   OfferCreateFlags,
   PaymentChannelClaim,
@@ -516,6 +518,22 @@ describe('Models Utils', function () {
 
       const result = convertTxFlagsToNumber(tx)
       assert.strictEqual(result, expected)
+    })
+
+    it('converts LoanSetFlags to its numeric value', function () {
+      const tx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        LoanBrokerID:
+          '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+        PrincipalRequested: '5000000',
+        Flags: {
+          tfLoanOverpayment: true,
+        },
+      }
+
+      const result = convertTxFlagsToNumber(tx)
+      assert.strictEqual(result, LoanSetFlags.tfLoanOverpayment)
     })
 
     it('converts other transaction types flags to its numeric value', function () {

@@ -18,6 +18,7 @@ import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
+import { LoanSetFlags } from '../transactions/loanSet'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 // eslint-disable-next-line import/no-cycle -- this method is needed to map txn flags
@@ -123,6 +124,7 @@ const txToFlag = {
   Batch: BatchFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
+  LoanSet: LoanSetFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,
   MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
