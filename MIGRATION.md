@@ -189,6 +189,22 @@ Please note that `xrpToDrops`, which was commonly used to set the amount of XRP 
 
 **Update:** a `number` cannot hold every drop above 2^33 XRP, so a later major release changed `dropsToXrp` and `Client.getXrpBalance` to return a `BigNumber`. See [`packages/xrpl/HISTORY.md`](packages/xrpl/HISTORY.md) for how to migrate.
 
+**Before**
+```ts
+const balance: number = await client.getXrpBalance(address)
+const total: number = balance + dropsToXrp(fee)
+```
+
+**After**
+```ts
+import { BigNumber, dropsToXrp } from 'xrpl'
+
+const balance: BigNumber = await client.getXrpBalance(address)
+const total: BigNumber = balance.plus(dropsToXrp(fee))
+total.toString() // exact decimal string, e.g. '922.913243'
+total.toNumber() // JavaScript number; loses drops above 2^33 XRP
+```
+
 ### 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`
 
 This move allows us to continue maintaining this package going forward as well as giving us more control over the dependencies to avoid needing polyfills.
