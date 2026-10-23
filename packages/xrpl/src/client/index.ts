@@ -925,10 +925,10 @@ class Client extends EventEmitter<EventTypes> {
    *
    * @example
    * ```ts
-   * const client = new Client(wss://s.altnet.rippletest.net:51233)
+   * const client = new Client('wss://s.altnet.rippletest.net:51233')
    * await client.connect()
    * const balance = await client.getXrpBalance('rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn')
-   * console.log(balance)
+   * console.log(balance.toString())
    * await client.disconnect()
    * /// '200'
    * ```

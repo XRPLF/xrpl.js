@@ -187,6 +187,8 @@ This should make it easier to work with the numbers. Because the max size of XRP
 
 Please note that `xrpToDrops`, which was commonly used to set the amount of XRP that is in a transaction is UNCHANGED as an `Amount` type in a `Transaction` needs a `string` input.
 
+**Update:** a `number` cannot hold every drop above 2^33 XRP, so a later major release changed `dropsToXrp` and `Client.getXrpBalance` to return a `BigNumber`. See [`packages/xrpl/HISTORY.md`](packages/xrpl/HISTORY.md) for how to migrate.
+
 ### 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`
 
 This move allows us to continue maintaining this package going forward as well as giving us more control over the dependencies to avoid needing polyfills.
