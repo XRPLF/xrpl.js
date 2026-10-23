@@ -1,3 +1,8 @@
+import BigNumber from 'bignumber.js'
+
+// `dropsToXrp` and `Client.getXrpBalance` return this class, so callers can type it.
+export { BigNumber }
+
 export { Client, ClientOptions } from './client'
 
 export * from './models'

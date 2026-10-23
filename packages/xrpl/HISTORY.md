@@ -4,6 +4,14 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES
+* `dropsToXrp()` now returns a `BigNumber` instead of a JavaScript `number`, and `Client.getXrpBalance()` returns `Promise<BigNumber>` instead of `Promise<number>`. A `number` cannot hold every drop above 2^33 XRP (about 8.6 billion XRP): `xrpToDrops(dropsToXrp('9999999999999999'))` returned `'9999999999999998'`, losing one drop on the round-trip. ([#3316](https://github.com/XRPLF/xrpl.js/issues/3316))
+
+  Migration:
+  - Call `.toString()` for an exact decimal string, or `.toNumber()` for a JavaScript number (which loses drops above 2^33 XRP).
+  - Add results with `.plus()`. In JavaScript, `dropsToXrp(a) + dropsToXrp(b)` now joins the two values as strings (`'1' + '2'` is `'12'`); TypeScript rejects it.
+  - To type the result, import `BigNumber` from `xrpl`, which now exports it. If your project has its own copy of `bignumber.js`, TypeScript treats that copy's `BigNumber` as a different type and will not assign the result to it.
+
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
 
