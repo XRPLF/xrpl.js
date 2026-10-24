@@ -354,7 +354,9 @@ class Client extends EventEmitter<EventTypes> {
    */
   public async request<
     R extends Request,
-    V extends APIVersion = typeof DEFAULT_API_VERSION,
+    V extends APIVersion = R['api_version'] extends APIVersion
+      ? R['api_version']
+      : typeof DEFAULT_API_VERSION,
     T = RequestResponseMap<R, V>,
   >(req: R): Promise<T> {
     const request = {
