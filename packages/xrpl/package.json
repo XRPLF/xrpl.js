@@ -46,7 +46,7 @@
     "react": "^19.2.7",
     "run-s": "^0.0.0",
     "typedoc": "0.28.19",
-    "ws": "^8.21.0"
+    "ws": "^8.22.0"
   },
   "scripts": {
     "build": "run-s build:lib build:web",
