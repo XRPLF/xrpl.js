@@ -7,6 +7,7 @@ import {
   MPTokenAuthorizeFlags,
   TransactionMetadata,
 } from '../../../src'
+import { MPToken } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -85,6 +86,11 @@ describe('MPTokenAuthorize', function () {
         1,
         'Holder owns 1 MPToken on the ledger',
       )
+      // A zero balance is a DEFAULT value, so MPTAmount is omitted. MPToken is
+      // not in the AccountObject union yet, hence the cast through unknown.
+      const mpToken = accountObjectsResponse.result
+        .account_objects[0] as unknown as MPToken
+      assert.isUndefined(mpToken.MPTAmount)
 
       authTx = {
         TransactionType: 'MPTokenAuthorize',

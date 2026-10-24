@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* Mark the ledger object fields that rippled omits when their value is 0 as optional: `MPToken.MPTAmount`, `LoanBroker.DebtMaximum`, the `AMM` object's `TradingFee` and the `TradingFee` and `DiscountedFee` of its vote and auction slots, and `Loan.PaymentRemaining`, `PrincipalOutstanding`, `TotalValueOutstanding`, `NextPaymentDueDate` and `GracePeriod`. Treat a missing field as 0.
 
 ## 5.3.0 (2026-09-16)
 
