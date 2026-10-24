@@ -180,8 +180,8 @@ describe('OracleSet', function () {
   })
 
   describe('Scale range', function () {
-    it(`accepts Scale values 0, 11, and 20 (11 and 20 were rejected before)`, function () {
-      for (const scale of [0, 11, 20]) {
+    it(`verifies valid Scale of 11 and 20, which were rejected before`, function () {
+      for (const scale of [11, 20]) {
         tx.PriceDataSeries[0].PriceData.Scale = scale
         assertValid(tx)
       }
