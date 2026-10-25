@@ -119,6 +119,7 @@ export {
   PaymentChannelClaimFlagsInterface,
   PaymentChannelClaim,
 } from './paymentChannelClaim'
+export { PaymentChannelClawback } from './paymentChannelClawback'
 export { PaymentChannelCreate } from './paymentChannelCreate'
 export { PaymentChannelFund } from './paymentChannelFund'
 export { PermissionedDomainSet } from './permissionedDomainSet'
