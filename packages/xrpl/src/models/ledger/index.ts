@@ -43,6 +43,7 @@ import Repo from './Repo'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
+import Subscription, { SubscriptionFlags } from './Subscription'
 import Ticket from './Ticket'
 import TokenIssuance, { TokenIssuanceFlags } from './TokenIssuance'
 import Vault, { VaultFlags } from './Vault'
@@ -103,6 +104,8 @@ export {
   SignerListFlags,
   Sponsorship,
   SponsorshipFlags,
+  Subscription,
+  SubscriptionFlags,
   Ticket,
   TokenIssuance,
   TokenIssuanceFlags,

@@ -23,6 +23,9 @@ const ALPHANET_TRANSACTION_TYPES = [
   'FirewallSet',
   'FirewallDelete',
   'WithdrawPreauth',
+  'SubscriptionSet',
+  'SubscriptionCancel',
+  'SubscriptionClaim',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
