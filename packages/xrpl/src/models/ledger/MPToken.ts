@@ -44,4 +44,9 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
    * object instead of the owner.
    */
   Sponsor?: string
+  /**
+   * (VaultContinuousAccrual) For a vault share MPToken, the time, in seconds since the
+   * Ripple Epoch, until which the vault's `RedemptionFee` applies to this holder.
+   */
+  RedemptionAfter?: number
 }
