@@ -18,7 +18,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `ContractCreate`, `ContractModify`, `ContractDelete`, `ContractClawback`, `ContractUserDelete` and `ContractCall` transactions, `ContractSource`, `Contract` and `ContractData` ledger entries and `AccountRoot.ContractID` (SmartContract amendment).
 * Rolling vaults and vault fees: `DealingInterval`, `DealingWindow`, `DepositFee`, `RedemptionFee`, `RedemptionPeriod` and `AccountingMethod` on `VaultCreate`, the fees on `VaultSet`, and the accrual fields on the `Vault`, `Loan` and `MPToken` ledger entries (VaultContinuousAccrual amendment).
 * `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
-* `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone` (OfferQualifiers amendment).
+* `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone`, and `all_or_none` and `min_quantity` on `account_offers` and `book_offers` offers (OfferQualifiers amendment).
 * IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
 
 ### Deprecated
