@@ -45,6 +45,7 @@ const ALPHANET_TRANSACTION_TYPES = [
   'ContractClawback',
   'ContractUserDelete',
   'ContractCall',
+  'PaymentChannelClawback',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(

@@ -149,6 +149,10 @@ import {
   validatePaymentChannelClaim,
 } from './paymentChannelClaim'
 import {
+  PaymentChannelClawback,
+  validatePaymentChannelClawback,
+} from './paymentChannelClawback'
+import {
   PaymentChannelCreate,
   validatePaymentChannelCreate,
 } from './paymentChannelCreate'
@@ -316,6 +320,7 @@ export type SubmittableTransaction =
   | PasskeyListSet
   | Payment
   | PaymentChannelClaim
+  | PaymentChannelClawback
   | PaymentChannelCreate
   | PaymentChannelFund
   | PermissionedDomainSet
@@ -727,6 +732,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PaymentChannelClaim':
       validatePaymentChannelClaim(tx)
+      break
+
+    case 'PaymentChannelClawback':
+      validatePaymentChannelClawback(tx)
       break
 
     case 'PaymentChannelCreate':

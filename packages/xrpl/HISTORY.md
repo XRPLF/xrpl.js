@@ -19,6 +19,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Rolling vaults and vault fees: `DealingInterval`, `DealingWindow`, `DepositFee`, `RedemptionFee`, `RedemptionPeriod` and `AccountingMethod` on `VaultCreate`, the fees on `VaultSet`, and the accrual fields on the `Vault`, `Loan` and `MPToken` ledger entries (VaultContinuousAccrual amendment).
 * `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
 * `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone` (OfferQualifiers amendment).
+* IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
 
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
