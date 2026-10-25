@@ -80,6 +80,25 @@ export type SponsorSignature =
       Signers?: never
     }
 
+/**
+ * (Passkey) A WebAuthn assertion that signs a transaction with a P-256 key in
+ * place of `TxnSignature`. The authenticator signs `AuthenticatorData`
+ * followed by the SHA-256 of `ClientDataJSON`, whose `challenge` is the
+ * base64url of the transaction's signing data. Pass the authenticator's
+ * signature through `normalizeP256Signature` from ripple-keypairs: the node
+ * accepts only strict DER with a low S value.
+ */
+export interface PasskeySignature {
+  /** The ID of the passkey, as listed in the account's PasskeyList. */
+  PasskeyID: string
+  /** The authenticator data of the WebAuthn assertion, as hex. */
+  AuthenticatorData: string
+  /** The client data JSON of the WebAuthn assertion, as hex. */
+  ClientDataJSON: string
+  /** The DER-encoded, low-S P-256 ECDSA signature, as hex. */
+  Signature: string
+}
+
 export interface Memo {
   Memo: {
     MemoData?: string

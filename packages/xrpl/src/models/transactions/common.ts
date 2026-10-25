@@ -19,6 +19,7 @@ import {
   MPTAmount,
   Memo,
   Signer,
+  PasskeySignature,
   SponsorSignature,
   XChainBridge,
 } from '../common'
@@ -756,6 +757,11 @@ export interface BaseTransaction extends Record<string, unknown> {
    * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
    */
   SponsorSignature?: SponsorSignature
+  /**
+   * (Passkey) The WebAuthn signature of a P-256 SigningPubKey, in place of
+   * TxnSignature.
+   */
+  PasskeySignature?: PasskeySignature
 }
 
 /**
@@ -873,6 +879,50 @@ function validateSponsorFlagsValue(
   if (hasFeeFlag && isInnerBatchTxn) {
     throw new ValidationError(
       'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  }
+}
+
+const PASSKEY_SIGNATURE_FIELDS = [
+  'PasskeyID',
+  'AuthenticatorData',
+  'ClientDataJSON',
+  'Signature',
+]
+const P256_PUBLIC_KEY_REGEX = /^F6[\dA-F]{128}$/iu
+
+/**
+ * Validate a transaction's PasskeySignature as rippled's preflight does
+ * (preflightCheckPasskey): its four fields are hex, the SigningPubKey is a
+ * P-256 key (0xF6 then 64 bytes), and there is no TxnSignature beside it.
+ *
+ * @param tx - The transaction to validate.
+ * @throws ValidationError when the PasskeySignature is malformed or misplaced.
+ */
+export function validatePasskeySignature(tx: Record<string, unknown>): void {
+  const signature = tx.PasskeySignature
+  if (signature === undefined) {
+    return
+  }
+  if (
+    !isRecord(signature) ||
+    !PASSKEY_SIGNATURE_FIELDS.every(
+      (field) => isString(signature[field]) && isHex(signature[field]),
+    )
+  ) {
+    throw new ValidationError('BaseTransaction: invalid PasskeySignature')
+  }
+  if (
+    !isString(tx.SigningPubKey) ||
+    !P256_PUBLIC_KEY_REGEX.test(tx.SigningPubKey)
+  ) {
+    throw new ValidationError(
+      'BaseTransaction: PasskeySignature requires a P-256 SigningPubKey',
+    )
+  }
+  if (tx.TxnSignature !== undefined) {
+    throw new ValidationError(
+      'BaseTransaction: PasskeySignature and TxnSignature cannot both be present',
     )
   }
 }
@@ -1034,6 +1084,8 @@ export function validateBaseTransaction(
 
   // Validate sponsor fields using helper function
   validateSponsorFields(common)
+
+  validatePasskeySignature(common)
 }
 
 /**
