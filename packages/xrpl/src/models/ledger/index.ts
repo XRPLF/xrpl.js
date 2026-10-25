@@ -42,6 +42,7 @@ import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
 import Ticket from './Ticket'
+import TokenIssuance, { TokenIssuanceFlags } from './TokenIssuance'
 import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
@@ -98,6 +99,8 @@ export {
   Sponsorship,
   SponsorshipFlags,
   Ticket,
+  TokenIssuance,
+  TokenIssuanceFlags,
   Vault,
   VaultFlags,
   VoteSlot,

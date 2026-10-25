@@ -8,7 +8,14 @@ import { TRANSACTION_TYPES } from 'ripple-binary-codec'
  * does not know, so the unit tests register these names first. Remove a name
  * once `definitions.json` carries it.
  */
-const ALPHANET_TRANSACTION_TYPES = ['BeneficiarySet', 'PasskeyListSet']
+const ALPHANET_TRANSACTION_TYPES = [
+  'BeneficiarySet',
+  'PasskeyListSet',
+  'TokenIssuanceCreate',
+  'TokenIssuanceSet',
+  'TokenIssuanceDestroy',
+  'TokenConvert',
+]
 
 ALPHANET_TRANSACTION_TYPES.filter(
   (name) => !TRANSACTION_TYPES.includes(name),
