@@ -134,6 +134,15 @@ import {
   SponsorshipTransfer,
   validateSponsorshipTransfer,
 } from './sponsorshipTransfer'
+import {
+  SubscriptionCancel,
+  validateSubscriptionCancel,
+} from './subscriptionCancel'
+import {
+  SubscriptionClaim,
+  validateSubscriptionClaim,
+} from './subscriptionClaim'
+import { SubscriptionSet, validateSubscriptionSet } from './subscriptionSet'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
@@ -238,6 +247,9 @@ export type SubmittableTransaction =
   | SignerListSet
   | SponsorshipSet
   | SponsorshipTransfer
+  | SubscriptionCancel
+  | SubscriptionClaim
+  | SubscriptionSet
   | TicketCreate
   | TrustSet
   | VaultClawback
@@ -568,6 +580,18 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'SponsorshipTransfer':
       validateSponsorshipTransfer(tx)
+      break
+
+    case 'SubscriptionCancel':
+      validateSubscriptionCancel(tx)
+      break
+
+    case 'SubscriptionClaim':
+      validateSubscriptionClaim(tx)
+      break
+
+    case 'SubscriptionSet':
+      validateSubscriptionSet(tx)
       break
 
     case 'TicketCreate':

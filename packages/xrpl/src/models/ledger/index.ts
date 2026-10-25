@@ -39,6 +39,7 @@ import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
+import Subscription, { SubscriptionFlags } from './Subscription'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
@@ -93,6 +94,8 @@ export {
   SignerListFlags,
   Sponsorship,
   SponsorshipFlags,
+  Subscription,
+  SubscriptionFlags,
   Ticket,
   Vault,
   VaultFlags,
