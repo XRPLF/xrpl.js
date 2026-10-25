@@ -17,6 +17,7 @@ import FeeSettings, {
   FeeSettingsPostAmendmentFields,
   FEE_SETTINGS_ID,
 } from './FeeSettings'
+import Firewall from './Firewall'
 import { Ledger, LedgerV1 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
@@ -41,6 +42,7 @@ import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
+import WithdrawPreauth from './WithdrawPreauth'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -63,6 +65,7 @@ export {
   FeeSettings,
   FeeSettingsPreAmendmentFields,
   FeeSettingsPostAmendmentFields,
+  Firewall,
   Ledger,
   LedgerV1,
   LedgerEntryFilter,
@@ -97,6 +100,7 @@ export {
   Vault,
   VaultFlags,
   VoteSlot,
+  WithdrawPreauth,
   XChainOwnedClaimID,
   XChainOwnedCreateAccountClaimID,
 }

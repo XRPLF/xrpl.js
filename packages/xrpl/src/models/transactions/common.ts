@@ -22,7 +22,12 @@ import {
   SponsorSignature,
   XChainBridge,
 } from '../common'
-import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
+import {
+  INTEGER_SANITY_CHECK,
+  isFlagEnabled,
+  isHex,
+  onlyHasFields,
+} from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
@@ -46,6 +51,8 @@ export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
 export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
 // Max MPT amount: 2^63 - 1.
 export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
+// Max legal XRP amount in drops: the node's STAmount::kMaxNativeN.
+export const MAX_XRP_DROPS = BigInt('100000000000000000')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -653,6 +660,56 @@ export interface GlobalFlagsInterface {
   tfInnerBatchTxn?: boolean
 }
 
+/** The `tfFullyCanonicalSig` universal transaction flag. */
+const TF_FULLY_CANONICAL_SIG = 0x80000000
+
+/**
+ * Whether a numeric Flags value holds only bits from `allowedBits` and
+ * `tfFullyCanonicalSig`.
+ *
+ * @param flags - The numeric Flags value.
+ * @param allowedBits - The single-bit flags the transaction may carry.
+ * @returns Whether every set bit is allowed.
+ */
+function hasOnlyAllowedBits(flags: number, allowedBits: number[]): boolean {
+  if (!Number.isInteger(flags) || flags < 0) {
+    return false
+  }
+  const known = [...allowedBits, TF_FULLY_CANONICAL_SIG]
+    .filter((bit) => isFlagEnabled(flags, bit))
+    .reduce((sum, bit) => sum + bit, 0)
+  return flags === known
+}
+
+/**
+ * Verify a transaction's Flags hold only its own flags and the universal
+ * flags, as rippled's transaction flag mask requires (temINVALID_FLAG).
+ *
+ * @param tx - The transaction to check.
+ * @param allowedFlags - The transaction-specific flags by name, e.g. a flags enum.
+ * @throws ValidationError when Flags holds any other flag.
+ */
+export function validateFlagsMask(
+  tx: Record<string, unknown>,
+  allowedFlags: Record<string, number | string> = {},
+): void {
+  const allowed = [
+    ...Object.entries(allowedFlags),
+    ...Object.entries(GlobalFlags),
+  ].filter((entry): entry is [string, number] => isNumber(entry[1]))
+  const allowedNames = allowed.map(([name]) => name)
+  const allowedBits = allowed.map(([, bit]) => bit)
+  const { Flags: flags } = tx
+  const valid =
+    flags == null ||
+    (isNumber(flags) && hasOnlyAllowedBits(flags, allowedBits)) ||
+    (isRecord(flags) &&
+      Object.keys(flags).every((name) => allowedNames.includes(name)))
+  if (!valid) {
+    throw new ValidationError(`${String(tx.TransactionType)}: invalid Flags`)
+  }
+}
+
 /**
  * Sponsor flags for transaction common fields.
  * These flags indicate what type of sponsorship is being used in a transaction.
@@ -1202,4 +1259,55 @@ export function isDomainID(domainID: unknown): domainID is string {
     isHex(domainID) &&
     domainID !== '0'.repeat(_DOMAIN_ID_LENGTH)
   )
+}
+
+const PUBLIC_KEY_HEX_LENGTH = 66
+const PUBLIC_KEY_PREFIXES = ['02', '03', 'ED']
+
+/**
+ * Verify the form and type of a CounterpartySignature inner object at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the CounterpartySignature is properly formed.
+ */
+export function isCounterpartySignature(
+  input: unknown,
+): input is Record<string, unknown> {
+  return (
+    isRecord(input) &&
+    (input.SigningPubKey === undefined || isString(input.SigningPubKey)) &&
+    (input.TxnSignature === undefined || isString(input.TxnSignature)) &&
+    (input.Signers === undefined ||
+      (isArray(input.Signers) && input.Signers.every(isSigner)))
+  )
+}
+
+/**
+ * Verify that a non-empty CounterpartySignature.SigningPubKey is a 33-byte
+ * secp256k1 or Ed25519 public key, as the node's preflightCheckSigningKey requires.
+ *
+ * @param tx - The transaction carrying the CounterpartySignature.
+ * @throws ValidationError when the SigningPubKey is not a public key.
+ */
+export function validateCounterpartySigningKey(
+  tx: Record<string, unknown>,
+): void {
+  const signature = tx.CounterpartySignature
+  if (
+    !isRecord(signature) ||
+    !isString(signature.SigningPubKey) ||
+    signature.SigningPubKey === ''
+  ) {
+    return
+  }
+  const key = signature.SigningPubKey
+  const isPublicKey =
+    key.length === PUBLIC_KEY_HEX_LENGTH &&
+    isHex(key) &&
+    PUBLIC_KEY_PREFIXES.includes(key.slice(0, 2).toUpperCase())
+  if (!isPublicKey) {
+    throw new ValidationError(
+      `${String(tx.TransactionType)}: CounterpartySignature.SigningPubKey is not a valid public key`,
+    )
+  }
 }

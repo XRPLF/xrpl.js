@@ -9,6 +9,7 @@ import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
+import Firewall from './Firewall'
 import LedgerHashes from './LedgerHashes'
 import Loan from './Loan'
 import LoanBroker from './LoanBroker'
@@ -23,6 +24,7 @@ import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
 import Vault from './Vault'
+import WithdrawPreauth from './WithdrawPreauth'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
@@ -38,6 +40,7 @@ type LedgerEntry =
   | DirectoryNode
   | Escrow
   | FeeSettings
+  | Firewall
   | LedgerHashes
   | Loan
   | LoanBroker
@@ -51,6 +54,7 @@ type LedgerEntry =
   | Sponsorship
   | Ticket
   | Vault
+  | WithdrawPreauth
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
   | MPTokenIssuance
@@ -68,6 +72,7 @@ type LedgerEntryFilter =
   | 'directory'
   | 'escrow'
   | 'fee'
+  | 'firewall'
   | 'hashes'
   | 'loan'
   | 'loan_broker'
@@ -84,6 +89,7 @@ type LedgerEntryFilter =
   | 'state'
   | 'ticket'
   | 'vault'
+  | 'withdraw_preauth'
   | 'xchain_owned_create_account_claim_id'
   | 'xchain_owned_claim_id'
 

@@ -54,6 +54,8 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import { FirewallDelete, validateFirewallDelete } from './firewallDelete'
+import { FirewallSet, validateFirewallSet } from './firewallSet'
 import {
   LoanBrokerCoverClawback,
   validateLoanBrokerCoverClawback,
@@ -143,6 +145,7 @@ import { VaultDelete, validateVaultDelete } from './vaultDelete'
 import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
 import { VaultSet, validateVaultSet } from './vaultSet'
 import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
+import { WithdrawPreauth, validateWithdrawPreauth } from './withdrawPreauth'
 import {
   XChainAccountCreateCommit,
   validateXChainAccountCreateCommit,
@@ -205,6 +208,8 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | FirewallDelete
+  | FirewallSet
   | LoanBrokerSet
   | LoanBrokerCoverClawback
   | LoanBrokerCoverDeposit
@@ -246,6 +251,7 @@ export type SubmittableTransaction =
   | VaultDeposit
   | VaultSet
   | VaultWithdraw
+  | WithdrawPreauth
   | XChainAccountCreateCommit
   | XChainAddAccountCreateAttestation
   | XChainAddClaimAttestation
@@ -438,6 +444,14 @@ export function validate(transaction: Record<string, unknown>): void {
       validateEscrowFinish(tx)
       break
 
+    case 'FirewallDelete':
+      validateFirewallDelete(tx)
+      break
+
+    case 'FirewallSet':
+      validateFirewallSet(tx)
+      break
+
     case 'LoanBrokerCoverClawback':
       validateLoanBrokerCoverClawback(tx)
       break
@@ -600,6 +614,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'VaultWithdraw':
       validateVaultWithdraw(tx)
+      break
+
+    case 'WithdrawPreauth':
+      validateWithdrawPreauth(tx)
       break
 
     case 'XChainAccountCreateCommit':
