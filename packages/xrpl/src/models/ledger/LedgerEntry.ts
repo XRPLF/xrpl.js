@@ -17,6 +17,7 @@ import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
+import PasskeyList from './PasskeyList'
 import PayChannel from './PayChannel'
 import PermissionedDomain from './PermissionedDomain'
 import RippleState from './RippleState'
@@ -46,6 +47,7 @@ type LedgerEntry =
   | NegativeUNL
   | Offer
   | Oracle
+  | PasskeyList
   | PayChannel
   | PermissionedDomain
   | RippleState
@@ -80,6 +82,7 @@ type LedgerEntryFilter =
   | 'nft_page'
   | 'offer'
   | 'oracle'
+  | 'passkey_list'
   | 'payment_channel'
   | 'permissioned_domain'
   | 'signer_list'

@@ -114,6 +114,7 @@ export {
 } from './offerCreate'
 export { OracleDelete } from './oracleDelete'
 export { OracleSet } from './oracleSet'
+export { Passkey, PasskeyListSet } from './passkeyListSet'
 export { PaymentFlags, PaymentFlagsInterface, Payment } from './payment'
 export {
   PaymentChannelClaimFlags,
