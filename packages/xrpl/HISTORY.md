@@ -20,6 +20,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
 * `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone`, and `all_or_none` and `min_quantity` on `account_offers` and `book_offers` offers (OfferQualifiers amendment).
 * IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
+* `signByCounterparty` and `combineCounterpartySigners`: counterparty signing for any transaction that carries a `CounterpartySignature` (LoanSet, FirewallSet, FirewallDelete, WithdrawPreauth); `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now call them. They, `hashSignedTx` and `computeSignature` take optional custom `definitions`.
 
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
