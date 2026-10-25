@@ -6,7 +6,7 @@ const assertInvalid = (tx: any, message: string): void =>
   assertTxValidationError(tx, validateContractUserDelete, message)
 
 const DISABLED =
-  'ContractUserDelete: the node refuses every ContractUserDelete (temDISABLED)'
+  'ContractUserDelete: disabled on this network (rippled returns temDISABLED for every ContractUserDelete)'
 
 /**
  * ContractUserDelete Transaction Verification Testing.

@@ -45,6 +45,6 @@ export function validateContractClawback(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Amount', isAmount)
 
   throw new ValidationError(
-    'ContractClawback: the node refuses every ContractClawback (temDISABLED)',
+    'ContractClawback: disabled on this network (rippled returns temDISABLED for every ContractClawback)',
   )
 }

@@ -43,6 +43,6 @@ export function validateContractUserDelete(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Gas', isUInt32)
 
   throw new ValidationError(
-    'ContractUserDelete: the node refuses every ContractUserDelete (temDISABLED)',
+    'ContractUserDelete: disabled on this network (rippled returns temDISABLED for every ContractUserDelete)',
   )
 }

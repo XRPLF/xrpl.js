@@ -6,7 +6,7 @@ const assertInvalid = (tx: any, message: string): void =>
   assertTxValidationError(tx, validateContractClawback, message)
 
 const DISABLED =
-  'ContractClawback: the node refuses every ContractClawback (temDISABLED)'
+  'ContractClawback: disabled on this network (rippled returns temDISABLED for every ContractClawback)'
 
 /**
  * ContractClawback Transaction Verification Testing.
