@@ -15,6 +15,11 @@ const ALPHANET_TRANSACTION_TYPES = [
   'TokenIssuanceSet',
   'TokenIssuanceDestroy',
   'TokenConvert',
+  'RepoCreate',
+  'RepoAccept',
+  'RepoCancel',
+  'RepoClose',
+  'RepoDefault',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
