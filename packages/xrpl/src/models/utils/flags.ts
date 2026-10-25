@@ -17,6 +17,7 @@ import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BallotCreateFlags } from '../transactions/ballotCreate'
 import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
+import { CouponClaimFlags } from '../transactions/couponClaim'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
@@ -126,6 +127,7 @@ const txToFlag = {
   AMMWithdraw: AMMWithdrawFlags,
   BallotCreate: BallotCreateFlags,
   Batch: BatchFlags,
+  CouponClaim: CouponClaimFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,

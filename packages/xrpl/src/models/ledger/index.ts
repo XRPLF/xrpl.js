@@ -9,6 +9,7 @@ import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
 import Bridge from './Bridge'
 import Check from './Check'
+import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
@@ -66,6 +67,7 @@ export {
   Beneficiary,
   Bridge,
   Check,
+  CouponSchedule,
   Credential,
   Delegate,
   DepositPreauth,

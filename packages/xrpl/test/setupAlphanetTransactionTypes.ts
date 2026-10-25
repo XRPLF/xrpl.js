@@ -30,6 +30,11 @@ const ALPHANET_TRANSACTION_TYPES = [
   'BallotCastVote',
   'BallotFinalize',
   'BallotDelete',
+  'CouponScheduleCreate',
+  'CouponScheduleSet',
+  'CouponScheduleDelete',
+  'CouponClaim',
+  'CouponPay',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
