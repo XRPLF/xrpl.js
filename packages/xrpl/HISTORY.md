@@ -7,6 +7,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Added
 * `FirewallSet`, `FirewallDelete` and `WithdrawPreauth` transactions and `Firewall` and `WithdrawPreauth` ledger entries (Firewall amendment).
 * `signByCounterparty` and `combineCounterpartySigners`: counterparty signing for any transaction that carries a `CounterpartySignature` (LoanSet, FirewallSet, FirewallDelete, WithdrawPreauth); `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now call them. They, `hashSignedTx` and `computeSignature` take optional custom `definitions`.
+* `autofill` adds one base fee per counterparty signature to `FirewallSet` (update), `FirewallDelete` and `WithdrawPreauth`, as rippled's `calculateBaseFee` does: the Signers of a present `CounterpartySignature`, or the signer list size of the counterparty recorded on the account's Firewall.
 
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
