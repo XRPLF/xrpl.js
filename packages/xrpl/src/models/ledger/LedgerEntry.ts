@@ -1,6 +1,7 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
 import AMM from './AMM'
+import Beneficiary from './Beneficiary'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
@@ -30,6 +31,7 @@ type LedgerEntry =
   | AccountRoot
   | Amendments
   | AMM
+  | Beneficiary
   | Bridge
   | Check
   | Credential
@@ -59,6 +61,7 @@ type LedgerEntryFilter =
   | 'account'
   | 'amendments'
   | 'amm'
+  | 'beneficiary'
   | 'bridge'
   | 'check'
   | 'credential'

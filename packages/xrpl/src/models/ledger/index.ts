@@ -4,6 +4,7 @@ import AccountRoot, {
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
+import Beneficiary from './Beneficiary'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
@@ -51,6 +52,7 @@ export {
   AMENDMENTS_ID,
   Amendments,
   AMM,
+  Beneficiary,
   Bridge,
   Check,
   Credential,

@@ -62,6 +62,13 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
    */
   LoanBrokerID?: string
   /**
+   * (Beneficiary) The parent ledger close time, in seconds since the Ripple
+   * Epoch, of this account's last transaction not signed by its beneficiary.
+   * Present only while the account has a Beneficiary designation; the
+   * beneficiary may act once `TimeLock` seconds have passed since this time.
+   */
+  LastInteraction?: number
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */
