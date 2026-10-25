@@ -2,12 +2,15 @@ import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
 import { Currency } from './currency'
+import { Data } from './data'
+import { DataType } from './data-type'
 import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
 import { Hash192 } from './hash-192'
 import { Hash256 } from './hash-256'
 import { Int32 } from './int-32'
 import { Issue } from './issue'
+import { Json } from './json'
 import { STNumber } from './st-number'
 import { PathSet } from './path-set'
 import { STArray } from './st-array'
@@ -27,12 +30,15 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Amount,
   Blob,
   Currency,
+  Data,
+  DataType,
   Hash128,
   Hash160,
   Hash192,
   Hash256,
   Int32,
   Issue,
+  Json,
   Number: STNumber,
   PathSet,
   SignedAmount,
@@ -57,6 +63,8 @@ export {
   Amount,
   Blob,
   Currency,
+  Data,
+  DataType,
   Hash128,
   Hash160,
   Hash192,

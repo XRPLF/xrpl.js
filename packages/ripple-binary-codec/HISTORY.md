@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+* Add the `Data` (STData), `DataType` (STDataType) and `Json` (STJson) serialized types of the smart-contracts amendment. `Json` decodes to the JSON xrpld returns and, like xrpld, cannot be encoded from a non-empty JSON value.
+
 ## 2.11.0 (2026-09-11)
 
 ### Added
