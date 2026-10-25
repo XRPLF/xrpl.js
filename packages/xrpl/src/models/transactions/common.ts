@@ -108,6 +108,19 @@ function isSigner(obj: unknown): obj is Signer {
   )
 }
 
+const SPONSOR_SIGNATURE_FIELDS = ['SigningPubKey', 'TxnSignature', 'Signers']
+
+/**
+ * Whether an object holds only the fields of rippled's SponsorSignature
+ * template (InnerObjectFormats.cpp), which refuses any other field.
+ *
+ * @param obj - The SponsorSignature object.
+ * @returns Whether every field is a template field.
+ */
+function hasOnlySponsorSignatureFields(obj: Record<string, unknown>): boolean {
+  return Object.keys(obj).every((key) => SPONSOR_SIGNATURE_FIELDS.includes(key))
+}
+
 /**
  * Verify the form and type of a SponsorSignature at runtime.
  *
@@ -120,7 +133,7 @@ function isSponsorSignature(
   obj: unknown,
   isInnerBatchTxn: boolean,
 ): obj is SponsorSignature {
-  if (!isRecord(obj)) {
+  if (!isRecord(obj) || !hasOnlySponsorSignatureFields(obj)) {
     return false
   }
 
