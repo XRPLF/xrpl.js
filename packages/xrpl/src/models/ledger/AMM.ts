@@ -1,4 +1,5 @@
 import { AuthAccount, Currency, IssuedCurrencyAmount } from '../common'
+import { XRPLNumber } from '../transactions/common'
 
 import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
 
@@ -7,6 +8,10 @@ export interface VoteSlot {
     Account: string
     TradingFee: number
     VoteWeight: number
+    /**
+     * (AMMCurves) The amplification coefficient this vote proposes for a StableSwap AMM.
+     */
+    Amplification?: number
   }
 }
 
@@ -75,4 +80,62 @@ export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
    * type, so this value is always 0.
    */
   Flags: 0
+  /**
+   * (AMMCurves) The bonding curve of the AMM, one of {@link AMMCurveType}.
+   * Absent for the constant-product curve (0).
+   */
+  CurveType?: number
+  /**
+   * (AMMCurves) The fee tier of a concentrated liquidity AMM, one of {@link AMMFeeTier}.
+   */
+  FeeTier?: number
+  /**
+   * (AMMCurves) The spacing between usable ticks of a concentrated liquidity AMM, set by its fee tier.
+   */
+  TickSpacing?: number
+  /**
+   * (AMMCurves) The tick of the current price of a concentrated liquidity AMM.
+   */
+  CurrentTick?: number
+  /**
+   * (AMMCurves) The liquidity of the positions whose range contains the current price
+   * of a concentrated liquidity AMM, as a hex-encoded 64-bit unsigned integer.
+   */
+  ActiveLiquidity?: string
+  /**
+   * (AMMCurves) The square root of the current price of a concentrated liquidity AMM.
+   */
+  SqrtPrice?: XRPLNumber
+  /**
+   * (AMMCurves) The fee growth per unit of liquidity for the first asset over the life
+   * of a concentrated liquidity AMM.
+   */
+  FeeGrowthGlobal0?: XRPLNumber
+  /**
+   * (AMMCurves) The fee growth per unit of liquidity for the second asset over the life
+   * of a concentrated liquidity AMM.
+   */
+  FeeGrowthGlobal1?: XRPLNumber
+  /**
+   * (AMMCurves) The amplification coefficient of a StableSwap AMM.
+   */
+  Amplification?: number
+  /**
+   * (AMMCurves) The time, in seconds since the Ripple Epoch, before which the
+   * amplification coefficient of a StableSwap AMM cannot change again.
+   */
+  AmplificationTime?: number
+  /**
+   * (AMMCurves) The number of open positions of a concentrated liquidity AMM.
+   * Absent when 0.
+   */
+  PositionCount?: number
+  /**
+   * (AMMCurves) The bin width of a binned AMM in basis points.
+   */
+  BinStep?: number
+  /**
+   * (AMMCurves) The bin that holds the current price of a binned AMM.
+   */
+  ActiveBinID?: number
 }

@@ -35,6 +35,10 @@ const ALPHANET_TRANSACTION_TYPES = [
   'CouponScheduleDelete',
   'CouponClaim',
   'CouponPay',
+  'AMMBinCreate',
+  'AMMBinDestroy',
+  'AMMCollectFees',
+  'AMMPositionTransfer',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
