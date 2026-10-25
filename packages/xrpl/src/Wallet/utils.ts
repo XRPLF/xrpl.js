@@ -14,11 +14,12 @@ import {
   encodeForSigning,
   encodeForSigningCounterparty,
   encodeForSigningSponsor,
+  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
-import { Transaction } from '../models'
+import { BaseTransaction, Transaction } from '../models'
 
 /**
  * If presented in binary form, the Signers array must be sorted based on
@@ -66,20 +67,25 @@ export function addressToBigNumber(address: string): BigNumber {
  * Decodes a transaction or transaction blob into a Transaction object.
  *
  * @param txOrBlob - A Transaction object or a hex string representing a transaction blob.
+ * @param definitions - Custom rippled types to encode and decode with.
  * @returns A Transaction object.
  * @throws If the input is not a valid Transaction or transaction blob.
  */
 export function getDecodedTransaction(
-  txOrBlob: Transaction | string,
+  txOrBlob: BaseTransaction | string,
+  definitions?: XrplDefinitionsBase,
 ): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob)) as unknown as Transaction
+    return decode(
+      encode(txOrBlob, definitions),
+      definitions,
+    ) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob) as unknown as Transaction
+  return decode(txOrBlob, definitions) as unknown as Transaction
 }
 
 /**
@@ -92,21 +98,26 @@ export type SignatureRole = 'transaction' | 'counterparty' | 'sponsor'
 const SIGNING_ENCODERS: Record<
   SignatureRole,
   {
-    single: (tx: Transaction) => string
-    multi: (tx: Transaction, signAs: string) => string
+    single: (tx: Transaction, definitions?: XrplDefinitionsBase) => string
+    multi: (
+      tx: Transaction,
+      signAs: string,
+      definitions?: XrplDefinitionsBase,
+    ) => string
   }
 > = {
   transaction: {
-    single: (tx) => encodeForSigning(tx),
-    multi: (tx, signAs) => encodeForMultisigning(tx, signAs),
+    single: (tx, defs) => encodeForSigning(tx, defs),
+    multi: (tx, signAs, defs) => encodeForMultisigning(tx, signAs, defs),
   },
   counterparty: {
-    single: (tx) => encodeForSigningCounterparty(tx),
-    multi: (tx, signAs) => encodeForMultisigningCounterparty(tx, signAs),
+    single: (tx, defs) => encodeForSigningCounterparty(tx, defs),
+    multi: (tx, signAs, defs) =>
+      encodeForMultisigningCounterparty(tx, signAs, defs),
   },
   sponsor: {
-    single: (tx) => encodeForSigningSponsor(tx),
-    multi: (tx, signAs) => encodeForMultisigningSponsor(tx, signAs),
+    single: (tx, defs) => encodeForSigningSponsor(tx, defs),
+    multi: (tx, signAs, defs) => encodeForMultisigningSponsor(tx, signAs, defs),
   },
 }
 
@@ -119,6 +130,8 @@ const SIGNING_ENCODERS: Record<
  * Can be either a classic address or an XAddress.
  * @param role - Which signature role to sign for. Defaults to `transaction`.
  * `counterparty` / `sponsor` use their `fixCleanup3_4_0` signing prefixes.
+ * @param definitions - Custom rippled types to encode with, for transaction
+ * types the bundled definitions.json does not carry yet.
  * @returns A signed transaction in the proper format.
  */
 // eslint-disable-next-line max-params -- role selects the fixCleanup3_4_0 signing prefix
@@ -127,6 +140,7 @@ export function computeSignature(
   privateKey: string,
   signAs?: string,
   role: SignatureRole = 'transaction',
+  definitions?: XrplDefinitionsBase,
 ): string {
   const encoders = SIGNING_ENCODERS[role]
   if (signAs) {
@@ -134,9 +148,9 @@ export function computeSignature(
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encoders.multi(tx, classicAddress), privateKey)
+    return sign(encoders.multi(tx, classicAddress, definitions), privateKey)
   }
-  return sign(encoders.single(tx), privateKey)
+  return sign(encoders.single(tx, definitions), privateKey)
 }
 
 const ENTROPY_LENGTH_BYTES = 16
