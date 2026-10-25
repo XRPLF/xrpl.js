@@ -14,6 +14,7 @@ import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
+import { BallotCreateFlags } from '../transactions/ballotCreate'
 import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
 import { LoanManageFlags } from '../transactions/loanManage'
@@ -120,6 +121,7 @@ const txToFlag = {
   AMMClawback: AMMClawbackFlags,
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
+  BallotCreate: BallotCreateFlags,
   Batch: BatchFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,

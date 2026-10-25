@@ -1,6 +1,8 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
 import AMM from './AMM'
+import Ballot from './Ballot'
+import BallotVote from './BallotVote'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
@@ -30,6 +32,8 @@ type LedgerEntry =
   | AccountRoot
   | Amendments
   | AMM
+  | Ballot
+  | BallotVote
   | Bridge
   | Check
   | Credential
@@ -59,6 +63,8 @@ type LedgerEntryFilter =
   | 'account'
   | 'amendments'
   | 'amm'
+  | 'ballot'
+  | 'ballot_vote'
   | 'bridge'
   | 'check'
   | 'credential'
