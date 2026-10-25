@@ -144,6 +144,7 @@ export {
   VaultCreate,
   VaultCreateFlags,
   VaultCreateFlagsInterface,
+  VaultAccountingMethod,
   VaultKind,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
