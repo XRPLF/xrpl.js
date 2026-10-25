@@ -117,4 +117,14 @@ describe('AMMClawback', function () {
     const errorMessage = 'AMMClawback: Amount.issuer must match Amount.issuer'
     assertInvalid(ammClawback, errorMessage)
   })
+
+  it(`verifies valid AMMClawback with CurveType`, function () {
+    ammClawback.CurveType = 1
+    assertValid(ammClawback)
+  })
+
+  it(`throws w/ invalid CurveType`, function () {
+    ammClawback.CurveType = '1'
+    assertInvalid(ammClawback, 'AMMClawback: invalid field CurveType')
+  })
 })

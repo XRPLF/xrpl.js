@@ -56,4 +56,14 @@ describe('AMMDelete', function () {
     const errorMessage = 'AMMDelete: Asset2 must be a Currency'
     assertInvalid(ammDelete, errorMessage)
   })
+
+  it(`verifies valid AMMDelete with CurveType`, function () {
+    ammDelete.CurveType = 1
+    assertValid(ammDelete)
+  })
+
+  it(`throws w/ invalid CurveType`, function () {
+    ammDelete.CurveType = '1'
+    assertInvalid(ammDelete, 'AMMDelete: invalid field CurveType')
+  })
 })

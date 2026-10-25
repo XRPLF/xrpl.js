@@ -4,6 +4,11 @@ import AccountRoot, {
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
+import AMMBin from './AMMBin'
+import AMMBinHolding from './AMMBinHolding'
+import AMMPosition from './AMMPosition'
+import AMMTick from './AMMTick'
+import AMMTickBitmap from './AMMTickBitmap'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
@@ -51,6 +56,11 @@ export {
   AMENDMENTS_ID,
   Amendments,
   AMM,
+  AMMBin,
+  AMMBinHolding,
+  AMMPosition,
+  AMMTick,
+  AMMTickBitmap,
   Bridge,
   Check,
   Credential,

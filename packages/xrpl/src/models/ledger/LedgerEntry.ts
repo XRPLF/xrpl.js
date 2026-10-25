@@ -1,6 +1,11 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
 import AMM from './AMM'
+import AMMBin from './AMMBin'
+import AMMBinHolding from './AMMBinHolding'
+import AMMPosition from './AMMPosition'
+import AMMTick from './AMMTick'
+import AMMTickBitmap from './AMMTickBitmap'
 import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
@@ -30,6 +35,11 @@ type LedgerEntry =
   | AccountRoot
   | Amendments
   | AMM
+  | AMMBin
+  | AMMBinHolding
+  | AMMPosition
+  | AMMTick
+  | AMMTickBitmap
   | Bridge
   | Check
   | Credential
@@ -59,6 +69,11 @@ type LedgerEntryFilter =
   | 'account'
   | 'amendments'
   | 'amm'
+  | 'amm_bin'
+  | 'amm_bin_holding'
+  | 'amm_position'
+  | 'amm_tick'
+  | 'amm_tick_bitmap'
   | 'bridge'
   | 'check'
   | 'credential'

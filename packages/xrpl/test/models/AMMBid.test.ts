@@ -161,4 +161,14 @@ describe('AMMBid', function () {
       "AMMBid: AuthAccounts must not include sender's address"
     assertInvalid(bid, errorMessage)
   })
+
+  it(`verifies valid AMMBid with CurveType`, function () {
+    bid.CurveType = 1
+    assertValid(bid)
+  })
+
+  it(`throws w/ invalid CurveType`, function () {
+    bid.CurveType = '1'
+    assertInvalid(bid, 'AMMBid: invalid field CurveType')
+  })
 })
