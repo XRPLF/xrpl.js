@@ -22,6 +22,7 @@ import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
+import TokenIssuance from './TokenIssuance'
 import Vault from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
 import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
@@ -50,6 +51,7 @@ type LedgerEntry =
   | SignerList
   | Sponsorship
   | Ticket
+  | TokenIssuance
   | Vault
   | XChainOwnedClaimID
   | XChainOwnedCreateAccountClaimID
@@ -83,6 +85,7 @@ type LedgerEntryFilter =
   | 'sponsorship'
   | 'state'
   | 'ticket'
+  | 'token_issuance'
   | 'vault'
   | 'xchain_owned_create_account_claim_id'
   | 'xchain_owned_claim_id'
