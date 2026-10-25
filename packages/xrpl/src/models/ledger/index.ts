@@ -14,6 +14,9 @@ import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
 import Bridge from './Bridge'
 import Check from './Check'
+import Contract from './Contract'
+import ContractData from './ContractData'
+import ContractSource from './ContractSource'
 import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
@@ -77,6 +80,9 @@ export {
   Beneficiary,
   Bridge,
   Check,
+  Contract,
+  ContractData,
+  ContractSource,
   CouponSchedule,
   Credential,
   Delegate,

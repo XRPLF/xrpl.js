@@ -69,6 +69,12 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
    */
   LastInteraction?: number
   /**
+   * The ledger entry ID of the corresponding Contract ledger entry.
+   * Present only on a smart contract's pseudo-account AccountRoot; always
+   * omitted on other accounts.
+   */
+  ContractID?: string
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */

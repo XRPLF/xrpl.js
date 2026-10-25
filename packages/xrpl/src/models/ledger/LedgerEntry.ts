@@ -11,6 +11,9 @@ import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
 import Bridge from './Bridge'
 import Check from './Check'
+import Contract from './Contract'
+import ContractData from './ContractData'
+import ContractSource from './ContractSource'
 import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
@@ -55,6 +58,9 @@ type LedgerEntry =
   | Beneficiary
   | Bridge
   | Check
+  | Contract
+  | ContractData
+  | ContractSource
   | CouponSchedule
   | Credential
   | Delegate
@@ -99,6 +105,9 @@ type LedgerEntryFilter =
   | 'beneficiary'
   | 'bridge'
   | 'check'
+  | 'contract'
+  | 'contract_data'
+  | 'contract_source'
   | 'coupon_schedule'
   | 'credential'
   | 'delegate'

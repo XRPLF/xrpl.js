@@ -62,6 +62,28 @@ export { ConfidentialMPTConvert } from './ConfidentialMPTConvert'
 export { ConfidentialMPTConvertBack } from './ConfidentialMPTConvertBack'
 export { ConfidentialMPTMergeInbox } from './ConfidentialMPTMergeInbox'
 export { ConfidentialMPTSend } from './ConfidentialMPTSend'
+export { ContractCall } from './contractCall'
+export { ContractClawback } from './contractClawback'
+export {
+  CONTRACT_DATA_TYPES,
+  ContractDataTypeName,
+  ContractFunction,
+  ContractInstanceParameter,
+  ContractInstanceParameterValue,
+  ContractParameter,
+  ContractParameterFlags,
+  ParameterType,
+  ParameterValue,
+  ParameterValueData,
+} from './contractCommon'
+export {
+  ContractCreate,
+  ContractCreateFlags,
+  ContractCreateFlagsInterface,
+} from './contractCreate'
+export { ContractDelete } from './contractDelete'
+export { ContractModify } from './contractModify'
+export { ContractUserDelete } from './contractUserDelete'
 export {
   CouponClaim,
   CouponClaimFlags,

@@ -39,6 +39,12 @@ const ALPHANET_TRANSACTION_TYPES = [
   'AMMBinDestroy',
   'AMMCollectFees',
   'AMMPositionTransfer',
+  'ContractCreate',
+  'ContractModify',
+  'ContractDelete',
+  'ContractClawback',
+  'ContractUserDelete',
+  'ContractCall',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(

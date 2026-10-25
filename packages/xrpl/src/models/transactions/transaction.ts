@@ -55,6 +55,15 @@ import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
 } from './ConfidentialMPTSend'
+import { ContractCall, validateContractCall } from './contractCall'
+import { ContractClawback, validateContractClawback } from './contractClawback'
+import { ContractCreate, validateContractCreate } from './contractCreate'
+import { ContractDelete, validateContractDelete } from './contractDelete'
+import { ContractModify, validateContractModify } from './contractModify'
+import {
+  ContractUserDelete,
+  validateContractUserDelete,
+} from './contractUserDelete'
 import { CouponClaim, validateCouponClaim } from './couponClaim'
 import { CouponPay, validateCouponPay } from './couponPay'
 import {
@@ -258,6 +267,12 @@ export type SubmittableTransaction =
   | ConfidentialMPTConvertBack
   | ConfidentialMPTMergeInbox
   | ConfidentialMPTSend
+  | ContractCall
+  | ContractClawback
+  | ContractCreate
+  | ContractDelete
+  | ContractModify
+  | ContractUserDelete
   | CouponClaim
   | CouponPay
   | CouponScheduleCreate
@@ -516,6 +531,30 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'ConfidentialMPTSend':
       validateConfidentialMPTSend(tx)
+      break
+
+    case 'ContractCall':
+      validateContractCall(tx)
+      break
+
+    case 'ContractClawback':
+      validateContractClawback(tx)
+      break
+
+    case 'ContractCreate':
+      validateContractCreate(tx)
+      break
+
+    case 'ContractDelete':
+      validateContractDelete(tx)
+      break
+
+    case 'ContractModify':
+      validateContractModify(tx)
+      break
+
+    case 'ContractUserDelete':
+      validateContractUserDelete(tx)
       break
 
     case 'CouponClaim':
