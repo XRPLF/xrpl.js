@@ -424,6 +424,68 @@ describe('BaseTransaction', function () {
       )
     })
 
+    // xrpld's Signer template is Account, SigningPubKey and TxnSignature
+    // (InnerObjectFormats.cpp:21-27), and STObject::applyTemplate refuses any
+    // other field (STObject.cpp:193-199): a P-256 multi-signer signs with
+    // TxnSignature, never a PasskeySignature.
+    it(`Handles a PasskeySignature inside a Signers entry`, function () {
+      assertInvalid(
+        {
+          Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+          TransactionType: 'Payment',
+          SigningPubKey: '',
+          Signers: [
+            {
+              Signer: {
+                Account: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+                SigningPubKey: p256Key,
+                TxnSignature: '3006020101020101',
+                PasskeySignature: { ...passkeySignature },
+              },
+            },
+          ],
+        },
+        'BaseTransaction: invalid Signers',
+      )
+    })
+
+    it(`Verifies a P-256 key signing a Signers entry with TxnSignature`, function () {
+      assertValid({
+        Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+        TransactionType: 'Payment',
+        SigningPubKey: '',
+        Signers: [
+          {
+            Signer: {
+              Account: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+              SigningPubKey: p256Key,
+              TxnSignature: '3006020101020101',
+            },
+          },
+        ],
+      })
+    })
+
+    // xrpld's SponsorSignature template is SigningPubKey, TxnSignature and
+    // Signers (InnerObjectFormats.cpp:132-138); any other field is refused
+    // (STObject.cpp:193-199).
+    it(`Handles a PasskeySignature inside SponsorSignature`, function () {
+      assertInvalid(
+        {
+          Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+          TransactionType: 'Payment',
+          Sponsor: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
+          SponsorFlags: 0x00000001,
+          SponsorSignature: {
+            SigningPubKey: p256Key,
+            TxnSignature: '3006020101020101',
+            PasskeySignature: { ...passkeySignature },
+          },
+        },
+        'Transaction: invalid SponsorSignature',
+      )
+    })
+
     it(`Handles a PasskeySignature beside a TxnSignature`, function () {
       assertInvalid(
         { ...passkeyTx(), TxnSignature: '3006020101020101' },

@@ -6,7 +6,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * `PasskeyListSet` transaction and `PasskeyList` ledger entry (Passkey amendment).
-* `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does.
+* `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does. As in rippled's inner object templates, a `Signers` entry or `SponsorSignature` cannot carry one: a P-256 multi-signer or sponsor signs with `TxnSignature`.
 
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
@@ -14,6 +14,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* `SponsorSignature` refuses fields outside rippled's template (`SigningPubKey`, `TxnSignature`, `Signers`).
 
 ## 5.3.0 (2026-09-16)
 
