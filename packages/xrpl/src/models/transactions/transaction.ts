@@ -126,6 +126,11 @@ import {
   PermissionedDomainSet,
   validatePermissionedDomainSet,
 } from './permissionedDomainSet'
+import { RepoAccept, validateRepoAccept } from './repoAccept'
+import { RepoCancel, validateRepoCancel } from './repoCancel'
+import { RepoClose, validateRepoClose } from './repoClose'
+import { RepoCreate, validateRepoCreate } from './repoCreate'
+import { RepoDefault, validateRepoDefault } from './repoDefault'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -234,6 +239,11 @@ export type SubmittableTransaction =
   | PaymentChannelFund
   | PermissionedDomainSet
   | PermissionedDomainDelete
+  | RepoAccept
+  | RepoCancel
+  | RepoClose
+  | RepoCreate
+  | RepoDefault
   | SetRegularKey
   | SignerListSet
   | SponsorshipSet
@@ -552,6 +562,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PermissionedDomainDelete':
       validatePermissionedDomainDelete(tx)
+      break
+
+    case 'RepoAccept':
+      validateRepoAccept(tx)
+      break
+
+    case 'RepoCancel':
+      validateRepoCancel(tx)
+      break
+
+    case 'RepoClose':
+      validateRepoClose(tx)
+      break
+
+    case 'RepoCreate':
+      validateRepoCreate(tx)
+      break
+
+    case 'RepoDefault':
+      validateRepoDefault(tx)
       break
 
     case 'SetRegularKey':

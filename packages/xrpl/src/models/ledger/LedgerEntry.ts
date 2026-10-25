@@ -18,6 +18,7 @@ import Offer from './Offer'
 import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import PermissionedDomain from './PermissionedDomain'
+import Repo from './Repo'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
@@ -46,6 +47,7 @@ type LedgerEntry =
   | Oracle
   | PayChannel
   | PermissionedDomain
+  | Repo
   | RippleState
   | SignerList
   | Sponsorship
@@ -79,6 +81,7 @@ type LedgerEntryFilter =
   | 'oracle'
   | 'payment_channel'
   | 'permissioned_domain'
+  | 'repo'
   | 'signer_list'
   | 'sponsorship'
   | 'state'
