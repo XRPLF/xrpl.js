@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does.
 * `TokenIssuanceCreate`, `TokenIssuanceSet`, `TokenIssuanceDestroy` and `TokenConvert` transactions, `TokenIssuance` ledger entry and `MPTokenIssuance.TokenIssuanceID` (TokenIssuance amendment).
 * `RepoCreate`, `RepoAccept`, `RepoCancel`, `RepoClose` and `RepoDefault` transactions and `Repo` ledger entry (Repo amendment).
+* `FirewallSet`, `FirewallDelete` and `WithdrawPreauth` transactions and `Firewall` and `WithdrawPreauth` ledger entries (Firewall amendment).
 
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.

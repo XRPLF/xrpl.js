@@ -20,6 +20,9 @@ const ALPHANET_TRANSACTION_TYPES = [
   'RepoCancel',
   'RepoClose',
   'RepoDefault',
+  'FirewallSet',
+  'FirewallDelete',
+  'WithdrawPreauth',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
