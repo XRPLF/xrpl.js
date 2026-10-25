@@ -26,6 +26,10 @@ const ALPHANET_TRANSACTION_TYPES = [
   'SubscriptionSet',
   'SubscriptionCancel',
   'SubscriptionClaim',
+  'BallotCreate',
+  'BallotCastVote',
+  'BallotFinalize',
+  'BallotDelete',
 ]
 
 ALPHANET_TRANSACTION_TYPES.filter(
