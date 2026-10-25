@@ -22,7 +22,12 @@ import {
   SponsorSignature,
   XChainBridge,
 } from '../common'
-import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
+import {
+  INTEGER_SANITY_CHECK,
+  isFlagEnabled,
+  isHex,
+  onlyHasFields,
+} from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
@@ -508,6 +513,49 @@ export function isHexWithByteLength(
   return check
 }
 
+const MPT_ISSUANCE_ID_BYTES = 24
+const ALL_ZERO_HEX_REGEX = /^0+$/u
+
+/**
+ * Verify the input is a 24-byte hex MPTokenIssuanceID.
+ *
+ * @param input - The value to check.
+ * @returns Whether the input is an MPTokenIssuanceID.
+ */
+export function isMPTokenIssuanceID(input: unknown): input is string {
+  return isHexWithByteLength(MPT_ISSUANCE_ID_BYTES)(input)
+}
+
+/**
+ * Throw when a hex-string field of the transaction is all zeros. The field's
+ * presence and type are validated separately.
+ *
+ * @param tx - The transaction to check.
+ * @param field - The name of the hex-string field.
+ * @throws ValidationError if the field is all zeros.
+ */
+export function validateNonZeroField(
+  tx: Record<string, unknown>,
+  field: string,
+): void {
+  const value = tx[field]
+  if (isString(value) && ALL_ZERO_HEX_REGEX.test(value)) {
+    throw new ValidationError(
+      `${String(tx.TransactionType)}: ${field} must not be zero`,
+    )
+  }
+}
+
+/**
+ * Whether an Amount (XRP drops, IOU or MPT) has a value greater than zero.
+ *
+ * @param amount - The amount to check.
+ * @returns Whether the amount's value is positive.
+ */
+export function isPositiveAmount(amount: unknown): boolean {
+  return parseAmountValue(amount) > 0
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**
@@ -651,6 +699,56 @@ export enum GlobalFlags {
 
 export interface GlobalFlagsInterface {
   tfInnerBatchTxn?: boolean
+}
+
+/** The `tfFullyCanonicalSig` universal transaction flag. */
+const TF_FULLY_CANONICAL_SIG = 0x80000000
+
+/**
+ * Whether a numeric Flags value holds only bits from `allowedBits` and
+ * `tfFullyCanonicalSig`.
+ *
+ * @param flags - The numeric Flags value.
+ * @param allowedBits - The single-bit flags the transaction may carry.
+ * @returns Whether every set bit is allowed.
+ */
+function hasOnlyAllowedBits(flags: number, allowedBits: number[]): boolean {
+  if (!Number.isInteger(flags) || flags < 0) {
+    return false
+  }
+  const known = [...allowedBits, TF_FULLY_CANONICAL_SIG]
+    .filter((bit) => isFlagEnabled(flags, bit))
+    .reduce((sum, bit) => sum + bit, 0)
+  return flags === known
+}
+
+/**
+ * Verify a transaction's Flags hold only its own flags and the universal
+ * flags, as rippled's transaction flag mask requires (temINVALID_FLAG).
+ *
+ * @param tx - The transaction to check.
+ * @param allowedFlags - The transaction-specific flags by name, e.g. a flags enum.
+ * @throws ValidationError when Flags holds any other flag.
+ */
+export function validateFlagsMask(
+  tx: Record<string, unknown>,
+  allowedFlags: Record<string, number | string> = {},
+): void {
+  const allowed = [
+    ...Object.entries(allowedFlags),
+    ...Object.entries(GlobalFlags),
+  ].filter((entry): entry is [string, number] => isNumber(entry[1]))
+  const allowedNames = allowed.map(([name]) => name)
+  const allowedBits = allowed.map(([, bit]) => bit)
+  const { Flags: flags } = tx
+  const valid =
+    flags == null ||
+    (isNumber(flags) && hasOnlyAllowedBits(flags, allowedBits)) ||
+    (isRecord(flags) &&
+      Object.keys(flags).every((name) => allowedNames.includes(name)))
+  if (!valid) {
+    throw new ValidationError(`${String(tx.TransactionType)}: invalid Flags`)
+  }
 }
 
 /**

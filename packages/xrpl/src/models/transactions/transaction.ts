@@ -43,6 +43,20 @@ import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
 } from './ConfidentialMPTSend'
+import { CouponClaim, validateCouponClaim } from './couponClaim'
+import { CouponPay, validateCouponPay } from './couponPay'
+import {
+  CouponScheduleCreate,
+  validateCouponScheduleCreate,
+} from './couponScheduleCreate'
+import {
+  CouponScheduleDelete,
+  validateCouponScheduleDelete,
+} from './couponScheduleDelete'
+import {
+  CouponScheduleSet,
+  validateCouponScheduleSet,
+} from './couponScheduleSet'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -195,6 +209,11 @@ export type SubmittableTransaction =
   | ConfidentialMPTConvertBack
   | ConfidentialMPTMergeInbox
   | ConfidentialMPTSend
+  | CouponClaim
+  | CouponPay
+  | CouponScheduleCreate
+  | CouponScheduleDelete
+  | CouponScheduleSet
   | CredentialAccept
   | CredentialCreate
   | CredentialDelete
@@ -396,6 +415,26 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'ConfidentialMPTSend':
       validateConfidentialMPTSend(tx)
+      break
+
+    case 'CouponClaim':
+      validateCouponClaim(tx)
+      break
+
+    case 'CouponPay':
+      validateCouponPay(tx)
+      break
+
+    case 'CouponScheduleCreate':
+      validateCouponScheduleCreate(tx)
+      break
+
+    case 'CouponScheduleDelete':
+      validateCouponScheduleDelete(tx)
+      break
+
+    case 'CouponScheduleSet':
+      validateCouponScheduleSet(tx)
       break
 
     case 'CredentialAccept':

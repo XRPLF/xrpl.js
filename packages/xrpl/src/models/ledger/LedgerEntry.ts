@@ -3,6 +3,7 @@ import Amendments from './Amendments'
 import AMM from './AMM'
 import Bridge from './Bridge'
 import Check from './Check'
+import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
@@ -32,6 +33,7 @@ type LedgerEntry =
   | AMM
   | Bridge
   | Check
+  | CouponSchedule
   | Credential
   | Delegate
   | DepositPreauth
@@ -61,6 +63,7 @@ type LedgerEntryFilter =
   | 'amm'
   | 'bridge'
   | 'check'
+  | 'coupon_schedule'
   | 'credential'
   | 'delegate'
   | 'deposit_preauth'
