@@ -2,6 +2,7 @@ import { coreTypes } from '../src/types'
 import fixtures from './fixtures/data-driven-tests.json'
 
 import { makeParser } from '../src/binary'
+import { encode, decode } from '../src'
 const { Amount, SignedAmount } = coreTypes
 
 function amountErrorTests() {
@@ -88,6 +89,62 @@ describe('Amount', function () {
     expect(() => Amount.from(mpt)).toThrow(
       new Error(mpt.value + ' is an illegal amount'),
     )
+  })
+
+  describe('MPT amount range', function () {
+    const mptIssuanceId = '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
+
+    it('accepts the lower and upper bounds of the valid range', function () {
+      for (const value of ['0', '1', '9223372036854775807']) {
+        const fixture = { value, mpt_issuance_id: mptIssuanceId }
+        expect(Amount.from(fixture).toJSON()).toEqual(fixture)
+      }
+    })
+
+    const outOfRange: Array<[string, string]> = [
+      ['2^63', '9223372036854775808'],
+      ['2^64 - 1', '18446744073709551615'],
+      ['2^64', '18446744073709551616'],
+      ['2^64 + 5', '18446744073709551621'],
+      ['2^128', '340282366920938463463374607431768211456'],
+      ['-1', '-1'],
+      ['-2^63', '-9223372036854775808'],
+    ]
+
+    outOfRange.forEach(function ([label, value]) {
+      it('rejects an out-of-range MPT amount: ' + label, function () {
+        expect(function () {
+          Amount.from({ value, mpt_issuance_id: mptIssuanceId })
+        }).toThrow(new Error(value + ' is an illegal amount'))
+      })
+    })
+
+    it('does not encode a truncated MPT amount in a transaction', function () {
+      const tx = {
+        TransactionType: 'Payment',
+        Account: 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf',
+        Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
+        Fee: '10',
+        Sequence: 1,
+        SigningPubKey: '',
+      }
+      const maxAmount = {
+        value: '9223372036854775807',
+        mpt_issuance_id: mptIssuanceId,
+      }
+      expect(decode(encode({ ...tx, Amount: maxAmount })).Amount).toEqual(
+        maxAmount,
+      )
+      expect(function () {
+        encode({
+          ...tx,
+          Amount: {
+            value: '18446744073709551621',
+            mpt_issuance_id: mptIssuanceId,
+          },
+        })
+      }).toThrow(new Error('18446744073709551621 is an illegal amount'))
+    })
   })
 
   it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
