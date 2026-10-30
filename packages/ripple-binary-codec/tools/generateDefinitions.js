@@ -300,7 +300,7 @@ async function main() {
   }
   hits = [
     ...ledgerFormatsMacroFile.matchAll(
-      /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+[ \n]*,[ \n]*([x0-9a-f]+)[ \n]*,[ \n]*([^,]+),[ \n]*([^,]+), \({$/gm,
+      /^ *LEDGER_ENTRY[A-Z_]*\(lt[A-Z_]+[ \n]*,[ \n]*([x0-9a-fA-F]+)[ \n]*,[ \n]*([^,]+),[ \n]*([^,]+), \({$/gm,
     ),
   ]
   hits.push(['', '-1', 'Invalid'])
