@@ -101,6 +101,11 @@ describe('Batch', function () {
     assertValid(tx)
   })
 
+  it('verifies Batch w/ LastLedgerSequence in inner transaction', function () {
+    tx.RawTransactions[0].RawTransaction.LastLedgerSequence = 1000
+    assertValid(tx)
+  })
+
   it('throws w/ invalid BatchSigners', function () {
     tx.BatchSigners = 0
     assertInvalid(tx, 'Batch: invalid field BatchSigners')
