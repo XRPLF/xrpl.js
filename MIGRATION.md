@@ -197,10 +197,8 @@ const total: number = balance + dropsToXrp(fee)
 
 **After**
 ```ts
-import { BigNumber, dropsToXrp } from 'xrpl'
-
-const balance: BigNumber = await client.getXrpBalance(address)
-const total: BigNumber = balance.plus(dropsToXrp(fee))
+const balance = await client.getXrpBalance(address)
+const total = balance.plus(dropsToXrp(fee))
 total.toString() // exact decimal string, e.g. '922.913243'
 total.toNumber() // JavaScript number; loses drops above 2^33 XRP
 ```

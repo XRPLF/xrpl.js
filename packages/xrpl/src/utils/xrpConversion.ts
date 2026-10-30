@@ -16,10 +16,6 @@ const SANITY_CHECK = /^-?[0-9.]+$/u
  * `number` lost up to 15 drops near the XRP supply on each
  * `xrpToDrops(dropsToXrp(value))` round-trip. See xrpl.js issue #3316.
  *
- * Use the `BigNumber` exported by `xrpl` to type the result. A separate copy
- * of `bignumber.js` declares a different `BigNumber` type, and TypeScript
- * will not assign this result to it.
- *
  * @param dropsToConvert - Drops to convert to XRP. This can be a string, number, or BigNumber.
  * @returns Amount in XRP, as a `BigNumber`. Call `.toString()` for a decimal
  * string or `.toNumber()` to convert to a JavaScript number (may lose

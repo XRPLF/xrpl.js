@@ -1,6 +1,7 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
-import { BigNumber, dropsToXrp, xrpToDrops } from '../../src'
+import { dropsToXrp, xrpToDrops } from '../../src/utils'
 
 function assertXrp(drops: BigNumber.Value, expected: string): void {
   const xrp = dropsToXrp(drops)
