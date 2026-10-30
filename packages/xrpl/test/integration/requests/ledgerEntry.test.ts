@@ -68,6 +68,9 @@ describe('ledger_entry', function () {
       })
 
       assert.isDefined(ledgerEntryResponse.result.node)
+      assert.isDefined(ledgerEntryResponse.result.node.OwnerCount)
+      // @ts-expect-error - Owner is not present in the AccountRoot response
+      assert.isUndefined(ledgerEntryResponse.result.node.Owner)
       // @ts-expect-error - node_binary is not present in the response
       assert.isUndefined(ledgerEntryResponse.result.node_binary)
     },
@@ -86,6 +89,9 @@ describe('ledger_entry', function () {
       })
 
       assert.isDefined(ledgerEntryResponse.result.node)
+      assert.isDefined(ledgerEntryResponse.result.node.OwnerCount)
+      // @ts-expect-error - Owner is not present in the AccountRoot response
+      assert.isUndefined(ledgerEntryResponse.result.node.Owner)
       // @ts-expect-error - node_binary is not present in the response
       assert.isUndefined(ledgerEntryResponse.result.node_binary)
     },
