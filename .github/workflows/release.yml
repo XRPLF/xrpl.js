@@ -726,6 +726,25 @@ jobs:
 
           echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
 
+          # Without an explicit base, GitHub picks the comparison tag itself and,
+          # with many packages tagged in this monorepo, often lands on an
+          # unrelated package's tag. Use the highest stable x.y.z release of this
+          # package whose version is strictly below the one being released.
+          CURRENT_CORE="${PKG_VERSION%%-*}"
+          PREVIOUS_TAG="$(
+            { git tag -l "${PKG_NAME}@*" \
+                | sed -n "s/^${PKG_NAME}@\([0-9]*\.[0-9]*\.[0-9]*\)$/\1/p"
+              echo "${CURRENT_CORE}"
+            } | sort -uV | grep -B1 -x -F "${CURRENT_CORE}" | grep -v -x -F "${CURRENT_CORE}" || true
+          )"
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            PREVIOUS_TAG="${PKG_NAME}@${PREVIOUS_TAG}"
+            echo "📝 Generating release notes against ${PREVIOUS_TAG}"
+          else
+            echo "⚠️ No previous stable tag found for ${PKG_NAME}; GitHub will choose the comparison base."
+          fi
+          echo "previous_tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
@@ -733,6 +752,7 @@ jobs:
           name: "${{ steps.create_tag.outputs.tag_name }}"
           draft: false
           generate_release_notes: true
+          previous_tag: "${{ steps.create_tag.outputs.previous_tag }}"
           prerelease: ${{ needs.get_version.outputs.is_beta == 'true' }}
           make_latest: ${{ needs.get_version.outputs.is_beta != 'true' }}
 
