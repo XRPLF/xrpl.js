@@ -12,3 +12,8 @@ export interface NFTokenOffer extends BaseLedgerEntry, HasPreviousTxnID {
   Owner: string
   OwnerNode?: string
 }
+
+export enum NFTokenOfferFlags {
+  /** The offer sells the NFToken; without it, the offer buys. */
+  lsfSellNFToken = 0x00000001,
+}

@@ -21,6 +21,7 @@ import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
+import TransactionProposal from './TransactionProposal'
 import Vault from './Vault'
 
 type LedgerEntry =
@@ -46,6 +47,7 @@ type LedgerEntry =
   | SignerList
   | Sponsorship
   | Ticket
+  | TransactionProposal
   | Vault
   | MPTokenIssuance
 
@@ -76,6 +78,7 @@ type LedgerEntryFilter =
   | 'sponsorship'
   | 'state'
   | 'ticket'
+  | 'transaction_proposal'
   | 'vault'
 
 export { LedgerEntry, LedgerEntryFilter }

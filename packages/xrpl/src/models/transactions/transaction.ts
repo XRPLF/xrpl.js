@@ -21,6 +21,7 @@ import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
   isIssuedCurrencyAmount,
+  isRecord,
   validateBaseTransaction,
 } from './common'
 import {
@@ -36,9 +37,17 @@ import {
   validateConfidentialMPTConvertBack,
 } from './ConfidentialMPTConvertBack'
 import {
+  ConfidentialMPTHolderKeyUpdate,
+  validateConfidentialMPTHolderKeyUpdate,
+} from './confidentialMPTHolderKeyUpdate'
+import {
   ConfidentialMPTMergeInbox,
   validateConfidentialMPTMergeInbox,
 } from './ConfidentialMPTMergeInbox'
+import {
+  ConfidentialMPTMirrorUpdate,
+  validateConfidentialMPTMirrorUpdate,
+} from './confidentialMPTMirrorUpdate'
 import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
@@ -135,6 +144,14 @@ import {
   validateSponsorshipTransfer,
 } from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
+import {
+  TransactionProposalCancel,
+  validateTransactionProposalCancel,
+} from './transactionProposalCancel'
+import {
+  TransactionProposalCreate,
+  validateTransactionProposalCreate,
+} from './transactionProposalCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
 import { VaultClawback, validateVaultClawback } from './vaultClawback'
@@ -167,7 +184,9 @@ export type SubmittableTransaction =
   | ConfidentialMPTClawback
   | ConfidentialMPTConvert
   | ConfidentialMPTConvertBack
+  | ConfidentialMPTHolderKeyUpdate
   | ConfidentialMPTMergeInbox
+  | ConfidentialMPTMirrorUpdate
   | ConfidentialMPTSend
   | CredentialAccept
   | CredentialCreate
@@ -213,6 +232,8 @@ export type SubmittableTransaction =
   | SponsorshipSet
   | SponsorshipTransfer
   | TicketCreate
+  | TransactionProposalCancel
+  | TransactionProposalCreate
   | TrustSet
   | VaultClawback
   | VaultCreate
@@ -356,8 +377,16 @@ export function validate(transaction: Record<string, unknown>): void {
       validateConfidentialMPTConvertBack(tx)
       break
 
+    case 'ConfidentialMPTHolderKeyUpdate':
+      validateConfidentialMPTHolderKeyUpdate(tx)
+      break
+
     case 'ConfidentialMPTMergeInbox':
       validateConfidentialMPTMergeInbox(tx)
+      break
+
+    case 'ConfidentialMPTMirrorUpdate':
+      validateConfidentialMPTMirrorUpdate(tx)
       break
 
     case 'ConfidentialMPTSend':
@@ -538,6 +567,18 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TicketCreate':
       validateTicketCreate(tx)
+      break
+
+    case 'TransactionProposalCancel':
+      validateTransactionProposalCancel(tx)
+      break
+
+    case 'TransactionProposalCreate':
+      validateTransactionProposalCreate(tx)
+      // The proposed transaction is validated here to avoid a dependency cycle
+      if (isRecord(tx.ProposedTransaction)) {
+        validate(tx.ProposedTransaction)
+      }
       break
 
     case 'TrustSet':

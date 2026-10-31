@@ -199,6 +199,20 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
    */
   nft_page?: string
 
+  /**
+   * The TransactionProposal object to retrieve. If a string, must be its
+   * object ID, as hexadecimal. If an object, the proposed transaction's
+   * `account` and its `ticket_seq` (TicketSequence) identify it.
+   */
+  transaction_proposal?:
+    | {
+        /** The account of the proposed transaction. */
+        account: string
+        /** The TicketSequence of the proposed transaction. */
+        ticket_seq: number
+      }
+    | string
+
   delegate?: {
     account: string
     authorize: string

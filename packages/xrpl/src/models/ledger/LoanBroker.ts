@@ -92,4 +92,18 @@ export default interface LoanBroker extends BaseLedgerEntry, HasPreviousTxnID {
    * Valid values are between 0 and 100000 inclusive. A value of 1 is equivalent to 1/10 bps or 0.001%.
    */
   CoverRateLiquidation?: number
+
+  /**
+   * The ID of the PermissionedDomain whose credentials a private LoanBroker's
+   * borrowers must hold.
+   */
+  DomainID?: string
+}
+
+export enum LoanBrokerFlags {
+  /**
+   * If set, the LoanBroker is private: only holders of its DomainID's
+   * credentials may borrow.
+   */
+  lsfLoanBrokerPrivate = 0x00010000,
 }

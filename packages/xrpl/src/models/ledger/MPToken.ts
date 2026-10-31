@@ -26,3 +26,12 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
    */
   Sponsor?: string
 }
+
+export enum MPTokenFlags {
+  /** The holder's balance is locked. */
+  lsfMPTLocked = 0x00000001,
+  /** The issuer has authorized the holder. */
+  lsfMPTAuthorized = 0x00000002,
+  /** The MPToken is held by an AMM account. */
+  lsfMPTAMM = 0x00000004,
+}
