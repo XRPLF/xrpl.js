@@ -7158,6 +7158,7 @@
     "OracleSet": 51,
     "Payment": 0,
     "PaymentChannelClaim": 15,
+    "PaymentChannelClawback": 223,
     "PaymentChannelCreate": 13,
     "PaymentChannelFund": 14,
     "PermissionedDomainDelete": 63,
