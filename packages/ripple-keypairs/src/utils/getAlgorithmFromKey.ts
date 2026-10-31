@@ -1,3 +1,7 @@
+import {
+  DILITHIUM_PRIVATE_KEY_BYTES,
+  DILITHIUM_PUBLIC_KEY_BYTES,
+} from '../signing-schemes/dilithium'
 import type { Algorithm, HexString, KeyType } from '../types'
 
 enum Prefix {
@@ -21,6 +25,8 @@ type CompositeKey = `${KeyType}_${Prefix}_${number}`
  * | secp256k1 | Public (3)  |  0x04  |   65   | prefix + 32 x-bytes + 32 y-bytes                      | ecdsa-secp256k1 |
  * | secp256k1 | Private (1) |  None  |   32   | Uint256BE (0 < n < order)                             | ecdsa-secp256k1 |
  * | secp256k1 | Private (2) |  0x00  |   33   | prefix + Uint256BE (0 < n < order)                    | ecdsa-secp256k1 |
+ * | ML-DSA-44 | Private     |  None  |  2560  | FIPS 204 packed secret key                            |       dilithium |
+ * | ML-DSA-44 | Public      |  None  |  1312  | FIPS 204 packed public key                            |       dilithium |
  *
  * Note: The 0x00 prefix for secpk256k1 Private (2) essentially 0 pads the number
  *       and the interpreted number is the same as 32 bytes.
@@ -33,6 +39,14 @@ const KEY_TYPES: Record<CompositeKey, Algorithm> = {
   [`public_${Prefix.SECP256K1_PUB_X}_33`]: 'ecdsa-secp256k1',
   [`public_${Prefix.SECP256K1_PUB_X_ODD_Y}_33`]: 'ecdsa-secp256k1',
   [`public_${Prefix.SECP256K1_PUB_XY}_65`]: 'ecdsa-secp256k1',
+  [`private_${Prefix.NONE}_${DILITHIUM_PRIVATE_KEY_BYTES}`]: 'dilithium',
+  [`public_${Prefix.NONE}_${DILITHIUM_PUBLIC_KEY_BYTES}`]: 'dilithium',
+}
+
+// Key lengths that carry no prefix byte
+const UNPREFIXED_LENGTHS: Record<KeyType, number[]> = {
+  private: [32, DILITHIUM_PRIVATE_KEY_BYTES],
+  public: [DILITHIUM_PUBLIC_KEY_BYTES],
 }
 
 function getKeyInfo(key: HexString) {
@@ -104,8 +118,9 @@ ${validFormats}
  */
 export function getAlgorithmFromKey(key: HexString, type: KeyType): Algorithm {
   const { prefix, len } = getKeyInfo(key)
-  // Special case back compat support for no prefix
-  const usedPrefix = type === 'private' && len === 32 ? Prefix.NONE : prefix
+  const usedPrefix = UNPREFIXED_LENGTHS[type].includes(len)
+    ? Prefix.NONE
+    : prefix
   const algorithm = KEY_TYPES[`${type}_${usedPrefix}_${len}`]
 
   if (!algorithm) {

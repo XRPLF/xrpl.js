@@ -1,5 +1,5 @@
 export type HexString = string
-export type Algorithm = 'ecdsa-secp256k1' | 'ed25519'
+export type Algorithm = 'ecdsa-secp256k1' | 'ed25519' | 'dilithium'
 export type KeyType = 'private' | 'public'
 
 export interface KeyPair {

@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@noble/curves": "^2.2.0",
+    "@noble/post-quantum": "^0.7.1",
     "@xrplf/isomorphic": "^1.0.2",
     "ripple-address-codec": "^5.0.1"
   },
