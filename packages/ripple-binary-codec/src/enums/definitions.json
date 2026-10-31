@@ -929,6 +929,16 @@
       }
     ],
     [
+      "SignCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -2299,6 +2309,36 @@
       }
     ],
     [
+      "ClientDataJSON",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 252,
+        "type": "Blob"
+      }
+    ],
+    [
+      "AuthenticatorData",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 253,
+        "type": "Blob"
+      }
+    ],
+    [
+      "PasskeyID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 254,
+        "type": "Blob"
+      }
+    ],
+    [
       "Account",
       {
         "isSerialized": true,
@@ -3039,6 +3079,26 @@
       }
     ],
     [
+      "Passkey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "STObject"
+      }
+    ],
+    [
+      "PasskeySignature",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -3255,6 +3315,16 @@
         "isSigningField": false,
         "isVLEncoded": false,
         "nth": 31,
+        "type": "STArray"
+      }
+    ],
+    [
+      "Passkeys",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
         "type": "STArray"
       }
     ],
@@ -5176,6 +5246,7 @@
     "NegativeUNL": 78,
     "Offer": 111,
     "Oracle": 128,
+    "PasskeyList": 513,
     "PayChannel": 120,
     "PermissionedDomain": 130,
     "RippleState": 114,
@@ -7156,6 +7227,7 @@
     "OfferCreate": 7,
     "OracleDelete": 52,
     "OracleSet": 51,
+    "PasskeyListSet": 201,
     "Payment": 0,
     "PaymentChannelClaim": 15,
     "PaymentChannelCreate": 13,
