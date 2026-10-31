@@ -1,0 +1,37 @@
+{
+  "FIELDS": [
+    [
+      "Backup",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 253,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "FirewallID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "Hash256"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "Firewall": 516,
+    "WithdrawPreauth": 517
+  },
+  "TRANSACTION_RESULTS": {
+    "tefFIREWALL_BLOCK": -101
+  },
+  "TRANSACTION_TYPES": {
+    "FirewallDelete": 212,
+    "FirewallSet": 211,
+    "WithdrawPreauth": 213
+  },
+  "TYPES": {}
+}
