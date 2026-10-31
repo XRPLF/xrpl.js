@@ -16,6 +16,11 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'DelegateSet',
   'AccountDelete',
   'Batch',
+  // Alphanet types whose transactions.macro entry is Delegation::NotDelegable:
+  'CouponScheduleCreate',
+  'CouponScheduleSet',
+  'CouponScheduleDelete',
+  'CouponPay',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

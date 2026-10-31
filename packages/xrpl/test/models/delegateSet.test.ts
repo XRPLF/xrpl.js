@@ -97,6 +97,30 @@ describe('DelegateSet', function () {
     assertInvalid(tx, errorMessage)
   })
 
+  // Alphanet transaction types whose transactions.macro entry is
+  // Delegation::NotDelegable; DelegateSet.cpp:42 returns temMALFORMED for them.
+  ;[
+    'CouponScheduleCreate',
+    'CouponScheduleSet',
+    'CouponScheduleDelete',
+    'CouponPay',
+  ].forEach((transactionType) => {
+    it(`throws w/ PermissionValue ${transactionType}, which is not delegable`, function () {
+      tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
+      assertInvalid(
+        tx,
+        `DelegateSet: PermissionValue contains a non-delegatable transaction ${transactionType}`,
+      )
+    })
+  })
+
+  ;['CouponClaim'].forEach((transactionType) => {
+    it(`accepts PermissionValue ${transactionType}, which is delegable`, function () {
+      tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
+      assertValid(tx)
+    })
+  })
+
   it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'EnableAmendment' } }]
     const errorMessage =
