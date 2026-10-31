@@ -929,6 +929,76 @@
       }
     ],
     [
+      "CouponCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 234,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ClaimantCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 235,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LastCouponTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 236,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "EarliestCallTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 237,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "CallNoticePeriod",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 238,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FirstCouponTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 239,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "CouponInterval",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 240,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1885,6 +1955,56 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 34,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponIndex",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 247,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponAccrued",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 248,
+        "type": "Amount"
+      }
+    ],
+    [
+      "PoolAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "Amount"
+      }
+    ],
+    [
+      "AccruedPerUnit",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
         "type": "Amount"
       }
     ],
@@ -3559,6 +3679,16 @@
       }
     ],
     [
+      "CouponAsset",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Issue"
+      }
+    ],
+    [
       "XChainBridge",
       {
         "isSerialized": true,
@@ -5158,6 +5288,7 @@
     "Amendments": 102,
     "Bridge": 105,
     "Check": 67,
+    "CouponSchedule": 520,
     "Credential": 129,
     "DID": 73,
     "Delegate": 131,
@@ -7120,6 +7251,11 @@
     "ConfidentialMPTConvertBack": 87,
     "ConfidentialMPTMergeInbox": 86,
     "ConfidentialMPTSend": 88,
+    "CouponClaim": 221,
+    "CouponPay": 222,
+    "CouponScheduleCreate": 218,
+    "CouponScheduleDelete": 220,
+    "CouponScheduleSet": 219,
     "CredentialAccept": 59,
     "CredentialCreate": 58,
     "CredentialDelete": 60,
