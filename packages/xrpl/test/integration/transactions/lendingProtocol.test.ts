@@ -26,6 +26,7 @@ import {
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
   VaultKind,
+  ValidationError,
 } from '../../../src'
 import {
   LoanFlags,
@@ -35,6 +36,7 @@ import {
 } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
+import { assertRejects } from '../../testUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -477,12 +479,10 @@ describe('Lending Protocol IT', () => {
       }
 
       // Fails as loan borrower has not signed yet.
-      await testTransaction(
-        testContext.client,
-        loanSetTx,
-        loanBrokerWallet,
-        undefined,
-        'temBAD_SIGNER',
+      await assertRejects(
+        testContext.client.submit(loanSetTx, { wallet: loanBrokerWallet }),
+        ValidationError,
+        "LoanSet requires the counterparty's signature (CounterpartySignature). Use signLoanSetByCounterparty before submitting.",
       )
 
       // Loan broker signs the transaction and sends it to the borrower
