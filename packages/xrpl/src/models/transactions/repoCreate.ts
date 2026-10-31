@@ -1,8 +1,7 @@
-import { stringToHex } from '@xrplf/isomorphic/utils'
-
 import { ValidationError } from '../../errors'
 import { Amount, MPTAmount } from '../common'
 import { INTEGER_SANITY_CHECK, isHex } from '../utils'
+import { isSameAsset } from '../utils/amount'
 
 import {
   Account,
@@ -30,15 +29,6 @@ const MAX_XRP_DROPS = BigInt('100000000000000000')
 
 /** Largest value of a 32-bit date field. */
 const MAX_UINT32 = 0xffffffff
-
-/** Hex characters before a 3-character code inside a 160-bit currency. */
-const ISO_CODE_HEX_OFFSET = 30
-
-/** Hex characters in a 160-bit currency. */
-const CURRENCY_HEX_LENGTH = 40
-
-/** Length of a 3-character currency code. */
-const ISO_CODE_LENGTH = 3
 
 /**
  * The RepoCreate transaction offers a repurchase agreement to a counterparty
@@ -95,50 +85,6 @@ export interface RepoCreate extends BaseTransaction {
  */
 function isRepoAmount(input: unknown): input is Amount | MPTAmount {
   return isAmount(input) || isMPTAmount(input)
-}
-
-/**
- * A currency code as its 40-character uppercase hex form.
- *
- * @param code - A 3-character or 40-character hex currency code.
- * @returns The hex form of the code.
- */
-function currencyHex(code: string): string {
-  if (code.length === ISO_CODE_LENGTH) {
-    return stringToHex(code)
-      .toUpperCase()
-      .padStart(ISO_CODE_HEX_OFFSET, '0')
-      .padEnd(CURRENCY_HEX_LENGTH, '0')
-  }
-  return code.toUpperCase()
-}
-
-/**
- * Whether two amounts are in the same asset.
- *
- * @param first - The first amount.
- * @param second - The second amount.
- * @returns Whether both are XRP, the same MPT, or the same IOU.
- */
-function isSameAsset(
-  first: Amount | MPTAmount,
-  second: Amount | MPTAmount,
-): boolean {
-  if (typeof first === 'string' || typeof second === 'string') {
-    return typeof first === typeof second
-  }
-  if ('mpt_issuance_id' in first || 'mpt_issuance_id' in second) {
-    return (
-      'mpt_issuance_id' in first &&
-      'mpt_issuance_id' in second &&
-      first.mpt_issuance_id.toUpperCase() ===
-        second.mpt_issuance_id.toUpperCase()
-    )
-  }
-  return (
-    currencyHex(first.currency) === currencyHex(second.currency) &&
-    areAddressesEqual(first.issuer, second.issuer)
-  )
 }
 
 /**
