@@ -17,8 +17,8 @@ import type { Wallet } from '.'
  * Signs a LoanSet transaction as the counterparty.
  *
  * This function adds a counterparty signature to a LoanSet transaction that has already been
- * signed by the first party. The counterparty uses their wallet to sign the transaction,
- * which is required for multi-party loan agreements on the XRP Ledger.
+ * signed by the first party, either single-signed or multisigned. The counterparty uses their
+ * wallet to sign the transaction, which is required for multi-party loan agreements on the XRP Ledger.
  *
  * @param wallet - The counterparty's wallet used for signing the transaction.
  * @param transaction - The LoanSet transaction to sign. Can be either:
@@ -58,7 +58,7 @@ export function signLoanSetByCounterparty(
       'Transaction is already signed by the counterparty.',
     )
   }
-  if (tx.TxnSignature == null || tx.SigningPubKey == null) {
+  if (!isSignedByFirstParty(tx)) {
     throw new ValidationError(
       'Transaction must be first signed by first party.',
     )
@@ -158,7 +158,7 @@ export function combineLoanSetCounterpartySigners(
       throw new ValidationError('CounterpartySignature must have Signers.')
     }
 
-    if (tx.TxnSignature == null || tx.SigningPubKey == null) {
+    if (!isSignedByFirstParty(tx)) {
       throw new ValidationError(
         'Transaction must be first signed by first party.',
       )
@@ -177,6 +177,14 @@ export function combineLoanSetCounterpartySigners(
     tx,
     tx_blob: encode(tx),
   }
+}
+
+// The Account signs with a single signature or, for a multisigned Account, with Signers.
+function isSignedByFirstParty(tx: Transaction): boolean {
+  return (
+    tx.SigningPubKey != null &&
+    (tx.TxnSignature != null || (tx.Signers != null && tx.Signers.length > 0))
+  )
 }
 
 function validateLoanSetTransactionEquivalence(transactions: LoanSet[]): void {
