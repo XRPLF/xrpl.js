@@ -1889,6 +1889,16 @@
       }
     ],
     [
+      "MinQuantity",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Amount"
+      }
+    ],
+    [
       "PublicKey",
       {
         "isSerialized": true,
@@ -6970,6 +6980,7 @@
     "tecUNFUNDED_AMM": 162,
     "tecUNFUNDED_OFFER": 103,
     "tecUNFUNDED_PAYMENT": 104,
+    "tecWOULD_CROSS": 253,
     "tecWRONG_ASSET": 194,
     "tecXCHAIN_ACCOUNT_CREATE_PAST": 181,
     "tecXCHAIN_ACCOUNT_CREATE_TOO_MANY": 182,
