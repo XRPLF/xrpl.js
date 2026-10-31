@@ -96,7 +96,7 @@ describe('Signing data', function () {
     )
 
     // custom number would need to updated in case it has been used by an existing transaction type
-    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 1000
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const actual = encodeForSigning(tx_json, newDefs)
@@ -105,7 +105,7 @@ describe('Signing data', function () {
         '53545800', // signingPrefix
         // TransactionType
         '12',
-        '00C8',
+        '03E8',
         // Flags
         '22',
         '80000000',
@@ -245,7 +245,7 @@ describe('Signing data', function () {
     )
 
     // custom number would need to updated in case it has been used by an existing transaction type
-    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 200
+    customPaymentDefinitions.TRANSACTION_TYPES.Payment = 1000
 
     const newDefs = new XrplDefinitions(customPaymentDefinitions)
     const signingAccount = 'rJZdUusLDtY9NEsGea7ijqhVrXv98rYBYN'
@@ -256,7 +256,7 @@ describe('Signing data', function () {
         '534D5400', // signingPrefix
         // TransactionType
         '12',
-        '00C8',
+        '03E8',
         // Flags
         '22',
         '80000000',

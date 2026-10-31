@@ -929,6 +929,26 @@
       }
     ],
     [
+      "LastInteraction",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "TimeLock",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -2545,6 +2565,16 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 31,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Beneficiary",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 254,
         "type": "AccountID"
       }
     ],
@@ -5156,6 +5186,7 @@
     "AMM": 121,
     "AccountRoot": 97,
     "Amendments": 102,
+    "Beneficiary": 512,
     "Bridge": 105,
     "Check": 67,
     "Credential": 129,
@@ -7111,6 +7142,7 @@
     "AccountDelete": 21,
     "AccountSet": 3,
     "Batch": 71,
+    "BeneficiarySet": 200,
     "CheckCancel": 18,
     "CheckCash": 17,
     "CheckCreate": 16,
