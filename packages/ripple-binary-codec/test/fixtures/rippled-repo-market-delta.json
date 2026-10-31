@@ -1,0 +1,59 @@
+{
+  "FIELDS": [
+    [
+      "CollateralAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "Amount"
+      }
+    ],
+    [
+      "MaturityDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 243,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "PurchasePrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "Amount"
+      }
+    ],
+    [
+      "RepoID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "Hash256"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "Repo": 515
+  },
+  "TRANSACTION_RESULTS": {
+    "tecREPO_ACTIVE": 252,
+    "tecREPO_PENDING": 251
+  },
+  "TRANSACTION_TYPES": {
+    "RepoAccept": 207,
+    "RepoCancel": 208,
+    "RepoClose": 209,
+    "RepoCreate": 206,
+    "RepoDefault": 210
+  },
+  "TYPES": {}
+}
