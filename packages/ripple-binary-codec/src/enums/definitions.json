@@ -929,6 +929,36 @@
       }
     ],
     [
+      "NextClaimTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 231,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "StartTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 232,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "Frequency",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 233,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1565,6 +1595,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 41,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "SubscriptionID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
         "type": "Hash256"
       }
     ],
@@ -5181,6 +5221,7 @@
     "RippleState": 114,
     "SignerList": 83,
     "Sponsorship": 144,
+    "Subscription": 521,
     "Ticket": 84,
     "Vault": 132,
     "XChainOwnedClaimID": 113,
@@ -7167,6 +7208,9 @@
     "SignerListSet": 12,
     "SponsorshipSet": 91,
     "SponsorshipTransfer": 90,
+    "SubscriptionCancel": 225,
+    "SubscriptionClaim": 226,
+    "SubscriptionSet": 224,
     "TicketCreate": 10,
     "TrustSet": 20,
     "UNLModify": 102,
