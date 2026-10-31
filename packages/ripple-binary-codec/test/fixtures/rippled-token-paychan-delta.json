@@ -1,0 +1,9 @@
+{
+  "FIELDS": [],
+  "LEDGER_ENTRY_TYPES": {},
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {
+    "PaymentChannelClawback": 223
+  },
+  "TYPES": {}
+}
