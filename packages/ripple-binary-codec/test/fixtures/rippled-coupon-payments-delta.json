@@ -1,0 +1,146 @@
+{
+  "FIELDS": [
+    [
+      "AccruedPerUnit",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CallNoticePeriod",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 238,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ClaimantCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 235,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "CouponAccrued",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 248,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponAsset",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Issue"
+      }
+    ],
+    [
+      "CouponCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 234,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "CouponIndex",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 247,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CouponInterval",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 240,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "EarliestCallTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 237,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FirstCouponTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 239,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LastCouponTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 236,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "PoolAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "Amount"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "CouponSchedule": 520
+  },
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {
+    "CouponClaim": 221,
+    "CouponPay": 222,
+    "CouponScheduleCreate": 218,
+    "CouponScheduleDelete": 220,
+    "CouponScheduleSet": 219
+  },
+  "TYPES": {}
+}
