@@ -1,0 +1,54 @@
+{
+  "FIELDS": [
+    [
+      "Frequency",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 233,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "NextClaimTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 231,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "StartTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 232,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SubscriptionID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "Hash256"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "Subscription": 521
+  },
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {
+    "SubscriptionCancel": 225,
+    "SubscriptionClaim": 226,
+    "SubscriptionSet": 224
+  },
+  "TYPES": {}
+}
