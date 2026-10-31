@@ -1569,6 +1569,16 @@
       }
     ],
     [
+      "TokenIssuanceID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -2719,6 +2729,16 @@
       }
     ],
     [
+      "IssuedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 248,
+        "type": "Number"
+      }
+    ],
+    [
       "LoanScale",
       {
         "isSerialized": true,
@@ -3379,6 +3399,16 @@
       }
     ],
     [
+      "TokenScale",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt8"
+      }
+    ],
+    [
       "TakerPaysCurrency",
       {
         "isSerialized": true,
@@ -3585,6 +3615,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 2,
+        "type": "Currency"
+      }
+    ],
+    [
+      "Currency",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
         "type": "Currency"
       }
     ],
@@ -5182,6 +5222,7 @@
     "SignerList": 83,
     "Sponsorship": 144,
     "Ticket": 84,
+    "TokenIssuance": 514,
     "Vault": 132,
     "XChainOwnedClaimID": 113,
     "XChainOwnedCreateAccountClaimID": 116
@@ -6963,6 +7004,7 @@
     "tecPATH_PARTIAL": 101,
     "tecPRECISION_LOSS": 197,
     "tecPSEUDO_ACCOUNT": 196,
+    "tecSUPPLY_EXCEEDED": 254,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecTOO_SOON": 152,
     "tecUNFUNDED": 129,
@@ -7168,6 +7210,10 @@
     "SponsorshipSet": 91,
     "SponsorshipTransfer": 90,
     "TicketCreate": 10,
+    "TokenConvert": 205,
+    "TokenIssuanceCreate": 202,
+    "TokenIssuanceDestroy": 204,
+    "TokenIssuanceSet": 203,
     "TrustSet": 20,
     "UNLModify": 102,
     "VaultClawback": 70,
