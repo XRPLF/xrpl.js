@@ -929,6 +929,26 @@
       }
     ],
     [
+      "VoteCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 241,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OpenTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 242,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1205,6 +1225,26 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 33,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "VoteLockedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "BallotWeight",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
         "type": "UInt64"
       }
     ],
@@ -1565,6 +1605,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 41,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "BallotID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
         "type": "Hash256"
       }
     ],
@@ -2295,6 +2345,36 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 46,
+        "type": "Blob"
+      }
+    ],
+    [
+      "VoterPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 248,
+        "type": "Blob"
+      }
+    ],
+    [
+      "TallyPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 249,
+        "type": "Blob"
+      }
+    ],
+    [
+      "EncryptedVote",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 250,
         "type": "Blob"
       }
     ],
@@ -3039,6 +3119,26 @@
       }
     ],
     [
+      "BallotResult",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BallotOption",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -3259,6 +3359,56 @@
       }
     ],
     [
+      "Results",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "STArray"
+      }
+    ],
+    [
+      "VoterEncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "STArray"
+      }
+    ],
+    [
+      "AuditorEncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "STArray"
+      }
+    ],
+    [
+      "EncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "STArray"
+      }
+    ],
+    [
+      "EncryptedTally",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -3375,6 +3525,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 22,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "OptionCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
         "type": "UInt8"
       }
     ],
@@ -5156,6 +5316,8 @@
     "AMM": 121,
     "AccountRoot": 97,
     "Amendments": 102,
+    "Ballot": 518,
+    "BallotVote": 519,
     "Bridge": 105,
     "Check": 67,
     "Credential": 129,
@@ -6914,6 +7076,11 @@
     "tecARRAY_TOO_LARGE": 191,
     "tecBAD_CREDENTIALS": 193,
     "tecBAD_PROOF": 199,
+    "tecBALLOT_BAD_OPTIONS": 246,
+    "tecBALLOT_CLOSED": 250,
+    "tecBALLOT_EXISTS": 247,
+    "tecBALLOT_NOT_OPEN": 248,
+    "tecBALLOT_VOTED": 249,
     "tecCANT_ACCEPT_OWN_NFTOKEN_OFFER": 158,
     "tecCLAIM": 100,
     "tecCRYPTOCONDITION_ERROR": 146,
@@ -7110,6 +7277,10 @@
     "AMMWithdraw": 37,
     "AccountDelete": 21,
     "AccountSet": 3,
+    "BallotCastVote": 215,
+    "BallotCreate": 214,
+    "BallotDelete": 217,
+    "BallotFinalize": 216,
     "Batch": 71,
     "CheckCancel": 18,
     "CheckCash": 17,
