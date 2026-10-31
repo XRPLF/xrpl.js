@@ -929,6 +929,16 @@
       }
     ],
     [
+      "MaturityDate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 243,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1569,6 +1579,16 @@
       }
     ],
     [
+      "RepoID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -1885,6 +1905,26 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 34,
+        "type": "Amount"
+      }
+    ],
+    [
+      "PurchasePrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "Amount"
+      }
+    ],
+    [
+      "CollateralAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
         "type": "Amount"
       }
     ],
@@ -5178,6 +5218,7 @@
     "Oracle": 128,
     "PayChannel": 120,
     "PermissionedDomain": 130,
+    "Repo": 515,
     "RippleState": 114,
     "SignerList": 83,
     "Sponsorship": 144,
@@ -6963,6 +7004,8 @@
     "tecPATH_PARTIAL": 101,
     "tecPRECISION_LOSS": 197,
     "tecPSEUDO_ACCOUNT": 196,
+    "tecREPO_ACTIVE": 252,
+    "tecREPO_PENDING": 251,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
     "tecTOO_SOON": 152,
     "tecUNFUNDED": 129,
@@ -7162,6 +7205,11 @@
     "PaymentChannelFund": 14,
     "PermissionedDomainDelete": 63,
     "PermissionedDomainSet": 62,
+    "RepoAccept": 207,
+    "RepoCancel": 208,
+    "RepoClose": 209,
+    "RepoCreate": 206,
+    "RepoDefault": 210,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
