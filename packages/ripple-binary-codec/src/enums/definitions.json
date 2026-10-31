@@ -1569,6 +1569,16 @@
       }
     ],
     [
+      "FirewallID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "Hash256"
+      }
+    ],
+    [
       "hash",
       {
         "isSerialized": false,
@@ -2545,6 +2555,16 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 31,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "Backup",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 253,
         "type": "AccountID"
       }
     ],
@@ -5165,6 +5185,7 @@
     "DirectoryNode": 100,
     "Escrow": 117,
     "FeeSettings": 115,
+    "Firewall": 516,
     "Invalid": -1,
     "LedgerHashes": 104,
     "Loan": 137,
@@ -5183,6 +5204,7 @@
     "Sponsorship": 144,
     "Ticket": 84,
     "Vault": 132,
+    "WithdrawPreauth": 517,
     "XChainOwnedClaimID": 113,
     "XChainOwnedCreateAccountClaimID": 116
   },
@@ -6999,6 +7021,7 @@
     "tefCREATED": -194,
     "tefEXCEPTION": -193,
     "tefFAILURE": -199,
+    "tefFIREWALL_BLOCK": -101,
     "tefINTERNAL": -192,
     "tefINVALID_LEDGER_FIX_TYPE": -178,
     "tefINVARIANT_FAILED": -182,
@@ -7131,6 +7154,8 @@
     "EscrowCancel": 4,
     "EscrowCreate": 1,
     "EscrowFinish": 2,
+    "FirewallDelete": 212,
+    "FirewallSet": 211,
     "Invalid": -1,
     "LedgerStateFix": 53,
     "LoanBrokerCoverClawback": 78,
@@ -7176,6 +7201,7 @@
     "VaultDeposit": 68,
     "VaultSet": 66,
     "VaultWithdraw": 69,
+    "WithdrawPreauth": 213,
     "XChainAccountCreateCommit": 44,
     "XChainAddAccountCreateAttestation": 46,
     "XChainAddClaimAttestation": 45,
