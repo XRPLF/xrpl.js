@@ -10,6 +10,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* `LoanSet` validation now matches rippled's preflight checks, which reject these values with `temINVALID`: `GracePeriod` must be between 60 and `PaymentInterval` (60 if omitted), `PaymentTotal` and `PrincipalRequested` must be greater than 0, `LoanOriginationFee` must be between 0 and `PrincipalRequested`, `LoanServiceFee`, `LatePaymentFee` and `ClosePaymentFee` must not be negative, and the `UInt32` fields must be integers in range.
+* `VaultCreate` validation now rejects a `WithdrawalPolicy` other than `vaultStrategyFirstComeFirstServe` (1), which rippled rejects with `temMALFORMED`.
+* `LoanSet` flags can be given as an object, such as `{ tfLoanOverpayment: true }`. This previously threw `Invalid flag tfLoanOverpayment`.
+* `Wallet.sign` now accepts flags given as an object for every transaction type. It previously threw `Cannot construct UInt32 from given value` unless the transaction had been through `autofill`.
 
 ## 5.3.0 (2026-09-16)
 
