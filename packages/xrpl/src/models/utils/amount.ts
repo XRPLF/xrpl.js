@@ -1,7 +1,32 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 
 import { Amount, MPTAmount } from '../common'
-import { isIssuedCurrencyAmount, isMPTAmount } from '../transactions/common'
+import {
+  areAddressesEqual,
+  isIssuedCurrencyAmount,
+  isMPTAmount,
+} from '../transactions/common'
+
+const ISO_CODE_LENGTH = 3
+const ISO_CODE_HEX_OFFSET = 30
+const CURRENCY_HEX_LENGTH = 40
+
+/**
+ * A currency code as its 40-character uppercase hex form.
+ *
+ * @param code - A 3-character or 40-character hex currency code.
+ * @returns The hex form of the code.
+ */
+function currencyHex(code: string): string {
+  if (code.length === ISO_CODE_LENGTH) {
+    return stringToHex(code)
+      .toUpperCase()
+      .padStart(ISO_CODE_HEX_OFFSET, '0')
+      .padEnd(CURRENCY_HEX_LENGTH, '0')
+  }
+  return code.toUpperCase()
+}
 
 /**
  * Check whether two amounts are denominated in the same asset: both XRP, both
@@ -22,14 +47,15 @@ export function isSameAsset(
     return (
       isMPTAmount(first) &&
       isMPTAmount(second) &&
-      first.mpt_issuance_id === second.mpt_issuance_id
+      first.mpt_issuance_id.toUpperCase() ===
+        second.mpt_issuance_id.toUpperCase()
     )
   }
   return (
     isIssuedCurrencyAmount(first) &&
     isIssuedCurrencyAmount(second) &&
-    first.currency === second.currency &&
-    first.issuer === second.issuer
+    currencyHex(first.currency) === currencyHex(second.currency) &&
+    areAddressesEqual(first.issuer, second.issuer)
   )
 }
 
