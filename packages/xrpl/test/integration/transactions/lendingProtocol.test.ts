@@ -271,20 +271,20 @@ describe('Lending Protocol IT', () => {
 
       // After payment, the principal outstanding should be reduced
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding, 10) <
-          parseInt(loanObject.PrincipalOutstanding, 10),
+        parseInt(paidLoan.PrincipalOutstanding as string, 10) <
+          parseInt(loanObject.PrincipalOutstanding as string, 10),
         'Principal should decrease after payment',
       )
       // Payment remaining should be decremented
       assert.equal(
         paidLoan.PaymentRemaining,
-        loanObject.PaymentRemaining - 1,
+        (loanObject.PaymentRemaining as number) - 1,
         'Payment remaining should decrease by 1',
       )
 
       // assert principal outstanding is not zero
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding, 10) > 0,
+        parseInt(paidLoan.PrincipalOutstanding as string, 10) > 0,
         'Principal should not be zero',
       )
 
@@ -301,7 +301,7 @@ describe('Lending Protocol IT', () => {
       // ========== STEP 5B: Make Second Payment with tfLoanFullPayment Flag ==========
       // Borrower makes the final payment with tfLoanFullPayment flag
       // This flag indicates the borrower is making a full early repayment
-      const finalPaymentAmount = paidLoan.PrincipalOutstanding
+      const finalPaymentAmount = paidLoan.PrincipalOutstanding as string
       const fullPaymentTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -325,8 +325,11 @@ describe('Lending Protocol IT', () => {
         (obj) => obj.index === loanObjectId,
       ) as Loan
 
+      // A repaid loan omits these DEFAULT fields rather than reporting 0
       assert.isUndefined(finalLoan.PrincipalOutstanding)
       assert.isUndefined(finalLoan.PaymentRemaining)
+      assert.isUndefined(finalLoan.TotalValueOutstanding)
+      assert.isUndefined(finalLoan.NextPaymentDueDate)
     },
     TIMEOUT,
   )
@@ -611,7 +614,7 @@ describe('Lending Protocol IT', () => {
       // is safely past it.
       await waitForAndForceProgressLedgerTime(
         testContext.client,
-        loanObject.NextPaymentDueDate + 200,
+        (loanObject.NextPaymentDueDate as number) + 200,
         400,
       )
 
@@ -708,6 +711,27 @@ describe('Lending Protocol IT', () => {
           BigInt((loanBrokerCoverClawbackTx.Amount as MPTAmount).value)
         ).toString(),
       )
+
+      // A DebtMaximum of 0 (no limit) is a DEFAULT value, so it is omitted
+      const loanBrokerUpdateTx: LoanBrokerSet = {
+        TransactionType: 'LoanBrokerSet',
+        Account: loanBrokerWallet.address,
+        VaultID: vaultObj.vaultObjectId,
+        LoanBrokerID: loanBrokerObjectId,
+        DebtMaximum: '0',
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerUpdateTx,
+        loanBrokerWallet,
+      )
+      const updatedLoanBroker = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanBrokerObjectId,
+        })
+      ).result.node as LoanBroker
+      assert.isUndefined(updatedLoanBroker.DebtMaximum)
 
       // Test LoanBrokerDelete
       const loanBrokerDeleteTx: LoanBrokerDelete = {
