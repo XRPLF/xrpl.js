@@ -211,13 +211,6 @@ export interface AuthorizeCredential {
   }
 }
 
-export interface XChainBridge {
-  LockingChainDoor: string
-  LockingChainIssue: Currency
-  IssuingChainDoor: string
-  IssuingChainIssue: Currency
-}
-
 /**
  * A PriceData object represents the price information for a token pair.
  *

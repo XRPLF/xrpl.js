@@ -151,15 +151,3 @@ export { VaultDelete } from './vaultDelete'
 export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
 export { VaultWithdraw } from './vaultWithdraw'
-export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
-export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
-export { XChainClaim } from './XChainClaim'
-export { XChainCommit } from './XChainCommit'
-export { XChainCreateBridge } from './XChainCreateBridge'
-export { XChainCreateClaimID } from './XChainCreateClaimID'
-export { XChainAccountCreateCommit } from './XChainAccountCreateCommit'
-export {
-  XChainModifyBridge,
-  XChainModifyBridgeFlags,
-  XChainModifyBridgeFlagsInterface,
-} from './XChainModifyBridge'

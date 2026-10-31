@@ -4,7 +4,6 @@ import AccountRoot, {
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
-import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
 import Delegate from './Delegate'
@@ -41,8 +40,6 @@ import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
-import XChainOwnedClaimID from './XChainOwnedClaimID'
-import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
 export {
   AccountRoot,
@@ -51,7 +48,6 @@ export {
   AMENDMENTS_ID,
   Amendments,
   AMM,
-  Bridge,
   Check,
   Credential,
   Delegate,
@@ -97,6 +93,4 @@ export {
   Vault,
   VaultFlags,
   VoteSlot,
-  XChainOwnedClaimID,
-  XChainOwnedCreateAccountClaimID,
 }

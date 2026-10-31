@@ -1,7 +1,6 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
 import AMM from './AMM'
-import Bridge from './Bridge'
 import Check from './Check'
 import Credential from './Credential'
 import Delegate from './Delegate'
@@ -23,14 +22,11 @@ import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
 import Ticket from './Ticket'
 import Vault from './Vault'
-import XChainOwnedClaimID from './XChainOwnedClaimID'
-import XChainOwnedCreateAccountClaimID from './XChainOwnedCreateAccountClaimID'
 
 type LedgerEntry =
   | AccountRoot
   | Amendments
   | AMM
-  | Bridge
   | Check
   | Credential
   | Delegate
@@ -51,15 +47,12 @@ type LedgerEntry =
   | Sponsorship
   | Ticket
   | Vault
-  | XChainOwnedClaimID
-  | XChainOwnedCreateAccountClaimID
   | MPTokenIssuance
 
 type LedgerEntryFilter =
   | 'account'
   | 'amendments'
   | 'amm'
-  | 'bridge'
   | 'check'
   | 'credential'
   | 'delegate'
@@ -84,7 +77,5 @@ type LedgerEntryFilter =
   | 'state'
   | 'ticket'
   | 'vault'
-  | 'xchain_owned_create_account_claim_id'
-  | 'xchain_owned_claim_id'
 
 export { LedgerEntry, LedgerEntryFilter }

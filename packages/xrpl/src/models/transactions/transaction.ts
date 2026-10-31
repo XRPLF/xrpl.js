@@ -143,32 +143,6 @@ import { VaultDelete, validateVaultDelete } from './vaultDelete'
 import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
 import { VaultSet, validateVaultSet } from './vaultSet'
 import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
-import {
-  XChainAccountCreateCommit,
-  validateXChainAccountCreateCommit,
-} from './XChainAccountCreateCommit'
-import {
-  XChainAddAccountCreateAttestation,
-  validateXChainAddAccountCreateAttestation,
-} from './XChainAddAccountCreateAttestation'
-import {
-  XChainAddClaimAttestation,
-  validateXChainAddClaimAttestation,
-} from './XChainAddClaimAttestation'
-import { XChainClaim, validateXChainClaim } from './XChainClaim'
-import { XChainCommit, validateXChainCommit } from './XChainCommit'
-import {
-  XChainCreateBridge,
-  validateXChainCreateBridge,
-} from './XChainCreateBridge'
-import {
-  XChainCreateClaimID,
-  validateXChainCreateClaimID,
-} from './XChainCreateClaimID'
-import {
-  XChainModifyBridge,
-  validateXChainModifyBridge,
-} from './XChainModifyBridge'
 
 /**
  * Transactions that can be submitted by clients
@@ -246,14 +220,6 @@ export type SubmittableTransaction =
   | VaultDeposit
   | VaultSet
   | VaultWithdraw
-  | XChainAccountCreateCommit
-  | XChainAddAccountCreateAttestation
-  | XChainAddClaimAttestation
-  | XChainClaim
-  | XChainCommit
-  | XChainCreateBridge
-  | XChainCreateClaimID
-  | XChainModifyBridge
 
 /**
  * Transactions that can only be created by validators.
@@ -600,38 +566,6 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'VaultWithdraw':
       validateVaultWithdraw(tx)
-      break
-
-    case 'XChainAccountCreateCommit':
-      validateXChainAccountCreateCommit(tx)
-      break
-
-    case 'XChainAddAccountCreateAttestation':
-      validateXChainAddAccountCreateAttestation(tx)
-      break
-
-    case 'XChainAddClaimAttestation':
-      validateXChainAddClaimAttestation(tx)
-      break
-
-    case 'XChainClaim':
-      validateXChainClaim(tx)
-      break
-
-    case 'XChainCommit':
-      validateXChainCommit(tx)
-      break
-
-    case 'XChainCreateBridge':
-      validateXChainCreateBridge(tx)
-      break
-
-    case 'XChainCreateClaimID':
-      validateXChainCreateClaimID(tx)
-      break
-
-    case 'XChainModifyBridge':
-      validateXChainModifyBridge(tx)
       break
 
     default:

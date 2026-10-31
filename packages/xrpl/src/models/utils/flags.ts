@@ -32,7 +32,6 @@ import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { VaultCreateFlags } from '../transactions/vaultCreate'
-import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
@@ -135,7 +134,6 @@ const txToFlag = {
   SponsorshipTransfer: SponsorshipTransferFlags,
   TrustSet: TrustSetFlags,
   VaultCreate: VaultCreateFlags,
-  XChainModifyBridge: XChainModifyBridgeFlags,
 }
 
 function isTxToFlagKey(

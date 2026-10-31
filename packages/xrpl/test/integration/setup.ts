@@ -1,20 +1,14 @@
-import { assert } from 'chai'
-
 import {
   AMMDeposit,
   AMMDepositFlags,
   Client,
   IssuedCurrency,
-  SignerListSet,
   Wallet,
-  XChainBridge,
-  XChainCreateBridge,
   XRP,
 } from '../../src'
 
 import serverUrl from './serverUrl'
 import {
-  GENESIS_ACCOUNT,
   createAMMPool,
   fundAccount,
   generateFundedWallet,
@@ -27,12 +21,6 @@ export interface TestAMMPool {
   testWallet: Wallet
   asset: XRP
   asset2: IssuedCurrency
-}
-
-interface TestBridge {
-  xchainBridge: XChainBridge
-  witness: Wallet
-  signatureReward: string
 }
 
 export interface XrplIntegrationTestContext {
@@ -104,72 +92,4 @@ export async function setupAMMPool(client: Client): Promise<TestAMMPool> {
     asset,
     asset2,
   }
-}
-
-export async function setupBridge(client: Client): Promise<TestBridge> {
-  const doorAccount = await generateFundedWallet(client)
-  const signatureReward = '200'
-  const xchainBridge: XChainBridge = {
-    LockingChainDoor: doorAccount.classicAddress,
-    LockingChainIssue: { currency: 'XRP' },
-    IssuingChainDoor: GENESIS_ACCOUNT,
-    IssuingChainIssue: { currency: 'XRP' },
-  }
-  const setupTx: XChainCreateBridge = {
-    TransactionType: 'XChainCreateBridge',
-    Account: doorAccount.classicAddress,
-    XChainBridge: xchainBridge,
-    SignatureReward: signatureReward,
-    MinAccountCreateAmount: '10000000',
-  }
-
-  await testTransaction(client, setupTx, doorAccount)
-
-  // confirm that the transaction actually went through
-  const accountObjectsResponse = await client.request({
-    command: 'account_objects',
-    account: doorAccount.classicAddress,
-    type: 'bridge',
-  })
-  assert.lengthOf(
-    accountObjectsResponse.result.account_objects,
-    1,
-    'Should be exactly one bridge owned by the account',
-  )
-
-  const witnessWallet = await generateFundedWallet(client)
-
-  const signerTx: SignerListSet = {
-    TransactionType: 'SignerListSet',
-    Account: doorAccount.classicAddress,
-    SignerEntries: [
-      {
-        SignerEntry: {
-          Account: witnessWallet.classicAddress,
-          SignerWeight: 1,
-        },
-      },
-    ],
-    SignerQuorum: 1,
-  }
-  await testTransaction(client, signerTx, doorAccount)
-
-  const signerAccountInfoResponse = await client.request({
-    command: 'account_info',
-    account: doorAccount.classicAddress,
-    signer_lists: true,
-  })
-  const signerListInfo = signerAccountInfoResponse.result.signer_lists?.[0]
-  assert.deepEqual(
-    signerListInfo?.SignerEntries,
-    signerTx.SignerEntries,
-    'SignerEntries were not set properly',
-  )
-  assert.equal(
-    signerListInfo?.SignerQuorum,
-    signerTx.SignerQuorum,
-    'SignerQuorum was not set properly',
-  )
-
-  return { xchainBridge, witness: witnessWallet, signatureReward }
 }
