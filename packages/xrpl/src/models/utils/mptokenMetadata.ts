@@ -11,9 +11,13 @@ import { isHex } from '.'
 
 export const MAX_MPT_META_BYTE_LENGTH = 1024
 export const MPT_META_WARNING_HEADER =
-  'MPTokenMetadata is not properly formatted as JSON as per the XLS-89 standard. ' +
+  'MPTokenMetadata does not follow the XLS-89 metadata schema ' +
+  '(expected fields: ticker/t, name/n, icon/i, asset_class/ac, issuer_name/in). ' +
   "While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable " +
-  'by Explorers and Indexers in the XRPL ecosystem.'
+  'by Explorers and Indexers in the XRPL ecosystem. ' +
+  'Example of valid metadata: {"t":"INV001","n":"Invoice F-2026-001",' +
+  '"i":"https://example.com/icon.png","ac":"other","in":"Example Issuer","ai":{"id":"F-2026-001"}} ' +
+  '— application-specific fields can be carried in additional_info/ai.'
 
 const MPT_META_URI_FIELDS = [
   {
@@ -470,6 +474,14 @@ export function decodeMPTokenMetadata(input: string): MPTokenMetadata {
 
 /**
  * Validates {@link MPTokenMetadata} adheres to XLS-89 standard.
+ *
+ * This is the same check behind the console warning printed when submitting
+ * an MPTokenIssuanceCreate, MPTokenIssuanceSet, or VaultCreate transaction
+ * with non-compliant metadata, so it can be run before signing to catch
+ * schema problems early instead of discovering them at submit time.
+ * A non-empty return value means the metadata is valid JSON that does not
+ * follow the XLS-89 schema — not that the JSON itself is malformed.
+ * (Genuinely unparseable JSON is reported as such in the returned messages.)
  *
  * @param input - Hex encoded {@link MPTokenMetadata}.
  * @returns Validation messages if {@link MPTokenMetadata} does not adheres to XLS-89 standard.
