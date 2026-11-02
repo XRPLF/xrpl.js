@@ -95,4 +95,52 @@ describe('OracleSet', function () {
     },
     TIMEOUT,
   )
+
+  it(
+    'omitted Scale',
+    async () => {
+      const closeTime: string = (
+        await testContext.client.request({
+          command: 'ledger',
+          ledger_index: 'validated',
+        })
+      ).result.ledger.close_time_iso
+
+      // A Scale of 0 is expressed by omitting the field, as rippled rejects
+      // a Scale that is explicitly set to 0.
+      const tx: OracleSet = {
+        TransactionType: 'OracleSet',
+        Account: testContext.wallet.classicAddress,
+        OracleDocumentID: 1234,
+        LastUpdateTime: Math.floor(new Date(closeTime).getTime() / 1000) + 20,
+        PriceDataSeries: [
+          {
+            PriceData: {
+              BaseAsset: 'XRP',
+              QuoteAsset: 'USD',
+              AssetPrice: 740,
+            },
+          },
+        ],
+        Provider: stringToHex('chainlink'),
+        AssetClass: stringToHex('currency'),
+      }
+
+      await testTransaction(testContext.client, tx, testContext.wallet)
+
+      const result = await testContext.client.request({
+        command: 'account_objects',
+        account: testContext.wallet.classicAddress,
+        type: 'oracle',
+      })
+
+      assert.equal(result.result.account_objects.length, 1)
+
+      const oracle = result.result.account_objects[0] as Oracle
+      assert.equal(oracle.PriceDataSeries.length, 1)
+      assert.equal(oracle.PriceDataSeries[0].PriceData.AssetPrice, '2e4')
+      assert.isUndefined(oracle.PriceDataSeries[0].PriceData.Scale)
+    },
+    TIMEOUT,
+  )
 })

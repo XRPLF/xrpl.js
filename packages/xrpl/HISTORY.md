@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* `OracleSet` validation now accepts a `PriceData` entry with `AssetPrice` and no `Scale`, which is how XLS-47 expresses a `Scale` of 0, and rejects an explicit `Scale: 0` that rippled refuses with "Field 'Scale' may not be explicitly set to default".
 
 ## 5.3.0 (2026-09-16)
 
