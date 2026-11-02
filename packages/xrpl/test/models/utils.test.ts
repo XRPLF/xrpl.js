@@ -28,6 +28,7 @@ import {
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
 import {
+  MPT_META_WARNING_HEADER,
   decodeMPTokenMetadata,
   encodeMPTokenMetadata,
   validateMPTokenMetadata,
@@ -594,6 +595,54 @@ describe('Models Utils', function () {
         assert.deepStrictEqual(validationMessages, testCase.validationMessages)
       })
     }
+  })
+
+  describe('MPTokenMetadata warning wording (xrpl.js#3562)', function () {
+    it('does not blame JSON formatting for valid JSON missing XLS-89 fields', function () {
+      const validationMessages = validateMPTokenMetadata(
+        stringToHex(
+          JSON.stringify({
+            id: 'F-2026-001',
+            montant: '50',
+            echeance: '2026-12-31',
+            sha256: 'abcd',
+          }),
+        ),
+      )
+
+      assert.isNotEmpty(validationMessages)
+      assert.isTrue(
+        validationMessages.every(
+          (message) => !message.includes('not properly formatted as JSON'),
+        ),
+      )
+      assert.include(validationMessages[0], 'ticker/t')
+    })
+
+    it('warning header describes a schema mismatch, not a JSON syntax error', function () {
+      assert.notInclude(
+        MPT_META_WARNING_HEADER,
+        'not properly formatted as JSON',
+      )
+      assert.include(MPT_META_WARNING_HEADER, 'XLS-89 metadata schema')
+      assert.include(MPT_META_WARNING_HEADER, 'ticker/t')
+    })
+
+    it('the example in the warning header is itself valid metadata', function () {
+      const validationMessages = validateMPTokenMetadata(
+        stringToHex(
+          JSON.stringify(
+            JSON.parse(
+              '{"t":"INV001","n":"Invoice F-2026-001",' +
+                '"i":"https://example.com/icon.png","ac":"other",' +
+                '"in":"Example Issuer","ai":{"id":"F-2026-001"}}',
+            ),
+          ),
+        ),
+      )
+
+      assert.deepStrictEqual(validationMessages, [])
+    })
   })
 
   describe('MPTokenMetadata encode/decode', function () {
