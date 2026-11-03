@@ -1,3 +1,6 @@
 *.md
 
 /.nx/workspace-data
+
+# Generated Emscripten glue code
+packages/mpt-crypto/wasm/

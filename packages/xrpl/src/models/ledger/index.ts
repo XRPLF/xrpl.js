@@ -27,8 +27,8 @@ import {
   MPTokenIssuance,
   MPTokenIssuanceFlags,
   MPTokenIssuanceFlagsInterface,
-  MPTokenIssuanceMutableFlags,
-  MPTokenIssuanceMutableFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
 } from './MPTokenIssuance'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
@@ -38,6 +38,7 @@ import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
+import Sponsorship, { SponsorshipFlags } from './Sponsorship'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
@@ -76,8 +77,8 @@ export {
   MPTokenIssuance,
   MPTokenIssuanceFlags,
   MPTokenIssuanceFlagsInterface,
-  MPTokenIssuanceMutableFlags,
-  MPTokenIssuanceMutableFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
   MPToken,
   NFTokenOffer,
   NFTokenPage,
@@ -90,6 +91,8 @@ export {
   RippleStateFlags,
   SignerList,
   SignerListFlags,
+  Sponsorship,
+  SponsorshipFlags,
   Ticket,
   Vault,
   VaultFlags,

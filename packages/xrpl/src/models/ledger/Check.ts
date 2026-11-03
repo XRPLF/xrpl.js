@@ -67,4 +67,10 @@ export default interface Check extends BaseLedgerEntry, HasPreviousTxnID {
    * hosted recipient at the sender's address.
    */
   SourceTag?: number
+  /**
+   * The account sponsoring the reserve for this Check. If present, the sponsor
+   * is responsible for the reserve requirement of this object instead of the
+   * owner.
+   */
+  Sponsor?: string
 }

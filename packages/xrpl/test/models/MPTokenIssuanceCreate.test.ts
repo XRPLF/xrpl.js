@@ -2,8 +2,8 @@ import { stringToHex } from '@xrplf/isomorphic/src/utils'
 
 import { MPTokenIssuanceCreateFlags, MPTokenMetadata } from '../../src'
 import {
-  MPTokenIssuanceCreateMutableFlags,
-  tmfMPTokenIssuanceCreateMutableMask,
+  MPTokenIssuanceCreateImmutableFlags,
+  tifMPTokenIssuanceImmutableMask,
   validateMPTokenIssuanceCreate,
 } from '../../src/models/transactions/MPTokenIssuanceCreate'
 import {
@@ -32,8 +32,7 @@ describe('MPTokenIssuanceCreate', function () {
       AssetScale: 2,
       TransferFee: 1,
       Flags: MPTokenIssuanceCreateFlags.tfMPTCanTransfer,
-      MutableFlags:
-        MPTokenIssuanceCreateMutableFlags.tmfMPTCanMutateTransferFee,
+      ImmutableFlags: MPTokenIssuanceCreateImmutableFlags.tifMPTTransferFee,
       MPTokenMetadata: stringToHex(`{
         "ticker": "TBILL",
         "name": "T-Bill Yield Token",
@@ -45,6 +44,20 @@ describe('MPTokenIssuanceCreate', function () {
     } as any
 
     assertValid(validMPTokenIssuanceCreate)
+  })
+
+  it(`verifies valid MPTokenIssuanceCreate w/ tfMPTCanHoldConfidentialBalance`, function () {
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+    } as any)
+
+    assertValid({
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Flags: { tfMPTCanHoldConfidentialBalance: true },
+    } as any)
   })
 
   it(`throws w/ MPTokenMetadata being an empty string`, function () {
@@ -148,25 +161,61 @@ describe('MPTokenIssuanceCreate', function () {
     )
   })
 
-  it(`throws w/ invalid MutableFlags value`, async () => {
-    const invalid = {
-      TransactionType: 'MPTokenIssuanceCreate',
-      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MutableFlags: tmfMPTokenIssuanceCreateMutableMask,
-    } as any
+  it(`throws w/ TransferFee and tfMPTCanHoldConfidentialBalance`, function () {
+    // Confidential amounts are encrypted, so a transfer rate cannot apply;
+    // rippled rejects this pairing with temBAD_TRANSFER_FEE.
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        // Distinct flag bits, so addition is equivalent to a bitwise OR.
+        Flags:
+          MPTokenIssuanceCreateFlags.tfMPTCanTransfer +
+          MPTokenIssuanceCreateFlags.tfMPTCanHoldConfidentialBalance,
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
+    )
 
-    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceCreate',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        TransferFee: 100,
+        Flags: {
+          tfMPTCanTransfer: true,
+          tfMPTCanHoldConfidentialBalance: true,
+        },
+      } as any,
+      'MPTokenIssuanceCreate: TransferFee cannot be provided together with the tfMPTCanHoldConfidentialBalance flag',
+    )
   })
 
-  it(`throws w/ MutableFlags explicitly set to 0`, async () => {
-    // rippled rejects a present-but-zero MutableFlags with temINVALID_FLAG.
+  it(`throws w/ invalid ImmutableFlags value`, async () => {
     const invalid = {
       TransactionType: 'MPTokenIssuanceCreate',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      MutableFlags: 0,
+      ImmutableFlags: tifMPTokenIssuanceImmutableMask,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceCreate: Invalid MutableFlags value')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
+    )
+  })
+
+  it(`throws w/ ImmutableFlags explicitly set to 0`, async () => {
+    // rippled rejects a present-but-zero ImmutableFlags with temINVALID_FLAG.
+    const invalid = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      ImmutableFlags: 0,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceCreate: Invalid ImmutableFlags value',
+    )
   })
 
   it(`throws with Zero MaximumAmount`, function () {
