@@ -1,11 +1,13 @@
-import { ValidationError } from '../../errors'
 import { IssuedCurrencyAmount } from '../common'
 
 import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
+  isNumber,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -136,21 +138,7 @@ export interface TrustSet extends BaseTransaction {
  */
 export function validateTrustSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  const { LimitAmount, QualityIn, QualityOut } = tx
-
-  if (LimitAmount === undefined) {
-    throw new ValidationError('TrustSet: missing field LimitAmount')
-  }
-
-  if (!isAmount(LimitAmount)) {
-    throw new ValidationError('TrustSet: invalid LimitAmount')
-  }
-
-  if (QualityIn !== undefined && typeof QualityIn !== 'number') {
-    throw new ValidationError('TrustSet: QualityIn must be a number')
-  }
-
-  if (QualityOut !== undefined && typeof QualityOut !== 'number') {
-    throw new ValidationError('TrustSet: QualityOut must be a number')
-  }
+  validateRequiredField(tx, 'LimitAmount', isAmount)
+  validateOptionalField(tx, 'QualityIn', isNumber)
+  validateOptionalField(tx, 'QualityOut', isNumber)
 }

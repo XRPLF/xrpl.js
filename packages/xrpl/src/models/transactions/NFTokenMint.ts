@@ -11,6 +11,7 @@ import {
   isNumber,
   validateBaseTransaction,
   validateOptionalField,
+  validateRequiredField,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -162,9 +163,7 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     throw new ValidationError('NFTokenMint: URI must be in hex format')
   }
 
-  if (tx.NFTokenTaxon == null) {
-    throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
-  }
+  validateRequiredField(tx, 'NFTokenTaxon', isNumber)
 
   if (tx.Amount == null) {
     if (tx.Expiration != null || tx.Destination != null) {
