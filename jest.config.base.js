@@ -12,7 +12,7 @@ module.exports = {
       },
     ],
     "node_modules/chai/.+\\.js$": "ts-jest",
-    "node_modules/(@scure|@noble|https-proxy-agent|agent-base)/.+\\.js$": [
+    "node_modules/(@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/.+\\.js$": [
       "ts-jest",
       {
         tsconfig: {
@@ -22,7 +22,7 @@ module.exports = {
       },
     ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base)/)"],
+  transformIgnorePatterns: ["/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   verbose: true,
