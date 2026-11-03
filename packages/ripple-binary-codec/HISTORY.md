@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Fixed
-* Reject MPT amounts outside `[0, 2^63 - 1]` in `Amount` instead of encoding a truncated value. Values of `2^64` and above have bit 63 clear, so the previous bit-mask check let them through and only the low 64 bits were serialized (e.g. `2^64 + 5` signed as `5`) (#3368).
+* Reject MPT amounts outside `[0, 2^63 - 1]` in `Amount` instead of encoding a truncated value. Values of `2^64` and above with bit 63 clear passed the previous bit-mask check and only their low 64 bits were serialized (e.g. `2^64 + 5` signed as `5`) (#3368).
 
 ## 2.11.0 (2026-09-11)
 
