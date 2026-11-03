@@ -453,7 +453,9 @@ export class Connection extends EventEmitter {
     this.ws.removeAllListeners()
     clearTimeout(connectionTimeoutID)
     // Add new, long-term connected listeners for messages and errors
-    this.ws.on('message', (message: string | Buffer) => this.onMessage(message))
+    this.ws.on('message', (rawMessage: string | Buffer) =>
+      this.onMessage(rawMessage),
+    )
     this.ws.on('error', (error) =>
       this.emit('error', 'websocket', error.message, error),
     )
