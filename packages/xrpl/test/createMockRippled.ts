@@ -16,10 +16,7 @@ interface RawMockFrame {
 }
 
 type MockResponse =
-  | BaseResponse
-  | ErrorResponse
-  | Record<string, unknown>
-  | RawMockFrame
+  BaseResponse | ErrorResponse | Record<string, unknown> | RawMockFrame
 
 function isRawMockFrame(response: MockResponse): response is RawMockFrame {
   return typeof response === 'object' && 'payload' in response
