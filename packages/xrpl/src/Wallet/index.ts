@@ -18,7 +18,7 @@ import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 import { rfc1751MnemonicToKey } from './rfc1751'
 import { verifySignature } from './signer'
-import { computeSignature } from './utils'
+import { computeSignature, validateEntropy } from './utils'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -177,11 +177,19 @@ export class Wallet {
   /**
    * Derives a wallet from an entropy (array of random numbers).
    *
-   * @param entropy - An array of random numbers to generate a seed used to derive a wallet.
+   * The entropy must be exactly 16 bytes of cryptographically random data, as a
+   * Uint8Array or an array of byte values. Strings are rejected: pass a hex
+   * string through a hex-to-bytes conversion first. Note that this method
+   * validates the shape of the entropy, not its quality — supplying predictable
+   * bytes yields a predictable, publicly derivable wallet.
+   *
+   * @param entropy - 16 bytes of random data used to generate a seed to derive a wallet.
    * @param opts - (Optional) Options to derive a Wallet.
    * @param opts.algorithm - The digital signature algorithm to generate an address for.
    * @param opts.masterAddress - Include if a Wallet uses a Regular Key Pair. It must be the master address of the account.
    * @returns A Wallet derived from an entropy.
+   *
+   * @throws ValidationError if entropy is not exactly 16 bytes of byte-valued data.
    */
   public static fromEntropy(
     entropy: Uint8Array | number[],
@@ -189,7 +197,7 @@ export class Wallet {
   ): Wallet {
     const algorithm = opts.algorithm ?? DEFAULT_ALGORITHM
     const options = {
-      entropy: Uint8Array.from(entropy),
+      entropy: validateEntropy(entropy),
       algorithm,
     }
     const seed = generateSeed(options)

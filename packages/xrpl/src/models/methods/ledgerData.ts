@@ -52,8 +52,7 @@ export interface LedgerDataBinaryLedgerEntry {
 }
 
 export type LedgerDataLedgerState = { index: string } & (
-  | LedgerDataBinaryLedgerEntry
-  | LedgerDataLabeledLedgerEntry
+  LedgerDataBinaryLedgerEntry | LedgerDataLabeledLedgerEntry
 )
 
 /**

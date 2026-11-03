@@ -10,6 +10,8 @@ import {
   validateOptionalField,
   isAccount,
   isNumber,
+  validateCredentialsList,
+  MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
 
 /**
@@ -40,6 +42,12 @@ export interface VaultWithdraw extends BaseTransaction {
    * Arbitrary tag identifying the reason for the withdrawal to the destination.
    */
   DestinationTag?: number
+
+  /**
+   * The credentials to authorize the withdrawal when the vault is gated by a
+   * permissioned domain (XLS-70).
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -55,4 +63,11 @@ export function validateVaultWithdraw(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    tx.TransactionType,
+    true,
+    MAX_AUTHORIZED_CREDENTIALS,
+  )
 }

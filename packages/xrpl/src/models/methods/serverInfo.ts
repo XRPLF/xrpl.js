@@ -34,14 +34,7 @@ export interface JobType {
 }
 
 export type protocol =
-  | 'http'
-  | 'https'
-  | 'grpc'
-  | 'peer'
-  | 'ws'
-  | 'ws2'
-  | 'wss'
-  | 'wss2'
+  'http' | 'https' | 'grpc' | 'peer' | 'ws' | 'ws2' | 'wss' | 'wss2'
 
 export interface ServerPort {
   port: string
