@@ -139,6 +139,25 @@ describe('Signing data', function () {
     )
   })
 
+  it('leaves PasskeySignature out of the single signing blob', function () {
+    const unsigned: Record<string, unknown> = {
+      ...tx_json,
+      SigningPubKey: `F6${'AB'.repeat(64)}`,
+    }
+    delete unsigned.TxnSignature
+    delete unsigned.Signature
+    const withPasskey = {
+      ...unsigned,
+      PasskeySignature: {
+        PasskeyID: 'A1B2',
+        AuthenticatorData: '49960DE5880E8C68',
+        ClientDataJSON: '7B7D',
+        Signature: '3006020101020101',
+      },
+    }
+    expect(encodeForSigning(withPasskey)).toEqual(encodeForSigning(unsigned))
+  })
+
   it('can fail gracefully for invalid TransactionType', function () {
     const invalidTransactionType = {
       ...tx_json,
