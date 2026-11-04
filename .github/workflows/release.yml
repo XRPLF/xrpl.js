@@ -811,7 +811,7 @@ jobs:
               if [[ "${title}" =~ ^Release\ [^\ ]+:\ .+\ →\ main$ ]]; then
                 continue
               fi
-              PR_LINES+="* ${title} by @${login} in ${url}"$'\n'
+              PR_LINES+="* ${title} by @${login} in [#${num}](${url})"$'\n'
             done
           fi
 
