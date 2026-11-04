@@ -10,10 +10,12 @@ import {
   parseAmountValue,
   isAccount,
   validateOptionalField,
-  Account,
   validateRequiredField,
+  Account,
   isNumber,
   isHexString,
+  areAddressesEqual,
+  isString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -126,13 +128,21 @@ function validateNFTokenBuyOfferCases(tx: Record<string, unknown>): void {
 export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Account === tx.Owner) {
+  if (
+    isString(tx.Account) &&
+    isString(tx.Owner) &&
+    areAddressesEqual(tx.Account, tx.Owner)
+  ) {
     throw new ValidationError(
       'NFTokenCreateOffer: Owner and Account must not be equal',
     )
   }
 
-  if (tx.Account === tx.Destination) {
+  if (
+    isString(tx.Account) &&
+    isString(tx.Destination) &&
+    areAddressesEqual(tx.Account, tx.Destination)
+  ) {
     throw new ValidationError(
       'NFTokenCreateOffer: Destination and Account must not be equal',
     )

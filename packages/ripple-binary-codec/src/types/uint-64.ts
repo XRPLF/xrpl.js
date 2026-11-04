@@ -13,6 +13,7 @@ const BASE10_AMOUNT_FIELDS = new Set([
   'OutstandingAmount',
   'MPTAmount',
   'LockedAmount',
+  'ConfidentialOutstandingAmount',
 ])
 
 function isBase10(fieldName: string): boolean {

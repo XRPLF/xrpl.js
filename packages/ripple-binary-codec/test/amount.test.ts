@@ -2,7 +2,7 @@ import { coreTypes } from '../src/types'
 import fixtures from './fixtures/data-driven-tests.json'
 
 import { makeParser } from '../src/binary'
-const { Amount } = coreTypes
+const { Amount, SignedAmount } = coreTypes
 
 function amountErrorTests() {
   fixtures.values_tests
@@ -150,4 +150,30 @@ describe('Amount', function () {
   })
 
   amountErrorTests()
+})
+
+describe('SignedAmount', function () {
+  it('round-trips a negative native XRP amount (e.g. FeeAmountDelta)', function () {
+    expect(SignedAmount.from('-1000000').toJSON()).toEqual('-1000000')
+  })
+
+  it('round-trips a positive native XRP amount', function () {
+    expect(SignedAmount.from('1000000').toJSON()).toEqual('1000000')
+  })
+
+  it('rejects out-of-range negative magnitudes the same as Amount', function () {
+    expect(() => SignedAmount.from('-100000000000000001')).toThrow()
+  })
+
+  it('does not affect the base Amount type, which still rejects negative XRP', function () {
+    expect(() => Amount.from('-1000000')).toThrow()
+  })
+
+  it('rejects a malformed string that BigNumber parses as NaN instead of throwing', function () {
+    expect(() => SignedAmount.from('abc')).toThrow()
+  })
+
+  it('rejects scientific notation that BigNumber accepts but BigInt rejects', function () {
+    expect(() => SignedAmount.from('1e5')).toThrow()
+  })
 })

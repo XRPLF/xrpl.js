@@ -65,4 +65,21 @@ describe('VaultWithdraw', function () {
       'VaultWithdraw: invalid field Destination, expected a valid account address',
     )
   })
+
+  it('verifies valid VaultWithdraw with CredentialIDs', function () {
+    tx.CredentialIDs = [
+      '0F0B70F4F4C5B27E39D62D4D69E9DF3D0BC0AC29B8FE7CD5AF1AC8C15F1D2E3B',
+    ]
+    assertValid(tx)
+  })
+
+  it('throws w/ duplicate CredentialIDs', function () {
+    const credentialId =
+      '0F0B70F4F4C5B27E39D62D4D69E9DF3D0BC0AC29B8FE7CD5AF1AC8C15F1D2E3B'
+    tx.CredentialIDs = [credentialId, credentialId]
+    assertInvalid(
+      tx,
+      'VaultWithdraw: CredentialIDs cannot contain duplicate elements',
+    )
+  })
 })

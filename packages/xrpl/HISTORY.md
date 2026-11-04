@@ -4,17 +4,42 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### BREAKING CHANGES
+### Changed
+* Some transaction validation error messages changed.
+
+### Deprecated
+* Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
+
+### Fixed
+* Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
+* `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
+
+## 5.3.0 (2026-09-16)
 
 ### Added
-* Support for `Dynamic MPT` (XLS-94D)
+* Add `LendingProtocolV1_1` support.
+
+## 5.2.0 (2026-09-11)
+
+### BREAKING CHANGES
+* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it: `Wallet.fromEntropy(hexToBytes(hex))`.
+
+### Fixed
+* `signLoanSetByCounterparty` and `signAsSponsor` now sign with the `fixCleanup3_4_0` counterparty and sponsor prefixes; signatures from earlier versions are rejected on networks where the amendment is enabled.
+
+## 5.1.0 (2026-08-24)
+
+### Added
+* Add XLS-68 Sponsorship support: `SponsorshipSet`/`SponsorshipTransfer` transactions, `Sponsorship` ledger entry, `signAsSponsor`/`combineSponsorSigners`/`addPreFundedSponsor` wallet helpers, `account_sponsoring` RPC method, and sponsor-fee/reserve fields on `Payment` and other transactions.
+* Support Dynamic MPTs (XLS-94d) based on latest spec change [XRPL-Standards#583](https://github.com/XRPLF/XRPL-Standards/pull/583).
 * Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
 * Add XLS-56 Batch V1_1 support to `signMultiBatch` and `combineBatchSigners` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
+* Add support for Confidential Transfers for Multi-Purpose Tokens (XLS-0096).
 
 ### Fixed
 * Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
 * Reverted [#3331](https://github.com/XRPLF/xrpl.js/pull/3331), which made `Client.getServerInfo()` and `Client.connect()` throw when the `server_info` request failed or the response omitted `network_id`. The SDK must not enforce `network_id` rules more strictly than a rippled node does for custom XRPL networks, so `getServerInfo()` once again logs such failures via `console.error` and leaves `client.networkID` undefined rather than throwing.
-* Better error handling and cleaner error messages in model validation
 
 
 ## 5.0.0 (2026-06-05)
@@ -37,6 +62,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
 * Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
 * Fix `Client.getServerInfo()` swallowing errors from the underlying `server_info` request, which left `client.networkID` undefined and caused `autofill()` to silently omit the `NetworkID` field — producing signed transactions valid on the wrong network (cross-network replay risk). The method now throws on request failure or when the response is missing `network_id`. ([#3321](https://github.com/XRPLF/xrpl.js/issues/3321))
+* Refuse to forward server-supplied `data.type` values that collide with `Connection`'s internal state events (`connected`, `disconnected`, `error`, `reconnect`, `reconnecting`). Previously a malicious or compromised server could inject `{"type":"connected"}` (and friends) over the wire and trigger spoofed local state transitions; the message is now dropped and surfaced as a `badMessage` error. ([`#3318`](https://github.com/XRPLF/xrpl.js/issues/3318))
 
 
 ## 4.6.0 (2026-02-12)

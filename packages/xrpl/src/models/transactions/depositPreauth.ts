@@ -6,8 +6,10 @@ import {
   validateBaseTransaction,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
-  validateOptionalField,
+  areAddressesEqual,
   isAccount,
+  isString,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -38,6 +40,19 @@ export interface DepositPreauth extends BaseTransaction {
   UnauthorizeCredentials?: AuthorizeCredential[]
 }
 
+function validateAuthorizationField(
+  tx: Record<string, unknown>,
+  field: 'Authorize' | 'Unauthorize',
+): void {
+  validateRequiredField(tx, field, isAccount)
+  if (isString(tx.Account) && areAddressesEqual(tx.Account, tx[field])) {
+    const action = field === 'Authorize' ? 'preauthorize' : 'unauthorize'
+    throw new ValidationError(
+      `DepositPreauth: Account can't ${action} its own address`,
+    )
+  }
+}
+
 /**
  * Verify the form and type of a DepositPreauth at runtime.
  *
@@ -46,24 +61,12 @@ export interface DepositPreauth extends BaseTransaction {
  */
 export function validateDepositPreauth(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-
   validateSingleAuthorizationFieldProvided(tx)
 
-  validateOptionalField(tx, 'Authorize', isAccount)
-  validateOptionalField(tx, 'Unauthorize', isAccount)
-
   if (tx.Authorize !== undefined) {
-    if (tx.Account === tx.Authorize) {
-      throw new ValidationError(
-        "DepositPreauth: Account can't preauthorize its own address",
-      )
-    }
+    validateAuthorizationField(tx, 'Authorize')
   } else if (tx.Unauthorize !== undefined) {
-    if (tx.Account === tx.Unauthorize) {
-      throw new ValidationError(
-        "DepositPreauth: Account can't unauthorize its own address",
-      )
-    }
+    validateAuthorizationField(tx, 'Unauthorize')
   } else if (tx.AuthorizeCredentials !== undefined) {
     validateCredentialsList(
       tx.AuthorizeCredentials,
