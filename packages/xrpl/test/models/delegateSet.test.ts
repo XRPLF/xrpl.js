@@ -49,7 +49,8 @@ describe('DelegateSet', function () {
 
   it(`throws w/ invalid field Permissions`, function () {
     tx.Permissions = 'TrustlineAuthorize'
-    const errorMessage = 'DelegateSet: invalid field Permissions'
+    const errorMessage =
+      'DelegateSet: invalid field Permissions, expected a valid array'
     assertInvalid(tx, errorMessage)
   })
 
@@ -80,27 +81,29 @@ describe('DelegateSet', function () {
 
   it(`throws w/ PermissionValue must be defined`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: null } }]
-    const errorMessage = 'DelegateSet: PermissionValue must be defined'
+    const errorMessage =
+      'DelegateSet: missing field Permission[0].PermissionValue'
     assertInvalid(tx, errorMessage)
   })
 
   it(`throws w/ PermissionValue must be a string`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 123 } }]
-    const errorMessage = 'DelegateSet: PermissionValue must be a string'
+    const errorMessage =
+      'DelegateSet: invalid field Permission[0].PermissionValue, expected a valid string'
     assertInvalid(tx, errorMessage)
   })
 
-  it(`throws w/ PermissionValue contains a non-delegatable transaction`, function () {
+  it(`throws w/ PermissionValue contains a non-delegable transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'AccountSet' } }]
     const errorMessage =
-      'DelegateSet: PermissionValue contains a non-delegatable transaction AccountSet'
+      'DelegateSet: PermissionValue contains non-delegable transaction AccountSet'
     assertInvalid(tx, errorMessage)
   })
 
-  it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {
+  it(`throws w/ PermissionValue contains a non-delegable pseudo transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'EnableAmendment' } }]
     const errorMessage =
-      'DelegateSet: PermissionValue contains a non-delegatable transaction EnableAmendment'
+      'DelegateSet: PermissionValue contains non-delegable transaction EnableAmendment'
     assertInvalid(tx, errorMessage)
   })
 

@@ -197,7 +197,7 @@ describe('ConfidentialMPTSend', function () {
         AmountCommitment: EC_POINT,
         BalanceCommitment: EC_POINT,
       },
-      'ConfidentialMPTSend: invalid field Destination',
+      'ConfidentialMPTSend: invalid field Destination, expected a valid account address',
     )
   })
 
@@ -254,7 +254,7 @@ describe('ConfidentialMPTSend', function () {
         AmountCommitment: EC_POINT,
         BalanceCommitment: EC_POINT,
       },
-      'ConfidentialMPTSend: invalid field DestinationTag',
+      'ConfidentialMPTSend: invalid field DestinationTag, expected a valid number',
     )
   })
 
@@ -292,7 +292,7 @@ describe('ConfidentialMPTSend', function () {
         BalanceCommitment: EC_POINT,
         CredentialIDs: CREDENTIAL_ID,
       },
-      'ConfidentialMPTSend: Credentials must be an array',
+      'ConfidentialMPTSend: invalid field CredentialIDs, expected a valid array',
     )
   })
 
@@ -311,7 +311,7 @@ describe('ConfidentialMPTSend', function () {
         BalanceCommitment: EC_POINT,
         CredentialIDs: [12345],
       },
-      'ConfidentialMPTSend: Invalid Credentials ID list format',
+      'ConfidentialMPTSend: Invalid CredentialIDs list format',
     )
   })
 })

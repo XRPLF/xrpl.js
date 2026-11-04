@@ -32,8 +32,9 @@ describe('OracleDelete', function () {
   })
 
   it(`throws w/ invalid OracleDocumentID`, function () {
-    tx.OracleDocumentID = '1234'
-    const errorMessage = 'OracleDelete: invalid field OracleDocumentID'
+    tx.OracleDocumentID = 'abcd'
+    const errorMessage =
+      'OracleDelete: invalid field OracleDocumentID, expected a valid number'
     assertInvalid(tx, errorMessage)
   })
 })

@@ -49,7 +49,10 @@ describe('XChainCreateClaimID', function () {
   it('throws w/ invalid XChainBridge', function () {
     tx.XChainBridge = { XChainDoor: 'test' }
 
-    assertInvalid(tx, 'XChainCreateClaimID: invalid field XChainBridge')
+    assertInvalid(
+      tx,
+      'XChainCreateClaimID: invalid field XChainBridge, expected a valid XChainBridge object',
+    )
   })
 
   it('throws w/ missing SignatureReward', function () {
@@ -61,7 +64,10 @@ describe('XChainCreateClaimID', function () {
   it('throws w/ invalid SignatureReward', function () {
     tx.SignatureReward = { currency: 'ETH' }
 
-    assertInvalid(tx, 'XChainCreateClaimID: invalid field SignatureReward')
+    assertInvalid(
+      tx,
+      'XChainCreateClaimID: invalid field SignatureReward, expected a valid Amount',
+    )
   })
 
   it('throws w/ missing OtherChainSource', function () {
@@ -73,6 +79,9 @@ describe('XChainCreateClaimID', function () {
   it('throws w/ invalid OtherChainSource', function () {
     tx.OtherChainSource = 123
 
-    assertInvalid(tx, 'XChainCreateClaimID: invalid field OtherChainSource')
+    assertInvalid(
+      tx,
+      'XChainCreateClaimID: invalid field OtherChainSource, expected a valid account address',
+    )
   })
 })

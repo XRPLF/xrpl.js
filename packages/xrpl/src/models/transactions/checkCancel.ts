@@ -1,8 +1,8 @@
 import {
   BaseTransaction,
-  isString,
+  isHexString,
   validateBaseTransaction,
-  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -31,5 +31,5 @@ export interface CheckCancel extends BaseTransaction {
 export function validateCheckCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'CheckID', isString)
+  validateRequiredField(tx, 'CheckID', isHexString)
 }

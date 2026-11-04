@@ -2,7 +2,6 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenMetadata } from '../../src'
 import {
-  VaultCreate,
   VaultCreateFlags,
   VaultKind,
   VaultWithdrawalPolicy,
@@ -21,7 +20,7 @@ const assertInvalid = (tx: any, message: string): void =>
  * Providing runtime verification testing for each specific transaction type.
  */
 describe('VaultCreate', function () {
-  let tx: VaultCreate
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -51,22 +50,23 @@ describe('VaultCreate', function () {
   })
 
   it('throws w/ missing Asset', function () {
-    // @ts-expect-error for test
     tx.Asset = undefined
     assertInvalid(tx, 'VaultCreate: missing field Asset')
   })
 
   it('throws w/ invalid Asset', function () {
-    // @ts-expect-error for test
     tx.Asset = 123
-    assertInvalid(tx, 'VaultCreate: invalid field Asset')
+    assertInvalid(
+      tx,
+      'VaultCreate: invalid field Asset, expected a valid Currency',
+    )
   })
 
   it('throws w/ Data field not hex', function () {
     tx.Data = 'zznothex'
     assertInvalid(
       tx,
-      'VaultCreate: Data must be a hex string with an even number of characters',
+      'VaultCreate: invalid field Data, expected a valid hex string',
     )
   })
 
@@ -87,7 +87,7 @@ describe('VaultCreate', function () {
     tx.MPTokenMetadata = 'ggnothex'
     assertInvalid(
       tx,
-      'VaultCreate: MPTokenMetadata must be a valid non-empty hex string',
+      'VaultCreate: invalid field MPTokenMetadata, expected a valid hex string',
     )
   })
 
@@ -100,9 +100,11 @@ describe('VaultCreate', function () {
   })
 
   it('throws w/ non-number WithdrawalPolicy', function () {
-    // @ts-expect-error for test
     tx.WithdrawalPolicy = 'invalid'
-    assertInvalid(tx, 'VaultCreate: invalid field WithdrawalPolicy')
+    assertInvalid(
+      tx,
+      'VaultCreate: invalid field WithdrawalPolicy, expected a valid number',
+    )
   })
 
   it('allows DomainID when tfVaultPrivate flag set', function () {
@@ -198,9 +200,11 @@ describe('VaultCreate', function () {
         currency: 'USD',
         issuer: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       }
-      // @ts-expect-error for test
       tx.Scale = 'invalid'
-      assertInvalid(tx, 'VaultCreate: invalid field Scale')
+      assertInvalid(
+        tx,
+        'VaultCreate: invalid field Scale, expected a valid number',
+      )
     })
 
     it('allows no Scale for IOU asset', function () {
@@ -290,9 +294,11 @@ describe('VaultCreate', function () {
     })
 
     it('throws w/ non-number VaultKind', function () {
-      // @ts-expect-error for test
       tx.VaultKind = 'invalid'
-      assertInvalid(tx, 'VaultCreate: invalid field VaultKind')
+      assertInvalid(
+        tx,
+        'VaultCreate: invalid field VaultKind, expected a valid number',
+      )
     })
 
     it('throws w/ an unsupported numeric VaultKind', function () {
@@ -309,7 +315,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = 810000000
       assertInvalid(
         tx,
-        'VaultCreate: SubscriptionDate must be an integer number of seconds since the Ripple Epoch',
+        'VaultCreate: invalid field SubscriptionDate, expected a valid number',
       )
     })
 
@@ -319,7 +325,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = NaN
       assertInvalid(
         tx,
-        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+        'VaultCreate: invalid field RedemptionDate, expected a valid number',
       )
     })
 
@@ -329,7 +335,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = 810000000.5
       assertInvalid(
         tx,
-        'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
+        'VaultCreate: invalid field RedemptionDate, expected a valid number',
       )
     })
   })

@@ -1,11 +1,10 @@
-import { HEX_REGEX } from '@xrplf/isomorphic/utils'
-
 import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
+  isAccount,
+  isHexString,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateCredentialType,
   validateOptionalField,
@@ -47,35 +46,27 @@ export interface CredentialCreate extends BaseTransaction {
 export function validateCredentialCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Account', isString)
+  validateRequiredField(tx, 'Account', isAccount)
 
-  validateRequiredField(tx, 'Subject', isString)
+  validateRequiredField(tx, 'Subject', isAccount)
 
   validateCredentialType(tx)
 
   validateOptionalField(tx, 'Expiration', isNumber)
 
-  validateURI(tx.URI)
-}
+  validateOptionalField(tx, 'URI', isHexString)
 
-function validateURI(URI: unknown): void {
-  if (URI === undefined) {
-    return
-  }
-
-  if (typeof URI !== 'string') {
-    throw new ValidationError('CredentialCreate: invalid field URI')
-  }
-
-  if (URI.length === 0) {
-    throw new ValidationError('CredentialCreate: URI cannot be an empty string')
-  } else if (URI.length > MAX_URI_LENGTH) {
-    throw new ValidationError(
-      `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
-    )
-  }
-
-  if (!HEX_REGEX.test(URI)) {
-    throw new ValidationError('CredentialCreate: URI must be encoded in hex')
+  const uriLength = tx.URI?.length
+  if (uriLength !== undefined) {
+    if (uriLength === 0) {
+      throw new ValidationError(
+        'CredentialCreate: URI cannot be an empty string',
+      )
+    }
+    if (uriLength > MAX_URI_LENGTH) {
+      throw new ValidationError(
+        `CredentialCreate: URI length must be <= ${MAX_URI_LENGTH}`,
+      )
+    }
   }
 }

@@ -12,10 +12,10 @@ import {
   validateRequiredField,
   validateOptionalField,
   isNumber,
-  isString,
   Account,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
   isArray,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
@@ -201,12 +201,16 @@ export interface PaymentMetadata extends TransactionMetadataBase {
 export function validatePayment(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isAmount, {
-    txType: 'PaymentTransaction',
-  })
-
+  validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
+  validateOptionalField(tx, 'Paths', isPaths, {
+    invalidMessage: 'expected a valid Paths array',
+  })
+
+  validateOptionalField(tx, 'SendMax', isAmount)
+  validateOptionalField(tx, 'DeliverMin', isAmount)
 
   validateCredentialsList(
     tx.CredentialIDs,
@@ -214,22 +218,9 @@ export function validatePayment(tx: Record<string, unknown>): void {
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
-
-  validateOptionalField(tx, 'InvoiceID', isString, {
-    txType: 'PaymentTransaction',
-  })
-
   validateOptionalField(tx, 'DomainID', isDomainID, {
     txType: 'PaymentTransaction',
     paramName: 'DomainID',
-  })
-
-  if (tx.Paths !== undefined && !isPaths(tx.Paths)) {
-    throw new ValidationError('PaymentTransaction: invalid Paths')
-  }
-
-  validateOptionalField(tx, 'SendMax', isAmount, {
-    txType: 'PaymentTransaction',
   })
 
   checkPartialPayment(tx)
@@ -292,7 +283,7 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
   if (tx.DeliverMin != null) {
     if (tx.Flags == null) {
       throw new ValidationError(
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+        'Payment: tfPartialPayment flag required with DeliverMin',
       )
     }
 
@@ -305,12 +296,14 @@ function checkPartialPayment(tx: Record<string, unknown>): void {
 
     if (!isTfPartialPayment) {
       throw new ValidationError(
-        'PaymentTransaction: tfPartialPayment flag required with DeliverMin',
+        'Payment: tfPartialPayment flag required with DeliverMin',
       )
     }
 
     if (!isAmount(tx.DeliverMin)) {
-      throw new ValidationError('PaymentTransaction: invalid DeliverMin')
+      throw new ValidationError(
+        'Payment: invalid field DeliverMin, expected a valid Amount',
+      )
     }
   }
 }

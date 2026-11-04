@@ -1,15 +1,14 @@
-import { ValidationError } from '../../errors'
-
 import {
   Account,
   BaseTransaction,
   isAccount,
-  isString,
+  isNumber,
   validateBaseTransaction,
   validateCredentialsList,
   validateOptionalField,
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 
 /**
@@ -60,18 +59,7 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
     MAX_AUTHORIZED_CREDENTIALS,
   )
 
-  if (tx.OfferSequence == null) {
-    throw new ValidationError('EscrowFinish: missing field OfferSequence')
-  }
-
-  if (
-    (typeof tx.OfferSequence !== 'number' &&
-      typeof tx.OfferSequence !== 'string') ||
-    Number.isNaN(Number(tx.OfferSequence))
-  ) {
-    throw new ValidationError('EscrowFinish: OfferSequence must be a number')
-  }
-
-  validateOptionalField(tx, 'Condition', isString)
-  validateOptionalField(tx, 'Fulfillment', isString)
+  validateRequiredField(tx, 'OfferSequence', isNumber)
+  validateOptionalField(tx, 'Condition', isHexString)
+  validateOptionalField(tx, 'Fulfillment', isHexString)
 }

@@ -209,10 +209,13 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      TransferFee: '100',
+      TransferFee: 'not-a-number',
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field TransferFee')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field TransferFee, expected a valid number',
+    )
   })
 
   it(`Throws w/ invalid (too low) value of TransferFee`, function () {
@@ -274,10 +277,13 @@ describe('MPTokenIssuanceSet', function () {
       TransactionType: 'MPTokenIssuanceSet',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
       MPTokenIssuanceID: TOKEN_ID,
-      ImmutableFlags: '100',
+      ImmutableFlags: 'not-a-number',
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field ImmutableFlags')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field ImmutableFlags, expected a valid number',
+    )
   })
 
   it(`Throws w/ invalid ImmutableFlags value`, function () {
@@ -323,7 +329,10 @@ describe('MPTokenIssuanceSet', function () {
       MPTokenMetadata: 1234,
     } as any
 
-    assertInvalid(invalid, 'MPTokenIssuanceSet: invalid field MPTokenMetadata')
+    assertInvalid(
+      invalid,
+      'MPTokenIssuanceSet: invalid field MPTokenMetadata, expected a valid hex string',
+    )
   })
 
   it(`Throws w/ invalid (non-hex characters) MPTokenMetadata`, function () {
@@ -336,7 +345,7 @@ describe('MPTokenIssuanceSet', function () {
 
     assertInvalid(
       invalid,
-      `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
+      `MPTokenIssuanceSet: invalid field MPTokenMetadata, expected a valid hex string`,
     )
   })
 

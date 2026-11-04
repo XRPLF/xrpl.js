@@ -1,5 +1,5 @@
 import { ValidationError } from '../../errors'
-import { isFlagEnabled, isHex } from '../utils'
+import { isFlagEnabled } from '../utils'
 // eslint-disable-next-line import/no-cycle -- this method is needed to convert txn flags to number
 import { convertTxFlagsToNumber } from '../utils/flags'
 import {
@@ -10,13 +10,13 @@ import {
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
   validateOptionalField,
   isAccount,
   GlobalFlagsInterface,
+  isHexString,
   isNumber,
   isDomainID,
   isHexWithByteLength,
@@ -189,7 +189,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
   validateOptionalField(
     tx,
@@ -206,7 +206,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
       'MPTokenIssuanceSet: AuditorEncryptionKey requires IssuerEncryptionKey',
     )
   }
-  validateOptionalField(tx, 'MPTokenMetadata', isString)
+  validateOptionalField(tx, 'MPTokenMetadata', isHexString)
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'ImmutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
@@ -314,10 +314,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   // clears the existing metadata (makeFieldAbsent). Only validate the hex
   // format, length, and XLS-89 schema when a non-empty value is supplied.
   if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata.length > 0) {
-    if (
-      !isHex(tx.MPTokenMetadata) ||
-      tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH
-    ) {
+    if (tx.MPTokenMetadata.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
       throw new ValidationError(
         `MPTokenIssuanceSet: MPTokenMetadata must be a valid hex string no more than ${MAX_MPT_META_BYTE_LENGTH} bytes (an empty string clears the field).`,
       )

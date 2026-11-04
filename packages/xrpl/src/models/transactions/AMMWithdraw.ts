@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
-  isIssuedCurrency,
+  isCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
@@ -85,9 +85,12 @@ export interface AMMWithdraw extends BaseTransaction {
 export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
-
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Amount2', isAmount)
+  validateOptionalField(tx, 'LPTokenIn', isIssuedCurrencyAmount)
+  validateOptionalField(tx, 'EPrice', isAmount)
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMWithdraw: must set Amount with Amount2')
@@ -95,8 +98,9 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Amount with EPrice')
   }
 
-  validateOptionalField(tx, 'LPTokenIn', isIssuedCurrencyAmount)
-  validateOptionalField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'Amount2', isAmount)
-  validateOptionalField(tx, 'EPrice', isAmount)
+  if (tx.LPTokenIn != null && !isIssuedCurrencyAmount(tx.LPTokenIn)) {
+    throw new ValidationError(
+      'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount',
+    )
+  }
 }

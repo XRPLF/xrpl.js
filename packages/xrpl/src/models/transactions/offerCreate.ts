@@ -7,9 +7,9 @@ import {
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
-  isNumber,
-  validateOptionalField,
   validateRequiredField,
+  validateOptionalField,
+  isNumber,
   isDomainID,
 } from './common'
 
@@ -130,10 +130,10 @@ export interface OfferCreate extends BaseTransaction {
 export function validateOfferCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'TakerGets', isAmount)
-  validateRequiredField(tx, 'TakerPays', isAmount)
   validateOptionalField(tx, 'Expiration', isNumber)
   validateOptionalField(tx, 'OfferSequence', isNumber)
+  validateRequiredField(tx, 'TakerGets', isAmount)
+  validateRequiredField(tx, 'TakerPays', isAmount)
 
   validateOptionalField(tx, 'DomainID', isDomainID, {
     txType: 'OfferCreate',

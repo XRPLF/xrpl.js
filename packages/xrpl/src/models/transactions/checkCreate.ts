@@ -1,16 +1,15 @@
-import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
 import {
   BaseTransaction,
   validateBaseTransaction,
-  isIssuedCurrencyAmount,
   isAccount,
   validateRequiredField,
   validateOptionalField,
   isNumber,
-  isString,
   Account,
+  isAmount,
+  isHexString,
 } from './common'
 
 /**
@@ -58,17 +57,9 @@ export interface CheckCreate extends BaseTransaction {
 export function validateCheckCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.SendMax === undefined) {
-    throw new ValidationError('CheckCreate: missing field SendMax')
-  }
-
+  validateRequiredField(tx, 'SendMax', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
-  if (typeof tx.SendMax !== 'string' && !isIssuedCurrencyAmount(tx.SendMax)) {
-    throw new ValidationError('CheckCreate: invalid SendMax')
-  }
-
   validateOptionalField(tx, 'Expiration', isNumber)
-  validateOptionalField(tx, 'InvoiceID', isString)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
 }

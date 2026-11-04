@@ -66,7 +66,10 @@ describe('SignerListSet', function () {
   it(`throws w/ invalid SignerEntries`, function () {
     signerListSetTx.SignerEntries = 'khgfgyhujk'
 
-    assertInvalid(signerListSetTx, 'SignerListSet: invalid field SignerEntries')
+    assertInvalid(
+      signerListSetTx,
+      'SignerListSet: invalid field SignerEntries, expected a valid array',
+    )
   })
 
   it(`throws w/ maximum of 32 members allowed in SignerEntries`, function () {
@@ -169,7 +172,7 @@ describe('SignerListSet', function () {
       },
     ]
     const errorMessage =
-      'SignerListSet: WalletLocator in SignerEntry must be a 256-bit (32-byte) hexadecimal value'
+      'SignerListSet: invalid field SignerEntries[0].WalletLocator, expected a valid hex string'
     assertInvalid(signerListSetTx, errorMessage)
   })
 })

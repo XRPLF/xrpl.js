@@ -1,4 +1,3 @@
-import { VaultDeposit } from '../../src/models/transactions'
 import { validateVaultDeposit } from '../../src/models/transactions/vaultDeposit'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -12,7 +11,7 @@ const assertInvalid = (tx: any, message: string): void =>
  * Provides runtime verification testing for VaultDeposit transaction type.
  */
 describe('VaultDeposit', function () {
-  let tx: VaultDeposit
+  let tx: any
 
   beforeEach(function () {
     tx = {
@@ -28,26 +27,28 @@ describe('VaultDeposit', function () {
   })
 
   it('throws w/ missing VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = undefined
     assertInvalid(tx, 'VaultDeposit: missing field VaultID')
   })
 
   it('throws w/ invalid VaultID', function () {
-    // @ts-expect-error for test
     tx.VaultID = 123
-    assertInvalid(tx, 'VaultDeposit: invalid field VaultID')
+    assertInvalid(
+      tx,
+      'VaultDeposit: invalid field VaultID, expected a valid hex string',
+    )
   })
 
   it('throws w/ missing Amount', function () {
-    // @ts-expect-error for test
     tx.Amount = undefined
     assertInvalid(tx, 'VaultDeposit: missing field Amount')
   })
 
   it('throws w/ non-string Amount', function () {
-    // @ts-expect-error for test
     tx.Amount = 123
-    assertInvalid(tx, 'VaultDeposit: invalid field Amount')
+    assertInvalid(
+      tx,
+      'VaultDeposit: invalid field Amount, expected a valid Amount',
+    )
   })
 })

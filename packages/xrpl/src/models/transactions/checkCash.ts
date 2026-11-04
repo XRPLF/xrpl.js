@@ -5,8 +5,9 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   isAmount,
-  isString,
+  validateRequiredField,
   validateOptionalField,
+  isHexString,
 } from './common'
 
 /**
@@ -46,6 +47,10 @@ export interface CheckCash extends BaseTransaction {
 export function validateCheckCash(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'CheckID', isHexString)
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'DeliverMin', isAmount)
+
   if (tx.Amount == null && tx.DeliverMin == null) {
     throw new ValidationError(
       'CheckCash: must have either Amount or DeliverMin',
@@ -57,8 +62,4 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
       'CheckCash: cannot have both Amount and DeliverMin',
     )
   }
-
-  validateOptionalField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'DeliverMin', isAmount)
-  validateOptionalField(tx, 'CheckID', isString)
 }

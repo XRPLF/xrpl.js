@@ -2,14 +2,14 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
-  isString,
+  isHexString,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
 
-// TODO: add docs
-
 /**
+ * Creates a new DID ledger entry or updates the fields of an existing one.
+ *
  * @category Transaction Models
  */
 export interface DIDSet extends BaseTransaction {
@@ -31,11 +31,11 @@ export interface DIDSet extends BaseTransaction {
 export function validateDIDSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
 
-  validateOptionalField(tx, 'DIDDocument', isString)
+  validateOptionalField(tx, 'DIDDocument', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
   if (
     tx.Data === undefined &&

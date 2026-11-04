@@ -1,6 +1,6 @@
 import {
   BaseTransaction,
-  isString,
+  isAccount,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -30,5 +30,5 @@ export interface SetRegularKey extends BaseTransaction {
 export function validateSetRegularKey(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'RegularKey', isString)
+  validateOptionalField(tx, 'RegularKey', isAccount)
 }

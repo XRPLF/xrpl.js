@@ -1,12 +1,13 @@
 import {
   BaseTransaction,
   GlobalFlagsInterface,
-  isString,
   validateBaseTransaction,
   validateCredentialsList,
   validateOptionalField,
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
+  isXRPAmount,
 } from './common'
 
 /**
@@ -151,16 +152,16 @@ export interface PaymentChannelClaim extends BaseTransaction {
 export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
+  validateRequiredField(tx, 'Channel', isHexString)
+  validateOptionalField(tx, 'Balance', isXRPAmount)
+  validateOptionalField(tx, 'Amount', isXRPAmount)
+  validateOptionalField(tx, 'Signature', isHexString)
+  validateOptionalField(tx, 'PublicKey', isHexString)
+
   validateCredentialsList(
     tx.CredentialIDs,
     tx.TransactionType,
     true,
     MAX_AUTHORIZED_CREDENTIALS,
   )
-
-  validateRequiredField(tx, 'Channel', isString)
-  validateOptionalField(tx, 'Balance', isString)
-  validateOptionalField(tx, 'Amount', isString)
-  validateOptionalField(tx, 'Signature', isString)
-  validateOptionalField(tx, 'PublicKey', isString)
 }

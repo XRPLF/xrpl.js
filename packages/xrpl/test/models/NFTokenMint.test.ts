@@ -1,4 +1,4 @@
-import { stringToHex } from '@xrplf/isomorphic/src/utils'
+import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { NFTokenMintFlags } from '../../src'
 import { validateNFTokenMint } from '../../src/models/transactions/NFTokenMint'
@@ -108,7 +108,10 @@ describe('NFTokenMint', function () {
       URI: 'http://xrpl.org',
     } as any
 
-    assertInvalid(invalid, 'NFTokenMint: URI must be in hex format')
+    assertInvalid(
+      invalid,
+      'NFTokenMint: invalid field URI, expected a valid hex string',
+    )
   })
 
   it(`throws when Amount is null but Expiration is present`, function () {

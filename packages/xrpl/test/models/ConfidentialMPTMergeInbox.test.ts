@@ -53,7 +53,7 @@ describe('ConfidentialMPTMergeInbox', function () {
         Account: ACCOUNT,
         MPTokenIssuanceID: 12345,
       },
-      'ConfidentialMPTMergeInbox: invalid field MPTokenIssuanceID',
+      'ConfidentialMPTMergeInbox: invalid field MPTokenIssuanceID, expected a valid string',
     )
   })
 })

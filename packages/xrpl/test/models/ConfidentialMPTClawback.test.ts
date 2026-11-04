@@ -122,7 +122,7 @@ describe('ConfidentialMPTClawback', function () {
         MPTAmount: '100',
         ZKProof: PROOF,
       },
-      'ConfidentialMPTClawback: invalid field Holder',
+      'ConfidentialMPTClawback: invalid field Holder, expected a valid account address',
     )
   })
 

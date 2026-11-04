@@ -35,7 +35,8 @@ describe('PermissionedDomainDelete', function () {
 
   it(`throws w/ invalid DomainID`, function () {
     tx.DomainID = 1234
-    const errorMessage = 'PermissionedDomainDelete: invalid field DomainID'
+    const errorMessage =
+      'PermissionedDomainDelete: invalid field DomainID, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 })

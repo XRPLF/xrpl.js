@@ -2,8 +2,9 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isHexString,
   isNumber,
-  isString,
+  isXRPAmount,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -30,6 +31,11 @@ export interface PaymentChannelCreate extends BaseTransaction {
    */
   Destination: Account
   /**
+   * Arbitrary tag to further specify the destination for this payment channel,
+   * such as a hosted recipient at the destination address.
+   */
+  DestinationTag?: number
+  /**
    * Amount of time the source address must wait before closing the channel if
    * it has unclaimed XRP.
    */
@@ -48,11 +54,6 @@ export interface PaymentChannelCreate extends BaseTransaction {
    * this time.
    */
   CancelAfter?: number
-  /**
-   * Arbitrary tag to further specify the destination for this payment channel,
-   * such as a hosted recipient at the destination address.
-   */
-  DestinationTag?: number
 }
 
 /**
@@ -66,12 +67,10 @@ export function validatePaymentChannelCreate(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Amount', isString)
-
+  validateRequiredField(tx, 'Amount', isXRPAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
-
   validateRequiredField(tx, 'SettleDelay', isNumber)
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
   validateOptionalField(tx, 'CancelAfter', isNumber)
 }

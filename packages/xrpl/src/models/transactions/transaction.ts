@@ -43,9 +43,9 @@ import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
 } from './ConfidentialMPTSend'
-import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
-import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
-import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
+import { CredentialAccept, validateCredentialAccept } from './credentialAccept'
+import { CredentialCreate, validateCredentialCreate } from './credentialCreate'
+import { CredentialDelete, validateCredentialDelete } from './credentialDelete'
 import { DelegateSet, validateDelegateSet } from './delegateSet'
 import { DepositPreauth, validateDepositPreauth } from './depositPreauth'
 import { DIDDelete, validateDIDDelete } from './DIDDelete'

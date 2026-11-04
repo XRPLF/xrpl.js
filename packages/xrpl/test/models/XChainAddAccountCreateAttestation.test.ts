@@ -64,7 +64,10 @@ describe('XChainAddAccountCreateAttestation', function () {
   it('throws w/ invalid Amount', function () {
     tx.Amount = { currency: 'ETH' }
 
-    assertInvalid(tx, 'XChainAddAccountCreateAttestation: invalid field Amount')
+    assertInvalid(
+      tx,
+      'XChainAddAccountCreateAttestation: invalid field Amount, expected a valid Amount',
+    )
   })
 
   it('throws w/ missing AttestationRewardAccount', function () {
@@ -81,7 +84,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field AttestationRewardAccount',
+      'XChainAddAccountCreateAttestation: invalid field AttestationRewardAccount, expected a valid account address',
     )
   })
 
@@ -99,7 +102,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field AttestationSignerAccount',
+      'XChainAddAccountCreateAttestation: invalid field AttestationSignerAccount, expected a valid account address',
     )
   })
 
@@ -117,7 +120,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field Destination',
+      'XChainAddAccountCreateAttestation: invalid field Destination, expected a valid account address',
     )
   })
 
@@ -135,7 +138,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field OtherChainSource',
+      'XChainAddAccountCreateAttestation: invalid field OtherChainSource, expected a valid account address',
     )
   })
 
@@ -153,7 +156,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field PublicKey',
+      'XChainAddAccountCreateAttestation: invalid field PublicKey, expected a valid hex string',
     )
   })
 
@@ -171,7 +174,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field Signature',
+      'XChainAddAccountCreateAttestation: invalid field Signature, expected a valid hex string',
     )
   })
 
@@ -189,7 +192,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field SignatureReward',
+      'XChainAddAccountCreateAttestation: invalid field SignatureReward, expected a valid Amount',
     )
   })
 
@@ -207,7 +210,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend',
+      'XChainAddAccountCreateAttestation: invalid field WasLockingChainSend, expected 0 or 1',
     )
   })
 
@@ -225,7 +228,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount',
+      'XChainAddAccountCreateAttestation: invalid field XChainAccountCreateCount, expected a valid number or hex string',
     )
   })
 
@@ -243,7 +246,7 @@ describe('XChainAddAccountCreateAttestation', function () {
 
     assertInvalid(
       tx,
-      'XChainAddAccountCreateAttestation: invalid field XChainBridge',
+      'XChainAddAccountCreateAttestation: invalid field XChainBridge, expected a valid XChainBridge object',
     )
   })
 })

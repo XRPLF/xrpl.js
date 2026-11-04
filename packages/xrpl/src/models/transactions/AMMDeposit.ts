@@ -5,7 +5,7 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
-  isIssuedCurrency,
+  isCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
   validateOptionalField,
@@ -87,9 +87,12 @@ export interface AMMDeposit extends BaseTransaction {
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
-
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
+  validateOptionalField(tx, 'LPTokenOut', isIssuedCurrencyAmount)
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Amount2', isAmount)
+  validateOptionalField(tx, 'EPrice', isAmount)
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMDeposit: must set Amount with Amount2')
@@ -100,9 +103,4 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
       'AMMDeposit: must set at least LPTokenOut or Amount',
     )
   }
-
-  validateOptionalField(tx, 'LPTokenOut', isIssuedCurrencyAmount)
-  validateOptionalField(tx, 'Amount', isAmount)
-  validateOptionalField(tx, 'Amount2', isAmount)
-  validateOptionalField(tx, 'EPrice', isAmount)
 }

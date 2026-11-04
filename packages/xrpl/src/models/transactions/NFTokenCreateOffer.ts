@@ -12,6 +12,8 @@ import {
   validateOptionalField,
   validateRequiredField,
   Account,
+  isNumber,
+  isHexString,
   areAddressesEqual,
   isString,
 } from './common'
@@ -146,18 +148,18 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
     )
   }
 
-  validateOptionalField(tx, 'Destination', isAccount)
-  validateOptionalField(tx, 'Owner', isAccount)
-
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Owner', isAccount)
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'Destination', isAccount)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
-  const flags = (tx.Flags ?? 0) as number | NFTokenCreateOfferFlagsInterface
+  const flags = (tx.Flags ?? 0) as number | Record<string, unknown>
   const isTfSellNFToken =
     typeof flags === 'number'
       ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)
-      : (flags.tfSellNFToken ?? false)
+      : flags.tfSellNFToken === true
 
   if (isTfSellNFToken) {
     validateNFTokenSellOfferCases(tx)

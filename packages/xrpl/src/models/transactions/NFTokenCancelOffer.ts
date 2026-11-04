@@ -48,7 +48,7 @@ export function validateNFTokenCancelOffer(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'NFTokenOffers', isArray)
 
-  if (tx.NFTokenOffers.length < 1) {
+  if (tx.NFTokenOffers.length === 0) {
     throw new ValidationError('NFTokenCancelOffer: empty field NFTokenOffers')
   }
 }

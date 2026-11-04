@@ -33,19 +33,22 @@ describe('DIDSet', function () {
   it('throws w/ invalid Data', function () {
     tx.Data = 123
 
-    assertInvalid(tx, 'DIDSet: invalid field Data')
+    assertInvalid(tx, 'DIDSet: invalid field Data, expected a valid hex string')
   })
 
   it('throws w/ invalid DIDDocument', function () {
     tx.DIDDocument = 123
 
-    assertInvalid(tx, 'DIDSet: invalid field DIDDocument')
+    assertInvalid(
+      tx,
+      'DIDSet: invalid field DIDDocument, expected a valid hex string',
+    )
   })
 
   it('throws w/ invalid URI', function () {
     tx.URI = 123
 
-    assertInvalid(tx, 'DIDSet: invalid field URI')
+    assertInvalid(tx, 'DIDSet: invalid field URI, expected a valid hex string')
   })
 
   it('throws w/ empty DID', function () {

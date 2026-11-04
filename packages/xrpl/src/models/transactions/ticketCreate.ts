@@ -1,8 +1,6 @@
-import { ValidationError } from '../../errors'
-
 import {
   BaseTransaction,
-  isNumber,
+  isNumberWithBounds,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -33,16 +31,6 @@ const MAX_TICKETS = 250
  */
 export function validateTicketCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'TicketCount', isNumber)
-  const { TicketCount } = tx
 
-  if (
-    !Number.isInteger(TicketCount) ||
-    TicketCount < 1 ||
-    TicketCount > MAX_TICKETS
-  ) {
-    throw new ValidationError(
-      'TicketCreate: TicketCount must be an integer from 1 to 250',
-    )
-  }
+  validateRequiredField(tx, 'TicketCount', isNumberWithBounds(1, MAX_TICKETS))
 }

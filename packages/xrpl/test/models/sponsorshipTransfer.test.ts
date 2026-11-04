@@ -24,7 +24,7 @@ describe('SponsorshipTransfer', function () {
   beforeEach(function () {
     sponsorshipTransferTx = {
       TransactionType: 'SponsorshipTransfer',
-      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Account: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
       ObjectID: LEDGER_INDEX,
       // Default to End scenario
       Flags: SponsorshipTransferFlags.tfSponsorshipEnd,
@@ -90,7 +90,7 @@ describe('SponsorshipTransfer', function () {
     sponsorshipTransferTx.SponsorFlags = SponsorFlags.spfSponsorReserve
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate or tfSponsorshipReassign (no ObjectID)',
     )
   })
 
@@ -101,7 +101,7 @@ describe('SponsorshipTransfer', function () {
     sponsorshipTransferTx.SponsorFlags = SponsorFlags.spfSponsorReserve
     assertInvalid(
       sponsorshipTransferTx,
-      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate',
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate or tfSponsorshipReassign (no ObjectID)',
     )
   })
 

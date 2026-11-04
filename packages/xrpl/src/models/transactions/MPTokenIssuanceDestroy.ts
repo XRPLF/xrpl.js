@@ -1,6 +1,6 @@
 import {
   BaseTransaction,
-  isString,
+  isHexString,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -30,5 +30,5 @@ export function validateMPTokenIssuanceDestroy(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
 }

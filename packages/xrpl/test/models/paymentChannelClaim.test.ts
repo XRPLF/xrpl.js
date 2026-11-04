@@ -51,30 +51,45 @@ describe('PaymentChannelClaim', function () {
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 100
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Channel')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: invalid field Channel, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Balance')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: invalid field Balance, expected a valid XRP Amount',
+    )
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Amount')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: invalid field Amount, expected a valid XRP Amount',
+    )
   })
 
   it(`throws w/ invalid Signature`, function () {
     channel.Signature = 1000
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Signature')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: invalid field Signature, expected a valid hex string',
+    )
   })
 
   it(`throws w/ invalid PublicKey`, function () {
     channel.PublicKey = ['100000']
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: invalid field PublicKey, expected a valid hex string',
+    )
   })
 })

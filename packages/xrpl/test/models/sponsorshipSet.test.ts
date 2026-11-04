@@ -21,7 +21,7 @@ describe('SponsorshipSet', function () {
   beforeEach(function () {
     sponsorshipSetTx = {
       TransactionType: 'SponsorshipSet',
-      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Account: 'rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1',
       Sponsee: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
       RemainingOwnerCountDelta: 1,
       Fee: '12',

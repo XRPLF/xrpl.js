@@ -40,7 +40,10 @@ describe('OfferCancel', function () {
 
   it(`throws w/ OfferSequence must be a number`, function () {
     offer.OfferSequence = 'abcd'
-    assertInvalid(offer, 'OfferCancel: invalid field OfferSequence')
+    assertInvalid(
+      offer,
+      'OfferCancel: invalid field OfferSequence, expected a valid number',
+    )
   })
 
   it(`throws w/ missing OfferSequence`, function () {

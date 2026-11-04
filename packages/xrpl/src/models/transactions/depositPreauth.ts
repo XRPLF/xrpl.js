@@ -7,6 +7,7 @@ import {
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
   areAddressesEqual,
+  isAccount,
   isString,
   validateRequiredField,
 } from './common'
@@ -43,7 +44,7 @@ function validateAuthorizationField(
   tx: Record<string, unknown>,
   field: 'Authorize' | 'Unauthorize',
 ): void {
-  validateRequiredField(tx, field, isString)
+  validateRequiredField(tx, field, isAccount)
   if (isString(tx.Account) && areAddressesEqual(tx.Account, tx[field])) {
     const action = field === 'Authorize' ? 'preauthorize' : 'unauthorize'
     throw new ValidationError(
@@ -72,6 +73,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
+      'AuthorizeCredentials',
     )
   } else if (tx.UnauthorizeCredentials !== undefined) {
     validateCredentialsList(
@@ -79,6 +81,7 @@ export function validateDepositPreauth(tx: Record<string, unknown>): void {
       tx.TransactionType,
       false,
       MAX_AUTHORIZED_CREDENTIALS,
+      'UnauthorizeCredentials',
     )
   }
 }

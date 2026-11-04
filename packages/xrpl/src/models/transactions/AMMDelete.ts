@@ -2,7 +2,7 @@ import { Currency } from '../common'
 
 import {
   BaseTransaction,
-  isIssuedCurrency,
+  isCurrency,
   validateBaseTransaction,
   validateRequiredField,
 } from './common'
@@ -41,7 +41,6 @@ export interface AMMDelete extends BaseTransaction {
 export function validateAMMDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Asset', isIssuedCurrency)
-
-  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+  validateRequiredField(tx, 'Asset', isCurrency)
+  validateRequiredField(tx, 'Asset2', isCurrency)
 }

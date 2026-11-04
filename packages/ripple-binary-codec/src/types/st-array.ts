@@ -17,6 +17,7 @@ function isObjects(args): args is Array<JsonObject> {
     Array.isArray(args) &&
     args.every(
       (arg) =>
+        arg != null &&
         typeof arg === 'object' &&
         Object.keys(arg).length === 1 &&
         typeof Object.values(arg)[0] === 'object',

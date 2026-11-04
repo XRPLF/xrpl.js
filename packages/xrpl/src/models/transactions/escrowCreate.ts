@@ -6,8 +6,8 @@ import {
   BaseTransaction,
   isAccount,
   isAmount,
+  isHexString,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -65,6 +65,9 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Amount', isAmount)
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
+  validateOptionalField(tx, 'CancelAfter', isNumber)
+  validateOptionalField(tx, 'FinishAfter', isNumber)
+  validateOptionalField(tx, 'Condition', isHexString)
 
   if (tx.CancelAfter === undefined && tx.FinishAfter === undefined) {
     throw new ValidationError(
@@ -77,8 +80,4 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
   }
-
-  validateOptionalField(tx, 'CancelAfter', isNumber)
-  validateOptionalField(tx, 'FinishAfter', isNumber)
-  validateOptionalField(tx, 'Condition', isString)
 }

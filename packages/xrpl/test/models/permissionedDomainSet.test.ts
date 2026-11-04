@@ -40,7 +40,8 @@ describe('PermissionedDomainSet', function () {
   it(`throws with invalid field DomainID`, function () {
     // DomainID is expected to be a string
     tx.DomainID = 1234
-    const errorMessage = 'PermissionedDomainSet: invalid field DomainID'
+    const errorMessage =
+      'PermissionedDomainSet: invalid field DomainID, expected a valid hex string'
     assertInvalid(tx, errorMessage)
   })
 
@@ -56,7 +57,7 @@ describe('PermissionedDomainSet', function () {
 
     assertInvalid(
       tx,
-      'PermissionedDomainSet: Credentials length cannot exceed 10 elements',
+      'PermissionedDomainSet: AcceptedCredentials length cannot exceed 10 elements',
     )
   })
 
@@ -64,7 +65,7 @@ describe('PermissionedDomainSet', function () {
     tx.AcceptedCredentials = []
     assertInvalid(
       tx,
-      'PermissionedDomainSet: Credentials cannot be an empty array',
+      'PermissionedDomainSet: AcceptedCredentials cannot be an empty array',
     )
   })
 
@@ -72,7 +73,7 @@ describe('PermissionedDomainSet', function () {
     tx.AcceptedCredentials = 'AcceptedCredentials is not an array'
     assertInvalid(
       tx,
-      'PermissionedDomainSet: invalid field AcceptedCredentials',
+      'PermissionedDomainSet: invalid field AcceptedCredentials, expected a valid array',
     )
   })
 
@@ -80,12 +81,15 @@ describe('PermissionedDomainSet', function () {
     tx.AcceptedCredentials = [sampleCredential, sampleCredential]
     assertInvalid(
       tx,
-      'PermissionedDomainSet: Credentials cannot contain duplicate elements',
+      'PermissionedDomainSet: AcceptedCredentials cannot contain duplicate elements',
     )
   })
 
   it('throws when AcceptedCredentials contains invalid format', function () {
     tx.AcceptedCredentials = [{ Field1: 'Value1', Field2: 'Value2' }]
-    assertInvalid(tx, 'PermissionedDomainSet: Invalid Credentials format')
+    assertInvalid(
+      tx,
+      'PermissionedDomainSet: Invalid AcceptedCredentials format',
+    )
   })
 })

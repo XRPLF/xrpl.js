@@ -5,8 +5,9 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAccount,
+  isHexString,
   isNumber,
-  isString,
+  isNumberWithBounds,
   validateBaseTransaction,
   validateOptionalField,
 } from './common'
@@ -181,32 +182,37 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'NFTokenMinter', isAccount)
 
-  validateOptionalField(tx, 'ClearFlag', isNumber)
   if (tx.ClearFlag !== undefined) {
+    if (typeof tx.ClearFlag !== 'number') {
+      throw new ValidationError(
+        'AccountSet: invalid field ClearFlag, expected a valid number',
+      )
+    }
     if (!Object.values(AccountSetAsfFlags).includes(tx.ClearFlag)) {
-      throw new ValidationError('AccountSet: invalid ClearFlag')
+      throw new ValidationError('AccountSet: invalid ClearFlag value')
     }
   }
 
-  validateOptionalField(tx, 'Domain', isString)
-  validateOptionalField(tx, 'EmailHash', isString)
-  validateOptionalField(tx, 'MessageKey', isString)
-  validateOptionalField(tx, 'SetFlag', isNumber)
+  validateOptionalField(tx, 'Domain', isHexString)
+  validateOptionalField(tx, 'EmailHash', isHexString)
+  validateOptionalField(tx, 'MessageKey', isHexString)
+
   if (tx.SetFlag !== undefined) {
+    if (typeof tx.SetFlag !== 'number') {
+      throw new ValidationError(
+        'AccountSet: invalid field SetFlag, expected a valid number',
+      )
+    }
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {
-      throw new ValidationError('AccountSet: invalid SetFlag')
+      throw new ValidationError('AccountSet: invalid SetFlag value')
     }
   }
 
   validateOptionalField(tx, 'TransferRate', isNumber)
 
-  validateOptionalField(tx, 'TickSize', isNumber)
-  if (tx.TickSize !== undefined) {
-    if (
-      tx.TickSize !== 0 &&
-      (tx.TickSize < MIN_TICK_SIZE || tx.TickSize > MAX_TICK_SIZE)
-    ) {
-      throw new ValidationError('AccountSet: invalid TickSize')
-    }
-  }
+  validateOptionalField(
+    tx,
+    'TickSize',
+    isNumberWithBounds(MIN_TICK_SIZE, MAX_TICK_SIZE),
+  )
 }
