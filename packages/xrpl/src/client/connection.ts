@@ -384,10 +384,10 @@ export class Connection extends EventEmitter {
       )
       return
     }
-    let parsedValue: Record<string, unknown>
+    let parsedValue: Record<string, unknown> | null
     try {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
-      parsedValue = JSON.parse(data.value) as Record<string, unknown>
+      parsedValue = JSON.parse(data.value) as Record<string, unknown> | null
     } catch (error) {
       if (error instanceof Error) {
         this.emit('error', 'badMessage', error.message, data.value)
@@ -396,7 +396,8 @@ export class Connection extends EventEmitter {
       }
       return
     }
-    if (parsedValue.id != null) {
+    // No id to reject. onMessage already reported this as badMessage.
+    if (parsedValue?.id != null) {
       try {
         this.requestManager.reject(
           // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true

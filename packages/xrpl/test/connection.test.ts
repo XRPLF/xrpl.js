@@ -1189,4 +1189,29 @@ describe('Connection', function () {
       'jsonInvalid',
     )
   }, 4000)
+
+  it.each([
+    ['no value', undefined],
+    ['a value with no id', '{"command":"submit"}'],
+    ['a value that is not an object', 'null'],
+  ])(
+    'reports badMessage without throwing for a type error message with %s',
+    async (_desc, value) => {
+      const badMessage = new Promise<void>((resolve) => {
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(
+        JSON.stringify({ type: 'error', error: 'jsonInvalid', value }),
+      )
+
+      await badMessage
+    },
+    TIMEOUT,
+  )
 })
