@@ -29,6 +29,6 @@ describe('CheckCancel', function () {
       CheckID: 4964734566545678,
     } as any
 
-    assertInvalid(invalidCheckID, 'CheckCancel: invalid CheckID')
+    assertInvalid(invalidCheckID, 'CheckCancel: invalid field CheckID')
   })
 })

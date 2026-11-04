@@ -7,6 +7,7 @@ import {
   isAccount,
   isAmount,
   isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -77,15 +78,7 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: CancelAfter must be a number')
-  }
-
-  if (tx.FinishAfter !== undefined && typeof tx.FinishAfter !== 'number') {
-    throw new ValidationError('EscrowCreate: FinishAfter must be a number')
-  }
-
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowCreate: Condition must be a string')
-  }
+  validateOptionalField(tx, 'CancelAfter', isNumber)
+  validateOptionalField(tx, 'FinishAfter', isNumber)
+  validateOptionalField(tx, 'Condition', isString)
 }
