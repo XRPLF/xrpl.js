@@ -929,6 +929,326 @@
       }
     ],
     [
+      "Subaccount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 86,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MakerFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 87,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "TakerFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 88,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OwnerFeeShare",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 89,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VaultFeeShare",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 90,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "BuilderFeeMax",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 91,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "BuilderFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 92,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VaultLossLimit",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 93,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VaultLossWindow",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 94,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ParameterDelay",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 95,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VaultLossWindowStart",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 96,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MarketCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 97,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MarginAccountCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 98,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "ParameterEffectiveTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 99,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "IndexMaxAge",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 100,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "IndexMaxLedgers",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 101,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "InitialMarginRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 102,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MaintenanceMarginRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 103,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OrderPriceBand",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 104,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MidSpreadMax",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 105,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MarkBand",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 106,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "MarkMoveMax",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 107,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "BasisWindow",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 108,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "FundingCap",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 109,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LiquidationPenalty",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 110,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LiquidationRewardShare",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 111,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SettleStaleAfter",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 112,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OrderCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 113,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LastRefreshTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 114,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RefreshLedger",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 115,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "StaleSince",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 116,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "SettledAt",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 117,
+        "type": "UInt32"
+      }
+    ],
+    [
       "IndexNext",
       {
         "isSerialized": true,
@@ -1565,6 +1885,46 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 41,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "PerpExchangeID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 43,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "ExchangeID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 44,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "MarketID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 45,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "MarginAccountID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 46,
         "type": "Hash256"
       }
     ],
@@ -2549,6 +2909,16 @@
       }
     ],
     [
+      "Builder",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 33,
+        "type": "AccountID"
+      }
+    ],
+    [
       "Number",
       {
         "isSerialized": true,
@@ -2719,6 +3089,326 @@
       }
     ],
     [
+      "CashTotal",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 20,
+        "type": "Number"
+      }
+    ],
+    [
+      "InsuranceFund",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 21,
+        "type": "Number"
+      }
+    ],
+    [
+      "OwnerFees",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 22,
+        "type": "Number"
+      }
+    ],
+    [
+      "SettlementBalance",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 23,
+        "type": "Number"
+      }
+    ],
+    [
+      "BadDebt",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 24,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenInterestNotional",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 25,
+        "type": "Number"
+      }
+    ],
+    [
+      "VaultLossInWindow",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 26,
+        "type": "Number"
+      }
+    ],
+    [
+      "PriceTick",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 27,
+        "type": "Number"
+      }
+    ],
+    [
+      "LotSize",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 28,
+        "type": "Number"
+      }
+    ],
+    [
+      "NotionalMax",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 29,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenInterestMax",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 30,
+        "type": "Number"
+      }
+    ],
+    [
+      "LiquidationRewardMin",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 31,
+        "type": "Number"
+      }
+    ],
+    [
+      "LiquidationChunkMin",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 32,
+        "type": "Number"
+      }
+    ],
+    [
+      "IndexPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
+        "type": "Number"
+      }
+    ],
+    [
+      "MarkPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 34,
+        "type": "Number"
+      }
+    ],
+    [
+      "BasisEMA",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 35,
+        "type": "Number"
+      }
+    ],
+    [
+      "FundingRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 36,
+        "type": "Number"
+      }
+    ],
+    [
+      "CumulativeFunding",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 37,
+        "type": "Number"
+      }
+    ],
+    [
+      "LossIndexLong",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 38,
+        "type": "Number"
+      }
+    ],
+    [
+      "LossIndexShort",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 39,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenInterestLong",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 40,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenInterestShort",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 41,
+        "type": "Number"
+      }
+    ],
+    [
+      "SettlementPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 42,
+        "type": "Number"
+      }
+    ],
+    [
+      "Cash",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 43,
+        "type": "Number"
+      }
+    ],
+    [
+      "WaterfallCredit",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 44,
+        "type": "Number"
+      }
+    ],
+    [
+      "Size",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 45,
+        "type": "Number"
+      }
+    ],
+    [
+      "EntryNotional",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 46,
+        "type": "Number"
+      }
+    ],
+    [
+      "FundingIndex",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 47,
+        "type": "Number"
+      }
+    ],
+    [
+      "LossIndex",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 48,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenBuy",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 49,
+        "type": "Number"
+      }
+    ],
+    [
+      "OpenSell",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 50,
+        "type": "Number"
+      }
+    ],
+    [
+      "LimitPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 51,
+        "type": "Number"
+      }
+    ],
+    [
       "LoanScale",
       {
         "isSerialized": true,
@@ -2735,6 +3425,16 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 2,
+        "type": "Int32"
+      }
+    ],
+    [
+      "FundingInterestRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 4,
         "type": "Int32"
       }
     ],
@@ -3039,6 +3739,36 @@
       }
     ],
     [
+      "IndexOracle",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 40,
+        "type": "STObject"
+      }
+    ],
+    [
+      "MarginTier",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 41,
+        "type": "STObject"
+      }
+    ],
+    [
+      "PendingParameters",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 42,
+        "type": "STObject"
+      }
+    ],
+    [
       "Signers",
       {
         "isSerialized": true,
@@ -3259,6 +3989,26 @@
       }
     ],
     [
+      "IndexOracles",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 32,
+        "type": "STArray"
+      }
+    ],
+    [
+      "MarginTiers",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 33,
+        "type": "STArray"
+      }
+    ],
+    [
       "CloseResolution",
       {
         "isSerialized": true,
@@ -3379,6 +4129,16 @@
       }
     ],
     [
+      "MarketStatus",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 23,
+        "type": "UInt8"
+      }
+    ],
+    [
       "TakerPaysCurrency",
       {
         "isSerialized": true,
@@ -3475,6 +4235,16 @@
         "isSigningField": true,
         "isVLEncoded": true,
         "nth": 5,
+        "type": "Vector256"
+      }
+    ],
+    [
+      "Markets",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 6,
         "type": "Vector256"
       }
     ],
@@ -5171,6 +5941,8 @@
     "LoanBroker": 136,
     "MPToken": 127,
     "MPTokenIssuance": 126,
+    "MarginAccount": 140,
+    "MarginPosition": 141,
     "NFTokenOffer": 55,
     "NFTokenPage": 80,
     "NegativeUNL": 78,
@@ -5178,6 +5950,9 @@
     "Oracle": 128,
     "PayChannel": 120,
     "PermissionedDomain": 130,
+    "PerpExchange": 138,
+    "PerpMarket": 139,
+    "PerpOrder": 142,
     "RippleState": 114,
     "SignerList": 83,
     "Sponsorship": 144,
@@ -6961,6 +7736,17 @@
     "tecOWNERS": 132,
     "tecPATH_DRY": 128,
     "tecPATH_PARTIAL": 101,
+    "tecPERP_HEALTHY": 212,
+    "tecPERP_INSUFFICIENT_COVER": 208,
+    "tecPERP_INSUFFICIENT_MARGIN": 205,
+    "tecPERP_MARKET_LIMIT": 210,
+    "tecPERP_MARKET_SETTLED": 209,
+    "tecPERP_NO_LIQUIDITY": 213,
+    "tecPERP_OI_CAP": 207,
+    "tecPERP_POSITION_LIMIT": 206,
+    "tecPERP_PRICE_BAND": 204,
+    "tecPERP_STALE_PRICE": 203,
+    "tecPERP_WATERFALL_CREDIT": 211,
     "tecPRECISION_LOSS": 197,
     "tecPSEUDO_ACCOUNT": 196,
     "tecTOKEN_PAIR_NOT_FOUND": 189,
@@ -7146,6 +7932,8 @@
     "MPTokenIssuanceCreate": 54,
     "MPTokenIssuanceDestroy": 55,
     "MPTokenIssuanceSet": 56,
+    "MarginDeposit": 107,
+    "MarginWithdraw": 108,
     "NFTokenAcceptOffer": 29,
     "NFTokenBurn": 26,
     "NFTokenCancelOffer": 28,
@@ -7162,6 +7950,14 @@
     "PaymentChannelFund": 14,
     "PermissionedDomainDelete": 63,
     "PermissionedDomainSet": 62,
+    "PerpExchangeDelete": 104,
+    "PerpExchangeSet": 103,
+    "PerpLiquidate": 111,
+    "PerpMarketDelete": 106,
+    "PerpMarketSet": 105,
+    "PerpOrderCancel": 110,
+    "PerpOrderCreate": 109,
+    "PerpRefresh": 112,
     "SetFee": 101,
     "SetRegularKey": 5,
     "SignerListSet": 12,
