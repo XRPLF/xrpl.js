@@ -7,10 +7,13 @@ import {
   isDomainID,
   isLedgerEntryId,
   isNumber,
+  isXRPLNumber,
   validateBaseTransaction,
+  validateFormatFields,
   validateHexMetadata,
   validateOptionalField,
   validateRequiredField,
+  XRPLNumber,
 } from './common'
 
 /** The largest Data payload, in bytes (rippled `kMaxDataPayloadLength`). */
@@ -24,22 +27,8 @@ const CREATION_ONLY_FIELDS = [
   'Asset',
   'Scale',
   'DomainID',
-  'VaultID',
-  'VaultLossWindow',
-  'ParameterDelay',
-]
-
-/** Rate and count fields, each a UInt32. */
-const UINT32_FIELDS = [
-  'MakerFee',
-  'TakerFee',
-  'OwnerFeeShare',
-  'VaultFeeShare',
-  'BuilderFeeMax',
-  'CoverRateMinimum',
-  'VaultLossLimit',
-  'VaultLossWindow',
-  'ParameterDelay',
+  'LiquidationRewardMin',
+  'LiquidationChunkMin',
 ]
 
 /**
@@ -64,23 +53,17 @@ export interface PerpExchangeSet extends BaseTransaction {
   /** Creation only: the Permissioned Domain every trader must be in. */
   DomainID?: string
 
-  /**
-   * Creation only: the backstop Vault, owned by the Account and holding the
-   * same Asset; present together with VaultLossWindow.
-   */
-  VaultID?: string
-
   /** The fee rate charged to a fill's maker, in 1/10 basis points. */
   MakerFee?: number
 
   /** The fee rate charged to a fill's taker, in 1/10 basis points. */
   TakerFee?: number
 
-  /** The share of each fee paid to the owner, in 1/10 basis points. */
+  /**
+   * The share of each fee paid to the owner, in 1/10 basis points, at most
+   * 100000; the rest goes to the insurance fund.
+   */
   OwnerFeeShare?: number
-
-  /** The share of each fee paid to the vault, in 1/10 basis points. */
-  VaultFeeShare?: number
 
   /** The highest builder fee an order may set, in 1/10 basis points. */
   BuilderFeeMax?: number
@@ -89,22 +72,22 @@ export interface PerpExchangeSet extends BaseTransaction {
   CoverRateMinimum?: number
 
   /**
-   * The share of the vault's assets the loss waterfall may draw per window,
-   * in 1/10 basis points.
+   * Required on creation: the penalty rate on liquidated notional, in 1/10
+   * basis points.
    */
-  VaultLossLimit?: number
+  LiquidationPenalty?: number
 
   /**
-   * Creation only: the vault loss window in seconds; present together with
-   * VaultID.
+   * Creation only: the reward paid to a liquidator from the insurance fund
+   * when the penalty is zero, as a Number string.
    */
-  VaultLossWindow?: number
+  LiquidationRewardMin?: XRPLNumber
 
   /**
-   * Creation only, and required there: seconds before a loosening change
-   * applies.
+   * Creation only, and required there: the notional above which a
+   * liquidation is partial, as a Number string.
    */
-  ParameterDelay?: number
+  LiquidationChunkMin?: XRPLNumber
 
   /** Operator metadata, hex-encoded, at most 256 bytes. */
   Data?: string
@@ -123,6 +106,23 @@ function isPerpExchangeData(input: unknown): input is string {
   )
 }
 
+/** Every field of a PerpExchangeSet with its type check, in macro order. */
+const FIELD_CHECKS: Array<[string, (input: unknown) => input is unknown]> = [
+  ['ExchangeID', isLedgerEntryId],
+  ['Asset', isCurrency],
+  ['Scale', isNumber],
+  ['DomainID', isDomainID],
+  ['MakerFee', isNumber],
+  ['TakerFee', isNumber],
+  ['OwnerFeeShare', isNumber],
+  ['BuilderFeeMax', isNumber],
+  ['CoverRateMinimum', isNumber],
+  ['LiquidationPenalty', isNumber],
+  ['LiquidationRewardMin', isXRPLNumber],
+  ['LiquidationChunkMin', isXRPLNumber],
+  ['Data', isPerpExchangeData],
+]
+
 /**
  * Verify the form and type of a {@link PerpExchangeSet} at runtime.
  *
@@ -131,19 +131,18 @@ function isPerpExchangeData(input: unknown): input is string {
  */
 export function validatePerpExchangeSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateOptionalField(tx, 'ExchangeID', isLedgerEntryId)
-  validateOptionalField(tx, 'Asset', isCurrency)
-  validateOptionalField(tx, 'Scale', isNumber)
-  validateOptionalField(tx, 'DomainID', isDomainID)
-  validateOptionalField(tx, 'VaultID', isLedgerEntryId)
-  UINT32_FIELDS.forEach((field) => validateOptionalField(tx, field, isNumber))
-  validateOptionalField(tx, 'Data', isPerpExchangeData)
+  validateFormatFields(
+    tx,
+    'PerpExchangeSet',
+    FIELD_CHECKS.map(([field]) => field),
+  )
+  FIELD_CHECKS.forEach(([field, check]) =>
+    validateOptionalField(tx, field, check),
+  )
 
-  const ownerFeeShare = isNumber(tx.OwnerFeeShare) ? tx.OwnerFeeShare : 0
-  const vaultFeeShare = isNumber(tx.VaultFeeShare) ? tx.VaultFeeShare : 0
-  if (ownerFeeShare + vaultFeeShare > RATE_UNITY) {
+  if (isNumber(tx.OwnerFeeShare) && tx.OwnerFeeShare > RATE_UNITY) {
     throw new ValidationError(
-      `PerpExchangeSet: OwnerFeeShare plus VaultFeeShare must not exceed ${RATE_UNITY}`,
+      `PerpExchangeSet: OwnerFeeShare must not exceed ${RATE_UNITY}`,
     )
   }
 
@@ -158,10 +157,6 @@ export function validatePerpExchangeSet(tx: Record<string, unknown>): void {
   }
 
   validateRequiredField(tx, 'Asset', isCurrency)
-  validateRequiredField(tx, 'ParameterDelay', isNumber)
-  if ((tx.VaultID === undefined) !== (tx.VaultLossWindow === undefined)) {
-    throw new ValidationError(
-      'PerpExchangeSet: VaultID and VaultLossWindow must be present together',
-    )
-  }
+  validateRequiredField(tx, 'LiquidationPenalty', isNumber)
+  validateRequiredField(tx, 'LiquidationChunkMin', isXRPLNumber)
 }

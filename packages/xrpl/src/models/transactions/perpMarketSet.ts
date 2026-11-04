@@ -13,6 +13,7 @@ import {
   isString,
   isXRPLNumber,
   validateBaseTransaction,
+  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
   XRPLNumber,
@@ -29,6 +30,8 @@ const CREATION_ONLY_FIELDS = [
   'ExchangeID',
   'BaseAsset',
   'QuoteAsset',
+  'IndexOracles',
+  'IndexMaxLedgers',
   'PriceTick',
   'LotSize',
 ]
@@ -39,7 +42,7 @@ const CREATION_ONLY_FIELDS = [
  * @category Transaction Flags
  */
 export enum PerpMarketSetFlags {
-  /** Update only: settle a Live market at its current mark. */
+  /** Update only: settle a Live market at its current index. */
   tfPerpMarketSettle = 0x00010000,
   /**
    * Creation only: a margin account with a position in the market holds no
@@ -62,7 +65,8 @@ export interface PerpMarketSetFlagsInterface extends GlobalFlagsInterface {
 /**
  * The PerpMarketSet transaction creates a perpetual futures market on an
  * exchange, or updates or settles one. Creation carries ExchangeID and every
- * required parameter; an update carries MarketID and the parameters to change.
+ * parameter; an update carries MarketID and the tighten-only parameters to
+ * change.
  *
  * @category Transaction Models
  */
@@ -81,13 +85,13 @@ export interface PerpMarketSet extends BaseTransaction {
   /** Creation only, and required there: the oracle pair's quote currency. */
   QuoteAsset?: string
 
-  /** Required on creation: 1 to 5 distinct XLS-47 oracles the index reads. */
+  /**
+   * Creation only, and required there: 1 to 5 distinct XLS-47 oracles the
+   * index reads.
+   */
   IndexOracles?: IndexOracle[]
 
-  /** Required on creation: seconds of provider-timestamp freshness. */
-  IndexMaxAge?: number
-
-  /** Required on creation: ledgers of write freshness. */
+  /** Creation only, and required there: ledgers of write freshness. */
   IndexMaxLedgers?: number
 
   /** Creation only, and required there: the price increment. */
@@ -104,39 +108,6 @@ export interface PerpMarketSet extends BaseTransaction {
 
   /** Required on creation: the share of the index order prices stay within. */
   OrderPriceBand?: number
-
-  /** Required on creation: the widest spread whose mid feeds the mark. */
-  MidSpreadMax?: number
-
-  /** Required on creation: the band around the index the mark is clamped to. */
-  MarkBand?: number
-
-  /** Required on creation: the largest move of the mark per refresh. */
-  MarkMoveMax?: number
-
-  /** Required on creation: seconds of the book basis EMA window. */
-  BasisWindow?: number
-
-  /** The signed funding interest rate per 8 hours, in 1/10 basis points. */
-  FundingInterestRate?: number
-
-  /** Required on creation: the funding rate cap per 8 hours. */
-  FundingCap?: number
-
-  /** Required on creation: the penalty rate on liquidated notional. */
-  LiquidationPenalty?: number
-
-  /** Required on creation: the share of the penalty paid to the liquidator. */
-  LiquidationRewardShare?: number
-
-  /** The reward paid from the insurance fund when the penalty is zero. */
-  LiquidationRewardMin?: XRPLNumber
-
-  /** Required on creation: the notional above which a liquidation is partial. */
-  LiquidationChunkMin?: XRPLNumber
-
-  /** Required on creation: seconds stale before anyone may settle the market. */
-  SettleStaleAfter?: number
 
   Flags?: number | PerpMarketSetFlagsInterface
 }
@@ -191,49 +162,13 @@ const FIELD_CHECKS: Array<[string, (input: unknown) => input is unknown]> = [
   ['BaseAsset', isString],
   ['QuoteAsset', isString],
   ['IndexOracles', isIndexOracles],
-  ['IndexMaxAge', isNumber],
   ['IndexMaxLedgers', isNumber],
   ['PriceTick', isXRPLNumber],
   ['LotSize', isXRPLNumber],
   ['MarginTiers', isMarginTiers],
   ['OpenInterestMax', isXRPLNumber],
   ['OrderPriceBand', isNumber],
-  ['MidSpreadMax', isNumber],
-  ['MarkBand', isNumber],
-  ['MarkMoveMax', isNumber],
-  ['BasisWindow', isNumber],
-  ['FundingInterestRate', isNumber],
-  ['FundingCap', isNumber],
-  ['LiquidationPenalty', isNumber],
-  ['LiquidationRewardShare', isNumber],
-  ['LiquidationRewardMin', isXRPLNumber],
-  ['LiquidationChunkMin', isXRPLNumber],
-  ['SettleStaleAfter', isNumber],
 ]
-
-/** Fields a creation must carry; the others of FIELD_CHECKS are optional. */
-const REQUIRED_ON_CREATION = new Set([
-  'ExchangeID',
-  'BaseAsset',
-  'QuoteAsset',
-  'IndexOracles',
-  'IndexMaxAge',
-  'IndexMaxLedgers',
-  'PriceTick',
-  'LotSize',
-  'MarginTiers',
-  'OpenInterestMax',
-  'OrderPriceBand',
-  'MidSpreadMax',
-  'MarkBand',
-  'MarkMoveMax',
-  'BasisWindow',
-  'FundingCap',
-  'LiquidationPenalty',
-  'LiquidationRewardShare',
-  'LiquidationChunkMin',
-  'SettleStaleAfter',
-])
 
 /**
  * Verify the form and type of a {@link PerpMarketSet} at runtime.
@@ -243,6 +178,11 @@ const REQUIRED_ON_CREATION = new Set([
  */
 export function validatePerpMarketSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(
+    tx,
+    'PerpMarketSet',
+    FIELD_CHECKS.map(([field]) => field),
+  )
   FIELD_CHECKS.forEach(([field, check]) =>
     validateOptionalField(tx, field, check),
   )
@@ -264,7 +204,7 @@ export function validatePerpMarketSet(tx: Record<string, unknown>): void {
     return
   }
 
-  FIELD_CHECKS.filter(([field]) => REQUIRED_ON_CREATION.has(field)).forEach(
+  FIELD_CHECKS.filter(([field]) => field !== 'MarketID').forEach(
     ([field, check]) => validateRequiredField(tx, field, check),
   )
   if (

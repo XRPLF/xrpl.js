@@ -1,4 +1,4 @@
-import { IndexOracle, MarginTier, PendingParameters } from '../common'
+import { IndexOracle, MarginTier } from '../common'
 import { XRPLNumber } from '../transactions/common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
@@ -28,9 +28,6 @@ export default interface PerpMarket extends BaseLedgerEntry, HasPreviousTxnID {
   /** The XLS-47 oracles the index reads. */
   IndexOracles: IndexOracle[]
 
-  /** Seconds of provider-timestamp freshness. */
-  IndexMaxAge: number
-
   /** Ledgers of write freshness. */
   IndexMaxLedgers: number
 
@@ -49,44 +46,11 @@ export default interface PerpMarket extends BaseLedgerEntry, HasPreviousTxnID {
   /** The share of the index order prices stay within. */
   OrderPriceBand: number
 
-  /** The widest spread whose mid feeds the mark. */
-  MidSpreadMax: number
-
-  /** The band around the index the mark is clamped to. */
-  MarkBand: number
-
-  /** The largest move of the mark per refresh. */
-  MarkMoveMax: number
-
-  /** Seconds of the book basis EMA window. */
-  BasisWindow: number
-
-  /** The signed funding interest rate per 8 hours. */
-  FundingInterestRate?: number
-
-  /** The funding rate cap per 8 hours. */
-  FundingCap: number
-
-  /** The penalty rate on liquidated notional. */
-  LiquidationPenalty: number
-
-  /** The share of the penalty paid to the liquidator. */
-  LiquidationRewardShare: number
-
-  /** The reward paid from the insurance fund when the penalty is zero. */
-  LiquidationRewardMin?: XRPLNumber
-
-  /** The notional above which a liquidation is partial. */
-  LiquidationChunkMin: XRPLNumber
-
-  /** Seconds stale before anyone may settle the market. */
-  SettleStaleAfter: number
-
-  /** The index price. */
+  /**
+   * The index price: the price for margin, liquidation, notional, withdrawals
+   * and settlement. It is frozen once the market is Settled.
+   */
   IndexPrice?: XRPLNumber
-
-  /** The mark price. */
-  MarkPrice?: XRPLNumber
 
   /** The book basis EMA. */
   BasisEMA?: XRPLNumber
@@ -118,23 +82,14 @@ export default interface PerpMarket extends BaseLedgerEntry, HasPreviousTxnID {
   /** The ledger of the last refresh. */
   RefreshLedger?: number
 
-  /** The time the market became Stale, in seconds since the Ripple Epoch. */
-  StaleSince?: number
-
-  /** The time the market was Settled, in seconds since the Ripple Epoch. */
-  SettledAt?: number
+  /**
+   * The time MarketStatus last changed, in seconds since the Ripple Epoch;
+   * set at creation.
+   */
+  StatusTime?: number
 
   /** 0 Live, 1 Stale, 2 Settled. */
   MarketStatus?: number
-
-  /** The price the market was settled at. */
-  SettlementPrice?: XRPLNumber
-
-  /** The queued loosening change. */
-  PendingParameters?: PendingParameters
-
-  /** The time, in seconds since the Ripple Epoch, the queued change applies. */
-  ParameterEffectiveTime?: number
 
   /** The page of the exchange owner's owner directory that lists this entry. */
   OwnerNode: string

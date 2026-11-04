@@ -1,4 +1,4 @@
-import { Currency, PendingParameters } from '../common'
+import { Currency } from '../common'
 import { Account, XRPLNumber } from '../transactions/common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
@@ -35,20 +35,14 @@ export default interface PerpExchange
   /** The Permissioned Domain every trader must be in. */
   DomainID?: string
 
-  /** The backstop Vault bound to this exchange. */
-  VaultID?: string
-
   /** The fee rate charged to a fill's maker. */
   MakerFee?: number
 
   /** The fee rate charged to a fill's taker. */
   TakerFee?: number
 
-  /** The share of each fee paid to the owner. */
+  /** The share of each fee paid to the owner; the rest goes to the insurance fund. */
   OwnerFeeShare?: number
-
-  /** The share of each fee paid to the vault. */
-  VaultFeeShare?: number
 
   /** The highest builder fee an order may set. */
   BuilderFeeMax?: number
@@ -56,14 +50,14 @@ export default interface PerpExchange
   /** Cover required per unit of open-interest notional. */
   CoverRateMinimum?: number
 
-  /** The share of the vault's assets the waterfall may draw per window. */
-  VaultLossLimit?: number
+  /** The penalty rate on liquidated notional. */
+  LiquidationPenalty: number
 
-  /** The vault loss window in seconds; present if and only if VaultID is. */
-  VaultLossWindow?: number
+  /** The reward paid from the insurance fund when the penalty is zero. */
+  LiquidationRewardMin?: XRPLNumber
 
-  /** Seconds before a loosening change applies. */
-  ParameterDelay: number
+  /** The notional above which a liquidation is partial. */
+  LiquidationChunkMin: XRPLNumber
 
   /** The pseudo-account's collateral balance. */
   AssetsTotal?: XRPLNumber
@@ -86,26 +80,14 @@ export default interface PerpExchange
   /** Shortfall no position could be charged for. */
   BadDebt?: XRPLNumber
 
-  /** The sum over markets of long open interest times the mark price. */
+  /** The sum over markets of long open interest times the index price. */
   OpenInterestNotional?: XRPLNumber
-
-  /** The start of the current vault loss window, in seconds. */
-  VaultLossWindowStart?: number
-
-  /** The amount drawn from the vault in the current window. */
-  VaultLossInWindow?: XRPLNumber
 
   /** The number of markets of the exchange. */
   MarketCount?: number
 
   /** The number of margin accounts of the exchange. */
   MarginAccountCount?: number
-
-  /** The queued loosening change. */
-  PendingParameters?: PendingParameters
-
-  /** The time, in seconds since the Ripple Epoch, the queued change applies. */
-  ParameterEffectiveTime?: number
 
   /** Operator metadata, hex-encoded. */
   Data?: string

@@ -4,7 +4,8 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
  * The MarginAccount object holds one account's cross-margined collateral on a
- * PerpExchange, under one subaccount number. Number fields are strings.
+ * PerpExchange; an account has at most one per exchange. Number fields are
+ * strings.
  *
  * @category Ledger Entries
  */
@@ -20,9 +21,6 @@ export default interface MarginAccount
 
   /** The ID of the PerpExchange the collateral is held on. */
   ExchangeID: string
-
-  /** The subaccount number. */
-  Subaccount: number
 
   /** Signed; deposited collateral plus realised PnL, funding, fees and losses. */
   Cash?: XRPLNumber

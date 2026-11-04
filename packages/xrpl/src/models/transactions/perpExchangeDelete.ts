@@ -2,6 +2,7 @@ import {
   BaseTransaction,
   isLedgerEntryId,
   validateBaseTransaction,
+  validateFormatFields,
   validateRequiredField,
 } from './common'
 
@@ -27,5 +28,6 @@ export interface PerpExchangeDelete extends BaseTransaction {
  */
 export function validatePerpExchangeDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(tx, 'PerpExchangeDelete', ['ExchangeID'])
   validateRequiredField(tx, 'ExchangeID', isLedgerEntryId)
 }

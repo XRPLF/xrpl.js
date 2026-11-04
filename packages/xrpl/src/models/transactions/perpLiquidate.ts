@@ -5,9 +5,9 @@ import {
   BaseTransaction,
   GlobalFlagsInterface,
   isLedgerEntryId,
-  isNumber,
   isXRPLNumber,
   validateBaseTransaction,
+  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
   XRPLNumber,
@@ -21,7 +21,7 @@ import {
 export enum PerpLiquidateFlags {
   /** Close the position against the order book. */
   tfPerpLiquidateToBook = 0x00010000,
-  /** The liquidator takes the position over at the mark. */
+  /** The liquidator takes the position over at the index. */
   tfPerpLiquidateTakeover = 0x00020000,
 }
 
@@ -38,7 +38,9 @@ export interface PerpLiquidateFlagsInterface extends GlobalFlagsInterface {
 
 /**
  * The PerpLiquidate transaction reduces a position of an under-margined
- * margin account, in book mode or takeover mode. Any account may submit it.
+ * margin account, in book mode or takeover mode. Any account with a margin
+ * account on the same exchange may submit it; that margin account receives
+ * the reward.
  *
  * @category Transaction Models
  */
@@ -54,12 +56,6 @@ export interface PerpLiquidate extends BaseTransaction {
   /** An upper bound on the size liquidated, as a Number string. */
   Size?: XRPLNumber
 
-  /**
-   * The subaccount number of the liquidator's margin account on the same
-   * exchange, which receives the reward. Defaults to 0.
-   */
-  Subaccount?: number
-
   Flags?: number | PerpLiquidateFlagsInterface
 }
 
@@ -71,10 +67,14 @@ export interface PerpLiquidate extends BaseTransaction {
  */
 export function validatePerpLiquidate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(tx, 'PerpLiquidate', [
+    'MarginAccountID',
+    'MarketID',
+    'Size',
+  ])
   validateRequiredField(tx, 'MarginAccountID', isLedgerEntryId)
   validateRequiredField(tx, 'MarketID', isLedgerEntryId)
   validateOptionalField(tx, 'Size', isXRPLNumber)
-  validateOptionalField(tx, 'Subaccount', isNumber)
 
   const toBook = hasFlag(
     tx,

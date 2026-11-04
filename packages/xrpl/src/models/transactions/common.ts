@@ -952,6 +952,57 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
   }
 }
 
+/** The fields every transaction may carry (rippled `TxFormats::getCommonFields`). */
+const COMMON_TRANSACTION_FIELDS = new Set([
+  'TransactionType',
+  'Flags',
+  'SourceTag',
+  'Account',
+  'Sequence',
+  'PreviousTxnID',
+  'LastLedgerSequence',
+  'AccountTxnID',
+  'Fee',
+  'OperationLimit',
+  'Memos',
+  'SigningPubKey',
+  'TicketSequence',
+  'TxnSignature',
+  'Signers',
+  'NetworkID',
+  'Delegate',
+  'Sponsor',
+  'SponsorFlags',
+  'SponsorSignature',
+])
+
+/**
+ * Verify that a transaction carries no protocol field outside its format, as
+ * rippled refuses such a transaction. A key that starts with a lower-case
+ * letter, such as `hash`, is an API field and is not checked.
+ *
+ * @param tx - The transaction to verify.
+ * @param txType - The transaction type, for the error message.
+ * @param fields - The fields of the transaction type's format.
+ * @throws ValidationError naming the first field outside the format.
+ */
+export function validateFormatFields(
+  tx: Record<string, unknown>,
+  txType: string,
+  fields: readonly string[],
+): void {
+  const unexpected = Object.keys(tx).find(
+    (key) =>
+      /^[A-Z]/u.test(key) &&
+      tx[key] !== undefined &&
+      !COMMON_TRANSACTION_FIELDS.has(key) &&
+      !fields.includes(key),
+  )
+  if (unexpected !== undefined) {
+    throw new ValidationError(`${txType}: unexpected field ${unexpected}`)
+  }
+}
+
 /**
  * Verify the common fields of a transaction. The validate functionality will be
  * optional, and will check transaction form at runtime. This should be called

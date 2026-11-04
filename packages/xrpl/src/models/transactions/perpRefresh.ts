@@ -6,6 +6,7 @@ import {
   GlobalFlagsInterface,
   isLedgerEntryId,
   validateBaseTransaction,
+  validateFormatFields,
   validateOptionalField,
 } from './common'
 
@@ -16,7 +17,8 @@ import {
  */
 export enum PerpRefreshFlags {
   /**
-   * Settle a market that has been Stale for at least its SettleStaleAfter.
+   * Settle a market that has been Stale for at least 86400 seconds
+   * (rippled `kSettleStaleAfter`).
    */
   tfPerpSettleStale = 0x00010000,
 }
@@ -32,8 +34,8 @@ export interface PerpRefreshFlagsInterface extends GlobalFlagsInterface {
 }
 
 /**
- * The PerpRefresh transaction refreshes a perpetual futures market's index,
- * mark and funding, and settles a margin account. Any account may submit it.
+ * The PerpRefresh transaction refreshes a perpetual futures market's index
+ * and funding, and settles a margin account. Any account may submit it.
  *
  * @category Transaction Models
  */
@@ -57,6 +59,7 @@ export interface PerpRefresh extends BaseTransaction {
  */
 export function validatePerpRefresh(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(tx, 'PerpRefresh', ['MarketID', 'MarginAccountID'])
   validateOptionalField(tx, 'MarketID', isLedgerEntryId)
   validateOptionalField(tx, 'MarginAccountID', isLedgerEntryId)
 

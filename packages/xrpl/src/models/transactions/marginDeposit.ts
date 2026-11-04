@@ -1,15 +1,12 @@
-import { ValidationError } from '../../errors'
 import { Amount, MPTAmount } from '../common'
-import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
   isLedgerEntryId,
-  isNumber,
   validateBaseTransaction,
-  validateOptionalField,
+  validateFormatFields,
   validateRequiredField,
 } from './common'
 
@@ -37,9 +34,9 @@ export interface MarginDepositFlagsInterface extends GlobalFlagsInterface {
 }
 
 /**
- * The MarginDeposit transaction deposits collateral into a margin account on
- * a perpetual futures exchange, creating the account if it does not exist, or
- * deposits the exchange owner's cover.
+ * The MarginDeposit transaction deposits collateral into the submitter's
+ * margin account on a perpetual futures exchange, creating the account if it
+ * does not exist, or deposits the exchange owner's cover.
  *
  * @category Transaction Models
  */
@@ -48,12 +45,6 @@ export interface MarginDeposit extends BaseTransaction {
 
   /** The ID of the PerpExchange ledger entry to deposit on. */
   ExchangeID: string
-
-  /**
-   * The subaccount number of the margin account. Defaults to 0; absent with
-   * tfPerpCover.
-   */
-  Subaccount?: number
 
   /** The collateral to deposit, in the exchange's Asset. */
   Amount: Amount | MPTAmount
@@ -69,16 +60,7 @@ export interface MarginDeposit extends BaseTransaction {
  */
 export function validateMarginDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(tx, 'MarginDeposit', ['ExchangeID', 'Amount'])
   validateRequiredField(tx, 'ExchangeID', isLedgerEntryId)
-  validateOptionalField(tx, 'Subaccount', isNumber)
   validateRequiredField(tx, 'Amount', isAmount)
-
-  if (
-    hasFlag(tx, MarginDepositFlags.tfPerpCover, 'tfPerpCover') &&
-    tx.Subaccount !== undefined
-  ) {
-    throw new ValidationError(
-      'MarginDeposit: Subaccount must be absent with tfPerpCover',
-    )
-  }
 }

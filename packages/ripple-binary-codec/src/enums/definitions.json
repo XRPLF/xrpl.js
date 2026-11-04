@@ -929,16 +929,6 @@
       }
     ],
     [
-      "Subaccount",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 86,
-        "type": "UInt32"
-      }
-    ],
-    [
       "MakerFee",
       {
         "isSerialized": true,
@@ -969,16 +959,6 @@
       }
     ],
     [
-      "VaultFeeShare",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 90,
-        "type": "UInt32"
-      }
-    ],
-    [
       "BuilderFeeMax",
       {
         "isSerialized": true,
@@ -999,46 +979,6 @@
       }
     ],
     [
-      "VaultLossLimit",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 93,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "VaultLossWindow",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 94,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "ParameterDelay",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 95,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "VaultLossWindowStart",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 96,
-        "type": "UInt32"
-      }
-    ],
-    [
       "MarketCount",
       {
         "isSerialized": true,
@@ -1055,26 +995,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 98,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "ParameterEffectiveTime",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 99,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "IndexMaxAge",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 100,
         "type": "UInt32"
       }
     ],
@@ -1119,82 +1039,12 @@
       }
     ],
     [
-      "MidSpreadMax",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 105,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "MarkBand",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 106,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "MarkMoveMax",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 107,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "BasisWindow",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 108,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "FundingCap",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 109,
-        "type": "UInt32"
-      }
-    ],
-    [
       "LiquidationPenalty",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 110,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "LiquidationRewardShare",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 111,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "SettleStaleAfter",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 112,
         "type": "UInt32"
       }
     ],
@@ -1229,22 +1079,12 @@
       }
     ],
     [
-      "StaleSince",
+      "StatusTime",
       {
         "isSerialized": true,
         "isSigningField": true,
         "isVLEncoded": false,
-        "nth": 116,
-        "type": "UInt32"
-      }
-    ],
-    [
-      "SettledAt",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 117,
+        "nth": 118,
         "type": "UInt32"
       }
     ],
@@ -3149,16 +2989,6 @@
       }
     ],
     [
-      "VaultLossInWindow",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 26,
-        "type": "Number"
-      }
-    ],
-    [
       "PriceTick",
       {
         "isSerialized": true,
@@ -3229,16 +3059,6 @@
       }
     ],
     [
-      "MarkPrice",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 34,
-        "type": "Number"
-      }
-    ],
-    [
       "BasisEMA",
       {
         "isSerialized": true,
@@ -3305,16 +3125,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 41,
-        "type": "Number"
-      }
-    ],
-    [
-      "SettlementPrice",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 42,
         "type": "Number"
       }
     ],
@@ -3425,16 +3235,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 2,
-        "type": "Int32"
-      }
-    ],
-    [
-      "FundingInterestRate",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 4,
         "type": "Int32"
       }
     ],
@@ -3755,16 +3555,6 @@
         "isSigningField": true,
         "isVLEncoded": false,
         "nth": 41,
-        "type": "STObject"
-      }
-    ],
-    [
-      "PendingParameters",
-      {
-        "isSerialized": true,
-        "isSigningField": true,
-        "isVLEncoded": false,
-        "nth": 42,
         "type": "STObject"
       }
     ],

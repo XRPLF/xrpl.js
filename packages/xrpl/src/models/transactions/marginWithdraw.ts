@@ -9,8 +9,8 @@ import {
   isAccount,
   isAmount,
   isLedgerEntryId,
-  isNumber,
   validateBaseTransaction,
+  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
 } from './common'
@@ -42,8 +42,9 @@ export interface MarginWithdrawFlagsInterface extends GlobalFlagsInterface {
 }
 
 /**
- * The MarginWithdraw transaction withdraws collateral from a margin account
- * on a perpetual futures exchange, or the exchange owner's cover or fees.
+ * The MarginWithdraw transaction withdraws collateral from the submitter's
+ * margin account on a perpetual futures exchange, or the exchange owner's
+ * cover or fees.
  *
  * @category Transaction Models
  */
@@ -52,12 +53,6 @@ export interface MarginWithdraw extends BaseTransaction {
 
   /** The ID of the PerpExchange ledger entry to withdraw from. */
   ExchangeID: string
-
-  /**
-   * The subaccount number of the margin account. Defaults to 0; absent with
-   * tfPerpCover or tfPerpOwnerFees.
-   */
-  Subaccount?: number
 
   /** The collateral to withdraw, in the exchange's Asset. */
   Amount: Amount | MPTAmount
@@ -76,8 +71,12 @@ export interface MarginWithdraw extends BaseTransaction {
  */
 export function validateMarginWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
+  validateFormatFields(tx, 'MarginWithdraw', [
+    'ExchangeID',
+    'Amount',
+    'Destination',
+  ])
   validateRequiredField(tx, 'ExchangeID', isLedgerEntryId)
-  validateOptionalField(tx, 'Subaccount', isNumber)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
 
@@ -95,12 +94,6 @@ export function validateMarginWithdraw(tx: Record<string, unknown>): void {
   if ([cover, ownerFees, deleteAccount].filter(Boolean).length > 1) {
     throw new ValidationError(
       'MarginWithdraw: at most one of tfPerpCover, tfPerpOwnerFees and tfPerpDeleteAccount may be set',
-    )
-  }
-
-  if ((cover || ownerFees) && tx.Subaccount !== undefined) {
-    throw new ValidationError(
-      'MarginWithdraw: Subaccount must be absent with tfPerpCover or tfPerpOwnerFees',
     )
   }
 }
