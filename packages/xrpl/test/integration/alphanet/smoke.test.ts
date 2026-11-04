@@ -28,9 +28,9 @@ import {
 } from '../../../src'
 import { ALPHANET } from '../serverUrl'
 
-const SERVER = 'wss://alphanet.xrpl.org'
+const SERVER = 'wss://alphanet.ws.xrplf.org'
 const FAUCET = {
-  faucetHost: 'faucet.alphanet.xrpl.org',
+  faucetHost: 'alphanet.faucet.xrplf.org',
   faucetPath: '/accounts',
 }
 const SETUP_TIMEOUT = 180000
