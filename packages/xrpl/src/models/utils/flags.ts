@@ -18,6 +18,8 @@ import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
+import { MarginDepositFlags } from '../transactions/marginDeposit'
+import { MarginWithdrawFlags } from '../transactions/marginWithdraw'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
 // eslint-disable-next-line import/no-cycle -- this method is needed to map txn flags
@@ -27,6 +29,10 @@ import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
+import { PerpLiquidateFlags } from '../transactions/perpLiquidate'
+import { PerpMarketSetFlags } from '../transactions/perpMarketSet'
+import { PerpOrderCreateFlags } from '../transactions/perpOrderCreate'
+import { PerpRefreshFlags } from '../transactions/perpRefresh'
 import { SponsorshipSetFlags } from '../transactions/sponsorshipSet'
 import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
 import type { Transaction } from '../transactions/transaction'
@@ -123,6 +129,8 @@ const txToFlag = {
   Batch: BatchFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
+  MarginDeposit: MarginDepositFlags,
+  MarginWithdraw: MarginWithdrawFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,
   MPTokenIssuanceCreate: MPTokenIssuanceCreateFlags,
   MPTokenIssuanceSet: MPTokenIssuanceSetFlags,
@@ -131,6 +139,10 @@ const txToFlag = {
   OfferCreate: OfferCreateFlags,
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,
+  PerpLiquidate: PerpLiquidateFlags,
+  PerpMarketSet: PerpMarketSetFlags,
+  PerpOrderCreate: PerpOrderCreateFlags,
+  PerpRefresh: PerpRefreshFlags,
   SponsorshipSet: SponsorshipSetFlags,
   SponsorshipTransfer: SponsorshipTransferFlags,
   TrustSet: TrustSetFlags,

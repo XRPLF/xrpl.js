@@ -106,8 +106,10 @@ describe('PerpMarketSet', function () {
   })
 
   it('throws w/ invalid IndexOracles', function () {
-    // @ts-expect-error for test
-    tx.IndexOracles = [{ IndexOracle: { Owner: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW' } }]
+    tx.IndexOracles = [
+      // @ts-expect-error for test
+      { IndexOracle: { Owner: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW' } },
+    ]
     assertInvalid(tx, 'PerpMarketSet: invalid field IndexOracles')
   })
 

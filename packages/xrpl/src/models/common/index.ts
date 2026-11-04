@@ -252,6 +252,72 @@ export interface PriceData {
 }
 
 /**
+ * An IndexOracle object names one XLS-47 Oracle that a perpetual futures
+ * market's index reads.
+ */
+export interface IndexOracle {
+  IndexOracle: {
+    /** The account that owns the Oracle. */
+    Owner: string
+
+    /** The OracleDocumentID of the Oracle. */
+    OracleDocumentID: number
+  }
+}
+
+/**
+ * A MarginTier object is one tier of a perpetual futures market's margin
+ * requirement.
+ */
+export interface MarginTier {
+  MarginTier: {
+    /** The upper bound of the tier's notional, as a Number string. */
+    NotionalMax: string
+
+    /** The initial margin rate of the tier, in 1/10 basis points. */
+    InitialMarginRate: number
+
+    /**
+     * The maintenance margin rate of the tier, in 1/10 basis points; lower
+     * than InitialMarginRate.
+     */
+    MaintenanceMarginRate: number
+  }
+}
+
+/**
+ * The queued loosening change of a PerpExchange or a PerpMarket. It carries
+ * only the fields being changed, each with its meaning on that entry; Number
+ * fields are strings.
+ */
+export interface PendingParameters {
+  MakerFee?: number
+  TakerFee?: number
+  OwnerFeeShare?: number
+  VaultFeeShare?: number
+  BuilderFeeMax?: number
+  CoverRateMinimum?: number
+  VaultLossLimit?: number
+  IndexOracles?: IndexOracle[]
+  IndexMaxAge?: number
+  IndexMaxLedgers?: number
+  MarginTiers?: MarginTier[]
+  OpenInterestMax?: string
+  OrderPriceBand?: number
+  MidSpreadMax?: number
+  MarkBand?: number
+  MarkMoveMax?: number
+  BasisWindow?: number
+  FundingInterestRate?: number
+  FundingCap?: number
+  LiquidationPenalty?: number
+  LiquidationRewardShare?: number
+  LiquidationRewardMin?: string
+  LiquidationChunkMin?: string
+  SettleStaleAfter?: number
+}
+
+/**
  * {@link MPTokenMetadata} object as per the XLS-89 standard.
  * Use {@link encodeMPTokenMetadata} utility function to convert to a compact hex string for on-ledger storage.
  * Use {@link decodeMPTokenMetadata} utility function to convert from a hex string to this format.

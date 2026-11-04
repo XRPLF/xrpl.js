@@ -12,12 +12,17 @@ import FeeSettings from './FeeSettings'
 import LedgerHashes from './LedgerHashes'
 import Loan from './Loan'
 import LoanBroker from './LoanBroker'
+import MarginAccount from './MarginAccount'
+import MarginPosition from './MarginPosition'
 import { MPTokenIssuance } from './MPTokenIssuance'
 import NegativeUNL from './NegativeUNL'
 import Offer from './Offer'
 import Oracle from './Oracle'
 import PayChannel from './PayChannel'
 import PermissionedDomain from './PermissionedDomain'
+import PerpExchange from './PerpExchange'
+import PerpMarket from './PerpMarket'
+import PerpOrder from './PerpOrder'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
@@ -41,11 +46,16 @@ type LedgerEntry =
   | LedgerHashes
   | Loan
   | LoanBroker
+  | MarginAccount
+  | MarginPosition
   | NegativeUNL
   | Offer
   | Oracle
   | PayChannel
   | PermissionedDomain
+  | PerpExchange
+  | PerpMarket
+  | PerpOrder
   | RippleState
   | SignerList
   | Sponsorship
@@ -71,6 +81,8 @@ type LedgerEntryFilter =
   | 'hashes'
   | 'loan'
   | 'loan_broker'
+  | 'margin_account'
+  | 'margin_position'
   | 'mpt_issuance'
   | 'mptoken'
   | 'nft_offer'
@@ -79,6 +91,9 @@ type LedgerEntryFilter =
   | 'oracle'
   | 'payment_channel'
   | 'permissioned_domain'
+  | 'perp_exchange'
+  | 'perp_market'
+  | 'perp_order'
   | 'signer_list'
   | 'sponsorship'
   | 'state'

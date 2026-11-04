@@ -22,6 +22,8 @@ import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
 import Loan, { LoanFlags } from './Loan'
 import LoanBroker from './LoanBroker'
+import MarginAccount from './MarginAccount'
+import MarginPosition from './MarginPosition'
 import { MPToken } from './MPToken'
 import {
   MPTokenIssuance,
@@ -36,6 +38,9 @@ import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
 import Oracle from './Oracle'
 import PayChannel from './PayChannel'
+import PerpExchange from './PerpExchange'
+import PerpMarket, { PerpMarketFlags } from './PerpMarket'
+import PerpOrder, { PerpOrderFlags } from './PerpOrder'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
@@ -72,6 +77,8 @@ export {
   LoanFlags,
   LoanBroker,
   Majority,
+  MarginAccount,
+  MarginPosition,
   NEGATIVE_UNL_ID,
   NegativeUNL,
   MPTokenIssuance,
@@ -87,6 +94,11 @@ export {
   OfferFlags,
   Oracle,
   PayChannel,
+  PerpExchange,
+  PerpMarket,
+  PerpMarketFlags,
+  PerpOrder,
+  PerpOrderFlags,
   RippleState,
   RippleStateFlags,
   SignerList,

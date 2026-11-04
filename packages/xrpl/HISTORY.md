@@ -4,12 +4,16 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* `PerpExchangeSet`, `PerpExchangeDelete`, `PerpMarketSet`, `PerpMarketDelete`, `MarginDeposit`, `MarginWithdraw`, `PerpOrderCreate`, `PerpOrderCancel`, `PerpLiquidate` and `PerpRefresh` transactions and `PerpExchange`, `PerpMarket`, `MarginAccount`, `MarginPosition` and `PerpOrder` ledger entries (PerpetualFutures amendment).
+
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
 
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* `DelegateSet` refuses the PerpetualFutures transaction types that rippled marks `Delegation::NotDelegable` (PerpExchangeSet, PerpExchangeDelete, PerpMarketSet, PerpMarketDelete, MarginWithdraw).
 
 ## 5.3.0 (2026-09-16)
 

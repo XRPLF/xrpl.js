@@ -72,6 +72,8 @@ import { LoanDelete, validateLoanDelete } from './loanDelete'
 import { LoanManage, validateLoanManage } from './loanManage'
 import { LoanPay, validateLoanPay } from './loanPay'
 import { LoanSet, validateLoanSet } from './loanSet'
+import { MarginDeposit, validateMarginDeposit } from './marginDeposit'
+import { MarginWithdraw, validateMarginWithdraw } from './marginWithdraw'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -126,6 +128,17 @@ import {
   PermissionedDomainSet,
   validatePermissionedDomainSet,
 } from './permissionedDomainSet'
+import {
+  PerpExchangeDelete,
+  validatePerpExchangeDelete,
+} from './perpExchangeDelete'
+import { PerpExchangeSet, validatePerpExchangeSet } from './perpExchangeSet'
+import { PerpLiquidate, validatePerpLiquidate } from './perpLiquidate'
+import { PerpMarketDelete, validatePerpMarketDelete } from './perpMarketDelete'
+import { PerpMarketSet, validatePerpMarketSet } from './perpMarketSet'
+import { PerpOrderCancel, validatePerpOrderCancel } from './perpOrderCancel'
+import { PerpOrderCreate, validatePerpOrderCreate } from './perpOrderCreate'
+import { PerpRefresh, validatePerpRefresh } from './perpRefresh'
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
@@ -214,6 +227,8 @@ export type SubmittableTransaction =
   | LoanDelete
   | LoanManage
   | LoanPay
+  | MarginDeposit
+  | MarginWithdraw
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
@@ -234,6 +249,14 @@ export type SubmittableTransaction =
   | PaymentChannelFund
   | PermissionedDomainSet
   | PermissionedDomainDelete
+  | PerpExchangeDelete
+  | PerpExchangeSet
+  | PerpLiquidate
+  | PerpMarketDelete
+  | PerpMarketSet
+  | PerpOrderCancel
+  | PerpOrderCreate
+  | PerpRefresh
   | SetRegularKey
   | SignerListSet
   | SponsorshipSet
@@ -474,6 +497,14 @@ export function validate(transaction: Record<string, unknown>): void {
       validateLoanPay(tx)
       break
 
+    case 'MarginDeposit':
+      validateMarginDeposit(tx)
+      break
+
+    case 'MarginWithdraw':
+      validateMarginWithdraw(tx)
+      break
+
     case 'MPTokenAuthorize':
       validateMPTokenAuthorize(tx)
       break
@@ -552,6 +583,38 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'PermissionedDomainDelete':
       validatePermissionedDomainDelete(tx)
+      break
+
+    case 'PerpExchangeDelete':
+      validatePerpExchangeDelete(tx)
+      break
+
+    case 'PerpExchangeSet':
+      validatePerpExchangeSet(tx)
+      break
+
+    case 'PerpLiquidate':
+      validatePerpLiquidate(tx)
+      break
+
+    case 'PerpMarketDelete':
+      validatePerpMarketDelete(tx)
+      break
+
+    case 'PerpMarketSet':
+      validatePerpMarketSet(tx)
+      break
+
+    case 'PerpOrderCancel':
+      validatePerpOrderCancel(tx)
+      break
+
+    case 'PerpOrderCreate':
+      validatePerpOrderCreate(tx)
+      break
+
+    case 'PerpRefresh':
+      validatePerpRefresh(tx)
       break
 
     case 'SetRegularKey':

@@ -105,9 +105,6 @@ describe('PerpExchangeSet', function () {
 
   it('throws w/ an update that changes a creation-only field', function () {
     tx.ExchangeID = EXCHANGE_ID
-    assertInvalid(
-      tx,
-      'PerpExchangeSet: Asset can only be set on creation',
-    )
+    assertInvalid(tx, 'PerpExchangeSet: Asset can only be set on creation')
   })
 })
