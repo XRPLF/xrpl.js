@@ -44,7 +44,7 @@
       "PasskeySignature",
       {
         "isSerialized": true,
-        "isSigningField": true,
+        "isSigningField": false,
         "isVLEncoded": false,
         "nth": 254,
         "type": "STObject"
