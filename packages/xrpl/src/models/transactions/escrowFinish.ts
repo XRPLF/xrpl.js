@@ -4,8 +4,10 @@ import {
   Account,
   BaseTransaction,
   isAccount,
+  isString,
   validateBaseTransaction,
   validateCredentialsList,
+  validateOptionalField,
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
 } from './common'
@@ -70,11 +72,6 @@ export function validateEscrowFinish(tx: Record<string, unknown>): void {
     throw new ValidationError('EscrowFinish: OfferSequence must be a number')
   }
 
-  if (tx.Condition !== undefined && typeof tx.Condition !== 'string') {
-    throw new ValidationError('EscrowFinish: Condition must be a string')
-  }
-
-  if (tx.Fulfillment !== undefined && typeof tx.Fulfillment !== 'string') {
-    throw new ValidationError('EscrowFinish: Fulfillment must be a string')
-  }
+  validateOptionalField(tx, 'Condition', isString)
+  validateOptionalField(tx, 'Fulfillment', isString)
 }

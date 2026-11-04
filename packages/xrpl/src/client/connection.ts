@@ -9,6 +9,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
+  RippledError,
   XrplError,
 } from '../errors'
 import type { APIVersion, RequestResponseMap } from '../models'
@@ -347,6 +348,66 @@ export class Connection extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
+  private handleResponseMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    try {
+      this.requestManager.handleResponse(data)
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, message)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+    }
+  }
+
+  private handleErrorMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    if (data.value == null) {
+      return
+    }
+    if (typeof data.value !== 'string') {
+      this.emit(
+        'error',
+        'badMessage',
+        'Expected error value to be a JSON string',
+        data,
+      )
+      return
+    }
+    let parsedValue: Record<string, unknown> | null
+    try {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
+      parsedValue = JSON.parse(data.value) as Record<string, unknown> | null
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, data.value)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+      return
+    }
+    // No id to reject. onMessage already reported this as badMessage.
+    if (parsedValue?.id != null) {
+      try {
+        this.requestManager.reject(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          parsedValue.id as string | number,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          new RippledError(data.error as string, data),
+        )
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : error
+        const errData: unknown = error instanceof Error ? message : error
+        this.emit('error', 'badMessage', errMsg, errData)
+      }
+    }
+  }
+
   /**
    * Handler for when messages are received from the server.
    *
@@ -369,22 +430,17 @@ export class Connection extends EventEmitter {
     }
     if (data.type == null && data.error) {
       // e.g. slowDown
-      this.emit('error', data.error, data.error_message, data)
+      this.emit('error', data.error, data.error_message ?? data.error, data)
       return
     }
     if (data.type) {
       this.forwardServerMessage(data, message)
     }
     if (data.type === 'response') {
-      try {
-        this.requestManager.handleResponse(data)
-      } catch (error) {
-        if (error instanceof Error) {
-          this.emit('error', 'badMessage', error.message, message)
-        } else {
-          this.emit('error', 'badMessage', error, error)
-        }
-      }
+      this.handleResponseMessage(data, message)
+    }
+    if (data.type === 'error') {
+      this.handleErrorMessage(data, message)
     }
   }
 

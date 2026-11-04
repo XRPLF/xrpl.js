@@ -91,7 +91,7 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidExpiration, 'CheckCreate: invalid Expiration')
+    assertInvalid(invalidExpiration, 'CheckCreate: invalid field Expiration')
   })
 
   it(`throws w/ invalid InvoiceID`, function () {
@@ -106,6 +106,6 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid InvoiceID')
+    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid field InvoiceID')
   })
 })
