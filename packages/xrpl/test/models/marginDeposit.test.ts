@@ -24,7 +24,6 @@ describe('MarginDeposit', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       ExchangeID:
         'DB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      Subaccount: 1,
       Amount: {
         currency: 'USD',
         issuer: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
@@ -37,8 +36,7 @@ describe('MarginDeposit', function () {
     assertValid(tx)
   })
 
-  it('verifies valid MarginDeposit w/ tfPerpCover and no Subaccount', function () {
-    delete tx.Subaccount
+  it('verifies valid MarginDeposit w/ tfPerpCover', function () {
     tx.Flags = MarginDepositFlags.tfPerpCover
     assertValid(tx)
   })
@@ -61,17 +59,10 @@ describe('MarginDeposit', function () {
     assertInvalid(tx, 'MarginDeposit: invalid field Amount')
   })
 
-  it('throws w/ invalid Subaccount', function () {
-    // @ts-expect-error for test
-    tx.Subaccount = '1'
-    assertInvalid(tx, 'MarginDeposit: invalid field Subaccount')
-  })
-
-  it('throws w/ tfPerpCover and Subaccount', function () {
-    tx.Flags = { tfPerpCover: true }
+  it('throws w/ Subaccount', function () {
     assertInvalid(
-      tx,
-      'MarginDeposit: Subaccount must be absent with tfPerpCover',
+      { ...tx, Subaccount: 1 },
+      'MarginDeposit: unexpected field Subaccount',
     )
   })
 })

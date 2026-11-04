@@ -29,17 +29,14 @@ describe('PerpExchangeSet', function () {
       Scale: 6,
       DomainID:
         'AB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      VaultID:
-        'CB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
       MakerFee: 100,
       TakerFee: 300,
       OwnerFeeShare: 20000,
-      VaultFeeShare: 30000,
       BuilderFeeMax: 500,
       CoverRateMinimum: 1000,
-      VaultLossLimit: 5000,
-      VaultLossWindow: 86400,
-      ParameterDelay: 604800,
+      LiquidationPenalty: 1000,
+      LiquidationRewardMin: '1',
+      LiquidationChunkMin: '10000',
       Data: 'ABCD',
     }
   })
@@ -54,6 +51,7 @@ describe('PerpExchangeSet', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       ExchangeID: EXCHANGE_ID,
       TakerFee: 250,
+      LiquidationPenalty: 2000,
       Data: 'ABCD',
     }
     assertValid(tx)
@@ -64,9 +62,26 @@ describe('PerpExchangeSet', function () {
     assertInvalid(tx, 'PerpExchangeSet: missing field Asset')
   })
 
-  it('throws w/ creation missing ParameterDelay', function () {
-    delete tx.ParameterDelay
-    assertInvalid(tx, 'PerpExchangeSet: missing field ParameterDelay')
+  it('throws w/ creation missing LiquidationPenalty', function () {
+    delete tx.LiquidationPenalty
+    assertInvalid(tx, 'PerpExchangeSet: missing field LiquidationPenalty')
+  })
+
+  it('throws w/ creation missing LiquidationChunkMin', function () {
+    delete tx.LiquidationChunkMin
+    assertInvalid(tx, 'PerpExchangeSet: missing field LiquidationChunkMin')
+  })
+
+  it('throws w/ invalid LiquidationChunkMin', function () {
+    // @ts-expect-error for test
+    tx.LiquidationChunkMin = 10000
+    assertInvalid(tx, 'PerpExchangeSet: invalid field LiquidationChunkMin')
+  })
+
+  it('throws w/ invalid LiquidationPenalty', function () {
+    // @ts-expect-error for test
+    tx.LiquidationPenalty = '1000'
+    assertInvalid(tx, 'PerpExchangeSet: invalid field LiquidationPenalty')
   })
 
   it('throws w/ invalid MakerFee', function () {
@@ -86,25 +101,57 @@ describe('PerpExchangeSet', function () {
     assertInvalid(tx, 'PerpExchangeSet: invalid field Data')
   })
 
-  it('throws w/ VaultID and no VaultLossWindow', function () {
-    delete tx.VaultLossWindow
-    assertInvalid(
-      tx,
-      'PerpExchangeSet: VaultID and VaultLossWindow must be present together',
-    )
-  })
-
-  it('throws w/ fee shares above 100000', function () {
-    tx.OwnerFeeShare = 60000
-    tx.VaultFeeShare = 50000
-    assertInvalid(
-      tx,
-      'PerpExchangeSet: OwnerFeeShare plus VaultFeeShare must not exceed 100000',
-    )
+  it('throws w/ OwnerFeeShare above 100000', function () {
+    tx.OwnerFeeShare = 100001
+    assertInvalid(tx, 'PerpExchangeSet: OwnerFeeShare must not exceed 100000')
   })
 
   it('throws w/ an update that changes a creation-only field', function () {
     tx.ExchangeID = EXCHANGE_ID
     assertInvalid(tx, 'PerpExchangeSet: Asset can only be set on creation')
+  })
+
+  it('throws w/ an update that changes LiquidationChunkMin', function () {
+    tx = {
+      TransactionType: 'PerpExchangeSet',
+      Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      ExchangeID: EXCHANGE_ID,
+      LiquidationChunkMin: '20000',
+    }
+    assertInvalid(
+      tx,
+      'PerpExchangeSet: LiquidationChunkMin can only be set on creation',
+    )
+  })
+
+  it('throws w/ an update that changes LiquidationRewardMin', function () {
+    tx = {
+      TransactionType: 'PerpExchangeSet',
+      Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      ExchangeID: EXCHANGE_ID,
+      LiquidationRewardMin: '2',
+    }
+    assertInvalid(
+      tx,
+      'PerpExchangeSet: LiquidationRewardMin can only be set on creation',
+    )
+  })
+
+  it('throws w/ VaultID', function () {
+    assertInvalid(
+      {
+        ...tx,
+        VaultID:
+          'CB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
+      },
+      'PerpExchangeSet: unexpected field VaultID',
+    )
+  })
+
+  it('throws w/ ParameterDelay', function () {
+    assertInvalid(
+      { ...tx, ParameterDelay: 604800 },
+      'PerpExchangeSet: unexpected field ParameterDelay',
+    )
   })
 })

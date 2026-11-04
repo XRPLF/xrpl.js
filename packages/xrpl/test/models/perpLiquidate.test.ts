@@ -30,7 +30,6 @@ describe('PerpLiquidate', function () {
       MarketID:
         'DB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
       Size: '1.5',
-      Subaccount: 0,
       Flags: PerpLiquidateFlags.tfPerpLiquidateToBook,
     }
   })
@@ -73,5 +72,12 @@ describe('PerpLiquidate', function () {
       tfPerpLiquidateTakeover: true,
     }
     assertInvalid(tx, EXACTLY_ONE_MODE)
+  })
+
+  it('throws w/ Subaccount', function () {
+    assertInvalid(
+      { ...tx, Subaccount: 0 },
+      'PerpLiquidate: unexpected field Subaccount',
+    )
   })
 })

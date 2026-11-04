@@ -37,7 +37,6 @@ describe('PerpMarketSet', function () {
           },
         },
       ],
-      IndexMaxAge: 60,
       IndexMaxLedgers: 10,
       PriceTick: '0.5',
       LotSize: '0.001',
@@ -59,17 +58,6 @@ describe('PerpMarketSet', function () {
       ],
       OpenInterestMax: '5000000',
       OrderPriceBand: 10000,
-      MidSpreadMax: 1000,
-      MarkBand: 5000,
-      MarkMoveMax: 1000,
-      BasisWindow: 3600,
-      FundingInterestRate: -10,
-      FundingCap: 750,
-      LiquidationPenalty: 1000,
-      LiquidationRewardShare: 50000,
-      LiquidationRewardMin: '1',
-      LiquidationChunkMin: '10000',
-      SettleStaleAfter: 86400,
       Flags: { tfPerpIsolatedOnly: true },
     }
   })
@@ -83,7 +71,8 @@ describe('PerpMarketSet', function () {
       TransactionType: 'PerpMarketSet',
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       MarketID: MARKET_ID,
-      FundingCap: 500,
+      OpenInterestMax: '4000000',
+      OrderPriceBand: 5000,
       Flags: PerpMarketSetFlags.tfPerpMarketSettle,
     }
     assertValid(tx)
@@ -92,6 +81,11 @@ describe('PerpMarketSet', function () {
   it('throws w/ creation missing MarginTiers', function () {
     delete tx.MarginTiers
     assertInvalid(tx, 'PerpMarketSet: missing field MarginTiers')
+  })
+
+  it('throws w/ creation missing OrderPriceBand', function () {
+    delete tx.OrderPriceBand
+    assertInvalid(tx, 'PerpMarketSet: missing field OrderPriceBand')
   })
 
   it('throws w/ creation missing BaseAsset', function () {
@@ -154,5 +148,42 @@ describe('PerpMarketSet', function () {
     tx.MarketID = MARKET_ID
     tx.Flags = 0
     assertInvalid(tx, 'PerpMarketSet: ExchangeID can only be set on creation')
+  })
+
+  it('throws w/ an update that changes IndexOracles', function () {
+    tx = {
+      TransactionType: 'PerpMarketSet',
+      Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      MarketID: MARKET_ID,
+      IndexOracles: tx.IndexOracles,
+    }
+    assertInvalid(tx, 'PerpMarketSet: IndexOracles can only be set on creation')
+  })
+
+  it('throws w/ an update that changes IndexMaxLedgers', function () {
+    tx = {
+      TransactionType: 'PerpMarketSet',
+      Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
+      MarketID: MARKET_ID,
+      IndexMaxLedgers: 5,
+    }
+    assertInvalid(
+      tx,
+      'PerpMarketSet: IndexMaxLedgers can only be set on creation',
+    )
+  })
+
+  it('throws w/ LiquidationPenalty', function () {
+    assertInvalid(
+      { ...tx, LiquidationPenalty: 1000 },
+      'PerpMarketSet: unexpected field LiquidationPenalty',
+    )
+  })
+
+  it('throws w/ FundingCap', function () {
+    assertInvalid(
+      { ...tx, FundingCap: 750 },
+      'PerpMarketSet: unexpected field FundingCap',
+    )
   })
 })

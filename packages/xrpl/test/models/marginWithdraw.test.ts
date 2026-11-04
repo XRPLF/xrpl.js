@@ -24,7 +24,6 @@ describe('MarginWithdraw', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       ExchangeID:
         'DB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      Subaccount: 1,
       Amount: '1000000',
       Destination: 'rsA2LpzuawewSBQXkiju3YQTMzW13pAAdW',
     }
@@ -39,8 +38,7 @@ describe('MarginWithdraw', function () {
     assertValid(tx)
   })
 
-  it('verifies valid MarginWithdraw w/ tfPerpOwnerFees and no Subaccount', function () {
-    delete tx.Subaccount
+  it('verifies valid MarginWithdraw w/ tfPerpOwnerFees', function () {
     tx.Flags = { tfPerpOwnerFees: true }
     assertValid(tx)
   })
@@ -64,7 +62,6 @@ describe('MarginWithdraw', function () {
   })
 
   it('throws w/ tfPerpCover and tfPerpOwnerFees', function () {
-    delete tx.Subaccount
     tx.Flags =
       MarginWithdrawFlags.tfPerpCover + MarginWithdrawFlags.tfPerpOwnerFees
     assertInvalid(
@@ -73,11 +70,10 @@ describe('MarginWithdraw', function () {
     )
   })
 
-  it('throws w/ tfPerpCover and Subaccount', function () {
-    tx.Flags = { tfPerpCover: true }
+  it('throws w/ Subaccount', function () {
     assertInvalid(
-      tx,
-      'MarginWithdraw: Subaccount must be absent with tfPerpCover or tfPerpOwnerFees',
+      { ...tx, Subaccount: 1 },
+      'MarginWithdraw: unexpected field Subaccount',
     )
   })
 })

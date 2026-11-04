@@ -27,7 +27,6 @@ describe('PerpOrderCreate', function () {
       Account: 'rfmDuhDyLGgx94qiwf3YF8BUV5j6KSvE8',
       MarketID:
         'DB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      Subaccount: 0,
       LimitPrice: '2.5',
       Size: '10',
       OfferSequence: 3,
@@ -99,5 +98,12 @@ describe('PerpOrderCreate', function () {
       PerpOrderCreateFlags.tfImmediateOrCancel +
       PerpOrderCreateFlags.tfFillOrKill
     assertInvalid(tx, AT_MOST_ONE_TIME_IN_FORCE)
+  })
+
+  it('throws w/ Subaccount', function () {
+    assertInvalid(
+      { ...tx, Subaccount: 0 },
+      'PerpOrderCreate: unexpected field Subaccount',
+    )
   })
 })
