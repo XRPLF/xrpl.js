@@ -8,6 +8,8 @@ import {
   isIssuedCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -85,21 +87,9 @@ export interface AMMDeposit extends BaseTransaction {
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMDeposit: missing field Asset')
-  }
+  validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMDeposit: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMDeposit: missing field Asset2')
-  }
-
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMDeposit: Asset2 must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMDeposit: must set Amount with Amount2')
@@ -111,21 +101,8 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
     )
   }
 
-  if (tx.LPTokenOut != null && !isIssuedCurrencyAmount(tx.LPTokenOut)) {
-    throw new ValidationError(
-      'AMMDeposit: LPTokenOut must be an IssuedCurrencyAmount',
-    )
-  }
-
-  if (tx.Amount != null && !isAmount(tx.Amount)) {
-    throw new ValidationError('AMMDeposit: Amount must be an Amount')
-  }
-
-  if (tx.Amount2 != null && !isAmount(tx.Amount2)) {
-    throw new ValidationError('AMMDeposit: Amount2 must be an Amount')
-  }
-
-  if (tx.EPrice != null && !isAmount(tx.EPrice)) {
-    throw new ValidationError('AMMDeposit: EPrice must be an Amount')
-  }
+  validateOptionalField(tx, 'LPTokenOut', isIssuedCurrencyAmount)
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Amount2', isAmount)
+  validateOptionalField(tx, 'EPrice', isAmount)
 }

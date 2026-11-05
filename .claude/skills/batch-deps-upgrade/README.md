@@ -2,7 +2,7 @@
 
 Batches all open Dependabot PRs into a single upgrade PR, plus any further upgrades needed to resolve the open Semgrep JIRA tickets that a package upgrade can fix.
 
-Only Semgrep JIRA tickets fixable by a package upgrade are in scope — the ones naming a vulnerable dependency and a recommended fix version.
+Only Semgrep JIRA tickets about a vulnerable dependency are in scope. A ticket with no fix version takes its fix version from the advisory: it's upgraded like any other ticket, closed as No-op when the package is gone or already patched, and left open for a human when no fixed release exists or the advisory has no usable affected range.
 
 The two inputs are independent: every in-scope ticket gets fixed whether or not a Dependabot PR proposes that upgrade — where none does, the batch PR adds it.
 
