@@ -23,15 +23,6 @@ import {
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
-import { ContractCall, validateContractCall } from './contractCall'
-import { ContractClawback, validateContractClawback } from './contractClawback'
-import { ContractCreate, validateContractCreate } from './contractCreate'
-import { ContractDelete, validateContractDelete } from './contractDelete'
-import { ContractModify, validateContractModify } from './contractModify'
-import {
-  ContractUserDelete,
-  validateContractUserDelete,
-} from './contractUserDelete'
 import {
   ConfidentialMPTClawback,
   validateConfidentialMPTClawback,
@@ -52,6 +43,15 @@ import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
 } from './ConfidentialMPTSend'
+import { ContractCall, validateContractCall } from './contractCall'
+import { ContractClawback, validateContractClawback } from './contractClawback'
+import { ContractCreate, validateContractCreate } from './contractCreate'
+import { ContractDelete, validateContractDelete } from './contractDelete'
+import { ContractModify, validateContractModify } from './contractModify'
+import {
+  ContractUserDelete,
+  validateContractUserDelete,
+} from './contractUserDelete'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'

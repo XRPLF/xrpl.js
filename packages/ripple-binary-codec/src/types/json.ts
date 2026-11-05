@@ -45,8 +45,7 @@ class STJson extends SerializedType {
   private static createEmpty(
     type: number,
     initialData?:
-      | Map<string, SerializedType | null>
-      | (SerializedType | null)[],
+      Map<string, SerializedType | null> | (SerializedType | null)[],
   ): STJson {
     const json = new STJson(new Uint8Array())
     json.data = initialData ?? (type === STJson.JsonType.Array ? [] : new Map())

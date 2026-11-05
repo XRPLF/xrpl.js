@@ -492,10 +492,7 @@ export async function getTransactionFee(
  * @param tx - The transaction object to set Gas on.
  * @returns A promise that resolves once Gas has been set.
  */
-export async function getGas(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function getGas(client: Client, tx: Transaction): Promise<void> {
   const copyTx = { ...tx }
   copyTx.Gas = 100000000000
   delete copyTx.SigningPubKey

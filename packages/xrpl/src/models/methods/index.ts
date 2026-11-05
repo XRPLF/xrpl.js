@@ -1,6 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
-/* eslint-disable max-len -- Conditional type indentation is deeply nested */
 /* eslint-disable max-lines -- There is a lot to export */
+/* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -512,18 +512,18 @@ export type RequestAllResponseMap<
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-    ? AccountLinesResponse
-    : T extends AccountObjectsRequest
-      ? AccountObjectsResponse
-      : T extends AccountOffersRequest
-        ? AccountOffersResponse
-        : T extends AccountTxRequest
-          ? AccountTxVersionResponseMap<Version>
-          : T extends LedgerDataRequest
-            ? LedgerDataResponse
-            : T extends BookOffersRequest
-              ? BookOffersResponse
-              : MarkerResponse<Version>
+  ? AccountLinesResponse
+  : T extends AccountObjectsRequest
+  ? AccountObjectsResponse
+  : T extends AccountOffersRequest
+  ? AccountOffersResponse
+  : T extends AccountTxRequest
+  ? AccountTxVersionResponseMap<Version>
+  : T extends LedgerDataRequest
+  ? LedgerDataResponse
+  : T extends BookOffersRequest
+  ? BookOffersResponse
+  : MarkerResponse<Version>
 
 export {
   // Allow users to define their own requests and responses.  This is useful for releasing experimental versions
