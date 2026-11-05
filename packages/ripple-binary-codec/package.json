@@ -1,6 +1,6 @@
 {
   "name": "ripple-binary-codec",
-  "version": "2.12.0-alphanet.0",
+  "version": "2.12.0-alphanet.2",
   "description": "XRP Ledger binary codec",
   "files": [
     "dist/*",
