@@ -632,6 +632,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+      pull-requests: read
     if: ${{ always() && needs.ask_for_sec_team_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
@@ -726,13 +727,131 @@ jobs:
 
           echo "tag_name=${TAG}" >> "$GITHUB_OUTPUT"
 
+          # Base for the release notes: the highest stable x.y.z release of this
+          # package whose version is strictly below the one being released. A new
+          # package with no stable release yet falls back to the latest stable
+          # xrpl release that does not already contain the package's first
+          # commit, so the PRs that created the package fall inside the range.
+          CURRENT_CORE="${PKG_VERSION%%-*}"
+          PREVIOUS_TAG="$(
+            { git tag -l "${PKG_NAME}@*" \
+                | sed -n "s/^${PKG_NAME}@\([0-9]*\.[0-9]*\.[0-9]*\)$/\1/p"
+              echo "${CURRENT_CORE}"
+            } | sort -uV | grep -B1 -x -F "${CURRENT_CORE}" | grep -v -x -F "${CURRENT_CORE}" || true
+          )"
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            PREVIOUS_TAG="${PKG_NAME}@${PREVIOUS_TAG}"
+          else
+            echo "ℹ️ No previous stable tag found for ${PKG_NAME}; falling back to an xrpl release."
+            FIRST_COMMIT="$(git log --format='%H' -- "packages/${PKG_NAME}" | tail -n 1)"
+            while read -r candidate; do
+              if [ -z "${FIRST_COMMIT}" ] || ! git merge-base --is-ancestor "${FIRST_COMMIT}" "${candidate}"; then
+                PREVIOUS_TAG="${candidate}"
+                break
+              fi
+            done < <(git tag -l "xrpl@*" | grep -x "xrpl@[0-9]*\.[0-9]*\.[0-9]*" | sort -rV || true)
+          fi
+          # Warn rather than fail: the package is already published and tagged.
+          if [ -z "${PREVIOUS_TAG}" ]; then
+            echo "::warning::Could not determine a previous tag; release notes will not list pull requests."
+          else
+            echo "📝 Generating release notes against ${PREVIOUS_TAG}"
+          fi
+          echo "previous_tag=${PREVIOUS_TAG}" >> "$GITHUB_OUTPUT"
+
+      # GitHub's generated notes list every PR merged in the range, whichever
+      # package it touched. Build the notes from this package's HISTORY.md and
+      # the PRs whose commits touched packages/<pkg> instead.
+      - name: Generate release notes
+        id: release_notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ steps.create_tag.outputs.tag_name }}
+          PREVIOUS_TAG: ${{ steps.create_tag.outputs.previous_tag }}
+        run: |
+          set -euo pipefail
+          NOTES="${RUNNER_TEMP}/release_notes.md"
+          HISTORY="packages/${PKG_NAME}/HISTORY.md"
+
+          # This version's HISTORY.md section. A prerelease (x.y.z-tag) falls back
+          # to "Unreleased", since it is usually cut before the heading is
+          # renamed; a stable release does not, as "Unreleased" may hold changes
+          # meant for a later version. Leading blank lines are dropped.
+          history_section() {
+            [ -f "${HISTORY}" ] || return 0
+            awk -v h="$1" '
+              /^## / { if (found) exit; if ($2 == h) { found = 1; next } }
+              found && (started || NF) { started = 1; print }
+            ' "${HISTORY}"
+          }
+          CHANGES="$(history_section "${PKG_VERSION}")"
+          if [[ "${PKG_VERSION}" == *-* ]] && [ -z "$(printf '%s' "${CHANGES}" | tr -d '[:space:]')" ]; then
+            CHANGES="$(history_section "Unreleased")"
+          fi
+
+          # PRs whose commits touched this package. Squash merges end in
+          # "(#123)"; otherwise ask GitHub which merged PR contains the commit.
+          # Commits with no PR (e.g. version bumps pushed to the release branch)
+          # are left out. API failures only warn: the package is already
+          # published and tagged, so the release must still be created.
+          PR_LINES=""
+          if [ -n "${PREVIOUS_TAG}" ]; then
+            PR_NUMBERS=""
+            while IFS=$'\t' read -r sha subject; do
+              # Release branch → main merges touch every released package.
+              if [[ "${subject}" =~ ^Release\ [^\ ]+:\ .+\ →\ main(\ \(#[0-9]+\))?$ ]]; then
+                continue
+              fi
+              num="$(printf '%s\n' "${subject}" | sed -n 's/.*(#\([0-9][0-9]*\))$/\1/p')"
+              if [ -z "${num}" ]; then
+                if ! num="$(gh api "repos/${REPO}/commits/${sha}/pulls" \
+                  --jq '[.[] | select(.merged_at != null)][0].number // empty')"; then
+                  echo "::warning::Could not look up the PR for commit ${sha}; leaving it out."
+                  num=""
+                fi
+              fi
+              if [ -n "${num}" ]; then
+                PR_NUMBERS+="${num}"$'\n'
+              fi
+            done < <(git log --format='%H%x09%s' "${PREVIOUS_TAG}..${TAG}" -- "packages/${PKG_NAME}")
+
+            for num in $(printf '%s' "${PR_NUMBERS}" | awk 'NF && !seen[$0]++'); do
+              if ! pr_data="$(gh api "repos/${REPO}/pulls/${num}" --jq '[.title, .user.login, .html_url] | @tsv')"; then
+                echo "::warning::Could not fetch PR #${num}; listing it without a title."
+                PR_LINES+="* [#${num}](https://github.com/${REPO}/pull/${num})"$'\n'
+                continue
+              fi
+              IFS=$'\t' read -r title login url <<< "${pr_data}"
+              PR_LINES+="* ${title} by @${login} in [#${num}](${url})"$'\n'
+            done
+          fi
+
+          {
+            if [ -n "$(printf '%s' "${CHANGES}" | tr -d '[:space:]')" ]; then
+              printf '## Changes\n\n%s\n\n' "${CHANGES}"
+            fi
+            printf '## Pull Requests\n\n'
+            if [ -n "${PR_LINES}" ]; then
+              printf '%s\n' "${PR_LINES}"
+            else
+              printf '_No pull requests touched packages/%s in this release._\n\n' "${PKG_NAME}"
+            fi
+            if [ -n "${PREVIOUS_TAG}" ]; then
+              printf '**Full Changelog**: https://github.com/%s/compare/%s...%s\n' "${REPO}" "${PREVIOUS_TAG}" "${TAG}"
+            fi
+          } > "${NOTES}"
+
+          cat "${NOTES}"
+          echo "path=${NOTES}" >> "$GITHUB_OUTPUT"
+
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "${{ steps.create_tag.outputs.tag_name }}"
           name: "${{ steps.create_tag.outputs.tag_name }}"
           draft: false
-          generate_release_notes: true
+          body_path: "${{ steps.release_notes.outputs.path }}"
           prerelease: ${{ needs.get_version.outputs.is_beta == 'true' }}
           make_latest: ${{ needs.get_version.outputs.is_beta != 'true' }}
 
