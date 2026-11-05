@@ -106,6 +106,29 @@ describe('PerpExchangeSet', function () {
     assertInvalid(tx, 'PerpExchangeSet: OwnerFeeShare must not exceed 100000')
   })
 
+  it.each([
+    ['MakerFee', 10000],
+    ['TakerFee', 10000],
+    ['BuilderFeeMax', 10000],
+    ['CoverRateMinimum', 100000],
+    ['LiquidationPenalty', 100000],
+  ])('verifies %s at its cap of %i', function (field, cap) {
+    assertValid({ ...tx, [field]: cap })
+  })
+
+  it.each([
+    ['MakerFee', 10000],
+    ['TakerFee', 10000],
+    ['BuilderFeeMax', 10000],
+    ['CoverRateMinimum', 100000],
+    ['LiquidationPenalty', 100000],
+  ])('throws w/ %s above %i', function (field, cap) {
+    assertInvalid(
+      { ...tx, [field]: cap + 1 },
+      `PerpExchangeSet: ${field} must not exceed ${cap}`,
+    )
+  })
+
   it('throws w/ an update that changes a creation-only field', function () {
     tx.ExchangeID = EXCHANGE_ID
     assertInvalid(tx, 'PerpExchangeSet: Asset can only be set on creation')
