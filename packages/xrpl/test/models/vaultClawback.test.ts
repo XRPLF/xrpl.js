@@ -62,4 +62,9 @@ describe('VaultClawback', function () {
     tx.Amount = '123456'
     assertInvalid(tx, 'VaultClawback: invalid field Amount')
   })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
+    assertInvalid(tx, 'VaultClawback: invalid field VaultID')
+  })
 })

@@ -1,8 +1,8 @@
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 export interface PermissionedDomainDelete extends BaseTransaction {
@@ -24,5 +24,5 @@ export function validatePermissionedDomainDelete(
 ): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'DomainID', isString)
+  validateRequiredField(tx, 'DomainID', isHexString)
 }

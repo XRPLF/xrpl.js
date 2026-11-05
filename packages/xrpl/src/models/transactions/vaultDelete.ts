@@ -8,6 +8,7 @@ import {
   validateOptionalField,
   isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
+  isHexString,
 } from './common'
 
 /**
@@ -39,7 +40,7 @@ export interface VaultDelete extends BaseTransaction {
 export function validateVaultDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateOptionalField(tx, 'MemoData', isString)
 
   if (tx.MemoData !== undefined) {

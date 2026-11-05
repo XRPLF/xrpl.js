@@ -84,4 +84,9 @@ describe('VaultWithdraw', function () {
       'VaultWithdraw: Credentials cannot contain duplicate elements',
     )
   })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
+    assertInvalid(tx, 'VaultWithdraw: invalid field VaultID')
+  })
 })

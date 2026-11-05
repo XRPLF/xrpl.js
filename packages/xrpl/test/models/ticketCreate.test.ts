@@ -32,7 +32,7 @@ describe('TicketCreate', function () {
 
   it('throws when TicketCount is not a number', function () {
     ticketCreate.TicketCount = '150'
-    assertInvalid(ticketCreate, 'TicketCreate: TicketCount must be a number')
+    assertInvalid(ticketCreate, 'TicketCreate: invalid field TicketCount')
   })
 
   it('throws when TicketCount is not an integer', function () {

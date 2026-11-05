@@ -201,6 +201,17 @@ export function isString(str: unknown): str is string {
 }
 
 /**
+ * Verify the form and type of a hex string at runtime. An empty string is
+ * valid, since some fields (for example `Domain`) use it to clear a value.
+ *
+ * @param str - The object to check the form and type of.
+ * @returns Whether the hex string is properly formed.
+ */
+export function isHexString(str: unknown): str is string {
+  return typeof str === 'string' && (str === '' || isHex(str))
+}
+
+/**
  * Verify the form and type of a number at runtime.
  *
  * @param num - The object to check the form and type of.
