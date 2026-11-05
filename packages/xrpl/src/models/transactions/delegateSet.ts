@@ -24,6 +24,11 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'TokenIssuanceSet',
   'TokenIssuanceDestroy',
   'TokenConvert',
+  'RepoCreate',
+  'RepoAccept',
+  'RepoCancel',
+  'RepoClose',
+  'RepoDefault',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

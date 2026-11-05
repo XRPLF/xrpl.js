@@ -37,6 +37,7 @@ import Offer, { OfferFlags } from './Offer'
 import Oracle from './Oracle'
 import PasskeyList from './PasskeyList'
 import PayChannel from './PayChannel'
+import Repo from './Repo'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
 import Sponsorship, { SponsorshipFlags } from './Sponsorship'
@@ -93,6 +94,7 @@ export {
   Oracle,
   PasskeyList,
   PayChannel,
+  Repo,
   RippleState,
   RippleStateFlags,
   SignerList,
