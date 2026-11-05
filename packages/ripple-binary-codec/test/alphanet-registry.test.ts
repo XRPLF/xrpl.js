@@ -8,8 +8,11 @@ const FIELD_TYPES: Record<string, string> = {
   AMOUNT: 'Amount',
   ARRAY: 'STArray',
   CURRENCY: 'Currency',
+  DATA: 'Data',
+  DATATYPE: 'DataType',
   INT32: 'Int32',
   ISSUE: 'Issue',
+  JSON: 'Json',
   NUMBER: 'Number',
   OBJECT: 'STObject',
   UINT8: 'UInt8',
@@ -17,6 +20,7 @@ const FIELD_TYPES: Record<string, string> = {
   UINT32: 'UInt32',
   UINT64: 'UInt64',
   UINT256: 'Hash256',
+  VECTOR256: 'Vector256',
   VL: 'Blob',
 }
 
@@ -37,6 +41,9 @@ const ledgerEntryTypes = new Set(
 const results = new Set(
   Object.values(definitions.TRANSACTION_RESULTS as Record<string, number>),
 )
+const serializedTypes = new Set(
+  Object.values(definitions.TYPES as Record<string, number>),
+)
 const fields = new Set(
   (definitions.FIELDS as Array<[string, { type: string; nth: number }]>).map(
     ([, field]) => `${field.type}/${field.nth}`,
@@ -48,6 +55,7 @@ function missing(space: string, block: Block): number[] {
     if (space === 'transaction') return !transactionTypes.has(n)
     if (space === 'ledger_entry') return !ledgerEntryTypes.has(n)
     if (space === 'tec' || space === 'tef') return !results.has(n)
+    if (space === 'sti') return !serializedTypes.has(n)
     return !fields.has(`${FIELD_TYPES[space.split('/')[1]]}/${n}`)
   })
 }

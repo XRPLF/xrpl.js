@@ -1,5 +1,5 @@
 {
-  "base": "XRPLF/rippled 097cb5e89b117d2e01e37120c3898605f2d36feb",
+  "base": "XRPLF/rippled b001f58c7a976be2d3688fb7ad0604be7775ee3f",
   "features": [
     {
       "id": "beneficiary",
@@ -270,7 +270,7 @@
           240
         ],
         "namespace": [
-          "Z"
+          "j"
         ]
       }
     },
@@ -303,7 +303,7 @@
           233
         ],
         "namespace": [
-          "b"
+          "k"
         ]
       }
     },
@@ -369,6 +369,124 @@
         "key_type": [
           3,
           3
+        ]
+      }
+    },
+    {
+      "id": "perpetual-futures",
+      "blocks": {
+        "transaction": [
+          231,
+          240
+        ],
+        "ledger_entry": [
+          527,
+          531
+        ],
+        "sfield/ACCOUNT": [
+          252,
+          252
+        ],
+        "sfield/ARRAY": [
+          246,
+          247
+        ],
+        "sfield/NUMBER": [
+          208,
+          236
+        ],
+        "sfield/OBJECT": [
+          248,
+          249
+        ],
+        "sfield/UINT256": [
+          244,
+          247
+        ],
+        "sfield/UINT32": [
+          204,
+          219
+        ],
+        "sfield/UINT8": [
+          249,
+          249
+        ],
+        "sfield/VECTOR256": [
+          254,
+          254
+        ],
+        "tec": [
+          232,
+          242
+        ],
+        "namespace": [
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7"
+        ]
+      }
+    },
+    {
+      "id": "smart-contracts",
+      "blocks": {
+        "transaction": [
+          103,
+          108
+        ],
+        "ledger_entry": [
+          133,
+          135
+        ],
+        "sfield/ACCOUNT": [
+          33,
+          33
+        ],
+        "sfield/ARRAY": [
+          32,
+          36
+        ],
+        "sfield/DATA": [
+          1,
+          1
+        ],
+        "sfield/DATATYPE": [
+          1,
+          1
+        ],
+        "sfield/JSON": [
+          1,
+          1
+        ],
+        "sfield/OBJECT": [
+          40,
+          44
+        ],
+        "sfield/UINT256": [
+          43,
+          44
+        ],
+        "sfield/UINT32": [
+          86,
+          86
+        ],
+        "sfield/VL": [
+          51,
+          53
+        ],
+        "sti": [
+          27,
+          29
+        ],
+        "tec": [
+          203,
+          203
+        ],
+        "namespace": [
+          "Z",
+          "b"
         ]
       }
     }
