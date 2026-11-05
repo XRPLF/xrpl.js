@@ -36,6 +36,10 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'BallotCastVote',
   'BallotFinalize',
   'BallotDelete',
+  'CouponScheduleCreate',
+  'CouponScheduleSet',
+  'CouponScheduleDelete',
+  'CouponPay',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

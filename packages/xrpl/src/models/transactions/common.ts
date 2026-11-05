@@ -603,6 +603,16 @@ export function validateNonZeroField(
   }
 }
 
+/**
+ * Whether an Amount (XRP drops, IOU or MPT) has a value greater than zero.
+ *
+ * @param amount - The amount to check.
+ * @returns Whether the amount's value is positive.
+ */
+export function isPositiveAmount(amount: unknown): boolean {
+  return parseAmountValue(amount) > 0
+}
+
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
 
 /**

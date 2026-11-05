@@ -18,6 +18,7 @@ import { BallotCreateFlags } from '../transactions/ballotCreate'
 import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
 import { ConfidentialMPTHolderKeyUpdateFlags } from '../transactions/confidentialMPTHolderKeyUpdate'
+import { CouponClaimFlags } from '../transactions/couponClaim'
 import { LoanBrokerSetFlags } from '../transactions/loanBrokerSet'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
@@ -127,6 +128,7 @@ const txToFlag = {
   BallotCreate: BallotCreateFlags,
   Batch: BatchFlags,
   ConfidentialMPTHolderKeyUpdate: ConfidentialMPTHolderKeyUpdateFlags,
+  CouponClaim: CouponClaimFlags,
   LoanBrokerSet: LoanBrokerSetFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,

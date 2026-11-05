@@ -5,6 +5,7 @@ import Ballot from './Ballot'
 import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
 import Check from './Check'
+import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
@@ -40,6 +41,7 @@ type LedgerEntry =
   | BallotVote
   | Beneficiary
   | Check
+  | CouponSchedule
   | Credential
   | Delegate
   | DepositPreauth
@@ -75,6 +77,7 @@ type LedgerEntryFilter =
   | 'ballot_vote'
   | 'beneficiary'
   | 'check'
+  | 'coupon_schedule'
   | 'credential'
   | 'delegate'
   | 'deposit_preauth'

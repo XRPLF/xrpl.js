@@ -64,6 +64,15 @@ export {
   ConfidentialMPTHolderKeyUpdateFlagsInterface,
 } from './confidentialMPTHolderKeyUpdate'
 export { ConfidentialMPTMirrorUpdate } from './confidentialMPTMirrorUpdate'
+export {
+  CouponClaim,
+  CouponClaimFlags,
+  CouponClaimFlagsInterface,
+} from './couponClaim'
+export { CouponPay } from './couponPay'
+export { CouponScheduleCreate } from './couponScheduleCreate'
+export { CouponScheduleDelete } from './couponScheduleDelete'
+export { CouponScheduleSet } from './couponScheduleSet'
 export { CredentialAccept } from './CredentialAccept'
 export { CredentialCreate } from './CredentialCreate'
 export { CredentialDelete } from './CredentialDelete'

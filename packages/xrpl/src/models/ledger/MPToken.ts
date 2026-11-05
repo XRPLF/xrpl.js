@@ -1,3 +1,5 @@
+import { Amount, MPTAmount } from '../common'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
@@ -26,6 +28,16 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   VoteLockedAmount?: string
   /** (ConfidentialVoting) The ledger index of the Ballot holding the vote lock. */
   BallotID?: string
+  /**
+   * (CouponPayments) The holder's settled but unclaimed coupons, in the
+   * schedule's coupon asset.
+   */
+  CouponAccrued?: Amount | MPTAmount
+  /**
+   * (CouponPayments) The schedule's per-unit accrual at the holder's last
+   * settlement.
+   */
+  CouponIndex?: Amount | MPTAmount
   /**
    * (Optional) The account sponsoring the reserve for this MPToken. If
    * present, the sponsor is responsible for the reserve requirement of this

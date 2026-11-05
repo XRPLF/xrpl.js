@@ -8,6 +8,7 @@ import Ballot, { BallotFlags } from './Ballot'
 import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
 import Check from './Check'
+import CouponSchedule from './CouponSchedule'
 import Credential from './Credential'
 import Delegate from './Delegate'
 import DepositPreauth from './DepositPreauth'
@@ -62,6 +63,7 @@ export {
   BallotVote,
   Beneficiary,
   Check,
+  CouponSchedule,
   Credential,
   Delegate,
   DepositPreauth,

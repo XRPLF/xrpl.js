@@ -124,6 +124,7 @@ export interface MPTokenIssuanceFlagsInterface {
   lsfMPTCanTransfer?: boolean
   lsfMPTCanClawback?: boolean
   lsfMPTCanHoldConfidentialBalance?: boolean
+  lsfMPTCouponSchedule?: boolean
 }
 
 export interface MPTokenIssuanceImmutableFlagsInterface {
@@ -174,6 +175,8 @@ export enum MPTokenIssuanceFlags {
   lsfMPTCanTransfer = 0x00000020,
   lsfMPTCanClawback = 0x00000040,
   lsfMPTCanHoldConfidentialBalance = 0x00000080,
+  /** (CouponPayments) The issuance has a CouponSchedule. */
+  lsfMPTCouponSchedule = 0x00000100,
 }
 
 export enum MPTokenIssuanceImmutableFlags {

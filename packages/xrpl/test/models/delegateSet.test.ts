@@ -118,6 +118,10 @@ describe('DelegateSet', function () {
     'BallotCastVote',
     'BallotFinalize',
     'BallotDelete',
+    'CouponScheduleCreate',
+    'CouponScheduleSet',
+    'CouponScheduleDelete',
+    'CouponPay',
   ].forEach((transactionType) => {
     it(`throws w/ PermissionValue ${transactionType}, which is not delegable`, function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
@@ -125,6 +129,13 @@ describe('DelegateSet', function () {
         tx,
         `DelegateSet: PermissionValue contains a non-delegatable transaction ${transactionType}`,
       )
+    })
+  })
+
+  ;['CouponClaim'].forEach((transactionType) => {
+    it(`accepts PermissionValue ${transactionType}, which is delegable`, function () {
+      tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
+      assertValid(tx)
     })
   })
 
