@@ -1,4 +1,7 @@
-import { validateLoanBrokerSet } from '../../src/models/transactions/loanBrokerSet'
+import {
+  LoanBrokerSetFlags,
+  validateLoanBrokerSet,
+} from '../../src/models/transactions/loanBrokerSet'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void =>
@@ -6,6 +9,9 @@ const assertValid = (tx: any): void =>
 
 const assertInvalid = (tx: any, errorMessage: string): void =>
   assertTxValidationError(tx, validateLoanBrokerSet, errorMessage)
+
+const DOMAIN_ID =
+  'D88930B33C2B6831660BFD006D91FF100011AD4E67CBB78B460AF0A215103737'
 
 describe('unit test LoanBrokerSet', () => {
   let tx: any
@@ -126,5 +132,52 @@ describe('unit test LoanBrokerSet', () => {
       tx,
       'LoanBrokerSet: CoverRateMinimum and CoverRateLiquidation must both be zero or both be non-zero',
     )
+  })
+
+  test('tfLoanBrokerPrivate has the network value', () => {
+    expect(LoanBrokerSetFlags.tfLoanBrokerPrivate).toBe(0x00010000)
+  })
+
+  test('valid private LoanBroker with a DomainID', () => {
+    delete tx.LoanBrokerID
+    tx.Flags = LoanBrokerSetFlags.tfLoanBrokerPrivate
+    tx.DomainID = DOMAIN_ID
+    assertValid(tx)
+  })
+
+  test('valid private LoanBroker w/ Flags as an object', () => {
+    delete tx.LoanBrokerID
+    tx.Flags = { tfLoanBrokerPrivate: true }
+    tx.DomainID = DOMAIN_ID
+    assertValid(tx)
+  })
+
+  test('tfLoanBrokerPrivate on an existing LoanBroker', () => {
+    tx.Flags = LoanBrokerSetFlags.tfLoanBrokerPrivate
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: tfLoanBrokerPrivate cannot be set on an existing LoanBroker',
+    )
+  })
+
+  test('DomainID on a new LoanBroker without tfLoanBrokerPrivate', () => {
+    delete tx.LoanBrokerID
+    tx.DomainID = DOMAIN_ID
+    assertInvalid(tx, 'LoanBrokerSet: DomainID requires tfLoanBrokerPrivate')
+  })
+
+  test('incorrect DomainID', () => {
+    tx.DomainID = 'INCORRECT_VALUE'
+    assertInvalid(
+      tx,
+      'LoanBrokerSet: DomainID must be 64 characters hexadecimal string',
+    )
+  })
+
+  test('zero DomainID', () => {
+    delete tx.LoanBrokerID
+    tx.Flags = LoanBrokerSetFlags.tfLoanBrokerPrivate
+    tx.DomainID = '0'.repeat(64)
+    assertInvalid(tx, 'LoanBrokerSet: DomainID must not be zero')
   })
 })

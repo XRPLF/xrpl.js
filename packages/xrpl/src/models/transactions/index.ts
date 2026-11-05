@@ -49,6 +49,12 @@ export { ConfidentialMPTConvert } from './ConfidentialMPTConvert'
 export { ConfidentialMPTConvertBack } from './ConfidentialMPTConvertBack'
 export { ConfidentialMPTMergeInbox } from './ConfidentialMPTMergeInbox'
 export { ConfidentialMPTSend } from './ConfidentialMPTSend'
+export {
+  ConfidentialMPTHolderKeyUpdate,
+  ConfidentialMPTHolderKeyUpdateFlags,
+  ConfidentialMPTHolderKeyUpdateFlagsInterface,
+} from './confidentialMPTHolderKeyUpdate'
+export { ConfidentialMPTMirrorUpdate } from './confidentialMPTMirrorUpdate'
 export { CredentialAccept } from './CredentialAccept'
 export { CredentialCreate } from './CredentialCreate'
 export { CredentialDelete } from './CredentialDelete'
@@ -60,7 +66,11 @@ export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
-export { LoanBrokerSet } from './loanBrokerSet'
+export {
+  LoanBrokerSet,
+  LoanBrokerSetFlags,
+  LoanBrokerSetFlagsInterface,
+} from './loanBrokerSet'
 export { LoanBrokerDelete } from './loanBrokerDelete'
 export { LoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
 export { LoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
@@ -137,6 +147,8 @@ export {
   SponsorshipTransferFlagsInterface,
 } from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
+export { TransactionProposalCancel } from './transactionProposalCancel'
+export { TransactionProposalCreate } from './transactionProposalCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
 export { VaultClawback } from './vaultClawback'
@@ -151,15 +163,3 @@ export { VaultDelete } from './vaultDelete'
 export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
 export { VaultWithdraw } from './vaultWithdraw'
-export { XChainAddAccountCreateAttestation } from './XChainAddAccountCreateAttestation'
-export { XChainAddClaimAttestation } from './XChainAddClaimAttestation'
-export { XChainClaim } from './XChainClaim'
-export { XChainCommit } from './XChainCommit'
-export { XChainCreateBridge } from './XChainCreateBridge'
-export { XChainCreateClaimID } from './XChainCreateClaimID'
-export { XChainAccountCreateCommit } from './XChainAccountCreateCommit'
-export {
-  XChainModifyBridge,
-  XChainModifyBridgeFlags,
-  XChainModifyBridgeFlagsInterface,
-} from './XChainModifyBridge'

@@ -21,6 +21,7 @@ import { Clawback, validateClawback } from './clawback'
 import {
   BaseTransaction,
   isIssuedCurrencyAmount,
+  isRecord,
   validateBaseTransaction,
 } from './common'
 import {
@@ -36,9 +37,17 @@ import {
   validateConfidentialMPTConvertBack,
 } from './ConfidentialMPTConvertBack'
 import {
+  ConfidentialMPTHolderKeyUpdate,
+  validateConfidentialMPTHolderKeyUpdate,
+} from './confidentialMPTHolderKeyUpdate'
+import {
   ConfidentialMPTMergeInbox,
   validateConfidentialMPTMergeInbox,
 } from './ConfidentialMPTMergeInbox'
+import {
+  ConfidentialMPTMirrorUpdate,
+  validateConfidentialMPTMirrorUpdate,
+} from './confidentialMPTMirrorUpdate'
 import {
   ConfidentialMPTSend,
   validateConfidentialMPTSend,
@@ -135,6 +144,14 @@ import {
   validateSponsorshipTransfer,
 } from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
+import {
+  TransactionProposalCancel,
+  validateTransactionProposalCancel,
+} from './transactionProposalCancel'
+import {
+  TransactionProposalCreate,
+  validateTransactionProposalCreate,
+} from './transactionProposalCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
 import { VaultClawback, validateVaultClawback } from './vaultClawback'
@@ -143,32 +160,6 @@ import { VaultDelete, validateVaultDelete } from './vaultDelete'
 import { VaultDeposit, validateVaultDeposit } from './vaultDeposit'
 import { VaultSet, validateVaultSet } from './vaultSet'
 import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
-import {
-  XChainAccountCreateCommit,
-  validateXChainAccountCreateCommit,
-} from './XChainAccountCreateCommit'
-import {
-  XChainAddAccountCreateAttestation,
-  validateXChainAddAccountCreateAttestation,
-} from './XChainAddAccountCreateAttestation'
-import {
-  XChainAddClaimAttestation,
-  validateXChainAddClaimAttestation,
-} from './XChainAddClaimAttestation'
-import { XChainClaim, validateXChainClaim } from './XChainClaim'
-import { XChainCommit, validateXChainCommit } from './XChainCommit'
-import {
-  XChainCreateBridge,
-  validateXChainCreateBridge,
-} from './XChainCreateBridge'
-import {
-  XChainCreateClaimID,
-  validateXChainCreateClaimID,
-} from './XChainCreateClaimID'
-import {
-  XChainModifyBridge,
-  validateXChainModifyBridge,
-} from './XChainModifyBridge'
 
 /**
  * Transactions that can be submitted by clients
@@ -193,7 +184,9 @@ export type SubmittableTransaction =
   | ConfidentialMPTClawback
   | ConfidentialMPTConvert
   | ConfidentialMPTConvertBack
+  | ConfidentialMPTHolderKeyUpdate
   | ConfidentialMPTMergeInbox
+  | ConfidentialMPTMirrorUpdate
   | ConfidentialMPTSend
   | CredentialAccept
   | CredentialCreate
@@ -239,6 +232,8 @@ export type SubmittableTransaction =
   | SponsorshipSet
   | SponsorshipTransfer
   | TicketCreate
+  | TransactionProposalCancel
+  | TransactionProposalCreate
   | TrustSet
   | VaultClawback
   | VaultCreate
@@ -246,14 +241,6 @@ export type SubmittableTransaction =
   | VaultDeposit
   | VaultSet
   | VaultWithdraw
-  | XChainAccountCreateCommit
-  | XChainAddAccountCreateAttestation
-  | XChainAddClaimAttestation
-  | XChainClaim
-  | XChainCommit
-  | XChainCreateBridge
-  | XChainCreateClaimID
-  | XChainModifyBridge
 
 /**
  * Transactions that can only be created by validators.
@@ -390,8 +377,16 @@ export function validate(transaction: Record<string, unknown>): void {
       validateConfidentialMPTConvertBack(tx)
       break
 
+    case 'ConfidentialMPTHolderKeyUpdate':
+      validateConfidentialMPTHolderKeyUpdate(tx)
+      break
+
     case 'ConfidentialMPTMergeInbox':
       validateConfidentialMPTMergeInbox(tx)
+      break
+
+    case 'ConfidentialMPTMirrorUpdate':
+      validateConfidentialMPTMirrorUpdate(tx)
       break
 
     case 'ConfidentialMPTSend':
@@ -574,6 +569,18 @@ export function validate(transaction: Record<string, unknown>): void {
       validateTicketCreate(tx)
       break
 
+    case 'TransactionProposalCancel':
+      validateTransactionProposalCancel(tx)
+      break
+
+    case 'TransactionProposalCreate':
+      validateTransactionProposalCreate(tx)
+      // The proposed transaction is validated here to avoid a dependency cycle
+      if (isRecord(tx.ProposedTransaction)) {
+        validate(tx.ProposedTransaction)
+      }
+      break
+
     case 'TrustSet':
       validateTrustSet(tx)
       break
@@ -600,38 +607,6 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'VaultWithdraw':
       validateVaultWithdraw(tx)
-      break
-
-    case 'XChainAccountCreateCommit':
-      validateXChainAccountCreateCommit(tx)
-      break
-
-    case 'XChainAddAccountCreateAttestation':
-      validateXChainAddAccountCreateAttestation(tx)
-      break
-
-    case 'XChainAddClaimAttestation':
-      validateXChainAddClaimAttestation(tx)
-      break
-
-    case 'XChainClaim':
-      validateXChainClaim(tx)
-      break
-
-    case 'XChainCommit':
-      validateXChainCommit(tx)
-      break
-
-    case 'XChainCreateBridge':
-      validateXChainCreateBridge(tx)
-      break
-
-    case 'XChainCreateClaimID':
-      validateXChainCreateClaimID(tx)
-      break
-
-    case 'XChainModifyBridge':
-      validateXChainModifyBridge(tx)
       break
 
     default:

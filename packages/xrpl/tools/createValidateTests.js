@@ -71,8 +71,6 @@ function getInvalidValue(paramTypes) {
       return JSON.stringify({ test: 'test' })
     } else if (paramType == 'Amount') {
       return JSON.stringify({ currency: 'ETH' })
-    } else if (paramType == 'XChainBridge') {
-      return JSON.stringify({ XChainDoor: 'test' })
     } else {
       return '/*TODO*/'
     }

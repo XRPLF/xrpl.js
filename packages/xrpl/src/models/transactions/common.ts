@@ -20,7 +20,6 @@ import {
   Memo,
   Signer,
   SponsorSignature,
-  XChainBridge,
 } from '../common'
 import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
 
@@ -177,7 +176,6 @@ const ISSUE_CURRENCY_SIZE = 2
 const MPT_CURRENCY_AMOUNT_SIZE = 2
 const ISSUED_CURRENCY_AMOUNT_SIZE = 3
 
-const XCHAIN_BRIDGE_SIZE = 4
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
 /**
@@ -444,23 +442,6 @@ export function isTokenAmount(
   amount: unknown,
 ): amount is IssuedCurrencyAmount | MPTAmount {
   return isIssuedCurrencyAmount(amount) || isMPTAmount(amount)
-}
-
-/**
- * Verify the form and type of an XChainBridge at runtime.
- *
- * @param input - The input to check the form and type of.
- * @returns Whether the XChainBridge is properly formed.
- */
-export function isXChainBridge(input: unknown): input is XChainBridge {
-  return (
-    isRecord(input) &&
-    Object.keys(input).length === XCHAIN_BRIDGE_SIZE &&
-    typeof input.LockingChainDoor === 'string' &&
-    isIssuedCurrency(input.LockingChainIssue) &&
-    typeof input.IssuingChainDoor === 'string' &&
-    isIssuedCurrency(input.IssuingChainIssue)
-  )
 }
 
 /**

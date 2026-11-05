@@ -16,6 +16,8 @@ import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BatchFlags } from '../transactions/batch'
 import { GlobalFlags } from '../transactions/common'
+import { ConfidentialMPTHolderKeyUpdateFlags } from '../transactions/confidentialMPTHolderKeyUpdate'
+import { LoanBrokerSetFlags } from '../transactions/loanBrokerSet'
 import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
@@ -32,7 +34,6 @@ import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { VaultCreateFlags } from '../transactions/vaultCreate'
-import { XChainModifyBridgeFlags } from '../transactions/XChainModifyBridge'
 
 import { isFlagEnabled } from '.'
 
@@ -121,6 +122,8 @@ const txToFlag = {
   AMMDeposit: AMMDepositFlags,
   AMMWithdraw: AMMWithdrawFlags,
   Batch: BatchFlags,
+  ConfidentialMPTHolderKeyUpdate: ConfidentialMPTHolderKeyUpdateFlags,
+  LoanBrokerSet: LoanBrokerSetFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
   MPTokenAuthorize: MPTokenAuthorizeFlags,
@@ -135,7 +138,6 @@ const txToFlag = {
   SponsorshipTransfer: SponsorshipTransferFlags,
   TrustSet: TrustSetFlags,
   VaultCreate: VaultCreateFlags,
-  XChainModifyBridge: XChainModifyBridgeFlags,
 }
 
 function isTxToFlagKey(

@@ -10,8 +10,8 @@ export default interface DirectoryNode
   extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'DirectoryNode'
   /**
-   * A bit-map of boolean flags enabled for this directory. Currently, the
-   * protocol defines no flags for DirectoryNode objects.
+   * A bit-map of boolean flags enabled for this directory: see
+   * {@link DirectoryNodeFlags}.
    */
   Flags: number
   /** The ID of root object for this directory. */
@@ -47,4 +47,11 @@ export default interface DirectoryNode
 
   /** The domain that the offer directory is a part of. */
   DomainID?: string
+}
+
+export enum DirectoryNodeFlags {
+  /** The directory lists an NFToken's buy offers. */
+  lsfNFTokenBuyOffers = 0x00000001,
+  /** The directory lists an NFToken's sell offers. */
+  lsfNFTokenSellOffers = 0x00000002,
 }

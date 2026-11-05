@@ -31,8 +31,6 @@ import NFTokenMint from './tx/NFTokenMint.json'
 import NFTokenMint2 from './tx/NFTokenMint2.json'
 import OfferCreateSell from './tx/offerCreateSell.json'
 import Payment from './tx/payment.json'
-import XChainCreateClaimID from './tx/XChainCreateClaimID.json'
-import XChainCreateClaimID2 from './tx/XChainCreateClaimID2.json'
 import unsubscribe from './unsubscribe.json'
 
 const submit = {
@@ -101,8 +99,6 @@ const tx = {
   NFTokenMint2,
   Payment,
   OfferCreateSell,
-  XChainCreateClaimID,
-  XChainCreateClaimID2,
 }
 
 const rippled = {

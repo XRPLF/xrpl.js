@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js'
 
 import { ValidationError } from '../../errors'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
+  GlobalFlagsInterface,
   validateHexMetadata,
   isLedgerEntryId,
   isNumber,
@@ -19,6 +21,31 @@ const MAX_DATA_LENGTH = 512
 const MAX_MANAGEMENT_FEE_RATE = 10000
 const MAX_COVER_RATE_MINIMUM = 100000
 const MAX_COVER_RATE_LIQUIDATION = 100000
+// A ledger entry ID of all zeros
+const ZERO_ID = /^0+$/u
+
+/**
+ * Enum representing values of {@link LoanBrokerSet} transaction flags.
+ *
+ * @category Transaction Flags
+ */
+export enum LoanBrokerSetFlags {
+  /**
+   * Create a private LoanBroker, whose borrowers must hold a credential of
+   * its DomainID. Only on creation.
+   */
+  tfLoanBrokerPrivate = 0x00010000,
+}
+
+/**
+ * Map of flags to boolean values representing {@link LoanBrokerSet}
+ * transaction flags.
+ *
+ * @category Transaction Flags
+ */
+export interface LoanBrokerSetFlagsInterface extends GlobalFlagsInterface {
+  tfLoanBrokerPrivate?: boolean
+}
 
 /**
  * The transaction creates a new LoanBroker object or updates an existing one.
@@ -27,6 +54,8 @@ const MAX_COVER_RATE_LIQUIDATION = 100000
  */
 export interface LoanBrokerSet extends BaseTransaction {
   TransactionType: 'LoanBrokerSet'
+
+  Flags?: number | LoanBrokerSetFlagsInterface
 
   /**
    * The Vault ID that the Lending Protocol will use to access liquidity.
@@ -64,6 +93,53 @@ export interface LoanBrokerSet extends BaseTransaction {
    * Valid values are between 0 and 100000 inclusive.
    */
   CoverRateLiquidation?: number
+
+  /**
+   * The ID of the PermissionedDomain whose credentials a private LoanBroker's
+   * borrowers must hold. On creation, requires tfLoanBrokerPrivate.
+   */
+  DomainID?: string
+}
+
+/**
+ * Verify tfLoanBrokerPrivate and DomainID: the flag only on creation, a
+ * DomainID on creation only with the flag, and a DomainID never zero.
+ *
+ * @param tx - LoanBrokerSet Transaction.
+ * @throws When the flag or DomainID is misused.
+ */
+function validatePrivateLoanBroker(tx: Record<string, unknown>): void {
+  const isPrivate = hasFlag(
+    tx,
+    LoanBrokerSetFlags.tfLoanBrokerPrivate,
+    'tfLoanBrokerPrivate',
+  )
+
+  if (tx.LoanBrokerID != null && isPrivate) {
+    throw new ValidationError(
+      'LoanBrokerSet: tfLoanBrokerPrivate cannot be set on an existing LoanBroker',
+    )
+  }
+
+  if (tx.DomainID == null) {
+    return
+  }
+
+  if (!isLedgerEntryId(tx.DomainID)) {
+    throw new ValidationError(
+      'LoanBrokerSet: DomainID must be 64 characters hexadecimal string',
+    )
+  }
+
+  if (ZERO_ID.test(tx.DomainID)) {
+    throw new ValidationError('LoanBrokerSet: DomainID must not be zero')
+  }
+
+  if (tx.LoanBrokerID == null && !isPrivate) {
+    throw new ValidationError(
+      'LoanBrokerSet: DomainID requires tfLoanBrokerPrivate',
+    )
+  }
 }
 
 /**
@@ -83,6 +159,7 @@ export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'DebtMaximum', isXRPLNumber)
   validateOptionalField(tx, 'CoverRateMinimum', isNumber)
   validateOptionalField(tx, 'CoverRateLiquidation', isNumber)
+  validateOptionalField(tx, 'DomainID', isString)
 
   if (!isLedgerEntryId(tx.VaultID)) {
     throw new ValidationError(
@@ -149,4 +226,6 @@ export function validateLoanBrokerSet(tx: Record<string, unknown>): void {
       'LoanBrokerSet: CoverRateMinimum and CoverRateLiquidation must both be zero or both be non-zero',
     )
   }
+
+  validatePrivateLoanBroker(tx)
 }

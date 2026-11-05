@@ -113,12 +113,11 @@ const typeMap = {
   VECTOR256: 'string[]',
   PATHSET: 'Path[]',
   ISSUE: 'Currency',
-  XCHAIN_BRIDGE: 'XChainBridge',
   OBJECT: 'any',
   ARRAY: 'any[]',
 }
 
-const allCommonImports = ['Amount', 'Currency', 'Path', 'XChainBridge']
+const allCommonImports = ['Amount', 'Currency', 'Path']
 const additionalValidationImports = ['string', 'number']
 
 async function updateTransactionFile(transactionMatch, jsTransactionFile, tx) {
@@ -136,14 +135,8 @@ async function updateTransactionFile(transactionMatch, jsTransactionFile, tx) {
 
   // Adds the imports to the end of the imports
   newJsTxFile = newJsTxFile.replace(
-    `import {
-  XChainModifyBridge,
-  validateXChainModifyBridge,
-} from './XChainModifyBridge'`,
-    `import {
-  XChainModifyBridge,
-  validateXChainModifyBridge,
-} from './XChainModifyBridge'
+    `import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'`,
+    `import { VaultWithdraw, validateVaultWithdraw } from './vaultWithdraw'
 import {
   ${tx},
   validate${tx},
@@ -181,8 +174,8 @@ async function updateIndexFile(tx) {
     '../src/models/transactions/index.ts',
   )
   indexFile = indexFile.replace(
-    `} from './XChainModifyBridge'`,
-    `} from './XChainModifyBridge'
+    `export { VaultWithdraw } from './vaultWithdraw'`,
+    `export { VaultWithdraw } from './vaultWithdraw'
 export { ${tx} } from './${tx}'`,
   )
   await fs.writeFile(
