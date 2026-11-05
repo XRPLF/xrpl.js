@@ -10,6 +10,7 @@ import { hexToBytes, randomBytes } from '@xrplf/isomorphic/utils'
 
 import { accountPublicFromPublicGenerator } from './signing-schemes/secp256k1/utils'
 import Sha512 from './utils/Sha512'
+import normalizeP256Signature from './utils/normalizeP256Signature'
 import assert from './utils/assert'
 import type { Algorithm, HexString, KeyPair, SigningScheme } from './types'
 import {
@@ -143,5 +144,6 @@ export {
   deriveAddress,
   deriveNodeAddress,
   decodeSeed,
+  normalizeP256Signature,
   type Algorithm,
 }

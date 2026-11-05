@@ -13,6 +13,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Added
 * `BeneficiarySet` transaction, `Beneficiary` ledger entry and `AccountRoot.LastInteraction` (Beneficiary amendment).
+* `PasskeyListSet` transaction and `PasskeyList` ledger entry (Passkey amendment).
+* `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does. As in rippled's inner object templates, a `Signers` entry or `SponsorSignature` cannot carry one: a P-256 multi-signer or sponsor signs with `TxnSignature`.
 
 ### Changed
 * Some transaction validation error messages changed.
@@ -26,7 +28,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
-* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet).
+* `SponsorSignature` refuses fields outside rippled's template (`SigningPubKey`, `TxnSignature`, `Signers`).
+* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet).
 
 ## 5.3.0 (2026-09-16)
 

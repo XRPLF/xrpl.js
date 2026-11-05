@@ -19,6 +19,7 @@ import {
   MPTAmount,
   Memo,
   Signer,
+  PasskeySignature,
   SponsorSignature,
 } from '../common'
 import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
@@ -97,6 +98,19 @@ function isSigner(obj: unknown): obj is Signer {
   )
 }
 
+const SPONSOR_SIGNATURE_FIELDS = ['SigningPubKey', 'TxnSignature', 'Signers']
+
+/**
+ * Whether an object holds only the fields of rippled's SponsorSignature
+ * template (InnerObjectFormats.cpp), which refuses any other field.
+ *
+ * @param obj - The SponsorSignature object.
+ * @returns Whether every field is a template field.
+ */
+function hasOnlySponsorSignatureFields(obj: Record<string, unknown>): boolean {
+  return Object.keys(obj).every((key) => SPONSOR_SIGNATURE_FIELDS.includes(key))
+}
+
 /**
  * Verify the form and type of a SponsorSignature at runtime.
  *
@@ -109,7 +123,7 @@ function isSponsorSignature(
   obj: unknown,
   isInnerBatchTxn: boolean,
 ): obj is SponsorSignature {
-  if (!isRecord(obj)) {
+  if (!isRecord(obj) || !hasOnlySponsorSignatureFields(obj)) {
     return false
   }
 
@@ -748,6 +762,11 @@ export interface BaseTransaction extends Record<string, unknown> {
    * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
    */
   SponsorSignature?: SponsorSignature
+  /**
+   * (Passkey) The WebAuthn signature of a P-256 SigningPubKey, in place of
+   * TxnSignature.
+   */
+  PasskeySignature?: PasskeySignature
 }
 
 /**
@@ -865,6 +884,50 @@ function validateSponsorFlagsValue(
   if (hasFeeFlag && isInnerBatchTxn) {
     throw new ValidationError(
       'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  }
+}
+
+const PASSKEY_SIGNATURE_FIELDS = [
+  'PasskeyID',
+  'AuthenticatorData',
+  'ClientDataJSON',
+  'Signature',
+]
+const P256_PUBLIC_KEY_REGEX = /^F6[\dA-F]{128}$/iu
+
+/**
+ * Validate a transaction's PasskeySignature as rippled's preflight does
+ * (preflightCheckPasskey): its four fields are hex, the SigningPubKey is a
+ * P-256 key (0xF6 then 64 bytes), and there is no TxnSignature beside it.
+ *
+ * @param tx - The transaction to validate.
+ * @throws ValidationError when the PasskeySignature is malformed or misplaced.
+ */
+export function validatePasskeySignature(tx: Record<string, unknown>): void {
+  const signature = tx.PasskeySignature
+  if (signature === undefined) {
+    return
+  }
+  if (
+    !isRecord(signature) ||
+    !PASSKEY_SIGNATURE_FIELDS.every(
+      (field) => isString(signature[field]) && isHex(signature[field]),
+    )
+  ) {
+    throw new ValidationError('BaseTransaction: invalid PasskeySignature')
+  }
+  if (
+    !isString(tx.SigningPubKey) ||
+    !P256_PUBLIC_KEY_REGEX.test(tx.SigningPubKey)
+  ) {
+    throw new ValidationError(
+      'BaseTransaction: PasskeySignature requires a P-256 SigningPubKey',
+    )
+  }
+  if (tx.TxnSignature !== undefined) {
+    throw new ValidationError(
+      'BaseTransaction: PasskeySignature and TxnSignature cannot both be present',
     )
   }
 }
@@ -1026,6 +1089,8 @@ export function validateBaseTransaction(
 
   // Validate sponsor fields using helper function
   validateSponsorFields(common)
+
+  validatePasskeySignature(common)
 }
 
 /**

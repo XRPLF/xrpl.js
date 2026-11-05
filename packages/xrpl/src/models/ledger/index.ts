@@ -35,6 +35,7 @@ import { NFTokenOffer, NFTokenOfferFlags } from './NFTokenOffer'
 import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
 import Oracle from './Oracle'
+import PasskeyList from './PasskeyList'
 import PayChannel from './PayChannel'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
@@ -89,6 +90,7 @@ export {
   Offer,
   OfferFlags,
   Oracle,
+  PasskeyList,
   PayChannel,
   RippleState,
   RippleStateFlags,

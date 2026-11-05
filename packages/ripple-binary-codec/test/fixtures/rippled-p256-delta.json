@@ -1,0 +1,82 @@
+{
+  "FIELDS": [
+    [
+      "AuthenticatorData",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 253,
+        "type": "Blob"
+      }
+    ],
+    [
+      "ClientDataJSON",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 252,
+        "type": "Blob"
+      }
+    ],
+    [
+      "Passkey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "STObject"
+      }
+    ],
+    [
+      "PasskeyID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 254,
+        "type": "Blob"
+      }
+    ],
+    [
+      "PasskeySignature",
+      {
+        "isSerialized": true,
+        "isSigningField": false,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "STObject"
+      }
+    ],
+    [
+      "Passkeys",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "STArray"
+      }
+    ],
+    [
+      "SignCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "UInt32"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "PasskeyList": 513
+  },
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {
+    "PasskeyListSet": 201
+  },
+  "TYPES": {}
+}

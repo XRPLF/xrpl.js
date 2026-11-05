@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- `normalizeP256Signature`, which returns a DER P-256 ECDSA signature in strict DER with a low S value (`(r, n - s)` for a high S), the only form rippled's Passkey amendment accepts.
+
 ## 3.1.0 (2026-09-11)
 
 ### BREAKING CHANGES

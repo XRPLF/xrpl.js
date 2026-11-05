@@ -115,6 +115,7 @@ import { OfferCancel, validateOfferCancel } from './offerCancel'
 import { OfferCreate, validateOfferCreate } from './offerCreate'
 import { OracleDelete, validateOracleDelete } from './oracleDelete'
 import { OracleSet, validateOracleSet } from './oracleSet'
+import { PasskeyListSet, validatePasskeyListSet } from './passkeyListSet'
 import { Payment, validatePayment } from './payment'
 import {
   PaymentChannelClaim,
@@ -223,6 +224,7 @@ export type SubmittableTransaction =
   | OfferCreate
   | OracleDelete
   | OracleSet
+  | PasskeyListSet
   | Payment
   | PaymentChannelClaim
   | PaymentChannelCreate
@@ -529,6 +531,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'OracleSet':
       validateOracleSet(tx)
+      break
+
+    case 'PasskeyListSet':
+      validatePasskeyListSet(tx)
       break
 
     case 'Payment':
