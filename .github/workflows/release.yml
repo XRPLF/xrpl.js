@@ -730,7 +730,8 @@ jobs:
           # Base for the release notes: the highest stable x.y.z release of this
           # package whose version is strictly below the one being released. A new
           # package with no stable release yet falls back to the latest stable
-          # xrpl release.
+          # xrpl release that does not already contain the package's first
+          # commit, so the PRs that created the package fall inside the range.
           CURRENT_CORE="${PKG_VERSION%%-*}"
           PREVIOUS_TAG="$(
             { git tag -l "${PKG_NAME}@*" \
@@ -741,12 +742,14 @@ jobs:
           if [ -n "${PREVIOUS_TAG}" ]; then
             PREVIOUS_TAG="${PKG_NAME}@${PREVIOUS_TAG}"
           else
-            PREVIOUS_TAG="$(
-              git tag -l "xrpl@*" \
-                | grep -x "xrpl@[0-9]*\.[0-9]*\.[0-9]*" \
-                | sort -V | tail -n 1 || true
-            )"
-            echo "ℹ️ No previous stable tag found for ${PKG_NAME}; falling back to the latest stable xrpl release."
+            echo "ℹ️ No previous stable tag found for ${PKG_NAME}; falling back to an xrpl release."
+            FIRST_COMMIT="$(git log --format='%H' -- "packages/${PKG_NAME}" | tail -n 1)"
+            while read -r candidate; do
+              if [ -z "${FIRST_COMMIT}" ] || ! git merge-base --is-ancestor "${FIRST_COMMIT}" "${candidate}"; then
+                PREVIOUS_TAG="${candidate}"
+                break
+              fi
+            done < <(git tag -l "xrpl@*" | grep -x "xrpl@[0-9]*\.[0-9]*\.[0-9]*" | sort -rV || true)
           fi
           # Warn rather than fail: the package is already published and tagged.
           if [ -z "${PREVIOUS_TAG}" ]; then
@@ -771,8 +774,10 @@ jobs:
           NOTES="${RUNNER_TEMP}/release_notes.md"
           HISTORY="packages/${PKG_NAME}/HISTORY.md"
 
-          # This version's HISTORY.md section, or "Unreleased" for a prerelease
-          # cut before the heading was renamed. Leading blank lines are dropped.
+          # This version's HISTORY.md section. A prerelease (x.y.z-tag) falls back
+          # to "Unreleased", since it is usually cut before the heading is
+          # renamed; a stable release does not, as "Unreleased" may hold changes
+          # meant for a later version. Leading blank lines are dropped.
           history_section() {
             [ -f "${HISTORY}" ] || return 0
             awk -v h="$1" '
@@ -781,22 +786,30 @@ jobs:
             ' "${HISTORY}"
           }
           CHANGES="$(history_section "${PKG_VERSION}")"
-          if [ -z "$(printf '%s' "${CHANGES}" | tr -d '[:space:]')" ]; then
+          if [[ "${PKG_VERSION}" == *-* ]] && [ -z "$(printf '%s' "${CHANGES}" | tr -d '[:space:]')" ]; then
             CHANGES="$(history_section "Unreleased")"
           fi
 
           # PRs whose commits touched this package. Squash merges end in
           # "(#123)"; otherwise ask GitHub which merged PR contains the commit.
           # Commits with no PR (e.g. version bumps pushed to the release branch)
-          # are left out.
+          # are left out. API failures only warn: the package is already
+          # published and tagged, so the release must still be created.
           PR_LINES=""
           if [ -n "${PREVIOUS_TAG}" ]; then
             PR_NUMBERS=""
             while IFS=$'\t' read -r sha subject; do
+              # Release branch → main merges touch every released package.
+              if [[ "${subject}" =~ ^Release\ [^\ ]+:\ .+\ →\ main(\ \(#[0-9]+\))?$ ]]; then
+                continue
+              fi
               num="$(printf '%s\n' "${subject}" | sed -n 's/.*(#\([0-9][0-9]*\))$/\1/p')"
               if [ -z "${num}" ]; then
-                num="$(gh api "repos/${REPO}/commits/${sha}/pulls" \
-                  --jq '[.[] | select(.merged_at != null)][0].number // empty')"
+                if ! num="$(gh api "repos/${REPO}/commits/${sha}/pulls" \
+                  --jq '[.[] | select(.merged_at != null)][0].number // empty')"; then
+                  echo "::warning::Could not look up the PR for commit ${sha}; leaving it out."
+                  num=""
+                fi
               fi
               if [ -n "${num}" ]; then
                 PR_NUMBERS+="${num}"$'\n'
@@ -804,13 +817,12 @@ jobs:
             done < <(git log --format='%H%x09%s' "${PREVIOUS_TAG}..${TAG}" -- "packages/${PKG_NAME}")
 
             for num in $(printf '%s' "${PR_NUMBERS}" | awk 'NF && !seen[$0]++'); do
-              IFS=$'\t' read -r title login url < <(
-                gh api "repos/${REPO}/pulls/${num}" --jq '[.title, .user.login, .html_url] | @tsv'
-              )
-              # Release branch → main merges touch every released package.
-              if [[ "${title}" =~ ^Release\ [^\ ]+:\ .+\ →\ main$ ]]; then
+              if ! pr_data="$(gh api "repos/${REPO}/pulls/${num}" --jq '[.title, .user.login, .html_url] | @tsv')"; then
+                echo "::warning::Could not fetch PR #${num}; listing it without a title."
+                PR_LINES+="* [#${num}](https://github.com/${REPO}/pull/${num})"$'\n'
                 continue
               fi
+              IFS=$'\t' read -r title login url <<< "${pr_data}"
               PR_LINES+="* ${title} by @${login} in [#${num}](${url})"$'\n'
             done
           fi
