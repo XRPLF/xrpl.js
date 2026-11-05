@@ -71,4 +71,9 @@ describe('VaultDelete', function () {
     tx.MemoData = 123
     assertInvalid(tx, 'VaultDelete: invalid field MemoData')
   })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
+    assertInvalid(tx, 'VaultDelete: invalid field VaultID')
+  })
 })

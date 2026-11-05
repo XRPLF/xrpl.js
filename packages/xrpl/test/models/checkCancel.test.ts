@@ -31,4 +31,15 @@ describe('CheckCancel', function () {
 
     assertInvalid(invalidCheckID, 'CheckCancel: invalid field CheckID')
   })
+
+  it(`throws w/ non-hex CheckID`, function () {
+    const validCheckCancel = {
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      TransactionType: 'CheckCancel',
+      CheckID:
+        '49647F0D748DC3FE26BDACBC57F251AADEFFF391403EC9BF87C97F67E9977FB0',
+    } as any
+    validCheckCancel.CheckID = 'not hex'
+    assertInvalid(validCheckCancel, 'CheckCancel: invalid field CheckID')
+  })
 })

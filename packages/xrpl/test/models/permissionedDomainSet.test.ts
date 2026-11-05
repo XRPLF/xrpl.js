@@ -88,4 +88,9 @@ describe('PermissionedDomainSet', function () {
     tx.AcceptedCredentials = [{ Field1: 'Value1', Field2: 'Value2' }]
     assertInvalid(tx, 'PermissionedDomainSet: Invalid Credentials format')
   })
+
+  it(`throws w/ non-hex DomainID`, function () {
+    tx.DomainID = 'not hex'
+    assertInvalid(tx, 'PermissionedDomainSet: invalid field DomainID')
+  })
 })

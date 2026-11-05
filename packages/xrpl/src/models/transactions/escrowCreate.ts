@@ -7,10 +7,10 @@ import {
   isAccount,
   isAmount,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 /**
@@ -80,5 +80,5 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'CancelAfter', isNumber)
   validateOptionalField(tx, 'FinishAfter', isNumber)
-  validateOptionalField(tx, 'Condition', isString)
+  validateOptionalField(tx, 'Condition', isHexString)
 }

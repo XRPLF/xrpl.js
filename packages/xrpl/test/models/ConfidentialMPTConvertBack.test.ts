@@ -171,4 +171,22 @@ describe('ConfidentialMPTConvertBack', function () {
       'ConfidentialMPTConvertBack: invalid field AuditorEncryptedAmount',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvertBack',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: 'not hex',
+        MPTAmount: '100',
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        AuditorEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+        ZKProof: PROOF,
+        BalanceCommitment: EC_POINT,
+      },
+      'ConfidentialMPTConvertBack: invalid field MPTokenIssuanceID',
+    )
+  })
 })

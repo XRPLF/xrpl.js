@@ -61,4 +61,45 @@ describe('MPTokenAuthorize', function () {
 
     assertInvalid(invalid, 'MPTokenAuthorize: missing field MPTokenIssuanceID')
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    let validMPTokenAuthorize = {
+      TransactionType: 'MPTokenAuthorize',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+    } as any
+
+    assertValid(validMPTokenAuthorize)
+
+    validMPTokenAuthorize = {
+      TransactionType: 'MPTokenAuthorize',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      MPTokenIssuanceID: TOKEN_ID,
+    } as any
+
+    assertValid(validMPTokenAuthorize)
+
+    validMPTokenAuthorize = {
+      TransactionType: 'MPTokenAuthorize',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
+    } as any
+
+    assertValid(validMPTokenAuthorize)
+
+    validMPTokenAuthorize = {
+      TransactionType: 'MPTokenAuthorize',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+      Flags: MPTokenAuthorizeFlags.tfMPTUnauthorize,
+    } as any
+    validMPTokenAuthorize.MPTokenIssuanceID = 'not hex'
+    assertInvalid(
+      validMPTokenAuthorize,
+      'MPTokenAuthorize: invalid field MPTokenIssuanceID',
+    )
+  })
 })

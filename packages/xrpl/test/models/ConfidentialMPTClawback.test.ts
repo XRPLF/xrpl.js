@@ -182,4 +182,18 @@ describe('ConfidentialMPTClawback', function () {
       'ConfidentialMPTClawback: Invalid MPTAmount',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTClawback',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: 'not hex',
+        Holder: HOLDER,
+        MPTAmount: '100',
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTClawback: invalid field MPTokenIssuanceID',
+    )
+  })
 })

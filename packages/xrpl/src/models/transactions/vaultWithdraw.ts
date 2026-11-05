@@ -4,7 +4,6 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
-  isString,
   isAmount,
   Account,
   validateOptionalField,
@@ -12,6 +11,7 @@ import {
   isNumber,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 
 /**
@@ -59,7 +59,7 @@ export interface VaultWithdraw extends BaseTransaction {
 export function validateVaultWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)

@@ -38,4 +38,9 @@ describe('PermissionedDomainDelete', function () {
     const errorMessage = 'PermissionedDomainDelete: invalid field DomainID'
     assertInvalid(tx, errorMessage)
   })
+
+  it(`throws w/ non-hex DomainID`, function () {
+    tx.DomainID = 'not hex'
+    assertInvalid(tx, 'PermissionedDomainDelete: invalid field DomainID')
+  })
 })

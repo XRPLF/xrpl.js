@@ -7,6 +7,7 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 /**
@@ -72,6 +73,6 @@ export function validatePaymentChannelCreate(
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
   validateRequiredField(tx, 'SettleDelay', isNumber)
-  validateRequiredField(tx, 'PublicKey', isString)
+  validateRequiredField(tx, 'PublicKey', isHexString)
   validateOptionalField(tx, 'CancelAfter', isNumber)
 }
