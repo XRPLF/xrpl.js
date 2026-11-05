@@ -47,7 +47,7 @@ npm run lint
 
 ## Running Tests
 
-For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `rippleci/rippled` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
+For integration and browser tests, we use a `rippled` node in standalone mode to test xrpl.js code against. To set this up, you can either configure and run `rippled` locally, or set up the Docker container `rippleci/xrpld` by [following these instructions](#integration-tests). The latter will require you to [install Docker](https://docs.docker.com/get-docker/).
 
 ### Unit Tests
 
@@ -77,7 +77,7 @@ npm run test:integration
 Breaking down the command:
 * `--detach` runs the container in the background so the terminal stays free.
 * `--publish 6006:6006` exposes the admin WebSocket port on the host.
-* `--volume "$PWD/.ci-config:/etc/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
+* `--volume "$PWD/.ci-config:/etc/xrpld/"` mounts the host directory containing `xrpld.cfg` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
 * `--name xrpld-service` names the container — this is the label shown by `docker ps` / `docker stats`.
 * `rippleci/xrpld:develop` is the image, regularly rebuilt from the `develop` branch of `rippled`. Omitting the tag resolves to `:latest`.
 * `--standalone` is passed to the image's entrypoint (`xrpld`) to start the node in standalone mode.
@@ -220,11 +220,11 @@ npm uninstall abbrev -w xrpl
 ## Updating the Docker container for CI
 
 In order to test the library, we need to enable the latest amendments in the docker container.
-This requires updating the `/.ci-config/rippled.cfg` file with the hashes and names of new amendments.
+This requires updating the `.ci-config/xrpld.cfg` file with the hashes and names of new amendments.
 
 In order to update the list, follow these steps from the top level of the library:
 1. Run `node ./.ci-config/getNewAmendments.js`
-2. If there are any new amendment hashes, add a comment to the end of `/.ci-config/rippled.cfg` with the date
+2. If there are any new amendment hashes, add a comment to the end of `.ci-config/xrpld.cfg` with the date
    - `Ex. "# Added August 9th, 2023"`
 3. For each hash printed out by the script, add the hash and name to the config file.
    - Ex. `B2A4DB846F0891BF2C76AB2F2ACC8F5B4EC64437135C6E56F3F859DE5FFD5856 ExpandedSignerList`
