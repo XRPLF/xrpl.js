@@ -10,7 +10,6 @@ import {
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   Account,
@@ -21,6 +20,8 @@ import {
   isDomainID,
   isHexWithByteLength,
   CONFIDENTIAL_EC_POINT_BYTES,
+  isHexString,
+  isString,
 } from './common'
 import {
   MAX_TRANSFER_FEE,
@@ -189,7 +190,7 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
  */
 export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateOptionalField(tx, 'Holder', isAccount)
   validateOptionalField(
     tx,

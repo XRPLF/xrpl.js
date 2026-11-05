@@ -9,8 +9,8 @@ import {
   validateRequiredField,
   validateOptionalField,
   isNumber,
-  isString,
   Account,
+  isHexString,
 } from './common'
 
 /**
@@ -70,5 +70,5 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
   }
 
   validateOptionalField(tx, 'Expiration', isNumber)
-  validateOptionalField(tx, 'InvoiceID', isString)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
 }

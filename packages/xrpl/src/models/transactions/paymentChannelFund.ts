@@ -5,6 +5,7 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 /**
@@ -48,7 +49,7 @@ export interface PaymentChannelFund extends BaseTransaction {
 export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'Channel', isString)
+  validateRequiredField(tx, 'Channel', isHexString)
   validateRequiredField(tx, 'Amount', isString)
   validateOptionalField(tx, 'Expiration', isNumber)
 }

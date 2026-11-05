@@ -5,8 +5,8 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   isAmount,
-  isString,
   validateOptionalField,
+  isHexString,
 } from './common'
 
 /**
@@ -60,5 +60,5 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
 
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'DeliverMin', isAmount)
-  validateOptionalField(tx, 'CheckID', isString)
+  validateOptionalField(tx, 'CheckID', isHexString)
 }

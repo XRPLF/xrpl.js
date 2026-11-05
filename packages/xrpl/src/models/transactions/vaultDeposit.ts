@@ -4,8 +4,8 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
-  isString,
   isAmount,
+  isHexString,
 } from './common'
 
 /**
@@ -37,6 +37,6 @@ export interface VaultDeposit extends BaseTransaction {
 export function validateVaultDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
 }

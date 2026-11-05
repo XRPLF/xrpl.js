@@ -100,4 +100,9 @@ describe('PaymentChannelCreate', function () {
 
     assertInvalid(channel, 'PaymentChannelCreate: invalid field CancelAfter')
   })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    channel.PublicKey = 'not hex'
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field PublicKey')
+  })
 })

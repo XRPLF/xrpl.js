@@ -74,4 +74,19 @@ describe('AccountSet', function () {
     tx.NFTokenMinter = ''
     assertInvalid(tx, 'AccountSet: invalid field NFTokenMinter')
   })
+
+  it(`throws w/ non-hex Domain`, function () {
+    tx.Domain = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field Domain')
+  })
+
+  it(`throws w/ non-hex EmailHash`, function () {
+    tx.EmailHash = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field EmailHash')
+  })
+
+  it(`throws w/ non-hex MessageKey`, function () {
+    tx.MessageKey = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field MessageKey')
+  })
 })
