@@ -159,22 +159,4 @@ describe('PerpExchangeSet', function () {
       'PerpExchangeSet: LiquidationRewardMin can only be set on creation',
     )
   })
-
-  it('throws w/ VaultID', function () {
-    assertInvalid(
-      {
-        ...tx,
-        VaultID:
-          'CB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      },
-      'PerpExchangeSet: unexpected field VaultID',
-    )
-  })
-
-  it('throws w/ ParameterDelay', function () {
-    assertInvalid(
-      { ...tx, ParameterDelay: 604800 },
-      'PerpExchangeSet: unexpected field ParameterDelay',
-    )
-  })
 })

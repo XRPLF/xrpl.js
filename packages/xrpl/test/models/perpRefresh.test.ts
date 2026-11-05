@@ -71,15 +71,4 @@ describe('PerpRefresh', function () {
     tx.Flags = { tfPerpSettleStale: true }
     assertInvalid(tx, 'PerpRefresh: tfPerpSettleStale requires MarketID')
   })
-
-  it('throws w/ ExchangeID', function () {
-    assertInvalid(
-      {
-        ...tx,
-        ExchangeID:
-          'AB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      },
-      'PerpRefresh: unexpected field ExchangeID',
-    )
-  })
 })

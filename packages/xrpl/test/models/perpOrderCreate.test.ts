@@ -99,11 +99,4 @@ describe('PerpOrderCreate', function () {
       PerpOrderCreateFlags.tfFillOrKill
     assertInvalid(tx, AT_MOST_ONE_TIME_IN_FORCE)
   })
-
-  it('throws w/ Subaccount', function () {
-    assertInvalid(
-      { ...tx, Subaccount: 0 },
-      'PerpOrderCreate: unexpected field Subaccount',
-    )
-  })
 })

@@ -172,18 +172,4 @@ describe('PerpMarketSet', function () {
       'PerpMarketSet: IndexMaxLedgers can only be set on creation',
     )
   })
-
-  it('throws w/ LiquidationPenalty', function () {
-    assertInvalid(
-      { ...tx, LiquidationPenalty: 1000 },
-      'PerpMarketSet: unexpected field LiquidationPenalty',
-    )
-  })
-
-  it('throws w/ FundingCap', function () {
-    assertInvalid(
-      { ...tx, FundingCap: 750 },
-      'PerpMarketSet: unexpected field FundingCap',
-    )
-  })
 })

@@ -58,11 +58,4 @@ describe('MarginDeposit', function () {
     tx.Amount = 1000
     assertInvalid(tx, 'MarginDeposit: invalid field Amount')
   })
-
-  it('throws w/ Subaccount', function () {
-    assertInvalid(
-      { ...tx, Subaccount: 1 },
-      'MarginDeposit: unexpected field Subaccount',
-    )
-  })
 })

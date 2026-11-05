@@ -2,7 +2,6 @@ import {
   BaseTransaction,
   isLedgerEntryId,
   validateBaseTransaction,
-  validateFormatFields,
   validateRequiredField,
 } from './common'
 
@@ -28,6 +27,5 @@ export interface PerpMarketDelete extends BaseTransaction {
  */
 export function validatePerpMarketDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'PerpMarketDelete', ['MarketID'])
   validateRequiredField(tx, 'MarketID', isLedgerEntryId)
 }

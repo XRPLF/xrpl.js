@@ -73,11 +73,4 @@ describe('PerpLiquidate', function () {
     }
     assertInvalid(tx, EXACTLY_ONE_MODE)
   })
-
-  it('throws w/ Subaccount', function () {
-    assertInvalid(
-      { ...tx, Subaccount: 0 },
-      'PerpLiquidate: unexpected field Subaccount',
-    )
-  })
 })

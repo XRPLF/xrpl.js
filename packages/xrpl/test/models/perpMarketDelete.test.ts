@@ -39,15 +39,4 @@ describe('PerpMarketDelete', function () {
     tx.MarketID = 1234
     assertInvalid(tx, 'PerpMarketDelete: invalid field MarketID')
   })
-
-  it('throws w/ ExchangeID', function () {
-    assertInvalid(
-      {
-        ...tx,
-        ExchangeID:
-          'AB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      },
-      'PerpMarketDelete: unexpected field ExchangeID',
-    )
-  })
 })

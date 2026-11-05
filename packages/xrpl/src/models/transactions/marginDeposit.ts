@@ -6,7 +6,6 @@ import {
   isAmount,
   isLedgerEntryId,
   validateBaseTransaction,
-  validateFormatFields,
   validateRequiredField,
 } from './common'
 
@@ -60,7 +59,6 @@ export interface MarginDeposit extends BaseTransaction {
  */
 export function validateMarginDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'MarginDeposit', ['ExchangeID', 'Amount'])
   validateRequiredField(tx, 'ExchangeID', isLedgerEntryId)
   validateRequiredField(tx, 'Amount', isAmount)
 }

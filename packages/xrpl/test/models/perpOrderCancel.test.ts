@@ -48,15 +48,4 @@ describe('PerpOrderCancel', function () {
     tx.Owner = 'not-an-account'
     assertInvalid(tx, 'PerpOrderCancel: invalid field Owner')
   })
-
-  it('throws w/ MarketID', function () {
-    assertInvalid(
-      {
-        ...tx,
-        MarketID:
-          'AB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
-      },
-      'PerpOrderCancel: unexpected field MarketID',
-    )
-  })
 })

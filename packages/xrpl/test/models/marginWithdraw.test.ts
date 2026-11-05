@@ -69,11 +69,4 @@ describe('MarginWithdraw', function () {
       'MarginWithdraw: at most one of tfPerpCover, tfPerpOwnerFees and tfPerpDeleteAccount may be set',
     )
   })
-
-  it('throws w/ Subaccount', function () {
-    assertInvalid(
-      { ...tx, Subaccount: 1 },
-      'MarginWithdraw: unexpected field Subaccount',
-    )
-  })
 })

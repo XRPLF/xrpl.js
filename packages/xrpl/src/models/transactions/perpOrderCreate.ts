@@ -10,7 +10,6 @@ import {
   isNumber,
   isXRPLNumber,
   validateBaseTransaction,
-  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
   XRPLNumber,
@@ -101,15 +100,6 @@ export interface PerpOrderCreate extends BaseTransaction {
  */
 export function validatePerpOrderCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'PerpOrderCreate', [
-    'MarketID',
-    'LimitPrice',
-    'Size',
-    'OfferSequence',
-    'Expiration',
-    'Builder',
-    'BuilderFee',
-  ])
   validateRequiredField(tx, 'MarketID', isLedgerEntryId)
   validateRequiredField(tx, 'LimitPrice', isXRPLNumber)
   validateRequiredField(tx, 'Size', isXRPLNumber)

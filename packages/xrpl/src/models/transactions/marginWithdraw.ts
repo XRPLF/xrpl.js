@@ -10,7 +10,6 @@ import {
   isAmount,
   isLedgerEntryId,
   validateBaseTransaction,
-  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
 } from './common'
@@ -71,11 +70,6 @@ export interface MarginWithdraw extends BaseTransaction {
  */
 export function validateMarginWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'MarginWithdraw', [
-    'ExchangeID',
-    'Amount',
-    'Destination',
-  ])
   validateRequiredField(tx, 'ExchangeID', isLedgerEntryId)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)

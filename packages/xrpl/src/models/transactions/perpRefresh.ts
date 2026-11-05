@@ -6,7 +6,6 @@ import {
   GlobalFlagsInterface,
   isLedgerEntryId,
   validateBaseTransaction,
-  validateFormatFields,
   validateOptionalField,
 } from './common'
 
@@ -59,7 +58,6 @@ export interface PerpRefresh extends BaseTransaction {
  */
 export function validatePerpRefresh(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'PerpRefresh', ['MarketID', 'MarginAccountID'])
   validateOptionalField(tx, 'MarketID', isLedgerEntryId)
   validateOptionalField(tx, 'MarginAccountID', isLedgerEntryId)
 

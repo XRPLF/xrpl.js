@@ -7,7 +7,6 @@ import {
   isLedgerEntryId,
   isXRPLNumber,
   validateBaseTransaction,
-  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
   XRPLNumber,
@@ -67,11 +66,6 @@ export interface PerpLiquidate extends BaseTransaction {
  */
 export function validatePerpLiquidate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'PerpLiquidate', [
-    'MarginAccountID',
-    'MarketID',
-    'Size',
-  ])
   validateRequiredField(tx, 'MarginAccountID', isLedgerEntryId)
   validateRequiredField(tx, 'MarketID', isLedgerEntryId)
   validateOptionalField(tx, 'Size', isXRPLNumber)

@@ -9,7 +9,6 @@ import {
   isNumber,
   isXRPLNumber,
   validateBaseTransaction,
-  validateFormatFields,
   validateHexMetadata,
   validateOptionalField,
   validateRequiredField,
@@ -150,11 +149,6 @@ const FIELD_CHECKS: Array<[string, (input: unknown) => input is unknown]> = [
  */
 export function validatePerpExchangeSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(
-    tx,
-    'PerpExchangeSet',
-    FIELD_CHECKS.map(([field]) => field),
-  )
   FIELD_CHECKS.forEach(([field, check]) =>
     validateOptionalField(tx, field, check),
   )

@@ -4,7 +4,6 @@ import {
   isAccount,
   isNumber,
   validateBaseTransaction,
-  validateFormatFields,
   validateOptionalField,
   validateRequiredField,
 } from './common'
@@ -34,7 +33,6 @@ export interface PerpOrderCancel extends BaseTransaction {
  */
 export function validatePerpOrderCancel(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
-  validateFormatFields(tx, 'PerpOrderCancel', ['OfferSequence', 'Owner'])
   validateRequiredField(tx, 'OfferSequence', isNumber)
   validateOptionalField(tx, 'Owner', isAccount)
 }
