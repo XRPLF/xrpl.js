@@ -179,15 +179,24 @@ describe('OracleSet', function () {
     assertInvalid(tx, errorMessage)
   })
 
-  it(`throws w/ Scale must be in range 0-10 when above max`, function () {
-    tx.PriceDataSeries[0].PriceData.Scale = 11
-    const errorMessage = 'OracleSet: Scale must be in range 0-10'
-    assertInvalid(tx, errorMessage)
-  })
+  describe('Scale range', function () {
+    it(`verifies valid Scale of 11 and 20, which were rejected before`, function () {
+      for (const scale of [11, 20]) {
+        tx.PriceDataSeries[0].PriceData.Scale = scale
+        assertValid(tx)
+      }
+    })
 
-  it(`throws w/ Scale must be in range 0-10 when below min`, function () {
-    tx.PriceDataSeries[0].PriceData.Scale = -1
-    const errorMessage = 'OracleSet: Scale must be in range 0-10'
-    assertInvalid(tx, errorMessage)
+    it(`throws w/ Scale must be in range 0-20 when above max`, function () {
+      tx.PriceDataSeries[0].PriceData.Scale = 21
+      const errorMessage = 'OracleSet: Scale must be in range 0-20'
+      assertInvalid(tx, errorMessage)
+    })
+
+    it(`throws w/ Scale must be in range 0-20 when below min`, function () {
+      tx.PriceDataSeries[0].PriceData.Scale = -1
+      const errorMessage = 'OracleSet: Scale must be in range 0-20'
+      assertInvalid(tx, errorMessage)
+    })
   })
 })

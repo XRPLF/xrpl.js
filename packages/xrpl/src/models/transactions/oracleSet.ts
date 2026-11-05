@@ -14,7 +14,7 @@ import {
 } from './common'
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
-const SCALE_MAX = 10
+const SCALE_MAX = 20
 const MINIMUM_ASSET_PRICE_LENGTH = 1
 const MAXIMUM_ASSET_PRICE_LENGTH = 16
 
