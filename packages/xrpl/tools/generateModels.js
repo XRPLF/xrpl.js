@@ -60,7 +60,7 @@ async function processRippledSource(folder) {
     'include/xrpl/protocol/detail/transactions.macro',
   )
   const txFormatsHits = transactionsMacroFile.matchAll(
-    /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*Delegation::[A-Za-z]+[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
+    /^ *TRANSACTION\(tt[A-Z_]+ *,* [0-9]+ *, *([A-Za-z]+)[ \n]*,[ \n]*Delegation::[A-Za-z]+[ \n]*,[ \n]*[A-Za-z0-9_{}]+[ \n]*,[ \n]*[A-Za-z|]+[ \n]*,[ \n]*\({[ \n]*(({sf[A-Za-z0-9]+, soe(OPTIONAL|REQUIRED|DEFAULT)(, soeMPT(None|Supported|NotSupported))?},[ \n]+)*)}\)\)$/gm,
   )
   const txFormats = {}
   for (const hit of txFormatsHits) {
@@ -79,7 +79,12 @@ async function processRippledSource(folder) {
     .split('\n  | ')
     .filter((value) => !value.includes('export type'))
     .map((value) => value.trim())
-  existingLibraryTxs.push('EnableAmendment', 'SetFee', 'UNLModify')
+  existingLibraryTxs.push(
+    'EnableAmendment',
+    'SetFee',
+    'UNLModify',
+    'LedgerStateFix',
+  )
 
   const txsToAdd = []
 
@@ -115,6 +120,9 @@ const typeMap = {
   ISSUE: 'Currency',
   OBJECT: 'any',
   ARRAY: 'any[]',
+  DATA: 'any',
+  DATA_TYPE: 'any',
+  JSON: 'any',
 }
 
 const allCommonImports = ['Amount', 'Currency', 'Path']

@@ -1,5 +1,5 @@
 import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from '../enums'
-import { SerializedType, JsonObject } from './serialized-type'
+import { SerializedType, JsonObject, SerializedTypeID } from './serialized-type'
 import { STObject } from './st-object'
 import { BinaryParser } from '../serdes/binary-parser'
 import { concat } from '@xrplf/isomorphic/utils'
@@ -107,6 +107,10 @@ class STArray extends SerializedType {
     }
 
     return result
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_ARRAY
   }
 }
 

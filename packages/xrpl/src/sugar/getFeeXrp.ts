@@ -44,3 +44,38 @@ export default async function getFeeXrp(
   // Round fee to 6 decimal places
   return new BigNumber(fee.toFixed(NUM_DECIMAL_PLACES)).toString(BASE_10)
 }
+
+/**
+ * Estimates the gas required for a transaction by simulating the provided tx blob.
+ *
+ * @param client - The Client used to connect to the ledger.
+ * @param txBlob - The transaction blob to simulate.
+ * @returns The estimated gas as a string.
+ */
+export async function getGasEstimate(
+  client: Client,
+  txBlob: string,
+): Promise<number> {
+  const response = await client.request({
+    command: 'simulate',
+    tx_blob: txBlob,
+  })
+
+  if (response.result.engine_result !== 'tesSUCCESS') {
+    throw new Error(response.result.engine_result_message)
+  }
+
+  if (typeof response.result.meta !== 'object') {
+    throw new XrplError(
+      'getGasEstimate: Could not get meta from simulate response',
+    )
+  }
+
+  const meta = response.result.meta
+  if (typeof meta.GasUsed !== 'number') {
+    throw new XrplError(
+      'getGasEstimate: GasUsed in simulate response is not a number',
+    )
+  }
+  return Number(meta.GasUsed)
+}

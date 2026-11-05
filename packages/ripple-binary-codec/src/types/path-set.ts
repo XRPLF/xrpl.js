@@ -1,7 +1,7 @@
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { BinaryParser } from '../serdes/binary-parser'
-import { SerializedType, JsonObject } from './serialized-type'
+import { SerializedType, JsonObject, SerializedTypeID } from './serialized-type'
 import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
 
 /**
@@ -284,6 +284,10 @@ class PathSet extends SerializedType {
     }
 
     return json
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_PATHSET
   }
 }
 

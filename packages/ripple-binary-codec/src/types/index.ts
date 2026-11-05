@@ -2,6 +2,8 @@ import { AccountID } from './account-id'
 import { Amount } from './amount'
 import { Blob } from './blob'
 import { Currency } from './currency'
+import { Data } from './data'
+import { DataType } from './dataType'
 import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
 import { Hash192 } from './hash-192'
@@ -26,6 +28,8 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Amount,
   Blob,
   Currency,
+  Data,
+  DataType,
   Hash128,
   Hash160,
   Hash192,
@@ -55,6 +59,8 @@ export {
   Amount,
   Blob,
   Currency,
+  Data,
+  DataType,
   Hash128,
   Hash160,
   Hash192,

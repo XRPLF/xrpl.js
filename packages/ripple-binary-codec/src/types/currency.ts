@@ -1,5 +1,6 @@
 import { Hash160 } from './hash-160'
 import { bytesToHex, hexToBytes, hexToString } from '@xrplf/isomorphic/utils'
+import { SerializedTypeID } from './serialized-type'
 
 const XRP_HEX_REGEX = /^0{40}$/
 const ISO_REGEX = /^[A-Z0-9a-z?!@#$%^&*(){}[\]|]{3}$/
@@ -134,6 +135,10 @@ class Currency extends Hash160 {
       return iso
     }
     return bytesToHex(this.bytes)
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_CURRENCY
   }
 }
 

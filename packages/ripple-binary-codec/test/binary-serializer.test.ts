@@ -55,6 +55,13 @@ const Ticket = {
   },
 }
 
+const Contract = {
+  call: {
+    tx: require('./fixtures/contract-call-tx.json'),
+    binary: require('./fixtures/contract-call-binary.json'),
+  },
+}
+
 let json_undefined = {
   TakerPays: '223174650',
   Account: 'rPk2dXr27rMw9G5Ej9ad2Tt7RJzGy8ycBp',
@@ -280,6 +287,13 @@ function nfTokenTest() {
   }
 }
 
+function ContractTest() {
+  it('can serialize ContractCall', () => {
+    expect(encode(Contract.call.tx)).toEqual(Contract.call.binary)
+    expect(decode(Contract.call.binary)).toEqual(Contract.call.tx)
+  })
+}
+
 describe('Binary Serialization', function () {
   describe('nestedObjectTests', nestedObjectTests)
   describe('BytesList', bytesListTest)
@@ -292,4 +306,5 @@ describe('Binary Serialization', function () {
   describe('OmitUndefined', omitUndefinedTest)
   describe('TicketTest', ticketTest)
   describe('NFToken', nfTokenTest)
+  describe('Contract', ContractTest)
 })
