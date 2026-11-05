@@ -1,0 +1,158 @@
+{
+  "FIELDS": [
+    [
+      "AccountingMethod",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "AccrualAnchor",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "Number"
+      }
+    ],
+    [
+      "AccrualRate",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "Number"
+      }
+    ],
+    [
+      "AccruedInterest",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "Number"
+      }
+    ],
+    [
+      "DealingInterval",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "DealingWindow",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "DepositFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 247,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "LastAccrualTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RedemptionAfter",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 244,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RedemptionFee",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 246,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "RedemptionPeriod",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 245,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "StruckDepositPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "Number"
+      }
+    ],
+    [
+      "StruckPrice",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "Number"
+      }
+    ],
+    [
+      "StruckUntil",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 248,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "UnearnedInterest",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Number"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {},
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {},
+  "TYPES": {}
+}

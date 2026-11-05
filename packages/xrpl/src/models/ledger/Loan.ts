@@ -142,6 +142,18 @@ export default interface Loan extends BaseLedgerEntry, HasPreviousTxnID {
    * It is determined based on the total loan value at creation time.
    */
   LoanScale?: number
+
+  /**
+   * (VaultContinuousAccrual) The time, in seconds since the Ripple Epoch, up to which
+   * this Loan's interest has been accrued into its Vault.
+   */
+  LastAccrualTime?: number
+
+  /**
+   * (VaultContinuousAccrual) Interest this Loan has accrued into its Vault and not yet
+   * paid, expressed in the Vault's asset.
+   */
+  AccruedInterest?: XRPLNumber
 }
 
 export enum LoanFlags {

@@ -21,6 +21,7 @@ import {
   isHexString,
   isString,
 } from './common'
+import { validateRedemptionPeriod, validateVaultFees } from './vaultFees'
 
 const MAX_SCALE = 18
 
@@ -56,6 +57,23 @@ export enum VaultKind {
    * subscription and redemption periods respectively.
    */
   vaultKindClosed = 1,
+  /**
+   * (VaultContinuousAccrual) A rolling vault: deposits and redemptions are
+   * accepted only inside a dealing window that opens at `SubscriptionDate` and
+   * reopens every `DealingInterval` seconds for `DealingWindow` seconds.
+   */
+  vaultKindRolling = 2,
+}
+
+/**
+ * Enum representing how a Vault recognizes loan interest
+ * (VaultContinuousAccrual). The legacy method (0) is never accepted on a new vault.
+ */
+export enum VaultAccountingMethod {
+  /** Interest is recognized as it is collected. */
+  vaultAccountingCash = 1,
+  /** Interest is recognized continuously as it is earned. */
+  vaultAccountingAccrual = 2,
 }
 
 /**
@@ -129,14 +147,16 @@ export interface VaultCreate extends BaseTransaction {
   Scale?: number
 
   /**
-   * (LendingProtocolV1_1) The kind of Vault: 0 for an open-ended vault (the default) or 1
-   * for a close-ended vault. Can only be set at Vault creation. See {@link VaultKind}.
+   * (LendingProtocolV1_1) The kind of Vault: 0 for an open-ended vault (the default), 1
+   * for a close-ended vault or 2 for a rolling vault (VaultContinuousAccrual). Can only be
+   * set at Vault creation. See {@link VaultKind}.
    */
   VaultKind?: number
 
   /**
-   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
-   * Epoch, up to which deposits into the Vault are accepted.
+   * (LendingProtocolV1_1, close-ended and rolling vaults only) The time, in seconds since
+   * the Ripple Epoch, up to which deposits into a close-ended Vault are accepted, or at
+   * which the first dealing window of a rolling Vault opens.
    */
   SubscriptionDate?: number
 
@@ -145,6 +165,42 @@ export interface VaultCreate extends BaseTransaction {
    * Epoch, at which shares may begin to be redeemed from the Vault.
    */
   RedemptionDate?: number
+
+  /**
+   * (VaultContinuousAccrual, rolling vaults only) The number of seconds between the
+   * openings of consecutive dealing windows. Required on a rolling vault.
+   */
+  DealingInterval?: number
+
+  /**
+   * (VaultContinuousAccrual, rolling vaults only) The number of seconds each dealing
+   * window stays open. Must be greater than 0 and less than `DealingInterval`.
+   */
+  DealingWindow?: number
+
+  /**
+   * (VaultContinuousAccrual) The fee taken from each deposit, in units of 1/10 basis
+   * point, between 0 and 50000 inclusive. The fee stays in the vault.
+   */
+  DepositFee?: number
+
+  /**
+   * (VaultContinuousAccrual) The fee taken from each redemption, in units of 1/10 basis
+   * point, between 0 and 50000 inclusive. The fee stays in the vault.
+   */
+  RedemptionFee?: number
+
+  /**
+   * (VaultContinuousAccrual) The number of seconds after a holder's latest deposit during
+   * which the `RedemptionFee` applies to that holder. Requires `RedemptionFee`.
+   */
+  RedemptionPeriod?: number
+
+  /**
+   * (VaultContinuousAccrual) How the vault recognizes loan interest: 1 for cash or 2 for
+   * accrual. See {@link VaultAccountingMethod}. Fixed at Vault creation.
+   */
+  AccountingMethod?: number
 }
 
 /* eslint-disable max-lines-per-function -- Not needed to reduce function */
@@ -168,17 +224,24 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'VaultKind', isNumber)
   validateOptionalField(tx, 'SubscriptionDate', isNumber)
   validateOptionalField(tx, 'RedemptionDate', isNumber)
+  validateOptionalField(tx, 'DealingInterval', isNumber)
+  validateOptionalField(tx, 'DealingWindow', isNumber)
+  validateOptionalField(tx, 'DepositFee', isNumber)
+  validateOptionalField(tx, 'RedemptionFee', isNumber)
+  validateOptionalField(tx, 'RedemptionPeriod', isNumber)
+  validateOptionalField(tx, 'AccountingMethod', isNumber)
 
   // `isNumber` accepts any JavaScript number, so guard against unsupported
   // VaultKind values and non-finite dates (e.g. NaN) that would otherwise slip
-  // past the close-ended branching below.
+  // past the vault-kind branching below.
   if (
     tx.VaultKind !== undefined &&
     tx.VaultKind !== VaultKind.vaultKindOpen &&
-    tx.VaultKind !== VaultKind.vaultKindClosed
+    tx.VaultKind !== VaultKind.vaultKindClosed &&
+    tx.VaultKind !== VaultKind.vaultKindRolling
   ) {
     throw new ValidationError(
-      `VaultCreate: VaultKind must be ${VaultKind.vaultKindOpen} (open-ended) or ${VaultKind.vaultKindClosed} (close-ended)`,
+      `VaultCreate: VaultKind must be ${VaultKind.vaultKindOpen} (open-ended), ${VaultKind.vaultKindClosed} (close-ended) or ${VaultKind.vaultKindRolling} (rolling)`,
     )
   }
 
@@ -263,35 +326,11 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
     }
   }
 
-  // LendingProtocolV1_1 close-ended vault rules. A close-ended vault (VaultKind === 1)
-  // requires both a subscription and a redemption date; an open-ended vault
-  // (the default) must not carry either date.
-  const isClosedEnded = tx.VaultKind === VaultKind.vaultKindClosed
-  const hasSubscription = tx.SubscriptionDate !== undefined
-  const hasRedemption = tx.RedemptionDate !== undefined
-  if (isClosedEnded) {
-    if (
-      typeof tx.SubscriptionDate !== 'number' ||
-      typeof tx.RedemptionDate !== 'number'
-    ) {
-      throw new ValidationError(
-        'VaultCreate: A close-ended vault requires both SubscriptionDate and RedemptionDate',
-      )
-    }
-    const investmentPeriod = tx.RedemptionDate - tx.SubscriptionDate
-    if (
-      investmentPeriod < MIN_INVESTMENT_PERIOD ||
-      investmentPeriod >= MAX_INVESTMENT_PERIOD
-    ) {
-      throw new ValidationError(
-        `VaultCreate: RedemptionDate - SubscriptionDate must be within [${MIN_INVESTMENT_PERIOD}, ${MAX_INVESTMENT_PERIOD}) seconds`,
-      )
-    }
-  } else if (hasSubscription || hasRedemption) {
-    throw new ValidationError(
-      'VaultCreate: SubscriptionDate and RedemptionDate can only be set on a close-ended vault (VaultKind=1)',
-    )
-  }
+  validateClosedEndedVault(tx)
+  validateRollingVault(tx)
+  validateAccountingMethod(tx)
+  validateRedemptionPeriod(tx)
+  validateVaultFees(tx)
 
   if (tx.MPTokenMetadata != null) {
     const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
@@ -309,3 +348,104 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
 }
 /* eslint-enable max-lines-per-function */
 /* eslint-enable max-statements */
+
+/**
+ * Check the date rules of open-ended and close-ended vaults: an open-ended vault
+ * carries neither date, and a close-ended vault carries both with an investment
+ * period inside [MIN_INVESTMENT_PERIOD, MAX_INVESTMENT_PERIOD).
+ *
+ * @param tx - A {@link VaultCreate} Transaction.
+ * @throws When a date rule is broken.
+ */
+function validateClosedEndedVault(tx: Record<string, unknown>): void {
+  const isClosedEnded = tx.VaultKind === VaultKind.vaultKindClosed
+  const isRolling = tx.VaultKind === VaultKind.vaultKindRolling
+  if (
+    !isClosedEnded &&
+    !isRolling &&
+    (tx.SubscriptionDate !== undefined || tx.RedemptionDate !== undefined)
+  ) {
+    throw new ValidationError(
+      'VaultCreate: SubscriptionDate and RedemptionDate cannot be set on an open-ended vault',
+    )
+  }
+  if (!isClosedEnded) {
+    return
+  }
+  if (
+    typeof tx.SubscriptionDate !== 'number' ||
+    typeof tx.RedemptionDate !== 'number'
+  ) {
+    throw new ValidationError(
+      'VaultCreate: A close-ended vault requires both SubscriptionDate and RedemptionDate',
+    )
+  }
+  const investmentPeriod = tx.RedemptionDate - tx.SubscriptionDate
+  if (
+    investmentPeriod < MIN_INVESTMENT_PERIOD ||
+    investmentPeriod >= MAX_INVESTMENT_PERIOD
+  ) {
+    throw new ValidationError(
+      `VaultCreate: RedemptionDate - SubscriptionDate must be within [${MIN_INVESTMENT_PERIOD}, ${MAX_INVESTMENT_PERIOD}) seconds`,
+    )
+  }
+}
+
+/**
+ * Check the rolling vault rules (VaultContinuousAccrual): only a rolling vault
+ * carries DealingInterval and DealingWindow; a rolling vault requires
+ * SubscriptionDate, DealingInterval and DealingWindow, forbids RedemptionDate,
+ * and its DealingWindow is greater than 0 and less than DealingInterval.
+ *
+ * @param tx - A {@link VaultCreate} Transaction.
+ * @throws When a rolling vault rule is broken.
+ */
+function validateRollingVault(tx: Record<string, unknown>): void {
+  const isRolling = tx.VaultKind === VaultKind.vaultKindRolling
+  if (!isRolling) {
+    if (tx.DealingInterval !== undefined || tx.DealingWindow !== undefined) {
+      throw new ValidationError(
+        `VaultCreate: DealingInterval and DealingWindow can only be set on a rolling vault (VaultKind=${VaultKind.vaultKindRolling})`,
+      )
+    }
+    return
+  }
+  if (
+    tx.SubscriptionDate === undefined ||
+    typeof tx.DealingInterval !== 'number' ||
+    typeof tx.DealingWindow !== 'number'
+  ) {
+    throw new ValidationError(
+      'VaultCreate: A rolling vault requires SubscriptionDate, DealingInterval and DealingWindow',
+    )
+  }
+  if (tx.RedemptionDate !== undefined) {
+    throw new ValidationError(
+      'VaultCreate: RedemptionDate cannot be set on a rolling vault',
+    )
+  }
+  if (tx.DealingWindow <= 0 || tx.DealingWindow >= tx.DealingInterval) {
+    throw new ValidationError(
+      'VaultCreate: DealingWindow must be greater than 0 and less than DealingInterval',
+    )
+  }
+}
+
+/**
+ * Check that AccountingMethod, when present, is cash or accrual; the legacy
+ * method is never assigned to a new vault.
+ *
+ * @param tx - A {@link VaultCreate} Transaction.
+ * @throws When AccountingMethod is not 1 or 2.
+ */
+function validateAccountingMethod(tx: Record<string, unknown>): void {
+  if (
+    tx.AccountingMethod !== undefined &&
+    tx.AccountingMethod !== VaultAccountingMethod.vaultAccountingCash &&
+    tx.AccountingMethod !== VaultAccountingMethod.vaultAccountingAccrual
+  ) {
+    throw new ValidationError(
+      `VaultCreate: AccountingMethod must be ${VaultAccountingMethod.vaultAccountingCash} (cash) or ${VaultAccountingMethod.vaultAccountingAccrual} (accrual)`,
+    )
+  }
+}

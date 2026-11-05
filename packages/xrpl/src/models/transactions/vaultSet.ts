@@ -6,12 +6,14 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isNumber,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
   isHexString,
   isString,
 } from './common'
+import { validateVaultFees } from './vaultFees'
 
 /**
  * The VaultSet transaction modifies mutable fields on an existing Vault object.
@@ -41,6 +43,25 @@ export interface VaultSet extends BaseTransaction {
    * The PermissionedDomain object ID associated with the shares of this Vault.
    */
   DomainID?: string
+
+  /**
+   * (VaultContinuousAccrual) The new fee taken from each deposit, in units of 1/10 basis
+   * point, between 0 and 50000 inclusive. A raise is refused while any share is outstanding.
+   */
+  DepositFee?: number
+
+  /**
+   * (VaultContinuousAccrual) The new fee taken from each redemption, in units of 1/10
+   * basis point, between 0 and 50000 inclusive. A raise is refused while any share is
+   * outstanding.
+   */
+  RedemptionFee?: number
+
+  /**
+   * (VaultContinuousAccrual) The new number of seconds after a holder's latest deposit
+   * during which the `RedemptionFee` applies to that holder.
+   */
+  RedemptionPeriod?: number
 }
 
 /**
@@ -56,6 +77,10 @@ export function validateVaultSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Data', isString)
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
   validateOptionalField(tx, 'DomainID', isHexString)
+  validateOptionalField(tx, 'DepositFee', isNumber)
+  validateOptionalField(tx, 'RedemptionFee', isNumber)
+  validateOptionalField(tx, 'RedemptionPeriod', isNumber)
+  validateVaultFees(tx)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data

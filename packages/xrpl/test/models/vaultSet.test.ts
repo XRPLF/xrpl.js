@@ -76,4 +76,44 @@ describe('VaultSet', function () {
     tx.DomainID = 'not hex'
     assertInvalid(tx, 'VaultSet: invalid field DomainID')
   })
+
+  it('verifies VaultSet with DepositFee, RedemptionFee and RedemptionPeriod', function () {
+    tx.DepositFee = 50000
+    tx.RedemptionFee = 0
+    tx.RedemptionPeriod = 86400
+    assertValid(tx)
+  })
+
+  it('verifies VaultSet with RedemptionPeriod alone', function () {
+    tx.RedemptionPeriod = 0
+    assertValid(tx)
+  })
+
+  it('throws w/ DepositFee above the maximum', function () {
+    tx.DepositFee = 50001
+    assertInvalid(tx, 'VaultSet: DepositFee must be between 0 and 50000')
+  })
+
+  it('throws w/ RedemptionFee above the maximum', function () {
+    tx.RedemptionFee = 50001
+    assertInvalid(tx, 'VaultSet: RedemptionFee must be between 0 and 50000')
+  })
+
+  it('throws w/ non-number DepositFee', function () {
+    // @ts-expect-error for test
+    tx.DepositFee = '100'
+    assertInvalid(tx, 'VaultSet: invalid field DepositFee')
+  })
+
+  it('throws w/ non-number RedemptionFee', function () {
+    // @ts-expect-error for test
+    tx.RedemptionFee = '100'
+    assertInvalid(tx, 'VaultSet: invalid field RedemptionFee')
+  })
+
+  it('throws w/ non-number RedemptionPeriod', function () {
+    // @ts-expect-error for test
+    tx.RedemptionPeriod = '86400'
+    assertInvalid(tx, 'VaultSet: invalid field RedemptionPeriod')
+  })
 })

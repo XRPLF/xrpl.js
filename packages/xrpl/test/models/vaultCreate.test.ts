@@ -2,6 +2,7 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 
 import { MPTokenMetadata } from '../../src'
 import {
+  VaultAccountingMethod,
   VaultCreate,
   VaultCreateFlags,
   VaultKind,
@@ -260,7 +261,7 @@ describe('VaultCreate', function () {
       tx.RedemptionDate = 810000000
       assertInvalid(
         tx,
-        'VaultCreate: SubscriptionDate and RedemptionDate can only be set on a close-ended vault (VaultKind=1)',
+        'VaultCreate: SubscriptionDate and RedemptionDate cannot be set on an open-ended vault',
       )
     })
 
@@ -301,10 +302,10 @@ describe('VaultCreate', function () {
     })
 
     it('throws w/ an unsupported numeric VaultKind', function () {
-      tx.VaultKind = 2
+      tx.VaultKind = 3
       assertInvalid(
         tx,
-        'VaultCreate: VaultKind must be 0 (open-ended) or 1 (close-ended)',
+        'VaultCreate: VaultKind must be 0 (open-ended), 1 (close-ended) or 2 (rolling)',
       )
     })
 
@@ -336,6 +337,201 @@ describe('VaultCreate', function () {
         tx,
         'VaultCreate: RedemptionDate must be an integer number of seconds since the Ripple Epoch',
       )
+    })
+  })
+
+  describe('rolling vault validation (VaultContinuousAccrual)', function () {
+    beforeEach(function () {
+      tx.VaultKind = VaultKind.vaultKindRolling
+      tx.SubscriptionDate = 800000000
+      tx.DealingInterval = 86400
+      tx.DealingWindow = 3600
+    })
+
+    it('allows a rolling vault with SubscriptionDate, DealingInterval and DealingWindow', function () {
+      assertValid(tx)
+    })
+
+    it('allows the largest DealingWindow below DealingInterval', function () {
+      tx.DealingWindow = 86399
+      assertValid(tx)
+    })
+
+    it('throws w/ rolling vault missing SubscriptionDate', function () {
+      delete tx.SubscriptionDate
+      assertInvalid(
+        tx,
+        'VaultCreate: A rolling vault requires SubscriptionDate, DealingInterval and DealingWindow',
+      )
+    })
+
+    it('throws w/ rolling vault missing DealingInterval', function () {
+      delete tx.DealingInterval
+      assertInvalid(
+        tx,
+        'VaultCreate: A rolling vault requires SubscriptionDate, DealingInterval and DealingWindow',
+      )
+    })
+
+    it('throws w/ rolling vault missing DealingWindow', function () {
+      delete tx.DealingWindow
+      assertInvalid(
+        tx,
+        'VaultCreate: A rolling vault requires SubscriptionDate, DealingInterval and DealingWindow',
+      )
+    })
+
+    it('throws w/ RedemptionDate on a rolling vault', function () {
+      tx.RedemptionDate = 810000000
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionDate cannot be set on a rolling vault',
+      )
+    })
+
+    it('throws w/ a zero DealingWindow', function () {
+      tx.DealingWindow = 0
+      assertInvalid(
+        tx,
+        'VaultCreate: DealingWindow must be greater than 0 and less than DealingInterval',
+      )
+    })
+
+    it('throws w/ DealingWindow equal to DealingInterval', function () {
+      tx.DealingWindow = 86400
+      assertInvalid(
+        tx,
+        'VaultCreate: DealingWindow must be greater than 0 and less than DealingInterval',
+      )
+    })
+
+    it('throws w/ DealingWindow above DealingInterval', function () {
+      tx.DealingWindow = 90000
+      assertInvalid(
+        tx,
+        'VaultCreate: DealingWindow must be greater than 0 and less than DealingInterval',
+      )
+    })
+
+    it('throws w/ DealingInterval on an open-ended vault', function () {
+      tx.VaultKind = VaultKind.vaultKindOpen
+      delete tx.SubscriptionDate
+      delete tx.DealingWindow
+      assertInvalid(
+        tx,
+        'VaultCreate: DealingInterval and DealingWindow can only be set on a rolling vault (VaultKind=2)',
+      )
+    })
+
+    it('throws w/ DealingWindow on a close-ended vault', function () {
+      tx.VaultKind = VaultKind.vaultKindClosed
+      tx.RedemptionDate = 810000000
+      delete tx.DealingInterval
+      assertInvalid(
+        tx,
+        'VaultCreate: DealingInterval and DealingWindow can only be set on a rolling vault (VaultKind=2)',
+      )
+    })
+
+    it('throws w/ non-number DealingInterval', function () {
+      // @ts-expect-error for test
+      tx.DealingInterval = '86400'
+      assertInvalid(tx, 'VaultCreate: invalid field DealingInterval')
+    })
+
+    it('throws w/ non-number DealingWindow', function () {
+      // @ts-expect-error for test
+      tx.DealingWindow = '3600'
+      assertInvalid(tx, 'VaultCreate: invalid field DealingWindow')
+    })
+  })
+
+  describe('fees and accounting method (VaultContinuousAccrual)', function () {
+    it('allows DepositFee, RedemptionFee and RedemptionPeriod at their maximum', function () {
+      tx.DepositFee = 50000
+      tx.RedemptionFee = 50000
+      tx.RedemptionPeriod = 86400
+      assertValid(tx)
+    })
+
+    it('allows a zero DepositFee and RedemptionFee', function () {
+      tx.DepositFee = 0
+      tx.RedemptionFee = 0
+      assertValid(tx)
+    })
+
+    it('allows RedemptionFee without RedemptionPeriod', function () {
+      tx.RedemptionFee = 100
+      assertValid(tx)
+    })
+
+    it('throws w/ DepositFee above the maximum', function () {
+      tx.DepositFee = 50001
+      assertInvalid(tx, 'VaultCreate: DepositFee must be between 0 and 50000')
+    })
+
+    it('throws w/ RedemptionFee above the maximum', function () {
+      tx.RedemptionFee = 50001
+      assertInvalid(
+        tx,
+        'VaultCreate: RedemptionFee must be between 0 and 50000',
+      )
+    })
+
+    it('throws w/ RedemptionPeriod without RedemptionFee', function () {
+      tx.RedemptionPeriod = 86400
+      assertInvalid(tx, 'VaultCreate: RedemptionPeriod requires RedemptionFee')
+    })
+
+    it('throws w/ non-number DepositFee', function () {
+      // @ts-expect-error for test
+      tx.DepositFee = '100'
+      assertInvalid(tx, 'VaultCreate: invalid field DepositFee')
+    })
+
+    it('throws w/ non-number RedemptionFee', function () {
+      // @ts-expect-error for test
+      tx.RedemptionFee = '100'
+      assertInvalid(tx, 'VaultCreate: invalid field RedemptionFee')
+    })
+
+    it('throws w/ non-number RedemptionPeriod', function () {
+      tx.RedemptionFee = 100
+      // @ts-expect-error for test
+      tx.RedemptionPeriod = '86400'
+      assertInvalid(tx, 'VaultCreate: invalid field RedemptionPeriod')
+    })
+
+    it('allows the cash AccountingMethod', function () {
+      tx.AccountingMethod = VaultAccountingMethod.vaultAccountingCash
+      assertValid(tx)
+    })
+
+    it('allows the accrual AccountingMethod', function () {
+      tx.AccountingMethod = VaultAccountingMethod.vaultAccountingAccrual
+      assertValid(tx)
+    })
+
+    it('throws w/ the legacy AccountingMethod (0)', function () {
+      tx.AccountingMethod = 0
+      assertInvalid(
+        tx,
+        'VaultCreate: AccountingMethod must be 1 (cash) or 2 (accrual)',
+      )
+    })
+
+    it('throws w/ an unknown AccountingMethod', function () {
+      tx.AccountingMethod = 3
+      assertInvalid(
+        tx,
+        'VaultCreate: AccountingMethod must be 1 (cash) or 2 (accrual)',
+      )
+    })
+
+    it('throws w/ non-number AccountingMethod', function () {
+      // @ts-expect-error for test
+      tx.AccountingMethod = '1'
+      assertInvalid(tx, 'VaultCreate: invalid field AccountingMethod')
     })
   })
 })
