@@ -22,6 +22,19 @@ const PERP_EXCHANGE_DATA_MAX_BYTE_LENGTH = 256
 /** The unit of a rate share, in 1/10 basis points. */
 const RATE_UNITY = 100000
 
+/** The highest trading fee rate, in 1/10 basis points (rippled `kMaxTradingFee`). */
+const MAX_TRADING_FEE = 10000
+
+/** Every rate field with the highest value rippled accepts for it. */
+const RATE_CAPS: Array<[string, number]> = [
+  ['MakerFee', MAX_TRADING_FEE],
+  ['TakerFee', MAX_TRADING_FEE],
+  ['OwnerFeeShare', RATE_UNITY],
+  ['BuilderFeeMax', MAX_TRADING_FEE],
+  ['CoverRateMinimum', RATE_UNITY],
+  ['LiquidationPenalty', RATE_UNITY],
+]
+
 /** Fields that only an exchange's creation may carry. */
 const CREATION_ONLY_FIELDS = [
   'Asset',
@@ -53,10 +66,10 @@ export interface PerpExchangeSet extends BaseTransaction {
   /** Creation only: the Permissioned Domain every trader must be in. */
   DomainID?: string
 
-  /** The fee rate charged to a fill's maker, in 1/10 basis points. */
+  /** The fee rate charged to a fill's maker, in 1/10 basis points, at most 10000. */
   MakerFee?: number
 
-  /** The fee rate charged to a fill's taker, in 1/10 basis points. */
+  /** The fee rate charged to a fill's taker, in 1/10 basis points, at most 10000. */
   TakerFee?: number
 
   /**
@@ -65,15 +78,21 @@ export interface PerpExchangeSet extends BaseTransaction {
    */
   OwnerFeeShare?: number
 
-  /** The highest builder fee an order may set, in 1/10 basis points. */
+  /**
+   * The highest builder fee an order may set, in 1/10 basis points, at most
+   * 10000.
+   */
   BuilderFeeMax?: number
 
-  /** Cover required per unit of open-interest notional, in 1/10 basis points. */
+  /**
+   * Cover required per unit of open-interest notional, in 1/10 basis points,
+   * at most 100000.
+   */
   CoverRateMinimum?: number
 
   /**
    * Required on creation: the penalty rate on liquidated notional, in 1/10
-   * basis points.
+   * basis points, at most 100000.
    */
   LiquidationPenalty?: number
 
@@ -140,11 +159,14 @@ export function validatePerpExchangeSet(tx: Record<string, unknown>): void {
     validateOptionalField(tx, field, check),
   )
 
-  if (isNumber(tx.OwnerFeeShare) && tx.OwnerFeeShare > RATE_UNITY) {
-    throw new ValidationError(
-      `PerpExchangeSet: OwnerFeeShare must not exceed ${RATE_UNITY}`,
-    )
-  }
+  RATE_CAPS.forEach(([field, cap]) => {
+    const value = tx[field]
+    if (isNumber(value) && value > cap) {
+      throw new ValidationError(
+        `PerpExchangeSet: ${field} must not exceed ${cap}`,
+      )
+    }
+  })
 
   if (tx.ExchangeID !== undefined) {
     const fixed = CREATION_ONLY_FIELDS.find((field) => tx[field] !== undefined)
