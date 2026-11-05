@@ -65,6 +65,7 @@ describe('getAlgorithmFromKey', () => {
         ecdsa-secp256k1   - Prefix: None   Length: 32 bytes
         ecdsa-secp256k1   - Prefix: 0x00   Length: 33 bytes
         ed25519           - Prefix: 0xed   Length: 33 bytes
+        dilithium         - Prefix: None   Length: 2560 bytes
     `),
         )
       }
@@ -92,6 +93,7 @@ describe('getAlgorithmFromKey', () => {
       ecdsa-secp256k1   - Prefix: 0x02   Length: 33 bytes
       ecdsa-secp256k1   - Prefix: 0x03   Length: 33 bytes
       ecdsa-secp256k1   - Prefix: 0x04   Length: 65 bytes
+      dilithium         - Prefix: None   Length: 1312 bytes
     `),
         )
       }

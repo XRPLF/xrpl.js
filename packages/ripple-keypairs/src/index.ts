@@ -20,6 +20,7 @@ import {
 
 import secp256k1 from './signing-schemes/secp256k1'
 import ed25519 from './signing-schemes/ed25519'
+import dilithium from './signing-schemes/dilithium'
 
 const SEED_ENTROPY_LENGTH_BYTES = 16
 
@@ -43,9 +44,15 @@ function isUint8Array(value: unknown): value is Uint8Array {
 }
 
 function getSigningScheme(algorithm: Algorithm): SigningScheme {
-  const schemes = { 'ecdsa-secp256k1': secp256k1, ed25519 }
+  const schemes = { 'ecdsa-secp256k1': secp256k1, ed25519, dilithium }
   return schemes[algorithm]
 }
+
+const VALID_ALGORITHMS: Algorithm[] = [
+  'ecdsa-secp256k1',
+  'ed25519',
+  'dilithium',
+]
 
 function generateSeed(
   options: {
@@ -53,7 +60,6 @@ function generateSeed(
     algorithm?: Algorithm
   } = {},
 ): string {
-  const VALID_ALGORITHMS: Algorithm[] = ['ecdsa-secp256k1', 'ed25519']
   assert.ok(
     !options.algorithm || VALID_ALGORITHMS.includes(options.algorithm),
     `Unsupported algorithm: ${options.algorithm}. Use one of: ${VALID_ALGORITHMS.join(', ')}`,
@@ -73,7 +79,11 @@ function generateSeed(
     `entropy must be exactly ${SEED_ENTROPY_LENGTH_BYTES} bytes`,
   )
   const entropy = supplied ?? randomBytes(SEED_ENTROPY_LENGTH_BYTES)
-  const type = options.algorithm === 'ecdsa-secp256k1' ? 'secp256k1' : 'ed25519'
+  // xrpld encodes a Dilithium seed as a family seed, like secp256k1
+  const type =
+    options.algorithm === 'ecdsa-secp256k1' || options.algorithm === 'dilithium'
+      ? 'secp256k1'
+      : 'ed25519'
   return encodeSeed(entropy, type)
 }
 
@@ -87,8 +97,10 @@ function deriveKeypair(
 ): KeyPair {
   const decoded = decodeSeed(seed)
   const proposedAlgorithm = options?.algorithm ?? decoded.type
-  const algorithm =
-    proposedAlgorithm === 'ed25519' ? 'ed25519' : 'ecdsa-secp256k1'
+  const algorithm: Algorithm =
+    proposedAlgorithm === 'ed25519' || proposedAlgorithm === 'dilithium'
+      ? proposedAlgorithm
+      : 'ecdsa-secp256k1'
   const scheme = getSigningScheme(algorithm)
   const keypair = scheme.deriveKeypair(decoded.bytes, options)
   const messageToVerify = Sha512.half('This test message should verify.')
