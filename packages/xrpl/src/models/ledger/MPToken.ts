@@ -20,6 +20,13 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   /** The holder's registered compressed ElGamal encryption key. */
   HolderEncryptionKey?: string
   /**
+   * (ConfidentialVoting) The holder's balance locked by a vote on an open
+   * Ballot, as a base-10 UInt64 string.
+   */
+  VoteLockedAmount?: string
+  /** (ConfidentialVoting) The ledger index of the Ballot holding the vote lock. */
+  BallotID?: string
+  /**
    * (Optional) The account sponsoring the reserve for this MPToken. If
    * present, the sponsor is responsible for the reserve requirement of this
    * object instead of the owner.

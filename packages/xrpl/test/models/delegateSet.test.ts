@@ -114,6 +114,10 @@ describe('DelegateSet', function () {
     'FirewallSet',
     'FirewallDelete',
     'WithdrawPreauth',
+    'BallotCreate',
+    'BallotCastVote',
+    'BallotFinalize',
+    'BallotDelete',
   ].forEach((transactionType) => {
     it(`throws w/ PermissionValue ${transactionType}, which is not delegable`, function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]

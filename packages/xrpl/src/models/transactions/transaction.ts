@@ -13,6 +13,10 @@ import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
+import { BallotCastVote, validateBallotCastVote } from './ballotCastVote'
+import { BallotCreate, validateBallotCreate } from './ballotCreate'
+import { BallotDelete, validateBallotDelete } from './ballotDelete'
+import { BallotFinalize, validateBallotFinalize } from './ballotFinalize'
 import { Batch, validateBatch } from './batch'
 import { BeneficiarySet, validateBeneficiarySet } from './beneficiarySet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
@@ -196,6 +200,10 @@ export type SubmittableTransaction =
   | AMMWithdraw
   | AccountDelete
   | AccountSet
+  | BallotCastVote
+  | BallotCreate
+  | BallotDelete
+  | BallotFinalize
   | Batch
   | BeneficiarySet
   | CheckCancel
@@ -368,6 +376,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AccountSet':
       validateAccountSet(tx)
+      break
+
+    case 'BallotCastVote':
+      validateBallotCastVote(tx)
+      break
+
+    case 'BallotCreate':
+      validateBallotCreate(tx)
+      break
+
+    case 'BallotDelete':
+      validateBallotDelete(tx)
+      break
+
+    case 'BallotFinalize':
+      validateBallotFinalize(tx)
       break
 
     case 'Batch':

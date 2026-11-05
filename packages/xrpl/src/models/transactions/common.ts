@@ -49,6 +49,8 @@ export const CONFIDENTIAL_CONVERT_PROOF_BYTES = 64
 export const CONFIDENTIAL_CLAWBACK_PROOF_BYTES = 64
 export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
 export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
+// The compact sigma proof alone, without the bulletproof (one per ballot option).
+export const CONFIDENTIAL_SEND_SIGMA_PROOF_BYTES = 192
 // Max MPT amount: 2^63 - 1.
 export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
 // Max legal XRP amount in drops: the node's STAmount::kMaxNativeN.
@@ -519,6 +521,86 @@ export function isHexWithByteLength(
   const check = (inp: unknown): inp is string =>
     isString(inp) && isHex(inp) && inp.length === byteLength * 2
   return check
+}
+
+const HEX_CHARS_PER_BYTE = 2
+const COMPRESSED_EC_POINT_PREFIXES = ['02', '03']
+const MPT_ISSUANCE_ID_BYTES = 24
+const ALL_ZERO_HEX_REGEX = /^0+$/u
+
+/**
+ * Verify the input is a 33-byte compressed secp256k1 point: hex whose first
+ * byte is 0x02 or 0x03.
+ *
+ * @param input - The value to check.
+ * @returns Whether the input is a compressed EC point.
+ */
+export function isCompressedECPoint(input: unknown): input is string {
+  return (
+    isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES)(input) &&
+    COMPRESSED_EC_POINT_PREFIXES.includes(
+      input.slice(0, HEX_CHARS_PER_BYTE).toUpperCase(),
+    )
+  )
+}
+
+/**
+ * Verify the input is a 66-byte ElGamal ciphertext made of two compressed
+ * secp256k1 points.
+ *
+ * @param input - The value to check.
+ * @returns Whether the input is an ElGamal ciphertext.
+ */
+export function isElGamalCiphertext(input: unknown): input is string {
+  const pointHexLength = CONFIDENTIAL_EC_POINT_BYTES * HEX_CHARS_PER_BYTE
+  return (
+    isHexWithByteLength(CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES)(input) &&
+    isCompressedECPoint(input.slice(0, pointHexLength)) &&
+    isCompressedECPoint(input.slice(pointHexLength))
+  )
+}
+
+/**
+ * Verify the input is a 24-byte hex MPTokenIssuanceID.
+ *
+ * @param input - The value to check.
+ * @returns Whether the input is an MPTokenIssuanceID.
+ */
+export function isMPTokenIssuanceID(input: unknown): input is string {
+  return isHexWithByteLength(MPT_ISSUANCE_ID_BYTES)(input)
+}
+
+/**
+ * Verify the input is a non-empty hex string of whole bytes, the JSON form of
+ * a non-empty variable-length (VL) field.
+ *
+ * @param input - The value to check.
+ * @returns Whether the input is non-empty hex of an even length.
+ */
+export function isNonEmptyHexBlob(input: unknown): input is string {
+  return (
+    isString(input) && isHex(input) && input.length % HEX_CHARS_PER_BYTE === 0
+  )
+}
+
+/**
+ * Throw when a hex-string field of the transaction is all zeros. The field's
+ * presence and type are validated separately.
+ *
+ * @param tx - The transaction to check.
+ * @param field - The name of the hex-string field.
+ * @throws ValidationError if the field is all zeros.
+ */
+export function validateNonZeroField(
+  tx: Record<string, unknown>,
+  field: string,
+): void {
+  const value = tx[field]
+  if (isString(value) && ALL_ZERO_HEX_REGEX.test(value)) {
+    throw new ValidationError(
+      `${String(tx.TransactionType)}: ${field} must not be zero`,
+    )
+  }
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */

@@ -39,6 +39,14 @@ export {
   AMMWithdrawFlagsInterface,
   AMMWithdraw,
 } from './AMMWithdraw'
+export { BallotCastVote, BallotOption } from './ballotCastVote'
+export {
+  BallotCreate,
+  BallotCreateFlags,
+  BallotCreateFlagsInterface,
+} from './ballotCreate'
+export { BallotDelete } from './ballotDelete'
+export { BallotFinalize, BallotResult } from './ballotFinalize'
 export { Batch, BatchFlags, BatchFlagsInterface, BatchSigner } from './batch'
 export { BeneficiarySet } from './beneficiarySet'
 export { CheckCancel } from './checkCancel'

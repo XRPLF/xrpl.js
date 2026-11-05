@@ -1,0 +1,182 @@
+{
+  "FIELDS": [
+    [
+      "AuditorEncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "STArray"
+      }
+    ],
+    [
+      "BallotID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "BallotOption",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BallotResult",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 251,
+        "type": "STObject"
+      }
+    ],
+    [
+      "BallotWeight",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "EncryptedTally",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "STArray"
+      }
+    ],
+    [
+      "EncryptedVote",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 250,
+        "type": "Blob"
+      }
+    ],
+    [
+      "EncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "STArray"
+      }
+    ],
+    [
+      "OpenTime",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 242,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "OptionCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 252,
+        "type": "UInt8"
+      }
+    ],
+    [
+      "Results",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 249,
+        "type": "STArray"
+      }
+    ],
+    [
+      "TallyPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 249,
+        "type": "Blob"
+      }
+    ],
+    [
+      "VoteCount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 241,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "VoteLockedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt64"
+      }
+    ],
+    [
+      "VoterEncryptedVotes",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 250,
+        "type": "STArray"
+      }
+    ],
+    [
+      "VoterPublicKey",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 248,
+        "type": "Blob"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "Ballot": 518,
+    "BallotVote": 519
+  },
+  "TRANSACTION_RESULTS": {
+    "tecBALLOT_BAD_OPTIONS": 246,
+    "tecBALLOT_CLOSED": 250,
+    "tecBALLOT_EXISTS": 247,
+    "tecBALLOT_NOT_OPEN": 248,
+    "tecBALLOT_VOTED": 249
+  },
+  "TRANSACTION_TYPES": {
+    "BallotCastVote": 215,
+    "BallotCreate": 214,
+    "BallotDelete": 217,
+    "BallotFinalize": 216
+  },
+  "TYPES": {}
+}

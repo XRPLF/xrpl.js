@@ -88,6 +88,11 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    * vaults. Absent for XRP-backed vaults.
    */
   ReferenceHolding?: string
+  /**
+   * (ConfidentialVoting) The ledger index of the issuance's most recently
+   * created Ballot.
+   */
+  BallotID?: string
 
   /**
    * A set of XLS-94D immutability flags (`lsifMPT*`) indicating which capabilities

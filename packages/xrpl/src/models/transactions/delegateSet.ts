@@ -32,6 +32,10 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'FirewallSet',
   'FirewallDelete',
   'WithdrawPreauth',
+  'BallotCreate',
+  'BallotCastVote',
+  'BallotFinalize',
+  'BallotDelete',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',
