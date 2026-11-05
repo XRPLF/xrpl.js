@@ -27,6 +27,7 @@ import Repo from './Repo'
 import RippleState from './RippleState'
 import SignerList from './SignerList'
 import Sponsorship from './Sponsorship'
+import Subscription from './Subscription'
 import Ticket from './Ticket'
 import TokenIssuance from './TokenIssuance'
 import TransactionProposal from './TransactionProposal'
@@ -62,6 +63,7 @@ type LedgerEntry =
   | RippleState
   | SignerList
   | Sponsorship
+  | Subscription
   | Ticket
   | TokenIssuance
   | TransactionProposal
@@ -102,6 +104,7 @@ type LedgerEntryFilter =
   | 'signer_list'
   | 'sponsorship'
   | 'state'
+  | 'subscription'
   | 'ticket'
   | 'token_issuance'
   | 'transaction_proposal'

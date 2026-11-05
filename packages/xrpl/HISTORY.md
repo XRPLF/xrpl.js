@@ -26,6 +26,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `BallotCreate`, `BallotCastVote`, `BallotFinalize` and `BallotDelete` transactions, `Ballot` and `BallotVote` ledger entries, and `BallotID` and `VoteLockedAmount` on MPToken ledger entries (ConfidentialVoting amendment).
 * `CouponScheduleCreate`, `CouponScheduleSet`, `CouponScheduleDelete`, `CouponClaim` and `CouponPay` transactions, `CouponSchedule` ledger entry, `CouponAccrued` and `CouponIndex` on MPToken and `lsfMPTCouponSchedule` (CouponPayments amendment).
 * IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
+* `SubscriptionSet`, `SubscriptionCancel` and `SubscriptionClaim` transactions and `Subscription` ledger entry (Subscription amendment).
 
 ### Changed
 * Some transaction validation error messages changed.

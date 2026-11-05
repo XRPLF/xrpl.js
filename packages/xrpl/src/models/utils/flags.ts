@@ -33,6 +33,7 @@ import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import { SponsorshipSetFlags } from '../transactions/sponsorshipSet'
 import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
+import { SubscriptionSetFlags } from '../transactions/subscriptionSet'
 import { TokenIssuanceCreateFlags } from '../transactions/tokenIssuanceCreate'
 import { TokenIssuanceSetFlags } from '../transactions/tokenIssuanceSet'
 import type { Transaction } from '../transactions/transaction'
@@ -142,6 +143,7 @@ const txToFlag = {
   Payment: PaymentFlags,
   SponsorshipSet: SponsorshipSetFlags,
   SponsorshipTransfer: SponsorshipTransferFlags,
+  SubscriptionSet: SubscriptionSetFlags,
   TokenIssuanceCreate: TokenIssuanceCreateFlags,
   TokenIssuanceSet: TokenIssuanceSetFlags,
   TrustSet: TrustSetFlags,

@@ -173,6 +173,13 @@ export {
   SponsorshipTransferFlags,
   SponsorshipTransferFlagsInterface,
 } from './sponsorshipTransfer'
+export { SubscriptionCancel } from './subscriptionCancel'
+export { SubscriptionClaim } from './subscriptionClaim'
+export {
+  SubscriptionSet,
+  SubscriptionSetFlags,
+  SubscriptionSetFlagsInterface,
+} from './subscriptionSet'
 export { TicketCreate } from './ticketCreate'
 export { TokenConvert } from './tokenConvert'
 export {
