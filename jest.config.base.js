@@ -12,17 +12,20 @@ module.exports = {
       },
     ],
     "node_modules/chai/.+\\.js$": "ts-jest",
-    "node_modules/(@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/.+\\.js$": [
-      "ts-jest",
-      {
-        tsconfig: {
-          target: "es2020",
-          allowJs: true,
+    "node_modules/(@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/.+\\.js$":
+      [
+        "ts-jest",
+        {
+          tsconfig: {
+            target: "es2020",
+            allowJs: true,
+          },
         },
-      },
-    ],
+      ],
   },
-  transformIgnorePatterns: ["/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/)"],
+  transformIgnorePatterns: [
+    "/node_modules/(?!(chai|@scure|@noble|https-proxy-agent|agent-base|proxy-agent-negotiate)/)",
+  ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   collectCoverage: true,
   verbose: true,

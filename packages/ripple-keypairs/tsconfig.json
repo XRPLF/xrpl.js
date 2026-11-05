@@ -22,7 +22,5 @@
       "path": "../ripple-address-codec/tsconfig.build.json"
     }
   ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }
