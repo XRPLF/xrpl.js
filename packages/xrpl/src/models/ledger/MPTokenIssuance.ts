@@ -98,6 +98,11 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    */
   ImmutableFlags?: number
   /**
+   * The ID of the TokenIssuance this MPT issuance is bound to, through which
+   * TokenConvert converts it to and from the IOU.
+   */
+  TokenIssuanceID?: string
+  /**
    * (Optional) The account sponsoring the reserve for this MPTokenIssuance.
    * If present, the sponsor is responsible for the reserve requirement of
    * this object instead of the owner.

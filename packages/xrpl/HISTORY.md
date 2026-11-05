@@ -17,6 +17,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does. As in rippled's inner object templates, a `Signers` entry or `SponsorSignature` cannot carry one: a P-256 multi-signer or sponsor signs with `TxnSignature`.
 * Rolling vaults and vault fees: `DealingInterval`, `DealingWindow`, `DepositFee`, `RedemptionFee`, `RedemptionPeriod` and `AccountingMethod` on `VaultCreate`, the fees on `VaultSet`, and the accrual fields on the `Vault`, `Loan` and `MPToken` ledger entries (VaultContinuousAccrual amendment).
 * `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
+* `TokenIssuanceCreate`, `TokenIssuanceSet`, `TokenIssuanceDestroy` and `TokenConvert` transactions, `TokenIssuance` ledger entry and `MPTokenIssuance.TokenIssuanceID` (TokenIssuance amendment).
 
 ### Changed
 * Some transaction validation error messages changed.
@@ -31,7 +32,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
 * `SponsorSignature` refuses fields outside rippled's template (`SigningPubKey`, `TxnSignature`, `Signers`).
-* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet).
+* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet, TokenIssuanceCreate, TokenIssuanceSet, TokenIssuanceDestroy, TokenConvert).
 
 ## 5.3.0 (2026-09-16)
 

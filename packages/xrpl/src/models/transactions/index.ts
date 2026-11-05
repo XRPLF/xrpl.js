@@ -149,6 +149,18 @@ export {
   SponsorshipTransferFlagsInterface,
 } from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
+export { TokenConvert } from './tokenConvert'
+export {
+  TokenIssuanceCreate,
+  TokenIssuanceCreateFlags,
+  TokenIssuanceCreateFlagsInterface,
+} from './tokenIssuanceCreate'
+export { TokenIssuanceDestroy } from './tokenIssuanceDestroy'
+export {
+  TokenIssuanceSet,
+  TokenIssuanceSetFlags,
+  TokenIssuanceSetFlagsInterface,
+} from './tokenIssuanceSet'
 export { TransactionProposalCancel } from './transactionProposalCancel'
 export { TransactionProposalCreate } from './transactionProposalCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'

@@ -146,6 +146,16 @@ import {
   validateSponsorshipTransfer,
 } from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
+import { TokenConvert, validateTokenConvert } from './tokenConvert'
+import {
+  TokenIssuanceCreate,
+  validateTokenIssuanceCreate,
+} from './tokenIssuanceCreate'
+import {
+  TokenIssuanceDestroy,
+  validateTokenIssuanceDestroy,
+} from './tokenIssuanceDestroy'
+import { TokenIssuanceSet, validateTokenIssuanceSet } from './tokenIssuanceSet'
 import {
   TransactionProposalCancel,
   validateTransactionProposalCancel,
@@ -236,6 +246,10 @@ export type SubmittableTransaction =
   | SponsorshipSet
   | SponsorshipTransfer
   | TicketCreate
+  | TokenConvert
+  | TokenIssuanceCreate
+  | TokenIssuanceDestroy
+  | TokenIssuanceSet
   | TransactionProposalCancel
   | TransactionProposalCreate
   | TrustSet
@@ -579,6 +593,22 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'TicketCreate':
       validateTicketCreate(tx)
+      break
+
+    case 'TokenConvert':
+      validateTokenConvert(tx)
+      break
+
+    case 'TokenIssuanceCreate':
+      validateTokenIssuanceCreate(tx)
+      break
+
+    case 'TokenIssuanceDestroy':
+      validateTokenIssuanceDestroy(tx)
+      break
+
+    case 'TokenIssuanceSet':
+      validateTokenIssuanceSet(tx)
       break
 
     case 'TransactionProposalCancel':

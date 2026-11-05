@@ -31,6 +31,8 @@ import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
 import { SponsorshipSetFlags } from '../transactions/sponsorshipSet'
 import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
+import { TokenIssuanceCreateFlags } from '../transactions/tokenIssuanceCreate'
+import { TokenIssuanceSetFlags } from '../transactions/tokenIssuanceSet'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { VaultCreateFlags } from '../transactions/vaultCreate'
@@ -136,6 +138,8 @@ const txToFlag = {
   Payment: PaymentFlags,
   SponsorshipSet: SponsorshipSetFlags,
   SponsorshipTransfer: SponsorshipTransferFlags,
+  TokenIssuanceCreate: TokenIssuanceCreateFlags,
+  TokenIssuanceSet: TokenIssuanceSetFlags,
   TrustSet: TrustSetFlags,
   VaultCreate: VaultCreateFlags,
 }

@@ -1,0 +1,57 @@
+{
+  "FIELDS": [
+    [
+      "Currency",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Currency"
+      }
+    ],
+    [
+      "IssuedAmount",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 248,
+        "type": "Number"
+      }
+    ],
+    [
+      "TokenIssuanceID",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Hash256"
+      }
+    ],
+    [
+      "TokenScale",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt8"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "TokenIssuance": 514
+  },
+  "TRANSACTION_RESULTS": {
+    "tecSUPPLY_EXCEEDED": 254
+  },
+  "TRANSACTION_TYPES": {
+    "TokenConvert": 205,
+    "TokenIssuanceCreate": 202,
+    "TokenIssuanceDestroy": 204,
+    "TokenIssuanceSet": 203
+  },
+  "TYPES": {}
+}
