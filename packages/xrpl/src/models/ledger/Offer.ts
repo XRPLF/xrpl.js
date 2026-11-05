@@ -1,4 +1,4 @@
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
@@ -54,10 +54,17 @@ export default interface Offer extends BaseLedgerEntry, HasPreviousTxnID {
    * Currently this field only applicable to hybrid offers.
    */
   AdditionalBooks?: Book[]
+  /**
+   * (OfferQualifiers) The smallest amount of TakerGets any single fill of this
+   * Offer may deliver, in the TakerGets asset.
+   */
+  MinQuantity?: Amount | MPTAmount
 }
 
 export enum OfferFlags {
   lsfPassive = 0x00010000,
   lsfSell = 0x00020000,
   lsfHybrid = 0x00040000,
+  /** (OfferQualifiers) The Offer fills completely or not at all. */
+  lsfAllOrNone = 0x00080000,
 }

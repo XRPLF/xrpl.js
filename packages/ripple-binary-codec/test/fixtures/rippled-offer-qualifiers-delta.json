@@ -1,0 +1,20 @@
+{
+  "FIELDS": [
+    [
+      "MinQuantity",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "Amount"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {},
+  "TRANSACTION_RESULTS": {
+    "tecWOULD_CROSS": 253
+  },
+  "TRANSACTION_TYPES": {},
+  "TYPES": {}
+}

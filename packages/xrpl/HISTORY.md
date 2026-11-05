@@ -18,6 +18,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Rolling vaults and vault fees: `DealingInterval`, `DealingWindow`, `DepositFee`, `RedemptionFee`, `RedemptionPeriod` and `AccountingMethod` on `VaultCreate`, the fees on `VaultSet`, and the accrual fields on the `Vault`, `Loan` and `MPToken` ledger entries (VaultContinuousAccrual amendment).
 * `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
 * `TokenIssuanceCreate`, `TokenIssuanceSet`, `TokenIssuanceDestroy` and `TokenConvert` transactions, `TokenIssuance` ledger entry and `MPTokenIssuance.TokenIssuanceID` (TokenIssuance amendment).
+* `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone`, and `all_or_none` and `min_quantity` on `account_offers` and `book_offers` offers (OfferQualifiers amendment).
 
 ### Changed
 * Some transaction validation error messages changed.

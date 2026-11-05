@@ -1,4 +1,4 @@
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 import { Offer } from '../ledger'
 
 import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
@@ -72,6 +72,16 @@ export interface BookOffer extends Offer {
    * first-in, first-out.
    */
   quality?: string
+  /**
+   * (OfferQualifiers) Present and true when the offer has `lsfAllOrNone`: it
+   * fills completely or not at all, so it cannot be taken to arbitrary depth.
+   */
+  all_or_none?: boolean
+  /**
+   * (OfferQualifiers) The offer's `MinQuantity`: the smallest amount of
+   * taker_gets one fill may take.
+   */
+  min_quantity?: Amount | MPTAmount
 }
 
 /**

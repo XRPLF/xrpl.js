@@ -1,6 +1,7 @@
 import { ValidationError } from '../../errors'
-import { Amount } from '../common'
+import { Amount, MPTAmount } from '../common'
 import { hasFlag } from '../utils'
+import { amountValue, isSameAsset } from '../utils/amount'
 
 import {
   BaseTransaction,
@@ -52,6 +53,18 @@ export enum OfferCreateFlags {
    * This flag cannot be set if the offer doesn't have a DomainID
    */
   tfHybrid = 0x00100000,
+  /**
+   * (OfferQualifiers) Fill the offer completely or not at all, at placement and
+   * whenever it is later crossed. Cannot be combined with tfImmediateOrCancel,
+   * tfFillOrKill or a MinQuantity.
+   */
+  tfAllOrNone = 0x00200000,
+  /**
+   * (OfferQualifiers) Never take liquidity: the offer fails with tecWOULD_CROSS
+   * instead of crossing an existing offer. Cannot be combined with
+   * tfImmediateOrCancel, tfFillOrKill or tfSell.
+   */
+  tfPostOnly = 0x00400000,
 }
 
 /**
@@ -94,6 +107,8 @@ export interface OfferCreateFlagsInterface extends GlobalFlagsInterface {
   tfFillOrKill?: boolean
   tfSell?: boolean
   tfHybrid?: boolean
+  tfAllOrNone?: boolean
+  tfPostOnly?: boolean
 }
 
 /**
@@ -119,6 +134,12 @@ export interface OfferCreate extends BaseTransaction {
   TakerPays: Amount
   /** The domain that the offer must be a part of. */
   DomainID?: string
+  /**
+   * (OfferQualifiers) The smallest amount of TakerGets any single fill may
+   * deliver. Must be in the TakerGets asset, greater than 0 and no more than
+   * TakerGets. Cannot be combined with tfAllOrNone.
+   */
+  MinQuantity?: Amount | MPTAmount
 }
 
 /**
@@ -146,6 +167,79 @@ export function validateOfferCreate(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError(
       'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
+  }
+
+  validateOfferQualifiers(tx)
+}
+
+/**
+ * Check the OfferQualifiers rules: tfAllOrNone excludes tfImmediateOrCancel,
+ * tfFillOrKill and MinQuantity; tfPostOnly excludes tfImmediateOrCancel,
+ * tfFillOrKill and tfSell; MinQuantity is in the TakerGets asset, greater than 0
+ * and no more than TakerGets.
+ *
+ * @param tx - An OfferCreate Transaction.
+ * @throws When a qualifier rule is broken.
+ */
+function validateOfferQualifiers(tx: Record<string, unknown>): void {
+  validateOptionalField(tx, 'MinQuantity', isAmount)
+
+  const isTakeOnly =
+    hasFlag(tx, OfferCreateFlags.tfImmediateOrCancel, 'tfImmediateOrCancel') ||
+    hasFlag(tx, OfferCreateFlags.tfFillOrKill, 'tfFillOrKill')
+  const isAllOrNone = hasFlag(tx, OfferCreateFlags.tfAllOrNone, 'tfAllOrNone')
+
+  if (isAllOrNone && isTakeOnly) {
+    throw new ValidationError(
+      'OfferCreate: tfAllOrNone cannot be combined with tfImmediateOrCancel or tfFillOrKill',
+    )
+  }
+
+  if (
+    hasFlag(tx, OfferCreateFlags.tfPostOnly, 'tfPostOnly') &&
+    (isTakeOnly || hasFlag(tx, OfferCreateFlags.tfSell, 'tfSell'))
+  ) {
+    throw new ValidationError(
+      'OfferCreate: tfPostOnly cannot be combined with tfImmediateOrCancel, tfFillOrKill or tfSell',
+    )
+  }
+
+  if (tx.MinQuantity === undefined) {
+    return
+  }
+
+  if (isAllOrNone) {
+    throw new ValidationError(
+      'OfferCreate: MinQuantity cannot be set together with tfAllOrNone',
+    )
+  }
+
+  validateMinQuantity(tx.MinQuantity, tx.TakerGets)
+}
+
+/**
+ * Check that MinQuantity is in the TakerGets asset, greater than 0 and no more
+ * than TakerGets.
+ *
+ * @param minQuantity - The MinQuantity amount.
+ * @param takerGets - The TakerGets amount.
+ * @throws When MinQuantity is in another asset or out of range.
+ */
+function validateMinQuantity(
+  minQuantity: Amount | MPTAmount,
+  takerGets: unknown,
+): void {
+  if (!isAmount(takerGets) || !isSameAsset(minQuantity, takerGets)) {
+    throw new ValidationError(
+      'OfferCreate: MinQuantity must be in the TakerGets asset',
+    )
+  }
+
+  const value = amountValue(minQuantity)
+  if (!value.isGreaterThan(0) || value.isGreaterThan(amountValue(takerGets))) {
+    throw new ValidationError(
+      'OfferCreate: MinQuantity must be greater than 0 and no more than TakerGets',
     )
   }
 }
