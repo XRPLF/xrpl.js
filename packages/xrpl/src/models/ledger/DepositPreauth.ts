@@ -27,4 +27,10 @@ export default interface DepositPreauth
   Authorize?: string
   /** The credential(s) that received the preauthorization. */
   AuthorizeCredentials?: AuthorizeCredential[]
+  /**
+   * The account sponsoring the reserve for this DepositPreauth. If present,
+   * the sponsor is responsible for the reserve requirement of this object
+   * instead of the owner.
+   */
+  Sponsor?: string
 }

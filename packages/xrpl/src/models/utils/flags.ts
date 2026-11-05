@@ -4,6 +4,12 @@ import {
   AccountRootFlagsInterface,
   AccountRootFlags,
 } from '../ledger/AccountRoot'
+import {
+  MPTokenIssuanceFlags,
+  MPTokenIssuanceFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
+} from '../ledger/MPTokenIssuance'
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
@@ -14,12 +20,15 @@ import { LoanManageFlags } from '../transactions/loanManage'
 import { LoanPayFlags } from '../transactions/loanPay'
 import { MPTokenAuthorizeFlags } from '../transactions/MPTokenAuthorize'
 import { MPTokenIssuanceCreateFlags } from '../transactions/MPTokenIssuanceCreate'
+// eslint-disable-next-line import/no-cycle -- this method is needed to map txn flags
 import { MPTokenIssuanceSetFlags } from '../transactions/MPTokenIssuanceSet'
 import { NFTokenCreateOfferFlags } from '../transactions/NFTokenCreateOffer'
 import { NFTokenMintFlags } from '../transactions/NFTokenMint'
 import { OfferCreateFlags } from '../transactions/offerCreate'
 import { PaymentFlags } from '../transactions/payment'
 import { PaymentChannelClaimFlags } from '../transactions/paymentChannelClaim'
+import { SponsorshipSetFlags } from '../transactions/sponsorshipSet'
+import { SponsorshipTransferFlags } from '../transactions/sponsorshipTransfer'
 import type { Transaction } from '../transactions/transaction'
 import { TrustSetFlags } from '../transactions/trustSet'
 import { VaultCreateFlags } from '../transactions/vaultCreate'
@@ -51,6 +60,61 @@ export function parseAccountRootFlags(
   return flagsInterface
 }
 
+/**
+ * Convert the `Flags` field of an `MPTokenIssuance` ledger object into a typed
+ * boolean view of the `lsfMPT*` flags.
+ *
+ * @param flags - The numeric value of `MPTokenIssuance.Flags`.
+ * @returns An interface with each set `lsfMPT*` flag as `true`.
+ */
+export function parseMPTokenIssuanceFlags(
+  flags: number,
+): MPTokenIssuanceFlagsInterface {
+  const flagsInterface: MPTokenIssuanceFlagsInterface = {}
+
+  Object.values(MPTokenIssuanceFlags).forEach((flag) => {
+    if (
+      typeof flag === 'string' &&
+      isFlagEnabled(flags, MPTokenIssuanceFlags[flag])
+    ) {
+      flagsInterface[flag] = true
+    }
+  })
+
+  return flagsInterface
+}
+
+/**
+ * Convert the `ImmutableFlags` field of an `MPTokenIssuance` ledger object into a
+ * typed boolean view of the `lsifMPT*` immutability flags (XLS-94D).
+ *
+ * @param flags - The numeric value of `MPTokenIssuance.ImmutableFlags`. This
+ * field is absent (equivalent to 0) on issuances where nothing has been made
+ * immutable and on pre-amendment objects, in which case an empty interface is
+ * returned.
+ * @returns An interface with each set `lsifMPT*` flag as `true`.
+ */
+export function parseMPTokenIssuanceImmutableFlags(
+  flags: number | undefined,
+): MPTokenIssuanceImmutableFlagsInterface {
+  const flagsInterface: MPTokenIssuanceImmutableFlagsInterface = {}
+
+  if (flags == null) {
+    return flagsInterface
+  }
+
+  Object.values(MPTokenIssuanceImmutableFlags).forEach((flag) => {
+    if (
+      typeof flag === 'string' &&
+      isFlagEnabled(flags, MPTokenIssuanceImmutableFlags[flag])
+    ) {
+      flagsInterface[flag] = true
+    }
+  })
+
+  return flagsInterface
+}
+
 const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMClawback: AMMClawbackFlags,
@@ -67,6 +131,8 @@ const txToFlag = {
   OfferCreate: OfferCreateFlags,
   PaymentChannelClaim: PaymentChannelClaimFlags,
   Payment: PaymentFlags,
+  SponsorshipSet: SponsorshipSetFlags,
+  SponsorshipTransfer: SponsorshipTransferFlags,
   TrustSet: TrustSetFlags,
   VaultCreate: VaultCreateFlags,
   XChainModifyBridge: XChainModifyBridgeFlags,

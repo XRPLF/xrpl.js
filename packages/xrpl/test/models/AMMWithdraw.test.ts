@@ -93,7 +93,7 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ Asset must be a Currency`, function () {
     withdraw.Asset = 1234
-    const errorMessage = 'AMMWithdraw: Asset must be a Currency'
+    const errorMessage = 'AMMWithdraw: invalid field Asset'
     assertInvalid(withdraw, errorMessage)
   })
 
@@ -105,7 +105,7 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ Asset2 must be a Currency`, function () {
     withdraw.Asset2 = 1234
-    const errorMessage = 'AMMWithdraw: Asset2 must be a Currency'
+    const errorMessage = 'AMMWithdraw: invalid field Asset2'
     assertInvalid(withdraw, errorMessage)
   })
 
@@ -127,28 +127,27 @@ describe('AMMWithdraw', function () {
 
   it(`throws w/ LPTokenIn must be an IssuedCurrencyAmount`, function () {
     withdraw.LPTokenIn = 1234
-    const errorMessage =
-      'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount'
+    const errorMessage = 'AMMWithdraw: invalid field LPTokenIn'
     assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Amount must be an Amount`, function () {
     withdraw.Amount = 1234
-    const errorMessage = 'AMMWithdraw: Amount must be an Amount'
+    const errorMessage = 'AMMWithdraw: invalid field Amount'
     assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     withdraw.Amount = '1000'
     withdraw.Amount2 = 1234
-    const errorMessage = 'AMMWithdraw: Amount2 must be an Amount'
+    const errorMessage = 'AMMWithdraw: invalid field Amount2'
     assertInvalid(withdraw, errorMessage)
   })
 
   it(`throws w/ EPrice must be an Amount`, function () {
     withdraw.Amount = '1000'
     withdraw.EPrice = 1234
-    const errorMessage = 'AMMWithdraw: EPrice must be an Amount'
+    const errorMessage = 'AMMWithdraw: invalid field EPrice'
     assertInvalid(withdraw, errorMessage)
   })
 })

@@ -44,7 +44,7 @@ describe('PaymentChannelCreate', function () {
   it(`missing Amount`, function () {
     delete channel.Amount
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing Amount')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field Amount')
   })
 
   it(`missing Destination`, function () {
@@ -56,19 +56,19 @@ describe('PaymentChannelCreate', function () {
   it(`missing SettleDelay`, function () {
     delete channel.SettleDelay
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing SettleDelay')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field SettleDelay')
   })
 
   it(`missing PublicKey`, function () {
     delete channel.PublicKey
 
-    assertInvalid(channel, 'PaymentChannelCreate: missing PublicKey')
+    assertInvalid(channel, 'PaymentChannelCreate: missing field PublicKey')
   })
 
   it(`invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelCreate: Amount must be a string')
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field Amount')
   })
 
   it(`invalid Destination`, function () {
@@ -80,13 +80,13 @@ describe('PaymentChannelCreate', function () {
   it(`invalid SettleDelay`, function () {
     channel.SettleDelay = '10'
 
-    assertInvalid(channel, 'PaymentChannelCreate: SettleDelay must be a number')
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field SettleDelay')
   })
 
   it(`invalid PublicKey`, function () {
     channel.PublicKey = 10
 
-    assertInvalid(channel, 'PaymentChannelCreate: PublicKey must be a string')
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field PublicKey')
   })
 
   it(`invalid DestinationTag`, function () {
@@ -98,6 +98,11 @@ describe('PaymentChannelCreate', function () {
   it(`invalid CancelAfter`, function () {
     channel.CancelAfter = '100'
 
-    assertInvalid(channel, 'PaymentChannelCreate: CancelAfter must be a number')
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field CancelAfter')
+  })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    channel.PublicKey = 'not hex'
+    assertInvalid(channel, 'PaymentChannelCreate: invalid field PublicKey')
   })
 })

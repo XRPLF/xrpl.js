@@ -17,7 +17,7 @@ describe('ContractCall', function () {
     tx = {
       TransactionType: 'ContractCall',
       Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
-      ComputationAllowance: 1000,
+      Gas: 1000,
       ContractAccount: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
       FunctionName: 'noop',
     } as any
@@ -27,14 +27,14 @@ describe('ContractCall', function () {
     assertValid(tx)
   })
 
-  it('throws w/ missing ComputationAllowance', function () {
-    delete tx.ComputationAllowance
-    assertInvalid(tx, 'ContractCall: missing field ComputationAllowance')
+  it('throws w/ missing Gas', function () {
+    delete tx.Gas
+    assertInvalid(tx, 'ContractCall: missing field Gas')
   })
 
-  it('throws w/ invalid ComputationAllowance', function () {
-    tx.ComputationAllowance = 'number'
-    assertInvalid(tx, 'ContractCall: invalid field ComputationAllowance')
+  it('throws w/ invalid Gas', function () {
+    tx.Gas = 'number'
+    assertInvalid(tx, 'ContractCall: invalid field Gas')
   })
 
   it('throws w/ missing ContractAccount', function () {

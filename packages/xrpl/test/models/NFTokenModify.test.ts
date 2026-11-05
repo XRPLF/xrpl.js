@@ -66,4 +66,17 @@ describe('NFTokenModify', function () {
 
     assertInvalid(invalid, 'NFTokenModify: URI must be in hex format')
   })
+
+  it(`throws w/ non-hex NFTokenID`, function () {
+    const validNFTokenModify = {
+      TransactionType: 'NFTokenModify',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      NFTokenID: TOKEN_ID,
+      Fee: '5000000',
+      Sequence: 2470665,
+      URI: stringToHex('http://xrpl.org'),
+    } as any
+    validNFTokenModify.NFTokenID = 'not hex'
+    assertInvalid(validNFTokenModify, 'NFTokenModify: invalid field NFTokenID')
+  })
 })

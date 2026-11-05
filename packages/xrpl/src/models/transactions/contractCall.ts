@@ -17,7 +17,7 @@ export interface ContractCall extends BaseTransaction {
   TransactionType: 'ContractCall'
 
   // Optional because autofill will add it if missing
-  ComputationAllowance?: number
+  Gas?: number
 
   ContractAccount: string
 
@@ -35,7 +35,7 @@ export interface ContractCall extends BaseTransaction {
 export function validateContractCall(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'ComputationAllowance', isNumber)
+  validateRequiredField(tx, 'Gas', isNumber)
 
   validateRequiredField(tx, 'ContractAccount', isString)
 

@@ -1,13 +1,13 @@
-import { ValidationError } from '../../errors'
-
 import {
   Account,
   BaseTransaction,
   isAccount,
   isNumber,
+  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 /**
@@ -67,40 +67,12 @@ export function validatePaymentChannelCreate(
 ): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing Amount')
-  }
-
-  if (typeof tx.Amount !== 'string') {
-    throw new ValidationError('PaymentChannelCreate: Amount must be a string')
-  }
+  validateRequiredField(tx, 'Amount', isString)
 
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
 
-  if (tx.SettleDelay === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing SettleDelay')
-  }
-
-  if (typeof tx.SettleDelay !== 'number') {
-    throw new ValidationError(
-      'PaymentChannelCreate: SettleDelay must be a number',
-    )
-  }
-
-  if (tx.PublicKey === undefined) {
-    throw new ValidationError('PaymentChannelCreate: missing PublicKey')
-  }
-
-  if (typeof tx.PublicKey !== 'string') {
-    throw new ValidationError(
-      'PaymentChannelCreate: PublicKey must be a string',
-    )
-  }
-
-  if (tx.CancelAfter !== undefined && typeof tx.CancelAfter !== 'number') {
-    throw new ValidationError(
-      'PaymentChannelCreate: CancelAfter must be a number',
-    )
-  }
+  validateRequiredField(tx, 'SettleDelay', isNumber)
+  validateRequiredField(tx, 'PublicKey', isHexString)
+  validateOptionalField(tx, 'CancelAfter', isNumber)
 }

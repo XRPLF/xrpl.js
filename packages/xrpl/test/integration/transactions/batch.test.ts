@@ -1,4 +1,4 @@
-import { Batch, Payment, Wallet } from '../../../src'
+import { Batch, CheckCreate, Payment, SponsorFlags, Wallet } from '../../../src'
 import { BatchFlags } from '../../../src/models/transactions/batch'
 import { signMultiBatch } from '../../../src/Wallet/batchSigner'
 import serverUrl from '../serverUrl'
@@ -67,6 +67,47 @@ describe('Batch', function () {
         ),
       }
       const autofilled = await testContext.client.autofill(tx)
+      await testBatchTransaction(autofilled, testContext.wallet)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'sponsored inner transaction',
+    async () => {
+      const sponsor = await generateFundedWallet(testContext.client)
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Flags: 0x40000000,
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        Amount: '10000000',
+      }
+      // The reserve of the Check is sponsored, and the sponsorship is not
+      // pre-funded, so the inner transaction carries the empty placeholder
+      // SponsorSignature and the sponsor authorizes it through BatchSigners.
+      const check: CheckCreate = {
+        TransactionType: 'CheckCreate',
+        Flags: 0x40000000,
+        Account: testContext.wallet.classicAddress,
+        Destination: destination.classicAddress,
+        SendMax: '1000000',
+        Sponsor: sponsor.classicAddress,
+        SponsorFlags: SponsorFlags.spfSponsorReserve,
+        SponsorSignature: { SigningPubKey: '' },
+      }
+      const tx: Batch = {
+        TransactionType: 'Batch',
+        Account: testContext.wallet.classicAddress,
+        Flags: BatchFlags.tfAllOrNothing,
+        RawTransactions: [payment, check].map((rawTx) => ({
+          RawTransaction: rawTx,
+        })),
+      }
+      const autofilled = await testContext.client.autofill(tx, 1)
+      // The sponsor is the only required signer: both inner transactions are
+      // initiated by the outer account, which never signs BatchSigners.
+      signMultiBatch(sponsor, autofilled)
       await testBatchTransaction(autofilled, testContext.wallet)
     },
     TIMEOUT,

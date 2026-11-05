@@ -1,6 +1,6 @@
 {
   "Account": "rG1QQv2nh2gr7RCZ1P8YYcBUKCCN633jCn",
-  "ComputationAllowance": 1000000,
+  "Gas": 1000000,
   "ContractAccount": "rBziFEmkBf1QaVKq36EHu9BXaLGmvDC6ww",
   "Fee": "200",
   "FunctionName": "66756E6374696F6E5F706172616D73",

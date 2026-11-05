@@ -13,6 +13,7 @@ import { Issue } from './issue'
 import { STNumber } from './st-number'
 import { PathSet } from './path-set'
 import { STArray } from './st-array'
+import { SignedAmount } from './signed-amount'
 import { STObject } from './st-object'
 import { UInt16 } from './uint-16'
 import { UInt32 } from './uint-32'
@@ -38,6 +39,7 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Issue,
   Number: STNumber,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,
@@ -67,6 +69,7 @@ export {
   Hash256,
   Int32,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,

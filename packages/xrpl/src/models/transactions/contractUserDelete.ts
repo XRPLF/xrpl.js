@@ -12,7 +12,7 @@ import {
 export interface ContractUserDelete extends BaseTransaction {
   TransactionType: 'ContractUserDelete'
 
-  ComputationAllowance: number
+  Gas: number
 
   ContractAccount: string
 }
@@ -26,7 +26,7 @@ export interface ContractUserDelete extends BaseTransaction {
 export function validateContractUserDelete(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'ComputationAllowance', isNumber)
+  validateRequiredField(tx, 'Gas', isNumber)
 
   validateRequiredField(tx, 'ContractAccount', isString)
 }

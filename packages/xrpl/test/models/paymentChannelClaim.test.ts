@@ -45,36 +45,51 @@ describe('PaymentChannelClaim', function () {
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
-    assertInvalid(channel, 'PaymentChannelClaim: missing Channel')
+    assertInvalid(channel, 'PaymentChannelClaim: missing field Channel')
   })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 100
 
-    assertInvalid(channel, 'PaymentChannelClaim: Channel must be a string')
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Channel')
   })
 
   it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
 
-    assertInvalid(channel, 'PaymentChannelClaim: Balance must be a string')
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Balance')
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelClaim: Amount must be a string')
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Amount')
   })
 
   it(`throws w/ invalid Signature`, function () {
     channel.Signature = 1000
 
-    assertInvalid(channel, 'PaymentChannelClaim: Signature must be a string')
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Signature')
   })
 
   it(`throws w/ invalid PublicKey`, function () {
     channel.PublicKey = ['100000']
 
-    assertInvalid(channel, 'PaymentChannelClaim: PublicKey must be a string')
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
+  })
+
+  it(`throws w/ non-hex Channel`, function () {
+    channel.Channel = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Channel')
+  })
+
+  it(`throws w/ non-hex Signature`, function () {
+    channel.Signature = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Signature')
+  })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    channel.PublicKey = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
   })
 })

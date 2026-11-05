@@ -13,7 +13,7 @@ import {
   LedgerEntryRequest,
 } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
-import { Account } from '../models/transactions/common'
+import { Account, areAddressesEqual } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp, { getGasEstimate } from './getFeeXrp'
@@ -26,6 +26,17 @@ const LEDGER_OFFSET = 20
 // Mainnet and testnet are exceptions. More context: https://github.com/XRPLF/rippled/pull/4370
 const RESTRICTED_NETWORKS = 1024
 const REQUIRED_NETWORKID_VERSION = '1.11.0'
+
+// Confidential MPT (XLS-0096) transactions are charged this many extra base
+// fees on top of the standard base fee (rippled kCONFIDENTIAL_FEE_MULTIPLIER).
+const CONFIDENTIAL_FEE_MULTIPLIER = 9
+const CONFIDENTIAL_MPT_TRANSACTION_TYPES = [
+  'ConfidentialMPTConvert',
+  'ConfidentialMPTConvertBack',
+  'ConfidentialMPTSend',
+  'ConfidentialMPTClawback',
+  'ConfidentialMPTMergeInbox',
+]
 
 /**
  * Determines whether the source rippled version is not later than the target rippled version.
@@ -139,6 +150,10 @@ export function setValidAddresses(tx: Transaction): void {
   convertToClassicAddress(tx, 'Owner')
   // SetRegularKey:
   convertToClassicAddress(tx, 'RegularKey')
+  // XLS-68 Sponsorship:
+  convertToClassicAddress(tx, 'Sponsor')
+  convertToClassicAddress(tx, 'Sponsee')
+  convertToClassicAddress(tx, 'CounterpartySponsor')
 }
 
 /**
@@ -310,28 +325,60 @@ async function fetchCounterPartySignersCount(
 }
 
 /**
+ * Calculates additional fees for a multisigned sponsor signature.
+ *
+ * Mirrors `signersCount`, which serves the same purpose for the transaction's own
+ * multisigning: a single sponsor signature costs nothing extra (like any single signer),
+ * and a multisigned SponsorSignature's signer count can't be reliably inferred at autofill
+ * time -- tx.SponsorSignature typically doesn't exist yet, since the sponsor only co-signs
+ * after the account has signed, and even when present its Signers array may not yet reflect
+ * every cosigner. So the caller must supply the expected count explicitly.
+ *
+ * @param netFeeDrops - The network fee in drops.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature.
+ * @returns The additional sponsor fee as a BigNumber.
+ */
+function calculateSponsorFee(
+  netFeeDrops: string,
+  sponsorSignersCount = 0,
+): BigNumber {
+  if (sponsorSignersCount <= 0) {
+    return new BigNumber(0)
+  }
+
+  // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+  console.warn(
+    `For sponsored transaction the auto calculated Fee accounts for sponsor signers to avoid transaction failure.`,
+  )
+  return new BigNumber(scaleValue(netFeeDrops, sponsorSignersCount))
+}
+
+/**
  * Calculates the fee per transaction type.
  *
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature (default is 0). Only used for a multisigned sponsor; a
+ * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
   signersCount = 0,
+  sponsorSignersCount = 0,
 ): Promise<BigNumber> {
   const netFeeXRP = await getFeeXrp(client)
   const netFeeDrops = xrpToDrops(netFeeXRP)
   let baseFee = new BigNumber(netFeeDrops)
 
-  const isSpecialTxCost = [
-    'AccountDelete',
-    'AMMCreate',
-    'VaultCreate',
-  ].includes(tx.TransactionType)
+  const isSpecialTxCost = ['AccountDelete', 'AMMCreate'].includes(
+    tx.TransactionType,
+  )
 
   // EscrowFinish Transaction with Fulfillment
   if (tx.TransactionType === 'EscrowFinish' && tx.Fulfillment != null) {
@@ -356,6 +403,16 @@ async function calculateFeePerTransactionType(
       Promise.resolve(new BigNumber(0)),
     )
     baseFee = BigNumber.sum(baseFee.times(2), rawTxFees)
+  } else if (CONFIDENTIAL_MPT_TRANSACTION_TYPES.includes(tx.TransactionType)) {
+    /*
+     * Confidential MPT Transaction
+     * rippled charges kCONFIDENTIAL_FEE_MULTIPLIER (9) extra base fees on top of
+     * the standard base fee, so the total before signers is baseFee × 10.
+     */
+    baseFee = BigNumber.sum(
+      baseFee,
+      scaleValue(netFeeDrops, CONFIDENTIAL_FEE_MULTIPLIER),
+    )
   }
 
   /*
@@ -382,7 +439,14 @@ async function calculateFeePerTransactionType(
     )
   }
 
+  // Add sponsor signature fees if applicable
+  const sponsorFee = calculateSponsorFee(netFeeDrops, sponsorSignersCount)
+  baseFee = BigNumber.sum(baseFee, sponsorFee)
+
   const maxFeeDrops = xrpToDrops(client.maxFeeXRP)
+  // For special transactions (AccountDelete, AMMCreate), the fee cap is bypassed.
+  // This means sponsor fees are also not subject to the cap for these transactions.
+  // For normal transactions, the total fee (base + sponsor) is capped at maxFeeXRP.
   const totalFee = isSpecialTxCost
     ? baseFee
     : BigNumber.min(baseFee, maxFeeDrops)
@@ -397,37 +461,47 @@ async function calculateFeePerTransactionType(
  * @param client - The client object.
  * @param tx - The transaction object.
  * @param [signersCount=0] - The number of signers (default is 0). Only used for multisigning.
+ * @param [sponsorSignersCount=0] - The expected number of signers for the sponsor's
+ * multisigned SponsorSignature (default is 0). Only used for a multisigned sponsor; a
+ * single sponsor signature adds no fee.
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
+// eslint-disable-next-line max-params -- mirrors calculateFeePerTransactionType
 export async function getTransactionFee(
   client: Client,
   tx: Transaction,
   signersCount = 0,
+  sponsorSignersCount = 0,
 ): Promise<void> {
-  const fee = await calculateFeePerTransactionType(client, tx, signersCount)
+  const fee = await calculateFeePerTransactionType(
+    client,
+    tx,
+    signersCount,
+    sponsorSignersCount,
+  )
   // eslint-disable-next-line @typescript-eslint/no-magic-numbers, require-atomic-updates, no-param-reassign -- fine here
   tx.Fee = fee.toString(10)
 }
 
 /**
- * Estimates and sets the ComputationAllowance for a transaction by encoding
+ * Estimates and sets the Gas for a transaction by encoding
  * a copy of the transaction with an empty SigningPubKey and zero Fee, then
  * querying the gas estimate from the server.
  *
  * @param client - The client used to request the gas estimate.
- * @param tx - The transaction object to set ComputationAllowance on.
- * @returns A promise that resolves once ComputationAllowance has been set.
+ * @param tx - The transaction object to set Gas on.
+ * @returns A promise that resolves once Gas has been set.
  */
-export async function getComputationAllowance(
+export async function getGas(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
   const copyTx = { ...tx }
-  copyTx.ComputationAllowance = 100000000000
+  copyTx.Gas = 100000000000
   delete copyTx.SigningPubKey
   const tx_blob = encode(copyTx)
   // eslint-disable-next-line require-atomic-updates, no-param-reassign -- ignore
-  tx.ComputationAllowance = await getGasEstimate(client, tx_blob)
+  tx.Gas = await getGasEstimate(client, tx_blob)
 }
 
 /**
@@ -464,28 +538,62 @@ export async function setLatestValidatedLedgerSequence(
  * @param tx - The transaction object.
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
+// eslint-disable-next-line max-lines-per-function -- necessary to check for all AccountDelete blockers
 export async function checkAccountDeleteBlockers(
   client: Client,
   tx: Transaction,
 ): Promise<void> {
-  const request: AccountObjectsRequest = {
+  const objectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
     ledger_index: 'validated',
     deletion_blockers_only: true,
   }
-  const response = await client.request(request)
-  return new Promise((resolve, reject) => {
-    if (response.result.account_objects.length > 0) {
-      reject(
-        new XrplError(
-          `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, or Checks associated with the account.`,
-          response.result.account_objects,
-        ),
-      )
-    }
-    resolve()
-  })
+  const infoRequest: AccountInfoRequest = {
+    command: 'account_info',
+    account: tx.Account,
+    ledger_index: 'validated',
+  }
+  const [objectsResponse, infoResponse] = await Promise.all([
+    client.request(objectsRequest),
+    client.request(infoRequest),
+  ])
+
+  if (objectsResponse.result.account_objects.length > 0) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; there are Escrows, PayChannels, RippleStates, Checks, or Sponsorships associated with the account.`,
+      objectsResponse.result.account_objects,
+    )
+  }
+
+  const accountRoot = infoResponse.result.account_data
+
+  // rippled's AccountDelete::preclaim blocks deletion outright if the account
+  // is sponsoring any reserve or fee obligations of its own, since those
+  // can't be resolved by the deletion.
+  if (
+    accountRoot.SponsoringOwnerCount != null ||
+    accountRoot.SponsoringAccountCount != null
+  ) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; it has outstanding sponsorship obligations (SponsoringOwnerCount/SponsoringAccountCount).`,
+    )
+  }
+
+  // rippled's AccountDelete::preclaim also requires that, if this account is
+  // itself a sponsored account, the AccountDelete's Destination match its
+  // Sponsor -- the sponsor must be the one to receive the deleted account's
+  // remaining balance.
+  if (
+    accountRoot.Sponsor != null &&
+    'Destination' in tx &&
+    typeof tx.Destination === 'string' &&
+    !areAddressesEqual(accountRoot.Sponsor, tx.Destination)
+  ) {
+    throw new XrplError(
+      `Account ${tx.Account} cannot be deleted; its Sponsor (${accountRoot.Sponsor}) does not match the AccountDelete Destination (${tx.Destination}).`,
+    )
+  }
 }
 
 /**

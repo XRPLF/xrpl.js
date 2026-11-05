@@ -5,10 +5,11 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   isAccount,
-  isString,
   validateOptionalField,
   Account,
   validateRequiredField,
+  isHexString,
+  isString,
 } from './common'
 
 /**
@@ -52,7 +53,7 @@ export interface NFTokenModify extends BaseTransaction {
 export function validateNFTokenModify(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateOptionalField(tx, 'Owner', isAccount)
   validateOptionalField(tx, 'URI', isString)
 
