@@ -1,0 +1,42 @@
+{
+  "FIELDS": [
+    [
+      "Beneficiary",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 254,
+        "type": "AccountID"
+      }
+    ],
+    [
+      "LastInteraction",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 253,
+        "type": "UInt32"
+      }
+    ],
+    [
+      "TimeLock",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": false,
+        "nth": 254,
+        "type": "UInt32"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {
+    "Beneficiary": 512
+  },
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {
+    "BeneficiarySet": 200
+  },
+  "TYPES": {}
+}

@@ -17,6 +17,8 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'DelegateSet',
   'AccountDelete',
   'Batch',
+  // Alphanet types whose transactions.macro entry is Delegation::NotDelegable:
+  'BeneficiarySet',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

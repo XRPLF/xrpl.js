@@ -14,6 +14,7 @@ import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
 import { Batch, validateBatch } from './batch'
+import { BeneficiarySet, validateBeneficiarySet } from './beneficiarySet'
 import { CheckCancel, validateCheckCancel } from './checkCancel'
 import { CheckCash, validateCheckCash } from './checkCash'
 import { CheckCreate, validateCheckCreate } from './checkCreate'
@@ -177,6 +178,7 @@ export type SubmittableTransaction =
   | AccountDelete
   | AccountSet
   | Batch
+  | BeneficiarySet
   | CheckCancel
   | CheckCash
   | CheckCreate
@@ -347,6 +349,10 @@ export function validate(transaction: Record<string, unknown>): void {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- already checked above
         validate(innerTx.RawTransaction as Record<string, unknown>)
       })
+      break
+
+    case 'BeneficiarySet':
+      validateBeneficiarySet(tx)
       break
 
     case 'CheckCancel':

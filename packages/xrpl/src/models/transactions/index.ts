@@ -40,6 +40,7 @@ export {
   AMMWithdraw,
 } from './AMMWithdraw'
 export { Batch, BatchFlags, BatchFlagsInterface, BatchSigner } from './batch'
+export { BeneficiarySet } from './beneficiarySet'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
