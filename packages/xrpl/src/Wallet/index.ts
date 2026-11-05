@@ -492,8 +492,12 @@ export { multisign, verifySignature } from './signer'
 export { authorizeChannel } from './authorizeChannel'
 
 export {
+  signByCounterparty,
+  combineCounterpartySigners,
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
+  CounterpartySignedTransaction,
+  CounterpartySignOptions,
 } from './counterpartySigner'
 
 export {

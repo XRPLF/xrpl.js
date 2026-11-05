@@ -17,6 +17,7 @@ import FeeSettings, {
   FeeSettingsPostAmendmentFields,
   FEE_SETTINGS_ID,
 } from './FeeSettings'
+import Firewall from './Firewall'
 import { Ledger, LedgerV1 } from './Ledger'
 import { LedgerEntry, LedgerEntryFilter } from './LedgerEntry'
 import LedgerHashes from './LedgerHashes'
@@ -45,6 +46,7 @@ import Ticket from './Ticket'
 import TokenIssuance, { TokenIssuanceFlags } from './TokenIssuance'
 import TransactionProposal from './TransactionProposal'
 import Vault, { VaultFlags } from './Vault'
+import WithdrawPreauth from './WithdrawPreauth'
 
 export {
   AccountRoot,
@@ -66,6 +68,7 @@ export {
   FeeSettings,
   FeeSettingsPreAmendmentFields,
   FeeSettingsPostAmendmentFields,
+  Firewall,
   Ledger,
   LedgerV1,
   LedgerEntryFilter,
@@ -108,4 +111,5 @@ export {
   Vault,
   VaultFlags,
   VoteSlot,
+  WithdrawPreauth,
 }

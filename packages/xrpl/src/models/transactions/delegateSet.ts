@@ -29,6 +29,9 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'RepoCancel',
   'RepoClose',
   'RepoDefault',
+  'FirewallSet',
+  'FirewallDelete',
+  'WithdrawPreauth',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

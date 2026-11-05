@@ -1,12 +1,42 @@
 // Add one test for single signing and one test for multi-signing
 
 import { assert } from 'chai'
-
-import { LoanSet, Wallet } from '../../src'
 import {
+  decode,
+  encodeForMultisigningCounterparty,
+  encodeForSigningCounterparty,
+  XrplDefinitions,
+} from 'ripple-binary-codec'
+import normalDefinitionsJson from 'ripple-binary-codec/dist/enums/definitions.json'
+import { type JsonObject } from 'ripple-binary-codec/dist/types/serialized-type'
+import { verify } from 'ripple-keypairs'
+
+import { AccountSet, FirewallSet, LoanSet, Wallet } from '../../src'
+import { hashSignedTx } from '../../src/utils/hashes'
+import {
+  combineCounterpartySigners,
   combineLoanSetCounterpartySigners,
+  signByCounterparty,
   signLoanSetByCounterparty,
 } from '../../src/Wallet/counterpartySigner'
+
+/**
+ * The bundled definitions, passed explicitly to exercise the `definitions` option.
+ *
+ * @returns The definitions.
+ */
+function firewallDefinitions(): XrplDefinitions {
+  return new XrplDefinitions(normalDefinitionsJson)
+}
+
+const FIREWALL_ID =
+  'E6DBAFC99223B42257915A63DFC6B0C032D4070F9A574B255AD97466726FC321'
+const FIRST_PARTY_SIGNATURE = {
+  SigningPubKey:
+    'EDFF8D8C5AC309EAA4F3A0C6D2AAF9A9DFA0724063398110365D4631971F604C4C',
+  TxnSignature:
+    '1AF5B3118F5F292EDCEAB34A4180792240AF86258C6BC8340D7523D396424F63B4BD4EAF20DE7C5AA9B472DB86AC36E956DAD02288638E59D90C7A0F6BF6E802',
+}
 
 describe('counterpartySigner', function () {
   it('single sign', function () {
@@ -167,5 +197,156 @@ describe('counterpartySigner', function () {
     ])
 
     assert.deepEqual(combinedSignedTx, expectedLoanSet as LoanSet)
+  })
+
+  describe('Firewall transactions', function () {
+    const definitions = firewallDefinitions()
+    const counterpartyWallet = Wallet.fromSeed(
+      'sEd7FqVHfNZ2UdGAwjssxPev2ujwJoT',
+    )
+    const firewallDelete = {
+      TransactionType: 'FirewallDelete',
+      Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+      Fee: '24',
+      Sequence: 7,
+      FirewallID: FIREWALL_ID,
+      ...FIRST_PARTY_SIGNATURE,
+    }
+
+    it('signs a FirewallDelete as the counterparty', function () {
+      const { tx, tx_blob, hash } = signByCounterparty(
+        counterpartyWallet,
+        firewallDelete,
+        { definitions },
+      )
+      const signature = tx.CounterpartySignature
+      assert.equal(signature?.SigningPubKey, counterpartyWallet.publicKey)
+      assert.isTrue(
+        verify(
+          encodeForSigningCounterparty(
+            tx as unknown as JsonObject,
+            definitions,
+          ),
+          signature?.TxnSignature ?? '',
+          counterpartyWallet.publicKey,
+        ),
+      )
+      assert.deepEqual(
+        decode(tx_blob, definitions),
+        tx as unknown as JsonObject,
+      )
+      assert.equal(hash, hashSignedTx(tx_blob, definitions))
+    })
+
+    it('signs a FirewallSet update as the counterparty', function () {
+      const firewallSet: FirewallSet = {
+        TransactionType: 'FirewallSet',
+        Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+        Fee: '24',
+        Sequence: 8,
+        FirewallID: FIREWALL_ID,
+        MaxFee: '1000',
+        ...FIRST_PARTY_SIGNATURE,
+      }
+      const { tx } = signByCounterparty(counterpartyWallet, firewallSet, {
+        definitions,
+      })
+      assert.isTrue(
+        verify(
+          encodeForSigningCounterparty(
+            tx as unknown as JsonObject,
+            definitions,
+          ),
+          tx.CounterpartySignature?.TxnSignature ?? '',
+          counterpartyWallet.publicKey,
+        ),
+      )
+    })
+
+    it('refuses a FirewallSet that creates a firewall', function () {
+      const create: FirewallSet = {
+        TransactionType: 'FirewallSet',
+        Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+        Counterparty: 'rp7Tj3Uu1RDrDd1tusge3bVBhUjNvzD19Y',
+        Backup: 'rQnFUSfgnLNA2KzvKUjRX69tbv7WX76UXW',
+        Fee: '12',
+        Sequence: 6,
+        ...FIRST_PARTY_SIGNATURE,
+      }
+      assert.throws(
+        () => signByCounterparty(counterpartyWallet, create, { definitions }),
+        'FirewallSet: CounterpartySignature is not allowed to create a firewall',
+      )
+    })
+
+    it('multi-signs and combines a WithdrawPreauth', function () {
+      const signerWallet1 = Wallet.fromSeed('sEdSyBUScyy9msTU36wdR68XkskQky5')
+      const signerWallet2 = Wallet.fromSeed('sEdT8LubWzQv3VAx1JQqctv78N28zLA')
+      const withdrawPreauth = {
+        TransactionType: 'WithdrawPreauth',
+        Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+        Authorize: 'rp7Tj3Uu1RDrDd1tusge3bVBhUjNvzD19Y',
+        Fee: '36',
+        Sequence: 9,
+        FirewallID: FIREWALL_ID,
+        ...FIRST_PARTY_SIGNATURE,
+      }
+      const signed = [signerWallet1, signerWallet2].map(
+        (wallet) =>
+          signByCounterparty(wallet, withdrawPreauth, {
+            multisign: true,
+            definitions,
+          }).tx,
+      )
+      const { tx, tx_blob } = combineCounterpartySigners(signed, definitions)
+      const signers = tx.CounterpartySignature?.Signers ?? []
+      assert.lengthOf(signers, 2)
+      signers.forEach(({ Signer: signer }) => {
+        assert.isTrue(
+          verify(
+            encodeForMultisigningCounterparty(
+              tx as unknown as JsonObject,
+              signer.Account,
+              definitions,
+            ),
+            signer.TxnSignature,
+            signer.SigningPubKey,
+          ),
+        )
+      })
+      assert.deepEqual(
+        decode(tx_blob, definitions),
+        tx as unknown as JsonObject,
+      )
+    })
+
+    it('refuses to combine different transactions', function () {
+      const signerWallet = Wallet.fromSeed('sEdSyBUScyy9msTU36wdR68XkskQky5')
+      const first = signByCounterparty(signerWallet, firewallDelete, {
+        multisign: true,
+        definitions,
+      }).tx
+      const second = signByCounterparty(
+        signerWallet,
+        { ...firewallDelete, Sequence: 99 },
+        { multisign: true, definitions },
+      ).tx
+      assert.throws(
+        () => combineCounterpartySigners([first, second], definitions),
+        'FirewallDelete transactions are not the same.',
+      )
+    })
+
+    it('refuses a transaction type without a CounterpartySignature', function () {
+      const accountSet: AccountSet = {
+        TransactionType: 'AccountSet',
+        Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+        ...FIRST_PARTY_SIGNATURE,
+      }
+      assert.throws(
+        () => signByCounterparty(counterpartyWallet, accountSet),
+        'Transaction type AccountSet does not carry a CounterpartySignature.',
+      )
+    })
   })
 })

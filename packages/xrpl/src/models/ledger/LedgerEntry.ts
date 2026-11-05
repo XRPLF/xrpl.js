@@ -9,6 +9,7 @@ import DepositPreauth from './DepositPreauth'
 import DirectoryNode from './DirectoryNode'
 import Escrow from './Escrow'
 import FeeSettings from './FeeSettings'
+import Firewall from './Firewall'
 import LedgerHashes from './LedgerHashes'
 import Loan from './Loan'
 import LoanBroker from './LoanBroker'
@@ -27,6 +28,7 @@ import Ticket from './Ticket'
 import TokenIssuance from './TokenIssuance'
 import TransactionProposal from './TransactionProposal'
 import Vault from './Vault'
+import WithdrawPreauth from './WithdrawPreauth'
 
 type LedgerEntry =
   | AccountRoot
@@ -40,6 +42,7 @@ type LedgerEntry =
   | DirectoryNode
   | Escrow
   | FeeSettings
+  | Firewall
   | LedgerHashes
   | Loan
   | LoanBroker
@@ -57,6 +60,7 @@ type LedgerEntry =
   | TokenIssuance
   | TransactionProposal
   | Vault
+  | WithdrawPreauth
   | MPTokenIssuance
 
 type LedgerEntryFilter =
@@ -72,6 +76,7 @@ type LedgerEntryFilter =
   | 'directory'
   | 'escrow'
   | 'fee'
+  | 'firewall'
   | 'hashes'
   | 'loan'
   | 'loan_broker'
@@ -92,5 +97,6 @@ type LedgerEntryFilter =
   | 'token_issuance'
   | 'transaction_proposal'
   | 'vault'
+  | 'withdraw_preauth'
 
 export { LedgerEntry, LedgerEntryFilter }

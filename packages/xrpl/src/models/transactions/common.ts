@@ -51,6 +51,8 @@ export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
 export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
 // Max MPT amount: 2^63 - 1.
 export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
+// Max legal XRP amount in drops: the node's STAmount::kMaxNativeN.
+export const MAX_XRP_DROPS = BigInt('100000000000000000')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
@@ -1314,4 +1316,55 @@ export function isDomainID(domainID: unknown): domainID is string {
     isHex(domainID) &&
     domainID !== '0'.repeat(_DOMAIN_ID_LENGTH)
   )
+}
+
+const PUBLIC_KEY_HEX_LENGTH = 66
+const PUBLIC_KEY_PREFIXES = ['02', '03', 'ED']
+
+/**
+ * Verify the form and type of a CounterpartySignature inner object at runtime.
+ *
+ * @param input - The input to check the form and type of.
+ * @returns Whether the CounterpartySignature is properly formed.
+ */
+export function isCounterpartySignature(
+  input: unknown,
+): input is Record<string, unknown> {
+  return (
+    isRecord(input) &&
+    (input.SigningPubKey === undefined || isString(input.SigningPubKey)) &&
+    (input.TxnSignature === undefined || isString(input.TxnSignature)) &&
+    (input.Signers === undefined ||
+      (isArray(input.Signers) && input.Signers.every(isSigner)))
+  )
+}
+
+/**
+ * Verify that a non-empty CounterpartySignature.SigningPubKey is a 33-byte
+ * secp256k1 or Ed25519 public key, as the node's preflightCheckSigningKey requires.
+ *
+ * @param tx - The transaction carrying the CounterpartySignature.
+ * @throws ValidationError when the SigningPubKey is not a public key.
+ */
+export function validateCounterpartySigningKey(
+  tx: Record<string, unknown>,
+): void {
+  const signature = tx.CounterpartySignature
+  if (
+    !isRecord(signature) ||
+    !isString(signature.SigningPubKey) ||
+    signature.SigningPubKey === ''
+  ) {
+    return
+  }
+  const key = signature.SigningPubKey
+  const isPublicKey =
+    key.length === PUBLIC_KEY_HEX_LENGTH &&
+    isHex(key) &&
+    PUBLIC_KEY_PREFIXES.includes(key.slice(0, 2).toUpperCase())
+  if (!isPublicKey) {
+    throw new ValidationError(
+      `${String(tx.TransactionType)}: CounterpartySignature.SigningPubKey is not a valid public key`,
+    )
+  }
 }

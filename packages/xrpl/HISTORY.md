@@ -20,6 +20,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `TokenIssuanceCreate`, `TokenIssuanceSet`, `TokenIssuanceDestroy` and `TokenConvert` transactions, `TokenIssuance` ledger entry and `MPTokenIssuance.TokenIssuanceID` (TokenIssuance amendment).
 * `OfferCreate.MinQuantity`, the `tfAllOrNone` and `tfPostOnly` flags, and `Offer.MinQuantity` and `lsfAllOrNone`, and `all_or_none` and `min_quantity` on `account_offers` and `book_offers` offers (OfferQualifiers amendment).
 * `RepoCreate`, `RepoAccept`, `RepoCancel`, `RepoClose` and `RepoDefault` transactions and `Repo` ledger entry (Repo amendment).
+* `FirewallSet`, `FirewallDelete` and `WithdrawPreauth` transactions and `Firewall` and `WithdrawPreauth` ledger entries (Firewall amendment).
+* `signByCounterparty` and `combineCounterpartySigners`: counterparty signing for any transaction that carries a `CounterpartySignature` (LoanSet, FirewallSet, FirewallDelete, WithdrawPreauth); `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now call them. They, `hashSignedTx` and `computeSignature` take optional custom `definitions`.
+* `autofill` adds one base fee per counterparty signature to `FirewallSet` (update), `FirewallDelete` and `WithdrawPreauth`, as rippled's `calculateBaseFee` does: the Signers of a present `CounterpartySignature`, or the signer list size of the counterparty recorded on the account's Firewall.
 
 ### Changed
 * Some transaction validation error messages changed.
@@ -34,7 +37,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
 * `SponsorSignature` refuses fields outside rippled's template (`SigningPubKey`, `TxnSignature`, `Signers`).
-* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet, TokenIssuanceCreate, TokenIssuanceSet, TokenIssuanceDestroy, TokenConvert, RepoCreate, RepoAccept, RepoCancel, RepoClose, RepoDefault).
+* `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet, TokenIssuanceCreate, TokenIssuanceSet, TokenIssuanceDestroy, TokenConvert, RepoCreate, RepoAccept, RepoCancel, RepoClose, RepoDefault, FirewallSet, FirewallDelete, WithdrawPreauth).
 
 ## 5.3.0 (2026-09-16)
 

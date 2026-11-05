@@ -111,6 +111,9 @@ describe('DelegateSet', function () {
     'RepoCancel',
     'RepoClose',
     'RepoDefault',
+    'FirewallSet',
+    'FirewallDelete',
+    'WithdrawPreauth',
   ].forEach((transactionType) => {
     it(`throws w/ PermissionValue ${transactionType}, which is not delegable`, function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]

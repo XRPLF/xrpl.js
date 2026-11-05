@@ -5,13 +5,20 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
-import { LoanBroker } from '../models/ledger'
+import { Firewall, LoanBroker } from '../models/ledger'
 import {
   AccountInfoRequest,
   AccountObjectsRequest,
   LedgerEntryRequest,
 } from '../models/methods'
-import { Batch, Payment, Transaction } from '../models/transactions'
+import {
+  Batch,
+  FirewallDelete,
+  FirewallSet,
+  Payment,
+  Transaction,
+  WithdrawPreauth,
+} from '../models/transactions'
 import { Account, areAddressesEqual } from '../models/transactions/common'
 import { xrpToDrops } from '../utils'
 
@@ -310,10 +317,24 @@ async function fetchCounterPartySignersCount(
     counterParty = resp.Owner
   }
 
-  // Now fetch the signer list for the counterparty.
+  return fetchSignerListSize(client, counterParty)
+}
+
+/**
+ * The number of signatures an account signs with: its signer list's entry
+ * count, or 1 when it has no signer list.
+ *
+ * @param client - The client object used to make the request.
+ * @param account - The signing account.
+ * @returns A Promise that resolves to the number of signatures.
+ */
+async function fetchSignerListSize(
+  client: Client,
+  account: Account,
+): Promise<number> {
   const signerListRequest: AccountInfoRequest = {
     command: 'account_info',
-    account: counterParty,
+    account,
     ledger_index: 'validated',
     signer_lists: true,
   }
@@ -321,6 +342,73 @@ async function fetchCounterPartySignersCount(
   const signerListResponse = await client.request(signerListRequest)
   const signerList = signerListResponse.result.signer_lists?.[0]
   return signerList?.SignerEntries.length ?? 1
+}
+
+/**
+ * The number of counterparty signatures a Firewall transaction pays for, as
+ * rippled's calculateBaseFee counts them (FirewallSet.cpp:36-56, and the same
+ * in FirewallDelete.cpp and WithdrawPreauth.cpp): the Signers of a present
+ * CounterpartySignature, 1 for a single signature, and otherwise the signer
+ * list size of the counterparty recorded on the account's Firewall. A
+ * FirewallSet that creates a firewall (no FirewallID) has no counterparty
+ * signature.
+ *
+ * @param client - The client object used to make the request.
+ * @param tx - A FirewallSet, FirewallDelete or WithdrawPreauth transaction.
+ * @returns A Promise that resolves to the number of counterparty signatures.
+ */
+async function fetchFirewallCounterpartySignersCount(
+  client: Client,
+  tx: FirewallSet | FirewallDelete | WithdrawPreauth,
+): Promise<number> {
+  const signature = tx.CounterpartySignature
+  if (signature != null) {
+    return signature.Signers?.length ?? (signature.TxnSignature == null ? 0 : 1)
+  }
+  if (tx.FirewallID == null) {
+    return 0
+  }
+  const firewall = (
+    await client.request({
+      command: 'ledger_entry',
+      index: tx.FirewallID,
+      ledger_index: 'validated',
+    } as LedgerEntryRequest)
+  ).result.node as Firewall
+  return fetchSignerListSize(client, firewall.Counterparty)
+}
+
+/**
+ * The extra fee for the counterparty's signatures on a LoanSet or a Firewall
+ * transaction, one base fee per signature; 0 for other transaction types.
+ *
+ * @param client - The client object used to make the request.
+ * @param tx - The transaction.
+ * @param netFeeDrops - The network base fee in drops.
+ * @returns A Promise that resolves to the extra fee in drops.
+ */
+async function calculateCounterpartyFee(
+  client: Client,
+  tx: Transaction,
+  netFeeDrops: string,
+): Promise<BigNumber> {
+  if (tx.TransactionType === 'LoanSet') {
+    const count = await fetchCounterPartySignersCount(client, tx)
+    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
+    console.warn(
+      `For LoanSet transaction the auto calculated Fee accounts for total number of signers the counterparty has to avoid transaction failure.`,
+    )
+    return new BigNumber(scaleValue(netFeeDrops, count))
+  }
+  if (
+    tx.TransactionType === 'FirewallSet' ||
+    tx.TransactionType === 'FirewallDelete' ||
+    tx.TransactionType === 'WithdrawPreauth'
+  ) {
+    const count = await fetchFirewallCounterpartySignersCount(client, tx)
+    return new BigNumber(scaleValue(netFeeDrops, count))
+  }
+  return new BigNumber(0)
 }
 
 /**
@@ -364,7 +452,7 @@ function calculateSponsorFee(
  * single sponsor signature adds no fee.
  * @returns A promise that returns the fee.
  */
-// eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
+// eslint-disable-next-line max-lines-per-function, max-params -- necessary to check for many transaction types.
 async function calculateFeePerTransactionType(
   client: Client,
   tx: Transaction,
@@ -422,21 +510,11 @@ async function calculateFeePerTransactionType(
     baseFee = BigNumber.sum(baseFee, scaleValue(netFeeDrops, signersCount))
   }
 
-  // LoanSet transactions have additional fees based on the number of signers for the counterparty.
-  if (tx.TransactionType === 'LoanSet') {
-    const counterPartySignersCount = await fetchCounterPartySignersCount(
-      client,
-      tx,
-    )
-    baseFee = BigNumber.sum(
-      baseFee,
-      scaleValue(netFeeDrops, counterPartySignersCount),
-    )
-    // eslint-disable-next-line no-console -- necessary to inform users about autofill behavior
-    console.warn(
-      `For LoanSet transaction the auto calculated Fee accounts for total number of signers the counterparty has to avoid transaction failure.`,
-    )
-  }
+  // LoanSet and Firewall transactions pay a base fee per counterparty signature.
+  baseFee = BigNumber.sum(
+    baseFee,
+    await calculateCounterpartyFee(client, tx, netFeeDrops),
+  )
 
   // Add sponsor signature fees if applicable
   const sponsorFee = calculateSponsorFee(netFeeDrops, sponsorSignersCount)

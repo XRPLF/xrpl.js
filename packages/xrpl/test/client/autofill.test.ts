@@ -10,7 +10,10 @@ import {
   Batch,
   VaultCreate,
   VaultWithdrawalPolicy,
+  type FirewallDelete,
+  type FirewallSet,
   type LoanSet,
+  type WithdrawPreauth,
 } from '../../src'
 import { ValidationError } from '../../src/errors'
 import rippled from '../fixtures/rippled'
@@ -831,6 +834,146 @@ describe('client.autofill', function () {
     const txResult = await testContext.client.autofill(tx)
     // base_fee + 3 * base_fee
     assert.strictEqual(txResult.Fee, '48')
+  })
+
+  // FirewallSet, FirewallDelete and WithdrawPreauth cost one more base fee per
+  // signature in CounterpartySignature (FirewallSet.cpp:36-56,
+  // FirewallDelete.cpp and WithdrawPreauth.cpp calculateBaseFee). The
+  // counterparty is the one recorded on the account's Firewall.
+  describe('Firewall counterparty fee', function () {
+    const account = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+    const counterparty = 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn'
+    const firewallID =
+      'E6DBAFC99223B42257915A63DFC6B0C032D4070F9A574B255AD97466726FC321'
+
+    /**
+     * Mocks the fee, ledger, account and Firewall responses.
+     *
+     * @param counterpartySigners - The counterparty's SignerEntries count, or
+     * 0 for no signer list.
+     */
+    function mockFirewallResponses(counterpartySigners: number): void {
+      testContext.mockRippled!.addResponse('account_info', (request) => {
+        const signerLists =
+          request.account === counterparty && counterpartySigners > 0
+            ? [
+                {
+                  SignerEntries: Array.from(
+                    { length: counterpartySigners },
+                    () => ({ SignerEntry: { Account: account } }),
+                  ),
+                },
+              ]
+            : undefined
+        return {
+          id: request.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            account_data: { Sequence: 23 },
+            signer_lists: signerLists,
+          },
+        }
+      })
+      testContext.mockRippled!.addResponse('ledger', {
+        status: 'success',
+        type: 'response',
+        result: { ledger_index: 9038214 },
+      })
+      testContext.mockRippled!.addResponse('server_info', {
+        status: 'success',
+        type: 'response',
+        result: { info: { validated_ledger: { base_fee_xrp: 0.00001 } } },
+      })
+      testContext.mockRippled!.addResponse('ledger_entry', (request) => {
+        assert.strictEqual(request.index, firewallID)
+        return {
+          id: request.id,
+          status: 'success',
+          type: 'response',
+          result: {
+            node: {
+              LedgerEntryType: 'Firewall',
+              Owner: account,
+              Counterparty: counterparty,
+            },
+          },
+        }
+      })
+    }
+
+    it('adds no fee to a FirewallSet that creates a firewall', async function () {
+      mockFirewallResponses(3)
+      testContext.mockRippled!.addResponse('ledger_entry', () => {
+        throw new Error('no Firewall lookup expected')
+      })
+      const tx: FirewallSet = {
+        TransactionType: 'FirewallSet',
+        Account: account,
+        Counterparty: counterparty,
+        Backup: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+      }
+      const txResult = await testContext.client.autofill(tx)
+      assert.strictEqual(txResult.Fee, '12')
+    })
+
+    it('adds one base fee for a single-signing counterparty', async function () {
+      mockFirewallResponses(0)
+      const tx = {
+        TransactionType: 'FirewallDelete',
+        Account: account,
+        FirewallID: firewallID,
+      } as unknown as FirewallDelete
+      const txResult = await testContext.client.autofill(tx)
+      // base_fee + 1 * base_fee
+      assert.strictEqual(txResult.Fee, '24')
+    })
+
+    it('adds a base fee per signer of a multisigning counterparty', async function () {
+      mockFirewallResponses(4)
+      const tx = {
+        TransactionType: 'WithdrawPreauth',
+        Account: account,
+        Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+        FirewallID: firewallID,
+      } as unknown as WithdrawPreauth
+      const txResult = await testContext.client.autofill(tx)
+      // base_fee + 4 * base_fee
+      assert.strictEqual(txResult.Fee, '60')
+    })
+
+    it('counts the signatures of a present CounterpartySignature', async function () {
+      mockFirewallResponses(4)
+      const tx: FirewallSet = {
+        TransactionType: 'FirewallSet',
+        Account: account,
+        FirewallID: firewallID,
+        MaxFee: '1000',
+        CounterpartySignature: {
+          Signers: [
+            {
+              Signer: {
+                Account: counterparty,
+                SigningPubKey:
+                  'EDFF8D8C5AC309EAA4F3A0C6D2AAF9A9DFA0724063398110365D4631971F604C4C',
+                TxnSignature: 'AB',
+              },
+            },
+            {
+              Signer: {
+                Account: account,
+                SigningPubKey:
+                  'EDFF8D8C5AC309EAA4F3A0C6D2AAF9A9DFA0724063398110365D4631971F604C4C',
+                TxnSignature: 'AB',
+              },
+            },
+          ],
+        },
+      }
+      const txResult = await testContext.client.autofill(tx)
+      // base_fee + 2 * base_fee
+      assert.strictEqual(txResult.Fee, '36')
+    })
   })
 
   describe('Sponsorship autofill', function () {

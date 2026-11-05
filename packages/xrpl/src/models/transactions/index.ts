@@ -66,6 +66,8 @@ export { DepositPreauth } from './depositPreauth'
 export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
+export { FirewallDelete } from './firewallDelete'
+export { FirewallSet } from './firewallSet'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
 export {
   LoanBrokerSet,
@@ -183,3 +185,4 @@ export { VaultDelete } from './vaultDelete'
 export { VaultDeposit } from './vaultDeposit'
 export { VaultSet } from './vaultSet'
 export { VaultWithdraw } from './vaultWithdraw'
+export { WithdrawPreauth } from './withdrawPreauth'
