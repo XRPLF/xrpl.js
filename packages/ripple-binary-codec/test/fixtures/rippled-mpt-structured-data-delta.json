@@ -1,0 +1,18 @@
+{
+  "FIELDS": [
+    [
+      "MPTokenSchema",
+      {
+        "isSerialized": true,
+        "isSigningField": true,
+        "isVLEncoded": true,
+        "nth": 251,
+        "type": "Blob"
+      }
+    ]
+  ],
+  "LEDGER_ENTRY_TYPES": {},
+  "TRANSACTION_RESULTS": {},
+  "TRANSACTION_TYPES": {},
+  "TYPES": {}
+}

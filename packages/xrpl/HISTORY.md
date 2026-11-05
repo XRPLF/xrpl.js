@@ -16,6 +16,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `PasskeyListSet` transaction and `PasskeyList` ledger entry (Passkey amendment).
 * `PasskeySignature` transaction field (Passkey amendment): a WebAuthn signature of a P-256 `SigningPubKey`, validated as rippled's preflight does. As in rippled's inner object templates, a `Signers` entry or `SponsorSignature` cannot carry one: a P-256 multi-signer or sponsor signs with `TxnSignature`.
 * Rolling vaults and vault fees: `DealingInterval`, `DealingWindow`, `DepositFee`, `RedemptionFee`, `RedemptionPeriod` and `AccountingMethod` on `VaultCreate`, the fees on `VaultSet`, and the accrual fields on the `Vault`, `Loan` and `MPToken` ledger entries (VaultContinuousAccrual amendment).
+* `MPTokenSchema` on `MPTokenIssuanceCreate`, `MPTokenIssuanceSet` and the `MPTokenIssuance` ledger entry, with the schema and metadata checks rippled applies (MPTStructuredData amendment).
 
 ### Changed
 * Some transaction validation error messages changed.

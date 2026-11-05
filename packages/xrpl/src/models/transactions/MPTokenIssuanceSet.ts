@@ -22,10 +22,12 @@ import {
   CONFIDENTIAL_EC_POINT_BYTES,
   isHexString,
   isString,
+  GlobalFlags,
 } from './common'
 import {
   MAX_TRANSFER_FEE,
   tifMPTokenIssuanceImmutableMask,
+  validateMPTokenSchema,
 } from './MPTokenIssuanceCreate'
 
 import type { Transaction } from '.'
@@ -91,6 +93,13 @@ export const tfMPTokenIssuanceSetEnableFlagMask =
   MPTokenIssuanceSetFlags.tfMPTSetCanClawback |
   MPTokenIssuanceSetFlags.tfMPTSetCanHoldConfidentialBalance
 /* eslint-enable no-bitwise */
+
+/**
+ * The lowest of the universal flag bits (rippled `tfUniversal`: tfInnerBatchTxn
+ * 0x40000000 and tfFullyCanonicalSig 0x80000000). A Flags value has a
+ * non-universal bit set exactly when it is not a multiple of this value.
+ */
+const LOWEST_UNIVERSAL_FLAG = GlobalFlags.tfInnerBatchTxn
 
 /**
  * Map of flags to boolean values representing {@link MPTokenIssuanceSet} transaction
@@ -179,6 +188,13 @@ export interface MPTokenIssuanceSet extends BaseTransaction {
    * be set together with the `Holder` field.
    */
   DomainID?: string
+  /**
+   * (MPTStructuredData) A new packed-record layout, in hex, of 1 to 256 one-byte
+   * type codes that types `MPTokenMetadata`. An empty string removes the field.
+   * Cannot be combined with `Holder` or with any transaction flag. Rejected if
+   * `lsifMPTMetadata` has been set in `ImmutableFlags`.
+   */
+  MPTokenSchema?: string
 }
 
 /* eslint-disable max-lines-per-function, max-statements -- All validation rules are needed */
@@ -211,6 +227,7 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'TransferFee', isNumber)
   validateOptionalField(tx, 'ImmutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
+  validateOptionalField(tx, 'MPTokenSchema', isString)
 
   if (tx.DomainID != null && tx.Holder != null) {
     throw new ValidationError(
@@ -249,13 +266,15 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
     )
   }
 
-  // A mutation sets/updates a capability flag, MPTokenMetadata, TransferFee, or
-  // ImmutableFlags. These may not be combined with a Holder or a lock/unlock.
+  // A mutation sets/updates a capability flag, MPTokenMetadata, TransferFee,
+  // ImmutableFlags, or MPTokenSchema. These may not be combined with a Holder or
+  // a lock/unlock.
   const isMutate =
     hasEnableFlag ||
     tx.MPTokenMetadata != null ||
     tx.TransferFee != null ||
-    tx.ImmutableFlags != null
+    tx.ImmutableFlags != null ||
+    tx.MPTokenSchema != null
   const isSetConfidentialKeys =
     tx.IssuerEncryptionKey != null || tx.AuditorEncryptionKey != null
 
@@ -267,6 +286,13 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError(
       'MPTokenIssuanceSet: Transaction does not change the state of the MPTokenIssuance ledger object.',
+    )
+  }
+
+  // A schema mutates the issuance itself: no flags beyond the universal ones.
+  if (tx.MPTokenSchema != null && flagsNum % LOWEST_UNIVERSAL_FLAG !== 0) {
+    throw new ValidationError(
+      'MPTokenIssuanceSet: MPTokenSchema cannot be combined with transaction flags',
     )
   }
 
@@ -314,6 +340,11 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
   // An empty MPTokenMetadata is valid on MPTokenIssuanceSet: per rippled it
   // clears the existing metadata (makeFieldAbsent). Only validate the hex
   // format, length, and XLS-89 schema when a non-empty value is supplied.
+  // An empty MPTokenSchema removes the field; any other must be well-formed.
+  if (typeof tx.MPTokenSchema === 'string' && tx.MPTokenSchema.length > 0) {
+    validateMPTokenSchema(tx, tx.MPTokenSchema)
+  }
+
   if (typeof tx.MPTokenMetadata === 'string' && tx.MPTokenMetadata.length > 0) {
     if (
       !isHex(tx.MPTokenMetadata) ||
@@ -326,7 +357,10 @@ export function validateMPTokenIssuanceSet(tx: Record<string, unknown>): void {
 
     const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
 
-    if (validationMessages.length > 0) {
+    // A schema types the metadata as a packed record, not XLS-89 JSON.
+    const hasSchema =
+      typeof tx.MPTokenSchema === 'string' && tx.MPTokenSchema.length > 0
+    if (validationMessages.length > 0 && !hasSchema) {
       const message = [
         MPT_META_WARNING_HEADER,
         ...validationMessages.map((msg) => `- ${msg}`),

@@ -491,4 +491,100 @@ describe('MPTokenIssuanceSet', function () {
       'MPTokenIssuanceSet: invalid field MPTokenIssuanceID',
     )
   })
+
+  describe('MPTokenSchema (MPTStructuredData)', function () {
+    const schemaSet = (
+      fields: Record<string, unknown>,
+    ): Record<string, unknown> => ({
+      TransactionType: 'MPTokenIssuanceSet',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+      ...fields,
+    })
+
+    it('verifies a schema-only MPTokenIssuanceSet', function () {
+      assertValid(schemaSet({ MPTokenSchema: '0204' }))
+    })
+
+    it('verifies an empty MPTokenSchema, which removes the field', function () {
+      assertValid(schemaSet({ MPTokenSchema: '' }))
+    })
+
+    it('verifies MPTokenSchema with MPTokenMetadata', function () {
+      assertValid(
+        schemaSet({ MPTokenSchema: '0E', MPTokenMetadata: '03616263' }),
+      )
+    })
+
+    it('does not log an XLS-89 warning when MPTokenSchema types the metadata', function () {
+      const warn = jest.spyOn(console, 'warn')
+      assertValid(
+        schemaSet({ MPTokenSchema: '0E', MPTokenMetadata: '03616263' }),
+      )
+      expect(warn).not.toHaveBeenCalled()
+      warn.mockRestore()
+    })
+
+    it('verifies MPTokenSchema with only universal flags', function () {
+      assertValid(schemaSet({ MPTokenSchema: '02', Flags: 0x80000000 }))
+    })
+
+    it('throws w/ non-string MPTokenSchema', function () {
+      assertInvalid(
+        schemaSet({ MPTokenSchema: 2 }),
+        'MPTokenIssuanceSet: invalid field MPTokenSchema',
+      )
+    })
+
+    it('throws w/ non-hex MPTokenSchema', function () {
+      assertInvalid(
+        schemaSet({ MPTokenSchema: 'zz' }),
+        'MPTokenIssuanceSet: MPTokenSchema must be a hex string with an even number of characters',
+      )
+    })
+
+    it('throws w/ MPTokenSchema longer than 256 bytes', function () {
+      assertInvalid(
+        schemaSet({ MPTokenSchema: '02'.repeat(257) }),
+        'MPTokenIssuanceSet: MPTokenSchema must be between 1 and 256 bytes',
+      )
+    })
+
+    it('throws w/ a malformed MPTokenSchema', function () {
+      assertInvalid(
+        schemaSet({ MPTokenSchema: '3002' }),
+        'MPTokenIssuanceSet: MPTokenSchema is not a well-formed schema',
+      )
+    })
+
+    it('throws w/ MPTokenSchema and Holder', function () {
+      assertInvalid(
+        schemaSet({
+          MPTokenSchema: '02',
+          Holder: 'rajgkBmMxmz161r8bWYH7CQAFZP5bA9oSG',
+        }),
+        'MPTokenIssuanceSet: Holder field is not allowed when mutating MPTokenIssuance.',
+      )
+    })
+
+    it('throws w/ MPTokenSchema and a lock flag', function () {
+      assertInvalid(
+        schemaSet({
+          MPTokenSchema: '02',
+          Flags: MPTokenIssuanceSetFlags.tfMPTLock,
+        }),
+        'MPTokenIssuanceSet: MPTokenSchema cannot be combined with transaction flags',
+      )
+    })
+
+    it('throws w/ MPTokenSchema and a capability-setting flag', function () {
+      assertInvalid(
+        schemaSet({
+          MPTokenSchema: '',
+          Flags: { tfMPTSetCanTransfer: true },
+        }),
+        'MPTokenIssuanceSet: MPTokenSchema cannot be combined with transaction flags',
+      )
+    })
+  })
 })

@@ -57,6 +57,11 @@ export interface MPTokenIssuance extends BaseLedgerEntry, HasPreviousTxnID {
    */
   MPTokenMetadata?: string
   /**
+   * (MPTStructuredData) A packed-record layout, in hex, of 1 to 256 one-byte
+   * type codes that types `MPTokenMetadata`.
+   */
+  MPTokenSchema?: string
+  /**
    * Identifies the page in the owner's directory where this
    * item is referenced.
    */

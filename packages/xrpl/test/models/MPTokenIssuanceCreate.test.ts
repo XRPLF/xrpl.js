@@ -264,6 +264,158 @@ describe('MPTokenIssuanceCreate', function () {
 })
 
 /**
+ * MPTokenSchema (MPTStructuredData) verification testing: the schema must be a
+ * well-formed packed-record layout and any MPTokenMetadata must decode exactly
+ * against it.
+ */
+describe('MPTokenIssuanceCreate MPTokenSchema', function () {
+  const ACCOUNT = 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm'
+  const create = (
+    schema: unknown,
+    metadata?: string,
+  ): Record<string, unknown> => {
+    const tx: Record<string, unknown> = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: ACCOUNT,
+      MPTokenSchema: schema,
+    }
+    if (metadata !== undefined) {
+      tx.MPTokenMetadata = metadata
+    }
+    return tx
+  }
+  const bytes = (count: number, fill = '00'): string => fill.repeat(count)
+  const notWellFormed =
+    'MPTokenIssuanceCreate: MPTokenSchema is not a well-formed schema'
+  const mismatch =
+    'MPTokenIssuanceCreate: MPTokenMetadata does not match MPTokenSchema'
+
+  it('verifies a schema without MPTokenMetadata', function () {
+    assertValid(create('0204'))
+  })
+
+  it('verifies MPTokenMetadata matching every fixed-width type code', function () {
+    // bool, u8, u16, u32, u64, u128, u256, xfl, account, currency, h160, h256, pubkey
+    const schema = '0102030405060708090A0B0C0D'
+    const widths = [1, 1, 2, 4, 8, 16, 32, 8, 20, 20, 20, 32, 33]
+    const data = widths.map((width) => bytes(width, '01')).join('')
+    assertValid(create(schema, data))
+  })
+
+  it('verifies str and bin values with one- and two-byte length prefixes', function () {
+    assertValid(create('0E0F', `03616263${'C100'}${bytes(193, 'AB')}`))
+  })
+
+  it('verifies an array of u8 and a nested tuple', function () {
+    assertValid(create('2002', '03010203'))
+    // tuple(u8, array(tuple(u8, str))): 7, [(5, 'abc'), (6, '')]
+    assertValid(create('30022030020E3131', '070205036162630600'))
+  })
+
+  it('verifies an empty array', function () {
+    assertValid(create('2003', '00'))
+  })
+
+  it('verifies a schema of 256 bytes and nesting depth 8', function () {
+    assertValid(create(bytes(256, '02')))
+    assertValid(create(`${bytes(8, '30')}02${bytes(8, '31')}`))
+  })
+
+  it('throws w/ non-string MPTokenSchema', function () {
+    assertInvalid(
+      create(1),
+      'MPTokenIssuanceCreate: invalid field MPTokenSchema',
+    )
+  })
+
+  it('throws w/ non-hex MPTokenSchema', function () {
+    assertInvalid(
+      create('zz'),
+      'MPTokenIssuanceCreate: MPTokenSchema must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ odd-length MPTokenSchema', function () {
+    assertInvalid(
+      create('020'),
+      'MPTokenIssuanceCreate: MPTokenSchema must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ empty MPTokenSchema', function () {
+    assertInvalid(
+      create(''),
+      'MPTokenIssuanceCreate: MPTokenSchema must be between 1 and 256 bytes',
+    )
+  })
+
+  it('throws w/ MPTokenSchema longer than 256 bytes', function () {
+    assertInvalid(
+      create(bytes(257, '02')),
+      'MPTokenIssuanceCreate: MPTokenSchema must be between 1 and 256 bytes',
+    )
+  })
+
+  it('throws w/ a reserved type code', function () {
+    assertInvalid(create('10'), notWellFormed)
+    assertInvalid(create('00'), notWellFormed)
+  })
+
+  it('throws w/ a tupleClose without a tupleOpen', function () {
+    assertInvalid(create('31'), notWellFormed)
+  })
+
+  it('throws w/ an unterminated tuple', function () {
+    assertInvalid(create('3002'), notWellFormed)
+  })
+
+  it('throws w/ an array code without an element type', function () {
+    assertInvalid(create('20'), notWellFormed)
+  })
+
+  it('throws w/ an array of a zero-width element', function () {
+    assertInvalid(create('203031'), notWellFormed)
+    assertInvalid(create('2030303131'), notWellFormed)
+  })
+
+  it('throws w/ nesting deeper than 8', function () {
+    assertInvalid(create(`${bytes(9, '30')}02${bytes(9, '31')}`), notWellFormed)
+    assertInvalid(create(`${bytes(9, '20')}02`), notWellFormed)
+  })
+
+  describe('MPTokenMetadata decoding against MPTokenSchema', function () {
+    it('throws w/ MPTokenMetadata shorter than the schema', function () {
+      assertInvalid(create('04', '010203'), mismatch)
+    })
+
+    it('throws w/ trailing MPTokenMetadata bytes', function () {
+      assertInvalid(create('02', '0102'), mismatch)
+    })
+
+    it('throws w/ a bool value other than 0 or 1', function () {
+      assertValid(create('01', '01'))
+      assertInvalid(create('01', '02'), mismatch)
+    })
+
+    it('throws w/ a truncated str value', function () {
+      assertInvalid(create('0E', '036162'), mismatch)
+    })
+
+    it('throws w/ a truncated two-byte length prefix', function () {
+      assertInvalid(create('0F', 'C1'), mismatch)
+    })
+
+    it('throws w/ an invalid length prefix byte', function () {
+      assertInvalid(create('0F', 'FF'), mismatch)
+    })
+
+    it('throws w/ an array count larger than the data', function () {
+      assertInvalid(create('2002', '030102'), mismatch)
+    })
+  })
+})
+
+/**
  * Test console warning is logged while validating MPTokenIssuanceCreate for MPTokenMetadata field.
  */
 /* eslint-disable no-console -- Require to test console warnings  */
@@ -302,6 +454,19 @@ describe('MPTokenMetadata warnings', function () {
     expect(console.warn).toHaveBeenCalledWith(
       expect.stringContaining(expectedMessage),
     )
+  })
+
+  it(`does not log an XLS-89 warning when MPTokenSchema types the metadata`, function () {
+    const tx = {
+      TransactionType: 'MPTokenIssuanceCreate',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenSchema: '0E',
+      MPTokenMetadata: '03616263',
+    }
+
+    assertValid(tx)
+
+    expect(console.warn).not.toHaveBeenCalled()
   })
 })
 /* eslint-enable no-console  */

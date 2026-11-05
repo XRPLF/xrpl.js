@@ -5,6 +5,11 @@ import {
   MPT_META_WARNING_HEADER,
   validateMPTokenMetadata,
 } from '../utils/mptokenMetadata'
+import {
+  MAX_MPT_SCHEMA_BYTE_LENGTH,
+  isWellFormedMPTokenSchema,
+  mptokenMetadataMatchesSchema,
+} from '../utils/mptokenSchema'
 
 import {
   BaseTransaction,
@@ -266,6 +271,13 @@ export interface MPTokenIssuanceCreate extends BaseTransaction {
 
   /* The domainID that governs admissibility pertaining to the MPToken. */
   DomainID?: string
+
+  /**
+   * (MPTStructuredData) A packed-record layout, in hex, of 1 to 256 one-byte type
+   * codes that types `MPTokenMetadata`. When `MPTokenMetadata` is present it must
+   * decode exactly against this schema.
+   */
+  MPTokenSchema?: string
 }
 
 export interface MPTokenIssuanceCreateMetadata extends TransactionMetadataBase {
@@ -289,6 +301,7 @@ export function validateMPTokenIssuanceCreate(
   validateOptionalField(tx, 'AssetScale', isNumber)
   validateOptionalField(tx, 'ImmutableFlags', isNumber)
   validateOptionalField(tx, 'DomainID', isDomainID)
+  validateOptionalField(tx, 'MPTokenSchema', isString)
 
   if (
     tx.DomainID != null &&
@@ -322,6 +335,18 @@ export function validateMPTokenIssuanceCreate(
     throw new ValidationError(
       `MPTokenIssuanceCreate: MPTokenMetadata (hex format) must be non-empty and no more than ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
     )
+  }
+
+  if (typeof tx.MPTokenSchema === 'string') {
+    validateMPTokenSchema(tx, tx.MPTokenSchema)
+    if (
+      typeof tx.MPTokenMetadata === 'string' &&
+      !mptokenMetadataMatchesSchema(tx.MPTokenSchema, tx.MPTokenMetadata)
+    ) {
+      throw new ValidationError(
+        'MPTokenIssuanceCreate: MPTokenMetadata does not match MPTokenSchema',
+      )
+    }
   }
 
   if (typeof tx.MaximumAmount === 'string') {
@@ -374,7 +399,8 @@ export function validateMPTokenIssuanceCreate(
     }
   }
 
-  if (tx.MPTokenMetadata != null) {
+  // A schema types the metadata as a packed record, not XLS-89 JSON.
+  if (tx.MPTokenMetadata != null && tx.MPTokenSchema == null) {
     const validationMessages = validateMPTokenMetadata(tx.MPTokenMetadata)
 
     if (validationMessages.length > 0) {
@@ -389,3 +415,35 @@ export function validateMPTokenIssuanceCreate(
   }
 }
 /* eslint-enable max-lines-per-function, max-statements */
+
+/**
+ * Check that a non-empty MPTokenSchema is an even-length hex string of 1 to 256
+ * bytes that forms a well-formed schema. Shared by MPTokenIssuanceCreate and
+ * MPTokenIssuanceSet.
+ *
+ * @param tx - The transaction carrying the schema.
+ * @param schema - The MPTokenSchema value.
+ * @throws When the schema is malformed.
+ */
+export function validateMPTokenSchema(
+  tx: Record<string, unknown>,
+  schema: string,
+): void {
+  const txType = String(tx.TransactionType)
+  if (schema.length % 2 !== 0 || (schema.length > 0 && !isHex(schema))) {
+    throw new ValidationError(
+      `${txType}: MPTokenSchema must be a hex string with an even number of characters`,
+    )
+  }
+  const byteLength = schema.length / 2
+  if (byteLength === 0 || byteLength > MAX_MPT_SCHEMA_BYTE_LENGTH) {
+    throw new ValidationError(
+      `${txType}: MPTokenSchema must be between 1 and ${MAX_MPT_SCHEMA_BYTE_LENGTH} bytes`,
+    )
+  }
+  if (!isWellFormedMPTokenSchema(schema)) {
+    throw new ValidationError(
+      `${txType}: MPTokenSchema is not a well-formed schema`,
+    )
+  }
+}
