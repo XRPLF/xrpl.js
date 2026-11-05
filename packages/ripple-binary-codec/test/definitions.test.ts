@@ -208,3 +208,34 @@ describe('encode and decode using new types as a parameter', function () {
     expect(decoded.FeeAmountDelta).toEqual('-1000')
   })
 })
+
+describe('PerpetualFutures definitions', function () {
+  it('encodes and decodes a PerpMarket StatusTime', function () {
+    const market = {
+      LedgerEntryType: 'PerpMarket',
+      Flags: 0,
+      StatusTime: 800000000,
+      MarketStatus: 1,
+    }
+    expect(decode(encode(market))).toEqual(market)
+  })
+
+  it('does not encode a MarginDeposit Subaccount', function () {
+    expect(() =>
+      encode({
+        TransactionType: 'MarginDeposit',
+        Account: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+        ExchangeID:
+          'DB303FC1C7611B22C09E773B51044F6BEA02EF917DF59A2E2860871E167066A5',
+        Amount: '1000',
+        Subaccount: 1,
+      }),
+    ).toThrow()
+  })
+
+  it('does not encode a PerpMarket MarkPrice', function () {
+    expect(() =>
+      encode({ LedgerEntryType: 'PerpMarket', MarkPrice: '100' }),
+    ).toThrow()
+  })
+})

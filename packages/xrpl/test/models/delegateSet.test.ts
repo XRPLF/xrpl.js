@@ -122,6 +122,11 @@ describe('DelegateSet', function () {
     'CouponScheduleSet',
     'CouponScheduleDelete',
     'CouponPay',
+    'PerpExchangeSet',
+    'PerpExchangeDelete',
+    'PerpMarketSet',
+    'PerpMarketDelete',
+    'MarginWithdraw',
   ].forEach((transactionType) => {
     it(`throws w/ PermissionValue ${transactionType}, which is not delegable`, function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
@@ -142,6 +147,11 @@ describe('DelegateSet', function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
       assertValid(tx)
     })
+  })
+
+  it('verifies valid DelegateSet w/ PermissionValue PerpOrderCreate', function () {
+    tx.Permissions = [{ Permission: { PermissionValue: 'PerpOrderCreate' } }]
+    assertValid(tx)
   })
 
   it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {

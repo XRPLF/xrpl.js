@@ -28,6 +28,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
 * `SubscriptionSet`, `SubscriptionCancel` and `SubscriptionClaim` transactions and `Subscription` ledger entry (Subscription amendment).
 * `AMMCollectFees`, `AMMPositionTransfer`, `AMMBinCreate` and `AMMBinDestroy` transactions; `CurveType` and curve fields on AMM transactions (`AMMVote.TradingFee` is now optional); `AMMPosition`, `AMMTick`, `AMMTickBitmap`, `AMMBin` and `AMMBinHolding` ledger entries and the new AMM ledger fields (AMMCurves amendment).
+* `PerpExchangeSet`, `PerpExchangeDelete`, `PerpMarketSet`, `PerpMarketDelete`, `MarginDeposit`, `MarginWithdraw`, `PerpOrderCreate`, `PerpOrderCancel`, `PerpLiquidate` and `PerpRefresh` transactions and `PerpExchange`, `PerpMarket`, `MarginAccount`, `MarginPosition` and `PerpOrder` ledger entries, and the `PerpExchangeID` field of `AccountRoot` (PerpetualFutures amendment).
 
 ### Changed
 * Some transaction validation error messages changed.
@@ -43,6 +44,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
 * `SponsorSignature` refuses fields outside rippled's template (`SigningPubKey`, `TxnSignature`, `Signers`).
 * `DelegateSet` refuses the alphanet transaction types that rippled marks `Delegation::NotDelegable` (BeneficiarySet, PasskeyListSet, TokenIssuanceCreate, TokenIssuanceSet, TokenIssuanceDestroy, TokenConvert, RepoCreate, RepoAccept, RepoCancel, RepoClose, RepoDefault, FirewallSet, FirewallDelete, WithdrawPreauth, BallotCreate, BallotCastVote, BallotFinalize, BallotDelete, CouponScheduleCreate, CouponScheduleSet, CouponScheduleDelete, CouponPay).
+* `DelegateSet` refuses the PerpetualFutures transaction types that rippled marks `Delegation::NotDelegable` (PerpExchangeSet, PerpExchangeDelete, PerpMarketSet, PerpMarketDelete, MarginWithdraw).
 
 ## 5.3.0 (2026-09-16)
 

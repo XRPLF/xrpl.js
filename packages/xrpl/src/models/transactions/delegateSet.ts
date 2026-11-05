@@ -40,6 +40,12 @@ const NON_DELEGABLE_TRANSACTIONS = new Set([
   'CouponScheduleSet',
   'CouponScheduleDelete',
   'CouponPay',
+  // PerpetualFutures types whose transactions.macro entry is Delegation::NotDelegable:
+  'PerpExchangeSet',
+  'PerpExchangeDelete',
+  'PerpMarketSet',
+  'PerpMarketDelete',
+  'MarginWithdraw',
   // Pseudo transactions below:
   'EnableAmendment',
   'SetFee',

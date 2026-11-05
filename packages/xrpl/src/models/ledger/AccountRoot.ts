@@ -69,6 +69,12 @@ export default interface AccountRoot extends BaseLedgerEntry, HasPreviousTxnID {
    */
   LastInteraction?: number
   /**
+   * The ledger entry ID of the corresponding PerpExchange ledger entry.
+   * Present only on a perpetual futures exchange's pseudo-account AccountRoot;
+   * always omitted on other accounts.
+   */
+  PerpExchangeID?: string
+  /**
    * A domain associated with this account. In JSON, this is the hexadecimal
    * for the ASCII representation of the domain.
    */

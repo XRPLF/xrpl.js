@@ -264,6 +264,40 @@ export interface PriceData {
 }
 
 /**
+ * An IndexOracle object names one XLS-47 Oracle that a perpetual futures
+ * market's index reads.
+ */
+export interface IndexOracle {
+  IndexOracle: {
+    /** The account that owns the Oracle. */
+    Owner: string
+
+    /** The OracleDocumentID of the Oracle. */
+    OracleDocumentID: number
+  }
+}
+
+/**
+ * A MarginTier object is one tier of a perpetual futures market's margin
+ * requirement.
+ */
+export interface MarginTier {
+  MarginTier: {
+    /** The upper bound of the tier's notional, as a Number string. */
+    NotionalMax: string
+
+    /** The initial margin rate of the tier, in 1/10 basis points. */
+    InitialMarginRate: number
+
+    /**
+     * The maintenance margin rate of the tier, in 1/10 basis points; lower
+     * than InitialMarginRate.
+     */
+    MaintenanceMarginRate: number
+  }
+}
+
+/**
  * {@link MPTokenMetadata} object as per the XLS-89 standard.
  * Use {@link encodeMPTokenMetadata} utility function to convert to a compact hex string for on-ledger storage.
  * Use {@link decodeMPTokenMetadata} utility function to convert from a hex string to this format.

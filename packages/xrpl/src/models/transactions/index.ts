@@ -108,6 +108,16 @@ export {
 } from './loanManage'
 export { LoanPay, LoanPayFlags, LoanPayFlagsInterface } from './loanPay'
 export {
+  MarginDeposit,
+  MarginDepositFlags,
+  MarginDepositFlagsInterface,
+} from './marginDeposit'
+export {
+  MarginWithdraw,
+  MarginWithdrawFlags,
+  MarginWithdrawFlagsInterface,
+} from './marginWithdraw'
+export {
   MPTokenAuthorize,
   MPTokenAuthorizeFlags,
   MPTokenAuthorizeFlagsInterface,
@@ -164,6 +174,30 @@ export { RepoCancel } from './repoCancel'
 export { RepoClose } from './repoClose'
 export { RepoCreate } from './repoCreate'
 export { RepoDefault } from './repoDefault'
+export { PerpExchangeDelete } from './perpExchangeDelete'
+export { PerpExchangeSet } from './perpExchangeSet'
+export {
+  PerpLiquidate,
+  PerpLiquidateFlags,
+  PerpLiquidateFlagsInterface,
+} from './perpLiquidate'
+export { PerpMarketDelete } from './perpMarketDelete'
+export {
+  PerpMarketSet,
+  PerpMarketSetFlags,
+  PerpMarketSetFlagsInterface,
+} from './perpMarketSet'
+export { PerpOrderCancel } from './perpOrderCancel'
+export {
+  PerpOrderCreate,
+  PerpOrderCreateFlags,
+  PerpOrderCreateFlagsInterface,
+} from './perpOrderCreate'
+export {
+  PerpRefresh,
+  PerpRefreshFlags,
+  PerpRefreshFlagsInterface,
+} from './perpRefresh'
 export { SetFee, SetFeePreAmendment, SetFeePostAmendment } from './setFee'
 export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
