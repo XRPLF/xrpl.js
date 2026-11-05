@@ -1,12 +1,18 @@
 import { ValidationError } from '../../errors'
 import { Currency } from '../common'
 
-import { AMM_MAX_TRADING_FEE } from './AMMCreate'
+import {
+  AMM_MAX_AMPLIFICATION,
+  AMM_MAX_TRADING_FEE,
+  AMM_MIN_AMPLIFICATION,
+  isAMMAmplificationInRange,
+} from './AMMCreate'
 import {
   BaseTransaction,
   isIssuedCurrency,
   isNumber,
   validateBaseTransaction,
+  validateOptionalField,
   validateRequiredField,
 } from './common'
 
@@ -32,8 +38,20 @@ export interface AMMVote extends BaseTransaction {
   /**
    * The proposed fee to vote for, in units of 1/100,000; a value of 1 is equivalent to 0.001%.
    * The maximum value is 1000, indicating a 1% fee.
+   * Optional since AMMCurves, so that a vote can carry only `Amplification`.
    */
-  TradingFee: number
+  TradingFee?: number
+
+  /**
+   * (AMMCurves) The curve type of the AMM to vote on, one of {@link AMMCurveType}.
+   * Defaults to the constant-product curve (0).
+   */
+  CurveType?: number
+
+  /**
+   * (AMMCurves) The proposed amplification coefficient of a StableSwap AMM, from 1 to 5000.
+   */
+  Amplification?: number
 }
 
 /**
@@ -49,11 +67,26 @@ export function validateAMMVote(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
-  validateRequiredField(tx, 'TradingFee', isNumber)
+  validateOptionalField(tx, 'TradingFee', isNumber)
 
-  if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
+  if (
+    typeof tx.TradingFee === 'number' &&
+    (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE)
+  ) {
     throw new ValidationError(
       `AMMVote: TradingFee must be between 0 and ${AMM_MAX_TRADING_FEE}`,
+    )
+  }
+
+  validateOptionalField(tx, 'CurveType', isNumber)
+  validateOptionalField(tx, 'Amplification', isNumber)
+
+  if (
+    tx.Amplification !== undefined &&
+    !isAMMAmplificationInRange(tx.Amplification)
+  ) {
+    throw new ValidationError(
+      `AMMVote: Amplification must be between ${AMM_MIN_AMPLIFICATION} and ${AMM_MAX_AMPLIFICATION}`,
     )
   }
 }

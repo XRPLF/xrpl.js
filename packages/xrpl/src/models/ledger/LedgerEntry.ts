@@ -1,6 +1,11 @@
 import AccountRoot from './AccountRoot'
 import Amendments from './Amendments'
 import AMM from './AMM'
+import AMMBin from './AMMBin'
+import AMMBinHolding from './AMMBinHolding'
+import AMMPosition from './AMMPosition'
+import AMMTick from './AMMTick'
+import AMMTickBitmap from './AMMTickBitmap'
 import Ballot from './Ballot'
 import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
@@ -38,6 +43,11 @@ type LedgerEntry =
   | AccountRoot
   | Amendments
   | AMM
+  | AMMBin
+  | AMMBinHolding
+  | AMMPosition
+  | AMMTick
+  | AMMTickBitmap
   | Ballot
   | BallotVote
   | Beneficiary
@@ -75,6 +85,11 @@ type LedgerEntryFilter =
   | 'account'
   | 'amendments'
   | 'amm'
+  | 'amm_bin'
+  | 'amm_bin_holding'
+  | 'amm_position'
+  | 'amm_tick'
+  | 'amm_tick_bitmap'
   | 'ballot'
   | 'ballot_vote'
   | 'beneficiary'

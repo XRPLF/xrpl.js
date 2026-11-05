@@ -6,6 +6,7 @@ import {
   isAmount,
   isArray,
   isIssuedCurrency,
+  isNumber,
   isRecord,
   validateBaseTransaction,
   validateOptionalField,
@@ -54,6 +55,12 @@ export interface AMMBid extends BaseTransaction {
    * This cannot include the address of the transaction sender.
    */
   AuthAccounts?: AuthAccount[]
+
+  /**
+   * (AMMCurves) The curve type of the AMM, one of {@link AMMCurveType}.
+   * Defaults to the constant-product curve (0).
+   */
+  CurveType?: number
 }
 
 /**
@@ -82,6 +89,8 @@ export function validateAMMBid(tx: Record<string, unknown>): void {
     }
     validateAuthAccounts(tx.Account, tx.AuthAccounts)
   }
+
+  validateOptionalField(tx, 'CurveType', isNumber)
 }
 
 function validateAuthAccounts(

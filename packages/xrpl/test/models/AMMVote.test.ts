@@ -57,12 +57,6 @@ describe('AMMVote', function () {
     assertInvalid(vote, errorMessage)
   })
 
-  it(`throws w/ missing field TradingFee`, function () {
-    delete vote.TradingFee
-    const errorMessage = 'AMMVote: missing field TradingFee'
-    assertInvalid(vote, errorMessage)
-  })
-
   it(`throws w/ TradingFee must be a number`, function () {
     vote.TradingFee = '25'
     const errorMessage = 'AMMVote: invalid field TradingFee'
@@ -79,5 +73,32 @@ describe('AMMVote', function () {
     vote.TradingFee = -1
     const errorMessage = 'AMMVote: TradingFee must be between 0 and 1000'
     assertInvalid(vote, errorMessage)
+  })
+
+  it(`verifies valid AMMVote w/o TradingFee`, function () {
+    delete vote.TradingFee
+    vote.CurveType = 2
+    vote.Amplification = 100
+    assertValid(vote)
+  })
+
+  it(`throws w/ invalid CurveType`, function () {
+    vote.CurveType = '2'
+    assertInvalid(vote, 'AMMVote: invalid field CurveType')
+  })
+
+  it(`throws w/ invalid Amplification`, function () {
+    vote.Amplification = '100'
+    assertInvalid(vote, 'AMMVote: invalid field Amplification')
+  })
+
+  it(`throws w/ Amplification below 1`, function () {
+    vote.Amplification = 0
+    assertInvalid(vote, 'AMMVote: Amplification must be between 1 and 5000')
+  })
+
+  it(`throws w/ Amplification above 5000`, function () {
+    vote.Amplification = 5001
+    assertInvalid(vote, 'AMMVote: Amplification must be between 1 and 5000')
   })
 })

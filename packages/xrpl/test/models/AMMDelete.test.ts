@@ -56,4 +56,14 @@ describe('AMMDelete', function () {
     const errorMessage = 'AMMDelete: invalid field Asset2'
     assertInvalid(ammDelete, errorMessage)
   })
+
+  it(`verifies valid AMMDelete with CurveType`, function () {
+    ammDelete.CurveType = 1
+    assertValid(ammDelete)
+  })
+
+  it(`throws w/ invalid CurveType`, function () {
+    ammDelete.CurveType = '1'
+    assertInvalid(ammDelete, 'AMMDelete: invalid field CurveType')
+  })
 })

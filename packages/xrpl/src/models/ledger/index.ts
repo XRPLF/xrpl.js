@@ -4,6 +4,11 @@ import AccountRoot, {
 } from './AccountRoot'
 import Amendments, { Majority, AMENDMENTS_ID } from './Amendments'
 import AMM, { VoteSlot } from './AMM'
+import AMMBin from './AMMBin'
+import AMMBinHolding from './AMMBinHolding'
+import AMMPosition from './AMMPosition'
+import AMMTick from './AMMTick'
+import AMMTickBitmap from './AMMTickBitmap'
 import Ballot, { BallotFlags } from './Ballot'
 import BallotVote from './BallotVote'
 import Beneficiary from './Beneficiary'
@@ -59,6 +64,11 @@ export {
   AMENDMENTS_ID,
   Amendments,
   AMM,
+  AMMBin,
+  AMMBinHolding,
+  AMMPosition,
+  AMMTick,
+  AMMTickBitmap,
   Ballot,
   BallotFlags,
   BallotVote,

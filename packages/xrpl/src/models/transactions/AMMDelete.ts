@@ -3,7 +3,9 @@ import { Currency } from '../common'
 import {
   BaseTransaction,
   isIssuedCurrency,
+  isNumber,
   validateBaseTransaction,
+  validateOptionalField,
   validateRequiredField,
 } from './common'
 
@@ -30,6 +32,12 @@ export interface AMMDelete extends BaseTransaction {
    * The definition for the other asset in the AMM's pool.
    */
   Asset2: Currency
+
+  /**
+   * (AMMCurves) The curve type of the AMM, one of {@link AMMCurveType}.
+   * Defaults to the constant-product curve (0).
+   */
+  CurveType?: number
 }
 
 /**
@@ -44,4 +52,6 @@ export function validateAMMDelete(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
   validateRequiredField(tx, 'Asset2', isIssuedCurrency)
+
+  validateOptionalField(tx, 'CurveType', isNumber)
 }

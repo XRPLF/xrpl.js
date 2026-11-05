@@ -8,6 +8,7 @@ import {
   isAccount,
   isIssuedCurrency,
   isIssuedCurrencyAmount,
+  isNumber,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -68,6 +69,12 @@ export interface AMMClawback extends BaseTransaction {
    * tokens in the AMM, all of the holder's tokens will be clawed back.
    */
   Amount?: IssuedCurrencyAmount
+
+  /**
+   * (AMMCurves) The curve type of the AMM, one of {@link AMMCurveType}.
+   * Defaults to the constant-product curve (0).
+   */
+  CurveType?: number
 }
 
 /**
@@ -114,4 +121,6 @@ export function validateAMMClawback(tx: Record<string, unknown>): void {
       )
     }
   }
+
+  validateOptionalField(tx, 'CurveType', isNumber)
 }

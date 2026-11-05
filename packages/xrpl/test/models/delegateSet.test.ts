@@ -132,14 +132,17 @@ describe('DelegateSet', function () {
     })
   })
 
-  ;['CouponClaim', 'PaymentChannelClawback', 'SubscriptionSet'].forEach(
-    (transactionType) => {
-      it(`accepts PermissionValue ${transactionType}, which is delegable`, function () {
-        tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
-        assertValid(tx)
-      })
-    },
-  )
+  ;[
+    'AMMCollectFees',
+    'CouponClaim',
+    'PaymentChannelClawback',
+    'SubscriptionSet',
+  ].forEach((transactionType) => {
+    it(`accepts PermissionValue ${transactionType}, which is delegable`, function () {
+      tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
+      assertValid(tx)
+    })
+  })
 
   it(`throws w/ PermissionValue contains a non-delegatable pseudo transaction`, function () {
     tx.Permissions = [{ Permission: { PermissionValue: 'EnableAmendment' } }]

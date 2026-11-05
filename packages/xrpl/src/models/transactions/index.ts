@@ -21,18 +21,22 @@ export {
 } from './accountSet'
 export { AccountDelete } from './accountDelete'
 export { AMMBid } from './AMMBid'
+export { AMMBinCreate } from './AMMBinCreate'
+export { AMMBinDestroy } from './AMMBinDestroy'
 export {
   AMMClawbackFlags,
   AMMClawbackFlagsInterface,
   AMMClawback,
 } from './AMMClawback'
-export { AMMCreate } from './AMMCreate'
+export { AMMCollectFees } from './AMMCollectFees'
+export { AMMBinStep, AMMCreate, AMMCurveType, AMMFeeTier } from './AMMCreate'
 export { AMMDelete } from './AMMDelete'
 export {
   AMMDepositFlags,
   AMMDepositFlagsInterface,
   AMMDeposit,
 } from './AMMDeposit'
+export { AMMPositionTransfer } from './AMMPositionTransfer'
 export { AMMVote } from './AMMVote'
 export {
   AMMWithdrawFlags,

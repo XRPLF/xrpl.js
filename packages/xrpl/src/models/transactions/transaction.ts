@@ -7,10 +7,17 @@ import { convertTxFlagsToNumber } from '../utils/flags'
 import { AccountDelete, validateAccountDelete } from './accountDelete'
 import { AccountSet, validateAccountSet } from './accountSet'
 import { AMMBid, validateAMMBid } from './AMMBid'
+import { AMMBinCreate, validateAMMBinCreate } from './AMMBinCreate'
+import { AMMBinDestroy, validateAMMBinDestroy } from './AMMBinDestroy'
 import { AMMClawback, validateAMMClawback } from './AMMClawback'
+import { AMMCollectFees, validateAMMCollectFees } from './AMMCollectFees'
 import { AMMCreate, validateAMMCreate } from './AMMCreate'
 import { AMMDelete, validateAMMDelete } from './AMMDelete'
 import { AMMDeposit, validateAMMDeposit } from './AMMDeposit'
+import {
+  AMMPositionTransfer,
+  validateAMMPositionTransfer,
+} from './AMMPositionTransfer'
 import { AMMVote, validateAMMVote } from './AMMVote'
 import { AMMWithdraw, validateAMMWithdraw } from './AMMWithdraw'
 import { BallotCastVote, validateBallotCastVote } from './ballotCastVote'
@@ -219,10 +226,14 @@ import { WithdrawPreauth, validateWithdrawPreauth } from './withdrawPreauth'
  */
 export type SubmittableTransaction =
   | AMMBid
+  | AMMBinCreate
+  | AMMBinDestroy
   | AMMClawback
+  | AMMCollectFees
   | AMMCreate
   | AMMDelete
   | AMMDeposit
+  | AMMPositionTransfer
   | AMMVote
   | AMMWithdraw
   | AccountDelete
@@ -382,8 +393,20 @@ export function validate(transaction: Record<string, unknown>): void {
       validateAMMBid(tx)
       break
 
+    case 'AMMBinCreate':
+      validateAMMBinCreate(tx)
+      break
+
+    case 'AMMBinDestroy':
+      validateAMMBinDestroy(tx)
+      break
+
     case 'AMMClawback':
       validateAMMClawback(tx)
+      break
+
+    case 'AMMCollectFees':
+      validateAMMCollectFees(tx)
       break
 
     case 'AMMCreate':
@@ -396,6 +419,10 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'AMMDeposit':
       validateAMMDeposit(tx)
+      break
+
+    case 'AMMPositionTransfer':
+      validateAMMPositionTransfer(tx)
       break
 
     case 'AMMVote':

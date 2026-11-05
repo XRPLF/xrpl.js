@@ -1,12 +1,22 @@
 import { ValidationError } from '../../errors'
 import { Amount, Currency, IssuedCurrencyAmount } from '../common'
+import { hasFlag } from '../utils'
 
+import {
+  AMM_MAX_BIN_ID,
+  AMM_MAX_TICK,
+  AMM_MIN_BIN_ID,
+  AMM_MIN_TICK,
+  AMMCurveType,
+  isAMMBinIDInRange,
+} from './AMMCreate'
 import {
   BaseTransaction,
   GlobalFlagsInterface,
   isAmount,
   isIssuedCurrency,
   isIssuedCurrencyAmount,
+  isNumber,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
@@ -76,6 +86,37 @@ export interface AMMDeposit extends BaseTransaction {
    * How many of the AMM's LP Tokens to buy.
    */
   LPTokenOut?: IssuedCurrencyAmount
+
+  /**
+   * (AMMCurves) The curve type of the AMM to deposit into, one of {@link AMMCurveType}.
+   * Defaults to the constant-product curve (0).
+   */
+  CurveType?: number
+
+  /**
+   * (AMMCurves) The lower tick of the new concentrated liquidity position, from -887272.
+   * Required, with `TickUpper`, when `CurveType` is 1.
+   */
+  TickLower?: number
+
+  /**
+   * (AMMCurves) The upper tick of the new concentrated liquidity position, up to 887272.
+   * Must be greater than `TickLower`. Required, with `TickLower`, when `CurveType` is 1.
+   */
+  TickUpper?: number
+
+  /**
+   * (AMMCurves) The bin of a binned AMM to deposit into, from -221818 to 221818.
+   * Required when `CurveType` is 3.
+   */
+  BinID?: number
+}
+
+interface AMMDepositCurveFields extends Record<string, unknown> {
+  CurveType?: number
+  TickLower?: number
+  TickUpper?: number
+  BinID?: number
 }
 
 /**
@@ -105,4 +146,111 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Amount2', isAmount)
   validateOptionalField(tx, 'EPrice', isAmount)
+
+  validateCurveFields(tx)
+}
+
+/**
+ * Sum the AMMDeposit mode flags (the {@link AMMDepositFlags}) set on a transaction.
+ *
+ * @param tx - An AMMDeposit Transaction.
+ * @returns The mode flags set on `tx`, as a number.
+ */
+function getDepositModeFlags(tx: Record<string, unknown>): number {
+  return Object.entries(AMMDepositFlags).reduce((flags, [name, value]) => {
+    if (typeof value === 'number' && hasFlag(tx, value, name)) {
+      return flags + value
+    }
+    return flags
+  }, 0)
+}
+
+/**
+ * Check the tick and bin fields of an AMMDeposit against its `CurveType`.
+ *
+ * @param tx - An AMMDeposit Transaction.
+ * @throws When a curve field has the wrong type, a field the curve type requires
+ * is missing or out of range, or a field the curve type does not use is present.
+ */
+function validateCurveFields(tx: Record<string, unknown>): void {
+  validateOptionalField(tx, 'CurveType', isNumber)
+  validateOptionalField(tx, 'TickLower', isNumber)
+  validateOptionalField(tx, 'TickUpper', isNumber)
+  validateOptionalField(tx, 'BinID', isNumber)
+
+  if (tx.CurveType === AMMCurveType.concentratedLiquidity) {
+    validateConcentratedLiquidityDeposit(tx)
+  } else if (tx.CurveType === AMMCurveType.binned) {
+    validateBinnedDeposit(tx)
+  } else if (
+    tx.TickLower !== undefined ||
+    tx.TickUpper !== undefined ||
+    tx.BinID !== undefined
+  ) {
+    throw new ValidationError(
+      `AMMDeposit: TickLower, TickUpper and BinID are only allowed when CurveType is ${AMMCurveType.concentratedLiquidity} or ${AMMCurveType.binned}`,
+    )
+  }
+}
+
+/**
+ * Check a deposit into a concentrated liquidity AMM.
+ *
+ * @param tx - An AMMDeposit Transaction with `CurveType` 1.
+ * @throws When the mode flag is not tfTwoAsset or tfSingleAsset, or the tick range is missing or invalid.
+ */
+function validateConcentratedLiquidityDeposit(tx: AMMDepositCurveFields): void {
+  const modeFlags = getDepositModeFlags(tx)
+  if (
+    modeFlags !== AMMDepositFlags.tfTwoAsset &&
+    modeFlags !== AMMDepositFlags.tfSingleAsset
+  ) {
+    throw new ValidationError(
+      `AMMDeposit: CurveType ${AMMCurveType.concentratedLiquidity} requires the tfTwoAsset or tfSingleAsset flag`,
+    )
+  }
+  if (tx.TickLower === undefined || tx.TickUpper === undefined) {
+    throw new ValidationError(
+      `AMMDeposit: TickLower and TickUpper are required when CurveType is ${AMMCurveType.concentratedLiquidity}`,
+    )
+  }
+  if (tx.TickLower >= tx.TickUpper) {
+    throw new ValidationError(
+      'AMMDeposit: TickLower must be less than TickUpper',
+    )
+  }
+  if (tx.TickLower < AMM_MIN_TICK || tx.TickUpper > AMM_MAX_TICK) {
+    throw new ValidationError(
+      `AMMDeposit: TickLower and TickUpper must be between ${AMM_MIN_TICK} and ${AMM_MAX_TICK}`,
+    )
+  }
+}
+
+/**
+ * Check a deposit into a binned AMM.
+ *
+ * @param tx - An AMMDeposit Transaction with `CurveType` 3.
+ * @throws When the mode flag is not tfTwoAsset, `BinID` is missing or out of range, or a tick field is present.
+ */
+function validateBinnedDeposit(tx: AMMDepositCurveFields): void {
+  if (getDepositModeFlags(tx) !== AMMDepositFlags.tfTwoAsset) {
+    throw new ValidationError(
+      `AMMDeposit: CurveType ${AMMCurveType.binned} requires the tfTwoAsset flag`,
+    )
+  }
+  if (tx.BinID === undefined) {
+    throw new ValidationError(
+      `AMMDeposit: BinID is required when CurveType is ${AMMCurveType.binned}`,
+    )
+  }
+  if (!isAMMBinIDInRange(tx.BinID)) {
+    throw new ValidationError(
+      `AMMDeposit: BinID must be between ${AMM_MIN_BIN_ID} and ${AMM_MAX_BIN_ID}`,
+    )
+  }
+  if (tx.TickLower !== undefined || tx.TickUpper !== undefined) {
+    throw new ValidationError(
+      `AMMDeposit: TickLower and TickUpper are not allowed when CurveType is ${AMMCurveType.binned}`,
+    )
+  }
 }

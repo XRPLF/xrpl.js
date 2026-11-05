@@ -27,6 +27,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `CouponScheduleCreate`, `CouponScheduleSet`, `CouponScheduleDelete`, `CouponClaim` and `CouponPay` transactions, `CouponSchedule` ledger entry, `CouponAccrued` and `CouponIndex` on MPToken and `lsfMPTCouponSchedule` (CouponPayments amendment).
 * IOU and MPT amounts on `PaymentChannelCreate`, `PaymentChannelFund`, `PaymentChannelClaim` and the `PayChannel` ledger entry (with `TransferRate` and `IssuerNode`), and the `PaymentChannelClawback` transaction (TokenPaychan amendment).
 * `SubscriptionSet`, `SubscriptionCancel` and `SubscriptionClaim` transactions and `Subscription` ledger entry (Subscription amendment).
+* `AMMCollectFees`, `AMMPositionTransfer`, `AMMBinCreate` and `AMMBinDestroy` transactions; `CurveType` and curve fields on AMM transactions (`AMMVote.TradingFee` is now optional); `AMMPosition`, `AMMTick`, `AMMTickBitmap`, `AMMBin` and `AMMBinHolding` ledger entries and the new AMM ledger fields (AMMCurves amendment).
 
 ### Changed
 * Some transaction validation error messages changed.
