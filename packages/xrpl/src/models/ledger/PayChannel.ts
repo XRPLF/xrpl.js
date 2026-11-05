@@ -1,3 +1,5 @@
+import { Amount, MPTAmount } from '../common'
+
 import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 /**
@@ -24,19 +26,21 @@ export default interface PayChannel extends BaseLedgerEntry, HasPreviousTxnID {
    */
   Destination: string
   /**
-   * Total XRP, in drops, that has been allocated to this channel. This
-   * includes XRP that has been paid to the destination address. This is
-   * initially set by the transaction that created the channel and can be
-   * increased if the source address sends a PaymentChannelFund transaction.
+   * Total amount that has been allocated to this channel: XRP in drops, or
+   * (TokenPaychan) an IOU or MPT amount. This includes funds that have been
+   * paid to the destination address. This is initially set by the transaction
+   * that created the channel and can be increased if the source address sends
+   * a PaymentChannelFund transaction, or decreased by a PaymentChannelClawback.
    */
-  Amount: string
+  Amount: Amount | MPTAmount
   /**
-   * Total XRP, in drops, already paid out by the channel. The difference
-   * between this value and the Amount field is how much XRP can still be paid
-   * to the destination address with PaymentChannelClaim transactions. If the
-   * channel closes, the remaining difference is returned to the source address.
+   * Total amount already paid out by the channel, in the channel's asset. The
+   * difference between this value and the Amount field is how much can still be
+   * paid to the destination address with PaymentChannelClaim transactions. If
+   * the channel closes, the remaining difference is returned to the source
+   * address.
    */
-  Balance: string
+  Balance: Amount | MPTAmount
   /**
    * Public key, in hexadecimal, of the key pair that can be used to sign
    * claims against this channel. This can be any valid secp256k1 or Ed25519
@@ -100,4 +104,17 @@ export default interface PayChannel extends BaseLedgerEntry, HasPreviousTxnID {
    * of the owner.
    */
   Sponsor?: string
+  /**
+   * (TokenPaychan) The issuer's transfer rate recorded when a token channel was
+   * created, as an integer where 1000000000 is parity. Absent when the rate is
+   * parity or the channel holds XRP.
+   */
+  TransferRate?: number
+  /**
+   * (TokenPaychan) A hint indicating which page of the token issuer's owner
+   * directory links to this object, in case the directory consists of multiple
+   * pages. Present on IOU channels whose issuer is neither the source nor the
+   * destination.
+   */
+  IssuerNode?: string
 }

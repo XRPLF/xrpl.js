@@ -1,12 +1,18 @@
+import { ValidationError } from '../../errors'
+import { Amount, MPTAmount } from '../common'
+
 import {
   BaseTransaction,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
   isHexString,
 } from './common'
+import {
+  validatePayChanAmount,
+  validatePayChanIssuedCurrency,
+} from './paymentChannelCreate'
 
 /**
  * Add additional XRP to an open payment channel, and optionally update the
@@ -23,10 +29,10 @@ export interface PaymentChannelFund extends BaseTransaction {
    */
   Channel: string
   /**
-   * Amount of XRP in drops to add to the channel. Must be a positive amount
-   * of XRP.
+   * Amount to add to the channel: XRP in drops, or (TokenPaychan) an IOU or MPT
+   * amount in the channel's asset. Must be greater than 0.
    */
-  Amount: string
+  Amount: Amount | MPTAmount
   /**
    * New Expiration time to set for the channel in seconds since the Ripple
    * Epoch. This must be later than either the current time plus the SettleDelay
@@ -50,6 +56,13 @@ export function validatePaymentChannelFund(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
   validateRequiredField(tx, 'Channel', isHexString)
-  validateRequiredField(tx, 'Amount', isString)
+
+  if (tx.Amount == null) {
+    throw new ValidationError('PaymentChannelFund: missing field Amount')
+  }
+
+  validatePayChanAmount(tx, 'Amount')
+  validatePayChanIssuedCurrency(tx, 'Amount')
+
   validateOptionalField(tx, 'Expiration', isNumber)
 }

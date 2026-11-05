@@ -57,13 +57,19 @@ describe('PaymentChannelClaim', function () {
   it(`throws w/ invalid Balance`, function () {
     channel.Balance = 100
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Balance')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: Balance must be an XRP, IOU or MPT amount',
+    )
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelClaim: invalid field Amount')
+    assertInvalid(
+      channel,
+      'PaymentChannelClaim: Amount must be an XRP, IOU or MPT amount',
+    )
   })
 
   it(`throws w/ invalid Signature`, function () {
@@ -91,5 +97,215 @@ describe('PaymentChannelClaim', function () {
   it(`throws w/ non-hex PublicKey`, function () {
     channel.PublicKey = 'not hex'
     assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
+  })
+
+  describe('token amounts (TokenPaychan)', function () {
+    it(`verifies an IOU Balance`, function () {
+      delete channel.Amount
+      channel.Balance = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '100.5',
+      }
+
+      assertValid(channel)
+    })
+
+    it(`verifies an MPT Balance`, function () {
+      delete channel.Amount
+      channel.Balance = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '100',
+      }
+
+      assertValid(channel)
+    })
+
+    it(`throws w/ a zero XRP Balance`, function () {
+      channel.Balance = '0'
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a negative IOU Balance`, function () {
+      delete channel.Amount
+      channel.Balance = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '-1',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a zero MPT Balance`, function () {
+      delete channel.Amount
+      channel.Balance = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '0',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a malformed token Balance`, function () {
+      channel.Balance = { currency: 'USD' }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance must be an XRP, IOU or MPT amount',
+      )
+    })
+
+    it(`verifies an IOU Amount`, function () {
+      delete channel.Balance
+      delete channel.Signature
+      channel.Amount = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '100.5',
+      }
+
+      assertValid(channel)
+    })
+
+    it(`verifies an MPT Amount`, function () {
+      delete channel.Balance
+      delete channel.Signature
+      channel.Amount = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '100',
+      }
+
+      assertValid(channel)
+    })
+
+    it(`throws w/ a zero XRP Amount`, function () {
+      channel.Amount = '0'
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Amount must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a negative IOU Amount`, function () {
+      delete channel.Balance
+      delete channel.Signature
+      channel.Amount = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '-1',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Amount must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a zero MPT Amount`, function () {
+      delete channel.Balance
+      delete channel.Signature
+      channel.Amount = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '0',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Amount must be greater than 0',
+      )
+    })
+
+    it(`throws w/ a malformed token Amount`, function () {
+      channel.Amount = { currency: 'USD' }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Amount must be an XRP, IOU or MPT amount',
+      )
+    })
+
+    it(`verifies IOU Balance and Amount in the same asset`, function () {
+      channel.Balance = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '10',
+      }
+      channel.Amount = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '10',
+      }
+
+      assertValid(channel)
+    })
+
+    it(`throws w/ Balance and Amount in different assets`, function () {
+      channel.Balance = '1000000'
+      channel.Amount = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '10',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance and Amount must be in the same asset',
+      )
+    })
+
+    it(`throws w/ Balance and Amount of different MPT issuances`, function () {
+      channel.Balance = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+        value: '1',
+      }
+      channel.Amount = {
+        mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3F',
+        value: '1',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance and Amount must be in the same asset',
+      )
+    })
+
+    it(`throws w/ an XRP Balance above Amount`, function () {
+      channel.Balance = '1000001'
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance cannot exceed Amount',
+      )
+    })
+
+    it(`throws w/ an IOU Balance above Amount`, function () {
+      channel.Balance = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '10.01',
+      }
+      channel.Amount = {
+        currency: 'USD',
+        issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+        value: '10',
+      }
+
+      assertInvalid(
+        channel,
+        'PaymentChannelClaim: Balance cannot exceed Amount',
+      )
+    })
   })
 })

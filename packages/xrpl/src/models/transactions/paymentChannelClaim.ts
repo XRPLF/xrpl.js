@@ -1,7 +1,11 @@
+import { ValidationError } from '../../errors'
+import { Amount, MPTAmount } from '../common'
+import { amountValue, isSameAsset } from '../utils/amount'
+
 import {
   BaseTransaction,
   GlobalFlagsInterface,
-  isString,
+  isAmount,
   validateBaseTransaction,
   validateCredentialsList,
   validateOptionalField,
@@ -9,6 +13,7 @@ import {
   MAX_AUTHORIZED_CREDENTIALS,
   isHexString,
 } from './common'
+import { validatePayChanAmount } from './paymentChannelCreate'
 
 /**
  * Enum representing values for PaymentChannelClaim transaction flags.
@@ -111,18 +116,20 @@ export interface PaymentChannelClaim extends BaseTransaction {
   /** The unique ID of the channel as a 64-character hexadecimal string. */
   Channel: string
   /**
-   * Total amount of XRP, in drops, delivered by this channel after processing
-   * this claim. Required to deliver XRP. Must be more than the total amount
-   * delivered by the channel so far, but not greater than the Amount of the
-   * signed claim. Must be provided except when closing the channel.
+   * Total amount delivered by this channel after processing this claim, in the
+   * channel's asset: XRP in drops, or (TokenPaychan) an IOU or MPT amount.
+   * Required to deliver funds. Must be more than the total amount delivered by
+   * the channel so far, but not greater than the Amount of the signed claim.
+   * Must be provided except when closing the channel.
    */
-  Balance?: string
+  Balance?: Amount | MPTAmount
   /**
-   * The amount of XRP, in drops, authorized by the Signature. This must match
-   * the amount in the signed message. This is the cumulative amount of XRP that
-   * can be dispensed by the channel, including XRP previously redeemed.
+   * The amount authorized by the Signature, in the channel's asset: XRP in
+   * drops, or (TokenPaychan) an IOU or MPT amount. This must match the amount in
+   * the signed message. This is the cumulative amount that can be dispensed by
+   * the channel, including funds previously redeemed.
    */
-  Amount?: string
+  Amount?: Amount | MPTAmount
   /**
    * The signature of this claim, as hexadecimal. The signed message contains
    * the channel ID and the amount of the claim. Required unless the sender of
@@ -160,8 +167,42 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
   )
 
   validateRequiredField(tx, 'Channel', isHexString)
-  validateOptionalField(tx, 'Balance', isString)
-  validateOptionalField(tx, 'Amount', isString)
+
+  if (tx.Balance !== undefined) {
+    validatePayChanAmount(tx, 'Balance')
+  }
+
+  if (tx.Amount !== undefined) {
+    validatePayChanAmount(tx, 'Amount')
+  }
+
+  validateBalanceWithinAmount(tx)
+
   validateOptionalField(tx, 'Signature', isHexString)
   validateOptionalField(tx, 'PublicKey', isHexString)
+}
+
+/**
+ * Check that a Balance and Amount given together are in the same asset and
+ * that Balance does not exceed Amount.
+ *
+ * @param tx - A PaymentChannelClaim Transaction.
+ * @throws When Balance and Amount differ in asset or Balance exceeds Amount.
+ */
+function validateBalanceWithinAmount(tx: Record<string, unknown>): void {
+  const balance = tx.Balance
+  const amount = tx.Amount
+  if (!isAmount(balance) || !isAmount(amount)) {
+    return
+  }
+  if (!isSameAsset(balance, amount)) {
+    throw new ValidationError(
+      'PaymentChannelClaim: Balance and Amount must be in the same asset',
+    )
+  }
+  if (amountValue(balance).isGreaterThan(amountValue(amount))) {
+    throw new ValidationError(
+      'PaymentChannelClaim: Balance cannot exceed Amount',
+    )
+  }
 }

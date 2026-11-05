@@ -132,7 +132,7 @@ describe('DelegateSet', function () {
     })
   })
 
-  ;['CouponClaim'].forEach((transactionType) => {
+  ;['CouponClaim', 'PaymentChannelClawback'].forEach((transactionType) => {
     it(`accepts PermissionValue ${transactionType}, which is delegable`, function () {
       tx.Permissions = [{ Permission: { PermissionValue: transactionType } }]
       assertValid(tx)

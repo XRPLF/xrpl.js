@@ -1,3 +1,6 @@
+import { assert } from 'chai'
+
+import { validate, ValidationError } from '../../src'
 import { validatePaymentChannelCreate } from '../../src/models/transactions/paymentChannelCreate'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
@@ -68,7 +71,10 @@ describe('PaymentChannelCreate', function () {
   it(`invalid Amount`, function () {
     channel.Amount = 1000
 
-    assertInvalid(channel, 'PaymentChannelCreate: invalid field Amount')
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: Amount must be an XRP, IOU or MPT amount',
+    )
   })
 
   it(`invalid Destination`, function () {
@@ -104,5 +110,86 @@ describe('PaymentChannelCreate', function () {
   it(`throws w/ non-hex PublicKey`, function () {
     channel.PublicKey = 'not hex'
     assertInvalid(channel, 'PaymentChannelCreate: invalid field PublicKey')
+  })
+
+  it(`verifies an IOU Amount`, function () {
+    channel.Amount = {
+      currency: 'USD',
+      issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+      value: '100.5',
+    }
+
+    assertValid(channel)
+  })
+
+  it(`verifies an MPT Amount`, function () {
+    channel.Amount = {
+      mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      value: '100',
+    }
+
+    assertValid(channel)
+  })
+
+  it(`throws w/ a zero XRP Amount`, function () {
+    channel.Amount = '0'
+
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: Amount must be greater than 0',
+    )
+  })
+
+  it(`throws w/ a negative IOU Amount`, function () {
+    channel.Amount = {
+      currency: 'USD',
+      issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+      value: '-1',
+    }
+
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: Amount must be greater than 0',
+    )
+  })
+
+  it(`throws w/ a zero MPT Amount`, function () {
+    channel.Amount = {
+      mpt_issuance_id: '000004C463C52827307480341125DA0577DEFC38405B0E3E',
+      value: '0',
+    }
+
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: Amount must be greater than 0',
+    )
+  })
+
+  it(`throws w/ a malformed token Amount`, function () {
+    channel.Amount = { currency: 'USD' }
+
+    assertInvalid(
+      channel,
+      'PaymentChannelCreate: Amount must be an XRP, IOU or MPT amount',
+    )
+  })
+
+  it(`throws w/ an IOU Amount using the XRP currency code`, function () {
+    channel.Amount = {
+      currency: 'XRP',
+      issuer: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+      value: '1',
+    }
+
+    assert.throws(
+      () => validatePaymentChannelCreate(channel),
+      ValidationError,
+      'PaymentChannelCreate: Amount cannot be an issued currency with the code XRP',
+    )
+    assert.throws(
+      () => validate(channel),
+      ValidationError,
+      'Cannot have an issued currency with a similar standard code to XRP',
+    )
   })
 })
