@@ -270,7 +270,7 @@ Add the `needs-second-reviewer` label when one reviewer shouldn't be the only li
 - Release, publishing or CI changes under `.github/`.
 - Large or cross-cutting changes that the first reviewer can't fully verify alone.
 
-On a labeled PR, the `second-review` check fails until two reviewers with write access have approved. Only each reviewer's latest review counts, and bot approvals never count. Don't remove the label to get around the check; if it was added by mistake, ask the maintainer who added it.
+On a labeled PR, the `second-review` check fails until two reviewers with write access have approved. Only each reviewer's latest review counts, and bot approvals never count. The check updates about a minute after each push, label change or review. Don't remove the label to get around the check; if it was added by mistake, ask the maintainer who added it.
 
 ### The AI reviewer
 
