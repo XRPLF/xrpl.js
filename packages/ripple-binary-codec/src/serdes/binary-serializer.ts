@@ -99,7 +99,7 @@ class BinarySerializer {
    *
    * @param length the length of the bytes
    */
-  private encodeVariableLength(length: number): Uint8Array {
+  static encodeVariableLength(length: number): Uint8Array {
     const lenBytes = new Uint8Array(3)
     if (length <= 192) {
       lenBytes[0] = length
@@ -158,7 +158,7 @@ class BinarySerializer {
       // this part doesn't happen for the Account field in a UNLModify transaction
       value.toBytesSink(bytes)
     }
-    this.put(this.encodeVariableLength(bytes.getLength()))
+    this.put(BinarySerializer.encodeVariableLength(bytes.getLength()))
     this.writeBytesList(bytes)
   }
 }

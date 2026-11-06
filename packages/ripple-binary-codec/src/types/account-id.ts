@@ -6,6 +6,7 @@ import {
 } from 'ripple-address-codec'
 import { Hash160 } from './hash-160'
 import { hexToBytes } from '@xrplf/isomorphic/utils'
+import { SerializedTypeID } from './serialized-type'
 
 const HEX_REGEX = /^[A-F0-9]{40}$/
 
@@ -80,6 +81,10 @@ class AccountID extends Hash160 {
    */
   toBase58(): string {
     return encodeAccountID(this.bytes)
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_ACCOUNT
   }
 }
 

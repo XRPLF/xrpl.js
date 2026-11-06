@@ -1,5 +1,6 @@
 import { Hash } from './hash'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
+import { SerializedTypeID } from './serialized-type'
 
 /**
  * Hash with a width of 128 bits
@@ -27,6 +28,10 @@ class Hash128 extends Hash {
       return ''
     }
     return hex
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_UINT128
   }
 }
 
