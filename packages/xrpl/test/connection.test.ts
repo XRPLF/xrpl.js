@@ -5,11 +5,13 @@ import { assert } from 'chai'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 
 import {
+  AccountInfoRequest,
   Client,
   ConnectionError,
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
+  RippledError,
   XrplError,
   TimeoutError,
   SubscribeRequest,
@@ -854,6 +856,32 @@ describe('Connection', function () {
   )
 
   it(
+    'handles malformed UTF-8 text websocket messages',
+    async () => {
+      clientContext.mockRippled!.addResponse('server_info', (request) => ({
+        payload: Buffer.from([
+          ...Buffer.from(
+            `{"type":"response","status":"success","id":${JSON.stringify(request.id)},"result":{"message":"`,
+          ),
+          0xff,
+          ...Buffer.from('"}}'),
+        ]),
+        binary: false,
+      }))
+
+      const response = await clientContext.client.request({
+        command: 'server_info',
+      })
+
+      assert.strictEqual(
+        (response.result as unknown as { message: string }).message,
+        '�',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'propagates RippledError data',
     async () => {
       const request: SubscribeRequest = {
@@ -1164,6 +1192,51 @@ describe('Connection', function () {
         'send: send errored after connection was closed: [XrplError(No existing promise with id 1, ' +
           '{"type":"reject","error":{"name":"DisconnectedError","data":{"message":"some error"}}})]',
       ])
+    },
+    TIMEOUT,
+  )
+
+  it('should handle jsonInvalid errors', async function () {
+    const response = {
+      error: 'jsonInvalid',
+      type: 'error',
+      value: '{"command":"submit","tx_json":"badjson"}',
+    }
+    // doesn't matter what the request is, since we're mocking the response
+    const request: AccountInfoRequest = {
+      command: 'account_info',
+      account: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+    }
+    clientContext.mockRippled?.addResponse(request.command, response)
+
+    await assertRejects(
+      clientContext.client.request(request),
+      RippledError,
+      'jsonInvalid',
+    )
+  }, 4000)
+
+  it.each([
+    ['no value', undefined],
+    ['a value with no id', '{"command":"submit"}'],
+    ['a value that is not an object', 'null'],
+  ])(
+    'reports badMessage without throwing for a type error message with %s',
+    async (_desc, value) => {
+      const badMessage = new Promise<void>((resolve) => {
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(
+        JSON.stringify({ type: 'error', error: 'jsonInvalid', value }),
+      )
+
+      await badMessage
     },
     TIMEOUT,
   )

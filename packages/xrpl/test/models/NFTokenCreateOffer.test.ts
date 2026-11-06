@@ -131,7 +131,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assertInvalid(invalid, 'NFTokenCreateOffer: invalid Amount')
+    assertInvalid(invalid, 'NFTokenCreateOffer: invalid field Amount')
   })
 
   it(`throws w/ missing Amount`, function () {
@@ -146,7 +146,7 @@ describe('NFTokenCreateOffer', function () {
       Sequence: 2470665,
     } as any
 
-    assertInvalid(invalid, 'NFTokenCreateOffer: invalid Amount')
+    assertInvalid(invalid, 'NFTokenCreateOffer: missing field Amount')
   })
 
   it(`throws w/ Owner for sell offer`, function () {
@@ -200,6 +200,25 @@ describe('NFTokenCreateOffer', function () {
     assertInvalid(
       invalid,
       'NFTokenCreateOffer: Amount must be greater than 0 for buy offers',
+    )
+  })
+
+  it(`throws w/ non-hex NFTokenID`, function () {
+    const validNFTokenCreateOffer = {
+      TransactionType: 'NFTokenCreateOffer',
+      NFTokenID: NFTOKEN_ID,
+      Amount: '1',
+      Owner: 'rcXY84C4g14iFp6taFXjjQGVeHqSCh9RX',
+      Expiration: 1000,
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Destination: 'r9LqNeG6qHxjeUocjvVki2XR35weJ9mZgQ',
+      Fee: '5000000',
+      Sequence: 2470665,
+    } as any
+    validNFTokenCreateOffer.NFTokenID = 'not hex'
+    assertInvalid(
+      validNFTokenCreateOffer,
+      'NFTokenCreateOffer: invalid field NFTokenID',
     )
   })
 })

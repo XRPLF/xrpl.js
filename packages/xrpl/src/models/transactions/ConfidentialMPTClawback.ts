@@ -6,11 +6,11 @@ import {
   isAccount,
   isMPTIssuer,
   isHexWithByteLength,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   validateConfidentialMPTAmount,
   CONFIDENTIAL_CLAWBACK_PROOF_BYTES,
+  isHexString,
 } from './common'
 
 /**
@@ -48,7 +48,7 @@ export function validateConfidentialMPTClawback(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   // rippled requires the submitter to be the issuer of the MPToken (temMALFORMED).
   if (!isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
     throw new ValidationError(

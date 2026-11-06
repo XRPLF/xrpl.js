@@ -40,7 +40,7 @@ describe('AMMCreate', function () {
 
   it(`throws w/ Amount must be an Amount`, function () {
     ammCreate.Amount = 1000
-    const errorMessage = 'AMMCreate: Amount must be an Amount'
+    const errorMessage = 'AMMCreate: invalid field Amount'
     assertInvalid(ammCreate, errorMessage)
   })
 
@@ -52,7 +52,7 @@ describe('AMMCreate', function () {
 
   it(`throws w/ Amount2 must be an Amount`, function () {
     ammCreate.Amount2 = 1000
-    const errorMessage = 'AMMCreate: Amount2 must be an Amount'
+    const errorMessage = 'AMMCreate: invalid field Amount2'
     assertInvalid(ammCreate, errorMessage)
   })
 
@@ -64,7 +64,7 @@ describe('AMMCreate', function () {
 
   it(`throws w/ TradingFee must be a number`, function () {
     ammCreate.TradingFee = '12'
-    const errorMessage = 'AMMCreate: TradingFee must be a number'
+    const errorMessage = 'AMMCreate: invalid field TradingFee'
     assertInvalid(ammCreate, errorMessage)
   })
 
