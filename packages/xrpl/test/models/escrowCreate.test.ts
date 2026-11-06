@@ -59,19 +59,19 @@ describe('EscrowCreate', function () {
   it(`invalid CancelAfter`, function () {
     escrow.CancelAfter = '100'
 
-    assertInvalid(escrow, 'EscrowCreate: CancelAfter must be a number')
+    assertInvalid(escrow, 'EscrowCreate: invalid field CancelAfter')
   })
 
   it(`invalid FinishAfter`, function () {
     escrow.FinishAfter = '1000'
 
-    assertInvalid(escrow, 'EscrowCreate: FinishAfter must be a number')
+    assertInvalid(escrow, 'EscrowCreate: invalid field FinishAfter')
   })
 
   it(`invalid Condition`, function () {
     escrow.Condition = 0x141243
 
-    assertInvalid(escrow, 'EscrowCreate: Condition must be a string')
+    assertInvalid(escrow, 'EscrowCreate: invalid field Condition')
   })
 
   it(`invalid DestinationTag`, function () {
@@ -98,5 +98,10 @@ describe('EscrowCreate', function () {
       escrow,
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
+  })
+
+  it(`throws w/ non-hex Condition`, function () {
+    escrow.Condition = 'not hex'
+    assertInvalid(escrow, 'EscrowCreate: invalid field Condition')
   })
 })

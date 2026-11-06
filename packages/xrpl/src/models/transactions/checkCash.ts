@@ -1,7 +1,13 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
 
-import { BaseTransaction, validateBaseTransaction, isAmount } from './common'
+import {
+  BaseTransaction,
+  validateBaseTransaction,
+  isAmount,
+  validateOptionalField,
+  isHexString,
+} from './common'
 
 /**
  * Attempts to redeem a Check object in the ledger to receive up to the amount
@@ -52,21 +58,7 @@ export function validateCheckCash(tx: Record<string, unknown>): void {
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary check
-  if (tx.Amount != null && tx.Amount !== undefined && !isAmount(tx.Amount)) {
-    throw new ValidationError('CheckCash: invalid Amount')
-  }
-
-  if (
-    tx.DeliverMin != null &&
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary check
-    tx.DeliverMin !== undefined &&
-    !isAmount(tx.DeliverMin)
-  ) {
-    throw new ValidationError('CheckCash: invalid DeliverMin')
-  }
-
-  if (tx.CheckID !== undefined && typeof tx.CheckID !== 'string') {
-    throw new ValidationError('CheckCash: invalid CheckID')
-  }
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'DeliverMin', isAmount)
+  validateOptionalField(tx, 'CheckID', isHexString)
 }

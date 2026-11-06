@@ -47,10 +47,6 @@ export function validateClawback(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'Amount', isClawbackAmount)
   validateOptionalField(tx, 'Holder', isAccount)
 
-  if (!isIssuedCurrencyAmount(tx.Amount) && !isMPTAmount(tx.Amount)) {
-    throw new ValidationError('Clawback: invalid Amount')
-  }
-
   if (isIssuedCurrencyAmount(tx.Amount) && tx.Account === tx.Amount.issuer) {
     throw new ValidationError('Clawback: invalid holder Account')
   }

@@ -50,4 +50,9 @@ describe('VaultDeposit', function () {
     tx.Amount = 123
     assertInvalid(tx, 'VaultDeposit: invalid field Amount')
   })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
+    assertInvalid(tx, 'VaultDeposit: invalid field VaultID')
+  })
 })

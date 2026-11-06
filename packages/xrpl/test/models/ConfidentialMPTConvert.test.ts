@@ -244,4 +244,22 @@ describe('ConfidentialMPTConvert', function () {
       'ConfidentialMPTConvert: MPTAmount out of range',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTConvert',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: 'not hex',
+        MPTAmount: '100',
+        HolderEncryptionKey: EC_POINT,
+        HolderEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        AuditorEncryptedAmount: CIPHERTEXT,
+        BlindingFactor: BLINDING,
+        ZKProof: PROOF,
+      },
+      'ConfidentialMPTConvert: invalid field MPTokenIssuanceID',
+    )
+  })
 })

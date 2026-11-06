@@ -91,7 +91,7 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidExpiration, 'CheckCreate: invalid Expiration')
+    assertInvalid(invalidExpiration, 'CheckCreate: invalid field Expiration')
   })
 
   it(`throws w/ invalid InvoiceID`, function () {
@@ -106,6 +106,22 @@ describe('CheckCreate', function () {
       Fee: '12',
     } as any
 
-    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid InvoiceID')
+    assertInvalid(invalidInvoiceID, 'CheckCreate: invalid field InvoiceID')
+  })
+
+  it(`throws w/ non-hex InvoiceID`, function () {
+    const validCheck = {
+      TransactionType: 'CheckCreate',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      SendMax: '100000000',
+      Expiration: 570113521,
+      InvoiceID:
+        '6F1DFD1D0FE8A32E40E1F2C05CF1C15545BAB56B617F9C6C2D63A6B704BEF59B',
+      DestinationTag: 1,
+      Fee: '12',
+    } as any
+    validCheck.InvoiceID = 'not hex'
+    assertInvalid(validCheck, 'CheckCreate: invalid field InvoiceID')
   })
 })

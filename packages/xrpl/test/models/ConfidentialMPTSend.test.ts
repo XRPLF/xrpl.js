@@ -314,4 +314,25 @@ describe('ConfidentialMPTSend', function () {
       'ConfidentialMPTSend: Invalid Credentials ID list format',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTSend',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: 'not hex',
+        Destination: DESTINATION,
+        DestinationTag: 12345,
+        SenderEncryptedAmount: CIPHERTEXT,
+        DestinationEncryptedAmount: CIPHERTEXT,
+        IssuerEncryptedAmount: CIPHERTEXT,
+        AuditorEncryptedAmount: CIPHERTEXT,
+        ZKProof: PROOF,
+        AmountCommitment: EC_POINT,
+        BalanceCommitment: EC_POINT,
+        CredentialIDs: [CREDENTIAL_ID],
+      },
+      'ConfidentialMPTSend: invalid field MPTokenIssuanceID',
+    )
+  })
 })

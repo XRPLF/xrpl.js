@@ -11,6 +11,7 @@ import {
   isNumber,
   validateBaseTransaction,
   validateOptionalField,
+  validateRequiredField,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
@@ -192,9 +193,7 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
     throw new ValidationError('NFTokenMint: URI must be in hex format')
   }
 
-  if (tx.NFTokenTaxon == null) {
-    throw new ValidationError('NFTokenMint: missing field NFTokenTaxon')
-  }
+  validateRequiredField(tx, 'NFTokenTaxon', isNumber)
 
   validateTransferFee(tx)
 
