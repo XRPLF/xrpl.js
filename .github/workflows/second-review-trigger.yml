@@ -35,4 +35,5 @@ jobs:
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           EVENT: ${{ github.event_name }}
-        run: echo "Requesting a second-review evaluation for PR #${PR_NUMBER} (${EVENT})."
+        run: |
+          echo "Requesting a second-review evaluation for PR #${PR_NUMBER} (${EVENT})."
