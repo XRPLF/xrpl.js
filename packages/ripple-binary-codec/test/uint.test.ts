@@ -289,6 +289,52 @@ describe('UInt decimal validation', () => {
       expect(() => UInt32.from(100000)).not.toThrow()
       expect(() => UInt32.from(4294967295)).not.toThrow()
     })
+
+    it('should accept base-10 integer strings', () => {
+      expect(UInt32.from('0').valueOf()).toBe(0)
+      expect(UInt32.from('12345').valueOf()).toBe(12345)
+      expect(UInt32.from('4294967295').valueOf()).toBe(4294967295)
+      expect(UInt32.from('+5').valueOf()).toBe(5)
+    })
+
+    it('should throw error when passed an out of range string', () => {
+      expect(() => UInt32.from('4294967296')).toThrow()
+      expect(() => UInt32.from('99999999999')).toThrow()
+    })
+
+    it('should throw error when passed a string that is not a base-10 integer', () => {
+      for (const val of [
+        '-1',
+        '1.5',
+        '1e3',
+        '0x10',
+        'abc',
+        '12abc',
+        '',
+        '+',
+        ' 1',
+      ]) {
+        expect(() => UInt32.from(val)).toThrow(
+          new Error('Cannot construct UInt32 from given value'),
+        )
+      }
+    })
+
+    it('should not encode a mangled DestinationTag string', () => {
+      const tx = {
+        TransactionType: 'Payment',
+        Account: 'rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh',
+        Destination: 'rPT1Sjq2YGrBMTttX4GZHjKu9dyfzbpAYe',
+        Amount: '1000000',
+        Fee: '12',
+        Sequence: 1,
+      }
+      expect(
+        decode(encode({ ...tx, DestinationTag: '1000' })).DestinationTag,
+      ).toBe(1000)
+      expect(() => encode({ ...tx, DestinationTag: '1e3' })).toThrow()
+      expect(() => encode({ ...tx, DestinationTag: '-1' })).toThrow()
+    })
   })
 
   describe('UInt64', () => {
