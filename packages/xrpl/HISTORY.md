@@ -23,6 +23,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
+* `OracleSet` validation now accepts a `PriceData` entry with `AssetPrice` and no `Scale`, which is how XLS-47 expresses a `Scale` of 0, and rejects an explicit `Scale: 0` that rippled refuses with "Field 'Scale' may not be explicitly set to default".
 
 ## 5.3.0 (2026-09-16)
 
