@@ -1,0 +1,128 @@
+# Requires a second approval on PRs labeled `needs-second-reviewer`.
+#
+# `main` requires one approving review. Add the `second-review` commit status as
+# a required check so a labeled PR can't merge until two reviewers with write
+# access have approved it. Unlabeled PRs pass. See CONTRIBUTING.md#code-review.
+#
+# Both triggers below always run this file from the default branch, with a
+# token that can post statuses even for fork PRs, so a PR can't change the
+# result or skip label and push events by editing it:
+#   - `pull_request_target`: PR opened, pushed, labeled or unlabeled.
+#   - `workflow_run`: after second-review-trigger.yml records a review change.
+# This workflow never checks out or runs PR code. One commit status per head
+# commit means there is never more than one `second-review` result.
+
+name: Second review
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+  workflow_run:
+    workflows: ["Second review trigger"]
+    types: [completed]
+
+permissions:
+  pull-requests: read
+  statuses: write
+
+# One queue per PR for both triggers, so a slow evaluation can't post a stale
+# result over a newer one. The key matches the trigger's run name. Skipped
+# trigger runs (thread replies) get their own group, so they never cancel a
+# real evaluation.
+concurrency:
+  group: "second-review-${{ github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success' && 'ignored-' || '' }}${{ github.event.workflow_run.display_title || format('Second review trigger for PR #{0}', github.event.pull_request.number) }}"
+  cancel-in-progress: true
+
+jobs:
+  # Not named `second-review`: a check run with the same name as the required
+  # commit status would be required too.
+  post-second-review-status:
+    if: >-
+      github.event_name == 'pull_request_target' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Evaluate approvals and post status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          # Set on `pull_request_target`.
+          EVENT_PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Set on `workflow_run` by the trigger run, which a PR can influence.
+          # Only used to pick which PR to look up; everything else is read from
+          # the API.
+          RUN_TITLE: ${{ github.event.workflow_run.display_title }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LABEL: needs-second-reviewer
+          REQUIRED_APPROVALS: 2
+        run: |
+          set -euo pipefail
+
+          if [ -n "${EVENT_PR_NUMBER}" ]; then
+            PR_NUMBER="${EVENT_PR_NUMBER}"
+          elif [[ "${RUN_TITLE}" =~ \#([0-9]+)$ ]]; then
+            PR_NUMBER="${BASH_REMATCH[1]}"
+          else
+            echo "::error::Could not read a PR number from the trigger run name."
+            exit 1
+          fi
+
+          # writersOnly drops reviewers without write access; bot reviews never
+          # count toward approvals.
+          RESULT="$(gh api graphql \
+            -F owner="${OWNER}" -F name="${REPO}" -F number="${PR_NUMBER}" \
+            -f query='
+              query($owner: String!, $name: String!, $number: Int!) {
+                repository(owner: $owner, name: $name) {
+                  pullRequest(number: $number) {
+                    state
+                    headRefOid
+                    labels(first: 100) { nodes { name } }
+                    latestOpinionatedReviews(first: 100, writersOnly: true) {
+                      nodes { state author { __typename login } }
+                    }
+                  }
+                }
+              }')"
+          PR="$(jq '.data.repository.pullRequest' <<< "${RESULT}")"
+
+          if [ "$(jq -r '.state' <<< "${PR}")" != "OPEN" ]; then
+            echo "PR #${PR_NUMBER} is not open; nothing to do." >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+          HEAD_SHA="$(jq -r '.headRefOid' <<< "${PR}")"
+
+          if jq -e --arg label "${LABEL}" 'any(.labels.nodes[]; .name == $label)' \
+            <<< "${PR}" > /dev/null; then
+            APPROVERS="$(jq -r '
+              .latestOpinionatedReviews.nodes[]
+              | select(.state == "APPROVED" and .author.__typename == "User")
+              | .author.login' <<< "${PR}")"
+            COUNT="$(printf '%s' "${APPROVERS}" | grep -c . || true)"
+            if [ "${COUNT}" -ge "${REQUIRED_APPROVALS}" ]; then
+              STATE=success
+            else
+              STATE=failure
+            fi
+            DESCRIPTION="${LABEL}: ${COUNT}/${REQUIRED_APPROVALS} approvals from reviewers with write access"
+          else
+            APPROVERS=""
+            STATE=success
+            DESCRIPTION="No ${LABEL} label: one approval is enough"
+          fi
+
+          gh api --silent "repos/${OWNER}/${REPO}/statuses/${HEAD_SHA}" \
+            -f state="${STATE}" \
+            -f context=second-review \
+            -f description="${DESCRIPTION}" \
+            -f target_url="${RUN_URL}"
+
+          {
+            echo "PR #${PR_NUMBER} at \`${HEAD_SHA:0:7}\`: **${STATE}**. ${DESCRIPTION}."
+            if [ -n "${APPROVERS}" ]; then
+              echo
+              printf -- '- @%s\n' ${APPROVERS}
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"

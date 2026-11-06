@@ -5,7 +5,7 @@
 - You should open a PR against `main` and ensure that all CI passes.
 - Your changes should have [unit](#unit-tests) and/or [integration tests](#integration-tests).
 - Your changes should [pass the linter](#run-the-linter).
-- You should get a full code review from two of the maintainers.
+- You should get a full code review from one of the maintainers, plus a second one if the PR is labeled `needs-second-reviewer`. The AI reviewer must also pass. See [Code review](#code-review).
 - Then you can merge your changes. (Which will then be included in the next release)
 
 ## Set up your dev environment
@@ -243,9 +243,46 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 - [ ] Lint the code with `npm lint`
 - [ ] Build your code with `npm build`
 - [ ] Run the unit tests with `npm test`
-- [ ] Get a full code review.
+- [ ] Get a full code review (see [Code review](#code-review)).
 - [ ] Merge your branch into `main` and push to github.
 - [ ] Ensure that all tests passed on the last CI that ran on `main`.
+
+## Code review
+
+A PR can merge into `main` when it has:
+
+- **One approving review** from a maintainer with write access.
+- **All required checks passing**, including:
+  - the unit and integration tests;
+  - `ai-review`, the XRPLF AI Reviewer (see [The AI reviewer](#the-ai-reviewer));
+  - `second-review`, which only matters on PRs labeled `needs-second-reviewer` (see below).
+
+Approving a PR means you reviewed it yourself. The AI reviewer is an extra check, not a replacement for your review.
+
+### When a PR needs a second review
+
+Add the `needs-second-reviewer` label when one reviewer shouldn't be the only line of defense. The first reviewer usually adds it; authors who can add labels should add it themselves. Use it for:
+
+- Binary serialization or encoding: `ripple-binary-codec`, `definitions.json`, `ripple-address-codec`.
+- Keys, signing and cryptography: `ripple-keypairs`, `secret-numbers`, `@xrplf/mpt-crypto`, wallet signing, multisigning and `Batch`.
+- Breaking changes to the public API.
+- Security fixes.
+- Release, publishing or CI changes under `.github/`.
+- Large or cross-cutting changes that the first reviewer can't fully verify alone.
+
+On a labeled PR, the `second-review` check fails until two reviewers with write access have approved. Only each reviewer's latest review counts, and bot approvals never count. The check updates about a minute after each push, label change or review. Don't remove the label to get around the check; if it was added by mistake, ask the maintainer who added it.
+
+### The AI reviewer
+
+The XRPLF AI Reviewer posts the `ai-review` check and inline comments on every PR.
+
+- **When it runs:** automatically on each push to a PR opened from a branch in this repo. On PRs from forks, the check stays pending until a maintainer comments `/ai-review` on the PR.
+- **What fails the check:** an unresolved finding of high or critical severity. Medium and low findings are posted as comments and don't block. Documentation and `*.md` files never block.
+- **Fixing a finding:** push a fix. Each push gets a fresh review, and the check updates when it finishes.
+- **False positives:** reply to the finding with `False positive:` followed by a short reason, for example `False positive: PKG_NAME is validated to [a-z0-9-] above, so it can't contain "/"`. The finding won't be raised again on that PR. If you have write access, the check is recomputed right away, and the bot replies `Dismissed by @you — gate updated`. If you don't, the check stays failed until a maintainer agrees, either by replying `False positive:` on the same finding or with an override.
+- **Overrides:** a maintainer can comment `/ai-review override <reason>` to mark the current commit as passing. Overrides are logged. Use them when a dismissal doesn't apply, and give a real reason.
+- **Only dismiss findings that are actually wrong.** Disagreement replies teach the reviewer what not to flag in this repo, so dismissing a valid finding makes future reviews worse.
+- **If the check stays pending** for more than about 15 minutes on a PR from this repo, the reviewer service may be down. Ask a repository admin.
 
 ## Release
 
