@@ -1,18 +1,18 @@
-# Starts the `second-review` evaluation in second-review.yml.
+# Starts a `second-review` evaluation in second-review.yml when a review changes.
 #
-# PR and review events run in the PR's context, where forks get a read-only
-# token and the workflow file comes from the PR itself. So this workflow does
-# nothing but record which PR changed, in its run name. second-review.yml runs
-# on `workflow_run` from the default branch, reads the PR's current state from
-# the API and posts the `second-review` commit status. Don't require this
-# workflow's check; require the `second-review` status.
+# GitHub has no trusted (`*_target`) version of review events, so this runs in
+# the PR's context, where forks get a read-only token and the workflow file
+# comes from the PR itself. It only records which PR changed, in its run name;
+# second-review.yml runs on `workflow_run` from the default branch, reads the
+# PR's current state from the API and posts the status. If a PR edits this file
+# to drop events, approvals just stop updating the status, so a failing check
+# stays failing. Label, push and open events are handled by second-review.yml
+# directly. Don't require this workflow's check.
 
 name: Second review trigger
 run-name: "Second review trigger for PR #${{ github.event.pull_request.number }}"
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
   pull_request_review:
     types: [submitted, dismissed]
 
@@ -24,7 +24,6 @@ jobs:
     # but they can't change the approval count, so skip them. GitHub can't
     # filter review events by state in `on:`, so they show up as skipped.
     if: >-
-      github.event_name == 'pull_request' ||
       github.event.action == 'dismissed' ||
       github.event.review.state == 'approved' ||
       github.event.review.state == 'changes_requested'
@@ -34,6 +33,6 @@ jobs:
       - name: Record PR
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          EVENT: ${{ github.event_name }}
+          EVENT: ${{ github.event.action }}
         run: |
-          echo "Requesting a second-review evaluation for PR #${PR_NUMBER} (${EVENT})."
+          echo "Requesting a second-review evaluation for PR #${PR_NUMBER} (review ${EVENT})."
