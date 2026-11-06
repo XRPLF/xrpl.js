@@ -1,0 +1,80 @@
+# Requires a second approval on PRs labeled `needs-second-reviewer`.
+#
+# `main` requires one approving review. Add `second-review` as a required status
+# check so a labeled PR can't merge until two reviewers with write access have
+# approved it. Unlabeled PRs pass immediately. See CONTRIBUTING.md#code-review.
+
+name: Second review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: second-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  second-review:
+    name: second-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check approvals
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          LABEL: needs-second-reviewer
+          REQUIRED_APPROVALS: 2
+        run: |
+          set -euo pipefail
+
+          # Read labels and reviews from the API, not the event payload, so a
+          # rerun always sees the current state. writersOnly drops reviewers
+          # without write access; bot reviews never count toward approvals.
+          RESULT="$(gh api graphql \
+            -F owner="${OWNER}" -F name="${REPO}" -F number="${PR_NUMBER}" \
+            -f query='
+              query($owner: String!, $name: String!, $number: Int!) {
+                repository(owner: $owner, name: $name) {
+                  pullRequest(number: $number) {
+                    labels(first: 100) { nodes { name } }
+                    latestOpinionatedReviews(first: 100, writersOnly: true) {
+                      nodes { state author { __typename login } }
+                    }
+                  }
+                }
+              }')"
+
+          if ! jq -e --arg label "${LABEL}" \
+            'any(.data.repository.pullRequest.labels.nodes[]; .name == $label)' \
+            <<< "${RESULT}" > /dev/null; then
+            echo "No \`${LABEL}\` label: one approval is enough." >> "${GITHUB_STEP_SUMMARY}"
+            exit 0
+          fi
+
+          APPROVERS="$(jq -r '
+            .data.repository.pullRequest.latestOpinionatedReviews.nodes[]
+            | select(.state == "APPROVED" and .author.__typename == "User")
+            | .author.login' <<< "${RESULT}")"
+          COUNT="$(printf '%s' "${APPROVERS}" | grep -c . || true)"
+
+          {
+            echo "\`${LABEL}\`: ${COUNT}/${REQUIRED_APPROVALS} approvals from reviewers with write access."
+            if [ -n "${APPROVERS}" ]; then
+              echo
+              printf -- '- @%s\n' ${APPROVERS}
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [ "${COUNT}" -lt "${REQUIRED_APPROVALS}" ]; then
+            echo "::error::This PR is labeled \`${LABEL}\` and has ${COUNT} of ${REQUIRED_APPROVALS} required approvals."
+            exit 1
+          fi
