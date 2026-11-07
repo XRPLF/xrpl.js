@@ -12,9 +12,14 @@
 
 import { hexToBytes, concat } from '@xrplf/isomorphic/utils'
 
+import { ValidationError } from '../errors'
+
 import rfc1751Words from './rfc1751Words.json'
 
 const rfc1751WordList: string[] = rfc1751Words
+
+// A 128-bit key is two 64-bit blocks of 6 words each, as in rippled's RFC1751::getKeyFromEnglish.
+const RFC1751_WORD_COUNT = 12
 
 // Added prettier-ignore to allow _BINARY to be on two lines, instead of one entry per line.
 
@@ -95,12 +100,28 @@ function keyToRFC1751Mnemonic(hex_key: string): string {
 /**
  * Converts an english mnemonic following rippled's modified RFC1751 standard to an encoded hex secret.
  *
- * @param english - A mnemonic generated using ripple's modified RFC1751 standard.
+ * @param english - A mnemonic generated using ripple's modified RFC1751 standard. Words may be
+ *                  separated by one or more ASCII whitespace characters (space, tab, newline,
+ *                  vertical tab, form feed, carriage return), and leading or trailing ASCII
+ *                  whitespace is ignored. Other Unicode whitespace is treated as part of a word,
+ *                  matching rippled.
+ * @throws ValidationError if the mnemonic does not contain exactly 12 words.
  * @throws Error if the parity after decoding does not match.
  * @returns A Buffer containing an encoded secret.
  */
 function rfc1751MnemonicToKey(english: string): Uint8Array {
-  const words = english.split(' ')
+  // rippled splits on boost::algorithm::is_space() in the "C" locale, which matches only these six
+  // ASCII characters. JavaScript's \s (and String.prototype.trim) also match Unicode spaces such
+  // as U+00A0, which rippled keeps as part of a word, so accepting them here would derive a
+  // different wallet than rippled's wallet_propose does for the same phrase.
+  const words = english.split(/[ \t\n\v\f\r]+/u).filter((word) => word !== '')
+  // Without this check a mnemonic missing its last word decodes a shorter key, and the
+  // parity bits of the truncated block pass by chance about 1 in 4 times.
+  if (words.length !== RFC1751_WORD_COUNT) {
+    throw new ValidationError(
+      `Expected an RFC1751 mnemonic of ${RFC1751_WORD_COUNT} words, but received ${words.length}`,
+    )
+  }
   let key: number[] = []
 
   for (let index = 0; index < words.length; index += 6) {
