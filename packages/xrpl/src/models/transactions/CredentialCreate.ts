@@ -12,7 +12,10 @@ import {
   validateRequiredField,
 } from './common'
 
-const MAX_URI_LENGTH = 256
+// rippled's maxCredentialURILength is 256 bytes; the field is hex-encoded,
+// so each byte takes two characters.
+const MAX_URI_BYTE_LENGTH = 256
+const MAX_URI_LENGTH = MAX_URI_BYTE_LENGTH * 2
 
 /**
  * Creates a Credential object. It must be sent by the issuer.

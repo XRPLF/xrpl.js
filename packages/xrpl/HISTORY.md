@@ -19,6 +19,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
+* `CredentialCreate` validation now allows a `URI` of up to 256 bytes (512 hex characters), to match rippled's `maxCredentialURILength`. Before, the limit was applied to the hex string length, so a `URI` between 129 and 256 bytes was wrongly rejected.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.

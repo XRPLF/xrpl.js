@@ -102,9 +102,14 @@ describe('credentialCreate', function () {
     assertInvalid(credentialCreate, errorMessage)
   })
 
+  it(`verifies valid credentialCreate w/ URI of max length (256 bytes)`, function () {
+    credentialCreate.URI = stringToHex('A'.repeat(256))
+    assertValid(credentialCreate)
+  })
+
   it(`throws w/ URI field too long`, function () {
-    credentialCreate.URI = stringToHex('A'.repeat(129))
-    const errorMessage = 'CredentialCreate: URI length must be <= 256'
+    credentialCreate.URI = stringToHex('A'.repeat(257))
+    const errorMessage = 'CredentialCreate: URI length must be <= 512'
     assertInvalid(credentialCreate, errorMessage)
   })
 
