@@ -81,4 +81,12 @@ function validateURI(URI: unknown): void {
   if (!HEX_REGEX.test(URI)) {
     throw new ValidationError('CredentialCreate: URI must be encoded in hex')
   }
+
+  // Each byte is two hex characters. An odd-length string is not a valid
+  // byte sequence, and hexToBytes would silently drop the last character.
+  if (URI.length % 2 !== 0) {
+    throw new ValidationError(
+      'CredentialCreate: URI must have an even number of hex characters',
+    )
+  }
 }
