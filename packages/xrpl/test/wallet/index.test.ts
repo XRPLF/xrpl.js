@@ -220,6 +220,20 @@ describe('Wallet', function () {
       assert.equal(wallet.seed, expectedSeed)
     })
 
+    it('rejects an RFC1751 mnemonic whose words are separated by non-ASCII whitespace', function () {
+      // rippled only splits on ASCII whitespace, so it would treat "CAB\u00a0BETH" as one word and
+      // fall back to hashing the phrase as a passphrase, deriving a different wallet.
+      const mnemonic =
+        'CAB\u00a0BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'rfc1751',
+          algorithm: ECDSA.ed25519,
+        })
+      }, /Expected an RFC1751 mnemonic of 12 words, but received 11/u)
+    })
+
     it('throws an error when an RFC1751 mnemonic is missing a word', function () {
       // Dropping the last word leaves a truncated block whose parity bits happen to
       // match, so without a word-count check this silently derives a different wallet.

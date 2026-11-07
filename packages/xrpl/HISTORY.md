@@ -23,7 +23,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
-* `Wallet.fromMnemonic` with `mnemonicEncoding: 'rfc1751'` now throws a `ValidationError` unless the mnemonic has exactly 12 words, matching rippled. Before, a mnemonic missing its last word could silently derive a different wallet. Words may now be separated by any whitespace.
+* `Wallet.fromMnemonic` with `mnemonicEncoding: 'rfc1751'` now throws a `ValidationError` unless the mnemonic has exactly 12 words, matching rippled. Before, a mnemonic missing its last word could silently derive a different wallet. Words may now be separated by one or more ASCII whitespace characters (space, tab, newline, vertical tab, form feed, carriage return), the same separators rippled accepts.
 
 ## 5.3.0 (2026-09-16)
 
