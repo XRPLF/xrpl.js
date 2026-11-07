@@ -12,7 +12,7 @@ import {
   validateRequiredField,
 } from './common'
 
-// rippled's maxCredentialURILength is 256 bytes; the field is hex-encoded,
+// xrpld's maxCredentialURILength is 256 bytes; the field is hex-encoded,
 // so each byte takes two characters.
 const MAX_URI_BYTE_LENGTH = 256
 const MAX_URI_LENGTH = MAX_URI_BYTE_LENGTH * 2
@@ -82,7 +82,8 @@ function validateURI(URI: unknown): void {
     throw new ValidationError('CredentialCreate: URI must be encoded in hex')
   }
 
-  // Each byte is two hex characters. An odd-length string is not a valid
+  // Each byte is two hex characters, so an odd-length string is not a valid
+  // byte sequence.
   if (URI.length % 2 !== 0) {
     throw new ValidationError(
       'CredentialCreate: URI must have an even number of hex characters',
