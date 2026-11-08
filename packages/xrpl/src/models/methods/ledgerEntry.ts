@@ -83,7 +83,8 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   /** The object ID of a Check object to retrieve. */
   check?: string
 
-  /* Specify the Credential to retrieve. If a string, must be the ledger entry ID of
+  /**
+   * Specify the Credential to retrieve. If a string, must be the ledger entry ID of
    * the entry, as hexadecimal. If an object, requires subject, issuer, and
    * credential_type sub-fields.
    */
@@ -95,8 +96,8 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
         /** The account that issued the credential. */
         issuer: string
 
-        /** The type of the credential, as issued. */
-        credentialType: string
+        /** The type of the credential, as issued, as hexadecimal. */
+        credential_type: string
       }
     | string
 

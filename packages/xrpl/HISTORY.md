@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   Migration:
   - Call `.toString()` for an exact decimal string, or `.toNumber()` for a JavaScript number (which loses drops above 2^33 XRP).
   - Add results with `.plus()`. In JavaScript, `dropsToXrp(a) + dropsToXrp(b)` now joins the two values as strings (`'1' + '2'` is `'12'`); TypeScript rejects it.
+* The object form of `LedgerEntryRequest.credential` now uses `credential_type` instead of `credentialType`, which is the name that xrpld and Clio read. The old name never matched the server, which rejected such requests with `malformedRequest`. To migrate, rename `credentialType` to `credential_type`.
 
 ### Changed
 * Some transaction validation error messages changed.
