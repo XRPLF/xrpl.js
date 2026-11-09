@@ -2,6 +2,7 @@ ISC License
 
 Copyright (c) 2012-2015 Ripple Labs Inc.
 Copyright (c) 2012-2021 Contributors to xrpl.js
+Copyright (c) 2019-2023 Contributors to xrpl.js
 Copyright (c) 2023 The XRPL developers
 
 Permission to use, copy, modify, and distribute this software for any
@@ -15,5 +16,3 @@ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-Each package under packages/ also contains its own LICENSE file.
