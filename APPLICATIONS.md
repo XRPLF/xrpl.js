@@ -76,10 +76,6 @@ Warning: Use at your own risk.
 
   3D Globe written in three.js connected to a Node.js websocket server that is listening to exchanges and the XRPL. The visualization aims to show trading, ODL, and liquidity at exchanges, intra-exchange volume, and flows.
 
-- **[Vextorium](https://api.vextorium.com/)**
-
-  Pay-per-call XRPL data APIs for apps and AI agents: AMM pools, LP positions, order books, swap quotes, RLUSD holders, issued tokens, escrows, oracles, MPT and credentials. Calls are paid over x402 in RLUSD on the XRP Ledger, through the x402 XRPL package built on `xrpl.js`.
-
 ## Wallets and wallet tools
 
 - **[Joey Wallet](https://joeywallet.xyz)**
@@ -151,6 +147,10 @@ Warning: Use at your own risk.
 - **[XRP Payment](https://xrpayments.co/)** (xrpayments.co)
 
   Tool for generating a XRP payment request URI in a QR code, with currency converter.
+
+- **[Vextorium](https://api.vextorium.com/)**
+
+  200+ pay-per-call data APIs for apps and AI agents, including official statistics, economic data and compliance checks. Accepts x402 payments in RLUSD on the XRP Ledger through @x402/xrpl, which depends on xrpl.js.
 
 ## Development tools
 
