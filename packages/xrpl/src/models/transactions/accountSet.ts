@@ -6,9 +6,9 @@ import {
   GlobalFlagsInterface,
   isAccount,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
+  isHexString,
 } from './common'
 
 /**
@@ -188,9 +188,9 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
     }
   }
 
-  validateOptionalField(tx, 'Domain', isString)
-  validateOptionalField(tx, 'EmailHash', isString)
-  validateOptionalField(tx, 'MessageKey', isString)
+  validateOptionalField(tx, 'Domain', isHexString)
+  validateOptionalField(tx, 'EmailHash', isHexString)
+  validateOptionalField(tx, 'MessageKey', isHexString)
   validateOptionalField(tx, 'SetFlag', isNumber)
   if (tx.SetFlag !== undefined) {
     if (!Object.values(AccountSetAsfFlags).includes(tx.SetFlag)) {

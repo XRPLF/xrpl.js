@@ -257,4 +257,9 @@ describe('Payment', function () {
       'Payment: Credentials cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
   })
+
+  it(`throws w/ non-hex InvoiceID`, function () {
+    payment.InvoiceID = 'not hex'
+    assertInvalid(payment, 'PaymentTransaction: invalid field InvoiceID')
+  })
 })

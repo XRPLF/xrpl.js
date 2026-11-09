@@ -120,6 +120,11 @@ describe('VaultCreate', function () {
     )
   })
 
+  it(`throws w/ non-hex DomainID`, function () {
+    tx.DomainID = 'not hex'
+    assertInvalid(tx, 'VaultCreate: invalid field DomainID')
+  })
+
   describe('Scale field validation', function () {
     it('throws w/ Scale provided for XRP asset', function () {
       tx.Asset = { currency: 'XRP' }

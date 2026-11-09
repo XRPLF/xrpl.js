@@ -58,4 +58,19 @@ describe('DIDSet', function () {
       'DIDSet: Must have at least one of `Data`, `DIDDocument`, and `URI`',
     )
   })
+
+  it(`throws w/ non-hex Data`, function () {
+    tx.Data = 'not hex'
+    assertInvalid(tx, 'DIDSet: invalid field Data')
+  })
+
+  it(`throws w/ non-hex DIDDocument`, function () {
+    tx.DIDDocument = 'not hex'
+    assertInvalid(tx, 'DIDSet: invalid field DIDDocument')
+  })
+
+  it(`throws w/ non-hex URI`, function () {
+    tx.URI = 'not hex'
+    assertInvalid(tx, 'DIDSet: invalid field URI')
+  })
 })

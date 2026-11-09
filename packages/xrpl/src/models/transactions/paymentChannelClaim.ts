@@ -7,6 +7,7 @@ import {
   validateOptionalField,
   validateRequiredField,
   MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 
 /**
@@ -158,9 +159,9 @@ export function validatePaymentChannelClaim(tx: Record<string, unknown>): void {
     MAX_AUTHORIZED_CREDENTIALS,
   )
 
-  validateRequiredField(tx, 'Channel', isString)
+  validateRequiredField(tx, 'Channel', isHexString)
   validateOptionalField(tx, 'Balance', isString)
   validateOptionalField(tx, 'Amount', isString)
-  validateOptionalField(tx, 'Signature', isString)
-  validateOptionalField(tx, 'PublicKey', isString)
+  validateOptionalField(tx, 'Signature', isHexString)
+  validateOptionalField(tx, 'PublicKey', isHexString)
 }

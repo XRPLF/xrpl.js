@@ -2,12 +2,12 @@ import { AuthorizeCredential } from '../common'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
   validateCredentialsList,
   isArray,
+  isHexString,
 } from './common'
 
 const MAX_ACCEPTED_CREDENTIALS = 10
@@ -36,7 +36,7 @@ export function validatePermissionedDomainSet(
 ): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
   validateRequiredField(tx, 'AcceptedCredentials', isArray)
 
   validateCredentialsList(

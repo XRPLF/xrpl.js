@@ -64,4 +64,9 @@ describe('PaymentChannelFund', function () {
 
     assertInvalid(channel, 'PaymentChannelFund: invalid field Expiration')
   })
+
+  it(`throws w/ non-hex Channel`, function () {
+    channel.Channel = 'not hex'
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Channel')
+  })
 })

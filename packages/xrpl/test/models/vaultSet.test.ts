@@ -66,4 +66,14 @@ describe('VaultSet', function () {
     tx.DomainID = 1234
     assertInvalid(tx, 'VaultSet: invalid field DomainID')
   })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
+    assertInvalid(tx, 'VaultSet: invalid field VaultID')
+  })
+
+  it(`throws w/ non-hex DomainID`, function () {
+    tx.DomainID = 'not hex'
+    assertInvalid(tx, 'VaultSet: invalid field DomainID')
+  })
 })

@@ -77,4 +77,19 @@ describe('PaymentChannelClaim', function () {
 
     assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
   })
+
+  it(`throws w/ non-hex Channel`, function () {
+    channel.Channel = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Channel')
+  })
+
+  it(`throws w/ non-hex Signature`, function () {
+    channel.Signature = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field Signature')
+  })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    channel.PublicKey = 'not hex'
+    assertInvalid(channel, 'PaymentChannelClaim: invalid field PublicKey')
+  })
 })

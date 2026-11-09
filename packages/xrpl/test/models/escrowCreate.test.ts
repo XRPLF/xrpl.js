@@ -99,4 +99,9 @@ describe('EscrowCreate', function () {
       'EscrowCreate: Either Condition or FinishAfter must be specified',
     )
   })
+
+  it(`throws w/ non-hex Condition`, function () {
+    escrow.Condition = 'not hex'
+    assertInvalid(escrow, 'EscrowCreate: invalid field Condition')
+  })
 })

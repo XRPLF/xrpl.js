@@ -127,4 +127,14 @@ describe('EscrowFinish', function () {
 
     assertInvalid(escrow, errorMessage)
   })
+
+  it(`throws w/ non-hex Condition`, function () {
+    escrow.Condition = 'not hex'
+    assertInvalid(escrow, 'EscrowFinish: invalid field Condition')
+  })
+
+  it(`throws w/ non-hex Fulfillment`, function () {
+    escrow.Fulfillment = 'not hex'
+    assertInvalid(escrow, 'EscrowFinish: invalid field Fulfillment')
+  })
 })

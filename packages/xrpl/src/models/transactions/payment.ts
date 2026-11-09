@@ -12,11 +12,11 @@ import {
   validateRequiredField,
   validateOptionalField,
   isNumber,
-  isString,
   Account,
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
   isArray,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -215,7 +215,7 @@ export function validatePayment(tx: Record<string, unknown>): void {
     MAX_AUTHORIZED_CREDENTIALS,
   )
 
-  validateOptionalField(tx, 'InvoiceID', isString, {
+  validateOptionalField(tx, 'InvoiceID', isHexString, {
     txType: 'PaymentTransaction',
   })
 

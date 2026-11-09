@@ -12,6 +12,7 @@ const assertInvalid = (tx: any, message: string): void =>
  *
  * Providing runtime verification testing for each specific transaction type.
  */
+// eslint-disable-next-line max-statements -- many validation cases
 describe('OracleSet', function () {
   let tx: any
 
@@ -198,5 +199,20 @@ describe('OracleSet', function () {
       const errorMessage = 'OracleSet: Scale must be in range 0-20'
       assertInvalid(tx, errorMessage)
     })
+  })
+
+  it(`throws w/ non-hex Provider`, function () {
+    tx.Provider = 'not hex'
+    assertInvalid(tx, 'OracleSet: invalid field Provider')
+  })
+
+  it(`throws w/ non-hex URI`, function () {
+    tx.URI = 'not hex'
+    assertInvalid(tx, 'OracleSet: invalid field URI')
+  })
+
+  it(`throws w/ non-hex AssetClass`, function () {
+    tx.AssetClass = 'not hex'
+    assertInvalid(tx, 'OracleSet: invalid field AssetClass')
   })
 })

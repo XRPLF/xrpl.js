@@ -14,6 +14,7 @@ import {
   Account,
   areAddressesEqual,
   isString,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -149,7 +150,7 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'Owner', isAccount)
 
-  validateRequiredField(tx, 'NFTokenID', isString)
+  validateRequiredField(tx, 'NFTokenID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
