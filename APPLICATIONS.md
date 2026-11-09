@@ -62,6 +62,10 @@ Warning: Use at your own risk.
 
   XRP Ledger and Xahau explorer, Hooks explorer, metrics, and analytics using a XWA backend that is synchronized live with the XRPL and Xahau.
 
+- **[XRPL.to - XRP Ledger token explorer](https://xrpl.to/)** (xrpl.to)
+
+  Token prices, holders, trades, NFTs and accounts on the XRP Ledger, with a free API.
+
 ## Data monitoring
 
 - **[zerptracker](https://zerptracker.com)**
