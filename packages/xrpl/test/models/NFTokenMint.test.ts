@@ -199,7 +199,7 @@ describe('NFTokenMint', function () {
 
     assertInvalid(
       invalid,
-      'NFTokenMint: TransferFee must be between 0 and 50000',
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
     )
   })
 
@@ -216,7 +216,41 @@ describe('NFTokenMint', function () {
 
     assertInvalid(
       invalid,
-      'NFTokenMint: TransferFee must be between 0 and 50000',
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ fractional TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: 1.5,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ NaN TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: NaN,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
     )
   })
 

@@ -152,9 +152,13 @@ function validateTransferFee(tx: Record<string, unknown>): void {
     return
   }
 
-  if (tx.TransferFee < 0 || tx.TransferFee > MAX_TRANSFER_FEE) {
+  if (
+    !Number.isInteger(tx.TransferFee) ||
+    tx.TransferFee < 0 ||
+    tx.TransferFee > MAX_TRANSFER_FEE
+  ) {
     throw new ValidationError(
-      `NFTokenMint: TransferFee must be between 0 and ${MAX_TRANSFER_FEE}`,
+      `NFTokenMint: TransferFee must be an integer between 0 and ${MAX_TRANSFER_FEE}`,
     )
   }
 
