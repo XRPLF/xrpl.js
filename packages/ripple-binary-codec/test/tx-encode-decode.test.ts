@@ -125,4 +125,52 @@ describe('encoding and decoding tx_json', function () {
       encode(my_tx)
     }).toThrow()
   })
+
+  it('throws when decoding a transaction with a duplicate field', function () {
+    // Same blob as encode(tx_json with Amount 1000, Fee 12), but with a
+    // second Amount field (61 40000000000F4240, i.e. 1000000 drops) spliced
+    // in right after the first one. rippled rejects such blobs, so decode
+    // must not silently keep the last value.
+    const duplicateAmount =
+      '120000220000000024000000016140000000000003E8' +
+      '6140000000000F4240' +
+      '68400000000000000C8114B5F762798A53D543A014CAF8B297CFF8F2F937E88314F667B0CA50CC7709A220B0561B85E53A48461FA8'
+    expect(() => {
+      decode(duplicateAmount)
+    }).toThrow('Duplicate field detected: Amount')
+  })
+
+  it('throws when decoding a transaction with a duplicate Sequence', function () {
+    // Valid Payment blob with the Sequence field (24 00000001) repeated.
+    const duplicateSequence =
+      '1200002200000000240000000124000000016140000000000003E8' +
+      '68400000000000000C8114B5F762798A53D543A014CAF8B297CFF8F2F937E88314F667B0CA50CC7709A220B0561B85E53A48461FA8'
+    expect(() => {
+      decode(duplicateSequence)
+    }).toThrow('Duplicate field detected: Sequence')
+  })
+
+  it('throws when decoding a transaction with a duplicate nested field', function () {
+    // Valid Payment with one Memo, but the MemoData field (7D 04 DEADBEEF)
+    // appears twice inside the same Memo object.
+    const duplicateMemoData =
+      '120000220000000024000000016140000000000003E8' +
+      '68400000000000000C8114B5F762798A53D543A014CAF8B297CFF8F2F937E88314F667B0CA50CC7709A220B0561B85E53A48461FA8' +
+      'F9EA7D04DEADBEEF7D04DEADBEEF7E097478742F706C61696EE1F1'
+    expect(() => {
+      decode(duplicateMemoData)
+    }).toThrow('Duplicate field detected: MemoData')
+  })
+
+  it('allows the same field name in different objects', function () {
+    // Two Memos each carry their own MemoData: same field name, different
+    // objects, so decoding must still succeed.
+    const my_tx = Object.assign({}, tx_json, {
+      Amount: '1000',
+      Fee: '10',
+      Memos: [{ Memo: { MemoData: 'AABB' } }, { Memo: { MemoData: 'CCDD' } }],
+    })
+    const encoded = encode(my_tx)
+    expect(decode(encoded)).toEqual(my_tx)
+  })
 })
