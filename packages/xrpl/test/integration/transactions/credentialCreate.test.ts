@@ -45,5 +45,22 @@ describe('CredentialCreate', function () {
     const { account_objects } = accountObjectsResponse.result
 
     assert.equal(account_objects.length, 1)
+
+    // Fetch the same credential with the object form of ledger_entry.
+    const ledgerEntryResponse = await testContext.client.request({
+      command: 'ledger_entry',
+      credential: {
+        subject: subjectWallet.classicAddress,
+        issuer: testContext.wallet.classicAddress,
+        credential_type: credentialCreateTx.CredentialType,
+      },
+    })
+
+    assert.deepInclude(ledgerEntryResponse.result.node, {
+      LedgerEntryType: 'Credential',
+      Subject: subjectWallet.classicAddress,
+      Issuer: testContext.wallet.classicAddress,
+      CredentialType: credentialCreateTx.CredentialType,
+    })
   })
 })
