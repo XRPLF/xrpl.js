@@ -25,7 +25,7 @@ All of which works in Node.js (tested on v22 and v24) & web browsers (tested for
 
 ### Requirements
 
-+ **[Node.js v22 or v24](https://nodejs.org/)** is recommended. Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested. It may still work with v5.x, but support will be removed in the next major release. Other versions may work but are not frequently tested.
++ **[Node.js v22 or v24](https://nodejs.org/)** is recommended, and xrpl.js requires v22.12.0 or later. Other versions may work but are not frequently tested.
 
 ### Installing xrpl.js
 

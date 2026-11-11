@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* `engines` now requires Node.js 20.19.0 or later, matching its ESM-only `@noble` dependencies. The package already failed to load on older Node.js versions.
+
 ## 1.0.2 (2026-06-04)
 * bump @noble/hashes from 1.8.0 to 2.0.1
 
