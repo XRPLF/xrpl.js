@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Fix MPT amount validation incorrectly rejecting the top half of the valid unsigned 64-bit range (values from `2^63` through the true maximum `2^64 - 1`), and correct the shared `data-driven-tests.json` fixture entries that encoded the same wrong boundary.
+
 ## 2.11.0 (2026-09-11)
 
 ### Added

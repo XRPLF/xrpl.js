@@ -17,7 +17,11 @@ const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
-const mptMask = BigInt(0x8000000000000000)
+// An MPT amount carries its sign and type in its own leading byte at
+// serialization, so unlike native XRP and IOU amounts no bit inside the
+// 64-bit value is reserved for sign. The valid range is the full unsigned
+// 64-bit range.
+const mptMax = BigInt('0xFFFFFFFFFFFFFFFF')
 
 /**
  * BigNumber configuration for Amount IOUs
@@ -322,7 +326,7 @@ class Amount extends SerializedType {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
 
-      if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
+      if (BigInt(amount) > mptMax) {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
     }
