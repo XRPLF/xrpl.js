@@ -571,6 +571,11 @@ export {
   NoRippleCheckRequest,
   NoRippleCheckResponse,
   // ledger methods
+  LedgerRequestExpandedTransactionsBinary,
+  LedgerRequestExpandedAccountsAndTransactions,
+  LedgerRequestExpandedTransactionsOnly,
+  LedgerRequestExpandedAccountsOnly,
+  LedgerResponseExpanded,
   LedgerRequest,
   LedgerResponse,
   LedgerV1Response,
