@@ -44,5 +44,8 @@
     "xrpl-ledger",
     "multi sign",
     "sign"
-  ]
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }

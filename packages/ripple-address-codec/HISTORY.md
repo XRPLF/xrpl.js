@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-### Fixed
-* `engines` now requires Node.js 20.19.0 or later, matching its ESM-only `@noble` dependencies. The package already failed to load on older Node.js versions.
+### BREAKING CHANGES
+* Drop support for Node.js 18 and 20. Node.js 20 reached end-of-life on April 30, 2026. The package now requires Node.js 22.12.0 or later.
 
 ## 5.0.1 (2026-06-04)
 
