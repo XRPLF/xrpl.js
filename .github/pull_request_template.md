@@ -25,7 +25,7 @@ Please check relevant options, delete irrelevant ones.
 
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected). Target the next major's branch, not `main`. See [Breaking changes](https://github.com/XRPLF/xrpl.js/blob/main/CONTRIBUTING.md#breaking-changes).
 - [ ] Refactor (non-breaking change that only restructures code)
 - [ ] Tests (You added tests for code that already exists, or your new feature included in this PR)
 - [ ] Documentation Updates
