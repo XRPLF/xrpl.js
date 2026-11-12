@@ -1,8 +1,8 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: quarterly
-    time: "15:00"
-  open-pull-requests-limit: 30
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: quarterly
+      time: "15:00"
+    open-pull-requests-limit: 30

@@ -10,5 +10,5 @@ module.exports = merge(getDefaultConfiguration(), {
     library: 'xrpl',
     path: path.join(__dirname, 'build/'),
     filename: `xrpl.default.js`,
-  }
+  },
 })
