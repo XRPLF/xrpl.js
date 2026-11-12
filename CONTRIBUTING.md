@@ -14,7 +14,7 @@ Keep `main` releasable as a minor or patch version. Don't merge a breaking chang
 
 - Open breaking-change PRs against the next major's branch, for example `xrpl-6.0.0`. Create it from `main` if it doesn't exist yet. One branch can carry majors for several packages.
 - Rebase the branch onto `main` to keep it current.
-- When the major is ready, release any pending fixes from `main` first. Then rebase the major branch onto `main`, merge it, and release the major from `main`.
+- When the major is ready, release any pending fixes from `main` first. Then rebase the major branch onto `main`, merge it, and release the major from `main`. Release each package before the packages that depend on it.
 
 ## Set up your dev environment
 
