@@ -2,6 +2,27 @@
 /* eslint-disable max-lines -- There is a lot to export */
 /* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
+import type {
+  AccountRoot,
+  AMM,
+  Bridge,
+  Check,
+  Credential,
+  Delegate,
+  DepositPreauth,
+  DID,
+  DirectoryNode,
+  Escrow,
+  MPToken,
+  MPTokenIssuance,
+  NFTokenPage,
+  Offer,
+  PayChannel,
+  RippleState,
+  Ticket,
+  XChainOwnedClaimID,
+  XChainOwnedCreateAccountClaimID,
+} from '../ledger'
 
 import {
   AccountChannelsRequest,
@@ -119,6 +140,26 @@ import {
   LedgerEntryBinaryResponse,
   LedgerEntryJsonResponse,
   LedgerEntryResponse,
+  LedgerEntryAccountRootRequest,
+  LedgerEntryAMMRequest,
+  LedgerEntryBridgeAccountRequest,
+  LedgerEntryBridgeRequest,
+  LedgerEntryCheckRequest,
+  LedgerEntryCredentialRequest,
+  LedgerEntryDelegateRequest,
+  LedgerEntryDepositPreauthRequest,
+  LedgerEntryDIDRequest,
+  LedgerEntryDirectoryRequest,
+  LedgerEntryEscrowRequest,
+  LedgerEntryMPTokenIssuanceRequest,
+  LedgerEntryMPTokenRequest,
+  LedgerEntryNFTokenPageRequest,
+  LedgerEntryOfferRequest,
+  LedgerEntryPayChannelRequest,
+  LedgerEntryRippleStateRequest,
+  LedgerEntryTicketRequest,
+  LedgerEntryXChainOwnedClaimIDRequest,
+  LedgerEntryXChainOwnedCreateAccountClaimIDRequest,
 } from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
@@ -202,6 +243,12 @@ import {
   UnsubscribeResponse,
 } from './unsubscribe'
 import { VaultInfoRequest, VaultInfoResponse } from './vaultInfo'
+
+type LedgerEntryLookupResponse<T, EntryType> =
+  T extends LedgerEntryJsonRequest
+    ? LedgerEntryJsonResponse<EntryType>
+    : LedgerEntryResponse<EntryType>
+
 /**
  * @category Requests
  */
@@ -223,6 +270,28 @@ type Request =
   | LedgerClosedRequest
   | LedgerCurrentRequest
   | LedgerDataRequest
+  | LedgerEntryBinaryRequest
+  | LedgerEntryJsonRequest
+  | LedgerEntryAccountRootRequest
+  | LedgerEntryAMMRequest
+  | LedgerEntryBridgeAccountRequest
+  | LedgerEntryBridgeRequest
+  | LedgerEntryCheckRequest
+  | LedgerEntryCredentialRequest
+  | LedgerEntryDelegateRequest
+  | LedgerEntryDepositPreauthRequest
+  | LedgerEntryDIDRequest
+  | LedgerEntryDirectoryRequest
+  | LedgerEntryEscrowRequest
+  | LedgerEntryMPTokenIssuanceRequest
+  | LedgerEntryMPTokenRequest
+  | LedgerEntryNFTokenPageRequest
+  | LedgerEntryOfferRequest
+  | LedgerEntryPayChannelRequest
+  | LedgerEntryRippleStateRequest
+  | LedgerEntryTicketRequest
+  | LedgerEntryXChainOwnedClaimIDRequest
+  | LedgerEntryXChainOwnedCreateAccountClaimIDRequest
   | LedgerEntryRequest
   // transaction methods
   | SimulateRequest
@@ -429,6 +498,46 @@ export type RequestResponseMap<
   ? LedgerDataResponse
   : T extends LedgerEntryBinaryRequest
   ? LedgerEntryBinaryResponse
+  : T extends LedgerEntryAccountRootRequest
+  ? LedgerEntryLookupResponse<T, AccountRoot>
+  : T extends LedgerEntryAMMRequest
+  ? LedgerEntryLookupResponse<T, AMM>
+  : T extends LedgerEntryBridgeAccountRequest
+  ? LedgerEntryLookupResponse<T, Bridge>
+  : T extends LedgerEntryBridgeRequest
+  ? LedgerEntryLookupResponse<T, Bridge>
+  : T extends LedgerEntryCheckRequest
+  ? LedgerEntryLookupResponse<T, Check>
+  : T extends LedgerEntryCredentialRequest
+  ? LedgerEntryLookupResponse<T, Credential>
+  : T extends LedgerEntryDelegateRequest
+  ? LedgerEntryLookupResponse<T, Delegate>
+  : T extends LedgerEntryDepositPreauthRequest
+  ? LedgerEntryLookupResponse<T, DepositPreauth>
+  : T extends LedgerEntryDIDRequest
+  ? LedgerEntryLookupResponse<T, DID>
+  : T extends LedgerEntryDirectoryRequest
+  ? LedgerEntryLookupResponse<T, DirectoryNode>
+  : T extends LedgerEntryEscrowRequest
+  ? LedgerEntryLookupResponse<T, Escrow>
+  : T extends LedgerEntryMPTokenIssuanceRequest
+  ? LedgerEntryLookupResponse<T, MPTokenIssuance>
+  : T extends LedgerEntryMPTokenRequest
+  ? LedgerEntryLookupResponse<T, MPToken>
+  : T extends LedgerEntryNFTokenPageRequest
+  ? LedgerEntryLookupResponse<T, NFTokenPage>
+  : T extends LedgerEntryOfferRequest
+  ? LedgerEntryLookupResponse<T, Offer>
+  : T extends LedgerEntryPayChannelRequest
+  ? LedgerEntryLookupResponse<T, PayChannel>
+  : T extends LedgerEntryRippleStateRequest
+  ? LedgerEntryLookupResponse<T, RippleState>
+  : T extends LedgerEntryTicketRequest
+  ? LedgerEntryLookupResponse<T, Ticket>
+  : T extends LedgerEntryXChainOwnedClaimIDRequest
+  ? LedgerEntryLookupResponse<T, XChainOwnedClaimID>
+  : T extends LedgerEntryXChainOwnedCreateAccountClaimIDRequest
+  ? LedgerEntryLookupResponse<T, XChainOwnedCreateAccountClaimID>
   : T extends LedgerEntryJsonRequest
   ? LedgerEntryJsonResponse
   : T extends LedgerEntryRequest
@@ -592,6 +701,26 @@ export {
   LedgerEntryBinaryResponse,
   LedgerEntryJsonResponse,
   LedgerEntryResponse,
+  LedgerEntryAccountRootRequest,
+  LedgerEntryAMMRequest,
+  LedgerEntryBridgeRequest,
+  LedgerEntryBridgeAccountRequest,
+  LedgerEntryCheckRequest,
+  LedgerEntryCredentialRequest,
+  LedgerEntryDelegateRequest,
+  LedgerEntryDepositPreauthRequest,
+  LedgerEntryDIDRequest,
+  LedgerEntryDirectoryRequest,
+  LedgerEntryEscrowRequest,
+  LedgerEntryMPTokenIssuanceRequest,
+  LedgerEntryMPTokenRequest,
+  LedgerEntryNFTokenPageRequest,
+  LedgerEntryOfferRequest,
+  LedgerEntryPayChannelRequest,
+  LedgerEntryRippleStateRequest,
+  LedgerEntryTicketRequest,
+  LedgerEntryXChainOwnedClaimIDRequest,
+  LedgerEntryXChainOwnedCreateAccountClaimIDRequest,
   // transaction methods with types
   SimulateRequest,
   SimulateResponse,
