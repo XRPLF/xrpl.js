@@ -62,6 +62,8 @@ export interface Batch extends BaseTransaction {
 
   BatchSigners?: BatchSigner[]
 
+  Flags?: number | BatchFlagsInterface
+
   RawTransactions: Array<{
     RawTransaction: SubmittableTransaction
   }>
