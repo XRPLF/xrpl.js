@@ -42,6 +42,6 @@
   "readmeFilename": "README.md",
   "prettier": "@xrplf/prettier-config",
   "engines": {
-    "node": ">= 18"
+    "node": ">=22.12.0"
   }
 }

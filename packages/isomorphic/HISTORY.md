@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### BREAKING CHANGES
+* Drop support for Node.js 18 and 20. Node.js 20 reached end-of-life on April 30, 2026. The package now requires Node.js 22.12.0 or later.
+
 ## 1.0.2 (2026-06-04)
 * bump @noble/hashes from 1.8.0 to 2.0.1
 
