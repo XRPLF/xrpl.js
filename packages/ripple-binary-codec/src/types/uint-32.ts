@@ -1,6 +1,7 @@
 import { UInt } from './uint'
 import { BinaryParser } from '../serdes/binary-parser'
 import { readUInt32BE, writeUInt32BE } from '../utils'
+import { SerializedTypeID } from './serialized-type'
 
 /**
  * Derived UInt class for serializing/deserializing 32 bit UInt
@@ -53,6 +54,10 @@ class UInt32 extends UInt {
    */
   valueOf(): number {
     return parseInt(readUInt32BE(this.bytes, 0), 10)
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_UINT32
   }
 }
 

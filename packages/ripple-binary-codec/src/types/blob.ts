@@ -1,4 +1,4 @@
-import { SerializedType } from './serialized-type'
+import { SerializedType, SerializedTypeID } from './serialized-type'
 import { BinaryParser } from '../serdes/binary-parser'
 import { hexToBytes } from '@xrplf/isomorphic/utils'
 
@@ -40,6 +40,10 @@ class Blob extends SerializedType {
     }
 
     throw new Error('Cannot construct Blob from value given')
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_VL
   }
 }
 

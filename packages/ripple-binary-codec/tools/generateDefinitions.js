@@ -104,6 +104,7 @@ async function main() {
         VL: 'Blob',
         DIR_NODE: 'DirectoryNode',
         PAYCHAN: 'PayChannel',
+        DATATYPE: 'DataType',
       }
       if (nonstandardRenames[inp] != null) return nonstandardRenames[inp]
 
@@ -236,7 +237,7 @@ async function main() {
   }
 
   const isSigningField = (t, notSigningField) => {
-    if (notSigningField == 'notSigning') return 'false'
+    if (notSigningField && /notSigning/i.test(notSigningField)) return 'false'
     if (
       t == 'LEDGERENTRY' ||
       t == 'TRANSACTION' ||
@@ -250,7 +251,7 @@ async function main() {
   // Parse SField.cpp for all the SFields and their serialization info
   let sfieldHits = [
     ...sfieldMacroFile.matchAll(
-      /^ *[A-Z]*TYPED_SFIELD[ \n]*\([ \n]*sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?(notSigning))?/gm,
+      /^ *[A-Z]*TYPED_SFIELD[ \n]*\([ \n]*sf([^,\n]*),[ \n]*([^, \n]+)[ \n]*,[ \n]*([0-9]+)(,.*?([kK]?[nN]otSigning))?/gm,
     ),
   ]
   sfieldHits.push(
