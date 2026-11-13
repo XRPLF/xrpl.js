@@ -7,7 +7,6 @@ import {
   NFTokenCreateOfferFlags,
   NFTokenMint,
   NFTSellOffersRequest,
-  TransactionMetadata,
   xrpToDrops,
 } from '../../../src'
 import { hashSignedTx } from '../../../src/utils/hashes'
@@ -47,9 +46,7 @@ describe('nft_sell_offers', function () {
       transaction: hashSignedTx(mintResponse.result.tx_blob),
     })
 
-    const extractedNFTokenID = getNFTokenID(
-      txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-    )
+    const extractedNFTokenID = getNFTokenID(txResponse.result.meta)
     if (!extractedNFTokenID) {
       throw new Error('Failed to extract NFTokenID from mint transaction')
     }

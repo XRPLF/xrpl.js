@@ -293,30 +293,31 @@ function assertRecyclable(json, forField) {
 
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
-    it(`whole_objects[${i}]: can parse blob into
-          ${JSON.stringify(
-            f.tx_json,
-          )}`, /*                                              */ () => {
-      const parser = makeParser(f.blob_with_no_signing)
-      let ix = 0
-      while (!parser.end()) {
-        const [field, value] = parser.readFieldAndValue()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
-        const expected: any = f.fields[ix]
-        const expectedJSON = expected[1].json
-        const expectedField = expected[0]
-        const actual = toJSON(value)
+    it(
+      `whole_objects[${i}]: can parse blob into
+          ${JSON.stringify(f.tx_json)}`,
+      /*                                              */ () => {
+        const parser = makeParser(f.blob_with_no_signing)
+        let ix = 0
+        while (!parser.end()) {
+          const [field, value] = parser.readFieldAndValue()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
+          const expected: any = f.fields[ix]
+          const expectedJSON = expected[1].json
+          const expectedField = expected[0]
+          const actual = toJSON(value)
 
-        try {
-          expect(actual).toEqual(expectedJSON)
-        } catch (e) {
-          throw new Error(`${e} ${field} a: ${actual} e: ${expectedJSON}`)
+          try {
+            expect(actual).toEqual(expectedJSON)
+          } catch (e) {
+            throw new Error(`${e} ${field} a: ${actual} e: ${expectedJSON}`)
+          }
+          expect(field.name).toEqual(expectedField)
+          assertRecyclable(actual, field)
+          ix++
         }
-        expect(field.name).toEqual(expectedField)
-        assertRecyclable(actual, field)
-        ix++
-      }
-    })
+      },
+    )
   })
 }
 

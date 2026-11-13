@@ -8,6 +8,10 @@ module.exports = {
       {
         tsconfig: {
           target: "es2020",
+          // Resolve dependencies through package.json "exports" so exports-only ESM
+          // packages (e.g. https-proxy-agent v9) type-check in tests.
+          module: "node20",
+          moduleResolution: "node16",
         },
       },
     ],

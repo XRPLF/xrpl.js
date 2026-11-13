@@ -17,9 +17,10 @@ Run at different times:
 
 ## Prerequisites
 
-- `gh auth login` -- needed to list open Dependabot PRs
-- Docker daemon running -- the skill starts a rippled container for integration/browser tests
-- Atlassian MCP available -- needed to read the Semgrep tickets and later comment on and close them
+- `gh auth login` — needed to list open Dependabot PRs and read GHSA advisories
+- `nvm` with the Node versions in the CI matrix (see `.github/workflows/nodejs.yml`) — unit and integration tests run on each of them
+- Docker daemon running — the skill starts an xrpld container for integration/browser tests, using the image CI uses (`.github/xrpld-image.env`)
+- Atlassian MCP available — needed to read the Semgrep tickets and later comment on and close them
 
 ## `/batch-deps-upgrade` — build the batch
 
@@ -29,7 +30,9 @@ From the xrpl.js repo root, start a new Claude Code session and run:
 /batch-deps-upgrade
 ```
 
-It discovers the open Dependabot PRs and Semgrep tickets, applies the upgrades, runs the full test suite, and writes `code-changes.md`, `pr-description.md` and `close-list.md` plus a commit message. It creates the branch but does not commit, and writes nothing outside the repo.
+It discovers the open Dependabot PRs and Semgrep tickets, applies the upgrades, runs build, lint, unit, integration, browser and faucet tests across the CI Node versions, and writes `code-changes.md`, `pr-description.md` and `close-list.md` plus a commit message. It creates the branch but does not commit. Its file edits stay in the repo, but it can change the machine outside it: Node versions installed with `nvm` and pulled Docker images.
+
+Faucet tests matter more than they look: CI runs them only after merge, so the skill's local run is the only faucet check before the PR lands.
 
 Then, by hand:
 

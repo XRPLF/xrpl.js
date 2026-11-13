@@ -133,8 +133,8 @@ export function signAsSponsor(
   }
 
   // Validate the final signed transaction (after SponsorSignature is attached)
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-  validate(tx as unknown as Record<string, unknown>)
+
+  validate(tx)
 
   const serialized = encode(tx)
   return {
@@ -176,8 +176,8 @@ export function combineSponsorSigners(
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>)
+
+    validate(tx)
 
     if (
       tx.SponsorSignature?.Signers == null ||
