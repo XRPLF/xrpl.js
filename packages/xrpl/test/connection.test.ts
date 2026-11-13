@@ -709,7 +709,7 @@ describe('Connection', function () {
   it(
     'Cannot connect because no server',
     async () => {
-      const connection = new Connection(undefined as unknown as string)
+      const connection = new Connection(undefined)
       return connection
         .connect()
         .then(() => {

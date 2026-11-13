@@ -6,7 +6,6 @@ import {
   convertStringToHex,
   getNFTokenID,
   NFTokenMint,
-  TransactionMetadata,
   TxRequest,
 } from '../../../src'
 import { hashSignedTx } from '../../../src/utils/hashes'
@@ -57,9 +56,7 @@ describe('NFTokenModify', function () {
       const mutableTxResponse = await testContext.client.request(mutableTx)
 
       const mutableNFTokenID =
-        getNFTokenID(
-          mutableTxResponse.result.meta as TransactionMetadata<NFTokenMint>,
-        ) ?? 'undefined'
+        getNFTokenID(mutableTxResponse.result.meta) ?? 'undefined'
 
       const accountNFTs = await testContext.client.request({
         command: 'account_nfts',

@@ -93,8 +93,8 @@ export function signMultiBatch(
   /*
    * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
    */
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-  validate(transaction as unknown as Record<string, unknown>)
+
+  validate(transaction)
 
   // An account must sign the Batch if it authorizes an inner transaction, is
   // the `Counterparty` of one, or is the Sponsor of a co-signed one.
@@ -184,8 +184,8 @@ export function combineBatchSigners(
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validateBatch(tx as unknown as Record<string, unknown>)
+
+    validateBatch(tx)
     if (tx.BatchSigners == null || tx.BatchSigners.length === 0) {
       throw new ValidationError(
         'For combining Batch transaction signatures, all transactions must include a BatchSigners field containing an array of signatures.',
