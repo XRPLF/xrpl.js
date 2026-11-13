@@ -1,3 +1,4 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
@@ -11,7 +12,6 @@ import {
   SubmitMultisignedRequest,
   SubmitMultisignedV1Response,
 } from '../../../src'
-import { convertStringToHex } from '../../../src/utils'
 import { multisign } from '../../../src/Wallet/signer'
 import serverUrl from '../serverUrl'
 import {
@@ -75,7 +75,7 @@ describe('submit_multisigned', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const accountSetTx = await client.autofill(accountSet, 2)
       const signed1 = signerWallet1.sign(accountSetTx, true)
@@ -148,7 +148,7 @@ describe('submit_multisigned', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const accountSetTx = await client.autofill(accountSet, 2)
       const signed1 = signerWallet1.sign(accountSetTx, true)
