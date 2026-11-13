@@ -16,6 +16,7 @@ import {
   validateCredentialsList,
   MAX_AUTHORIZED_CREDENTIALS,
   isArray,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -200,13 +201,9 @@ export interface PaymentMetadata extends TransactionMetadataBase {
 export function validatePayment(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Amount === undefined) {
-    throw new ValidationError('PaymentTransaction: missing field Amount')
-  }
-
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('PaymentTransaction: invalid Amount')
-  }
+  validateRequiredField(tx, 'Amount', isAmount, {
+    txType: 'PaymentTransaction',
+  })
 
   validateRequiredField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'DestinationTag', isNumber)
@@ -218,9 +215,9 @@ export function validatePayment(tx: Record<string, unknown>): void {
     MAX_AUTHORIZED_CREDENTIALS,
   )
 
-  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
-    throw new ValidationError('PaymentTransaction: InvoiceID must be a string')
-  }
+  validateOptionalField(tx, 'InvoiceID', isHexString, {
+    txType: 'PaymentTransaction',
+  })
 
   validateOptionalField(tx, 'DomainID', isDomainID, {
     txType: 'PaymentTransaction',
@@ -231,9 +228,9 @@ export function validatePayment(tx: Record<string, unknown>): void {
     throw new ValidationError('PaymentTransaction: invalid Paths')
   }
 
-  if (tx.SendMax !== undefined && !isAmount(tx.SendMax)) {
-    throw new ValidationError('PaymentTransaction: invalid SendMax')
-  }
+  validateOptionalField(tx, 'SendMax', isAmount, {
+    txType: 'PaymentTransaction',
+  })
 
   checkPartialPayment(tx)
   checkSponsorCreatedAccount(tx)

@@ -2,11 +2,19 @@
 
 ### High Level Process to Contribute Code
 
-- You should open a PR against `main` and ensure that all CI passes.
+- You should open a PR against `main` and ensure that all CI passes. Breaking changes go to a separate branch instead; see [Breaking changes](#breaking-changes).
 - Your changes should have [unit](#unit-tests) and/or [integration tests](#integration-tests).
 - Your changes should [pass the linter](#run-the-linter).
 - You should get a full code review from two of the maintainers.
 - Then you can merge your changes. (Which will then be included in the next release)
+
+### Breaking changes
+
+Keep `main` releasable as a minor or patch version. Don't merge a breaking change into `main`, in any package.
+
+- Open breaking-change PRs against the next major's branch, for example `xrpl-6.0.0`. Create it from `main` if it doesn't exist yet. One branch can carry majors for several packages.
+- Rebase the branch onto `main` to keep it current.
+- When the major is ready, release any pending fixes from `main` first. Then rebase the major branch onto `main`, merge it, and release the major from `main`. Release each package before the packages that depend on it.
 
 ## Set up your dev environment
 

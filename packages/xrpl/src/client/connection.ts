@@ -9,6 +9,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
+  RippledError,
   XrplError,
 } from '../errors'
 import type { APIVersion, RequestResponseMap } from '../models'
@@ -21,6 +22,22 @@ import RequestManager from './RequestManager'
 const SECONDS_PER_MINUTE = 60
 const TIMEOUT = 20
 const CONNECTION_TIMEOUT = 5
+
+/**
+ * Event names that are emitted internally by Connection to signal local
+ * client/socket state transitions. These must never be emitted as a result
+ * of a server-supplied `data.type`, otherwise a malicious or compromised
+ * rippled server could spoof connection state (e.g. claim the client is
+ * `connected` when it is not, or inject a fake `error`/`disconnected`/
+ * `reconnect`/`reconnecting` to drive the client into a bad state).
+ */
+const RESERVED_INTERNAL_EVENTS: ReadonlySet<string> = new Set([
+  'connected',
+  'disconnected',
+  'error',
+  'reconnect',
+  'reconnecting',
+])
 
 /**
  * ConnectionOptions is the configuration for the Connection class.
@@ -64,6 +81,7 @@ function createWebSocket(
 ): WebSocket | null {
   const options: ClientOptions = {
     agent: config.agent,
+    skipUTF8Validation: true,
   }
   if (config.headers) {
     options.headers = config.headers
@@ -330,12 +348,75 @@ export class Connection extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
+  private handleResponseMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    try {
+      this.requestManager.handleResponse(data)
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, message)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+    }
+  }
+
+  private handleErrorMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    if (data.value == null) {
+      return
+    }
+    if (typeof data.value !== 'string') {
+      this.emit(
+        'error',
+        'badMessage',
+        'Expected error value to be a JSON string',
+        data,
+      )
+      return
+    }
+    let parsedValue: Record<string, unknown> | null
+    try {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
+      parsedValue = JSON.parse(data.value) as Record<string, unknown> | null
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, data.value)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+      return
+    }
+    // No id to reject. onMessage already reported this as badMessage.
+    if (parsedValue?.id != null) {
+      try {
+        this.requestManager.reject(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          parsedValue.id as string | number,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          new RippledError(data.error as string, data),
+        )
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : error
+        const errData: unknown = error instanceof Error ? message : error
+        this.emit('error', 'badMessage', errMsg, errData)
+      }
+    }
+  }
+
   /**
    * Handler for when messages are received from the server.
    *
-   * @param message - The message received from the server.
+   * @param rawMessage - The message received from the server.
    */
-  private onMessage(message): void {
+  private onMessage(rawMessage: string | Buffer): void {
+    const message =
+      typeof rawMessage === 'string' ? rawMessage : rawMessage.toString('utf8')
+
     this.trace('receive', message)
     let data: Record<string, unknown>
     try {
@@ -349,24 +430,64 @@ export class Connection extends EventEmitter {
     }
     if (data.type == null && data.error) {
       // e.g. slowDown
-      this.emit('error', data.error, data.error_message, data)
+      this.emit('error', data.error, data.error_message ?? data.error, data)
       return
     }
     if (data.type) {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
-      this.emit(data.type as string, data)
+      this.forwardServerMessage(data, message)
     }
     if (data.type === 'response') {
-      try {
-        this.requestManager.handleResponse(data)
-      } catch (error) {
-        if (error instanceof Error) {
-          this.emit('error', 'badMessage', error.message, message)
-        } else {
-          this.emit('error', 'badMessage', error, error)
-        }
-      }
+      this.handleResponseMessage(data, message)
     }
+    if (data.type === 'error') {
+      this.handleErrorMessage(data, message)
+    }
+  }
+
+  /**
+   * Forwards a server message to listeners keyed by its `data.type`, after
+   * validating the server-controlled `type`. Messages whose `type` is not a
+   * string, or whose `type` collides with one of Connection's reserved
+   * internal event names, are dropped and surfaced as a `badMessage` error
+   * rather than forwarded.
+   *
+   * @param data - The parsed server message.
+   * @param message - The raw message string, used for diagnostics.
+   */
+  private forwardServerMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    // `data.type` is server-controlled, so its runtime type must be checked
+    // before it is used as an event name. A compile-time `as string` is not
+    // enough: a payload like `{"type":["error"]}` slips past
+    // `RESERVED_INTERNAL_EVENTS.has(...)` (an array never matches a string in
+    // the Set) yet still coerces to the string "error" when passed to `emit`,
+    // re-opening the spoofing hole. Reject any non-string `type` outright.
+    if (typeof data.type !== 'string') {
+      this.emit(
+        'error',
+        'badMessage',
+        `Server message 'type' must be a string (got ${typeof data.type}); dropping.`,
+        message,
+      )
+      return
+    }
+    const type = data.type
+    // Refuse to forward server-supplied event names that collide with
+    // Connection's internal state events. Otherwise a rogue server could
+    // spoof local connection state by sending e.g. `{"type":"connected"}`
+    // or `{"type":"error"}`.
+    if (RESERVED_INTERNAL_EVENTS.has(type)) {
+      this.emit(
+        'error',
+        'badMessage',
+        `Server message used reserved internal event type "${type}"; dropping.`,
+        message,
+      )
+      return
+    }
+    this.emit(type, data)
   }
 
   /**
@@ -388,7 +509,9 @@ export class Connection extends EventEmitter {
     this.ws.removeAllListeners()
     clearTimeout(connectionTimeoutID)
     // Add new, long-term connected listeners for messages and errors
-    this.ws.on('message', (message: string) => this.onMessage(message))
+    this.ws.on('message', (rawMessage: string | Buffer) =>
+      this.onMessage(rawMessage),
+    )
     this.ws.on('error', (error) =>
       this.emit('error', 'websocket', error.message, error),
     )

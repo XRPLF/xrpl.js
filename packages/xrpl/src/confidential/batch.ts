@@ -408,6 +408,26 @@ interface InboxCredit {
 }
 
 /**
+ * Add a Send's re-randomized ciphertext to a balance. A balance an earlier Clawback
+ * reset is uncomputable, and so is that balance plus this credit: leave it
+ * uncomputable rather than throw, since the Send's own proof does not depend on the
+ * destination's balances and a later inner that reads one still throws via
+ * {@link readBalance}.
+ *
+ * @param crypto - The confidential crypto module.
+ * @param balance - The predicted balance, or `undefined` if reset.
+ * @param credit - The Send's re-randomized ciphertext for this balance.
+ * @returns The credited balance, or `undefined` if the balance is uncomputable.
+ */
+async function addCredit(
+  crypto: MptCryptoModule,
+  balance: string | undefined,
+  credit: string,
+): Promise<string | undefined> {
+  return balance == null ? undefined : crypto.addCiphertexts(balance, credit)
+}
+
+/**
  * Predict a destination's balances after a Send credits it. rippled credits three
  * of the recipient's balances — inbox, issuer-encrypted, and (with an auditor)
  * auditor-encrypted — each re-randomized with the proof challenge (an added
@@ -419,7 +439,7 @@ interface InboxCredit {
  * @param dest - The destination's current predicted state.
  * @param credit - The Send's ciphertexts and the issuer/auditor keys to credit under.
  * @returns The destination's state after the credits.
- * @throws {XrplError} If the destination key or a credited balance was reset/absent.
+ * @throws {XrplError} If the destination holder key is absent.
  */
 async function applyInboxCredit(
   crypto: MptCryptoModule,
@@ -428,8 +448,14 @@ async function applyInboxCredit(
 ): Promise<TokenState> {
   const { tx, issuerKey, auditorKey } = credit
   const challenge = tx.ZKProof.slice(0, CHALLENGE_HEX_LEN)
-  // rippled re-randomizes each credited ciphertext with the send challenge — adding
-  // an encryption of zero under the target key — before the homomorphic add.
+  /**
+   * Re-randomize a Send ciphertext the way rippled does before crediting it: add an
+   * encryption of zero under the target key, blinded with the send challenge.
+   *
+   * @param ciphertext - The Send's ciphertext for one balance.
+   * @param key - The ElGamal key that balance is encrypted under.
+   * @returns The re-randomized ciphertext.
+   */
   async function rerandomize(ciphertext: string, key: string): Promise<string> {
     return crypto.addCiphertexts(
       ciphertext,
@@ -438,18 +464,21 @@ async function applyInboxCredit(
   }
 
   const destKey = readBalance(dest.holderKey, 'destination holder key')
-  const inbox = await crypto.addCiphertexts(
-    readBalance(dest.inbox, 'destination inbox balance'),
+  const inbox = await addCredit(
+    crypto,
+    dest.inbox,
     await rerandomize(tx.DestinationEncryptedAmount, destKey),
   )
-  const issuerEnc = await crypto.addCiphertexts(
-    readBalance(dest.issuerEnc, 'destination issuer-encrypted balance'),
+  const issuerEnc = await addCredit(
+    crypto,
+    dest.issuerEnc,
     await rerandomize(tx.IssuerEncryptedAmount, issuerKey),
   )
   let { auditorEnc } = dest
   if (tx.AuditorEncryptedAmount != null && auditorKey != null) {
-    auditorEnc = await crypto.addCiphertexts(
-      readBalance(auditorEnc, 'destination auditor-encrypted balance'),
+    auditorEnc = await addCredit(
+      crypto,
+      auditorEnc,
       await rerandomize(tx.AuditorEncryptedAmount, auditorKey),
     )
   }

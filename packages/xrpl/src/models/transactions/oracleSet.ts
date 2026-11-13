@@ -7,10 +7,10 @@ import {
   isArray,
   isNumber,
   isRecord,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
+  isHexString,
 } from './common'
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
@@ -81,11 +81,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
 
   validateRequiredField(tx, 'LastUpdateTime', isNumber)
 
-  validateOptionalField(tx, 'Provider', isString)
+  validateOptionalField(tx, 'Provider', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
-  validateOptionalField(tx, 'AssetClass', isString)
+  validateOptionalField(tx, 'AssetClass', isHexString)
 
   /* eslint-disable max-statements, max-lines-per-function -- necessary to validate many fields */
   validateRequiredField(

@@ -8,6 +8,8 @@ import {
   isIssuedCurrency,
   isRecord,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 const MAX_AUTH_ACCOUNTS = 4
@@ -63,36 +65,16 @@ export interface AMMBid extends BaseTransaction {
 export function validateAMMBid(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMBid: missing field Asset')
-  }
+  validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMBid: Asset must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMBid: missing field Asset2')
-  }
+  validateOptionalField(tx, 'BidMin', isAmount)
 
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMBid: Asset2 must be a Currency')
-  }
+  validateOptionalField(tx, 'BidMax', isAmount)
 
-  if (tx.BidMin != null && !isAmount(tx.BidMin)) {
-    throw new ValidationError('AMMBid: BidMin must be an Amount')
-  }
-
-  if (tx.BidMax != null && !isAmount(tx.BidMax)) {
-    throw new ValidationError('AMMBid: BidMax must be an Amount')
-  }
-
+  validateOptionalField(tx, 'AuthAccounts', isArray)
   if (tx.AuthAccounts != null) {
-    if (!isArray(tx.AuthAccounts)) {
-      throw new ValidationError(
-        `AMMBid: AuthAccounts must be an AuthAccount array`,
-      )
-    }
     if (tx.AuthAccounts.length > MAX_AUTH_ACCOUNTS) {
       throw new ValidationError(
         `AMMBid: AuthAccounts length must not be greater than ${MAX_AUTH_ACCOUNTS}`,
