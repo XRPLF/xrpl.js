@@ -95,7 +95,7 @@ export async function getStartingBalance(
 ): Promise<number> {
   let startingBalance = 0
   try {
-    startingBalance = (await client.getXrpBalance(classicAddress)).toNumber()
+    startingBalance = Number(await client.getXrpBalance(classicAddress))
   } catch {
     // startingBalance remains '0'
   }
@@ -264,7 +264,7 @@ async function getUpdatedBalance(
       try {
         let newBalance
         try {
-          newBalance = (await client.getXrpBalance(address)).toNumber()
+          newBalance = Number(await client.getXrpBalance(address))
         } catch {
           /* newBalance remains undefined */
         }

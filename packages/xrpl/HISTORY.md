@@ -4,13 +4,6 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
-### BREAKING CHANGES
-* `dropsToXrp()` now returns a `BigNumber` instead of a JavaScript `number`, and `Client.getXrpBalance()` returns `Promise<BigNumber>` instead of `Promise<number>`. A `number` cannot hold every drop above 2^33 XRP (about 8.6 billion XRP): `xrpToDrops(dropsToXrp('9999999999999999'))` returned `'9999999999999998'`, losing one drop on the round-trip. ([#3316](https://github.com/XRPLF/xrpl.js/issues/3316))
-
-  Migration:
-  - Call `.toString()` for an exact decimal string, or `.toNumber()` for a JavaScript number (which loses drops above 2^33 XRP).
-  - Add results with `.plus()`. In JavaScript, `dropsToXrp(a) + dropsToXrp(b)` now joins the two values as strings (`'1' + '2'` is `'12'`); TypeScript rejects it.
-
 ### Changed
 * Some transaction validation error messages changed.
 

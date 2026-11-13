@@ -114,3 +114,7 @@ You are also welcome to create an [issue](https://github.com/XRPLF/xrpl.js/issue
 - [#javascript in the XRPL Developer Discord for questions & support](https://xrpldevs.org)
 - [xrpl-announce (The mailing list for new xrpl.js versions)](https://groups.google.com/g/xrpl-announce)
 - [Applications that use xrpl.js](https://github.com/XRPLF/xrpl.js/blob/main/APPLICATIONS.md) (You can open a PR to add your project!)
+
+## License
+
+xrpl.js is licensed under the [ISC License](LICENSE). Each package under `packages/` also contains its own `LICENSE` file.
