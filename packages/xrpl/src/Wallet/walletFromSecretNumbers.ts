@@ -23,17 +23,15 @@ export function walletFromSecretNumbers(
   secretNumbers: string[] | string,
   opts?: { masterAddress?: string; algorithm?: ECDSA },
 ): Wallet {
-  const secret = new Account(secretNumbers).getFamilySeed()
-  const updatedOpts: { masterAddress?: string; algorithm?: ECDSA } = {
-    masterAddress: undefined,
-    algorithm: undefined,
-  }
   // Use secp256k1 since that's the algorithm used by popular wallets like Xumm when generating secret number accounts
-  if (opts === undefined) {
-    updatedOpts.algorithm = ECDSA.secp256k1
-  } else {
-    updatedOpts.masterAddress = opts.masterAddress
-    updatedOpts.algorithm = opts.algorithm ?? ECDSA.secp256k1
-  }
-  return Wallet.fromSecret(secret, updatedOpts)
+  const algorithm = opts?.algorithm ?? ECDSA.secp256k1
+  // Pass the algorithm into Account so the family seed's prefix matches the
+  // keypair derivation. Otherwise Account defaults to ed25519 and produces an
+  // ed25519-family seed, which cannot restore this wallet via
+  // Wallet.fromSeed (the algorithm is inferred from the seed prefix there).
+  const secret = new Account(secretNumbers, algorithm).getFamilySeed()
+  return Wallet.fromSecret(secret, {
+    masterAddress: opts?.masterAddress,
+    algorithm,
+  })
 }
