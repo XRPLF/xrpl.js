@@ -139,18 +139,34 @@ describe('OracleSet', function () {
     assertInvalid(tx, errorMessage)
   })
 
-  it(`throws w/ missing AssetPrice with Scale present of PriceDataSeries`, function () {
-    delete tx.PriceDataSeries[0].PriceData.AssetPrice
-    const errorMessage =
-      'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present'
-    assertInvalid(tx, errorMessage)
-  })
+  // An omitted Scale is how a Scale of 0 is expressed, so rippled rejects an
+  // explicit Scale of 0 but accepts an AssetPrice on its own.
+  describe('AssetPrice and Scale pairing', function () {
+    it(`verifies valid AssetPrice without Scale of PriceDataSeries`, function () {
+      delete tx.PriceDataSeries[0].PriceData.Scale
+      assertValid(tx)
+    })
 
-  it(`throws w/ missing Scale with AssetPrice present of PriceDataSeries`, function () {
-    delete tx.PriceDataSeries[0].PriceData.Scale
-    const errorMessage =
-      'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present'
-    assertInvalid(tx, errorMessage)
+    it(`verifies valid PriceData without AssetPrice and Scale of PriceDataSeries`, function () {
+      // a pair without AssetPrice removes that pair from the Oracle
+      delete tx.PriceDataSeries[0].PriceData.AssetPrice
+      delete tx.PriceDataSeries[0].PriceData.Scale
+      assertValid(tx)
+    })
+
+    it(`throws w/ missing AssetPrice with Scale present of PriceDataSeries`, function () {
+      delete tx.PriceDataSeries[0].PriceData.AssetPrice
+      const errorMessage =
+        'OracleSet: PriceDataSeries must have `AssetPrice` if `Scale` is present'
+      assertInvalid(tx, errorMessage)
+    })
+
+    it(`throws w/ Scale explicitly set to 0 of PriceDataSeries`, function () {
+      tx.PriceDataSeries[0].PriceData.Scale = 0
+      const errorMessage =
+        'OracleSet: Scale must be omitted instead of set to 0'
+      assertInvalid(tx, errorMessage)
+    })
   })
 
   it(`throws w/ invalid AssetPrice of PriceDataSeries`, function () {

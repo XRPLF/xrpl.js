@@ -44,6 +44,7 @@ export interface OracleSet extends BaseTransaction {
   /**
    * An array of up to 10 PriceData objects, each representing the price information
    * for a token pair. More than five PriceData objects require two owner reserves.
+   * To publish an AssetPrice with a Scale of 0, omit the Scale field.
    */
   PriceDataSeries: PriceData[]
 
@@ -140,13 +141,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
           )
         }
 
-        // Either AssetPrice and Scale are both present or both excluded
-        if (
-          (priceDataInner.AssetPrice == null) !==
-          (priceDataInner.Scale == null)
-        ) {
+        // An omitted Scale means a Scale of 0, so AssetPrice may appear on its own,
+        // but a Scale without an AssetPrice has nothing to scale.
+        if (priceDataInner.AssetPrice == null && priceDataInner.Scale != null) {
           throw new ValidationError(
-            'OracleSet: PriceDataSeries must have both `AssetPrice` and `Scale` if any are present',
+            'OracleSet: PriceDataSeries must have `AssetPrice` if `Scale` is present',
           )
         }
 
@@ -178,6 +177,13 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         if ('Scale' in priceDataInner) {
           if (!isNumber(priceDataInner.Scale)) {
             throw new ValidationError('OracleSet: invalid field Scale')
+          }
+
+          // rippled rejects a Scale that is explicitly set to its default value.
+          if (priceDataInner.Scale === 0) {
+            throw new ValidationError(
+              'OracleSet: Scale must be omitted instead of set to 0',
+            )
           }
 
           if (priceDataInner.Scale < 0 || priceDataInner.Scale > SCALE_MAX) {
