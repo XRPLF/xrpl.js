@@ -90,6 +90,32 @@ describe('Amount', function () {
     )
   })
 
+  // An MPT amount carries its sign and type in its own leading byte at
+  // serialization, so unlike native XRP and IOU amounts no bit inside the
+  // 64-bit value is reserved for sign. The valid range is the full unsigned
+  // 64-bit range, [0, 2^64 - 1].
+  it('accepts MPT amounts across the full unsigned 64-bit range', function () {
+    const issuanceId = '0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47'
+
+    for (const [value, expectedHex] of [
+      ['9223372036854775808', '608000000000000000'], // 2^63
+      ['18446744073709551615', '60FFFFFFFFFFFFFFFF'], // 2^64 - 1, the real max
+    ]) {
+      const amt = Amount.from({ value, mpt_issuance_id: issuanceId })
+      expect(amt.toHex()).toEqual(expectedHex + issuanceId)
+    }
+  })
+
+  it('rejects an MPT amount above the unsigned 64-bit range', function () {
+    const mpt = {
+      value: '18446744073709551616', // 2^64
+      mpt_issuance_id: '0000012FFD9EE5DA93AC614B4DB94D7E0FCE415CA51BED47',
+    }
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+  })
+
   it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
     const amt = Amount.from('1000000')
     const serializedHexBeforeJsonCalls = amt.toHex()
