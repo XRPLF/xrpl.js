@@ -118,7 +118,7 @@ describe('Payment', function () {
 
   it(`throws when Amount is invalid`, function () {
     payment.Amount = 1234
-    assertInvalid(payment, 'PaymentTransaction: invalid Amount')
+    assertInvalid(payment, 'PaymentTransaction: invalid field Amount')
   })
 
   it(`throws when Destination is missing`, function () {
@@ -153,7 +153,7 @@ describe('Payment', function () {
 
   it(`throws when InvoiceID is not a string`, function () {
     payment.InvoiceID = 19832
-    assertInvalid(payment, 'PaymentTransaction: InvoiceID must be a string')
+    assertInvalid(payment, 'PaymentTransaction: invalid field InvoiceID')
   })
 
   it(`throws when Paths is invalid`, function () {
@@ -163,7 +163,7 @@ describe('Payment', function () {
 
   it(`throws when SendMax is invalid`, function () {
     payment.SendMax = 100000000
-    assertInvalid(payment, 'PaymentTransaction: invalid SendMax')
+    assertInvalid(payment, 'PaymentTransaction: invalid field SendMax')
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
@@ -256,5 +256,10 @@ describe('Payment', function () {
     const errorMessage =
       'Payment: Credentials cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
+  })
+
+  it(`throws w/ non-hex InvoiceID`, function () {
+    payment.InvoiceID = 'not hex'
+    assertInvalid(payment, 'PaymentTransaction: invalid field InvoiceID')
   })
 })

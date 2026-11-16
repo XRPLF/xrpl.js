@@ -10,9 +10,11 @@ import {
   parseAmountValue,
   isAccount,
   validateOptionalField,
+  validateRequiredField,
   Account,
   areAddressesEqual,
   isString,
+  isHexString,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
 
@@ -148,16 +150,11 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Destination', isAccount)
   validateOptionalField(tx, 'Owner', isAccount)
 
-  if (tx.NFTokenID == null) {
-    throw new ValidationError('NFTokenCreateOffer: missing field NFTokenID')
-  }
+  validateRequiredField(tx, 'NFTokenID', isHexString)
+  validateRequiredField(tx, 'Amount', isAmount)
 
-  if (!isAmount(tx.Amount)) {
-    throw new ValidationError('NFTokenCreateOffer: invalid Amount')
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
-  const flags = (tx.Flags ?? 0) as number | NFTokenCreateOfferFlagsInterface
+  // checked in BaseTransaction
+  const flags: number | NFTokenCreateOfferFlagsInterface = tx.Flags ?? 0
   const isTfSellNFToken =
     typeof flags === 'number'
       ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)

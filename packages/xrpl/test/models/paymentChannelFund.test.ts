@@ -38,30 +38,35 @@ describe('PaymentChannelFund', function () {
   it(`throws w/ missing Amount`, function () {
     delete channel.Amount
 
-    assertInvalid(channel, 'PaymentChannelFund: missing Amount')
+    assertInvalid(channel, 'PaymentChannelFund: missing field Amount')
   })
 
   it(`throws w/ missing Channel`, function () {
     delete channel.Channel
 
-    assertInvalid(channel, 'PaymentChannelFund: missing Channel')
+    assertInvalid(channel, 'PaymentChannelFund: missing field Channel')
   })
 
   it(`throws w/ invalid Amount`, function () {
     channel.Amount = 100
 
-    assertInvalid(channel, 'PaymentChannelFund: Amount must be a string')
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Amount')
   })
 
   it(`throws w/ invalid Channel`, function () {
     channel.Channel = 1000
 
-    assertInvalid(channel, 'PaymentChannelFund: Channel must be a string')
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Channel')
   })
 
   it(`throws w/ invalid Expiration`, function () {
     channel.Expiration = '1000'
 
-    assertInvalid(channel, 'PaymentChannelFund: Expiration must be a number')
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Expiration')
+  })
+
+  it(`throws w/ non-hex Channel`, function () {
+    channel.Channel = 'not hex'
+    assertInvalid(channel, 'PaymentChannelFund: invalid field Channel')
   })
 })

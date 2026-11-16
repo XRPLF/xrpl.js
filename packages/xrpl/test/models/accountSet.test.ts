@@ -37,7 +37,7 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid SetFlag (incorrect type)`, function () {
     tx.SetFlag = 'abc'
-    assertInvalid(tx, 'AccountSet: invalid SetFlag')
+    assertInvalid(tx, 'AccountSet: invalid field SetFlag')
   })
 
   it(`throws w/ invalid ClearFlag`, function () {
@@ -47,22 +47,22 @@ describe('AccountSet', function () {
 
   it(`throws w/ invalid Domain`, function () {
     tx.Domain = 6578616
-    assertInvalid(tx, 'AccountSet: invalid Domain')
+    assertInvalid(tx, 'AccountSet: invalid field Domain')
   })
 
   it(`throws w/ invalid EmailHash`, function () {
     tx.EmailHash = 6578656789876543
-    assertInvalid(tx, 'AccountSet: invalid EmailHash')
+    assertInvalid(tx, 'AccountSet: invalid field EmailHash')
   })
 
   it(`throws w/ invalid MessageKey`, function () {
     tx.MessageKey = 6578656789876543
-    assertInvalid(tx, 'AccountSet: invalid MessageKey')
+    assertInvalid(tx, 'AccountSet: invalid field MessageKey')
   })
 
   it(`throws w/ invalid TransferRate`, function () {
     tx.TransferRate = '1000000001'
-    assertInvalid(tx, 'AccountSet: invalid TransferRate')
+    assertInvalid(tx, 'AccountSet: invalid field TransferRate')
   })
 
   it(`throws w/ invalid TickSize`, function () {
@@ -73,5 +73,20 @@ describe('AccountSet', function () {
   it(`throws w/ invalid NFTokenMinter`, function () {
     tx.NFTokenMinter = ''
     assertInvalid(tx, 'AccountSet: invalid field NFTokenMinter')
+  })
+
+  it(`throws w/ non-hex Domain`, function () {
+    tx.Domain = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field Domain')
+  })
+
+  it(`throws w/ non-hex EmailHash`, function () {
+    tx.EmailHash = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field EmailHash')
+  })
+
+  it(`throws w/ non-hex MessageKey`, function () {
+    tx.MessageKey = 'not hex'
+    assertInvalid(tx, 'AccountSet: invalid field MessageKey')
   })
 })

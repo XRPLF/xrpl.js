@@ -5,7 +5,9 @@ import { AMM_MAX_TRADING_FEE } from './AMMCreate'
 import {
   BaseTransaction,
   isIssuedCurrency,
+  isNumber,
   validateBaseTransaction,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -43,29 +45,11 @@ export interface AMMVote extends BaseTransaction {
 export function validateAMMVote(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMVote: missing field Asset')
-  }
+  validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMVote: Asset must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMVote: missing field Asset2')
-  }
-
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMVote: Asset2 must be a Currency')
-  }
-
-  if (tx.TradingFee == null) {
-    throw new ValidationError('AMMVote: missing field TradingFee')
-  }
-
-  if (typeof tx.TradingFee !== 'number') {
-    throw new ValidationError('AMMVote: TradingFee must be a number')
-  }
+  validateRequiredField(tx, 'TradingFee', isNumber)
 
   if (tx.TradingFee < 0 || tx.TradingFee > AMM_MAX_TRADING_FEE) {
     throw new ValidationError(
