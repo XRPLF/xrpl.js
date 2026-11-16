@@ -16,6 +16,7 @@ import {
   Account,
   isAccount,
   isRecord,
+  isHexString,
 } from './common'
 
 const MAX_DATA_LENGTH = 512
@@ -179,7 +180,7 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'LoanBrokerID', isString)
   validateRequiredField(tx, 'PrincipalRequested', isXRPLNumber)
   validateOptionalField(tx, 'CounterpartySignature', isRecord)
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
   validateOptionalField(tx, 'Counterparty', isAccount)
   validateOptionalField(tx, 'LoanOriginationFee', isXRPLNumber)
   validateOptionalField(tx, 'LoanServiceFee', isXRPLNumber)

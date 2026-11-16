@@ -34,8 +34,8 @@ function multisign(transactions: Array<Transaction | string>): string {
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>)
+
+    validate(tx)
     if (tx.Signers == null || tx.Signers.length === 0) {
       throw new ValidationError(
         "For multisigning all transactions must include a Signers field containing an array of signatures. You may have forgotten to pass the 'forMultisign' parameter when signing.",

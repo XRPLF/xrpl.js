@@ -215,7 +215,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid Expiration')
+    assertInvalid(offerTx, 'OfferCreate: invalid field Expiration')
   })
 
   it(`throws w/ invalid OfferSequence`, function () {
@@ -239,7 +239,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid OfferSequence')
+    assertInvalid(offerTx, 'OfferCreate: invalid field OfferSequence')
   })
 
   it(`throws w/ invalid TakerPays`, function () {
@@ -259,7 +259,7 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid TakerPays')
+    assertInvalid(offerTx, 'OfferCreate: invalid field TakerPays')
   })
 
   it(`throws w/ invalid TakerGets`, function () {
@@ -283,6 +283,6 @@ describe('OfferCreate', function () {
         '3045022100D874CDDD6BB24ED66E83B1D3574D3ECAC753A78F26DB7EBA89EAB8E7D72B95F802207C8CCD6CEA64E4AE2014E59EE9654E02CA8F03FE7FCE0539E958EAE182234D91',
     } as any
 
-    assertInvalid(offerTx, 'OfferCreate: invalid TakerGets')
+    assertInvalid(offerTx, 'OfferCreate: invalid field TakerGets')
   })
 })
