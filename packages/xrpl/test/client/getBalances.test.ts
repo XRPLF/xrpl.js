@@ -1,3 +1,7 @@
+import { assert } from 'chai'
+import cloneDeep from 'lodash/cloneDeep'
+
+import addresses from '../fixtures/addresses.json'
 import responses from '../fixtures/responses'
 import rippled from '../fixtures/rippled'
 import rippledAccountLines from '../fixtures/rippled/accountLines'
@@ -112,6 +116,38 @@ describe('client.getBalances', function () {
         )
         assertResultMatch(result, expectedResponse, 'getBalances')
       })
+    })
+  })
+
+  describe('XRP balance', function () {
+    function mockXrpBalance(drops: string): void {
+      const accountInfo = cloneDeep(rippled.account_info.normal)
+      accountInfo.result.account_data.Balance = drops
+      testContext.mockRippled!.addResponse('account_info', accountInfo)
+      testContext.mockRippled!.addResponse(
+        'account_lines',
+        rippledAccountLines.normal,
+      )
+      testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
+    }
+
+    it('keeps every drop of a large balance', async function () {
+      mockXrpBalance('9999999999999999')
+      const result = await testContext.client.getBalances(addresses.ACCOUNT)
+      assert.deepEqual(result[0], {
+        currency: 'XRP',
+        value: '9999999999.999999',
+      })
+    })
+
+    it('is omitted when zero', async function () {
+      mockXrpBalance('0')
+      const result = await testContext.client.getBalances(addresses.ACCOUNT)
+      assertResultMatch(
+        result,
+        responses.getBalances.filter((item) => item.currency !== 'XRP'),
+        'getBalances',
+      )
     })
   })
 })

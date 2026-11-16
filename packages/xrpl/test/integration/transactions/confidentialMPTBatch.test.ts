@@ -480,9 +480,7 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
       )
       const bob = await registerHolderKey(client, setup.mptID)
       const carol = await generateFundedWallet(client)
-      const carolBefore = Number(
-        await client.getXrpBalance(carol.classicAddress),
-      )
+      const carolBefore = await client.getXrpBalance(carol.classicAddress)
 
       const batch = await prepareConfidentialBatch(client, {
         account: alice.wallet.classicAddress,
@@ -502,10 +500,8 @@ describe('confidential/prepareConfidentialBatch (integration)', function () {
       assert.strictEqual(await getSpendable(client, alice, setup.mptID), 70n)
       // ...and so did the plain XRP Payment (carol +1 XRP) in the same atomic
       // Batch, proving regular and confidential inners interleave and sequence.
-      const carolAfter = Number(
-        await client.getXrpBalance(carol.classicAddress),
-      )
-      assert.strictEqual(carolAfter - carolBefore, 1)
+      const carolAfter = await client.getXrpBalance(carol.classicAddress)
+      assert.strictEqual(carolAfter.minus(carolBefore).toString(), '1')
     },
     TIMEOUT,
   )

@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js'
 import { assert } from 'chai'
 
 import rippled from '../fixtures/rippled'
@@ -30,7 +31,8 @@ describe('client.getXrpBalance', function () {
         )
         testContext.mockRippled!.addResponse('ledger', rippled.ledger.normal)
         const result = await testContext.client.getXrpBalance(testcase.address)
-        assert.equal(result, 922.913243)
+        assert.instanceOf(result, BigNumber)
+        assert.strictEqual(result.toString(), '922.913243')
       })
     })
   })
