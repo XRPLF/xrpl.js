@@ -206,7 +206,7 @@ describe('sponsorSigner', function () {
           ...tx1,
           SigningPubKey: undefined,
           TxnSignature: undefined,
-        } as Payment,
+        },
       ])
     }, 'Transaction must be first signed by the account.')
 
@@ -221,14 +221,14 @@ describe('sponsorSigner', function () {
             TxnSignature:
               'E983F7BED3E129E93F3001567006FD12AA8E6B180DFD18E2293D998080E80F133E1D7142A36C30BCDDB67339EEE02449937A4DEA1500BF06E2803E29C1B76A05',
           },
-        } as Payment,
+        },
       ])
     }, 'SponsorSignature must have Signers.')
 
     // Test error: transactions are not the same
     assert.throws(() => {
       combineSponsorSigners([
-        tx1 as Payment,
+        tx1,
         {
           ...tx2,
           Amount: '6000000',
@@ -237,10 +237,7 @@ describe('sponsorSigner', function () {
     }, 'Sponsor transactions are not the same.')
 
     // Test successful combination
-    const { tx: combinedTx } = combineSponsorSigners([
-      tx1 as Payment,
-      tx2 as Payment,
-    ])
+    const { tx: combinedTx } = combineSponsorSigners([tx1, tx2])
 
     // Verify structure. Signatures are deterministic (Ed25519), so each
     // sponsor signer's signature is pinned exactly below to catch any
