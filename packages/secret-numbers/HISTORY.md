@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### BREAKING CHANGES
+* Drop support for Node.js 18 and 20. Node.js 20 reached end-of-life on April 30, 2026. The package now requires Node.js 22.12.0 or later.
+
 ## 3.0.0 (2026-06-05)
 
 ### BREAKING CHANGES:
