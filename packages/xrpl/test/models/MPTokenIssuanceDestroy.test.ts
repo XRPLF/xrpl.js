@@ -35,4 +35,17 @@ describe('MPTokenIssuanceDestroy', function () {
       'MPTokenIssuanceDestroy: missing field MPTokenIssuanceID',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    const validMPTokenIssuanceDestroy = {
+      TransactionType: 'MPTokenIssuanceDestroy',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      MPTokenIssuanceID: TOKEN_ID,
+    } as any
+    validMPTokenIssuanceDestroy.MPTokenIssuanceID = 'not hex'
+    assertInvalid(
+      validMPTokenIssuanceDestroy,
+      'MPTokenIssuanceDestroy: invalid field MPTokenIssuanceID',
+    )
+  })
 })

@@ -64,8 +64,7 @@ export function signLoanSetByCounterparty(
     )
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-  validate(tx as unknown as Record<string, unknown>)
+  validate(tx)
 
   let multisignAddress: boolean | string = false
   if (typeof opts.multisign === 'string') {
@@ -144,8 +143,8 @@ export function combineLoanSetCounterpartySigners(
     /*
      * This will throw a more clear error for JS users if any of the supplied transactions has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>)
+
+    validate(tx)
 
     if (tx.TransactionType !== 'LoanSet') {
       throw new ValidationError('Transaction must be a LoanSet transaction.')

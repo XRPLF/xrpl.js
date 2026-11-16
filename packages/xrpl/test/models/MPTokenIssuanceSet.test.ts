@@ -480,4 +480,15 @@ describe('MPTokenIssuanceSet', function () {
       'MPTokenIssuanceSet: Can not lock/unlock while mutating MPTokenIssuance.',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'MPTokenIssuanceSet',
+        Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+        MPTokenIssuanceID: 'not hex',
+      } as any,
+      'MPTokenIssuanceSet: invalid field MPTokenIssuanceID',
+    )
+  })
 })

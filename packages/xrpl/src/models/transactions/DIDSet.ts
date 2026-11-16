@@ -2,9 +2,9 @@ import { ValidationError } from '../../errors'
 
 import {
   BaseTransaction,
-  isString,
   validateBaseTransaction,
   validateOptionalField,
+  isHexString,
 } from './common'
 
 // TODO: add docs
@@ -31,11 +31,11 @@ export interface DIDSet extends BaseTransaction {
 export function validateDIDSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
 
-  validateOptionalField(tx, 'DIDDocument', isString)
+  validateOptionalField(tx, 'DIDDocument', isHexString)
 
-  validateOptionalField(tx, 'URI', isString)
+  validateOptionalField(tx, 'URI', isHexString)
 
   if (
     tx.Data === undefined &&

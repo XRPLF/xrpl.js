@@ -237,7 +237,7 @@ class Amount extends SerializedType {
       const parser = new BinaryParser(this.toString())
       const leadingByte = parser.read(1)
       const amount = parser.read(8)
-      const mptID = Hash192.fromParser(parser) as Hash192
+      const mptID = Hash192.fromParser(parser)
 
       const isPositive = leadingByte[0] & 0x40
       const sign = isPositive ? '' : '-'

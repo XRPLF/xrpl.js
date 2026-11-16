@@ -7,7 +7,6 @@ import {
   isMPTIssuer,
   isHexWithByteLength,
   isNumber,
-  isString,
   validateBaseTransaction,
   validateRequiredField,
   validateOptionalField,
@@ -16,6 +15,7 @@ import {
   CONFIDENTIAL_EC_POINT_BYTES,
   CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
   CONFIDENTIAL_SEND_PROOF_BYTES,
+  isHexString,
 } from './common'
 
 /**
@@ -92,7 +92,7 @@ export function validateConfidentialMPTSend(tx: Record<string, unknown>): void {
   )
   const isCommitment = isHexWithByteLength(CONFIDENTIAL_EC_POINT_BYTES)
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   validateRequiredField(tx, 'Destination', isAccount)
   if (tx.Account === tx.Destination) {
     throw new ValidationError(
