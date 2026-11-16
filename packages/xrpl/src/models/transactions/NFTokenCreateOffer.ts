@@ -153,8 +153,8 @@ export function validateNFTokenCreateOffer(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'NFTokenID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- checked in BaseTransaction
-  const flags = (tx.Flags ?? 0) as number | NFTokenCreateOfferFlagsInterface
+  // checked in BaseTransaction
+  const flags: number | NFTokenCreateOfferFlagsInterface = tx.Flags ?? 0
   const isTfSellNFToken =
     typeof flags === 'number'
       ? isFlagEnabled(flags, NFTokenCreateOfferFlags.tfSellNFToken)
