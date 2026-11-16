@@ -67,10 +67,7 @@ describe('NFTokenMint', function () {
         account: testContext.wallet.address,
       })
 
-      const nftokenID =
-        getNFTokenID(
-          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-        ) ?? 'undefined'
+      const nftokenID = getNFTokenID(txResponse.result.meta) ?? 'undefined'
 
       const accountHasNFT = accountNFTs.result.account_nfts.some(
         (value) => value.NFTokenID === nftokenID,
@@ -149,10 +146,7 @@ describe('NFTokenMint', function () {
         'tesSUCCESS',
       )
 
-      const nftokenID =
-        getNFTokenID(
-          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-        ) ?? 'undefined'
+      const nftokenID = getNFTokenID(txResponse.result.meta) ?? 'undefined'
 
       const nftokenOfferID = (
         txResponse.result.meta as TransactionMetadata<NFTokenMint>
