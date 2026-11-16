@@ -201,6 +201,7 @@ const balance = await client.getXrpBalance(address)
 const total = balance.plus(dropsToXrp(fee))
 total.toString() // exact decimal string, e.g. '922.913243'
 total.toNumber() // JavaScript number; loses drops above 2^33 XRP
+balance.lt(dropsToXrp(fee)) // compare with .lt()/.isEqualTo(), not < or ===
 ```
 
 ### 5. `xrpl-secret-numbers` has been moved into the mono-repo as `@xrplf/secret-numbers`

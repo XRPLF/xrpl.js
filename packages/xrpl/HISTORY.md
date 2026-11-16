@@ -10,6 +10,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
   Migration:
   - Call `.toString()` for an exact decimal string, or `.toNumber()` for a JavaScript number (which loses drops above 2^33 XRP).
   - Add results with `.plus()`. In JavaScript, `dropsToXrp(a) + dropsToXrp(b)` now joins the two values as strings (`'1' + '2'` is `'12'`); TypeScript rejects it.
+  - Compare results with `.lt()`, `.gt()`, `.isEqualTo()` or `.isZero()`. `<` and `>` between two results compare them as strings, so `dropsToXrp('9000000') < dropsToXrp('10000000')` is `false`, and `===` is always `false` for two results. TypeScript does not catch either.
 * Drop support for Node.js 20, which reached end-of-life on April 30, 2026. `xrpl` now requires Node.js 22.12.0 or later.
 
 ### Changed
