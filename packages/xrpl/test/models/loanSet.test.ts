@@ -105,10 +105,7 @@ describe('unit test LoanSet', () => {
 
   test('incorrect Data', () => {
     tx.Data = 'INCORRECT_VALUE'
-    assertInvalid(
-      tx,
-      'LoanSet: Data must be a valid non-empty hex string up to 512 characters',
-    )
+    assertInvalid(tx, 'LoanSet: invalid field Data')
   })
 
   test('negative LoanServiceFee, LatePaymentFee or ClosePaymentFee', () => {
