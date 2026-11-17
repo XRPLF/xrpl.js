@@ -1,4 +1,4 @@
-import { validateBatch } from '../../src/models/transactions/batch'
+import { Batch, BatchFlagsInterface, validateBatch } from '../../src/models/transactions/batch'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateBatch)
@@ -151,4 +151,28 @@ describe('Batch', function () {
       'Batch: RawTransactions[0] must contain the `tfInnerBatchTxn` flag.',
     )
   })
+
+  it('accepts BatchFlagsInterface for Flags', function () {
+    const withFlags = (Flags: Batch['Flags']): Batch => ({ ...tx, Flags })
+
+    assertValid(withFlags({ tfAllOrNothing: true }))
+    assertValid(withFlags({ tfOnlyOne: true }))
+    assertValid(withFlags({ tfUntilFailure: true }))
+    assertValid(withFlags({ tfIndependent: true }))
+
+    // @ts-expect-error - tfPartialPayment is a Payment flag, not a Batch flag
+    withFlags({ tfPartialPayment: true })
+  })
+
+  it('accepts a BatchFlagsInterface value for Flags', function () {
+    const flags: BatchFlagsInterface = { tfAllOrNothing: true }
+    const batch: Batch = { ...tx, Flags: flags }
+
+    assertValid(batch)
+    // Reading a batch mode flag off Batch.Flags only compiles with BatchFlagsInterface
+    assert.isTrue(
+      typeof batch.Flags === 'object' && batch.Flags.tfAllOrNothing === true,
+    )
+  })
+
 })
