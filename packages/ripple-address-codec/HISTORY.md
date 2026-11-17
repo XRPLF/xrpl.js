@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* `encodeXAddress` and `classicAddressToXAddress` now throw `Invalid tag` for negative, non-integer and NaN tags, which were previously encoded as a different tag.
+
 ## 5.0.1 (2026-06-04)
 
 ### Fixed

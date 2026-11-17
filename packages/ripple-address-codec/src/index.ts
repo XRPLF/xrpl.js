@@ -31,6 +31,14 @@ function classicAddressToXAddress(
   return encodeXAddress(accountId, tag, test)
 }
 
+function isInvalidTag(tag: number | false): boolean {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Passing null is a common js mistake
+  if (tag === false || tag == null) {
+    return false
+  }
+  return !Number.isInteger(tag) || tag < 0 || tag > MAX_32_BIT_UNSIGNED_INT
+}
+
 function encodeXAddress(
   accountId: Uint8Array,
   tag: number | false,
@@ -40,7 +48,7 @@ function encodeXAddress(
     // RIPEMD160 is 160 bits = 20 bytes
     throw new Error('Account ID must be 20 bytes')
   }
-  if (tag !== false && tag > MAX_32_BIT_UNSIGNED_INT) {
+  if (isInvalidTag(tag)) {
     throw new Error('Invalid tag')
   }
   const theTag = tag || 0
