@@ -186,7 +186,7 @@ describe('Wallet', function () {
 
     it('throws an error when using an bip39 mnemonic for RFC1751', function () {
       const mnemonic =
-        'draw attack antique swing base employ blur above palace lucky glide clap pen use illegal'
+        'draw attack antique swing base employ blur above palace lucky glide clap'
       assert.throws(() => {
         Wallet.fromMnemonic(mnemonic, {
           mnemonicEncoding: 'rfc1751',
@@ -205,6 +205,74 @@ describe('Wallet', function () {
       })
 
       assert.equal(wallet.seed, expectedSeed)
+    })
+
+    it('derives a wallet using rfc1751 mnemonic with irregular whitespace', function () {
+      const algorithm = ECDSA.ed25519
+      const mnemonic =
+        '  CAB  BETH\tHANK BIRD MEND SIGN\nGILD ANY KERN HYDE CHAT STUB\n'
+      const expectedSeed = 'sEdVaw4m9W3H3ou3VnyvDwvPAP5BEz1'
+      const wallet = Wallet.fromMnemonic(mnemonic, {
+        mnemonicEncoding: 'rfc1751',
+        algorithm,
+      })
+
+      assert.equal(wallet.seed, expectedSeed)
+    })
+
+    it('rejects an RFC1751 mnemonic whose words are separated by non-ASCII whitespace', function () {
+      // rippled only splits on ASCII whitespace, so it would treat "CAB\u00a0BETH" as one word and
+      // fall back to hashing the phrase as a passphrase, deriving a different wallet.
+      const mnemonic =
+        'CAB\u00a0BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB'
+
+      assert.throws(() => {
+        Wallet.fromMnemonic(mnemonic, {
+          mnemonicEncoding: 'rfc1751',
+          algorithm: ECDSA.ed25519,
+        })
+      }, /Expected an RFC1751 mnemonic of 12 words, but received 11/u)
+    })
+
+    it('throws an error when an RFC1751 mnemonic is missing a word', function () {
+      // Dropping the last word leaves a truncated block whose parity bits happen to
+      // match, so without a word-count check this silently derives a different wallet.
+      const mnemonic = 'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT'
+      assert.throws(
+        () => {
+          Wallet.fromMnemonic(mnemonic, {
+            mnemonicEncoding: 'rfc1751',
+          })
+        },
+        ValidationError,
+        /^Expected an RFC1751 mnemonic of 12 words, but received 11$/u,
+      )
+    })
+
+    it('throws an error when an RFC1751 mnemonic has an extra word', function () {
+      const mnemonic =
+        'CAB BETH HANK BIRD MEND SIGN GILD ANY KERN HYDE CHAT STUB CAB'
+      assert.throws(
+        () => {
+          Wallet.fromMnemonic(mnemonic, {
+            mnemonicEncoding: 'rfc1751',
+          })
+        },
+        ValidationError,
+        /^Expected an RFC1751 mnemonic of 12 words, but received 13$/u,
+      )
+    })
+
+    it('throws an error when an RFC1751 mnemonic is empty', function () {
+      assert.throws(
+        () => {
+          Wallet.fromMnemonic('   ', {
+            mnemonicEncoding: 'rfc1751',
+          })
+        },
+        ValidationError,
+        /^Expected an RFC1751 mnemonic of 12 words, but received 0$/u,
+      )
     })
 
     it('derives a wallet using a Regular Key Pair', function () {
