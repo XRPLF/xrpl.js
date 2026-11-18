@@ -20,6 +20,8 @@ interface Vector {
   wrongPublicKey: string
 }
 
+// Every keypair, address and signature here matches xrpl-py 5.2.0 and xrpl4j
+// BcSignatureService for the same seed and message.
 const vectors: Vector[] = [knownAnswer.secp256k1, knownAnswer.ed25519]
 
 function toAlgorithm(name: string): Algorithm {
@@ -77,7 +79,7 @@ describe.each(vectors)('known-answer keypairs - $algorithm', (vector) => {
     )
   })
 
-  it('verify rejects a truncated signature', () => {
+  it('verify throws on a truncated signature', () => {
     const truncated = vector.signature.slice(0, vector.signature.length - 8)
     expect(() =>
       verify(messageHex, truncated, vector.keypair.publicKey),
