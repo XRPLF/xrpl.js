@@ -1,9 +1,9 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
   NFTokenModify,
   NFTokenMintFlags,
-  convertStringToHex,
   getNFTokenID,
   NFTokenMint,
   TxRequest,
@@ -32,8 +32,8 @@ describe('NFTokenModify', function () {
   it(
     'modify NFToken URI',
     async function () {
-      const oldUri = convertStringToHex('https://www.google.com')
-      const newUri = convertStringToHex('https://www.youtube.com')
+      const oldUri = stringToHex('https://www.google.com')
+      const newUri = stringToHex('https://www.youtube.com')
 
       const mutableMint: NFTokenMint = {
         TransactionType: 'NFTokenMint',
