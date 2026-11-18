@@ -6,10 +6,12 @@ import { Hash128 } from './hash-128'
 import { Hash160 } from './hash-160'
 import { Hash192 } from './hash-192'
 import { Hash256 } from './hash-256'
+import { Int32 } from './int-32'
 import { Issue } from './issue'
 import { STNumber } from './st-number'
 import { PathSet } from './path-set'
 import { STArray } from './st-array'
+import { SignedAmount } from './signed-amount'
 import { STObject } from './st-object'
 import { UInt16 } from './uint-16'
 import { UInt32 } from './uint-32'
@@ -29,9 +31,11 @@ const coreTypes: Record<string, typeof SerializedType> = {
   Hash160,
   Hash192,
   Hash256,
+  Int32,
   Issue,
   Number: STNumber,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,
@@ -57,7 +61,9 @@ export {
   Hash160,
   Hash192,
   Hash256,
+  Int32,
   PathSet,
+  SignedAmount,
   STArray,
   STObject,
   UInt8,

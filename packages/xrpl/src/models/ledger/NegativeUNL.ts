@@ -13,8 +13,7 @@ export const NEGATIVE_UNL_ID =
  * @category Ledger Entries
  */
 export default interface NegativeUNL
-  extends BaseLedgerEntry,
-    HasOptionalPreviousTxnID {
+  extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'NegativeUNL'
   /**
    * A list of trusted validators that are currently disabled.

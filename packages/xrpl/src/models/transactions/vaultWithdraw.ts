@@ -4,11 +4,14 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
-  isString,
   isAmount,
   Account,
   validateOptionalField,
   isAccount,
+  isNumber,
+  validateCredentialsList,
+  MAX_AUTHORIZED_CREDENTIALS,
+  isHexString,
 } from './common'
 
 /**
@@ -34,6 +37,17 @@ export interface VaultWithdraw extends BaseTransaction {
    * An account to receive the assets. It must be able to receive the asset.
    */
   Destination?: Account
+
+  /**
+   * Arbitrary tag identifying the reason for the withdrawal to the destination.
+   */
+  DestinationTag?: number
+
+  /**
+   * The credentials to authorize the withdrawal when the vault is gated by a
+   * permissioned domain (XLS-70).
+   */
+  CredentialIDs?: string[]
 }
 
 /**
@@ -45,7 +59,15 @@ export interface VaultWithdraw extends BaseTransaction {
 export function validateVaultWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateRequiredField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Destination', isAccount)
+  validateOptionalField(tx, 'DestinationTag', isNumber)
+
+  validateCredentialsList(
+    tx.CredentialIDs,
+    tx.TransactionType,
+    true,
+    MAX_AUTHORIZED_CREDENTIALS,
+  )
 }

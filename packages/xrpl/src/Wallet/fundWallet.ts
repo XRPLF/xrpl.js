@@ -34,6 +34,11 @@ export interface FundingOptions {
    */
   faucetPath?: string
   /**
+   * The protocol to use for the faucet server. Defaults to 'https'. Use 'http' to interact with a local faucet server
+   * running on http://
+   */
+  faucetProtocol?: 'http' | 'https'
+  /**
    * An optional field to indicate the use case context of the faucet transaction
    * Ex: integration test, code snippets.
    */
@@ -101,6 +106,7 @@ export interface FundWalletOptions {
   faucetHost?: string
   faucetPath?: string
   amount?: string
+  faucetProtocol?: 'http' | 'https'
   usageContext?: string
 }
 
@@ -121,6 +127,8 @@ export interface FundWalletOptions {
  * you should provide the path using this option.
  * Ex: client.fundWallet(null,{'faucet.altnet.rippletest.net', '/accounts'})
  * specifies a request to 'faucet.altnet.rippletest.net/accounts' to fund a new wallet.
+ * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+ * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
  * @param options.amount - A custom amount to fund, if undefined or null, the default amount will be 1000.
  * @param client - A connection to the XRPL to send requests and transactions.
  * @param startingBalance - The amount of XRP in the given walletToFund on ledger already.
@@ -145,7 +153,8 @@ export async function requestFunding(
     throw new XRPLFaucetError('No faucet hostname could be derived')
   }
   const pathname = options.faucetPath ?? getFaucetPath(hostname)
-  const response = await fetch(`https://${hostname}${pathname}`, {
+  const protocol = options.faucetProtocol ?? 'https'
+  const response = await fetch(`${protocol}://${hostname}${pathname}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

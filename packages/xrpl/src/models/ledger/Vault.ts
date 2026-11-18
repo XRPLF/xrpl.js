@@ -64,7 +64,7 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    * The identifier of the share MPTokenIssuance object.
    */
-  MPTokenIssuanceID: string
+  ShareMPTID: string
 
   /**
    * Indicates the withdrawal strategy used by the Vault.
@@ -80,6 +80,35 @@ export default interface Vault extends BaseLedgerEntry, HasPreviousTxnID {
    * Arbitrary metadata about the Vault. Limited to 256 bytes.
    */
   Data?: string
+
+  /**
+   * The scaling factor for vault shares. Only applicable for IOU assets.
+   * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
+   */
+  Scale?: number
+
+  /**
+   * (LendingProtocolV1_1) The internal version of the ledger object's structure.
+   */
+  LEVersion?: number
+
+  /**
+   * (LendingProtocolV1_1) The kind of Vault: 0 for an open-ended vault or 1 for a
+   * close-ended vault.
+   */
+  VaultKind?: number
+
+  /**
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, up to which deposits into the Vault are accepted.
+   */
+  SubscriptionDate?: number
+
+  /**
+   * (LendingProtocolV1_1, close-ended vaults only) The time, in seconds since the Ripple
+   * Epoch, at which shares may begin to be redeemed from the Vault.
+   */
+  RedemptionDate?: number
 }
 
 export enum VaultFlags {

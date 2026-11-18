@@ -22,7 +22,7 @@ import {
   Wallet,
   XRP,
 } from '../../../src'
-import { Vault, VaultFlags } from '../../../src/models/ledger'
+import { MPTokenIssuance, Vault, VaultFlags } from '../../../src/models/ledger'
 import { MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import serverUrl from '../serverUrl'
 import {
@@ -78,7 +78,7 @@ describe('Single Asset Vault', function () {
         LimitAmount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999999999e80',
         },
       }
 
@@ -91,7 +91,7 @@ describe('Single Asset Vault', function () {
         Amount: {
           currency: currencyCode,
           issuer: issuerWallet.classicAddress,
-          value: '1000',
+          value: '9999999999',
         },
       }
 
@@ -109,9 +109,8 @@ describe('Single Asset Vault', function () {
           VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
-        AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
+        AssetsMaximum: '9999900000000000000000000',
+        Scale: 2,
       }
 
       await testTransaction(testContext.client, tx, vaultOwnerWallet)
@@ -137,7 +136,31 @@ describe('Single Asset Vault', function () {
         VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
       )
       assert.equal(vault.Data, tx.Data)
-      assert.equal(assetsMaximum, '500')
+      assert.equal(assetsMaximum, '99999e20')
+      assert.equal(vault.Scale, 2)
+
+      // --- Verify ReferenceHolding on shares via vault_info ---
+      const vaultInfoResult = await testContext.client.request({
+        command: 'vault_info',
+        vault_id: vaultId,
+      })
+      const shares = vaultInfoResult.result.vault.shares
+      assert.isDefined(
+        shares.ReferenceHolding,
+        'IOU-backed vault shares should have ReferenceHolding set',
+      )
+
+      // --- Verify ReferenceHolding via ledger_entry ---
+      const ledgerEntryResult = await testContext.client.request({
+        command: 'ledger_entry',
+        mpt_issuance: vaultInfoResult.result.vault.ShareMPTID,
+      })
+      const mptIssuance = ledgerEntryResult.result
+        .node as unknown as MPTokenIssuance
+      assert.isDefined(
+        mptIssuance.ReferenceHolding,
+        'IOU-backed MPTokenIssuance should have ReferenceHolding set',
+      )
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data
@@ -208,6 +231,8 @@ describe('Single Asset Vault', function () {
           issuer: issuerWallet.classicAddress,
           value: withdrawAmount,
         },
+        Destination: holderWallet.classicAddress,
+        DestinationTag: 10,
         Fee: '5000000',
       }
 
@@ -357,8 +382,6 @@ describe('Single Asset Vault', function () {
         Data: stringToHex('vault metadata'),
         MPTokenMetadata: stringToHex('share metadata'),
         AssetsMaximum: '500',
-        // This covers owner reserve fee with potentially high open_ledger_cost
-        Fee: '5000000',
         Flags: VaultCreateFlags.tfVaultShareNonTransferable,
       }
 
@@ -387,6 +410,29 @@ describe('Single Asset Vault', function () {
       assert.equal(vault.Data, vaultCreateTx.Data)
       assert.equal(assetsMaximum, '500')
       assert.notEqual(vaultFlags, VaultFlags.lsfVaultPrivate)
+
+      // --- Verify ReferenceHolding on shares via vault_info ---
+      const vaultInfoResult = await testContext.client.request({
+        command: 'vault_info',
+        vault_id: vaultId,
+      })
+      const shares = vaultInfoResult.result.vault.shares
+      assert.isDefined(
+        shares.ReferenceHolding,
+        'MPT-backed vault shares should have ReferenceHolding set',
+      )
+
+      // --- Verify ReferenceHolding via ledger_entry ---
+      const ledgerEntryResult = await testContext.client.request({
+        command: 'ledger_entry',
+        mpt_issuance: vaultInfoResult.result.vault.ShareMPTID,
+      })
+      const mptIssuance = ledgerEntryResult.result
+        .node as unknown as MPTokenIssuance
+      assert.isDefined(
+        mptIssuance.ReferenceHolding,
+        'MPT-backed MPTokenIssuance should have ReferenceHolding set',
+      )
 
       // --- VaultSet Transaction ---
       // Increase the AssetsMaximum to 1000 and update Data

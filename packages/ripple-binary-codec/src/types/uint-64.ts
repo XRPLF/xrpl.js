@@ -13,6 +13,7 @@ const BASE10_AMOUNT_FIELDS = new Set([
   'OutstandingAmount',
   'MPTAmount',
   'LockedAmount',
+  'ConfidentialOutstandingAmount',
 ])
 
 function isBase10(fieldName: string): boolean {
@@ -51,9 +52,9 @@ class UInt64 extends UInt {
       return val
     }
 
-    let buf = new Uint8Array(UInt64.width)
+    let buf: Uint8Array = new Uint8Array(UInt64.width)
 
-    if (typeof val === 'number') {
+    if (typeof val === 'number' && Number.isInteger(val)) {
       if (val < 0) {
         throw new Error('value must be an unsigned integer')
       }

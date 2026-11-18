@@ -23,6 +23,26 @@ import {
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
+import {
+  ConfidentialMPTClawback,
+  validateConfidentialMPTClawback,
+} from './ConfidentialMPTClawback'
+import {
+  ConfidentialMPTConvert,
+  validateConfidentialMPTConvert,
+} from './ConfidentialMPTConvert'
+import {
+  ConfidentialMPTConvertBack,
+  validateConfidentialMPTConvertBack,
+} from './ConfidentialMPTConvertBack'
+import {
+  ConfidentialMPTMergeInbox,
+  validateConfidentialMPTMergeInbox,
+} from './ConfidentialMPTMergeInbox'
+import {
+  ConfidentialMPTSend,
+  validateConfidentialMPTSend,
+} from './ConfidentialMPTSend'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -34,6 +54,24 @@ import { EnableAmendment } from './enableAmendment'
 import { EscrowCancel, validateEscrowCancel } from './escrowCancel'
 import { EscrowCreate, validateEscrowCreate } from './escrowCreate'
 import { EscrowFinish, validateEscrowFinish } from './escrowFinish'
+import {
+  LoanBrokerCoverClawback,
+  validateLoanBrokerCoverClawback,
+} from './loanBrokerCoverClawback'
+import {
+  LoanBrokerCoverDeposit,
+  validateLoanBrokerCoverDeposit,
+} from './loanBrokerCoverDeposit'
+import {
+  LoanBrokerCoverWithdraw,
+  validateLoanBrokerCoverWithdraw,
+} from './loanBrokerCoverWithdraw'
+import { LoanBrokerDelete, validateLoanBrokerDelete } from './loanBrokerDelete'
+import { LoanBrokerSet, validateLoanBrokerSet } from './loanBrokerSet'
+import { LoanDelete, validateLoanDelete } from './loanDelete'
+import { LoanManage, validateLoanManage } from './loanManage'
+import { LoanPay, validateLoanPay } from './loanPay'
+import { LoanSet, validateLoanSet } from './loanSet'
 import { TransactionMetadata } from './metadata'
 import { MPTokenAuthorize, validateMPTokenAuthorize } from './MPTokenAuthorize'
 import {
@@ -91,6 +129,11 @@ import {
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
+import { SponsorshipSet, validateSponsorshipSet } from './sponsorshipSet'
+import {
+  SponsorshipTransfer,
+  validateSponsorshipTransfer,
+} from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
@@ -147,6 +190,11 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | ConfidentialMPTClawback
+  | ConfidentialMPTConvert
+  | ConfidentialMPTConvertBack
+  | ConfidentialMPTMergeInbox
+  | ConfidentialMPTSend
   | CredentialAccept
   | CredentialCreate
   | CredentialDelete
@@ -157,6 +205,15 @@ export type SubmittableTransaction =
   | EscrowCancel
   | EscrowCreate
   | EscrowFinish
+  | LoanBrokerSet
+  | LoanBrokerCoverClawback
+  | LoanBrokerCoverDeposit
+  | LoanBrokerCoverWithdraw
+  | LoanBrokerDelete
+  | LoanSet
+  | LoanDelete
+  | LoanManage
+  | LoanPay
   | MPTokenAuthorize
   | MPTokenIssuanceCreate
   | MPTokenIssuanceDestroy
@@ -179,6 +236,8 @@ export type SubmittableTransaction =
   | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
+  | SponsorshipSet
+  | SponsorshipTransfer
   | TicketCreate
   | TrustSet
   | VaultClawback
@@ -319,6 +378,26 @@ export function validate(transaction: Record<string, unknown>): void {
       validateClawback(tx)
       break
 
+    case 'ConfidentialMPTClawback':
+      validateConfidentialMPTClawback(tx)
+      break
+
+    case 'ConfidentialMPTConvert':
+      validateConfidentialMPTConvert(tx)
+      break
+
+    case 'ConfidentialMPTConvertBack':
+      validateConfidentialMPTConvertBack(tx)
+      break
+
+    case 'ConfidentialMPTMergeInbox':
+      validateConfidentialMPTMergeInbox(tx)
+      break
+
+    case 'ConfidentialMPTSend':
+      validateConfidentialMPTSend(tx)
+      break
+
     case 'CredentialAccept':
       validateCredentialAccept(tx)
       break
@@ -357,6 +436,42 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'EscrowFinish':
       validateEscrowFinish(tx)
+      break
+
+    case 'LoanBrokerCoverClawback':
+      validateLoanBrokerCoverClawback(tx)
+      break
+
+    case 'LoanBrokerCoverDeposit':
+      validateLoanBrokerCoverDeposit(tx)
+      break
+
+    case 'LoanBrokerCoverWithdraw':
+      validateLoanBrokerCoverWithdraw(tx)
+      break
+
+    case 'LoanBrokerDelete':
+      validateLoanBrokerDelete(tx)
+      break
+
+    case 'LoanBrokerSet':
+      validateLoanBrokerSet(tx)
+      break
+
+    case 'LoanSet':
+      validateLoanSet(tx)
+      break
+
+    case 'LoanManage':
+      validateLoanManage(tx)
+      break
+
+    case 'LoanDelete':
+      validateLoanDelete(tx)
+      break
+
+    case 'LoanPay':
+      validateLoanPay(tx)
       break
 
     case 'MPTokenAuthorize':
@@ -445,6 +560,14 @@ export function validate(transaction: Record<string, unknown>): void {
 
     case 'SignerListSet':
       validateSignerListSet(tx)
+      break
+
+    case 'SponsorshipSet':
+      validateSponsorshipSet(tx)
+      break
+
+    case 'SponsorshipTransfer':
+      validateSponsorshipTransfer(tx)
       break
 
     case 'TicketCreate':

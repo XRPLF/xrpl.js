@@ -7,8 +7,7 @@ import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface DirectoryNode
-  extends BaseLedgerEntry,
-    HasOptionalPreviousTxnID {
+  extends BaseLedgerEntry, HasOptionalPreviousTxnID {
   LedgerEntryType: 'DirectoryNode'
   /**
    * A bit-map of boolean flags enabled for this directory. Currently, the

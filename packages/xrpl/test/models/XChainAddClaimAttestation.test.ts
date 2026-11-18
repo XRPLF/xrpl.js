@@ -186,4 +186,14 @@ describe('XChainAddClaimAttestation', function () {
 
     assertInvalid(tx, 'XChainAddClaimAttestation: invalid field XChainClaimID')
   })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    tx.PublicKey = 'not hex'
+    assertInvalid(tx, 'XChainAddClaimAttestation: invalid field PublicKey')
+  })
+
+  it(`throws w/ non-hex Signature`, function () {
+    tx.Signature = 'not hex'
+    assertInvalid(tx, 'XChainAddClaimAttestation: invalid field Signature')
+  })
 })

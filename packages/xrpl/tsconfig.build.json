@@ -9,6 +9,9 @@
       "path": "../isomorphic/tsconfig.build.json"
     },
     {
+      "path": "../mpt-crypto/tsconfig.build.json"
+    },
+    {
       "path": "../ripple-address-codec/tsconfig.build.json"
     },
     {

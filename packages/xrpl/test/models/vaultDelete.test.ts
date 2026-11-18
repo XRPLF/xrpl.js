@@ -1,3 +1,5 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
+
 import { VaultDelete } from '../../src/models/transactions'
 import { validateVaultDelete } from '../../src/models/transactions/vaultDelete'
 import { assertTxIsValid, assertTxValidationError } from '../testUtils'
@@ -35,6 +37,43 @@ describe('VaultDelete', function () {
   it('throws w/ invalid VaultID', function () {
     // @ts-expect-error for test
     tx.VaultID = 123
+    assertInvalid(tx, 'VaultDelete: invalid field VaultID')
+  })
+
+  it('verifies valid VaultDelete with MemoData', function () {
+    tx.MemoData = stringToHex('A'.repeat(256))
+    assertValid(tx)
+  })
+
+  it('throws w/ MemoData not hex', function () {
+    tx.MemoData = 'zznothex'
+    assertInvalid(
+      tx,
+      'VaultDelete: MemoData must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ MemoData of odd length', function () {
+    tx.MemoData = 'ABC'
+    assertInvalid(
+      tx,
+      'VaultDelete: MemoData must be a hex string with an even number of characters',
+    )
+  })
+
+  it('throws w/ MemoData too large', function () {
+    tx.MemoData = stringToHex('A'.repeat(257))
+    assertInvalid(tx, 'VaultDelete: MemoData must not exceed 256 bytes')
+  })
+
+  it('throws w/ non-string MemoData', function () {
+    // @ts-expect-error for test
+    tx.MemoData = 123
+    assertInvalid(tx, 'VaultDelete: invalid field MemoData')
+  })
+
+  it(`throws w/ non-hex VaultID`, function () {
+    tx.VaultID = 'not hex'
     assertInvalid(tx, 'VaultDelete: invalid field VaultID')
   })
 })
