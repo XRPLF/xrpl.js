@@ -25,6 +25,7 @@ import {
   type MPTAmount,
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
+  multisign,
   VaultKind,
 } from '../../../src'
 import {
@@ -726,6 +727,143 @@ describe('Lending Protocol IT', () => {
         type: 'loan_broker',
       })
       assert.equal(loanBrokerDeleteResult.result.account_objects.length, 0)
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Lending protocol integration test with a multi-signed loan broker',
+    async () => {
+      const loanBrokerWallet = await generateFundedWallet(testContext.client)
+      const depositorWallet = await generateFundedWallet(testContext.client)
+      const borrowerWallet = await generateFundedWallet(testContext.client)
+      const brokerSigner1 = Wallet.generate()
+      const brokerSigner2 = Wallet.generate()
+      const borrowerSigner1 = Wallet.generate()
+      const borrowerSigner2 = Wallet.generate()
+
+      // Both sides are multi-signed: the loan broker signs the LoanSet with
+      // Signers and the borrower co-signs with CounterpartySignature.Signers.
+      await setupMultiSigning(
+        testContext,
+        loanBrokerWallet,
+        brokerSigner1,
+        brokerSigner2,
+      )
+      await setupMultiSigning(
+        testContext,
+        borrowerWallet,
+        borrowerSigner1,
+        borrowerSigner2,
+      )
+
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const vaultCreateTx: VaultCreate = {
+        TransactionType: 'VaultCreate',
+        Asset: { currency: 'XRP' },
+        Account: loanBrokerWallet.address,
+        VaultKind: VaultKind.vaultKindClosed,
+        SubscriptionDate: subscriptionDate,
+        RedemptionDate: subscriptionDate + 86400,
+      }
+      const vaultCreateResp = await testTransaction(
+        testContext.client,
+        vaultCreateTx,
+        loanBrokerWallet,
+      )
+      const vaultObjectId = hashVault(
+        vaultCreateResp.result.tx_json.Account,
+        vaultCreateResp.result.tx_json.Sequence as number,
+      )
+
+      const vaultDepositTx: VaultDeposit = {
+        TransactionType: 'VaultDeposit',
+        Account: depositorWallet.address,
+        VaultID: vaultObjectId,
+        Amount: '10000000',
+      }
+      await testTransaction(testContext.client, vaultDepositTx, depositorWallet)
+
+      const loanBrokerSetTx: LoanBrokerSet = {
+        TransactionType: 'LoanBrokerSet',
+        Account: loanBrokerWallet.address,
+        VaultID: vaultObjectId,
+        DebtMaximum: '25000000',
+      }
+      const loanBrokerTxResp = await testTransaction(
+        testContext.client,
+        loanBrokerSetTx,
+        loanBrokerWallet,
+      )
+      const loanBrokerObjectId = hashLoanBroker(
+        loanBrokerTxResp.result.tx_json.Account,
+        loanBrokerTxResp.result.tx_json.Sequence as number,
+      )
+      const loanBrokerObject = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanBrokerObjectId,
+        })
+      ).result.node as LoanBroker
+
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
+
+      let loanSetTx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        PrincipalRequested: '5000000',
+        Counterparty: borrowerWallet.address,
+        PaymentTotal: 1,
+      }
+      loanSetTx = await testContext.client.autofill(loanSetTx, 2)
+      const brokerSignedTx = multisign([
+        brokerSigner1.sign(loanSetTx, true).tx_blob,
+        brokerSigner2.sign(loanSetTx, true).tx_blob,
+      ])
+
+      const { tx: signer1SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        brokerSignedTx,
+        { multisign: true },
+      )
+      const { tx: signer2SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner2,
+        brokerSignedTx,
+        { multisign: true },
+      )
+      const { tx: combinedSignedTx } = combineLoanSetCounterpartySigners([
+        signer1SignedTx,
+        signer2SignedTx,
+      ])
+
+      await testTransaction(
+        testContext.client,
+        combinedSignedTx,
+        loanBrokerWallet,
+      )
+
+      const loanObjectId = hashLoan(
+        loanBrokerObjectId,
+        loanBrokerObject.LoanSequence,
+      )
+      const loanObject = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanObjectId,
+        })
+      ).result.node as Loan
+
+      assert.equal(loanObject.Borrower, borrowerWallet.address)
+      assert.equal(loanObject.LoanBrokerID, loanBrokerObjectId)
+      assert.equal(
+        loanObject.PrincipalOutstanding,
+        loanSetTx.PrincipalRequested,
+      )
     },
     TIMEOUT,
   )
