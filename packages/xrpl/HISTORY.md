@@ -18,6 +18,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
 * `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now accept a `LoanSet` whose `Account` is multisigned. They previously threw `Transaction must be first signed by first party.` because they only looked for a `TxnSignature`, so a loan broker with a signer list could not originate a loan.
 * `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`.
+* `Wallet.sign` now throws a `ValidationError` when single-signing a transaction whose `Account` (or `Delegate`, if present) doesn't match the wallet's address. Before, it happily produced a valid-looking `tx_blob` for any `Account`, so `verifySignature`/`wallet.verifyTransaction` would report a forged transaction as authentic even though the signer wasn't authorized for that account.
 
 ## 5.3.0 (2026-09-16)
 
