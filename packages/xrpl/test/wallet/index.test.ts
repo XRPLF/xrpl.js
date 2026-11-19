@@ -2,6 +2,9 @@ import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
 import {
+  Batch,
+  BatchFlags,
+  GlobalFlags,
   LoanSet,
   LoanSetFlags,
   NFTokenMint,
@@ -887,6 +890,55 @@ describe('Wallet', function () {
         wallet.sign(payment),
         wallet.sign({ ...payment, Flags: PaymentFlags.tfPartialPayment }),
       )
+    })
+
+    it('sign succeeds when Batch inner transactions have flags as an object', async function () {
+      const inner = (
+        Sequence: number,
+        Flags: Payment['Flags'],
+      ): { RawTransaction: Payment } => ({
+        RawTransaction: {
+          TransactionType: 'Payment',
+          Account: wallet.classicAddress,
+          Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+          Amount: '1000',
+          Fee: '0',
+          SigningPubKey: '',
+          Sequence,
+          Flags,
+        },
+      })
+      const batch: Batch = {
+        TransactionType: 'Batch',
+        Account: wallet.classicAddress,
+        Fee: '40',
+        Sequence: 1,
+        Flags: BatchFlags.tfAllOrNothing,
+        RawTransactions: [
+          inner(2, { tfInnerBatchTxn: true, tfPartialPayment: true }),
+          inner(3, { tfInnerBatchTxn: true }),
+        ],
+      }
+      const numericFlags = [
+        // eslint-disable-next-line no-bitwise -- combine flags
+        GlobalFlags.tfInnerBatchTxn | PaymentFlags.tfPartialPayment,
+        GlobalFlags.tfInnerBatchTxn,
+      ]
+
+      assert.deepEqual(
+        wallet.sign(batch),
+        wallet.sign({
+          ...batch,
+          RawTransactions: [
+            inner(2, numericFlags[0]),
+            inner(3, numericFlags[1]),
+          ],
+        }),
+      )
+      // The caller's transaction is left as given
+      assert.deepEqual(batch.RawTransactions[1].RawTransaction.Flags, {
+        tfInnerBatchTxn: true,
+      })
     })
 
     it('sign succeeds with source.amount/destination.minAmount', async function () {

@@ -417,6 +417,20 @@ export class Wallet {
     if (typeof txToSignAndEncode.Flags === 'object') {
       txToSignAndEncode.Flags = convertTxFlagsToNumber(tx)
     }
+    // Same for a Batch's inner transactions, copied so the caller's object is unchanged
+    if (txToSignAndEncode.TransactionType === 'Batch') {
+      txToSignAndEncode.RawTransactions = txToSignAndEncode.RawTransactions.map(
+        ({ RawTransaction }) => ({
+          RawTransaction:
+            typeof RawTransaction.Flags === 'object'
+              ? {
+                  ...RawTransaction,
+                  Flags: convertTxFlagsToNumber(RawTransaction),
+                }
+              : RawTransaction,
+        }),
+      )
+    }
 
     if (multisignAddress) {
       txToSignAndEncode.SigningPubKey = ''

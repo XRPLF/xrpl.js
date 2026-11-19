@@ -16,10 +16,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
-* `LoanSet` validation now matches rippled's preflight checks, which reject these values with `temINVALID`: `GracePeriod` must be between 60 and `PaymentInterval` (60 if omitted), `PaymentTotal` and `PrincipalRequested` must be greater than 0, `LoanOriginationFee` must be between 0 and `PrincipalRequested`, `LoanServiceFee`, `LatePaymentFee` and `ClosePaymentFee` must not be negative, and the `UInt32` fields must be integers in range.
-* `VaultCreate` validation now rejects a `WithdrawalPolicy` other than `vaultStrategyFirstComeFirstServe` (1), which rippled rejects with `temMALFORMED`.
-* `LoanSet` flags can be given as an object, such as `{ tfLoanOverpayment: true }`. This previously threw `Invalid flag tfLoanOverpayment`.
-* `Wallet.sign` now accepts flags given as an object for every transaction type. It previously threw `Cannot construct UInt32 from given value` unless the transaction had been through `autofill`.
+* `LoanSet` and `VaultCreate` validation now rejects the values rippled rejects in preflight, for example a `GracePeriod` below 60 or a `WithdrawalPolicy` other than 1. Before, these passed validation and failed on submit.
+* Flags given as an object, such as `{ tfLoanOverpayment: true }`, now work for `LoanSet`, in `Wallet.sign` without `autofill` first, and on the inner transactions of a `Batch`. Before, these threw an error.
 
 ## 5.3.0 (2026-09-16)
 
