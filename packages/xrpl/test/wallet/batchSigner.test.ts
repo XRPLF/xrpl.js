@@ -412,7 +412,7 @@ describe('Wallet batch operations', function () {
 
     it('fails with signed inner transaction', function () {
       assert.throws(
-        () => combineBatchSigners([secpWallet.sign(tx1).tx_blob, tx2]),
+        () => combineBatchSigners([submitWallet.sign(tx1).tx_blob, tx2]),
         ValidationError,
         'Batch transaction must be unsigned.',
       )

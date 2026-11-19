@@ -10,7 +10,7 @@ import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
-import { GlobalFlags } from '../models/transactions/common'
+import { areAddressesEqual, GlobalFlags } from '../models/transactions/common'
 import { hasFlag } from '../models/utils'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
@@ -409,6 +409,17 @@ export class Wallet {
     validate(tx)
     if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
       throw new ValidationError('Cannot sign a Batch inner transaction.')
+    }
+
+    if (!multisignAddress) {
+      // A delegated transaction is authorized by the delegate, not the
+      // account holder, so the delegate is the required signer when present.
+      const requiredSigner = tx.Delegate ?? tx.Account
+      if (!areAddressesEqual(requiredSigner, this.classicAddress)) {
+        throw new ValidationError(
+          'The wallet used to sign a transaction must match its Account (or its Delegate, if present)',
+        )
+      }
     }
 
     const txToSignAndEncode = { ...tx }
