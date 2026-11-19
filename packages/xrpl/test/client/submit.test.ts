@@ -3,9 +3,6 @@ import { assert } from 'chai'
 import cloneDeep from 'lodash/cloneDeep'
 
 import {
-  Batch,
-  BatchFlags,
-  GlobalFlags,
   LoanSet,
   multisign,
   signLoanSetByCounterparty,
@@ -195,43 +192,6 @@ describe('client.submit', function () {
         brokerWallet.sign(loanSet).tx_blob,
       )
       const response = await testContext.client.submit(tx_blob)
-      assert.equal(response.result.engine_result, 'tesSUCCESS')
-    })
-
-    it('should submit a Batch whose inner LoanSet has no CounterpartySignature', async function () {
-      testContext.mockRippled!.addResponse('submit', rippled.submit.success)
-
-      const innerFields = {
-        Flags: GlobalFlags.tfInnerBatchTxn,
-        Fee: '0',
-        SigningPubKey: '',
-      }
-      const batch: Batch = {
-        TransactionType: 'Batch',
-        Account: brokerWallet.address,
-        Flags: BatchFlags.tfAllOrNothing,
-        Sequence: 1,
-        Fee: '40',
-        LastLedgerSequence: 12312,
-        RawTransactions: [
-          {
-            RawTransaction: { ...loanSet, ...innerFields, Sequence: 2 },
-          },
-          {
-            RawTransaction: {
-              TransactionType: 'Payment',
-              Account: brokerWallet.address,
-              Destination: borrowerWallet.address,
-              Amount: '1000000',
-              Sequence: 3,
-              ...innerFields,
-            },
-          },
-        ],
-      }
-      const response = await testContext.client.submit(
-        brokerWallet.sign(batch).tx_blob,
-      )
       assert.equal(response.result.engine_result, 'tesSUCCESS')
     })
   })

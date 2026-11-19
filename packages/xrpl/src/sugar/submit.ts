@@ -9,8 +9,7 @@ import type {
 import { ValidationError, XrplError } from '../errors'
 import { Signer } from '../models/common'
 import { TxResponse } from '../models/methods'
-import { BaseTransaction, GlobalFlags } from '../models/transactions/common'
-import { hasFlag } from '../models/utils'
+import { BaseTransaction } from '../models/transactions/common'
 import { decode, encode } from '../utils'
 
 /** Approximate time for a ledger to close, in milliseconds */
@@ -301,14 +300,10 @@ function isAccountDelete(transaction: Transaction | string): boolean {
 }
 
 // checks if the transaction is a LoanSet that rippled would reject with temBAD_SIGNER for
-// lacking the counterparty's signature (only a Batch inner LoanSet may omit it)
+// lacking the counterparty's signature
 function isLoanSetMissingCounterpartySignature(
   transaction: Transaction | string,
 ): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
-  return (
-    tx.TransactionType === 'LoanSet' &&
-    tx.CounterpartySignature == null &&
-    !hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')
-  )
+  return tx.TransactionType === 'LoanSet' && tx.CounterpartySignature == null
 }

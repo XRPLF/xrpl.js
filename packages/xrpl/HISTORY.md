@@ -16,7 +16,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
 * The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
 * Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
-* `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`. Batch inner LoanSets are not affected.
+* `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`.
 
 ## 5.3.0 (2026-09-16)
 
