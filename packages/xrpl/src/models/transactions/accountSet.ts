@@ -11,6 +11,9 @@ import {
   isHexString,
 } from './common'
 
+const MIN_TRANSFER_RATE = 1000000000
+const MAX_TRANSFER_RATE = 2000000000
+
 /**
  * Enum for AccountSet Flags.
  *
@@ -199,6 +202,15 @@ export function validateAccountSet(tx: Record<string, unknown>): void {
   }
 
   validateOptionalField(tx, 'TransferRate', isNumber)
+  if (
+    tx.TransferRate !== undefined &&
+    (!Number.isInteger(tx.TransferRate) ||
+      (tx.TransferRate !== 0 &&
+        (tx.TransferRate < MIN_TRANSFER_RATE ||
+          tx.TransferRate > MAX_TRANSFER_RATE)))
+  ) {
+    throw new ValidationError('AccountSet: invalid TransferRate')
+  }
 
   validateOptionalField(tx, 'TickSize', isNumber)
   if (tx.TickSize !== undefined) {
