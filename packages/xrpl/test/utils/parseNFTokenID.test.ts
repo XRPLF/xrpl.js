@@ -60,8 +60,7 @@ describe('parseNFTokenID', function () {
     (offset) => {
       const nftokenID =
         '000B0539C35B55AA096BA6D87A6E6C965A6534150DC56E5E12C5D09E0000000C'
-      const invalidID =
-        `${nftokenID.slice(0, offset)}Z${nftokenID.slice(offset + 1)}`
+      const invalidID = `${nftokenID.slice(0, offset)}Z${nftokenID.slice(offset + 1)}`
       assert.throws(
         () => parseNFTokenID(invalidID),
         XrplError,
