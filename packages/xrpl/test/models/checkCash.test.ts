@@ -87,4 +87,51 @@ describe('CheckCash', function () {
     validCheckCash.CheckID = 'not hex'
     assertInvalid(validCheckCash, 'CheckCash: invalid field CheckID')
   })
+
+  it.each(['Amount', 'DeliverMin'])(
+    'rejects missing CheckID with %s',
+    (amountField) => {
+      assertInvalid(
+        {
+          Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          TransactionType: 'CheckCash',
+          [amountField]: '100000000',
+        },
+        'CheckCash: missing field CheckID',
+      )
+    },
+  )
+
+  it.each([
+    { amountField: 'Amount', checkID: undefined },
+    { amountField: 'DeliverMin', checkID: undefined },
+    { amountField: 'Amount', checkID: null },
+    { amountField: 'DeliverMin', checkID: null },
+  ])(
+    'rejects CheckID $checkID with $amountField',
+    ({ amountField, checkID }) => {
+      assertInvalid(
+        {
+          Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+          TransactionType: 'CheckCash',
+          [amountField]: '100000000',
+          CheckID: checkID,
+        },
+        'CheckCash: missing field CheckID',
+      )
+    },
+  )
+
+  it.each(['Amount', 'DeliverMin'])(
+    'accepts valid CheckID with %s',
+    (amountField) => {
+      assertValid({
+        Account: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+        TransactionType: 'CheckCash',
+        [amountField]: '100000000',
+        CheckID:
+          '838766BA2B995C00744175F69A1B11E32C3DBC40E64801A4056FCBD657F57334',
+      })
+    },
+  )
 })
