@@ -36,7 +36,11 @@ class XrplError extends Error {
   public toString(): string {
     let result = `[${this.name}(${this.message}`
     if (this.data) {
-      result += `, ${JSON.stringify(this.data)}`
+      try {
+        result += `, ${JSON.stringify(this.data)}`
+      } catch {
+        result += ', [unserializable data]'
+      }
     }
     result += ')]'
     return result
