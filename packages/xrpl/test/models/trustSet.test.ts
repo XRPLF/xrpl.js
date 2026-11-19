@@ -46,6 +46,33 @@ describe('TrustSet', function () {
     assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
   })
 
+  for (const amount of ['0', '1000', '1.5', '-1']) {
+    it(`rejects XRP LimitAmount ${amount}`, function () {
+      trustSet.LimitAmount = amount
+      assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
+    })
+  }
+
+  it('rejects an MPT LimitAmount', function () {
+    trustSet.LimitAmount = {
+      mpt_issuance_id: '00000001' + 'A'.repeat(40),
+      value: '1000',
+    }
+    assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
+  })
+
+  for (const field of ['currency', 'issuer', 'value']) {
+    it(`rejects LimitAmount without ${field}`, function () {
+      delete trustSet.LimitAmount[field]
+      assertInvalid(trustSet, 'TrustSet: invalid field LimitAmount')
+    })
+  }
+
+  it('accepts a zero issued-currency limit to remove a trust line', function () {
+    trustSet.LimitAmount.value = '0'
+    assertValid(trustSet)
+  })
+
   it('throws when QualityIn is not a number', function () {
     trustSet.QualityIn = '1234'
     assertInvalid(trustSet, 'TrustSet: invalid field QualityIn')
