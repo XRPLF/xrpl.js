@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Read unsigned 16-bit and 32-bit integers from the supplied array view, respecting its byte offset and bounds (#3309).
+
 ## 2.11.0 (2026-09-11)
 
 ### Added
