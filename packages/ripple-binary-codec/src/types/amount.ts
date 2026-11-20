@@ -17,7 +17,8 @@ const MAX_IOU_PRECISION = 16
 const MAX_DROPS = new BigNumber('1e17')
 const MIN_XRP = new BigNumber('1e-6')
 const mask = BigInt(0x00000000ffffffff)
-const mptMask = BigInt(0x8000000000000000)
+// Largest valid MPT amount: INT64_MAX (2^63 - 1)
+const MAX_MPT = new BigNumber('9223372036854775807')
 
 /**
  * BigNumber configuration for Amount IOUs
@@ -318,11 +319,7 @@ class Amount extends SerializedType {
       throw new Error(`${amount.toString()} is an illegal amount`)
     }
     if (!decimal.isZero()) {
-      if (decimal < BigNumber(0)) {
-        throw new Error(`${amount.toString()} is an illegal amount`)
-      }
-
-      if (Number(BigInt(amount) & BigInt(mptMask)) != 0) {
+      if (decimal.isNegative() || decimal.gt(MAX_MPT)) {
         throw new Error(`${amount.toString()} is an illegal amount`)
       }
     }

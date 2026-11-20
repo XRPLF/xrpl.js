@@ -1098,6 +1098,38 @@ describe('Wallet', function () {
       }, /^1.1234567 is an illegal amount/u)
     })
 
+    it('sign throws when an oversized MPT amount is provided', function () {
+      const mptIssuanceId = '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
+      // 9223372036854775807 is 2^63 - 1, the largest valid MPT amount.
+      const base: Transaction = {
+        TransactionType: 'Payment',
+        Account: wallet.classicAddress,
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '9223372036854775807',
+        },
+        Fee: '10',
+        Sequence: 1,
+      }
+      // The valid maximum signs and round-trips unchanged on the public path.
+      assert.deepEqual(decode(wallet.sign(base).tx_blob).Amount, base.Amount)
+
+      // 18446744073709551621 is 2^64 + 5; without the range check it is
+      // truncated to 5 and signed. It must throw instead.
+      const oversized: Transaction = {
+        ...base,
+        Amount: {
+          mpt_issuance_id: mptIssuanceId,
+          value: '18446744073709551621',
+        },
+      }
+      assert.throws(
+        () => wallet.sign(oversized),
+        /^18446744073709551621 is an illegal amount/u,
+      )
+    })
+
     const issuedCurrencyPayment: Transaction = {
       TransactionType: 'Payment',
       Account: 'r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59',
