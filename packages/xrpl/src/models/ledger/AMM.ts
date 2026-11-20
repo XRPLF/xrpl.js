@@ -5,7 +5,7 @@ import { BaseLedgerEntry, HasOptionalPreviousTxnID } from './BaseLedgerEntry'
 export interface VoteSlot {
   VoteEntry: {
     Account: string
-    TradingFee: number
+    TradingFee?: number
     VoteWeight: number
   }
 }
@@ -45,7 +45,7 @@ export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
      * The trading fee to be charged to the auction owner, in the same format as TradingFee.
      * By default this is 0, meaning that the auction owner can trade at no fee instead of the standard fee for this AMM.
      */
-    DiscountedFee: number
+    DiscountedFee?: number
     /**
      * The time when this slot expires, in seconds since the Ripple Epoch.
      */
@@ -65,7 +65,7 @@ export default interface AMM extends BaseLedgerEntry, HasOptionalPreviousTxnID {
    * The percentage fee to be charged for trades against this AMM instance, in units of 1/100,000.
    * The maximum value is 1000, for a 1% fee.
    */
-  TradingFee: number
+  TradingFee?: number
   /**
    * A list of vote objects, representing votes on the pool's trading fee.
    */

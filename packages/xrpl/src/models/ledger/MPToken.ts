@@ -4,7 +4,7 @@ export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'MPToken'
   Account: string
   MPTokenIssuanceID: string
-  MPTAmount: string
+  MPTAmount?: string
   Flags: number
   OwnerNode?: string
   LockedAmount?: string
