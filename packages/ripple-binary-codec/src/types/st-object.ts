@@ -67,12 +67,21 @@ class STObject extends SerializedType {
   static fromParser(parser: BinaryParser): STObject {
     const list: BytesList = new BytesList()
     const bytes: BinarySerializer = new BinarySerializer(list)
+    const seenFields = new Set<string>()
 
     while (!parser.end()) {
       const field = parser.readField()
       if (field.name === OBJECT_END_MARKER) {
         break
       }
+
+      // rippled rejects serialized objects with a repeated field
+      // ("Duplicate field detected"), so a blob that repeats a field must
+      // not decode silently to the last value.
+      if (seenFields.has(field.name)) {
+        throw new Error(`Duplicate field detected: ${field.name}`)
+      }
+      seenFields.add(field.name)
 
       const associatedValue = parser.readFieldValue(field)
 
