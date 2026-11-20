@@ -13,6 +13,7 @@ import {
 } from '../models/methods'
 import { Batch, Payment, Transaction } from '../models/transactions'
 import { Account, areAddressesEqual } from '../models/transactions/common'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 import { xrpToDrops } from '../utils'
 
 import getFeeXrp from './getFeeXrp'
@@ -614,6 +615,10 @@ export async function autofillBatchTxn(
 
   for (const rawTxn of tx.RawTransactions) {
     const txn = rawTxn.RawTransaction
+
+    if (typeof txn.Flags === 'object') {
+      txn.Flags = convertTxFlagsToNumber(txn)
+    }
 
     // Sequence processing
     if (txn.Sequence == null && txn.TicketSequence == null) {

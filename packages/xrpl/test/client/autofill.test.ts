@@ -761,6 +761,48 @@ describe('client.autofill', function () {
     assert.strictEqual(txResult.RawTransactions[1].RawTransaction.Sequence, 23)
   })
 
+  it('should convert Batch inner transaction flags given as an object', async function () {
+    const sender = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+    const tx: Batch = {
+      TransactionType: 'Batch',
+      Account: sender,
+      RawTransactions: [
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: { tfInnerBatchTxn: true },
+            Account: sender,
+            Authorize: 'rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo',
+          },
+        },
+        {
+          RawTransaction: {
+            TransactionType: 'DepositPreauth',
+            Flags: 0x40000000,
+            Account: sender,
+            Authorize: 'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+          },
+        },
+      ],
+      Fee,
+      Sequence,
+      LastLedgerSequence,
+    }
+    testContext.mockRippled!.addResponse('account_info', {
+      status: 'success',
+      type: 'response',
+      result: {
+        account_data: {
+          Sequence: 23,
+        },
+      },
+    })
+    const txResult = await testContext.client.autofill(tx)
+    txResult.RawTransactions.forEach((rawTxOuter) => {
+      assert.strictEqual(rawTxOuter.RawTransaction.Flags, 0x40000000)
+    })
+  })
+
   it('should autofill LoanSet transaction', async function () {
     const tx: LoanSet = {
       TransactionType: 'LoanSet',
