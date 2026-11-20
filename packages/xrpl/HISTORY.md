@@ -21,6 +21,7 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * `LoanSet` and `VaultCreate` validation now rejects the values rippled rejects in preflight, for example a `GracePeriod` below 60 or a `WithdrawalPolicy` other than 1. Before, these passed validation and failed on submit.
 * Flags given as an object, such as `{ tfLoanOverpayment: true }`, now work for `LoanSet`, in `Wallet.sign` without `autofill` first, and on the inner transactions of a `Batch`. Before, these threw an error.
 * Mark the ledger object fields that rippled omits when their value is 0 as optional: `MPToken.MPTAmount`, `LoanBroker.DebtMaximum`, the `AMM` object's `TradingFee` and the `TradingFee` and `DiscountedFee` of its vote and auction slots, and `Loan.PaymentRemaining`, `PrincipalOutstanding`, `TotalValueOutstanding`, `NextPaymentDueDate` and `GracePeriod`. Treat a missing field as 0.
+* Add `DID`, `MPToken`, `NFTokenOffer` and `NFTokenPage` to the `LedgerEntry` union, and so to `AccountObject`, and export the `PermissionedDomain` ledger entry type. `account_objects`, `ledger_entry` and `ledger_data` results of these types could not be narrowed without a cast. These four models now match rippled: `MPToken.Account` and `NFTokenOffer.NFTokenID` are added, and fields rippled can omit are optional.
 
 ## 5.3.0 (2026-09-16)
 

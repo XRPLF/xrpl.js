@@ -2,6 +2,7 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface MPToken extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'MPToken'
+  Account: string
   MPTokenIssuanceID: string
   MPTAmount?: string
   Flags: number
