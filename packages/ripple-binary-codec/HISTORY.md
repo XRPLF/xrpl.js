@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* Fix: `UInt32.from` now only accepts base-10 integer strings within the UInt32 range, instead of silently truncating (`'1e3'` → 1, `'abc'` → 0) or wrapping (`'-1'` → 4294967295) them.
+
 ## 2.11.0 (2026-09-11)
 
 ### Added
