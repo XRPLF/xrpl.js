@@ -12,7 +12,10 @@ import {
   validateRequiredField,
 } from './common'
 
-const MAX_URI_LENGTH = 256
+// xrpld's maxCredentialURILength is 256 bytes; the field is hex-encoded,
+// so each byte takes two characters.
+const MAX_URI_BYTE_LENGTH = 256
+const MAX_URI_LENGTH = MAX_URI_BYTE_LENGTH * 2
 
 /**
  * Creates a Credential object. It must be sent by the issuer.
@@ -77,5 +80,13 @@ function validateURI(URI: unknown): void {
 
   if (!HEX_REGEX.test(URI)) {
     throw new ValidationError('CredentialCreate: URI must be encoded in hex')
+  }
+
+  // Each byte is two hex characters, so an odd-length string is not a valid
+  // byte sequence.
+  if (URI.length % 2 !== 0) {
+    throw new ValidationError(
+      'CredentialCreate: URI must have an even number of hex characters',
+    )
   }
 }

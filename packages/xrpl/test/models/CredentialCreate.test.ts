@@ -102,15 +102,29 @@ describe('credentialCreate', function () {
     assertInvalid(credentialCreate, errorMessage)
   })
 
+  it(`verifies valid credentialCreate w/ URI of max length (256 bytes)`, function () {
+    credentialCreate.URI = stringToHex('A'.repeat(256))
+    assertValid(credentialCreate)
+  })
+
   it(`throws w/ URI field too long`, function () {
-    credentialCreate.URI = stringToHex('A'.repeat(129))
-    const errorMessage = 'CredentialCreate: URI length must be <= 256'
+    credentialCreate.URI = stringToHex('A'.repeat(257))
+    const errorMessage = 'CredentialCreate: URI length must be <= 512'
     assertInvalid(credentialCreate, errorMessage)
   })
 
   it(`throws w/ URI field not hex`, function () {
     credentialCreate.URI = 'this is not hex'
     const errorMessage = 'CredentialCreate: URI must be encoded in hex'
+    assertInvalid(credentialCreate, errorMessage)
+  })
+
+  it(`throws w/ URI field odd-length hex`, function () {
+    // 511 hex characters: within the length limit, but not a whole number
+    // of bytes. Encoding would silently drop the last character.
+    credentialCreate.URI = 'A'.repeat(511)
+    const errorMessage =
+      'CredentialCreate: URI must have an even number of hex characters'
     assertInvalid(credentialCreate, errorMessage)
   })
 })
