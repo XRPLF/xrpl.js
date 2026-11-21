@@ -89,4 +89,26 @@ describe('AccountSet', function () {
     tx.MessageKey = 'not hex'
     assertInvalid(tx, 'AccountSet: invalid field MessageKey')
   })
+
+  it.each([
+    -1,
+    1,
+    999999999,
+    2000000001,
+    1000000000.5,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    Number.NEGATIVE_INFINITY,
+  ])('rejects invalid numeric TransferRate %s', (transferRate) => {
+    tx.TransferRate = transferRate
+    assertInvalid(tx, 'AccountSet: invalid TransferRate')
+  })
+
+  it.each([0, 1000000000, 1000000001, 1200000000, 1999999999, 2000000000])(
+    'accepts valid TransferRate %s',
+    (transferRate) => {
+      tx.TransferRate = transferRate
+      assertValid(tx)
+    },
+  )
 })
