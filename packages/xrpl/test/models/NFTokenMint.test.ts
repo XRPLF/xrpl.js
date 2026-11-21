@@ -144,4 +144,149 @@ describe('NFTokenMint', function () {
       'NFTokenMint: Amount is required when Expiration or Destination is present',
     )
   })
+
+  it(`verifies valid NFTokenMint with maximum TransferFee`, function () {
+    const valid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: 50000,
+    } as any
+
+    assertValid(valid)
+  })
+
+  it(`verifies valid NFTokenMint with zero TransferFee and no tfTransferable`, function () {
+    const valid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      TransferFee: 0,
+    } as any
+
+    assertValid(valid)
+  })
+
+  it(`throws w/ invalid TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: '100',
+    } as any
+
+    assertInvalid(invalid, 'NFTokenMint: invalid field TransferFee')
+  })
+
+  it(`throws w/ TransferFee above maximum`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: 50001,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ negative TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: -1,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ fractional TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: 1.5,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ NaN TransferFee`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfTransferable,
+      TransferFee: NaN,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee must be an integer between 0 and 50000',
+    )
+  })
+
+  it(`throws w/ TransferFee and no tfTransferable flag`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: NFTokenMintFlags.tfBurnable,
+      TransferFee: 1,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee cannot be provided without enabling tfTransferable flag',
+    )
+  })
+
+  it(`throws w/ TransferFee and tfTransferable disabled in Flags object`, function () {
+    const invalid = {
+      TransactionType: 'NFTokenMint',
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      NFTokenTaxon: 0,
+      Flags: {
+        tfTransferable: false,
+      },
+      TransferFee: 1,
+    } as any
+
+    assertInvalid(
+      invalid,
+      'NFTokenMint: TransferFee cannot be provided without enabling tfTransferable flag',
+    )
+  })
 })
