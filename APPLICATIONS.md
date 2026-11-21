@@ -148,6 +148,10 @@ Warning: Use at your own risk.
 
   Tool for generating a XRP payment request URI in a QR code, with currency converter.
 
+- **[Vextorium](https://api.vextorium.com/)**
+
+  200+ pay-per-call data APIs for apps and AI agents, including official statistics, economic data and compliance checks. Accepts x402 payments in RLUSD on the XRP Ledger through @x402/xrpl, which depends on xrpl.js.
+
 ## Development tools
 
 - **[XRP Faucets for Testnet and Devnet](https://xrpl.org/xrp-testnet-faucet.html)**
