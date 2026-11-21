@@ -188,6 +188,16 @@ const testCases: AddressTestCase[] = [
     })
   }
 
+  ;[-1, -4294967295, 1.5].forEach((tag) => {
+    const classicAddress = 'rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf'
+
+    it(`Converting ${classicAddress}:${tag}${network} throws`, () => {
+      expect(() => {
+        classicAddressToXAddress(classicAddress, tag, isTestAddress)
+      }).toThrow(new Error('Invalid tag'))
+    })
+  })
+
   {
     const classicAddress = 'r'
     it(`Invalid classic address: Converting ${classicAddress}${network} throws`, () => {
