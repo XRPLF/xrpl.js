@@ -78,6 +78,10 @@ Warning: Use at your own risk.
 
 ## Wallets and wallet tools
 
+- **[Vultisig](https://vultisig.com)**
+
+  Vultisig is an open-source, self-custodial multi-chain wallet that uses multi-party computation (MPC) threshold signing instead of a seed phrase. It supports XRP send and receive, destination tags, and trust lines on iOS, Android, desktop, and as a browser extension. The source code is available at [https://github.com/vultisig](https://github.com/vultisig).
+
 - **[Joey Wallet](https://joeywallet.xyz)**
 
   Joey Wallet is a secure, self-custody cryptocurrency wallet and gateway to Web3 decentralized applications (dApps) on the XRP Ledger (XRPL). Documentation and integration details are located at [https://docs.joeywallet.xyz/](https://docs.joeywallet.xyz).
