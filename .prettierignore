@@ -1,3 +1,12 @@
 *.md
 
 /.nx/workspace-data
+
+# Generated Emscripten glue code
+packages/mpt-crypto/wasm/
+
+# Formatted by hand; ESLint disables prettier/prettier in this file
+packages/xrpl/src/models/methods/index.ts
+
+# Generated TypeDoc output; formatted in a separate PR
+docs/

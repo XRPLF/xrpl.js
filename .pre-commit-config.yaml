@@ -1,0 +1,40 @@
+# pre-commit is a tool to perform a predefined set of tasks manually and/or
+# automatically before git commits are made.
+#
+# Config reference: https://pre-commit.com/#pre-commit-configyaml---top-level
+#
+# Common tasks
+#
+# - Run on all files:   pre-commit run --all-files
+# - Register git hooks: pre-commit install --hook-type pre-commit
+#
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+# Generated TypeDoc output; formatted in a separate PR.
+exclude: ^docs/
+
+repos:
+  # `pre-commit sample-config` default hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # Autoformat: YAML, JSON, Markdown, etc. (respects .prettierignore)
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: 0ee178619d696787ca73d210cc191d720868c631 # frozen: v3.9.6
+    hooks:
+      - id: prettier
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        description: Run ESLint (with autofix) across all packages
+        entry: npx lerna run lint --stream -- --fix
+        language: system
+        pass_filenames: false
+        types_or: [ts, tsx, javascript, jsx]

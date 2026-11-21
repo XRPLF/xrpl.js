@@ -2,9 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "es2017"
-    ],
+    "lib": ["es2017"],
     "outDir": "./dist",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -24,8 +22,5 @@
       "path": "../ripple-address-codec/tsconfig.build.json"
     }
   ],
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.json"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.json"]
 }
