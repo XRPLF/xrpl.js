@@ -995,7 +995,7 @@ export function validateBaseTransaction(
     )
   }
 
-  validateRequiredField(common, 'Account', isString)
+  validateRequiredField(common, 'Account', isAccount)
 
   validateOptionalField(common, 'Fee', isString)
 

@@ -24,7 +24,7 @@ describe('SponsorshipTransfer', function () {
   beforeEach(function () {
     sponsorshipTransferTx = {
       TransactionType: 'SponsorshipTransfer',
-      Account: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXoKk',
+      Account: 'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
       ObjectID: LEDGER_INDEX,
       // Default to End scenario
       Flags: SponsorshipTransferFlags.tfSponsorshipEnd,

@@ -1,6 +1,7 @@
 import { assert } from 'chai'
+import { classicAddressToXAddress } from 'ripple-address-codec'
 
-import { ValidationError } from '../../src'
+import { validate, ValidationError } from '../../src'
 import { validateBaseTransaction } from '../../src/models/transactions/common'
 
 const assertValid = (tx: any): void =>
@@ -361,5 +362,49 @@ describe('BaseTransaction', function () {
       invalidSponsorSignatureOnInnerBatchTxn,
       'Transaction: invalid SponsorSignature',
     )
+  })
+})
+
+describe('BaseTransaction Account validation', function () {
+  it.each([
+    '',
+    'not-an-address',
+    'r....',
+    'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFf',
+    '0x0000000000000000000000000000000000000001',
+    ' r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe ',
+  ])('rejects malformed Account %j', (account) => {
+    const txJson = {
+      Account: account,
+      TransactionType: 'Payment',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Amount: '1000',
+    }
+    assertInvalid(txJson, 'Payment: invalid field Account')
+    assert.throws(
+      () => validate(txJson),
+      ValidationError,
+      'Payment: invalid field Account',
+    )
+  })
+
+  it.each([
+    'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+    classicAddressToXAddress(
+      'r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe',
+      false,
+      false,
+    ),
+    classicAddressToXAddress('r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe', 123, false),
+    classicAddressToXAddress('r97KeayHuEsDwyU1yPBVtMLLoQr79QcRFe', 123, true),
+  ])('accepts valid classic or X-address Account %s', (account) => {
+    const txJson = {
+      Account: account,
+      TransactionType: 'Payment',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      Amount: '1000',
+    }
+    assertValid(txJson)
+    assert.doesNotThrow(() => validate(txJson))
   })
 })
