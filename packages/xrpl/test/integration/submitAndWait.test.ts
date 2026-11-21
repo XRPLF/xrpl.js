@@ -145,4 +145,27 @@ describe('client.submitAndWait', function () {
     },
     TIMEOUT,
   )
+
+  it('returns a TxResponse with the transaction data and metadata', async () => {
+    const accountSet: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: testContext.wallet.classicAddress,
+      Domain: convertStringToHex('example.com'),
+    }
+    const { tx_blob: signedAccountSet } = testContext.wallet.sign(
+      await testContext.client.autofill(accountSet),
+    )
+    const responsePromise = testContext.client.submitAndWait(signedAccountSet)
+    const ledgerPromise = delayedLedgerAccept()
+    return Promise.all([responsePromise, ledgerPromise]).then(
+      ([response, _ledger]) => {
+        assert.isDefined(response.result.tx_json)
+        assert.isDefined(response.result.meta)
+        // @ts-expect-error: tx_blob is only defined for binary responses
+        assert.isUndefined(response.result.tx_blob)
+        // @ts-expect-error: meta_blob is only defined for binary responses
+        assert.isUndefined(response.result.meta_blob)
+      },
+    )
+  })
 })
