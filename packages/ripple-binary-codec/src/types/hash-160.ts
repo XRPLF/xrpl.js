@@ -1,4 +1,5 @@
 import { Hash } from './hash'
+import { SerializedTypeID } from './serialized-type'
 
 /**
  * Hash with a width of 160 bits
@@ -13,6 +14,10 @@ class Hash160 extends Hash {
     }
 
     super(bytes ?? Hash160.ZERO_160.bytes)
+  }
+
+  getSType(): SerializedTypeID {
+    return SerializedTypeID.STI_UINT160
   }
 }
 
