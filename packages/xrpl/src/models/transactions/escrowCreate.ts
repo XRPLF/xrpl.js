@@ -81,4 +81,14 @@ export function validateEscrowCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'CancelAfter', isNumber)
   validateOptionalField(tx, 'FinishAfter', isNumber)
   validateOptionalField(tx, 'Condition', isHexString)
+
+  if (
+    typeof tx.CancelAfter === 'number' &&
+    typeof tx.FinishAfter === 'number' &&
+    tx.CancelAfter <= tx.FinishAfter
+  ) {
+    throw new ValidationError(
+      'EscrowCreate: CancelAfter must be greater than FinishAfter',
+    )
+  }
 }
