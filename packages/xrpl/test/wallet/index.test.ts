@@ -1011,19 +1011,23 @@ describe('Wallet', function () {
     it('sign throws when an oversized MPT amount is provided', function () {
       const mptIssuanceId = '00002403C84A0A28E0190E208E982C352BBD5006600555CF'
       // 9223372036854775807 is 2^63 - 1, the largest valid MPT amount.
+      // Keep the amount in an untyped literal: a `Transaction`'s `Amount` union
+      // is not assignable to the codec's JSON return type, so comparing against
+      // `base.Amount` fails to type-check under ts-jest (TS2345).
+      const maxAmount = {
+        mpt_issuance_id: mptIssuanceId,
+        value: '9223372036854775807',
+      }
       const base: Transaction = {
         TransactionType: 'Payment',
         Account: wallet.classicAddress,
         Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
-        Amount: {
-          mpt_issuance_id: mptIssuanceId,
-          value: '9223372036854775807',
-        },
+        Amount: maxAmount,
         Fee: '10',
         Sequence: 1,
       }
       // The valid maximum signs and round-trips unchanged on the public path.
-      assert.deepEqual(decode(wallet.sign(base).tx_blob).Amount, base.Amount)
+      assert.deepEqual(decode(wallet.sign(base).tx_blob).Amount, maxAmount)
 
       // 18446744073709551621 is 2^64 + 5; without the range check it is
       // truncated to 5 and signed. It must throw instead.
