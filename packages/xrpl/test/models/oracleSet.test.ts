@@ -180,6 +180,12 @@ describe('OracleSet', function () {
     assertInvalid(tx, errorMessage)
   })
 
+  it(`throws w/ fractional Scale of PriceDataSeries`, function () {
+    tx.PriceDataSeries[0].PriceData.Scale = 10.5
+    const errorMessage = 'OracleSet: invalid field Scale'
+    assertInvalid(tx, errorMessage)
+  })
+
   describe('Scale range', function () {
     it(`verifies valid Scale of 11 and 20, which were rejected before`, function () {
       for (const scale of [11, 20]) {

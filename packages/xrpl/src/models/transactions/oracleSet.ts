@@ -176,7 +176,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         }
 
         if ('Scale' in priceDataInner) {
-          if (!isNumber(priceDataInner.Scale)) {
+          // The binary codec stores Scale as a UInt8, so it must be an integer.
+          if (
+            !isNumber(priceDataInner.Scale) ||
+            !Number.isInteger(priceDataInner.Scale)
+          ) {
             throw new ValidationError('OracleSet: invalid field Scale')
           }
 
