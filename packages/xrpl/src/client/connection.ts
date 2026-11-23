@@ -9,6 +9,7 @@ import {
   DisconnectedError,
   NotConnectedError,
   ConnectionError,
+  RippledError,
   XrplError,
 } from '../errors'
 import type { APIVersion, RequestResponseMap } from '../models'
@@ -80,6 +81,7 @@ function createWebSocket(
 ): WebSocket | null {
   const options: ClientOptions = {
     agent: config.agent,
+    skipUTF8Validation: true,
   }
   if (config.headers) {
     options.headers = config.headers
@@ -346,12 +348,75 @@ export class Connection extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-empty-function, class-methods-use-this -- Does nothing on default
   public readonly trace: (id: string, message: string) => void = () => {}
 
+  private handleResponseMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    try {
+      this.requestManager.handleResponse(data)
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, message)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+    }
+  }
+
+  private handleErrorMessage(
+    data: Record<string, unknown>,
+    message: string,
+  ): void {
+    if (data.value == null) {
+      return
+    }
+    if (typeof data.value !== 'string') {
+      this.emit(
+        'error',
+        'badMessage',
+        'Expected error value to be a JSON string',
+        data,
+      )
+      return
+    }
+    let parsedValue: Record<string, unknown> | null
+    try {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- needed
+      parsedValue = JSON.parse(data.value) as Record<string, unknown> | null
+    } catch (error) {
+      if (error instanceof Error) {
+        this.emit('error', 'badMessage', error.message, data.value)
+      } else {
+        this.emit('error', 'badMessage', error, error)
+      }
+      return
+    }
+    // No id to reject. onMessage already reported this as badMessage.
+    if (parsedValue?.id != null) {
+      try {
+        this.requestManager.reject(
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          parsedValue.id as string | number,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
+          new RippledError(data.error as string, data),
+        )
+      } catch (error) {
+        const errMsg = error instanceof Error ? error.message : error
+        const errData: unknown = error instanceof Error ? message : error
+        this.emit('error', 'badMessage', errMsg, errData)
+      }
+    }
+  }
+
   /**
    * Handler for when messages are received from the server.
    *
-   * @param message - The message received from the server.
+   * @param rawMessage - The message received from the server.
    */
-  private onMessage(message): void {
+  private onMessage(rawMessage: string | Buffer): void {
+    const message =
+      typeof rawMessage === 'string' ? rawMessage : rawMessage.toString('utf8')
+
     this.trace('receive', message)
     let data: Record<string, unknown>
     try {
@@ -365,22 +430,17 @@ export class Connection extends EventEmitter {
     }
     if (data.type == null && data.error) {
       // e.g. slowDown
-      this.emit('error', data.error, data.error_message, data)
+      this.emit('error', data.error, data.error_message ?? data.error, data)
       return
     }
     if (data.type) {
       this.forwardServerMessage(data, message)
     }
     if (data.type === 'response') {
-      try {
-        this.requestManager.handleResponse(data)
-      } catch (error) {
-        if (error instanceof Error) {
-          this.emit('error', 'badMessage', error.message, message)
-        } else {
-          this.emit('error', 'badMessage', error, error)
-        }
-      }
+      this.handleResponseMessage(data, message)
+    }
+    if (data.type === 'error') {
+      this.handleErrorMessage(data, message)
     }
   }
 
@@ -449,7 +509,9 @@ export class Connection extends EventEmitter {
     this.ws.removeAllListeners()
     clearTimeout(connectionTimeoutID)
     // Add new, long-term connected listeners for messages and errors
-    this.ws.on('message', (message: string) => this.onMessage(message))
+    this.ws.on('message', (rawMessage: string | Buffer) =>
+      this.onMessage(rawMessage),
+    )
     this.ws.on('error', (error) =>
       this.emit('error', 'websocket', error.message, error),
     )

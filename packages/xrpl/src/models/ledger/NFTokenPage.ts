@@ -2,11 +2,12 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
 
 export interface NFToken {
   NFToken: {
-    Flags: number
-    Issuer: string
     NFTokenID: string
-    NFTokenTaxon: number
     URI?: string
+    // Not stored on the ledger; decode them from NFTokenID with parseNFTokenID.
+    Flags?: number
+    Issuer?: string
+    NFTokenTaxon?: number
   }
 }
 

@@ -4,12 +4,24 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Changed
+* Some transaction validation error messages changed.
+
 ### Deprecated
 * Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
 
 ### Fixed
 * Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
 * `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
+* The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
+* Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
+* `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now accept a `LoanSet` whose `Account` is multisigned. They previously threw `Transaction must be first signed by first party.` because they only looked for a `TxnSignature`, so a loan broker with a signer list could not originate a loan.
+* `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`.
+* `LoanSet` and `VaultCreate` validation now rejects the values rippled rejects in preflight, for example a `GracePeriod` below 60 or a `WithdrawalPolicy` other than 1. Before, these passed validation and failed on submit.
+* Flags given as an object, such as `{ tfLoanOverpayment: true }`, now work for `LoanSet`, in `Wallet.sign` without `autofill` first, and on the inner transactions of a `Batch`. Before, these threw an error.
+* Mark the ledger object fields that rippled omits when their value is 0 as optional: `MPToken.MPTAmount`, `LoanBroker.DebtMaximum`, the `AMM` object's `TradingFee` and the `TradingFee` and `DiscountedFee` of its vote and auction slots, and `Loan.PaymentRemaining`, `PrincipalOutstanding`, `TotalValueOutstanding`, `NextPaymentDueDate` and `GracePeriod`. Treat a missing field as 0.
+* Add `DID`, `MPToken`, `NFTokenOffer` and `NFTokenPage` to the `LedgerEntry` union, and so to `AccountObject`, and export the `PermissionedDomain` ledger entry type. `account_objects`, `ledger_entry` and `ledger_data` results of these types could not be narrowed without a cast. These four models now match rippled: `MPToken.Account` and `NFTokenOffer.NFTokenID` are added, and fields rippled can omit are optional.
 
 ## 5.3.0 (2026-09-16)
 
@@ -21,8 +33,8 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ### BREAKING CHANGES
 * `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it: `Wallet.fromEntropy(hexToBytes(hex))`.
 
-### Changed
-* Support the `fixCleanup3_4_0` signing prefixes.
+### Fixed
+* `signLoanSetByCounterparty` and `signAsSponsor` now sign with the `fixCleanup3_4_0` counterparty and sponsor prefixes; signatures from earlier versions are rejected on networks where the amendment is enabled.
 
 ## 5.1.0 (2026-08-24)
 
