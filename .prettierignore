@@ -10,3 +10,6 @@ packages/xrpl/src/models/methods/index.ts
 
 # Generated TypeDoc output; formatted in a separate PR
 docs/
+
+# Vendored minified code
+packages/xrpl/test/vendor/

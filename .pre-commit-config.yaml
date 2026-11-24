@@ -11,8 +11,9 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-# Generated TypeDoc output; formatted in a separate PR.
-exclude: ^docs/
+# docs/: generated TypeDoc output; formatted in a separate PR.
+# packages/xrpl/test/vendor/: vendored minified code.
+exclude: ^(docs/|packages/xrpl/test/vendor/)
 
 repos:
   # `pre-commit sample-config` default hooks
@@ -29,12 +30,17 @@ repos:
     hooks:
       - id: prettier
 
+  # A local hook, not mirrors-eslint: with ESLint installed in an isolated
+  # pre-commit environment, the type-aware rules cannot resolve the packages'
+  # node_modules and import/no-unused-modules fails to load. ESLint and its
+  # plugins are pinned and hash-checked by package-lock.json, so run
+  # `npm ci` first.
   - repo: local
     hooks:
       - id: eslint
         name: eslint
         description: Run ESLint (with autofix) across all packages
-        entry: npx lerna run lint --stream -- --fix
+        entry: npx --no-install lerna run lint --stream -- --fix
         language: system
         pass_filenames: false
         types_or: [ts, tsx, javascript, jsx]

@@ -7,31 +7,36 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   run-hooks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 24.x
-        uses: actions/setup-node@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 24.x
+          persist-credentials: false
 
-      - name: Setup npm version 10
-        run: npm i -g npm@10 --registry=https://registry.npmjs.org
+      - name: Use Node.js 24.22.3
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.3
+
+      - name: Setup npm version 10.9.8
+        run: npm i -g npm@10.9.8 --registry=https://registry.npmjs.org
 
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             node_modules
             */*/node_modules
-          key: ${{ runner.os }}-deps-24.x-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-deps-24.22.3-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-deps-24.x-
+            ${{ runner.os }}-deps-24.22.3-
 
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
@@ -41,12 +46,12 @@ jobs:
         run: npm run build
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.x"
+          python-version: "3.14.10"
 
       - name: Cache pre-commit environments
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
@@ -54,7 +59,7 @@ jobs:
             pre-commit-
 
       - name: Install pre-commit
-        run: pip install pre-commit
+        run: pip install --require-hashes -r .github/requirements/pre-commit.txt
 
       - name: Run pre-commit
         env:
