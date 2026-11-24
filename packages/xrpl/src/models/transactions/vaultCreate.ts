@@ -15,10 +15,11 @@ import {
   isNumber,
   isCurrency,
   validateRequiredField,
-  isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  isHexString,
+  isString,
 } from './common'
 
 const MAX_SCALE = 18
@@ -162,7 +163,7 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
   validateOptionalField(tx, 'MPTokenMetadata', isString)
   validateOptionalField(tx, 'WithdrawalPolicy', isNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
   validateOptionalField(tx, 'Scale', isNumber)
   validateOptionalField(tx, 'VaultKind', isNumber)
   validateOptionalField(tx, 'SubscriptionDate', isNumber)
@@ -178,6 +179,16 @@ export function validateVaultCreate(tx: Record<string, unknown>): void {
   ) {
     throw new ValidationError(
       `VaultCreate: VaultKind must be ${VaultKind.vaultKindOpen} (open-ended) or ${VaultKind.vaultKindClosed} (close-ended)`,
+    )
+  }
+
+  if (
+    tx.WithdrawalPolicy !== undefined &&
+    tx.WithdrawalPolicy !==
+      VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe
+  ) {
+    throw new ValidationError(
+      `VaultCreate: WithdrawalPolicy must be ${VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe} (first come, first served)`,
     )
   }
 

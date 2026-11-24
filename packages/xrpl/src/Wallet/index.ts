@@ -12,6 +12,7 @@ import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
 import { GlobalFlags } from '../models/transactions/common'
 import { hasFlag } from '../models/utils'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
@@ -405,13 +406,31 @@ export class Wallet {
     /*
      * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
      */
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- validate does not accept Transaction type
-    validate(tx as unknown as Record<string, unknown>)
+
+    validate(tx)
     if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
       throw new ValidationError('Cannot sign a Batch inner transaction.')
     }
 
     const txToSignAndEncode = { ...tx }
+    // Flags given as an object (e.g. { tfPartialPayment: true }) must be encoded as a number
+    if (typeof txToSignAndEncode.Flags === 'object') {
+      txToSignAndEncode.Flags = convertTxFlagsToNumber(tx)
+    }
+    // Same for a Batch's inner transactions, copied so the caller's object is unchanged
+    if (txToSignAndEncode.TransactionType === 'Batch') {
+      txToSignAndEncode.RawTransactions = txToSignAndEncode.RawTransactions.map(
+        ({ RawTransaction }) => ({
+          RawTransaction:
+            typeof RawTransaction.Flags === 'object'
+              ? {
+                  ...RawTransaction,
+                  Flags: convertTxFlagsToNumber(RawTransaction),
+                }
+              : RawTransaction,
+        }),
+      )
+    }
 
     if (multisignAddress) {
       txToSignAndEncode.SigningPubKey = ''

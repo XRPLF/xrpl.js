@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 import { ValidationError } from '../../errors'
 import { Signer } from '../common'
 
@@ -5,7 +7,6 @@ import {
   BaseTransaction,
   validateHexMetadata,
   isLedgerEntryId,
-  isNumber,
   isXRPLNumber,
   validateBaseTransaction,
   validateOptionalField,
@@ -16,6 +17,7 @@ import {
   Account,
   isAccount,
   isRecord,
+  isHexString,
 } from './common'
 
 const MAX_DATA_LENGTH = 512
@@ -25,6 +27,15 @@ const MAX_LATE_INTEREST_RATE = 100_000
 const MAX_CLOSE_INTEREST_RATE = 100_000
 const MAX_OVER_PAYMENT_INTEREST_RATE = 100_000
 const MIN_PAYMENT_INTERVAL = 60
+// rippled's GracePeriod bounds: at least 60, at most PaymentInterval (60 if omitted)
+const MIN_GRACE_PERIOD = 60
+const DEFAULT_PAYMENT_INTERVAL = 60
+const MAX_UINT32 = 0xffffffff
+const NON_NEGATIVE_FEE_FIELDS = [
+  'LoanServiceFee',
+  'LatePaymentFee',
+  'ClosePaymentFee',
+] as const
 
 /**
  * The transaction creates a new Loan object.
@@ -179,20 +190,20 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
   validateRequiredField(tx, 'LoanBrokerID', isString)
   validateRequiredField(tx, 'PrincipalRequested', isXRPLNumber)
   validateOptionalField(tx, 'CounterpartySignature', isRecord)
-  validateOptionalField(tx, 'Data', isString)
+  validateOptionalField(tx, 'Data', isHexString)
   validateOptionalField(tx, 'Counterparty', isAccount)
   validateOptionalField(tx, 'LoanOriginationFee', isXRPLNumber)
   validateOptionalField(tx, 'LoanServiceFee', isXRPLNumber)
   validateOptionalField(tx, 'LatePaymentFee', isXRPLNumber)
   validateOptionalField(tx, 'ClosePaymentFee', isXRPLNumber)
-  validateOptionalField(tx, 'OverpaymentFee', isNumber)
-  validateOptionalField(tx, 'InterestRate', isNumber)
-  validateOptionalField(tx, 'LateInterestRate', isNumber)
-  validateOptionalField(tx, 'CloseInterestRate', isNumber)
-  validateOptionalField(tx, 'OverpaymentInterestRate', isNumber)
-  validateOptionalField(tx, 'PaymentTotal', isNumber)
-  validateOptionalField(tx, 'PaymentInterval', isNumber)
-  validateOptionalField(tx, 'GracePeriod', isNumber)
+  validateOptionalField(tx, 'OverpaymentFee', isUInt32)
+  validateOptionalField(tx, 'InterestRate', isUInt32)
+  validateOptionalField(tx, 'LateInterestRate', isUInt32)
+  validateOptionalField(tx, 'CloseInterestRate', isUInt32)
+  validateOptionalField(tx, 'OverpaymentInterestRate', isUInt32)
+  validateOptionalField(tx, 'PaymentTotal', isUInt32)
+  validateOptionalField(tx, 'PaymentInterval', isUInt32)
+  validateOptionalField(tx, 'GracePeriod', isUInt32)
 
   if (!isLedgerEntryId(tx.LoanBrokerID)) {
     throw new ValidationError(
@@ -203,6 +214,32 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
   if (tx.Data != null && !validateHexMetadata(tx.Data, MAX_DATA_LENGTH)) {
     throw new ValidationError(
       `LoanSet: Data must be a valid non-empty hex string up to ${MAX_DATA_LENGTH} characters`,
+    )
+  }
+
+  NON_NEGATIVE_FEE_FIELDS.forEach((field) => {
+    const fee = tx[field]
+    if (fee != null && new BigNumber(fee).isLessThan(0)) {
+      throw new ValidationError(
+        `LoanSet: ${field} must be greater than or equal to 0`,
+      )
+    }
+  })
+
+  const principalRequested = new BigNumber(tx.PrincipalRequested)
+  if (!principalRequested.isGreaterThan(0)) {
+    throw new ValidationError(
+      'LoanSet: PrincipalRequested must be greater than 0',
+    )
+  }
+
+  const originationFee = new BigNumber(tx.LoanOriginationFee ?? 0)
+  if (
+    originationFee.isLessThan(0) ||
+    originationFee.isGreaterThan(principalRequested)
+  ) {
+    throw new ValidationError(
+      'LoanSet: LoanOriginationFee must be between 0 and PrincipalRequested inclusive',
     )
   }
 
@@ -252,6 +289,10 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
     )
   }
 
+  if (tx.PaymentTotal != null && tx.PaymentTotal <= 0) {
+    throw new ValidationError('LoanSet: PaymentTotal must be greater than 0')
+  }
+
   if (tx.PaymentInterval != null && tx.PaymentInterval < MIN_PAYMENT_INTERVAL) {
     throw new ValidationError(
       `LoanSet: PaymentInterval must be greater than or equal to ${MIN_PAYMENT_INTERVAL}`,
@@ -259,12 +300,21 @@ export function validateLoanSet(tx: Record<string, unknown>): void {
   }
 
   if (
-    tx.PaymentInterval != null &&
     tx.GracePeriod != null &&
-    tx.GracePeriod > tx.PaymentInterval
+    (tx.GracePeriod < MIN_GRACE_PERIOD ||
+      tx.GracePeriod > (tx.PaymentInterval ?? DEFAULT_PAYMENT_INTERVAL))
   ) {
     throw new ValidationError(
-      `LoanSet: GracePeriod must not be greater than PaymentInterval`,
+      `LoanSet: GracePeriod must be between ${MIN_GRACE_PERIOD} and PaymentInterval (${DEFAULT_PAYMENT_INTERVAL} if omitted) inclusive`,
     )
   }
+}
+
+function isUInt32(value: unknown): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isInteger(value) &&
+    value >= 0 &&
+    value <= MAX_UINT32
+  )
 }

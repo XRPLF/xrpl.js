@@ -74,7 +74,7 @@ export default interface LoanBroker extends BaseLedgerEntry, HasPreviousTxnID {
   /**
    *  The maximum amount the protocol can owe the Vault. The default value of 0 means there is no limit to the debt.
    */
-  DebtMaximum: XRPLNumber
+  DebtMaximum?: XRPLNumber
 
   /**
    * The total amount of first-loss capital deposited into the Lending Protocol.

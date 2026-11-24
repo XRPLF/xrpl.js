@@ -6,10 +6,11 @@ import {
   validateBaseTransaction,
   validateOptionalField,
   validateRequiredField,
-  isString,
   VAULT_DATA_MAX_BYTE_LENGTH,
   XRPLNumber,
   isXRPLNumber,
+  isHexString,
+  isString,
 } from './common'
 
 /**
@@ -51,10 +52,10 @@ export interface VaultSet extends BaseTransaction {
 export function validateVaultSet(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateOptionalField(tx, 'Data', isString)
   validateOptionalField(tx, 'AssetsMaximum', isXRPLNumber)
-  validateOptionalField(tx, 'DomainID', isString)
+  validateOptionalField(tx, 'DomainID', isHexString)
 
   if (tx.Data !== undefined) {
     const dataHex = tx.Data

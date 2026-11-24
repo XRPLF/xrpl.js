@@ -10,6 +10,7 @@ import {
   validateOptionalField,
   isNumber,
   Account,
+  isHexString,
 } from './common'
 
 /**
@@ -68,11 +69,6 @@ export function validateCheckCreate(tx: Record<string, unknown>): void {
     throw new ValidationError('CheckCreate: invalid SendMax')
   }
 
-  if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
-    throw new ValidationError('CheckCreate: invalid Expiration')
-  }
-
-  if (tx.InvoiceID !== undefined && typeof tx.InvoiceID !== 'string') {
-    throw new ValidationError('CheckCreate: invalid InvoiceID')
-  }
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'InvoiceID', isHexString)
 }

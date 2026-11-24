@@ -294,9 +294,7 @@ function assertRecyclable(json, forField) {
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
     it(`whole_objects[${i}]: can parse blob into
-          ${JSON.stringify(
-            f.tx_json,
-          )}`, /*                                              */ () => {
+          ${JSON.stringify(f.tx_json)}`, /*                                              */ () => {
       const parser = makeParser(f.blob_with_no_signing)
       let ix = 0
       while (!parser.end()) {

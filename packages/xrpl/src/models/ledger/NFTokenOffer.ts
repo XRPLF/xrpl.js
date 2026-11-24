@@ -6,8 +6,9 @@ export interface NFTokenOffer extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'NFTokenOffer'
   Amount: Amount
   Destination?: string
-  Expiration: number
+  Expiration?: number
   Flags: number
+  NFTokenID: string
   NFTokenOfferNode?: string
   Owner: string
   OwnerNode?: string
