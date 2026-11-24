@@ -68,7 +68,12 @@ Release a major version from `main` only after its major branch (for example `xr
 
 ### **Reviewing the release details and scan result**
 
-The pipeline will pause at the "Print Test/Security scan result and invite Dev team to review" step and also before the final release step, relevant team should review the release details and scan result. Stable release will be reviewed by infosec team as Sec reviewer. Beta release will be reviewed by security champions from Dev team.
+The pipeline pauses at the "First approval (dev team)" step. A member of the dev team should review the release details and scan result, then approve or reject the release.
+
+- **Stable release**: after the dev approval, the pipeline asks the infosec team for a review in `#ripplex-security` and pauses again before the final release step until a Sec reviewer approves (`official-release` GitHub Environment).
+- **Beta release**: the dev approval is the only gate. The infosec team is not notified, and the package is published right after the dev approval (`beta-release` GitHub Environment, which must have no required reviewers).
+
+A release is a beta when `npmjs_dist_tag` is anything other than `latest`. Because a beta skips the infosec review, the pipeline rejects a beta whose version is not a prerelease (`x.y.z-<prerelease>`).
 
 
 ---
@@ -109,7 +114,7 @@ The pipeline will pause at the "Print Test/Security scan result and invite Dev t
 ---
 
 ### 5. **Release Stage**
-- Requires manual approval (Set up through **GitHub Environment**).
+- Stable release requires manual approval from the infosec team (set up through the `official-release` **GitHub Environment**). Beta release runs in the `beta-release` environment with no further approval.
 - Creates a GitHub Release with a tag like `<package_name>@<version>`.
 - Downloads the built package tarball.
 - Publishes the package to the public npm registry.
