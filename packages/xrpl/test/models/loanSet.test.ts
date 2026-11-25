@@ -1,6 +1,10 @@
 import { LoanSetFlags } from '../../src'
 import { validateLoanSet } from '../../src/models/transactions/loanSet'
-import { assertTxIsValid, assertTxValidationError } from '../testUtils'
+import {
+  assertTxIsValid,
+  assertTxValidationError,
+  generateInterfaceTypeTests,
+} from '../testUtils'
 
 const assertValid = (tx: any): void => assertTxIsValid(tx, validateLoanSet)
 
@@ -18,31 +22,40 @@ const UINT32_FIELDS = [
   'GracePeriod',
 ]
 
+const BASE_TX = {
+  TransactionType: 'LoanSet',
+  Account: 'rPGxCzMicNJRe1U1CD5QyNjXdLUtdgSa7B',
+  Counterparty: 'rp7Tj3Uu1RDrDd1tusge3bVBhUjNvzD19Y',
+  LoanBrokerID:
+    'E9A08C918E26407493CC4ADD381BA979CFEB7E440D0863B01FB31C231D167E42',
+  PrincipalRequested: '100000',
+  LoanOriginationFee: '100',
+  LoanServiceFee: '10',
+  LatePaymentFee: '20',
+  ClosePaymentFee: '30',
+  OverpaymentFee: 100,
+  InterestRate: 500,
+  LateInterestRate: 1000,
+  CloseInterestRate: 200,
+  OverpaymentInterestRate: 300,
+  PaymentTotal: 12,
+  PaymentInterval: 2592000,
+  GracePeriod: 604800,
+  Data: 'ABCD',
+}
+
 describe('unit test LoanSet', () => {
   let tx: any
 
   beforeEach(() => {
-    tx = {
-      TransactionType: 'LoanSet',
-      Account: 'rPGxCzMicNJRe1U1CD5QyNjXdLUtdgSa7B',
-      Counterparty: 'rp7Tj3Uu1RDrDd1tusge3bVBhUjNvzD19Y',
-      LoanBrokerID:
-        'E9A08C918E26407493CC4ADD381BA979CFEB7E440D0863B01FB31C231D167E42',
-      PrincipalRequested: '100000',
-      LoanOriginationFee: '100',
-      LoanServiceFee: '10',
-      LatePaymentFee: '20',
-      ClosePaymentFee: '30',
-      OverpaymentFee: 100,
-      InterestRate: 500,
-      LateInterestRate: 1000,
-      CloseInterestRate: 200,
-      OverpaymentInterestRate: 300,
-      PaymentTotal: 12,
-      PaymentInterval: 2592000,
-      GracePeriod: 604800,
-      Data: 'ABCD',
-    }
+    tx = { ...BASE_TX }
+  })
+
+  describe('field type checks', () => {
+    generateInterfaceTypeTests(
+      { txType: 'LoanSet', validateFn: validateLoanSet, baseTx: BASE_TX },
+      { fileName: 'loanSet.ts', interfaceName: 'LoanSet' },
+    )
   })
 
   test('valid tx', () => {
@@ -72,17 +85,11 @@ describe('unit test LoanSet', () => {
       tx,
       'LoanSet: LoanBrokerID must be 64 characters hexadecimal string',
     )
-
-    delete tx.LoanBrokerID
-    assertInvalid(tx, 'LoanSet: missing field LoanBrokerID')
   })
 
   test('incorrect PrincipalRequested', () => {
     tx.PrincipalRequested = 'abc'
     assertInvalid(tx, 'LoanSet: invalid field PrincipalRequested')
-
-    delete tx.PrincipalRequested
-    assertInvalid(tx, 'LoanSet: missing field PrincipalRequested')
   })
 
   test('PrincipalRequested not greater than 0', () => {
@@ -96,11 +103,6 @@ describe('unit test LoanSet', () => {
   test('incorrect Counterparty', () => {
     tx.Counterparty = 'INCORRECT_VALUE'
     assertInvalid(tx, 'LoanSet: invalid field Counterparty')
-  })
-
-  test('incorrect CounterpartySignature', () => {
-    tx.CounterpartySignature = 'INCORRECT_VALUE'
-    assertInvalid(tx, 'LoanSet: invalid field CounterpartySignature')
   })
 
   test('incorrect Data', () => {
