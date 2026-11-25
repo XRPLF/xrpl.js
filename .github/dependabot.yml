@@ -19,5 +19,8 @@ updates:
           - "*"
       npm-security:
         applies-to: security-updates
+        update-types:
+          - minor
+          - patch
         patterns:
           - "*"
