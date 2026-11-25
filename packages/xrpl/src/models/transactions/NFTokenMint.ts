@@ -1,6 +1,6 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
-import { isHex } from '../utils'
+import { hasFlag, isHex } from '../utils'
 
 import {
   Account,
@@ -14,6 +14,7 @@ import {
   validateRequiredField,
 } from './common'
 import type { TransactionMetadataBase } from './metadata'
+import { MAX_TRANSFER_FEE } from './MPTokenIssuanceCreate'
 
 /**
  * Transaction Flags for an NFTokenMint Transaction.
@@ -90,8 +91,8 @@ export interface NFTokenMint extends BaseTransaction {
    * Specifies the fee charged by the issuer for secondary sales of the Token,
    * if such sales are allowed. Valid values for this field are between 0 and
    * 50000 inclusive, allowing transfer rates between 0.000% and 50.000% in
-   * increments of 0.001%. This field must NOT be present if the
-   * `tfTransferable` flag is not set.
+   * increments of 0.001%. A non-zero value requires the `tfTransferable`
+   * flag to be set.
    */
   TransferFee?: number
   /**
@@ -139,6 +140,39 @@ export interface NFTokenMintMetadata extends TransactionMetadataBase {
 }
 
 /**
+ * Verify the TransferFee of an NFTokenMint at runtime.
+ *
+ * @param tx - An NFTokenMint Transaction.
+ * @throws When the TransferFee is malformed or set without the tfTransferable flag.
+ */
+function validateTransferFee(tx: Record<string, unknown>): void {
+  validateOptionalField(tx, 'TransferFee', isNumber)
+
+  if (typeof tx.TransferFee !== 'number') {
+    return
+  }
+
+  if (
+    !Number.isInteger(tx.TransferFee) ||
+    tx.TransferFee < 0 ||
+    tx.TransferFee > MAX_TRANSFER_FEE
+  ) {
+    throw new ValidationError(
+      `NFTokenMint: TransferFee must be an integer between 0 and ${MAX_TRANSFER_FEE}`,
+    )
+  }
+
+  if (
+    tx.TransferFee > 0 &&
+    !hasFlag(tx, NFTokenMintFlags.tfTransferable, 'tfTransferable')
+  ) {
+    throw new ValidationError(
+      'NFTokenMint: TransferFee cannot be provided without enabling tfTransferable flag',
+    )
+  }
+}
+
+/**
  * Verify the form and type of an NFTokenMint at runtime.
  *
  * @param tx - An NFTokenMint Transaction.
@@ -164,6 +198,8 @@ export function validateNFTokenMint(tx: Record<string, unknown>): void {
   }
 
   validateRequiredField(tx, 'NFTokenTaxon', isNumber)
+
+  validateTransferFee(tx)
 
   if (tx.Amount == null) {
     if (tx.Expiration != null || tx.Destination != null) {
