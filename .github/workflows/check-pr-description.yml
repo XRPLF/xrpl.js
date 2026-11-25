@@ -11,18 +11,26 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   check_description:
     if: ${{ github.event.pull_request.draft != true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Write PR body to file
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: printenv PR_BODY >pr_body.md
+
+      - name: Test the description check
+        run: python3 -m unittest discover -s .github/scripts
 
       - name: Check PR description differs from template
         run: |

@@ -11,6 +11,7 @@ Usage:
 
 import argparse
 import re
+import secrets
 import sys
 from pathlib import Path
 
@@ -68,13 +69,24 @@ def main() -> int:
     norm_template = normalize(template)
     norm_pr_body = normalize(pr_body)
 
+    if not norm_pr_body:
+        print(
+            "::error::PR description is empty. "
+            "Please fill in the pull request template."
+        )
+        return 1
+
     if norm_pr_body == norm_template:
         print(
             "::error::PR description (ignoring HTML comments) is identical"
             " to the template. Please fill in the details of your change."
-            f"\n\nVisible template content:\n---\n{norm_template}\n---"
-            f"\n\nVisible PR description content:\n---\n{norm_pr_body}\n---"
         )
+        # Stop GitHub from running workflow commands in the echoed text.
+        token = secrets.token_hex(16)
+        print(f"::stop-commands::{token}")
+        print(f"Visible template content:\n---\n{norm_template}\n---")
+        print(f"\nVisible PR description content:\n---\n{norm_pr_body}\n---")
+        print(f"::{token}::")
         return 1
 
     print("PR description has been customized from the template.")
