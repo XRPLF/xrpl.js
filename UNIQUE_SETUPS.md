@@ -36,7 +36,7 @@ If you want to use `xrpl.js` with React Native you will need to install polyfill
    # compile `react-native-get-random-values` pods see https://www.npmjs.com/package/react-native-get-random-values#installation
    npx pod-install
    ```
-   
+
 3. Create `polyfills.js` and add
 
 ```javascript

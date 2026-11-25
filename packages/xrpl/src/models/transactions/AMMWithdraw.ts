@@ -8,6 +8,8 @@ import {
   isIssuedCurrency,
   isIssuedCurrencyAmount,
   validateBaseTransaction,
+  validateOptionalField,
+  validateRequiredField,
 } from './common'
 
 /**
@@ -83,21 +85,9 @@ export interface AMMWithdraw extends BaseTransaction {
 export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.Asset == null) {
-    throw new ValidationError('AMMWithdraw: missing field Asset')
-  }
+  validateRequiredField(tx, 'Asset', isIssuedCurrency)
 
-  if (!isIssuedCurrency(tx.Asset)) {
-    throw new ValidationError('AMMWithdraw: Asset must be a Currency')
-  }
-
-  if (tx.Asset2 == null) {
-    throw new ValidationError('AMMWithdraw: missing field Asset2')
-  }
-
-  if (!isIssuedCurrency(tx.Asset2)) {
-    throw new ValidationError('AMMWithdraw: Asset2 must be a Currency')
-  }
+  validateRequiredField(tx, 'Asset2', isIssuedCurrency)
 
   if (tx.Amount2 != null && tx.Amount == null) {
     throw new ValidationError('AMMWithdraw: must set Amount with Amount2')
@@ -105,21 +95,8 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
     throw new ValidationError('AMMWithdraw: must set Amount with EPrice')
   }
 
-  if (tx.LPTokenIn != null && !isIssuedCurrencyAmount(tx.LPTokenIn)) {
-    throw new ValidationError(
-      'AMMWithdraw: LPTokenIn must be an IssuedCurrencyAmount',
-    )
-  }
-
-  if (tx.Amount != null && !isAmount(tx.Amount)) {
-    throw new ValidationError('AMMWithdraw: Amount must be an Amount')
-  }
-
-  if (tx.Amount2 != null && !isAmount(tx.Amount2)) {
-    throw new ValidationError('AMMWithdraw: Amount2 must be an Amount')
-  }
-
-  if (tx.EPrice != null && !isAmount(tx.EPrice)) {
-    throw new ValidationError('AMMWithdraw: EPrice must be an Amount')
-  }
+  validateOptionalField(tx, 'LPTokenIn', isIssuedCurrencyAmount)
+  validateOptionalField(tx, 'Amount', isAmount)
+  validateOptionalField(tx, 'Amount2', isAmount)
+  validateOptionalField(tx, 'EPrice', isAmount)
 }

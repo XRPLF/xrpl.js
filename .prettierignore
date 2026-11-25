@@ -1,3 +1,19 @@
 *.md
 
 /.nx/workspace-data
+
+# Generated Emscripten glue code
+packages/mpt-crypto/wasm/
+
+# Formatted by hand; ESLint disables prettier/prettier in this file
+packages/xrpl/src/models/methods/index.ts
+
+# Generated TypeDoc output; formatted in a separate PR
+docs/
+
+# Vendored minified code
+packages/xrpl/test/vendor/
+
+# Captured rippled ledger responses, kept as one line
+**/ledgerFull*.json
+**/ledger-full-*.json
