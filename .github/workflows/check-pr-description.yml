@@ -24,16 +24,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Write PR body to file
-        env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-        run: printenv PR_BODY >pr_body.md
-
-      - name: Test the description check
-        run: python3 -m unittest discover -s .github/scripts
-
+      # TODO: replace with the XRPLF/actions commit once XRPLF/actions merges
+      # check-pr-description.
       - name: Check PR description differs from template
-        run: |
-          python3 .github/scripts/check-pr-description.py \
-              --template-file .github/pull_request_template.md \
-              --pr-body-file pr_body.md
+        uses: mvadari/actions/check-pr-description@0532aa0541b438f034133f266717a1113f92da68
