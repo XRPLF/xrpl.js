@@ -1,3 +1,4 @@
+import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import {
@@ -10,7 +11,6 @@ import {
   OfferCreate,
   ECDSA,
 } from '../../src'
-import { convertStringToHex } from '../../src/utils'
 import { multisign } from '../../src/Wallet/signer'
 
 import serverUrl from './serverUrl'
@@ -85,7 +85,7 @@ describe('regular key', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: regularKeyWallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       await testTransaction(testContext.client, accountSet, regularKeyWallet)
@@ -103,7 +103,7 @@ describe('regular key', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: masterWallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
 
       await testTransaction(testContext.client, accountSet, masterWallet)
@@ -259,7 +259,7 @@ describe('regular key', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const accountSetTx = await client.autofill(accountSet, 2)
       const signed1 = regularKeyWallet.sign(accountSetTx, true)
@@ -319,7 +319,7 @@ describe('regular key', function () {
       const accountSet: AccountSet = {
         TransactionType: 'AccountSet',
         Account: testContext.wallet.classicAddress,
-        Domain: convertStringToHex('example.com'),
+        Domain: stringToHex('example.com'),
       }
       const accountSetTx = await client.autofill(accountSet, 2)
       const signed1 = sameKeyDefaultAddressWallet.sign(accountSetTx, true)
