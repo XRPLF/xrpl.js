@@ -146,6 +146,13 @@ jobs:
             echo "With npmjs_dist_tag 'latest', version must be of the form x.y.z. Found '$VERSION'." >&2
             exit 1
           fi
+
+          # Betas skip the sec team review, so they must not publish a version
+          # that an ordinary semver range (e.g. ^4.0.0) could resolve to.
+          if [[ "${IS_BETA:-false}" == "true" ]] && ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+-[0-9A-Za-z.-]+$ ]]; then
+            echo "With a non-'latest' npmjs_dist_tag, version must be a prerelease of the form x.y.z-<prerelease> (e.g. 4.5.0-beta.1). Found '$VERSION'." >&2
+            exit 1
+          fi
           echo "package_version=$VERSION" >> "$GITHUB_OUTPUT"
 
   run_faucet_test:
@@ -590,9 +597,11 @@ jobs:
       - name: Awaiting approval
         run: echo "Awaiting Dev team approval"
 
+  # Stable releases only. A beta release needs the dev team approval alone, so
+  # the sec team is not asked to review it.
   ask_for_sec_team_review:
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.first_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
+    if: ${{ always() && needs.get_version.outputs.is_beta != 'true' && needs.first_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
         get_version,
@@ -633,7 +642,15 @@ jobs:
       id-token: write
       contents: write
       pull-requests: read
-    if: ${{ always() && needs.ask_for_sec_team_review.result == 'success' && needs.run_tests.result == 'success' && (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
+    # Both release types need the dev team approval. A stable release also needs
+    # the sec team review request to have gone out; a beta release skips it.
+    if: >-
+      ${{ always() &&
+        needs.first_review.result == 'success' &&
+        (needs.ask_for_sec_team_review.result == 'success' ||
+          (needs.get_version.outputs.is_beta == 'true' && needs.ask_for_sec_team_review.result == 'skipped')) &&
+        needs.run_tests.result == 'success' &&
+        (needs.run_faucet_test.result == 'success' || needs.run_faucet_test.result == 'skipped') }}
     needs:
       [
         get_version,
@@ -649,8 +666,10 @@ jobs:
     env:
       PKG_VERSION: "${{ needs.get_version.outputs.package_version }}"
       PKG_NAME: "${{ github.event.inputs.package_name }}"
+    # `official-release` requires a sec team approval. `beta-release` must have no
+    # required reviewers, so a beta publishes right after the dev team approval.
     environment:
-      name: official-release
+      name: ${{ needs.get_version.outputs.is_beta == 'true' && 'beta-release' || 'official-release' }}
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       - name: Prevent second attempt
@@ -702,6 +721,16 @@ jobs:
 
           if [[ "${IS_BETA}" != "true" ]] && ! [[ "${PKG_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Stable releases (tagged with 'latest') must use x.y.z SemVer. Found '${PKG_VERSION}'." >&2
+            exit 1
+          fi
+
+          # PKG_VERSION was validated on an earlier checkout of the release branch
+          # than the one the tarball was packed from. Publish only if the branch
+          # did not move to a different version in between, so the version that
+          # was validated and reviewed is the one that gets published.
+          TARBALL_VERSION="$(tar -xzOf "${PKG}" package/package.json | jq -er '.version')"
+          if [[ "${TARBALL_VERSION}" != "${PKG_VERSION}" ]]; then
+            echo "❌ Tarball version '${TARBALL_VERSION}' does not match the validated version '${PKG_VERSION}'." >&2
             exit 1
           fi
 
