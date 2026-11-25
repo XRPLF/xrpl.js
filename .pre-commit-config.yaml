@@ -26,7 +26,7 @@ repos:
 
   # Autoformat: YAML, JSON, Markdown, etc. (respects .prettierignore)
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: 0ee178619d696787ca73d210cc191d720868c631 # frozen: v3.9.6
+    rev: c035d5c3fc2ce295b961030061d09de67d9203dc # frozen: v3.10.1
     hooks:
       - id: prettier
 
