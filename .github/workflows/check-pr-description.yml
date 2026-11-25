@@ -24,7 +24,5 @@ jobs:
         with:
           persist-credentials: false
 
-      # TODO: replace with the XRPLF/actions commit once XRPLF/actions merges
-      # check-pr-description.
       - name: Check PR description differs from template
-        uses: mvadari/actions/check-pr-description@0532aa0541b438f034133f266717a1113f92da68
+        uses: XRPLF/actions/check-pr-description@326b8a45c8dec23c37559396685d98ba65e5076a
