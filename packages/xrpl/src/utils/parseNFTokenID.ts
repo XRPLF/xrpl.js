@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import { encodeAccountID } from 'ripple-address-codec'
 
 import { XrplError } from '../errors'
+import { isHex } from '../models/utils'
 
 /**
  * An issuer may issue several NFTs with the same taxon; to ensure that NFTs are
@@ -74,6 +75,10 @@ export default function parseNFTokenID(nftokenID: string): {
   if (nftokenID.length !== expectedLength) {
     throw new XrplError(`Attempting to parse a nftokenID with length ${nftokenID.length}
     , but expected a token with length ${expectedLength}`)
+  }
+
+  if (!isHex(nftokenID)) {
+    throw new XrplError('Invalid NFTokenID: expected a hexadecimal string')
   }
 
   const scrambledTaxon = new BigNumber(
