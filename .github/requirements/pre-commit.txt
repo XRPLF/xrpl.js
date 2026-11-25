@@ -1,7 +1,5 @@
 # Hash-pinned pre-commit for .github/workflows/pre-commit.yml.
-# Regenerate: echo "pre-commit==<version>" | pip-compile --generate-hashes --strip-extras --no-header -o .github/requirements/pre-commit.txt -
---index-url https://artifactory.ops.ripple.com/artifactory/api/pypi/ripple-pypi/simple
---trusted-host artifactory.ops.ripple.com
+# Regenerate: echo "pre-commit==<version>" | pip-compile --index-url https://pypi.org/simple --generate-hashes --strip-extras --no-header -o .github/requirements/pre-commit.txt -
 
 cfgv==3.5.0 \
     --hash=sha256:a8dc6b26ad22ff227d2634a65cb388215ce6cc96bbcc5cfde7641ae87e8dacc0 \
