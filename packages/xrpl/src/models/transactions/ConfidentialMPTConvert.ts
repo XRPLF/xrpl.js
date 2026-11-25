@@ -3,7 +3,6 @@ import { ValidationError } from '../../errors'
 import {
   BaseTransaction,
   isMPTIssuer,
-  isString,
   isHexWithByteLength,
   validateBaseTransaction,
   validateRequiredField,
@@ -13,6 +12,7 @@ import {
   CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES,
   CONFIDENTIAL_BLINDING_FACTOR_BYTES,
   CONFIDENTIAL_CONVERT_PROOF_BYTES,
+  isHexString,
 } from './common'
 
 /**
@@ -89,7 +89,7 @@ export function validateConfidentialMPTConvert(
   tx: Record<string, unknown>,
 ): void {
   validateBaseTransaction(tx)
-  validateRequiredField(tx, 'MPTokenIssuanceID', isString)
+  validateRequiredField(tx, 'MPTokenIssuanceID', isHexString)
   // rippled forbids the issuer from converting its own issuance (temMALFORMED).
   if (isMPTIssuer(tx.Account, tx.MPTokenIssuanceID)) {
     throw new ValidationError(

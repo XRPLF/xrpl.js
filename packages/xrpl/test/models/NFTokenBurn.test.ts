@@ -38,4 +38,17 @@ describe('NFTokenBurn', function () {
 
     assertInvalid(invalid, 'NFTokenBurn: missing field NFTokenID')
   })
+
+  it(`throws w/ non-hex NFTokenID`, function () {
+    const validNFTokenBurn = {
+      TransactionType: 'NFTokenBurn',
+      NFTokenID: TOKEN_ID,
+      Account: 'rWYkbWkCeg8dP6rXALnjgZSjjLyih5NXm',
+      Fee: '5000000',
+      Sequence: 2470665,
+      Flags: 2147483648,
+    } as any
+    validNFTokenBurn.NFTokenID = 'not hex'
+    assertInvalid(validNFTokenBurn, 'NFTokenBurn: invalid field NFTokenID')
+  })
 })

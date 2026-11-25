@@ -15,6 +15,7 @@ const assertInvalid = (tx: any, message: string): void =>
  *
  * Providing runtime verification testing for each specific transaction type.
  */
+// eslint-disable-next-line max-statements -- many validation cases
 describe('XChainAddAccountCreateAttestation', function () {
   let tx: any
 
@@ -244,6 +245,22 @@ describe('XChainAddAccountCreateAttestation', function () {
     assertInvalid(
       tx,
       'XChainAddAccountCreateAttestation: invalid field XChainBridge',
+    )
+  })
+
+  it(`throws w/ non-hex PublicKey`, function () {
+    tx.PublicKey = 'not hex'
+    assertInvalid(
+      tx,
+      'XChainAddAccountCreateAttestation: invalid field PublicKey',
+    )
+  })
+
+  it(`throws w/ non-hex Signature`, function () {
+    tx.Signature = 'not hex'
+    assertInvalid(
+      tx,
+      'XChainAddAccountCreateAttestation: invalid field Signature',
     )
   })
 })

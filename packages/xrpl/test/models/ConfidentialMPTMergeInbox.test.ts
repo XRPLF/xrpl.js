@@ -56,4 +56,15 @@ describe('ConfidentialMPTMergeInbox', function () {
       'ConfidentialMPTMergeInbox: invalid field MPTokenIssuanceID',
     )
   })
+
+  it(`throws w/ non-hex MPTokenIssuanceID`, function () {
+    assertInvalid(
+      {
+        TransactionType: 'ConfidentialMPTMergeInbox',
+        Account: ACCOUNT,
+        MPTokenIssuanceID: 'not hex',
+      },
+      'ConfidentialMPTMergeInbox: invalid field MPTokenIssuanceID',
+    )
+  })
 })

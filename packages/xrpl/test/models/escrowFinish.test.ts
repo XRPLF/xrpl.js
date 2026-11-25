@@ -60,13 +60,13 @@ describe('EscrowFinish', function () {
   it(`throws w/ invalid Condition`, function () {
     escrow.Condition = 10
 
-    assertInvalid(escrow, 'EscrowFinish: Condition must be a string')
+    assertInvalid(escrow, 'EscrowFinish: invalid field Condition')
   })
 
   it(`throws w/ invalid Fulfillment`, function () {
     escrow.Fulfillment = 0x142341
 
-    assertInvalid(escrow, 'EscrowFinish: Fulfillment must be a string')
+    assertInvalid(escrow, 'EscrowFinish: invalid field Fulfillment')
   })
 
   it(`throws w/ non-array CredentialIDs`, function () {
@@ -126,5 +126,15 @@ describe('EscrowFinish', function () {
       'EscrowFinish: Credentials cannot contain duplicate elements'
 
     assertInvalid(escrow, errorMessage)
+  })
+
+  it(`throws w/ non-hex Condition`, function () {
+    escrow.Condition = 'not hex'
+    assertInvalid(escrow, 'EscrowFinish: invalid field Condition')
+  })
+
+  it(`throws w/ non-hex Fulfillment`, function () {
+    escrow.Fulfillment = 'not hex'
+    assertInvalid(escrow, 'EscrowFinish: invalid field Fulfillment')
   })
 })
