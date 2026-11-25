@@ -724,6 +724,16 @@ jobs:
             exit 1
           fi
 
+          # PKG_VERSION was validated on an earlier checkout of the release branch
+          # than the one the tarball was packed from. Publish only if the branch
+          # did not move to a different version in between, so the version that
+          # was validated and reviewed is the one that gets published.
+          TARBALL_VERSION="$(tar -xzOf "${PKG}" package/package.json | jq -er '.version')"
+          if [[ "${TARBALL_VERSION}" != "${PKG_VERSION}" ]]; then
+            echo "❌ Tarball version '${TARBALL_VERSION}' does not match the validated version '${PKG_VERSION}'." >&2
+            exit 1
+          fi
+
           npm i -g npm@11.6.0
           npm publish "${PKG}" --provenance --access public --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
 
