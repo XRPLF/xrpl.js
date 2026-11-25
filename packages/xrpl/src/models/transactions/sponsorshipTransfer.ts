@@ -1,0 +1,243 @@
+import { ValidationError } from '../../errors'
+
+import {
+  BaseTransaction,
+  GlobalFlagsInterface,
+  isAccount,
+  isRecord,
+  isString,
+  validateBaseTransaction,
+  areAddressesEqual,
+  SponsorFlags,
+} from './common'
+
+/**
+ * Flags for the SponsorshipTransfer transaction.
+ *
+ * @category Transaction Flags
+ */
+export enum SponsorshipTransferFlags {
+  /**
+   * End an existing sponsorship relationship for the specified object.
+   */
+  tfSponsorshipEnd = 0x00010000,
+  /**
+   * Create a new sponsorship relationship for the specified object.
+   */
+  tfSponsorshipCreate = 0x00020000,
+  /**
+   * Reassign sponsorship from one sponsor to another for the specified object.
+   */
+  tfSponsorshipReassign = 0x00040000,
+}
+
+/**
+ * Map of flags to boolean values representing the SponsorshipTransfer transaction
+ * flags.
+ *
+ * @category Transaction Flags
+ */
+// eslint-disable-next-line max-len -- interface name is descriptive
+export interface SponsorshipTransferFlagsInterface extends GlobalFlagsInterface {
+  /**
+   * End an existing sponsorship relationship for the specified object.
+   */
+  tfSponsorshipEnd?: boolean
+  /**
+   * Create a new sponsorship relationship for the specified object.
+   */
+  tfSponsorshipCreate?: boolean
+  /**
+   * Reassign sponsorship from one sponsor to another for the specified object.
+   */
+  tfSponsorshipReassign?: boolean
+}
+
+/**
+ * A SponsorshipTransfer transaction transfers ownership of a ledger object's
+ * reserve sponsorship from one sponsor to another, creates a new sponsorship,
+ * or removes sponsorship entirely.
+ *
+ * This transaction allows changing which account is paying the reserve for a
+ * specific ledger object (such as a trust line, offer, escrow, etc.) or for
+ * account-level sponsorship.
+ *
+ * @category Transaction Models
+ */
+export interface SponsorshipTransfer extends BaseTransaction {
+  TransactionType: 'SponsorshipTransfer'
+  /**
+   * (Optional) The ledger object ID of the object whose sponsorship is being
+   * transferred. This identifies the specific ledger entry whose reserve
+   * sponsorship will be changed. When omitted, this transaction refers to
+   * account-level sponsorship.
+   */
+  ObjectID?: string
+  /**
+   * (Optional) The account whose object/account-level sponsorship is being
+   * ended. Only valid for the tfSponsorshipEnd scenario; must not be present
+   * for tfSponsorshipCreate or tfSponsorshipReassign. Defaults to Account
+   * when omitted.
+   */
+  Sponsee?: string
+  Flags?: number | SponsorshipTransferFlagsInterface
+}
+
+/**
+ * Verify the form and type of a SponsorshipTransfer at runtime.
+ *
+ * @param tx - A SponsorshipTransfer Transaction.
+ * @throws Malformed.
+ */
+// eslint-disable-next-line max-lines-per-function, max-statements -- necessary for validation
+export function validateSponsorshipTransfer(tx: Record<string, unknown>): void {
+  validateBaseTransaction(tx)
+
+  // Validate flag scenario - exactly one of the three scenario flags must be set
+  // Handle both numeric flags and boolean flag objects
+  let hasEnd = false
+  let hasCreate = false
+  let hasReassign = false
+
+  if (typeof tx.Flags === 'number') {
+    /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+    hasEnd = (tx.Flags & SponsorshipTransferFlags.tfSponsorshipEnd) !== 0
+    hasCreate = (tx.Flags & SponsorshipTransferFlags.tfSponsorshipCreate) !== 0
+    hasReassign =
+      (tx.Flags & SponsorshipTransferFlags.tfSponsorshipReassign) !== 0
+    /* eslint-enable no-bitwise */
+  } else if (isRecord(tx.Flags)) {
+    // Handle boolean flags object
+    const flagsObj = tx.Flags
+    hasEnd = flagsObj.tfSponsorshipEnd === true
+    hasCreate = flagsObj.tfSponsorshipCreate === true
+    hasReassign = flagsObj.tfSponsorshipReassign === true
+  }
+
+  const scenarioCount =
+    (hasEnd ? 1 : 0) + (hasCreate ? 1 : 0) + (hasReassign ? 1 : 0)
+
+  if (scenarioCount === 0) {
+    throw new ValidationError(
+      'SponsorshipTransfer: must specify exactly one scenario flag (tfSponsorshipEnd, tfSponsorshipCreate, or tfSponsorshipReassign)',
+    )
+  }
+
+  if (scenarioCount > 1) {
+    throw new ValidationError(
+      'SponsorshipTransfer: cannot specify multiple scenario flags (tfSponsorshipEnd, tfSponsorshipCreate, tfSponsorshipReassign are mutually exclusive)',
+    )
+  }
+
+  // Validate ObjectID if present (optional for account-level sponsorship)
+  if (tx.ObjectID !== undefined) {
+    if (!isString(tx.ObjectID)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: ObjectID must be a string',
+      )
+    }
+
+    // ObjectID should be a 64-character hex string (ledger object ID)
+    if (!/^[0-9A-Fa-f]{64}$/u.test(tx.ObjectID)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: ObjectID must be a 64-character hexadecimal string',
+      )
+    }
+  }
+
+  // Validate Sponsor based on scenario
+  const hasSponsor = tx.Sponsor !== undefined
+
+  // tfSponsorshipEnd: Sponsor should NOT be present
+  if (hasEnd && hasSponsor) {
+    throw new ValidationError(
+      'SponsorshipTransfer: Sponsor field must not be present for tfSponsorshipEnd scenario',
+    )
+  }
+
+  // tfSponsorshipCreate or tfSponsorshipReassign: Sponsor is REQUIRED
+  if ((hasCreate || hasReassign) && !hasSponsor) {
+    throw new ValidationError(
+      'SponsorshipTransfer: Sponsor field is required for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+    )
+  }
+
+  // Validate Sponsor if present
+  if (tx.Sponsor !== undefined) {
+    if (!isString(tx.Sponsor)) {
+      throw new ValidationError('SponsorshipTransfer: Sponsor must be a string')
+    }
+
+    // Check identity before validating address format
+    if (isString(tx.Account) && areAddressesEqual(tx.Account, tx.Sponsor)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Account and Sponsor cannot be the same',
+      )
+    }
+
+    if (!isAccount(tx.Sponsor)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  // tfSponsorshipCreate or tfSponsorshipReassign: SponsorFlags must be present
+  // with the spfSponsorReserve bit set (the new sponsor covers the reserve).
+  if (hasCreate || hasReassign) {
+    /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+    const hasReserveFlag =
+      typeof tx.SponsorFlags === 'number' &&
+      (tx.SponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
+    /* eslint-enable no-bitwise */
+
+    if (!hasReserveFlag) {
+      throw new ValidationError(
+        'SponsorshipTransfer: SponsorFlags must be present with the spfSponsorReserve bit set for tfSponsorshipCreate and tfSponsorshipReassign scenarios',
+      )
+    }
+  }
+
+  // Account-level reserve sponsorship (tfSponsorshipCreate or tfSponsorshipReassign with no
+  // ObjectID) changes the reserve responsibility for the account itself, so the new sponsor
+  // must explicitly co-sign via SponsorSignature. Object-level sponsorship may draw from a
+  // pre-funded Sponsorship object's budget instead, so no signature is required there.
+  const isAccountLevelReserveSponsorship =
+    (hasCreate || hasReassign) && tx.ObjectID === undefined
+  if (isAccountLevelReserveSponsorship && tx.SponsorSignature === undefined) {
+    throw new ValidationError(
+      'SponsorshipTransfer: SponsorSignature is required for account-level tfSponsorshipCreate ' +
+        'or tfSponsorshipReassign (no ObjectID)',
+    )
+  }
+
+  // Validate Sponsee based on scenario
+  const hasSponsee = tx.Sponsee !== undefined
+
+  // tfSponsorshipCreate or tfSponsorshipReassign: Sponsee must NOT be present
+  if ((hasCreate || hasReassign) && hasSponsee) {
+    throw new ValidationError(
+      'SponsorshipTransfer: Sponsee field must not be present for tfSponsorshipCreate or tfSponsorshipReassign scenarios',
+    )
+  }
+
+  // Validate Sponsee if present
+  if (tx.Sponsee !== undefined) {
+    if (!isString(tx.Sponsee)) {
+      throw new ValidationError('SponsorshipTransfer: Sponsee must be a string')
+    }
+
+    // Check identity before validating address format
+    if (isString(tx.Account) && areAddressesEqual(tx.Account, tx.Sponsee)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Account and Sponsee cannot be the same',
+      )
+    }
+
+    if (!isAccount(tx.Sponsee)) {
+      throw new ValidationError(
+        'SponsorshipTransfer: Sponsee must be a valid account address',
+      )
+    }
+  }
+}

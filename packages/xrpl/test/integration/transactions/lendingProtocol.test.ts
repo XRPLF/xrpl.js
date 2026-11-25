@@ -25,6 +25,9 @@ import {
   type MPTAmount,
   signLoanSetByCounterparty,
   combineLoanSetCounterpartySigners,
+  multisign,
+  VaultKind,
+  ValidationError,
 } from '../../../src'
 import {
   LoanFlags,
@@ -34,13 +37,19 @@ import {
 } from '../../../src/models/ledger'
 import { type MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import { hashLoan, hashLoanBroker, hashVault } from '../../../src/utils/hashes'
+import { assertRejects } from '../../testUtils'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
   teardownClient,
   type XrplIntegrationTestContext,
 } from '../setup'
-import { generateFundedWallet, testTransaction } from '../utils'
+import {
+  generateFundedWallet,
+  getLedgerCloseTime,
+  testTransaction,
+  waitForAndForceProgressLedgerTime,
+} from '../utils'
 
 interface VaultObject {
   mptIssuanceId: string
@@ -72,7 +81,15 @@ describe('Lending Protocol IT', () => {
       const loanBrokerWallet = vaultOwnerWallet
 
       // ========== STEP 1: Create Vault ==========
-      // The vault is the pool of funds that the loan broker will lend from
+      // The vault is the pool of funds that the loan broker will lend from.
+      // Under LendingProtocolV1_1 a LoanBroker can only be attached to a
+      // close-ended vault, which requires both a SubscriptionDate and a
+      // RedemptionDate. These are ledger close times, so derive them from the
+      // latest validated ledger (the standalone clock is not in sync with the
+      // local system clock).
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const redemptionDate = subscriptionDate + 86400
       const vaultCreateTx: VaultCreate = {
         TransactionType: 'VaultCreate',
         Asset: {
@@ -80,6 +97,9 @@ describe('Lending Protocol IT', () => {
         },
         Account: vaultOwnerWallet.address,
         AssetsMaximum: '1e17',
+        VaultKind: VaultKind.vaultKindClosed,
+        SubscriptionDate: subscriptionDate,
+        RedemptionDate: redemptionDate,
       }
 
       const vaultCreateResp = await testTransaction(
@@ -170,6 +190,14 @@ describe('Lending Protocol IT', () => {
       )
 
       // ========== STEP 4: Create Loan ==========
+      // Advance the ledger into the vault's Investment phase before creating the
+      // loan. LendingProtocolV1_1 only accepts a LoanSet while the close-ended
+      // vault is in its Investment phase (subscriptionDate < closeTime < redemptionDate).
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
+
       // The loan broker initiates a loan for the borrower
       // This requires dual signatures: broker and borrower
       let loanSetTx: LoanSet = {
@@ -246,20 +274,20 @@ describe('Lending Protocol IT', () => {
 
       // After payment, the principal outstanding should be reduced
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding, 10) <
-          parseInt(loanObject.PrincipalOutstanding, 10),
+        parseInt(paidLoan.PrincipalOutstanding as string, 10) <
+          parseInt(loanObject.PrincipalOutstanding as string, 10),
         'Principal should decrease after payment',
       )
       // Payment remaining should be decremented
       assert.equal(
         paidLoan.PaymentRemaining,
-        loanObject.PaymentRemaining - 1,
+        (loanObject.PaymentRemaining as number) - 1,
         'Payment remaining should decrease by 1',
       )
 
       // assert principal outstanding is not zero
       assert.isTrue(
-        parseInt(paidLoan.PrincipalOutstanding, 10) > 0,
+        parseInt(paidLoan.PrincipalOutstanding as string, 10) > 0,
         'Principal should not be zero',
       )
 
@@ -276,7 +304,7 @@ describe('Lending Protocol IT', () => {
       // ========== STEP 5B: Make Second Payment with tfLoanFullPayment Flag ==========
       // Borrower makes the final payment with tfLoanFullPayment flag
       // This flag indicates the borrower is making a full early repayment
-      const finalPaymentAmount = paidLoan.PrincipalOutstanding
+      const finalPaymentAmount = paidLoan.PrincipalOutstanding as string
       const fullPaymentTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -300,8 +328,11 @@ describe('Lending Protocol IT', () => {
         (obj) => obj.index === loanObjectId,
       ) as Loan
 
+      // A repaid loan omits these DEFAULT fields rather than reporting 0
       assert.isUndefined(finalLoan.PrincipalOutstanding)
       assert.isUndefined(finalLoan.PaymentRemaining)
+      assert.isUndefined(finalLoan.TotalValueOutstanding)
+      assert.isUndefined(finalLoan.NextPaymentDueDate)
     },
     TIMEOUT,
   )
@@ -322,11 +353,19 @@ describe('Lending Protocol IT', () => {
       // The Vault Owner and Loan Broker must be on the same account.
       const loanBrokerWallet = vaultOwnerWallet
 
-      // Create a vault
+      // Create a close-ended vault. The SubscriptionDate / RedemptionDate are
+      // ledger close times, so derive them from the latest validated ledger
+      // (the standalone clock is not in sync with the local system clock).
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const redemptionDate = subscriptionDate + 86400
+
       const vaultObj: VaultObject = await createSingleAssetVault(
         testContext,
         vaultOwnerWallet,
         mptIssuerWallet,
+        subscriptionDate,
+        redemptionDate,
       )
 
       // Depositor Authorizes to hold MPT
@@ -424,6 +463,14 @@ describe('Lending Protocol IT', () => {
       assert.equal(loanBrokerObject.index, loanBrokerObjectId)
       assert.equal(loanBrokerObject.DebtMaximum, loanBrokerSetTx.DebtMaximum)
 
+      // Advance the ledger into the vault's Investment phase before creating the
+      // loan. LendingProtocolV1_1 only accepts a LoanSet while the close-ended
+      // vault is in its Investment phase (subscriptionDate < closeTime < redemptionDate).
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
+
       // Create a Loan object
       let loanSetTx: LoanSet = {
         TransactionType: 'LoanSet',
@@ -436,12 +483,10 @@ describe('Lending Protocol IT', () => {
       }
 
       // Fails as loan borrower has not signed yet.
-      await testTransaction(
-        testContext.client,
-        loanSetTx,
-        loanBrokerWallet,
-        undefined,
-        'temBAD_SIGNER',
+      await assertRejects(
+        testContext.client.submit(loanSetTx, { wallet: loanBrokerWallet }),
+        ValidationError,
+        "LoanSet requires the counterparty's signature (CounterpartySignature). Use signLoanSetByCounterparty before submitting.",
       )
 
       // Loan broker signs the transaction and sends it to the borrower
@@ -561,6 +606,19 @@ describe('Lending Protocol IT', () => {
         ).toString(),
       )
 
+      // Advance the ledger past the loan's first payment due date so the loan
+      // becomes overdue. Under fixCleanup3_4_0 a loan can only be impaired once a
+      // payment is late (parentCloseTime > NextPaymentDueDate), and the
+      // late-payment LoanPay below requires the same; otherwise LoanManage and
+      // LoanPay return tecTOO_SOON. Overshoot the due date by a comfortable
+      // margin so the effective (close-time-resolution-rounded) parentCloseTime
+      // is safely past it.
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        (loanObject.NextPaymentDueDate as number) + 200,
+        400,
+      )
+
       // Test LoanManage - Mark loan as impaired
       const loanManageTx: LoanManage = {
         TransactionType: 'LoanManage',
@@ -581,7 +639,9 @@ describe('Lending Protocol IT', () => {
       ) as Loan
       assert.equal(loanObject.Flags, LoanFlags.lsfLoanImpaired)
 
-      // Test LoanPay
+      // Test LoanPay. The loan is now overdue, so the payment must set the
+      // late-payment flag; a normal LoanPay on an overdue loan returns
+      // tecEXPIRED under fixCleanup3_4_0.
       const loanPayTx: LoanPay = {
         TransactionType: 'LoanPay',
         Account: borrowerWallet.address,
@@ -589,6 +649,9 @@ describe('Lending Protocol IT', () => {
         Amount: {
           mpt_issuance_id: vaultObj.mptIssuanceId,
           value: '100000',
+        },
+        Flags: {
+          tfLoanLatePayment: true,
         },
       }
       await testTransaction(testContext.client, loanPayTx, borrowerWallet)
@@ -650,6 +713,27 @@ describe('Lending Protocol IT', () => {
         ).toString(),
       )
 
+      // A DebtMaximum of 0 (no limit) is a DEFAULT value, so it is omitted
+      const loanBrokerUpdateTx: LoanBrokerSet = {
+        TransactionType: 'LoanBrokerSet',
+        Account: loanBrokerWallet.address,
+        VaultID: vaultObj.vaultObjectId,
+        LoanBrokerID: loanBrokerObjectId,
+        DebtMaximum: '0',
+      }
+      await testTransaction(
+        testContext.client,
+        loanBrokerUpdateTx,
+        loanBrokerWallet,
+      )
+      const updatedLoanBroker = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanBrokerObjectId,
+        })
+      ).result.node as LoanBroker
+      assert.isUndefined(updatedLoanBroker.DebtMaximum)
+
       // Test LoanBrokerDelete
       const loanBrokerDeleteTx: LoanBrokerDelete = {
         TransactionType: 'LoanBrokerDelete',
@@ -670,21 +754,167 @@ describe('Lending Protocol IT', () => {
     },
     TIMEOUT,
   )
+
+  it(
+    'Lending protocol integration test with a multi-signed loan broker',
+    async () => {
+      const loanBrokerWallet = await generateFundedWallet(testContext.client)
+      const depositorWallet = await generateFundedWallet(testContext.client)
+      const borrowerWallet = await generateFundedWallet(testContext.client)
+      const brokerSigner1 = Wallet.generate()
+      const brokerSigner2 = Wallet.generate()
+      const borrowerSigner1 = Wallet.generate()
+      const borrowerSigner2 = Wallet.generate()
+
+      // Both sides are multi-signed: the loan broker signs the LoanSet with
+      // Signers and the borrower co-signs with CounterpartySignature.Signers.
+      await setupMultiSigning(
+        testContext,
+        loanBrokerWallet,
+        brokerSigner1,
+        brokerSigner2,
+      )
+      await setupMultiSigning(
+        testContext,
+        borrowerWallet,
+        borrowerSigner1,
+        borrowerSigner2,
+      )
+
+      const closeTime = await getLedgerCloseTime(testContext.client)
+      const subscriptionDate = closeTime + 10
+      const vaultCreateTx: VaultCreate = {
+        TransactionType: 'VaultCreate',
+        Asset: { currency: 'XRP' },
+        Account: loanBrokerWallet.address,
+        VaultKind: VaultKind.vaultKindClosed,
+        SubscriptionDate: subscriptionDate,
+        RedemptionDate: subscriptionDate + 86400,
+      }
+      const vaultCreateResp = await testTransaction(
+        testContext.client,
+        vaultCreateTx,
+        loanBrokerWallet,
+      )
+      const vaultObjectId = hashVault(
+        vaultCreateResp.result.tx_json.Account,
+        vaultCreateResp.result.tx_json.Sequence as number,
+      )
+
+      const vaultDepositTx: VaultDeposit = {
+        TransactionType: 'VaultDeposit',
+        Account: depositorWallet.address,
+        VaultID: vaultObjectId,
+        Amount: '10000000',
+      }
+      await testTransaction(testContext.client, vaultDepositTx, depositorWallet)
+
+      const loanBrokerSetTx: LoanBrokerSet = {
+        TransactionType: 'LoanBrokerSet',
+        Account: loanBrokerWallet.address,
+        VaultID: vaultObjectId,
+        DebtMaximum: '25000000',
+      }
+      const loanBrokerTxResp = await testTransaction(
+        testContext.client,
+        loanBrokerSetTx,
+        loanBrokerWallet,
+      )
+      const loanBrokerObjectId = hashLoanBroker(
+        loanBrokerTxResp.result.tx_json.Account,
+        loanBrokerTxResp.result.tx_json.Sequence as number,
+      )
+      const loanBrokerObject = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanBrokerObjectId,
+        })
+      ).result.node as LoanBroker
+
+      await waitForAndForceProgressLedgerTime(
+        testContext.client,
+        subscriptionDate + 1,
+      )
+
+      let loanSetTx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: loanBrokerWallet.address,
+        LoanBrokerID: loanBrokerObjectId,
+        PrincipalRequested: '5000000',
+        Counterparty: borrowerWallet.address,
+        PaymentTotal: 1,
+      }
+      loanSetTx = await testContext.client.autofill(loanSetTx, 2)
+      const brokerSignedTx = multisign([
+        brokerSigner1.sign(loanSetTx, true).tx_blob,
+        brokerSigner2.sign(loanSetTx, true).tx_blob,
+      ])
+
+      const { tx: signer1SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        brokerSignedTx,
+        { multisign: true },
+      )
+      const { tx: signer2SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner2,
+        brokerSignedTx,
+        { multisign: true },
+      )
+      const { tx: combinedSignedTx } = combineLoanSetCounterpartySigners([
+        signer1SignedTx,
+        signer2SignedTx,
+      ])
+
+      await testTransaction(
+        testContext.client,
+        combinedSignedTx,
+        loanBrokerWallet,
+      )
+
+      const loanObjectId = hashLoan(
+        loanBrokerObjectId,
+        loanBrokerObject.LoanSequence,
+      )
+      const loanObject = (
+        await testContext.client.request({
+          command: 'ledger_entry',
+          index: loanObjectId,
+        })
+      ).result.node as Loan
+
+      assert.equal(loanObject.Borrower, borrowerWallet.address)
+      assert.equal(loanObject.LoanBrokerID, loanBrokerObjectId)
+      assert.equal(
+        loanObject.PrincipalOutstanding,
+        loanSetTx.PrincipalRequested,
+      )
+    },
+    TIMEOUT,
+  )
 })
 
+// eslint-disable-next-line max-params -- close-ended vault dates are required
 async function createSingleAssetVault(
   testContext: XrplIntegrationTestContext,
   vaultOwnerWallet: Wallet,
   mptIssuerWallet: Wallet,
+  subscriptionDate: number,
+  redemptionDate: number,
 ): Promise<VaultObject> {
   const mptIssuanceId = await createMPToken(testContext, mptIssuerWallet)
 
+  // Under LendingProtocolV1_1 a LoanBroker can only be attached to a
+  // close-ended vault, so create the vault with a SubscriptionDate and
+  // RedemptionDate.
   const vaultCreateTx: VaultCreate = {
     TransactionType: 'VaultCreate',
     Asset: {
       mpt_issuance_id: mptIssuanceId,
     },
     Account: vaultOwnerWallet.address,
+    VaultKind: VaultKind.vaultKindClosed,
+    SubscriptionDate: subscriptionDate,
+    RedemptionDate: redemptionDate,
   }
 
   const vaultCreateResp = await testTransaction(

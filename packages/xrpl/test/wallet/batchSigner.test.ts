@@ -222,6 +222,46 @@ describe('Wallet batch operations', function () {
       )
     })
 
+    it('requires the sponsor of a sponsored inner transaction to sign', function () {
+      const inner = transaction.RawTransactions[0].RawTransaction
+      inner.Sponsor = otherWallet.address
+      // spfSponsorReserve
+      inner.SponsorFlags = 0x00000002
+
+      // A pre-funded sponsorship carries no SponsorSignature and needs no
+      // BatchSigners entry.
+      assert.throws(
+        () => signMultiBatch(otherWallet, transaction),
+        ValidationError,
+        'Must be signing for an address submitting a transaction in the Batch.',
+      )
+
+      // The empty placeholder marks a sponsorship authorized through
+      // BatchSigners, so the sponsor becomes a required signer.
+      inner.SponsorSignature = { SigningPubKey: '' }
+      signMultiBatch(otherWallet, transaction)
+      assert.strictEqual(
+        transaction.BatchSigners?.[0].BatchSigner.Account,
+        otherWallet.address,
+      )
+    })
+
+    it('does not make the outer account a signer when it sponsors an inner transaction', function () {
+      const inner = transaction.RawTransactions[0].RawTransaction
+      inner.Sponsor = transaction.Account
+      // spfSponsorReserve
+      inner.SponsorFlags = 0x00000002
+      inner.SponsorSignature = { SigningPubKey: '' }
+
+      // The outer account signs the Batch itself, and rippled rejects a
+      // BatchSigners entry for it with temBAD_SIGNER.
+      assert.throws(
+        () => signMultiBatch(submitWallet, transaction),
+        ValidationError,
+        'Must be signing for an address submitting a transaction in the Batch.',
+      )
+    })
+
     it('fails with not-included account', function () {
       assert.throws(
         () => signMultiBatch(otherWallet, transaction),

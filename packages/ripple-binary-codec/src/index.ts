@@ -108,6 +108,102 @@ function encodeForMultisigning(
 }
 
 /**
+ * Encode a transaction for signing by the counterparty.
+ *
+ * Under `fixCleanup3_4_0` a counterparty signature covers a distinct signing
+ * prefix so it cannot be replayed as a first-party signature.
+ *
+ * @param json JSON object representing the transaction.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns a hex string of the encoded transaction.
+ */
+function encodeForSigningCounterparty(
+  json: object,
+  definitions?: XrplDefinitionsBase,
+): string {
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  return bytesToHex(
+    signingData(json as JsonObject, HashPrefix.counterpartyTransactionSig, {
+      definitions,
+    }),
+  )
+}
+
+/**
+ * Encode a transaction for multi-signing by the counterparty (`fixCleanup3_4_0`).
+ *
+ * @param json JSON object representing the transaction.
+ * @param signer string representing the account to sign the transaction with.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns a hex string of the encoded transaction.
+ */
+function encodeForMultisigningCounterparty(
+  json: object,
+  signer: string,
+  definitions?: XrplDefinitionsBase,
+): string {
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  return bytesToHex(
+    multiSigningData(json as JsonObject, signer, {
+      prefix: HashPrefix.counterpartyTransactionMultiSig,
+      definitions,
+    }),
+  )
+}
+
+/**
+ * Encode a transaction for signing by the sponsor.
+ *
+ * Under `fixCleanup3_4_0` a sponsor signature covers a distinct signing prefix
+ * so it cannot be replayed as a first-party signature.
+ *
+ * @param json JSON object representing the transaction.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns a hex string of the encoded transaction.
+ */
+function encodeForSigningSponsor(
+  json: object,
+  definitions?: XrplDefinitionsBase,
+): string {
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  return bytesToHex(
+    signingData(json as JsonObject, HashPrefix.sponsorTransactionSig, {
+      definitions,
+    }),
+  )
+}
+
+/**
+ * Encode a transaction for multi-signing by the sponsor (`fixCleanup3_4_0`).
+ *
+ * @param json JSON object representing the transaction.
+ * @param signer string representing the account to sign the transaction with.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
+ * @returns a hex string of the encoded transaction.
+ */
+function encodeForMultisigningSponsor(
+  json: object,
+  signer: string,
+  definitions?: XrplDefinitionsBase,
+): string {
+  if (typeof json !== 'object') {
+    throw new Error()
+  }
+  return bytesToHex(
+    multiSigningData(json as JsonObject, signer, {
+      prefix: HashPrefix.sponsorTransactionMultiSig,
+      definitions,
+    }),
+  )
+}
+
+/**
  * Encode a Batch transaction for signing.
  *
  * @param json JSON object representing the transaction.
@@ -152,6 +248,10 @@ export {
   encodeForSigning,
   encodeForSigningClaim,
   encodeForMultisigning,
+  encodeForSigningCounterparty,
+  encodeForMultisigningCounterparty,
+  encodeForSigningSponsor,
+  encodeForMultisigningSponsor,
   encodeForSigningBatch,
   encodeQuality,
   decodeQuality,

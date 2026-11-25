@@ -161,9 +161,7 @@
       "asset_subclass": "treasury",
       "issuer_name": "Issuer"
     },
-    "validationMessages": [
-      "icon/i: should be a non-empty string."
-    ]
+    "validationMessages": ["icon/i: should be a non-empty string."]
   },
   {
     "testName": "invalid asset_class",
@@ -217,9 +215,7 @@
       "asset_subclass": "stablecoin",
       "uris": []
     },
-    "validationMessages": [
-      "uris/us: should be a non-empty array."
-    ]
+    "validationMessages": ["uris/us: should be a non-empty array."]
   },
   {
     "testName": "additional_info is invalid type - array",
@@ -229,10 +225,7 @@
       "icon": "https://example.com/icon.png",
       "asset_class": "defi",
       "issuer_name": "Issuer",
-      "additional_info": [
-        "not",
-        "valid"
-      ]
+      "additional_info": ["not", "valid"]
     },
     "validationMessages": [
       "additional_info/ai: should be a string or JSON object."
@@ -389,9 +382,7 @@
         "cusip": "912796RX0"
       }
     },
-    "validationMessages": [
-      "uris/us: should be a non-empty array."
-    ]
+    "validationMessages": ["uris/us: should be a non-empty array."]
   },
   {
     "testName": "invalid uri inner structure",
@@ -403,10 +394,7 @@
       "asset_class": "rwa",
       "asset_subclass": "treasury",
       "issuer_name": "Example Yield Co.",
-      "uris": [
-        1,
-        2
-      ],
+      "uris": [1, 2],
       "additional_info": {
         "interest_rate": "5.00%",
         "interest_type": "variable",
@@ -530,9 +518,7 @@
         "cusip": "912796RX0"
       }
     },
-    "validationMessages": [
-      "MPTokenMetadata must be max 1024 bytes."
-    ]
+    "validationMessages": ["MPTokenMetadata must be max 1024 bytes."]
   },
   {
     "testName": "null values",

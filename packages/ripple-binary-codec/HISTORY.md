@@ -2,8 +2,28 @@
 
 ## Unreleased
 
+## 2.11.0 (2026-09-11)
+
+### Added
+* Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
+
 ### Changed
-* Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)). Tracks an unmerged rippled PR; the wire format may still change.
+* Regenerate `definitions.json` from rippled 3.4.0: adds new fields (e.g. `VaultKind`, `SubscriptionDate`, `RedemptionDate`) and **removes Hook/Emit field definitions**, as Hooks is no longer supported. `decode()` of a blob containing a Hook field now throws on the unknown field.
+
+## 2.10.0 (2026-08-20)
+
+### Added
+* New SignedAmount type to support negative values
+* FeeAmountDelta remapped to SignedAmount wire type
+
+## 2.9.0 (2026-08-13)
+
+### Added
+* Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96).
+* Add definitions for Sponsored Fees and Reserves (XLS-68).
+
+### Changed
+* Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
 
 ## 2.8.0 (2026-06-04)
 
