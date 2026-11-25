@@ -44,3 +44,21 @@ repos:
         language: system
         pass_filenames: false
         types_or: [ts, tsx, javascript, jsx]
+
+  # Lock files generated behind a private mirror point at that mirror, which
+  # CI and other contributors cannot reach. Rewrite them to the public
+  # registries.
+  - repo: local
+    hooks:
+      - id: fix-npm-registry-urls
+        name: Replace non-public registry URLs in package-lock.json
+        entry: >-
+          perl -pi -e 's#"resolved": "https?://(?!registry\.npmjs\.org/)[^"]*?/((?:\@[^/"]+/)?[^/"\@]+/-/[^/"]+\.tgz)"#"resolved": "https://registry.npmjs.org/$1"#'
+        language: system
+        files: (^|/)package-lock\.json$
+      - id: fix-pypi-index-urls
+        name: Remove non-public index URLs from pip requirements
+        entry: >-
+          perl -ni -e 'print unless /^--(index-url|extra-index-url|trusted-host)\s+(?!https:\/\/pypi\.org\/)/'
+        language: system
+        files: ^\.github/requirements/.*\.txt$
