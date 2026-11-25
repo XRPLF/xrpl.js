@@ -37,7 +37,7 @@ jobs:
       is_beta: ${{ steps.validate_inputs.outputs.is_beta }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.event.inputs.release_branch_name }}
@@ -184,7 +184,7 @@ jobs:
       release_pr_url: ${{ steps.ensure_pr.outputs.pr_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ needs.get_version.outputs.release_branch }}
@@ -413,7 +413,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -666,7 +666,7 @@ jobs:
           node-version: 24
           registry-url: "https://registry.npmjs.org/"
       - name: Checkout release branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ needs.get_version.outputs.release_branch }}

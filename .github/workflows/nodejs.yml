@@ -51,7 +51,7 @@ jobs:
       is_private: ${{ steps.resolve.outputs.is_private }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
 
@@ -108,7 +108,7 @@ jobs:
         node-version: [24.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
@@ -151,7 +151,7 @@ jobs:
         node-version: [22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
@@ -198,7 +198,7 @@ jobs:
         node-version: [22.x, 24.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
@@ -271,7 +271,7 @@ jobs:
         node-version: [24.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
