@@ -77,3 +77,6 @@ lerna-debug.log
 .claude/skills/batch-deps-upgrade/code-changes.md
 .claude/skills/batch-deps-upgrade/pr-description.md
 .claude/skills/batch-deps-upgrade/close-list.md
+
+# Generated TypeDoc output; deployed to GitHub Pages by generate-documentation.yml
+docs/

@@ -11,9 +11,8 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
-# docs/: generated TypeDoc output; formatted in a separate PR.
-# packages/xrpl/test/vendor/: vendored minified code.
-exclude: ^(docs/|packages/xrpl/test/vendor/)
+# Vendored minified code.
+exclude: ^packages/xrpl/test/vendor/
 
 repos:
   # `pre-commit sample-config` default hooks
