@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload documentation files as artifact
         id: docs-artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/
           retention-days: 10
