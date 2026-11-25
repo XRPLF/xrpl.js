@@ -104,4 +104,47 @@ describe('EscrowCreate', function () {
     escrow.Condition = 'not hex'
     assertInvalid(escrow, 'EscrowCreate: invalid field Condition')
   })
+
+  it.each([
+    { cancelAfter: 100, finishAfter: 200, conditional: false },
+    { cancelAfter: 200, finishAfter: 200, conditional: false },
+    { cancelAfter: 100, finishAfter: 200, conditional: true },
+    { cancelAfter: 200, finishAfter: 200, conditional: true },
+  ])(
+    'rejects CancelAfter $cancelAfter <= FinishAfter $finishAfter (conditional=$conditional)',
+    ({ cancelAfter, finishAfter, conditional }) => {
+      escrow.CancelAfter = cancelAfter
+      escrow.FinishAfter = finishAfter
+      if (!conditional) {
+        delete escrow.Condition
+      }
+      assertInvalid(
+        escrow,
+        'EscrowCreate: CancelAfter must be greater than FinishAfter',
+      )
+    },
+  )
+
+  it.each([false, true])(
+    'accepts CancelAfter immediately after FinishAfter (conditional=%s)',
+    (conditional) => {
+      escrow.CancelAfter = 201
+      escrow.FinishAfter = 200
+      if (!conditional) {
+        delete escrow.Condition
+      }
+      assertValid(escrow)
+    },
+  )
+
+  it('accepts a timed escrow without CancelAfter', function () {
+    delete escrow.CancelAfter
+    delete escrow.Condition
+    assertValid(escrow)
+  })
+
+  it('accepts a conditional escrow without FinishAfter', function () {
+    delete escrow.FinishAfter
+    assertValid(escrow)
+  })
 })
