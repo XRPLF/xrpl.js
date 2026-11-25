@@ -13,3 +13,7 @@ docs/
 
 # Vendored minified code
 packages/xrpl/test/vendor/
+
+# Captured rippled ledger responses, kept as one line
+**/ledgerFull*.json
+**/ledger-full-*.json
