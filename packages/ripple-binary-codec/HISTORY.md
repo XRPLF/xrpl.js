@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Fixed
+* `Amount` now throws for MPT values above `2^63 - 1` instead of encoding a truncated value (#3368).
+
 ## 2.11.0 (2026-09-11)
 
 ### Added
