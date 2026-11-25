@@ -185,7 +185,7 @@ You can see the complete reference documentation at [`xrpl.js` docs](https://js.
 npm run docgen
 ```
 
-This updates `docs/` at the top level, where GitHub Pages looks for the docs.
+This writes the docs to `docs/` at the top level. `docs/` is not committed: the `generate-documentation.yml` workflow builds the docs and deploys them to GitHub Pages.
 
 ## Updating `definitions.json`
 
