@@ -94,16 +94,20 @@ export function writeInt64BE(
  * @param offset Number of bytes to skip before starting to read. Must satisfy 0 <= offset <= buf.length - 2
  */
 export function readUInt16BE(array: Uint8Array, offset: number): string {
-  return new DataView(array.buffer).getUint16(offset, false).toString(10)
+  return new DataView(array.buffer, array.byteOffset, array.byteLength)
+    .getUint16(offset, false)
+    .toString(10)
 }
 
 /**
- * Reads an unsigned, big-endian 16-bit integer from the array at the specified offset.
+ * Reads an unsigned, big-endian 32-bit integer from the array at the specified offset.
  * @param array Uint8Array to read
  * @param offset Number of bytes to skip before starting to read. Must satisfy 0 <= offset <= buf.length - 4
  */
 export function readUInt32BE(array: Uint8Array, offset: number): string {
-  return new DataView(array.buffer).getUint32(offset, false).toString(10)
+  return new DataView(array.buffer, array.byteOffset, array.byteLength)
+    .getUint32(offset, false)
+    .toString(10)
 }
 
 /**
