@@ -2,8 +2,14 @@ import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
 import {
+  Batch,
+  BatchFlags,
+  GlobalFlags,
+  LoanSet,
+  LoanSetFlags,
   NFTokenMint,
   Payment,
+  PaymentFlags,
   Transaction,
   walletFromSecretNumbers,
 } from '../../src'
@@ -935,6 +941,90 @@ describe('Wallet', function () {
         `Flags = ${JSON.stringify(decoded.Flags)}, should be undefined`,
       )
       assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds when given flags as an object', async function () {
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '20000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfPartialPayment: true },
+      }
+      const loanSet: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        LoanBrokerID:
+          '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+        PrincipalRequested: '5000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfLoanOverpayment: true },
+      }
+
+      assert.strictEqual(
+        decode(wallet.sign(payment).tx_blob).Flags,
+        PaymentFlags.tfPartialPayment,
+      )
+      assert.strictEqual(
+        decode(wallet.sign(loanSet).tx_blob).Flags,
+        LoanSetFlags.tfLoanOverpayment,
+      )
+      assert.deepEqual(
+        wallet.sign(payment),
+        wallet.sign({ ...payment, Flags: PaymentFlags.tfPartialPayment }),
+      )
+    })
+
+    it('sign succeeds when Batch inner transactions have flags as an object', async function () {
+      const inner = (
+        Sequence: number,
+        Flags: Payment['Flags'],
+      ): { RawTransaction: Payment } => ({
+        RawTransaction: {
+          TransactionType: 'Payment',
+          Account: wallet.classicAddress,
+          Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+          Amount: '1000',
+          Fee: '0',
+          SigningPubKey: '',
+          Sequence,
+          Flags,
+        },
+      })
+      const batch: Batch = {
+        TransactionType: 'Batch',
+        Account: wallet.classicAddress,
+        Fee: '40',
+        Sequence: 1,
+        Flags: BatchFlags.tfAllOrNothing,
+        RawTransactions: [
+          inner(2, { tfInnerBatchTxn: true, tfPartialPayment: true }),
+          inner(3, { tfInnerBatchTxn: true }),
+        ],
+      }
+      const numericFlags = [
+        // eslint-disable-next-line no-bitwise -- combine flags
+        GlobalFlags.tfInnerBatchTxn | PaymentFlags.tfPartialPayment,
+        GlobalFlags.tfInnerBatchTxn,
+      ]
+
+      assert.deepEqual(
+        wallet.sign(batch),
+        wallet.sign({
+          ...batch,
+          RawTransactions: [
+            inner(2, numericFlags[0]),
+            inner(3, numericFlags[1]),
+          ],
+        }),
+      )
+      // The caller's transaction is left as given
+      assert.deepEqual(batch.RawTransactions[1].RawTransaction.Flags, {
+        tfInnerBatchTxn: true,
+      })
     })
 
     it('sign succeeds with source.amount/destination.minAmount', async function () {
