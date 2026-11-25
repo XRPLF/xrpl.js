@@ -19,6 +19,8 @@ import { sign } from 'ripple-keypairs'
 
 import { ValidationError } from '../errors'
 import { Transaction } from '../models'
+import { areAddressesEqual } from '../models/transactions/common'
+import { convertTxFlagsToNumber } from '../models/utils/flags'
 
 /**
  * If presented in binary form, the Signers array must be sorted based on
@@ -47,6 +49,57 @@ export function compareSigners<T extends { Account: string }>(
     )
   }
   return result
+}
+
+/**
+ * Checks that a single-signing wallet is authorized to sign the given
+ * transaction: the wallet's address must match the transaction's `Delegate`
+ * (if present) or its `Account` otherwise. Multisigning carries its signer's
+ * address explicitly in `Signers[].Account`, so it isn't checked here.
+ *
+ * @param tx - The transaction being signed.
+ * @param classicAddress - The signing wallet's classic address.
+ * @throws ValidationError if the wallet isn't the required signer.
+ */
+export function assertSingleSignerMatchesTransaction(
+  tx: Transaction,
+  classicAddress: string,
+): void {
+  const requiredSigner = tx.Delegate ?? tx.Account
+  if (!areAddressesEqual(requiredSigner, classicAddress)) {
+    throw new ValidationError(
+      'The wallet used to sign a transaction must match its Account (or its Delegate, if present)',
+    )
+  }
+}
+
+/**
+ * Returns a copy of a transaction with any object-form `Flags` (e.g.
+ * `{ tfPartialPayment: true }`), including those of a `Batch`'s inner
+ * transactions, encoded as a number.
+ *
+ * @param tx - The transaction to normalize.
+ * @returns A copy of `tx` with numeric `Flags`.
+ */
+export function withNumericFlags(tx: Transaction): Transaction {
+  const normalized = { ...tx }
+  if (typeof normalized.Flags === 'object') {
+    normalized.Flags = convertTxFlagsToNumber(tx)
+  }
+  if (normalized.TransactionType === 'Batch') {
+    normalized.RawTransactions = normalized.RawTransactions.map(
+      ({ RawTransaction }) => ({
+        RawTransaction:
+          typeof RawTransaction.Flags === 'object'
+            ? {
+                ...RawTransaction,
+                Flags: convertTxFlagsToNumber(RawTransaction),
+              }
+            : RawTransaction,
+      }),
+    )
+  }
+  return normalized
 }
 
 export const NUM_BITS_IN_HEX = 16

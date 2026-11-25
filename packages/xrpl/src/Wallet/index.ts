@@ -10,16 +10,20 @@ import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 import ECDSA from '../ECDSA'
 import { ValidationError } from '../errors'
 import { Transaction, validate } from '../models/transactions'
-import { areAddressesEqual, GlobalFlags } from '../models/transactions/common'
+import { GlobalFlags } from '../models/transactions/common'
 import { hasFlag } from '../models/utils'
-import { convertTxFlagsToNumber } from '../models/utils/flags'
 import { ensureClassicAddress } from '../sugar/utils'
 import { omitBy } from '../utils/collections'
 import { hashSignedTx } from '../utils/hashes/hashLedger'
 
 import { rfc1751MnemonicToKey } from './rfc1751'
 import { verifySignature } from './signer'
-import { computeSignature, validateEntropy } from './utils'
+import {
+  assertSingleSignerMatchesTransaction,
+  computeSignature,
+  validateEntropy,
+  withNumericFlags,
+} from './utils'
 
 const DEFAULT_ALGORITHM: ECDSA = ECDSA.ed25519
 const DEFAULT_DERIVATION_PATH = "m/44'/144'/0'/0/0"
@@ -415,33 +419,10 @@ export class Wallet {
     if (!multisignAddress) {
       // A delegated transaction is authorized by the delegate, not the
       // account holder, so the delegate is the required signer when present.
-      const requiredSigner = tx.Delegate ?? tx.Account
-      if (!areAddressesEqual(requiredSigner, this.classicAddress)) {
-        throw new ValidationError(
-          'The wallet used to sign a transaction must match its Account (or its Delegate, if present)',
-        )
-      }
+      assertSingleSignerMatchesTransaction(tx, this.classicAddress)
     }
 
-    const txToSignAndEncode = { ...tx }
-    // Flags given as an object (e.g. { tfPartialPayment: true }) must be encoded as a number
-    if (typeof txToSignAndEncode.Flags === 'object') {
-      txToSignAndEncode.Flags = convertTxFlagsToNumber(tx)
-    }
-    // Same for a Batch's inner transactions, copied so the caller's object is unchanged
-    if (txToSignAndEncode.TransactionType === 'Batch') {
-      txToSignAndEncode.RawTransactions = txToSignAndEncode.RawTransactions.map(
-        ({ RawTransaction }) => ({
-          RawTransaction:
-            typeof RawTransaction.Flags === 'object'
-              ? {
-                  ...RawTransaction,
-                  Flags: convertTxFlagsToNumber(RawTransaction),
-                }
-              : RawTransaction,
-        }),
-      )
-    }
+    const txToSignAndEncode = withNumericFlags(tx)
 
     if (multisignAddress) {
       txToSignAndEncode.SigningPubKey = ''
