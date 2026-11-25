@@ -14,7 +14,7 @@ import {
 } from './common'
 
 const PRICE_DATA_SERIES_MAX_LENGTH = 10
-const SCALE_MAX = 10
+const SCALE_MAX = 20
 const MINIMUM_ASSET_PRICE_LENGTH = 1
 const MAXIMUM_ASSET_PRICE_LENGTH = 16
 
@@ -176,7 +176,11 @@ export function validateOracleSet(tx: Record<string, unknown>): void {
         }
 
         if ('Scale' in priceDataInner) {
-          if (!isNumber(priceDataInner.Scale)) {
+          // The binary codec stores Scale as a UInt8, so it must be an integer.
+          if (
+            !isNumber(priceDataInner.Scale) ||
+            !Number.isInteger(priceDataInner.Scale)
+          ) {
             throw new ValidationError('OracleSet: invalid field Scale')
           }
 
