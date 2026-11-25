@@ -20,13 +20,13 @@ jobs:
         node-version: [22.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ env.GIT_REF }}
           fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -35,7 +35,7 @@ jobs:
           npm i -g npm@10 --registry=https://registry.npmjs.org
       - name: Cache node modules
         id: cache-nodemodules
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         env:
           cache-name: cache-node-modules
         with:
@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload documentation files as artifact
         id: docs-artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs/
           retention-days: 10
@@ -74,4 +74,4 @@ jobs:
     steps:
       - name: Deploy to Documentation to GitHub Pages
         id: docs-artifact
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
