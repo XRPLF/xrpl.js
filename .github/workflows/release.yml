@@ -672,7 +672,7 @@ jobs:
           ref: ${{ needs.get_version.outputs.release_branch }}
 
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: npm-package-tarball
           path: dist
