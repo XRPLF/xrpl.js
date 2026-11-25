@@ -946,7 +946,7 @@ describe('Wallet', function () {
     it('sign succeeds when given flags as an object', async function () {
       const payment: Payment = {
         TransactionType: 'Payment',
-        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Account: wallet.address,
         Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
         Amount: '20000000',
         Sequence: 1,
@@ -955,7 +955,7 @@ describe('Wallet', function () {
       }
       const loanSet: LoanSet = {
         TransactionType: 'LoanSet',
-        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Account: wallet.address,
         LoanBrokerID:
           '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
         PrincipalRequested: '5000000',
