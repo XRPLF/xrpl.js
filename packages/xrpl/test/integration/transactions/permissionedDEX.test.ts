@@ -1,31 +1,16 @@
 import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
-import {
-  PermissionedDomainSet,
-  AuthorizeCredential,
-  Wallet,
-  IssuedCurrencyAmount,
-  AccountSetAsfFlags,
-} from '../../../src'
+import { Wallet, IssuedCurrencyAmount, AccountSetAsfFlags } from '../../../src'
 import Offer from '../../../src/models/ledger/Offer'
 import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
-import {
-  BookOffersRequest,
-  BookOffersResponse,
-} from '../../../src/models/methods/bookOffers'
+import { BookOffersResponse } from '../../../src/models/methods/bookOffers'
 import { SubmitResponse } from '../../../src/models/methods/submit'
-import {
-  SubscribeBook,
-  SubscribeRequest,
-} from '../../../src/models/methods/subscribe'
-import { CredentialAccept } from '../../../src/models/transactions/CredentialAccept'
-import { CredentialCreate } from '../../../src/models/transactions/CredentialCreate'
+import { SubscribeRequest } from '../../../src/models/methods/subscribe'
 import {
   OfferCreate,
   OfferCreateFlags,
 } from '../../../src/models/transactions/offerCreate'
-import { Payment } from '../../../src/models/transactions/payment'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -70,7 +55,7 @@ describe('PermissionedDEX', function () {
         Subject: wallet1.classicAddress,
         Account: testContext.wallet.classicAddress,
         CredentialType: stringToHex('Passport'),
-      } as CredentialCreate,
+      },
       testContext.wallet,
     )
 
@@ -82,7 +67,7 @@ describe('PermissionedDEX', function () {
         Subject: wallet2.classicAddress,
         Account: testContext.wallet.classicAddress,
         CredentialType: stringToHex('Passport'),
-      } as CredentialCreate,
+      },
       testContext.wallet,
     )
 
@@ -98,9 +83,9 @@ describe('PermissionedDEX', function () {
               CredentialType: stringToHex('Passport'),
               Issuer: testContext.wallet.classicAddress,
             },
-          } as AuthorizeCredential,
+          },
         ],
-      } as PermissionedDomainSet,
+      },
       testContext.wallet,
     )
 
@@ -112,7 +97,7 @@ describe('PermissionedDEX', function () {
         Account: wallet1.classicAddress,
         Issuer: testContext.wallet.classicAddress,
         CredentialType: stringToHex('Passport'),
-      } as CredentialAccept,
+      },
       wallet1,
     )
 
@@ -123,7 +108,7 @@ describe('PermissionedDEX', function () {
         Account: wallet2.classicAddress,
         Issuer: testContext.wallet.classicAddress,
         CredentialType: stringToHex('Passport'),
-      } as CredentialAccept,
+      },
       wallet2,
     )
     // fetch the domainID from the of the PermissionedDomain ledger object
@@ -178,7 +163,7 @@ describe('PermissionedDEX', function () {
           value: '10000',
         },
         Destination: wallet1.classicAddress,
-      } as Payment,
+      },
       testContext.wallet,
     )
 
@@ -193,7 +178,7 @@ describe('PermissionedDEX', function () {
           value: '10000',
         },
         Destination: wallet2.classicAddress,
-      } as Payment,
+      },
       testContext.wallet,
     )
 
@@ -211,7 +196,7 @@ describe('PermissionedDEX', function () {
         },
         Flags: OfferCreateFlags.tfHybrid,
         DomainID: permDomainLedgerObject.index,
-      } as OfferCreate,
+      },
       wallet1,
     )
   })
@@ -284,7 +269,7 @@ describe('PermissionedDEX', function () {
             currency: 'XRP',
           },
           domain: permDomainLedgerObject.index,
-        } as BookOffersRequest)
+        })
 
       assert.equal(bookOffersResponse.result.offers.length, 1)
       assert.equal(bookOffersResponse.result.offers[0].TakerGets, '1000')
@@ -321,7 +306,7 @@ describe('PermissionedDEX', function () {
             },
             taker: wallet1.classicAddress,
             domain: permDomainLedgerObject.index,
-          } as SubscribeBook,
+          },
         ],
       }
 

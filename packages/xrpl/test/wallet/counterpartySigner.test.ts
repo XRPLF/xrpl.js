@@ -1,8 +1,14 @@
 // Add one test for single signing and one test for multi-signing
 
 import { assert } from 'chai'
+import {
+  decode,
+  encodeForMultisigningCounterparty,
+  encodeForSigningCounterparty,
+} from 'ripple-binary-codec'
+import { verify } from 'ripple-keypairs'
 
-import { LoanSet, Wallet } from '../../src'
+import { LoanSet, multisign, Wallet } from '../../src'
 import {
   combineLoanSetCounterpartySigners,
   signLoanSetByCounterparty,
@@ -45,7 +51,7 @@ describe('counterpartySigner', function () {
         SigningPubKey:
           'ED1139D765C2C8F175153EE663D2CBE574685D5FCF61A6A33DF7AC72C9903D3F94',
         TxnSignature:
-          '440B839B41834A9292B23A8DB547EA34DC89FC8313056C96812384A860848381C4F11867F1092594D3E263DB2433CEB07E2AD312944FF68F2E2EF995ABAE9C05',
+          '2C0D70281D70E40EAF54C12E21823BE3838426F4EF34E391FA28B2B226669647FFF8D5771D37F43741136555006CCB269CF8ED983748ADB22F09148F02578107',
       },
     }
 
@@ -128,7 +134,7 @@ describe('counterpartySigner', function () {
               SigningPubKey:
                 'EDD184F5FE58EC1375AB1CF17A3C5A12A8DEE89DD5228772D69E28EE37438FE59E',
               TxnSignature:
-                'C3A989FFA24CE21AE9E1734653387B34044A82B13F34B7B1175CB20118F9EF904ABEA691E4D3EFFD1EBF63C3B50F29AA89B68AF4A70CF74601CD326772D1680E',
+                'BDF36CEDBC8151619D8C3A2452D5775B744C0BB04722F757FB88EA744D18A5DED875F72009B92ED5039422FF0FFEC7CF635310910ED1D0623D24CE27AFDB6401',
               Account: 'rBJMcbqnAaxcUeEPF7WiaoHCtFiTmga7un',
             },
           },
@@ -137,7 +143,7 @@ describe('counterpartySigner', function () {
               SigningPubKey:
                 'ED121AF03981F6496E47854955F65FC8763232D74EBF73877889514137BB72720A',
               TxnSignature:
-                '3A3D91798FCF56289BBF53A97D0CB07CFB5050CFBA05451A1C9A3A9E370AE81DCC3134E6CC35579ACA8937F15DF358DAB728054AC17C3858177C6947C1E21806',
+                '3743ADC994FDAC886627FE12D3C8D5AA6F300F8903E2148D11A78E752D48C5B4CFF3A106BFE0019B661246BA9E33AFF37E060B4872812F8D79D9871DE4C56C04',
               Account: 'rKQhhSnRXJyqDq5BFtWG2E6zxAdq6wDyQC',
             },
           },
@@ -167,5 +173,118 @@ describe('counterpartySigner', function () {
     ])
 
     assert.deepEqual(combinedSignedTx, expectedLoanSet as LoanSet)
+  })
+
+  describe('with a multisigned Account', function () {
+    const accountSigner1 = Wallet.fromSeed('sEdT2fq1MdpXJdosNRZ1tuHk4qU3V2m')
+    const accountSigner2 = Wallet.fromSeed('sEdVYtgZDoV2YX48M2tUf8WHknNmuYK')
+    const borrowerWallet = Wallet.fromSeed('sEd7FqVHfNZ2UdGAwjssxPev2ujwJoT')
+    const borrowerSigner1 = Wallet.fromSeed('sEdSyBUScyy9msTU36wdR68XkskQky5')
+    const borrowerSigner2 = Wallet.fromSeed('sEdT8LubWzQv3VAx1JQqctv78N28zLA')
+
+    const unsignedLoanSet: LoanSet = {
+      TransactionType: 'LoanSet',
+      Flags: 0,
+      Sequence: 1702,
+      LastLedgerSequence: 1725,
+      PaymentTotal: 1,
+      LoanBrokerID:
+        '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+      Fee: '480',
+      Account: 'rpfK3KEEBwXjUXKQnvAs1SbQhVKu7CSkY1',
+      Counterparty: borrowerWallet.address,
+      PrincipalRequested: '5000000',
+    }
+    const multisignedLoanSet = multisign([
+      accountSigner1.sign(unsignedLoanSet, true).tx_blob,
+      accountSigner2.sign(unsignedLoanSet, true).tx_blob,
+    ])
+    const accountSigners = (decode(multisignedLoanSet) as unknown as LoanSet)
+      .Signers
+
+    it('single sign', function () {
+      const { tx } = signLoanSetByCounterparty(
+        borrowerWallet,
+        multisignedLoanSet,
+      )
+
+      assert.equal(tx.SigningPubKey, '')
+      assert.deepEqual(tx.Signers, accountSigners)
+      assert.equal(
+        tx.CounterpartySignature?.SigningPubKey,
+        borrowerWallet.publicKey,
+      )
+      assert.isTrue(
+        verify(
+          encodeForSigningCounterparty(tx),
+          tx.CounterpartySignature?.TxnSignature ?? '',
+          borrowerWallet.publicKey,
+        ),
+      )
+    })
+
+    it('multi sign', function () {
+      const { tx: signer1SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+      const { tx: signer2SignedTx } = signLoanSetByCounterparty(
+        borrowerSigner2,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+
+      const { tx } = combineLoanSetCounterpartySigners([
+        signer1SignedTx,
+        signer2SignedTx,
+      ])
+
+      assert.equal(tx.SigningPubKey, '')
+      assert.deepEqual(tx.Signers, accountSigners)
+      const counterpartySigners = tx.CounterpartySignature?.Signers ?? []
+      assert.lengthOf(counterpartySigners, 2)
+      counterpartySigners.forEach(({ Signer: signer }) => {
+        assert.isTrue(
+          verify(
+            encodeForMultisigningCounterparty(tx, signer.Account),
+            signer.TxnSignature,
+            signer.SigningPubKey,
+          ),
+        )
+      })
+    })
+
+    it('throws if the Account has not signed', function () {
+      assert.throws(() => {
+        signLoanSetByCounterparty(borrowerWallet, {
+          ...unsignedLoanSet,
+          SigningPubKey: '',
+        })
+      }, 'Transaction must be first signed by first party.')
+
+      assert.throws(() => {
+        signLoanSetByCounterparty(borrowerWallet, {
+          ...unsignedLoanSet,
+          SigningPubKey: '',
+          Signers: [],
+        })
+      }, 'Transaction must be first signed by first party.')
+
+      const { tx: counterpartySignedTx } = signLoanSetByCounterparty(
+        borrowerSigner1,
+        multisignedLoanSet,
+        { multisign: true },
+      )
+      assert.throws(() => {
+        combineLoanSetCounterpartySigners([
+          {
+            ...counterpartySignedTx,
+            SigningPubKey: undefined,
+            Signers: undefined,
+          },
+        ])
+      }, 'Transaction must be first signed by first party.')
+    })
   })
 })

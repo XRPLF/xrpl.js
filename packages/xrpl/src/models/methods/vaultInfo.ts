@@ -127,7 +127,7 @@ export interface VaultInfoResponse extends BaseResponse {
         /**
          * Identifier for the owner node of the shares.
          */
-        OwnerNode?: string
+        OwnerNode: string
 
         /**
          * The ID of the MPTokenIssuance object. It will always be equal to vault.ShareMPTID.
@@ -142,7 +142,47 @@ export interface VaultInfoResponse extends BaseResponse {
         /**
          * Bit-field flags associated with the shares issuance.
          */
-        Flags?: number
+        Flags: number
+
+        /**
+         * An asset scale is a non-negative integer (0, 1, 2, ...)
+         * such that one MPT unit equals 10^(-scale) of a
+         * corresponding standard unit.
+         */
+        AssetScale?: number
+
+        /**
+         * An unsigned 64-bit number that specifies the maximum
+         * number of MPTs that can be distributed to non-issuing
+         * accounts (i.e., minted).
+         */
+        MaximumAmount?: string
+
+        /**
+         * This value specifies the fee, in tenths of a basis
+         * point, charged by the issuer for secondary sales of the
+         * token. Valid values are between 0 and 50,000 inclusive.
+         */
+        TransferFee?: number
+
+        /**
+         * Arbitrary metadata about this issuance, in hex format.
+         * The limit for this field is 1024 bytes.
+         */
+        MPTokenMetadata?: string
+
+        /**
+         * The total amount of this MPT that is currently locked
+         * across all holders via Escrow or PaymentChannel.
+         */
+        LockedAmount?: string
+
+        /**
+         * Hash256 pointing to the vault pseudo-account's holding for the
+         * underlying asset. Present for IOU and MPT-backed vaults.
+         * Absent for XRP-backed vaults.
+         */
+        ReferenceHolding?: string
       }
 
       /**
@@ -153,17 +193,17 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Identifier for the owner node in the ledger tree.
        */
-      OwnerNode?: string
+      OwnerNode: string
 
       /**
        * Multi-purpose token ID associated with this vault.
        */
-      ShareMPTID?: string
+      ShareMPTID: string
 
       /**
        * Policy defining withdrawal conditions.
        */
-      WithdrawalPolicy?: number
+      WithdrawalPolicy: number
 
       /**
        * The maximum asset amount that can be held in the vault. Zero value indicates there is no cap.
@@ -184,7 +224,7 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Flags
        */
-      Flags?: number
+      Flags: number
     }
 
     /**

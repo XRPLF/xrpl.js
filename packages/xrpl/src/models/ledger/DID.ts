@@ -10,11 +10,11 @@ export default interface DID extends BaseLedgerEntry, HasPreviousTxnID {
 
   Account: string
 
-  Data: string
+  Data?: string
 
-  DIDDocument: string
+  DIDDocument?: string
 
-  URI: string
+  URI?: string
 
   Flags: 0
 

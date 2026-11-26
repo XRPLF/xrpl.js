@@ -1,8 +1,8 @@
 {
-  "TransactionType":"TicketCreate",
-  "TicketCount":1,
-  "Account":"r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA",
-  "Sequence":0,
-  "TicketSequence":23,
-  "Fee":"10000"
+  "TransactionType": "TicketCreate",
+  "TicketCount": 1,
+  "Account": "r4SDqUD1ZcfoZrhnsZ94XNFKxYL4oHYJyA",
+  "Sequence": 0,
+  "TicketSequence": 23,
+  "Fee": "10000"
 }

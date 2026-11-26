@@ -1,12 +1,13 @@
 {
-    "binary": "120066240000000026040B52006840000000000000007300701321EDB6FC8E803EE8EDC2793F1EC917B2EE41D35255618DEB91D3F9B1FC89B75D4539810000101101",
-    "tx": {
-        "UNLModifyDisabling": 1,
-        "LedgerSequence": 67850752,
-        "UNLModifyValidator": "EDB6FC8E803EE8EDC2793F1EC917B2EE41D35255618DEB91D3F9B1FC89B75D4539",
-        "TransactionType": "UNLModify",
-        "Account": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
-        "Sequence": 0,
-        "Fee": "0",
-        "SigningPubKey": ""}
+  "binary": "120066240000000026040B52006840000000000000007300701321EDB6FC8E803EE8EDC2793F1EC917B2EE41D35255618DEB91D3F9B1FC89B75D4539810000101101",
+  "tx": {
+    "UNLModifyDisabling": 1,
+    "LedgerSequence": 67850752,
+    "UNLModifyValidator": "EDB6FC8E803EE8EDC2793F1EC917B2EE41D35255618DEB91D3F9B1FC89B75D4539",
+    "TransactionType": "UNLModify",
+    "Account": "rrrrrrrrrrrrrrrrrrrrrhoLvTp",
+    "Sequence": 0,
+    "Fee": "0",
+    "SigningPubKey": ""
+  }
 }
