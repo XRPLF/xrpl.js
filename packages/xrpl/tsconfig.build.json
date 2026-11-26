@@ -1,12 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
+    "rootDir": "./src"
   },
   "include": ["./src/**/*.ts", "./src/**/*.json"],
   "references": [
     {
       "path": "../isomorphic/tsconfig.build.json"
+    },
+    {
+      "path": "../mpt-crypto/tsconfig.build.json"
     },
     {
       "path": "../ripple-address-codec/tsconfig.build.json"

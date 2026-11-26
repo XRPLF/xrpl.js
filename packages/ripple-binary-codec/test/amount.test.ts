@@ -2,7 +2,7 @@ import { coreTypes } from '../src/types'
 import fixtures from './fixtures/data-driven-tests.json'
 
 import { makeParser } from '../src/binary'
-const { Amount } = coreTypes
+const { Amount, SignedAmount } = coreTypes
 
 function amountErrorTests() {
   fixtures.values_tests
@@ -80,5 +80,100 @@ describe('Amount', function () {
       })
     }
   })
+  it('rejects non-numeric MPT amount values with a validation error', function () {
+    const mpt = {
+      value: 'abc',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    }
+    expect(() => Amount.from(mpt)).toThrow(
+      new Error(mpt.value + ' is an illegal amount'),
+    )
+  })
+
+  it('toJSON() does not mutate internal buffer for native XRP amounts', function () {
+    const amt = Amount.from('1000000')
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for IOU amounts', function () {
+    const amt = Amount.from({
+      value: '1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative IOU amounts', function () {
+    const amt = Amount.from({
+      value: '-1',
+      issuer: '0000000000000000000000000000000000000000',
+      currency: 'USD',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for MPT amounts', function () {
+    const amt = Amount.from({
+      value: '100',
+      mpt_issuance_id: '00002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    })
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
+  it('toJSON() does not mutate internal buffer for negative MPT amounts', function () {
+    const parser = makeParser(
+      '20000000000000006400002403C84A0A28E0190E208E982C352BBD5006600555CF',
+    )
+    const amt = parser.readType(Amount)
+    const serializedHexBeforeJsonCalls = amt.toHex()
+    const firstJsonResult = amt.toJSON()
+    const secondJsonResult = amt.toJSON()
+    expect(secondJsonResult).toEqual(firstJsonResult)
+    expect(amt.toHex()).toEqual(serializedHexBeforeJsonCalls)
+  })
+
   amountErrorTests()
+})
+
+describe('SignedAmount', function () {
+  it('round-trips a negative native XRP amount (e.g. FeeAmountDelta)', function () {
+    expect(SignedAmount.from('-1000000').toJSON()).toEqual('-1000000')
+  })
+
+  it('round-trips a positive native XRP amount', function () {
+    expect(SignedAmount.from('1000000').toJSON()).toEqual('1000000')
+  })
+
+  it('rejects out-of-range negative magnitudes the same as Amount', function () {
+    expect(() => SignedAmount.from('-100000000000000001')).toThrow()
+  })
+
+  it('does not affect the base Amount type, which still rejects negative XRP', function () {
+    expect(() => Amount.from('-1000000')).toThrow()
+  })
+
+  it('rejects a malformed string that BigNumber parses as NaN instead of throwing', function () {
+    expect(() => SignedAmount.from('abc')).toThrow()
+  })
+
+  it('rejects scientific notation that BigNumber accepts but BigInt rejects', function () {
+    expect(() => SignedAmount.from('1e5')).toThrow()
+  })
 })

@@ -50,7 +50,7 @@ describe('Batch', function () {
             Fee: '0',
             Flags: 0x40000000,
             NetworkID: 21336,
-            Sequence: 0,
+            Sequence: 1,
             SigningPubKey: '',
             TransactionType: 'Payment',
           },
@@ -90,7 +90,7 @@ describe('Batch', function () {
             Fee: '0',
             Flags: 0x40000000,
             NetworkID: 21336,
-            Sequence: 0,
+            Sequence: 1,
             SigningPubKey: '',
             TransactionType: 'Payment',
           },
@@ -98,6 +98,11 @@ describe('Batch', function () {
       ],
       TransactionType: 'Batch',
     }
+    assertValid(tx)
+  })
+
+  it('verifies Batch w/ LastLedgerSequence in inner transaction', function () {
+    tx.RawTransactions[0].RawTransaction.LastLedgerSequence = 1000
     assertValid(tx)
   })
 

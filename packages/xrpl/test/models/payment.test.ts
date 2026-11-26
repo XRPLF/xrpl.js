@@ -37,11 +37,53 @@ describe('Payment', function () {
         [{ currency: 'BTC', issuer: 'r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X' }],
       ],
       SendMax: '100000000',
+      DomainID: '5'.repeat(64),
     } as any
   })
 
   it(`verifies valid Payment`, function () {
     assertValid(payment)
+  })
+
+  it(`verifies DeliverMax is valid`, function () {
+    payment.DeliverMax = '1234'
+    assertValid(payment)
+  })
+
+  it(`throws -- invalid DomainID type`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: { sampleDictKey: 1 },
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , exceeds expected length`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: '5'.repeat(65),
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
+  })
+
+  it(`throws -- invalid DomainID , falls short of expected length`, function () {
+    const paymentTx = {
+      TransactionType: 'Payment',
+      Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+      Amount: '1234',
+      Destination: 'rfkE1aSy9G8Upk4JssnwBxhEv5p4mn2KTy',
+      DomainID: '5'.repeat(63),
+    } as any
+
+    assertInvalid(paymentTx, 'PaymentTransaction: invalid field DomainID')
   })
 
   it(`Verifies memos correctly`, function () {
@@ -76,7 +118,7 @@ describe('Payment', function () {
 
   it(`throws when Amount is invalid`, function () {
     payment.Amount = 1234
-    assertInvalid(payment, 'PaymentTransaction: invalid Amount')
+    assertInvalid(payment, 'PaymentTransaction: invalid field Amount')
   })
 
   it(`throws when Destination is missing`, function () {
@@ -111,7 +153,7 @@ describe('Payment', function () {
 
   it(`throws when InvoiceID is not a string`, function () {
     payment.InvoiceID = 19832
-    assertInvalid(payment, 'PaymentTransaction: InvoiceID must be a string')
+    assertInvalid(payment, 'PaymentTransaction: invalid field InvoiceID')
   })
 
   it(`throws when Paths is invalid`, function () {
@@ -121,7 +163,7 @@ describe('Payment', function () {
 
   it(`throws when SendMax is invalid`, function () {
     payment.SendMax = 100000000
-    assertInvalid(payment, 'PaymentTransaction: invalid SendMax')
+    assertInvalid(payment, 'PaymentTransaction: invalid field SendMax')
   })
 
   it(`verifies valid DeliverMin with tfPartialPayment flag set as a number`, function () {
@@ -214,5 +256,10 @@ describe('Payment', function () {
     const errorMessage =
       'Payment: Credentials cannot contain duplicate elements'
     assertInvalid(payment, errorMessage)
+  })
+
+  it(`throws w/ non-hex InvoiceID`, function () {
+    payment.InvoiceID = 'not hex'
+    assertInvalid(payment, 'PaymentTransaction: invalid field InvoiceID')
   })
 })

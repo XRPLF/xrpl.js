@@ -67,10 +67,7 @@ describe('NFTokenMint', function () {
         account: testContext.wallet.address,
       })
 
-      const nftokenID =
-        getNFTokenID(
-          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-        ) ?? 'undefined'
+      const nftokenID = getNFTokenID(txResponse.result.meta) ?? 'undefined'
 
       const accountHasNFT = accountNFTs.result.account_nfts.some(
         (value) => value.NFTokenID === nftokenID,
@@ -103,9 +100,8 @@ describe('NFTokenMint', function () {
         account: testContext.wallet.address,
         ledger_index: 'validated',
       }
-      const accountInfoResponse = await testContext.client.request(
-        accountInfoRequest,
-      )
+      const accountInfoResponse =
+        await testContext.client.request(accountInfoRequest)
       assert.equal(
         accountInfoResponse.result.account_data.FirstNFTokenSequence,
         mintTransactionSeq,
@@ -150,10 +146,7 @@ describe('NFTokenMint', function () {
         'tesSUCCESS',
       )
 
-      const nftokenID =
-        getNFTokenID(
-          txResponse.result.meta as TransactionMetadata<NFTokenMint>,
-        ) ?? 'undefined'
+      const nftokenID = getNFTokenID(txResponse.result.meta) ?? 'undefined'
 
       const nftokenOfferID = (
         txResponse.result.meta as TransactionMetadata<NFTokenMint>

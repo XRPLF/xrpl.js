@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+## 2.11.0 (2026-09-11)
+
+### Added
+* Add `encodeForSigningCounterparty` / `encodeForMultisigningCounterparty` and `encodeForSigningSponsor` / `encodeForMultisigningSponsor` for the role-specific signing prefixes introduced by `fixCleanup3_4_0`.
+
+### Changed
+* Regenerate `definitions.json` from rippled 3.4.0: adds new fields (e.g. `VaultKind`, `SubscriptionDate`, `RedemptionDate`) and **removes Hook/Emit field definitions**, as Hooks is no longer supported. `decode()` of a blob containing a Hook field now throws on the unknown field.
+
+## 2.10.0 (2026-08-20)
+
+### Added
+* New SignedAmount type to support negative values
+* FeeAmountDelta remapped to SignedAmount wire type
+
+## 2.9.0 (2026-08-13)
+
+### Added
+* Add definitions for Confidential Transfers for Multi-Purpose Tokens (XLS-96).
+* Add definitions for Sponsored Fees and Reserves (XLS-68).
+
+### Changed
+* Add XLS-56 Batch V1_1 support to `signingBatchData` / `encodeForSigningBatch` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
+
+## 2.8.0 (2026-06-04)
+
+### Fixed
+* Fix: Include the last byte in the comparison operator of `Hash[128|256]` types.
+* Fix: Validate the input of non-numeric values for `Amount` field.
+* Fix: Add validation checks for negative inputs to `read`, `peek` and `skip` methods in the binary-codec.
+* Fix: `Amount.toJSON()` no longer mutates the internal buffer for native XRP amounts; subsequent calls and re-serializations now return consistent values (#3319).
+
+## 2.7.0 (2026-02-12)
+
+### Added
+* Add `Int32` serialized type.
+
+### Fixed
+* Fix STNumber serialization logic to work with large mantissa scale [10^18, 10^19-1].
+* Error if a decimal is passed into a `UInt`-typed field.
+
+## 2.6.0 (2025-12-16)
+
+### Added
+* Allow `encodeForMultisigning` to work with transactions that have non-empty `SigningPubKey`. Required to encode `LoanSet` transaction by counterparty signers for signing.
+
+## 2.5.1 (2025-10-29)
+
+### Fixed
+* Fix serialization/deserialization issues in `Issue` serialized type for MPTIssue.
+
+## 2.5.0 (2025-07-29)
+
 ### Added
 * Support for `Single Asset Vault` (XLS-65)
 * Adds new `STNumber` serialization type.

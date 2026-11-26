@@ -5,11 +5,13 @@ import { assert } from 'chai'
 import { HttpsProxyAgent } from 'https-proxy-agent'
 
 import {
+  AccountInfoRequest,
   Client,
   ConnectionError,
   DisconnectedError,
   NotConnectedError,
   ResponseFormatError,
+  RippledError,
   XrplError,
   TimeoutError,
   SubscribeRequest,
@@ -81,10 +83,13 @@ async function createServer(): Promise<net.Server> {
 
 describe('Connection', function () {
   let clientContext: XrplTestContext
+  const CONNECTION_TIMEOUT = 1000
 
   beforeEach(async () => {
     // console.log(`before: `, expect.getState().currentTestName)
-    clientContext = await setupClient()
+    clientContext = await setupClient({
+      clientOptions: { connectionTimeout: CONNECTION_TIMEOUT },
+    })
   })
   afterEach(async () => {
     // console.log(`after: `, expect.getState().currentTestName)
@@ -425,7 +430,7 @@ describe('Connection', function () {
       } catch (error) {
         // @ts-expect-error -- Error has a message
         expect(error.message).toEqual(
-          "Error: connect() timed out after 5000 ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.",
+          `Error: connect() timed out after ${CONNECTION_TIMEOUT} ms. If your internet connection is working, the rippled server may be blocked or inaccessible. You can also try setting the 'connectionTimeout' option in the Client constructor.`,
         )
         expect(spy).toHaveBeenCalled()
         // @ts-expect-error -- Promise throws timeout error after test is done
@@ -460,7 +465,7 @@ describe('Connection', function () {
     'reconnect on unexpected close',
     async () => {
       const connectedPromise = new Promise<void>((resolve) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           resolve()
         })
       })
@@ -506,7 +511,7 @@ describe('Connection', function () {
       const num = 3
 
       const connectedPromise = new Promise<void>((resolve, reject) => {
-        clientContext.client.connection.on('connected', () => {
+        clientContext.client.on('connected', () => {
           connectsCount += 1
           if (connectsCount < num) {
             breakConnection()
@@ -636,7 +641,7 @@ describe('Connection', function () {
           reject(new XrplError(`should not throw error, got ${String(error)}`))
         })
 
-        setTimeout(resolve, 5000)
+        setTimeout(resolve, 500)
       })
 
       const disconnectedPromise = new Promise<void>((resolve) => {
@@ -673,6 +678,26 @@ describe('Connection', function () {
   )
 
   it(
+    'should not accumulate connected listeners after multiple reconnects',
+    async () => {
+      // Simulate multiple reconnect events
+      for (let iter = 0; iter < 5; iter++) {
+        clientContext.client.connection.emit('reconnect')
+      }
+
+      // There should be at most 1 'connected' listener on the connection,
+      // not 5 (which would indicate listener accumulation / leak)
+      const count = clientContext.client.connection.listenerCount('connected')
+      assert.strictEqual(
+        count,
+        1,
+        `Expected exactly 1 'connected' listener but found ${count}`,
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'Multiply connect calls',
     async () => {
       await clientContext.client.connect()
@@ -684,7 +709,7 @@ describe('Connection', function () {
   it(
     'Cannot connect because no server',
     async () => {
-      const connection = new Connection(undefined as unknown as string)
+      const connection = new Connection(undefined)
       return connection
         .connect()
         .then(() => {
@@ -831,6 +856,32 @@ describe('Connection', function () {
   )
 
   it(
+    'handles malformed UTF-8 text websocket messages',
+    async () => {
+      clientContext.mockRippled!.addResponse('server_info', (request) => ({
+        payload: Buffer.from([
+          ...Buffer.from(
+            `{"type":"response","status":"success","id":${JSON.stringify(request.id)},"result":{"message":"`,
+          ),
+          0xff,
+          ...Buffer.from('"}}'),
+        ]),
+        binary: false,
+      }))
+
+      const response = await clientContext.client.request({
+        command: 'server_info',
+      })
+
+      assert.strictEqual(
+        (response.result as unknown as { message: string }).message,
+        '�',
+      )
+    },
+    TIMEOUT,
+  )
+
+  it(
     'propagates RippledError data',
     async () => {
       const request: SubscribeRequest = {
@@ -880,6 +931,125 @@ describe('Connection', function () {
     TIMEOUT,
   )
 
+  // Server messages whose `type` collides with a reserved internal event
+  // name (`connected`, `disconnected`, `error`, `reconnect`, `reconnecting`)
+  // must not be forwarded as that internal event. Otherwise a rogue server
+  // could spoof connection state. For `error` specifically, we also verify
+  // the raw spoofed payload object never reaches 'error' listeners — only
+  // the synthesized `('error', 'badMessage', ...)` emission is allowed.
+  it.each(['connected', 'disconnected', 'reconnect', 'reconnecting', 'error'])(
+    'drops server message with reserved internal event type "%s"',
+    async (reservedType) => {
+      const spoofedPayload = { type: reservedType, error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        // For non-'error' reserved events, a direct listener on that event
+        // must never fire from a server message. (We can't attach this for
+        // 'error' because the fix itself emits 'error' to surface badMessage.)
+        if (reservedType !== 'error') {
+          clientContext.client.connection.on(reservedType, () => {
+            reject(
+              new XrplError(
+                `Reserved internal event "${reservedType}" was emitted from a server message`,
+              ),
+            )
+          })
+        }
+
+        clientContext.client.connection.on(
+          'error',
+          (errorCodeOrPayload, errorMessage) => {
+            // The fix's emission: emit('error', 'badMessage', '<msg>', rawJson).
+            if (
+              errorCodeOrPayload === 'badMessage' &&
+              typeof errorMessage === 'string' &&
+              errorMessage.includes(reservedType)
+            ) {
+              resolve()
+              return
+            }
+            // If the raw spoofed payload object reaches 'error' listeners,
+            // the type:"error" spoof bug has regressed.
+            if (
+              errorCodeOrPayload != null &&
+              typeof errorCodeOrPayload === 'object' &&
+              (errorCodeOrPayload as { type?: unknown }).type === reservedType
+            ) {
+              reject(
+                new XrplError(
+                  'Spoofed server payload was forwarded to error listeners',
+                ),
+              )
+              return
+            }
+            // Any other 'error' emission is unexpected — fail fast instead of
+            // waiting for the test to time out.
+            reject(
+              new XrplError(
+                `Unexpected 'error' emission: ${JSON.stringify(errorCodeOrPayload)}`,
+              ),
+            )
+          },
+        )
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
+  // A non-string `type` must never be used as an event name. Arrays are the
+  // dangerous case: `{"type":["error"]}` fails the RESERVED_INTERNAL_EVENTS
+  // Set check (an array is never === a string) but coerces to the string
+  // "error" when passed to `emit`, which would otherwise re-open the spoofing
+  // hole the reserved-event guard closes. All non-string types are dropped and
+  // surfaced as `badMessage`.
+  it.each([
+    ['connected', ['connected']],
+    ['disconnected', ['disconnected']],
+    ['reconnect', [['reconnect']]],
+    ['reconnecting', ['reconnecting']],
+    ['error', ['error']],
+  ])(
+    'drops server message whose non-string type coerces to "%s"',
+    async (coercesTo, spoofedType) => {
+      const spoofedPayload = { type: spoofedType, error: 'spoof' }
+
+      const result = new Promise<void>((resolve, reject) => {
+        // Regression guard: the event the non-string type coerces to must never
+        // receive the raw server payload. Keying off the forwarded payload
+        // object (rather than the event merely firing) lets this same check
+        // cover the `error` case, where the event is also the channel the fix
+        // uses to report `badMessage`.
+        clientContext.client.connection.on(coercesTo, (forwarded) => {
+          if (forwarded != null && typeof forwarded === 'object') {
+            reject(
+              new XrplError(
+                `Non-string server type was forwarded as internal event "${coercesTo}"`,
+              ),
+            )
+          }
+        })
+
+        // Success: the message is dropped and surfaced as a badMessage error.
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(JSON.stringify(spoofedPayload))
+
+      await result
+    },
+    TIMEOUT,
+  )
+
   // it('should clean up websocket connection if error after websocket is opened', async function () {
   //   await clientContext.client.disconnect()
   //   // fail on connection
@@ -915,7 +1085,7 @@ describe('Connection', function () {
         reject(new XrplError('Should not emit error.'))
       })
 
-      setTimeout(resolve, 5000)
+      setTimeout(resolve, 500)
     })
 
     let disconnectedCount = 0
@@ -976,6 +1146,97 @@ describe('Connection', function () {
         XrplError,
         "Response with id 'test' is already pending",
       )
+    },
+    TIMEOUT,
+  )
+
+  it(
+    'Delayed websocket error callback on send',
+    async () => {
+      const traceMessages: string[] = []
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.trace = (
+        id: string,
+        message: string,
+      ): void => {
+        traceMessages.push(`${id}: ${message}`)
+      }
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.ws.send = function (
+        _ignore,
+        sendCallback,
+      ): void {
+        // server_info request will timeout in 0.5s, but we send an error after 1s
+        setTimeout(() => {
+          sendCallback({ message: 'some error' })
+        }, 1000)
+      }
+
+      await clientContext.client.connection
+        .request({ command: 'server_info' }, 500)
+        .then(() => {
+          assert.fail('Should throw TimeoutError')
+        })
+        .catch((error) => {
+          assert(error instanceof TimeoutError)
+          assert.include(error.message, 'Timeout for request')
+        })
+
+      // wait to ensure that XrplError is not thrown after test is done
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1500)
+      })
+
+      assert.includeMembers(traceMessages, [
+        'send: send errored after connection was closed: [XrplError(No existing promise with id 1, ' +
+          '{"type":"reject","error":{"name":"DisconnectedError","data":{"message":"some error"}}})]',
+      ])
+    },
+    TIMEOUT,
+  )
+
+  it('should handle jsonInvalid errors', async function () {
+    const response = {
+      error: 'jsonInvalid',
+      type: 'error',
+      value: '{"command":"submit","tx_json":"badjson"}',
+    }
+    // doesn't matter what the request is, since we're mocking the response
+    const request: AccountInfoRequest = {
+      command: 'account_info',
+      account: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+    }
+    clientContext.mockRippled?.addResponse(request.command, response)
+
+    await assertRejects(
+      clientContext.client.request(request),
+      RippledError,
+      'jsonInvalid',
+    )
+  }, 4000)
+
+  it.each([
+    ['no value', undefined],
+    ['a value with no id', '{"command":"submit"}'],
+    ['a value that is not an object', 'null'],
+  ])(
+    'reports badMessage without throwing for a type error message with %s',
+    async (_desc, value) => {
+      const badMessage = new Promise<void>((resolve) => {
+        clientContext.client.connection.on('error', (errorCode) => {
+          if (errorCode === 'badMessage') {
+            resolve()
+          }
+        })
+      })
+
+      // @ts-expect-error -- Testing private member
+      clientContext.client.connection.onMessage(
+        JSON.stringify({ type: 'error', error: 'jsonInvalid', value }),
+      )
+
+      await badMessage
     },
     TIMEOUT,
   )

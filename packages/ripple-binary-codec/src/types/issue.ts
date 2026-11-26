@@ -1,10 +1,11 @@
-import { concat } from '@xrplf/isomorphic/utils'
+import { bytesToHex, concat } from '@xrplf/isomorphic/utils'
 import { BinaryParser } from '../serdes/binary-parser'
 
 import { AccountID } from './account-id'
 import { Currency } from './currency'
 import { JsonObject, SerializedType } from './serialized-type'
 import { Hash192 } from './hash-192'
+import { readUInt32BE, writeUInt32BE } from '../utils'
 
 interface XRPIssue extends JsonObject {
   currency: string
@@ -35,21 +36,23 @@ function isIssueObject(arg): arg is IssueObject {
   return isXRP || isIOU || isMPT
 }
 
+const MPT_WIDTH = 44
+const NO_ACCOUNT = AccountID.from('0000000000000000000000000000000000000001')
+
 /**
- * Class for serializing/Deserializing Amounts
+ * Class for serializing/Deserializing Issue
  */
 class Issue extends SerializedType {
-  static readonly ZERO_ISSUED_CURRENCY: Issue = new Issue(new Uint8Array(20))
+  static readonly XRP_ISSUE: Issue = new Issue(new Uint8Array(20))
 
   constructor(bytes: Uint8Array) {
-    super(bytes ?? Issue.ZERO_ISSUED_CURRENCY.bytes)
+    super(bytes ?? Issue.XRP_ISSUE.bytes)
   }
 
   /**
-   * Construct an amount from an IOU or string amount
+   * Construct Issue from XRPIssue, IOUIssue or MPTIssue
    *
-   * @param value An Amount, object representing an IOU, MPTAmount, or a string
-   *     representing an integer amount
+   * @param value An object representing an XRPIssue, IOUIssue or MPTIssue
    * @returns An Issue object
    */
   static from<T extends Issue | IssueObject>(value: T): Issue {
@@ -76,45 +79,69 @@ class Issue extends SerializedType {
         const mptIssuanceIdBytes = Hash192.from(
           value.mpt_issuance_id.toString(),
         ).toBytes()
-        return new Issue(mptIssuanceIdBytes)
+        const issuerAccount = mptIssuanceIdBytes.slice(4)
+        const sequence = Number(readUInt32BE(mptIssuanceIdBytes.slice(0, 4), 0)) // sequence is in Big-endian format in mpt_issuance_id
+
+        // Convert to Little-endian
+        const sequenceBuffer = new Uint8Array(4)
+        new DataView(sequenceBuffer.buffer).setUint32(0, sequence, true)
+
+        return new Issue(
+          concat([issuerAccount, NO_ACCOUNT.toBytes(), sequenceBuffer]),
+        )
       }
     }
 
-    throw new Error('Invalid type to construct an Amount')
+    throw new Error('Invalid type to construct an Issue')
   }
 
   /**
-   * Read an amount from a BinaryParser
+   * Read Issue from a BinaryParser
    *
-   * @param parser BinaryParser to read the Amount from
-   * @param hint The number of bytes to consume from the parser.
-   * For an MPT amount, pass 24 (the fixed length for Hash192).
+   * @param parser BinaryParser to read the Issue from
    *
    * @returns An Issue object
    */
-  static fromParser(parser: BinaryParser, hint?: number): Issue {
-    if (hint === Hash192.width) {
-      const mptBytes = parser.read(Hash192.width)
-      return new Issue(mptBytes)
+  static fromParser(parser: BinaryParser): Issue {
+    // XRP
+    const currencyOrAccount = parser.read(20)
+    if (new Currency(currencyOrAccount).toJSON() === 'XRP') {
+      return new Issue(currencyOrAccount)
     }
-    const currency = parser.read(20)
-    if (new Currency(currency).toJSON() === 'XRP') {
-      return new Issue(currency)
+
+    // MPT
+    const issuerAccountId = new AccountID(parser.read(20))
+    if (NO_ACCOUNT.toHex() === issuerAccountId.toHex()) {
+      const sequence = parser.read(4)
+      return new Issue(
+        concat([currencyOrAccount, NO_ACCOUNT.toBytes(), sequence]),
+      )
     }
-    const currencyAndIssuer = [currency, parser.read(20)]
-    return new Issue(concat(currencyAndIssuer))
+
+    // IOU
+    return new Issue(concat([currencyOrAccount, issuerAccountId.toBytes()]))
   }
 
   /**
-   * Get the JSON representation of this Amount
+   * Get the JSON representation of this IssueObject
    *
    * @returns the JSON interpretation of this.bytes
    */
   toJSON(): IssueObject {
-    // If the buffer is exactly 24 bytes, treat it as an MPT amount.
-    if (this.toBytes().length === Hash192.width) {
+    // If the buffer is exactly 44 bytes, treat it as an MPTIssue.
+    if (this.toBytes().length === MPT_WIDTH) {
+      const issuerAccount = this.toBytes().slice(0, 20)
+      const sequence = new DataView(this.toBytes().slice(40).buffer).getUint32(
+        0,
+        true,
+      )
+
+      // sequence part of mpt_issuance_id should be in Big-endian
+      const sequenceBuffer = new Uint8Array(4)
+      writeUInt32BE(sequenceBuffer, sequence, 0)
+
       return {
-        mpt_issuance_id: this.toHex().toUpperCase(),
+        mpt_issuance_id: bytesToHex(concat([sequenceBuffer, issuerAccount])),
       }
     }
 

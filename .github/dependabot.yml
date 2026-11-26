@@ -1,8 +1,36 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "15:00"
-  open-pull-requests-limit: 10
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: quarterly
+      time: "15:00"
+    open-pull-requests-limit: 30
+    groups:
+      # Minor and patch bumps land in a single PR.
+      # Major bumps are left out on purpose so they still arrive one per PR:
+      # a breaking upgrade (e.g. a new ESLint major)
+      # would otherwise fail CI and block every safe bump with it.
+      npm-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+        patterns:
+          - "*"
+      npm-security:
+        applies-to: security-updates
+        update-types:
+          - minor
+          - patch
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: quarterly
+      time: "15:00"
+    open-pull-requests-limit: 30
+    groups:
+      github-actions:
+        patterns:
+          - "*"

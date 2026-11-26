@@ -81,7 +81,7 @@ describe('Utils', () => {
       '024286',
     ]
     const entropy = hexToBytes('76ebb2d06879b45b7568fb9c1ded097c')
-    expect(secretToEntropy(secret)).toEqual(entropy)
+    expect(Array.from(secretToEntropy(secret))).toEqual(Array.from(entropy))
   })
 
   it('parseSecretString with spaces valid', () => {

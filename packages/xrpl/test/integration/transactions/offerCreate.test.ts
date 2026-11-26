@@ -22,12 +22,10 @@ describe('OfferCreate', function () {
 
   beforeAll(async () => {
     testContext = await setupClient(serverUrl)
-    if (!wallet_deep_freeze_trustline) {
-      // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
-      wallet_deep_freeze_trustline = await generateFundedWallet(
-        testContext.client,
-      )
-    }
+    // eslint-disable-next-line require-atomic-updates -- race condition doesn't really matter
+    wallet_deep_freeze_trustline ??= await generateFundedWallet(
+      testContext.client,
+    )
   })
 
   afterAll(async () => teardownClient(testContext))

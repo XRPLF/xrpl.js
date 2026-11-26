@@ -27,8 +27,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface LedgerRequest<Binary extends boolean = false>
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger'
   /**
    * Admin required If true, return full information on the entire ledger.
@@ -180,8 +179,8 @@ export interface LedgerRequestExpandedAccountsAndTransactions<
  *
  * @category Requests
  */
-export interface LedgerRequestExpandedTransactionsBinary
-  extends LedgerRequest<true> {
+// eslint-disable-next-line max-len -- interface name is descriptive
+export interface LedgerRequestExpandedTransactionsBinary extends LedgerRequest<true> {
   expand: true
   transactions: true
   binary: true
@@ -210,14 +209,18 @@ export interface LedgerQueueData {
   max_spend_drops?: string
 }
 
-export interface LedgerBinary
-  extends Omit<Ledger, 'transactions' | 'accountState'> {
+export interface LedgerBinary extends Omit<
+  Ledger,
+  'transactions' | 'accountState'
+> {
   accountState?: string[]
   transactions?: string[]
 }
 
-export interface LedgerBinaryV1
-  extends Omit<LedgerV1, 'transactions' | 'accountState'> {
+export interface LedgerBinaryV1 extends Omit<
+  LedgerV1,
+  'transactions' | 'accountState'
+> {
   accountState?: string[]
   transactions?: string[]
 }

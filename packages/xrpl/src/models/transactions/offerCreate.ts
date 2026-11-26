@@ -1,11 +1,16 @@
 import { ValidationError } from '../../errors'
 import { Amount } from '../common'
+import { hasFlag } from '../utils'
 
 import {
   BaseTransaction,
   GlobalFlagsInterface,
   validateBaseTransaction,
   isAmount,
+  isNumber,
+  validateOptionalField,
+  validateRequiredField,
+  isDomainID,
 } from './common'
 
 /**
@@ -42,6 +47,11 @@ export enum OfferCreateFlags {
    * the TakerPays amount in exchange.
    */
   tfSell = 0x00080000,
+  /**
+   * Indicates the offer is hybrid. (meaning it is part of both a domain and open order book)
+   * This flag cannot be set if the offer doesn't have a DomainID
+   */
+  tfHybrid = 0x00100000,
 }
 
 /**
@@ -83,6 +93,7 @@ export interface OfferCreateFlagsInterface extends GlobalFlagsInterface {
   tfImmediateOrCancel?: boolean
   tfFillOrKill?: boolean
   tfSell?: boolean
+  tfHybrid?: boolean
 }
 
 /**
@@ -106,6 +117,8 @@ export interface OfferCreate extends BaseTransaction {
   TakerGets: Amount
   /** The amount and type of currency being requested by the offer creator. */
   TakerPays: Amount
+  /** The domain that the offer must be a part of. */
+  DomainID?: string
 }
 
 /**
@@ -117,27 +130,22 @@ export interface OfferCreate extends BaseTransaction {
 export function validateOfferCreate(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  if (tx.TakerGets === undefined) {
-    throw new ValidationError('OfferCreate: missing field TakerGets')
-  }
+  validateRequiredField(tx, 'TakerGets', isAmount)
+  validateRequiredField(tx, 'TakerPays', isAmount)
+  validateOptionalField(tx, 'Expiration', isNumber)
+  validateOptionalField(tx, 'OfferSequence', isNumber)
 
-  if (tx.TakerPays === undefined) {
-    throw new ValidationError('OfferCreate: missing field TakerPays')
-  }
+  validateOptionalField(tx, 'DomainID', isDomainID, {
+    txType: 'OfferCreate',
+    paramName: 'DomainID',
+  })
 
-  if (typeof tx.TakerGets !== 'string' && !isAmount(tx.TakerGets)) {
-    throw new ValidationError('OfferCreate: invalid TakerGets')
-  }
-
-  if (typeof tx.TakerPays !== 'string' && !isAmount(tx.TakerPays)) {
-    throw new ValidationError('OfferCreate: invalid TakerPays')
-  }
-
-  if (tx.Expiration !== undefined && typeof tx.Expiration !== 'number') {
-    throw new ValidationError('OfferCreate: invalid Expiration')
-  }
-
-  if (tx.OfferSequence !== undefined && typeof tx.OfferSequence !== 'number') {
-    throw new ValidationError('OfferCreate: invalid OfferSequence')
+  if (
+    tx.DomainID == null &&
+    hasFlag(tx, OfferCreateFlags.tfHybrid, 'tfHybrid')
+  ) {
+    throw new ValidationError(
+      'OfferCreate: tfHybrid flag cannot be set if DomainID is not present',
+    )
   }
 }

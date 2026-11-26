@@ -1,10 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  AccountTxRequest,
-  Payment,
-  type TransactionMetadata,
-} from '../../../src'
+import { AccountTxRequest, Payment } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -63,8 +59,7 @@ describe('account_tx', function () {
       assert.equal(response.type, expected.type)
       assert.equal(response.result.account, expected.result.account)
       assert.equal(
-        (response.result.transactions[0].meta as TransactionMetadata<Payment>)
-          .TransactionResult,
+        response.result.transactions[0].meta.TransactionResult,
         'tesSUCCESS',
       )
       assert.equal(
@@ -155,8 +150,7 @@ describe('account_tx', function () {
       assert.equal(response.type, expected.type)
       assert.equal(response.result.account, expected.result.account)
       assert.equal(
-        (response.result.transactions[0].meta as TransactionMetadata<Payment>)
-          .TransactionResult,
+        response.result.transactions[0].meta.TransactionResult,
         'tesSUCCESS',
       )
       assert.equal(

@@ -93,6 +93,38 @@ export function subscribeDone(client: Client): void {
   client.removeAllListeners()
 }
 
+/**
+ * Checks if a specific amendment is enabled on the server.
+ *
+ * @param client - The XRPL client.
+ * @param amendmentName - The name of the amendment to check (e.g., 'PermissionDelegation').
+ * @returns True if the amendment is enabled, false otherwise.
+ */
+export async function isAmendmentEnabled(
+  client: Client,
+  amendmentName: string,
+): Promise<boolean> {
+  try {
+    const featureResponse = await client.request({
+      command: 'feature',
+    })
+
+    // Search through all features to find the one with the matching name
+    const features = featureResponse.result.features
+    for (const feature of Object.values(features)) {
+      if (feature.name === amendmentName) {
+        return feature.enabled
+      }
+    }
+
+    // Amendment not found
+    return false
+  } catch (error) {
+    // If the feature command fails, assume the amendment is not enabled
+    return false
+  }
+}
+
 export async function submitTransaction({
   client,
   transaction,

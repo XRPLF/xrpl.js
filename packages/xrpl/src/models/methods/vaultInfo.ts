@@ -48,12 +48,12 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Amount of assets currently available for withdrawal.
        */
-      AssetsAvailable: string
+      AssetsAvailable?: string
 
       /**
        * Total amount of assets in the vault.
        */
-      AssetsTotal: string
+      AssetsTotal?: string
 
       /**
        * Ledger entry type, always "Vault".
@@ -127,7 +127,7 @@ export interface VaultInfoResponse extends BaseResponse {
         /**
          * Identifier for the owner node of the shares.
          */
-        OwnerNode?: string
+        OwnerNode: string
 
         /**
          * The ID of the MPTokenIssuance object. It will always be equal to vault.ShareMPTID.
@@ -142,7 +142,47 @@ export interface VaultInfoResponse extends BaseResponse {
         /**
          * Bit-field flags associated with the shares issuance.
          */
-        Flags?: number
+        Flags: number
+
+        /**
+         * An asset scale is a non-negative integer (0, 1, 2, ...)
+         * such that one MPT unit equals 10^(-scale) of a
+         * corresponding standard unit.
+         */
+        AssetScale?: number
+
+        /**
+         * An unsigned 64-bit number that specifies the maximum
+         * number of MPTs that can be distributed to non-issuing
+         * accounts (i.e., minted).
+         */
+        MaximumAmount?: string
+
+        /**
+         * This value specifies the fee, in tenths of a basis
+         * point, charged by the issuer for secondary sales of the
+         * token. Valid values are between 0 and 50,000 inclusive.
+         */
+        TransferFee?: number
+
+        /**
+         * Arbitrary metadata about this issuance, in hex format.
+         * The limit for this field is 1024 bytes.
+         */
+        MPTokenMetadata?: string
+
+        /**
+         * The total amount of this MPT that is currently locked
+         * across all holders via Escrow or PaymentChannel.
+         */
+        LockedAmount?: string
+
+        /**
+         * Hash256 pointing to the vault pseudo-account's holding for the
+         * underlying asset. Present for IOU and MPT-backed vaults.
+         * Absent for XRP-backed vaults.
+         */
+        ReferenceHolding?: string
       }
 
       /**
@@ -153,22 +193,38 @@ export interface VaultInfoResponse extends BaseResponse {
       /**
        * Identifier for the owner node in the ledger tree.
        */
-      OwnerNode?: string
+      OwnerNode: string
 
       /**
        * Multi-purpose token ID associated with this vault.
        */
-      ShareMPTID?: string
+      ShareMPTID: string
 
       /**
        * Policy defining withdrawal conditions.
        */
-      WithdrawalPolicy?: number
+      WithdrawalPolicy: number
+
+      /**
+       * The maximum asset amount that can be held in the vault. Zero value indicates there is no cap.
+       */
+      AssetsMaximum?: string
+
+      /**
+       * Arbitrary metadata about the Vault. Limited to 256 bytes.
+       */
+      Data?: string
+
+      /**
+       * The scaling factor for vault shares. Only applicable for IOU assets.
+       * Valid values are between 0 and 18 inclusive. For XRP and MPT, this is always 0.
+       */
+      Scale?: number
 
       /**
        * Flags
        */
-      Flags?: number
+      Flags: number
     }
 
     /**
@@ -182,6 +238,12 @@ export interface VaultInfoResponse extends BaseResponse {
      * response.
      */
     ledger_index?: number
+
+    /**
+     * The ledger index of the current in-progress ledger, which was used when
+     * retrieving this information. May be omitted.
+     */
+    ledger_current_index?: number
 
     /**
      * If included and set to true, the information in this response comes from

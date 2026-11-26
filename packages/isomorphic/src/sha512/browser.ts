@@ -1,4 +1,4 @@
-import { sha512 as nobleImpl } from '@noble/hashes/sha512'
+import { sha512 as nobleImpl } from '@noble/hashes/sha2.js'
 
 import wrapNoble from '../internal/wrapNoble'
 

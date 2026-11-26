@@ -1,0 +1,63 @@
+# pre-commit is a tool to perform a predefined set of tasks manually and/or
+# automatically before git commits are made.
+#
+# Config reference: https://pre-commit.com/#pre-commit-configyaml---top-level
+#
+# Common tasks
+#
+# - Run on all files:   pre-commit run --all-files
+# - Register git hooks: pre-commit install --hook-type pre-commit
+#
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+# Vendored minified code.
+exclude: ^packages/xrpl/test/vendor/
+
+repos:
+  # `pre-commit sample-config` default hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c # frozen: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  # Autoformat: YAML, JSON, Markdown, etc. (respects .prettierignore)
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: c035d5c3fc2ce295b961030061d09de67d9203dc # frozen: v3.10.1
+    hooks:
+      - id: prettier
+
+  # A local hook, not mirrors-eslint: with ESLint installed in an isolated
+  # pre-commit environment, the type-aware rules cannot resolve the packages'
+  # node_modules and import/no-unused-modules fails to load. ESLint and its
+  # plugins are pinned and hash-checked by package-lock.json, so run
+  # `npm ci` first.
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        description: Run ESLint (with autofix) across all packages
+        entry: npx --no-install lerna run lint --stream -- --fix
+        language: system
+        pass_filenames: false
+        types_or: [ts, tsx, javascript, jsx]
+
+  # Lock files generated behind a private mirror point at that mirror, which
+  # CI and other contributors cannot reach. Rewrite them to the public
+  # registries.
+  - repo: local
+    hooks:
+      - id: fix-npm-registry-urls
+        name: Replace non-public registry URLs in package-lock.json
+        entry: >-
+          perl -pi -e 's#"resolved": "https?://(?!registry\.npmjs\.org/)[^"]*?/((?:\@[^/"]+/)?[^/"\@]+/-/[^/"]+\.tgz)"#"resolved": "https://registry.npmjs.org/$1"#'
+        language: system
+        files: (^|/)package-lock\.json$
+      - id: fix-pypi-index-urls
+        name: Remove non-public index URLs from pip requirements
+        entry: >-
+          perl -ni -e 'print unless /^--(index-url|extra-index-url|trusted-host)\s+(?!https:\/\/pypi\.org\/)/'
+        language: system
+        files: ^\.github/requirements/.*\.txt$

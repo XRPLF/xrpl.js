@@ -7,10 +7,10 @@ import { encode } from 'ripple-binary-codec'
 import {
   EnableAmendment,
   OfferCreate,
+  Payment,
   Transaction,
   ValidationError,
 } from '../../src'
-import { BatchInnerTransaction } from '../../src/models/transactions/batch'
 import {
   hashStateTree,
   hashTxTree,
@@ -21,6 +21,9 @@ import {
   hashAccountRoot,
   hashOfferId,
   hashSignerListId,
+  hashVault,
+  hashLoanBroker,
+  hashLoan,
 } from '../../src/utils/hashes'
 import fixtures from '../fixtures/rippled'
 import { assertResultMatch } from '../testUtils'
@@ -38,7 +41,7 @@ function createLedgerTest(ledgerIndex: number): void {
     `fixtures/rippled/ledgerFull${ledgerIndex}.json`,
   )
 
-  // eslint-disable-next-line node/no-sync -- must be sync version when not in async method
+  // eslint-disable-next-line n/no-sync -- must be sync version when not in async method
   const ledgerRaw = fs.readFileSync(fileLocation, { encoding: 'utf8' })
   const ledgerJSON = JSON.parse(ledgerRaw)
 
@@ -149,6 +152,37 @@ describe('Hashes', function () {
     assert.equal(actualEntryHash, expectedEntryHash)
   })
 
+  it('calcVaultEntryHash', function () {
+    const account = 'rDcMtA1XpH5DGwiaqFif2cYCvgk5vxHraS'
+    const sequence = 18
+    const expectedEntryHash =
+      '9C3208D7F99E5644643542518859401A96C93D80CC5F757AF0DF1781046C0A6A'
+    const actualEntryHash = hashVault(account, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcLoanBrokerHash', function () {
+    const account = 'rNTrjogemt4dZD13PaqphezBWSmiApNH4K'
+    const sequence = 84
+    const expectedEntryHash =
+      'E799B84AC949CE2D8F27435C784F15C72E6A23ACA6841BA6D2F37A1E5DA4110F'
+    const actualEntryHash = hashLoanBroker(account, sequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
+  it('calcLoanHash', function () {
+    const loanBrokerId =
+      'AEB642A65066A6E6F03D312713475D958E0B320B74AD1A76B5B2EABB752E52AA'
+    const loanSequence = 1
+    const expectedEntryHash =
+      'E93874AB62125DF2E86FB6C724B261F8E654E0334715C4D7160C0F148CDC9B47'
+    const actualEntryHash = hashLoan(loanBrokerId, loanSequence)
+
+    assert.equal(actualEntryHash, expectedEntryHash)
+  })
+
   it('Hash a signed transaction correctly', function () {
     const expected_hash =
       '458101D51051230B1D56E9ACAFAA34451BF65FA000F95DF6F0FF5B3A62D83FC2'
@@ -214,7 +248,7 @@ describe('Hashes', function () {
   })
 
   it('hashSignedTx - batch transaction', function () {
-    const transaction: BatchInnerTransaction = {
+    const transaction: Payment = {
       Account: 'rPMh7Pi9ct699iZUTWaytJUoHcJ7cgyziK',
       Amount: '1000000',
       Destination: 'rJCxK2hX9tDMzbnn3cg1GU2g19Kfmhzxkp',

@@ -21,8 +21,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface LedgerDataRequest<Binary extends boolean = false>
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_data'
   /**
    * If set to true, return ledger objects as hashed hex strings instead of
@@ -64,8 +63,9 @@ export type LedgerDataLedgerState<Binary extends boolean = false> = {
  *
  * @category Responses
  */
-export interface LedgerDataResponse<Binary extends boolean = false>
-  extends BaseResponse {
+export interface LedgerDataResponse<
+  Binary extends boolean = false,
+> extends BaseResponse {
   result: {
     /** The ledger index of this ledger version. */
     ledger_index: number

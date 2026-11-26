@@ -16,8 +16,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface NFTHistoryRequest<Binary extends boolean = false>
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'nft_history'
   /**
    * The unique identifier of an NFToken.
@@ -93,21 +92,21 @@ export type NFTHistoryTransaction<
           ledger_hash: string
         }
     : Binary extends true
-    ? {
-        /** Unique hashed String representing the transaction. */
-        tx_blob: string
-        /** Hex string of the transaction metadata. */
-        meta: string
-        /** The ledger index of the ledger version that included this transaction. */
-        ledger_index: number
-        date: number
-      }
-    : {
-        /** JSON object defining the transaction. */
-        tx: Transaction & ResponseOnlyTxInfo
-        /** The transaction metadata in JSON format. */
-        meta: TransactionMetadata
-      })
+      ? {
+          /** Unique hashed String representing the transaction. */
+          tx_blob: string
+          /** Hex string of the transaction metadata. */
+          meta: string
+          /** The ledger index of the ledger version that included this transaction. */
+          ledger_index: number
+          date: number
+        }
+      : {
+          /** JSON object defining the transaction. */
+          tx: Transaction & ResponseOnlyTxInfo
+          /** The transaction metadata in JSON format. */
+          meta: TransactionMetadata
+        })
 
 /**
  * Expected response from an {@link NFTHistoryRequest}.

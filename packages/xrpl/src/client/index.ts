@@ -137,16 +137,16 @@ type RequestNextPageReturnMap<
 > = T extends AccountChannelsRequest
   ? AccountChannelsResponse
   : T extends AccountLinesRequest
-  ? AccountLinesResponse
-  : T extends AccountObjectsRequest
-  ? AccountObjectsResponse
-  : T extends AccountOffersRequest
-  ? AccountOffersResponse
-  : T extends AccountTxRequest<Binary>
-  ? AccountTxResponse<Binary>
-  : T extends LedgerDataRequest<Binary>
-  ? LedgerDataResponse<Binary>
-  : never
+    ? AccountLinesResponse
+    : T extends AccountObjectsRequest
+      ? AccountObjectsResponse
+      : T extends AccountOffersRequest
+        ? AccountOffersResponse
+        : T extends AccountTxRequest<Binary>
+          ? AccountTxResponse<Binary>
+          : T extends LedgerDataRequest<Binary>
+            ? LedgerDataResponse<Binary>
+            : never
 
 /**
  * Get the response key / property name that contains the listed data for a
@@ -258,6 +258,16 @@ class Client extends EventEmitter<EventTypes> {
       )
     }
 
+    if (
+      options.authorization != null &&
+      !server.startsWith('wss://') &&
+      !server.startsWith('wss+unix://')
+    ) {
+      throw new ValidationError(
+        'Authorization Credentials cannot be sent over an unencrypted connection. Use wss:// or wss+unix:// instead.',
+      )
+    }
+
     this.feeCushion = options.feeCushion ?? DEFAULT_FEE_CUSHION
     this.maxFeeXRP = options.maxFeeXRP ?? DEFAULT_MAX_FEE_XRP
 
@@ -268,7 +278,12 @@ class Client extends EventEmitter<EventTypes> {
     })
 
     this.connection.on('reconnect', () => {
-      this.connection.on('connected', () => this.emit('connected'))
+      // Remove any stale 'connected' listeners from previous reconnect attempts
+      // to prevent duplicate event emissions (N+1 listener accumulation)
+      this.connection.removeAllListeners('connected')
+
+      // Use .once() so the listener auto-removes after firing
+      this.connection.once('connected', () => this.emit('connected'))
     })
 
     this.connection.on('disconnected', (code: number) => {
@@ -393,7 +408,7 @@ class Client extends EventEmitter<EventTypes> {
   public async requestNextPage<
     T extends RequestNextPageType<B>,
     U extends RequestNextPageReturnMap<T, B>,
-    B extends T['binary'] extends true ? true : false,
+    B extends (T['binary'] extends true ? true : false),
   >(req: T, resp: U): Promise<RequestNextPageReturnMap<T, B>> {
     if (!resp.result.marker) {
       return Promise.reject(
@@ -485,7 +500,7 @@ class Client extends EventEmitter<EventTypes> {
      * If limit is not provided, fetches all data over multiple requests.
      * NOTE: This may return much more than needed. Set limit when possible.
      */
-    const countTo: number = request.limit == null ? Infinity : request.limit
+    const countTo: number = request.limit ?? Infinity
     let count = 0
     let marker: unknown = request.marker
     const results: U[] = []
@@ -669,12 +684,17 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link SubmittableTransaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
+   * SponsorSignature. Only used for a multisigned sponsor; a single sponsor signature adds no
+   * fee. Mirrors `signersCount`: this cannot be reliably inferred at autofill time (the
+   * SponsorSignature typically doesn't exist yet), so the caller must supply it.
    * @returns The autofilled transaction.
    * @throws ValidationError If Amount and DeliverMax fields are not identical in a Payment Transaction
    */
   public async autofill<T extends SubmittableTransaction>(
     transaction: T,
     signersCount?: number,
+    sponsorSignersCount?: number,
   ): Promise<T> {
     const tx = { ...transaction }
 
@@ -682,14 +702,14 @@ class Client extends EventEmitter<EventTypes> {
     tx.Flags = convertTxFlagsToNumber(tx)
 
     const promises: Array<Promise<void>> = []
-    if (tx.NetworkID == null) {
-      tx.NetworkID = txNeedsNetworkID(this) ? this.networkID : undefined
-    }
+    tx.NetworkID ??= txNeedsNetworkID(this) ? this.networkID : undefined
     if (tx.Sequence == null) {
       promises.push(setNextValidSequenceNumber(this, tx))
     }
     if (tx.Fee == null) {
-      promises.push(getTransactionFee(this, tx, signersCount))
+      promises.push(
+        getTransactionFee(this, tx, signersCount, sponsorSignersCount),
+      )
     }
     if (tx.LastLedgerSequence == null) {
       promises.push(setLatestValidatedLedgerSequence(this, tx))
@@ -893,13 +913,17 @@ class Client extends EventEmitter<EventTypes> {
    * @param transaction - A {@link Transaction} in JSON format
    * @param signersCount - The expected number of signers for this transaction.
    * Only used for multisigned transactions.
+   * @param sponsorSignersCount - The expected number of signers for the sponsor's multisigned
+   * SponsorSignature. Only used for a multisigned sponsor; a single sponsor signature adds no fee.
+   * @returns The prepared transaction with required fields autofilled.
    * @deprecated Use autofill instead, provided for users familiar with v1
    */
   public async prepareTransaction(
     transaction: SubmittableTransaction,
     signersCount?: number,
+    sponsorSignersCount?: number,
   ): ReturnType<Client['autofill']> {
-    return this.autofill(transaction, signersCount)
+    return this.autofill(transaction, signersCount, sponsorSignersCount)
   }
 
   /**
@@ -1160,7 +1184,7 @@ class Client extends EventEmitter<EventTypes> {
    * const newWallet = Wallet.generate()
    * const { balance, wallet  } = await client.fundWallet(newWallet, {
    *       amount: '10',
-   *       faucetHost: 'https://custom-faucet.example.com',
+   *       faucetHost: 'custom-faucet.example.com',
    *       faucetPath: '/accounts'
    *     })
    *     console.log(`Sent 10 XRP to wallet: ${address} from the given faucet. Resulting balance: ${balance} XRP`)
@@ -1170,6 +1194,20 @@ class Client extends EventEmitter<EventTypes> {
    * }
    * ```
    *
+   * Example 3: Fund wallet using a local faucet server
+   *
+   * To interact with a faucet server running on http://, use the faucetProtocol option:
+   *
+   * ```ts
+   * const newWallet = Wallet.generate()
+   * const { balance, wallet  } = await client.fundWallet(newWallet, {
+   *       amount: '10',
+   *       faucetHost: 'localhost:8000',
+   *       faucetPath: '/accounts',
+   *       faucetProtocol: 'http'
+   *     })
+   * ```
+   *
    * @param wallet - An existing XRPL Wallet to fund. If undefined or null, a new Wallet will be created.
    * @param options - See below.
    * @param options.faucetHost - A custom host for a faucet server. On devnet,
@@ -1177,6 +1215,8 @@ class Client extends EventEmitter<EventTypes> {
    * attempt to determine the correct server automatically. In other environments,
    * or if you would like to customize the faucet host in devnet or testnet,
    * you should provide the host using this option.
+   * @param options.faucetProtocol - The protocol to use for the faucet server ('http' or 'https').
+   * Defaults to 'https'. Use 'http' to interact with a local faucet server running on http://.
    * @param options.faucetPath - A custom path for a faucet server. On devnet,
    * testnet, AMM devnet, and HooksV3 testnet, `fundWallet` will
    * attempt to determine the correct path automatically. In other environments,

@@ -17,8 +17,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  * @category Requests
  */
 export interface AccountTxRequest<Binary extends boolean = false>
-  extends BaseRequest,
-    LookupByLedgerRequest {
+  extends BaseRequest, LookupByLedgerRequest {
   command: 'account_tx'
   /** A unique identifier for the account, most commonly the account's address. */
   account: string
@@ -91,20 +90,20 @@ export type AccountTxTransaction<
           close_time_iso: string
         }
     : Binary extends true
-    ? {
-        /** Unique hashed String representing the transaction. */
-        tx_blob: string
-        /** Hex string of the transaction metadata. */
-        meta: string
-        /** The ledger index of the ledger version that included this transaction. */
-        ledger_index: number
-      }
-    : {
-        /** JSON object defining the transaction in rippled API v1. */
-        tx: Transaction & ResponseOnlyTxInfo
-        /** The transaction metadata in JSON format. */
-        meta: TransactionMetadata
-      })
+      ? {
+          /** Unique hashed String representing the transaction. */
+          tx_blob: string
+          /** Hex string of the transaction metadata. */
+          meta: string
+          /** The ledger index of the ledger version that included this transaction. */
+          ledger_index: number
+        }
+      : {
+          /** JSON object defining the transaction in rippled API v1. */
+          tx: Transaction & ResponseOnlyTxInfo
+          /** The transaction metadata in JSON format. */
+          meta: TransactionMetadata
+        })
 
 /**
  * Base interface for account transaction responses.

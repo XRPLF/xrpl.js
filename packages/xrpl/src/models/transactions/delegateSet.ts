@@ -5,11 +5,12 @@ import {
   validateBaseTransaction,
   validateRequiredField,
   isAccount,
+  isArray,
   Account,
 } from './common'
 
 const PERMISSIONS_MAX_LENGTH = 10
-const NON_DELEGATABLE_TRANSACTIONS = new Set([
+const NON_DELEGABLE_TRANSACTIONS = new Set([
   'AccountSet',
   'SetRegularKey',
   'SignerListSet',
@@ -65,7 +66,7 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     )
   }
 
-  validateRequiredField(tx, 'Permissions', Array.isArray)
+  validateRequiredField(tx, 'Permissions', isArray)
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- required for validation
   const permissions = tx.Permissions as DelegateSet['Permissions']
@@ -97,7 +98,7 @@ export function validateDelegateSet(tx: Record<string, unknown>): void {
     if (typeof permissionValue !== 'string') {
       throw new ValidationError('DelegateSet: PermissionValue must be a string')
     }
-    if (NON_DELEGATABLE_TRANSACTIONS.has(permissionValue)) {
+    if (NON_DELEGABLE_TRANSACTIONS.has(permissionValue)) {
       throw new ValidationError(
         `DelegateSet: PermissionValue contains a non-delegatable transaction ${permissionValue}`,
       )

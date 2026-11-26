@@ -19,9 +19,7 @@ import { BaseRequest, BaseResponse, LookupByLedgerRequest } from './baseMethod'
  *
  * @category Requests
  */
-export interface LedgerEntryRequest<Binary extends boolean = false>
-  extends BaseRequest,
-    LookupByLedgerRequest {
+export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
   command: 'ledger_entry'
 
   /**
@@ -66,7 +64,7 @@ export interface LedgerEntryRequest<Binary extends boolean = false>
    * the XRP Ledger's binary format. Otherwise, return data in JSON format. The
    * default is false.
    */
-  binary?: Binary
+  binary?: boolean
 
   /*
    * Only one of the following properties should be defined in a single request
@@ -230,9 +228,31 @@ export interface LedgerEntryRequest<Binary extends boolean = false>
     account: string
     authorize: string
   }
+
+  /**
+   * Retrieve a Sponsorship object from the ledger.
+   * If a string, must be the object ID of the Sponsorship, as hexadecimal.
+   * If an object, requires sponsor and sponsee sub-fields.
+   */
+  sponsorship?:
+    | {
+        /** The account that is the sponsor (Owner of the Sponsorship object). */
+        sponsor: string
+        /** The account that is being sponsored (Sponsee). */
+        sponsee: string
+      }
+    | string
 }
 
-interface LedgerEntryResponseBase {
+export type LedgerEntryBinaryRequest = LedgerEntryRequest & {
+  binary: true
+}
+
+export type LedgerEntryJsonRequest = LedgerEntryRequest & {
+  binary?: false
+}
+
+interface LedgerEntryResponseResultBase {
   /** The unique ID of this ledger object. */
   index: string
   /** The ledger index of the ledger that was used when retrieving this data. */
@@ -245,25 +265,45 @@ interface LedgerEntryResponseBase {
 }
 
 /**
+ * Response expected from a {@link LedgerEntryRequest} with binary: true.
+ *
+ * @category Responses
+ */
+export interface LedgerEntryBinaryResponse extends BaseResponse {
+  result: LedgerEntryResponseResultBase & {
+    /** The binary representation of the ledger object, as hexadecimal. */
+    node_binary: string
+  }
+}
+
+/**
+ * Response expected from a {@link LedgerEntryRequest} with binary: false or omitted.
+ *
+ * @category Responses
+ */
+export interface LedgerEntryJsonResponse<T = LedgerEntry> extends BaseResponse {
+  result: LedgerEntryResponseResultBase & {
+    /**
+     * Object containing the data of this ledger object, according to the
+     * ledger format.
+     */
+    node: T
+  }
+}
+
+/**
  * Response expected from a {@link LedgerEntryRequest}.
  *
  * @category Responses
  */
-export interface LedgerEntryResponse<
-  T = LedgerEntry,
-  Binary extends boolean = false,
-> extends BaseResponse {
-  result: LedgerEntryResponseBase &
-    (Binary extends true
-      ? {
-          /** The binary representation of the ledger object, as hexadecimal. */
-          node_binary: string
-        }
-      : {
-          /**
-           * Object containing the data of this ledger object, according to the
-           * ledger format.
-           */
-          node: T
-        })
+export interface LedgerEntryResponse<T = LedgerEntry> extends BaseResponse {
+  result: LedgerEntryResponseResultBase & {
+    /**
+     * Object containing the data of this ledger object, according to the
+     * ledger format.
+     */
+    node?: T
+    /** The binary representation of the ledger object, as hexadecimal. */
+    node_binary?: string
+  }
 }
