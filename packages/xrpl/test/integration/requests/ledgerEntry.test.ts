@@ -40,7 +40,7 @@ describe('ledger_entry', function () {
         await testContext.client.request(ledgerEntryRequest)
 
       const expectedResponse = {
-        api_version: 2,
+        api_version: 2 as const,
         id: ledgerEntryResponse.id,
         type: 'response',
         result: {

@@ -1,10 +1,6 @@
 import { assert } from 'chai'
 
-import {
-  AccountTxRequest,
-  Payment,
-  type TransactionMetadata,
-} from '../../../src'
+import { AccountTxRequest, Payment } from '../../../src'
 import serverUrl from '../serverUrl'
 import {
   setupClient,
@@ -63,33 +59,29 @@ describe('account_tx', function () {
       assert.equal(response.type, expected.type)
       assert.equal(response.result.account, expected.result.account)
       assert.equal(
-        (response.result.transactions[0].meta as TransactionMetadata<Payment>)
-          .TransactionResult,
+        response.result.transactions[0].meta.TransactionResult,
         'tesSUCCESS',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.LastLedgerSequence,
+        typeof response.result.transactions[0].tx_json.LastLedgerSequence,
         'number',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.Sequence,
+        typeof response.result.transactions[0].tx_json.Sequence,
         'number',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.SigningPubKey,
+        typeof response.result.transactions[0].tx_json.SigningPubKey,
         'string',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.TxnSignature,
+        typeof response.result.transactions[0].tx_json.TxnSignature,
         'string',
       )
-      assert.equal(
-        typeof response.result.transactions[0].tx_json?.Fee,
-        'string',
-      )
+      assert.equal(typeof response.result.transactions[0].tx_json.Fee, 'string')
       assert.equal(typeof response.result.transactions[0].hash, 'string')
       assert.equal(
-        typeof response.result.transactions[0].tx_json?.ledger_index,
+        typeof response.result.transactions[0].tx_json.ledger_index,
         'number',
       )
 
@@ -158,30 +150,26 @@ describe('account_tx', function () {
       assert.equal(response.type, expected.type)
       assert.equal(response.result.account, expected.result.account)
       assert.equal(
-        (response.result.transactions[0].meta as TransactionMetadata<Payment>)
-          .TransactionResult,
+        response.result.transactions[0].meta.TransactionResult,
         'tesSUCCESS',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx?.LastLedgerSequence,
+        typeof response.result.transactions[0].tx.LastLedgerSequence,
         'number',
       )
+      assert.equal(typeof response.result.transactions[0].tx.Sequence, 'number')
       assert.equal(
-        typeof response.result.transactions[0].tx?.Sequence,
-        'number',
-      )
-      assert.equal(
-        typeof response.result.transactions[0].tx?.SigningPubKey,
+        typeof response.result.transactions[0].tx.SigningPubKey,
         'string',
       )
       assert.equal(
-        typeof response.result.transactions[0].tx?.TxnSignature,
+        typeof response.result.transactions[0].tx.TxnSignature,
         'string',
       )
-      assert.equal(typeof response.result.transactions[0].tx?.Fee, 'string')
-      assert.equal(typeof response.result.transactions[0].tx?.hash, 'string')
+      assert.equal(typeof response.result.transactions[0].tx.Fee, 'string')
+      assert.equal(typeof response.result.transactions[0].tx.hash, 'string')
       assert.equal(
-        typeof response.result.transactions[0].tx?.ledger_index,
+        typeof response.result.transactions[0].tx.ledger_index,
         'number',
       )
 
