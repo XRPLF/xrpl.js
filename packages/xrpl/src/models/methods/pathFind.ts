@@ -56,9 +56,7 @@ export interface PathFindStatusRequest extends BasePathFindRequest {
  * @category Requests
  */
 export type PathFindRequest =
-  | PathFindCreateRequest
-  | PathFindCloseRequest
-  | PathFindStatusRequest
+  PathFindCreateRequest | PathFindCloseRequest | PathFindStatusRequest
 
 export interface PathFindPathOption {
   /** Array of arrays of objects defining payment paths. */

@@ -1,0 +1,83 @@
+name: Run pre-commit hooks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run-hooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24.22.3
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.22.3
+
+      - name: Setup npm version 10.9.8
+        run: npm i -g npm@10.9.8 --registry=https://registry.npmjs.org
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-deps-24.22.3-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-24.22.3-
+
+      - name: Install Dependencies
+        if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14.10"
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-
+
+      - name: Install pre-commit
+        run: pip install --require-hashes -r .github/requirements/pre-commit.txt
+
+      - name: Run pre-commit
+        env:
+          MESSAGE: |
+            One or more files did not pass lint/formatting checks.
+
+            To run the checks (and autofix what can be autofixed) locally, run:
+              pre-commit run --all-files
+
+            Then commit and push the changes.
+        run: |
+          set +e
+          pre-commit run --all-files --show-diff-on-failure --color always --verbose
+          rc=$?
+          set -e
+
+          if [ $rc -ne 0 ]; then
+              git status
+              echo "${MESSAGE}"
+              exit 1
+          fi

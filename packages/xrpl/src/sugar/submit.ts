@@ -34,7 +34,8 @@ async function sleep(ms: number): Promise<void> {
  * @param [failHard=false] - Optional. Determines whether the submission should fail hard (true) or not (false). Default is false.
  * @param definitions - Optional. Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A promise that resolves with the response from the client.
- * @throws {ValidationError} If the signed transaction is not valid (not signed).
+ * @throws {ValidationError} If the signed transaction is not valid (not signed, or a LoanSet
+ * missing its CounterpartySignature).
  *
  * @example
  * import { Client } from "xrpl"
@@ -57,6 +58,12 @@ export async function submitRequest(
 ): Promise<SubmitResponse> {
   if (!isSigned(signedTransaction, definitions)) {
     throw new ValidationError('Transaction must be signed.')
+  }
+
+  if (isLoanSetMissingCounterpartySignature(signedTransaction)) {
+    throw new ValidationError(
+      "LoanSet requires the counterparty's signature (CounterpartySignature). Use signLoanSetByCounterparty before submitting.",
+    )
   }
 
   const signedTxEncoded =
@@ -305,4 +312,13 @@ export function getLastLedgerSequence(
 function isAccountDelete(transaction: Transaction | string): boolean {
   const tx = typeof transaction === 'string' ? decode(transaction) : transaction
   return tx.TransactionType === 'AccountDelete'
+}
+
+// checks if the transaction is a LoanSet that rippled would reject with temBAD_SIGNER for
+// lacking the counterparty's signature
+function isLoanSetMissingCounterpartySignature(
+  transaction: Transaction | string,
+): boolean {
+  const tx = typeof transaction === 'string' ? decode(transaction) : transaction
+  return tx.TransactionType === 'LoanSet' && tx.CounterpartySignature == null
 }

@@ -2,9 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "es2017"
-    ],
+    "lib": ["es2017"],
     "outDir": "./dist",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -20,7 +18,5 @@
     }
   ],
   "files": [],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "include": ["src/**/*.ts"]
 }

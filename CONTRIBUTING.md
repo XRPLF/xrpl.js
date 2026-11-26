@@ -2,11 +2,19 @@
 
 ### High Level Process to Contribute Code
 
-- You should open a PR against `main` and ensure that all CI passes.
+- You should open a PR against `main` and ensure that all CI passes. Breaking changes go to a separate branch instead; see [Breaking changes](#breaking-changes).
 - Your changes should have [unit](#unit-tests) and/or [integration tests](#integration-tests).
 - Your changes should [pass the linter](#run-the-linter).
-- You should get a full code review from two of the maintainers.
+- You should get a full code review from one of the maintainers, plus a second one if the PR is labeled `needs-second-reviewer`. The AI reviewer must also pass. See [Code review](#code-review).
 - Then you can merge your changes. (Which will then be included in the next release)
+
+### Breaking changes
+
+Keep `main` releasable as a minor or patch version. Don't merge a breaking change into `main`, in any package.
+
+- Open breaking-change PRs against the next major's branch, for example `xrpl-6.0.0`. Create it from `main` if it doesn't exist yet. One branch can carry majors for several packages.
+- Rebase the branch onto `main` to keep it current.
+- When the major is ready, release any pending fixes from `main` first. Then rebase the major branch onto `main`, merge it, and release the major from `main`. Release each package before the packages that depend on it.
 
 ## Set up your dev environment
 
@@ -67,7 +75,7 @@ npm install
 docker run \
   --detach \
   --publish 6006:6006 \
-  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --volume "$PWD/.ci-config:/etc/xrpld/" \
   --name xrpld-service \
   rippleci/xrpld:develop --standalone
 npm run build
@@ -77,10 +85,14 @@ npm run test:integration
 Breaking down the command:
 * `--detach` runs the container in the background so the terminal stays free.
 * `--publish 6006:6006` exposes the admin WebSocket port on the host.
-* `--volume "$PWD/.ci-config:/etc/opt/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
+* `--volume "$PWD/.ci-config:/etc/xrpld/"` mounts the host directory containing `xrpld.cfg` and `validators.txt` into the container. The host path may be relative, but the container path must be absolute; `$PWD` is used so the command works regardless of where it's run from.
 * `--name xrpld-service` names the container — this is the label shown by `docker ps` / `docker stats`.
 * `rippleci/xrpld:develop` is the image, regularly rebuilt from the `develop` branch of `rippled`. Omitting the tag resolves to `:latest`.
 * `--standalone` is passed to the image's entrypoint (`xrpld`) to start the node in standalone mode.
+
+Maintainers can run integration and browser tests against a private xrpld image by committing a version to `.github/xrpld-image.env`. Set `XRPLD_PRIVATE_VERSION` to the version without the `private-` prefix (for example, `XRPLD_PRIVATE_VERSION=3.3.0-rc2`); every workflow run triggered afterwards — including pull request runs — pulls `registry.gitlab.com/ripple/xrpledger/xrpld_package_deploy/xrpld-private:private-<version>`. Leave the value empty to use the default public image `rippleci/xrpld:develop`.
+
+Private image access requires the repository variable `GITLAB_REGISTRY_USERNAME` and repository secret `GITLAB_REGISTRY_TOKEN`, configured with a GitLab deploy token that has `read_registry` access. These credentials are not exposed to fork pull requests, so a private version must be tested from a branch in this repository; a fork pull request with a private version set will fail fast rather than silently fall back.
 
 Note to Contributors: When you're done, stop and remove the container with `docker stop xrpld-service && docker rm xrpld-service`.
 
@@ -115,7 +127,7 @@ npm run build
 docker run \
   --detach \
   --publish 6006:6006 \
-  --volume "$PWD/.ci-config:/etc/opt/xrpld/" \
+  --volume "$PWD/.ci-config:/etc/xrpld/" \
   --name xrpld-service \
   rippleci/xrpld:develop --standalone
 npm run test:browser
@@ -173,15 +185,14 @@ You can see the complete reference documentation at [`xrpl.js` docs](https://js.
 npm run docgen
 ```
 
-This updates `docs/` at the top level, where GitHub Pages looks for the docs.
+This writes the docs to `docs/` at the top level. `docs/` is not committed: the `generate-documentation.yml` workflow builds the docs and deploys them to GitHub Pages.
 
 ## Updating `definitions.json`
 
-This should almost always be done using [this script](./packages/ripple-binary-codec/tools/generateDefinitions.js) - if the output needs manual intervention afterwards, consider updating the script instead.
+> **Note:** The previous workflow that generated definitions from rippled source files is deprecated. The generation script is being updated to use the `server_definitions` WebSocket command against a running rippled node instead. Until that work is complete, update definitions.json manually:
 
-1. Clone / pull the latest changes from [rippled](https://github.com/XRPLF/rippled) - Specifically the `develop` branch is usually the right one.
-2. Run `node packages/ripple-binary-codec/tools/generateDefinitions.js path/to/rippled` (assuming you're calling this file from the root directory of xrpl.js).
-3. Verify that the changes make sense by inspection before submitting, as there may be updates required for the tool depending on the latest amendments we're updating to match.
+1. Start a rippled node from the develop branch.
+2. Send the `server_definitions` command via WebSocket and copy the response `result` into `packages/ripple-binary-codec/src/enums/definitions.json`.
 
 ## Adding and removing packages
 
@@ -240,9 +251,46 @@ Note: The same updated config can be used to update xrpl-py's CI as well.
 - [ ] Lint the code with `npm lint`
 - [ ] Build your code with `npm build`
 - [ ] Run the unit tests with `npm test`
-- [ ] Get a full code review.
+- [ ] Get a full code review (see [Code review](#code-review)).
 - [ ] Merge your branch into `main` and push to github.
 - [ ] Ensure that all tests passed on the last CI that ran on `main`.
+
+## Code review
+
+A PR can merge into `main` when it has:
+
+- **One approving review** from a maintainer with write access.
+- **All required checks passing**, including:
+  - the unit and integration tests;
+  - `ai-review`, the XRPLF AI Reviewer (see [The AI reviewer](#the-ai-reviewer));
+  - `second-review`, which only matters on PRs labeled `needs-second-reviewer` (see below).
+
+Approving a PR means you reviewed it yourself. The AI reviewer is an extra check, not a replacement for your review.
+
+### When a PR needs a second review
+
+Add the `needs-second-reviewer` label when one reviewer shouldn't be the only line of defense. The first reviewer usually adds it; authors who can add labels should add it themselves. Use it for:
+
+- Binary serialization or encoding: `ripple-binary-codec`, `definitions.json`, `ripple-address-codec`.
+- Keys, signing and cryptography: `ripple-keypairs`, `secret-numbers`, `@xrplf/mpt-crypto`, wallet signing, multisigning and `Batch`.
+- Breaking changes to the public API.
+- Security fixes.
+- Release, publishing or CI changes under `.github/`.
+- Large or cross-cutting changes that the first reviewer can't fully verify alone.
+
+On a labeled PR, the `second-review` check fails until two reviewers with write access have approved. Only each reviewer's latest review counts, and bot approvals never count. The check updates about a minute after each push, label change or review. Don't remove the label to get around the check; if it was added by mistake, ask the maintainer who added it.
+
+### The AI reviewer
+
+The XRPLF AI Reviewer posts the `ai-review` check and inline comments on every PR.
+
+- **When it runs:** automatically on each push to a PR opened from a branch in this repo. On PRs from forks, the check stays pending until a maintainer comments `/ai-review` on the PR.
+- **What fails the check:** an unresolved finding of high or critical severity. Medium and low findings are posted as comments and don't block. Documentation and `*.md` files never block.
+- **Fixing a finding:** push a fix. Each push gets a fresh review, and the check updates when it finishes.
+- **False positives:** reply to the finding with `False positive:` followed by a short reason, for example `False positive: PKG_NAME is validated to [a-z0-9-] above, so it can't contain "/"`. The finding won't be raised again on that PR. If you have write access, the check is recomputed right away, and the bot replies `Dismissed by @you — gate updated`. If you don't, the check stays failed until a maintainer agrees, either by replying `False positive:` on the same finding or with an override.
+- **Overrides:** a maintainer can comment `/ai-review override <reason>` to mark the current commit as passing. Overrides are logged. Use them when a dismissal doesn't apply, and give a real reason.
+- **Only dismiss findings that are actually wrong.** Disagreement replies teach the reviewer what not to flag in this repo, so dismissing a valid finding makes future reviews worse.
+- **If the check stays pending** for more than about 15 minutes on a PR from this repo, the reviewer service may be down. Ask a repository admin.
 
 ## Release
 

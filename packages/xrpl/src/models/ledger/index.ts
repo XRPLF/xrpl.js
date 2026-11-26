@@ -23,15 +23,23 @@ import LedgerHashes from './LedgerHashes'
 import Loan, { LoanFlags } from './Loan'
 import LoanBroker from './LoanBroker'
 import { MPToken } from './MPToken'
-import { MPTokenIssuance } from './MPTokenIssuance'
+import {
+  MPTokenIssuance,
+  MPTokenIssuanceFlags,
+  MPTokenIssuanceFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
+} from './MPTokenIssuance'
 import NegativeUNL, { NEGATIVE_UNL_ID } from './NegativeUNL'
 import { NFTokenOffer } from './NFTokenOffer'
 import { NFToken, NFTokenPage } from './NFTokenPage'
 import Offer, { OfferFlags } from './Offer'
 import Oracle from './Oracle'
 import PayChannel from './PayChannel'
+import PermissionedDomain from './PermissionedDomain'
 import RippleState, { RippleStateFlags } from './RippleState'
 import SignerList, { SignerListFlags } from './SignerList'
+import Sponsorship, { SponsorshipFlags } from './Sponsorship'
 import Ticket from './Ticket'
 import Vault, { VaultFlags } from './Vault'
 import XChainOwnedClaimID from './XChainOwnedClaimID'
@@ -68,6 +76,10 @@ export {
   NEGATIVE_UNL_ID,
   NegativeUNL,
   MPTokenIssuance,
+  MPTokenIssuanceFlags,
+  MPTokenIssuanceFlagsInterface,
+  MPTokenIssuanceImmutableFlags,
+  MPTokenIssuanceImmutableFlagsInterface,
   MPToken,
   NFTokenOffer,
   NFTokenPage,
@@ -76,10 +88,13 @@ export {
   OfferFlags,
   Oracle,
   PayChannel,
+  PermissionedDomain,
   RippleState,
   RippleStateFlags,
   SignerList,
   SignerListFlags,
+  Sponsorship,
+  SponsorshipFlags,
   Ticket,
   Vault,
   VaultFlags,

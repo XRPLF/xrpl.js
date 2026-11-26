@@ -25,6 +25,26 @@ import {
   isIssuedCurrencyAmount,
   validateBaseTransaction,
 } from './common'
+import {
+  ConfidentialMPTClawback,
+  validateConfidentialMPTClawback,
+} from './ConfidentialMPTClawback'
+import {
+  ConfidentialMPTConvert,
+  validateConfidentialMPTConvert,
+} from './ConfidentialMPTConvert'
+import {
+  ConfidentialMPTConvertBack,
+  validateConfidentialMPTConvertBack,
+} from './ConfidentialMPTConvertBack'
+import {
+  ConfidentialMPTMergeInbox,
+  validateConfidentialMPTMergeInbox,
+} from './ConfidentialMPTMergeInbox'
+import {
+  ConfidentialMPTSend,
+  validateConfidentialMPTSend,
+} from './ConfidentialMPTSend'
 import { CredentialAccept, validateCredentialAccept } from './CredentialAccept'
 import { CredentialCreate, validateCredentialCreate } from './CredentialCreate'
 import { CredentialDelete, validateCredentialDelete } from './CredentialDelete'
@@ -111,6 +131,11 @@ import {
 import { SetFee } from './setFee'
 import { SetRegularKey, validateSetRegularKey } from './setRegularKey'
 import { SignerListSet, validateSignerListSet } from './signerListSet'
+import { SponsorshipSet, validateSponsorshipSet } from './sponsorshipSet'
+import {
+  SponsorshipTransfer,
+  validateSponsorshipTransfer,
+} from './sponsorshipTransfer'
 import { TicketCreate, validateTicketCreate } from './ticketCreate'
 import { TrustSet, validateTrustSet } from './trustSet'
 import { UNLModify } from './UNLModify'
@@ -167,6 +192,11 @@ export type SubmittableTransaction =
   | CheckCash
   | CheckCreate
   | Clawback
+  | ConfidentialMPTClawback
+  | ConfidentialMPTConvert
+  | ConfidentialMPTConvertBack
+  | ConfidentialMPTMergeInbox
+  | ConfidentialMPTSend
   | CredentialAccept
   | CredentialCreate
   | CredentialDelete
@@ -208,6 +238,8 @@ export type SubmittableTransaction =
   | PermissionedDomainDelete
   | SetRegularKey
   | SignerListSet
+  | SponsorshipSet
+  | SponsorshipTransfer
   | TicketCreate
   | TrustSet
   | VaultClawback
@@ -353,6 +385,26 @@ export function validate(
 
     case 'Clawback':
       validateClawback(tx)
+      break
+
+    case 'ConfidentialMPTClawback':
+      validateConfidentialMPTClawback(tx)
+      break
+
+    case 'ConfidentialMPTConvert':
+      validateConfidentialMPTConvert(tx)
+      break
+
+    case 'ConfidentialMPTConvertBack':
+      validateConfidentialMPTConvertBack(tx)
+      break
+
+    case 'ConfidentialMPTMergeInbox':
+      validateConfidentialMPTMergeInbox(tx)
+      break
+
+    case 'ConfidentialMPTSend':
+      validateConfidentialMPTSend(tx)
       break
 
     case 'CredentialAccept':
@@ -517,6 +569,14 @@ export function validate(
 
     case 'SignerListSet':
       validateSignerListSet(tx)
+      break
+
+    case 'SponsorshipSet':
+      validateSponsorshipSet(tx)
+      break
+
+    case 'SponsorshipTransfer':
+      validateSponsorshipTransfer(tx)
       break
 
     case 'TicketCreate':
