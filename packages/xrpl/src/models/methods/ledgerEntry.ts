@@ -228,6 +228,20 @@ export interface LedgerEntryRequest extends BaseRequest, LookupByLedgerRequest {
     account: string
     authorize: string
   }
+
+  /**
+   * Retrieve a Sponsorship object from the ledger.
+   * If a string, must be the object ID of the Sponsorship, as hexadecimal.
+   * If an object, requires sponsor and sponsee sub-fields.
+   */
+  sponsorship?:
+    | {
+        /** The account that is the sponsor (Owner of the Sponsorship object). */
+        sponsor: string
+        /** The account that is being sponsored (Sponsee). */
+        sponsee: string
+      }
+    | string
 }
 
 export type LedgerEntryBinaryRequest = LedgerEntryRequest & {

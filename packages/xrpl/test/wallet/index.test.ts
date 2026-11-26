@@ -2,12 +2,19 @@ import { assert } from 'chai'
 import { decode } from 'ripple-binary-codec'
 
 import {
+  Batch,
+  BatchFlags,
+  GlobalFlags,
+  LoanSet,
+  LoanSetFlags,
   NFTokenMint,
   Payment,
+  PaymentFlags,
   Transaction,
   walletFromSecretNumbers,
 } from '../../src'
 import ECDSA from '../../src/ECDSA'
+import { ValidationError } from '../../src/errors'
 import { Wallet } from '../../src/Wallet'
 import requests from '../fixtures/requests'
 import responses from '../fixtures/responses'
@@ -475,6 +482,152 @@ describe('Wallet', function () {
       assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
       assert.equal(wallet.classicAddress, masterAddress)
     })
+
+    it('derives a wallet using a Uint8Array', function () {
+      const wallet = Wallet.fromEntropy(new Uint8Array(16).fill(0))
+
+      assert.equal(wallet.publicKey, entropyPublicKeyED25519)
+      assert.equal(wallet.privateKey, entropyPrivateKeyED25519)
+    })
+
+    // A string is iterable, so Uint8Array.from() used to coerce it: every
+    // letter became NaN and stored as 0, minting a spendable wallet from
+    // mostly-zero entropy with no error at all.
+    it('throws when entropy is a string rather than bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy('abcdefghijklmnop' as unknown as Uint8Array),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy is a 32-character hex string', function () {
+      assert.throws(
+        () =>
+          Wallet.fromEntropy(
+            'a3f5c1d9e8b7460213fdca9876543210' as unknown as Uint8Array,
+          ),
+        ValidationError,
+      )
+    })
+
+    it('does not derive the zero-entropy wallet from a string', function () {
+      const strings = [
+        'abcdefghijklmnop',
+        'zyxwvutsrqponmlk',
+        'pppppppppppppppp',
+      ]
+      for (const input of strings) {
+        assert.throws(
+          () => Wallet.fromEntropy(input as unknown as Uint8Array),
+          ValidationError,
+        )
+      }
+    })
+
+    it('throws when entropy is shorter than 16 bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(new Uint8Array(15).fill(1)),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy is longer than 16 bytes', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(new Uint8Array(32).fill(7)),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy contains non-byte values', function () {
+      const outOfRange = new Array(16).fill(0)
+      outOfRange[0] = 256
+      assert.throws(() => Wallet.fromEntropy(outOfRange), ValidationError)
+
+      const notAnInteger = new Array(16).fill(0)
+      notAnInteger[0] = 1.5
+      assert.throws(() => Wallet.fromEntropy(notAnInteger), ValidationError)
+
+      const nan = new Array(16).fill(0)
+      nan[0] = NaN
+      assert.throws(() => Wallet.fromEntropy(nan), ValidationError)
+    })
+
+    // A sparse array reports a length but holds no values at its positions.
+    // `Array(n).map()` produces one, since map skips holes.
+    it('throws when entropy is a sparse array', function () {
+      assert.throws(() => Wallet.fromEntropy(new Array(16)), ValidationError)
+      assert.throws(
+        () => Wallet.fromEntropy(new Array(16).map(() => 1)),
+        ValidationError,
+      )
+    })
+
+    it('throws when entropy is short but length-padded', function () {
+      const padded = [1, 2, 3]
+      padded.length = 16
+      assert.throws(() => Wallet.fromEntropy(padded), ValidationError)
+    })
+
+    // Malformed input must be rejected outright. Returning any wallet at all,
+    // whatever its address, is a failure.
+    it('rejects every malformed input', function () {
+      const malformed = [
+        'abcdefghijklmnop',
+        new Array(16),
+        new Array(16).map(() => 1),
+        [],
+      ]
+      malformed.forEach((input) => {
+        assert.throws(
+          () => Wallet.fromEntropy(input as unknown as Uint8Array),
+          ValidationError,
+        )
+      })
+    })
+
+    // Entropy is read by index, so an @@iterator on the caller's array cannot
+    // change which bytes are used, and cannot make the read unbounded.
+    it('ignores a caller-supplied @@iterator', function () {
+      const lying = new Array(16).fill(200)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Hostile object under test.
+      ;(lying as any)[Symbol.iterator] = function* fake(): Generator<number> {
+        for (let index = 0; index < 16; index++) {
+          yield 0
+        }
+      }
+      const wallet = Wallet.fromEntropy(lying)
+      assert.equal(
+        wallet.classicAddress,
+        Wallet.fromEntropy(new Array(16).fill(200)).classicAddress,
+      )
+      assert.notEqual(
+        wallet.classicAddress,
+        Wallet.fromEntropy(new Uint8Array(16)).classicAddress,
+      )
+    })
+
+    it('does not hang on a non-terminating @@iterator', function () {
+      const eternal = new Array(15).fill(1)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Hostile object under test.
+      ;(eternal as any)[Symbol.iterator] =
+        function* forever(): Generator<number> {
+          for (;;) {
+            yield 1
+          }
+        }
+      assert.throws(() => Wallet.fromEntropy(eternal), ValidationError)
+    })
+
+    it('throws when entropy is null or undefined', function () {
+      assert.throws(
+        () => Wallet.fromEntropy(null as unknown as Uint8Array),
+        ValidationError,
+      )
+      assert.throws(
+        () => Wallet.fromEntropy(undefined as unknown as Uint8Array),
+        ValidationError,
+      )
+    })
   })
 
   // eslint-disable-next-line max-statements -- Required for test coverage.
@@ -702,6 +855,90 @@ describe('Wallet', function () {
         `Flags = ${JSON.stringify(decoded.Flags)}, should be undefined`,
       )
       assert.deepEqual(result, expectedResult)
+    })
+
+    it('sign succeeds when given flags as an object', async function () {
+      const payment: Payment = {
+        TransactionType: 'Payment',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+        Amount: '20000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfPartialPayment: true },
+      }
+      const loanSet: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: 'r45Rev1EXGxy2hAUmJPCne97KUE7qyrD3j',
+        LoanBrokerID:
+          '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+        PrincipalRequested: '5000000',
+        Sequence: 1,
+        Fee: '12',
+        Flags: { tfLoanOverpayment: true },
+      }
+
+      assert.strictEqual(
+        decode(wallet.sign(payment).tx_blob).Flags,
+        PaymentFlags.tfPartialPayment,
+      )
+      assert.strictEqual(
+        decode(wallet.sign(loanSet).tx_blob).Flags,
+        LoanSetFlags.tfLoanOverpayment,
+      )
+      assert.deepEqual(
+        wallet.sign(payment),
+        wallet.sign({ ...payment, Flags: PaymentFlags.tfPartialPayment }),
+      )
+    })
+
+    it('sign succeeds when Batch inner transactions have flags as an object', async function () {
+      const inner = (
+        Sequence: number,
+        Flags: Payment['Flags'],
+      ): { RawTransaction: Payment } => ({
+        RawTransaction: {
+          TransactionType: 'Payment',
+          Account: wallet.classicAddress,
+          Destination: 'rQ3PTWGLCbPz8ZCicV5tCX3xuymojTng5r',
+          Amount: '1000',
+          Fee: '0',
+          SigningPubKey: '',
+          Sequence,
+          Flags,
+        },
+      })
+      const batch: Batch = {
+        TransactionType: 'Batch',
+        Account: wallet.classicAddress,
+        Fee: '40',
+        Sequence: 1,
+        Flags: BatchFlags.tfAllOrNothing,
+        RawTransactions: [
+          inner(2, { tfInnerBatchTxn: true, tfPartialPayment: true }),
+          inner(3, { tfInnerBatchTxn: true }),
+        ],
+      }
+      const numericFlags = [
+        // eslint-disable-next-line no-bitwise -- combine flags
+        GlobalFlags.tfInnerBatchTxn | PaymentFlags.tfPartialPayment,
+        GlobalFlags.tfInnerBatchTxn,
+      ]
+
+      assert.deepEqual(
+        wallet.sign(batch),
+        wallet.sign({
+          ...batch,
+          RawTransactions: [
+            inner(2, numericFlags[0]),
+            inner(3, numericFlags[1]),
+          ],
+        }),
+      )
+      // The caller's transaction is left as given
+      assert.deepEqual(batch.RawTransactions[1].RawTransaction.Flags, {
+        tfInnerBatchTxn: true,
+      })
     })
 
     it('sign succeeds with source.amount/destination.minAmount', async function () {

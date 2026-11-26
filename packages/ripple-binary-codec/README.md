@@ -37,12 +37,12 @@ Encode a transaction object into a hex-string. Note that encode filters out fiel
   OwnerCount: 0,
   PreviousTxnID: 'DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF',
   Balance: '10000000000',
-  Account: 'rLs1MzkFWCxTbuAHgjeTZK4fcCDDnf2KRv' 
+  Account: 'rLs1MzkFWCxTbuAHgjeTZK4fcCDDnf2KRv'
 })
 '1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337'
 ```
 
-#### X-Address Compatibility 
+#### X-Address Compatibility
   * ripple-binary-codec handles X-addresses by looking for a few specific files (Account/SourceTag, Destination/DestinationTag).
   * If other fields (in the future) must to support X-addresses with tags, this library will need to be updated.
   * When decoding rippled binary, the output will always output classic address + tag, with no X-addresses. X-address support only applies when encoding to binary.
@@ -72,7 +72,7 @@ Encode the transaction object for multi-signing.
 '5D06F4C3362FE1D0'
 ```
 
-### decodeQuality(value: string): string 
+### decodeQuality(value: string): string
 ```js
 > api.decodeQuality('5D06F4C3362FE1D0')
 '195796912.5171664'
