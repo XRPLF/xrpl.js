@@ -503,7 +503,7 @@ class Client extends EventEmitter<EventTypes> {
         marker,
       }
       // eslint-disable-next-line no-await-in-loop -- Necessary for this, it really has to wait
-      const singleResponse = await this.connection.request(repeatProps)
+      const singleResponse = await this.request(repeatProps)
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Should be true
       const singleResult = (singleResponse as MarkerResponse<APIVersion>).result
       if (!(collectKey in singleResult)) {
