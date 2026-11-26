@@ -6,7 +6,7 @@ import {
   isValidXAddress,
   xAddressToClassicAddress,
 } from 'ripple-address-codec'
-import { TRANSACTION_TYPES } from 'ripple-binary-codec'
+import { DEFAULT_DEFINITIONS, XrplDefinitionsBase } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
 import {
@@ -969,11 +969,13 @@ export function validateSponsorFields(tx: Record<string, unknown>): void {
  * any time a transaction will be verified.
  *
  * @param common - An interface w/ common transaction fields.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @throws When the common param is malformed.
  */
 // eslint-disable-next-line max-statements, max-lines-per-function -- lines required for validation
 export function validateBaseTransaction(
   common: unknown,
+  definitions: XrplDefinitionsBase = DEFAULT_DEFINITIONS,
 ): asserts common is BaseTransaction {
   if (!isRecord(common)) {
     throw new ValidationError(
@@ -989,7 +991,7 @@ export function validateBaseTransaction(
     throw new ValidationError('BaseTransaction: TransactionType not string')
   }
 
-  if (!TRANSACTION_TYPES.includes(common.TransactionType)) {
+  if (!definitions.transactionNames.includes(common.TransactionType)) {
     throw new ValidationError(
       `BaseTransaction: Unknown TransactionType ${common.TransactionType}`,
     )

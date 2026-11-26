@@ -4,6 +4,10 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Adds support for Custom Definitions to `client.submit()` and `client.submitAndWait()`
+* Custom definitions support for `util.encode`, `util.decode`, `util.encodeForSigning` and `Wallet.sign`.
+
 ### Changed
 * Some transaction validation error messages changed.
 

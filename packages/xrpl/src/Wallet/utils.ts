@@ -14,6 +14,7 @@ import {
   encodeForSigning,
   encodeForSigningCounterparty,
   encodeForSigningSponsor,
+  XrplDefinitionsBase,
 } from 'ripple-binary-codec'
 import { sign } from 'ripple-keypairs'
 
@@ -66,20 +67,25 @@ export function addressToBigNumber(address: string): BigNumber {
  * Decodes a transaction or transaction blob into a Transaction object.
  *
  * @param txOrBlob - A Transaction object or a hex string representing a transaction blob.
+ * @param definitions - Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @returns A Transaction object.
  * @throws If the input is not a valid Transaction or transaction blob.
  */
 export function getDecodedTransaction(
   txOrBlob: Transaction | string,
+  definitions?: XrplDefinitionsBase,
 ): Transaction {
   if (typeof txOrBlob === 'object') {
     // We need this to handle X-addresses in multisigning
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-    return decode(encode(txOrBlob)) as unknown as Transaction
+    return decode(
+      encode(txOrBlob, definitions),
+      definitions,
+    ) as unknown as Transaction
   }
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- We are casting here to get strong typing
-  return decode(txOrBlob) as unknown as Transaction
+  return decode(txOrBlob, definitions) as unknown as Transaction
 }
 
 /**
@@ -92,21 +98,28 @@ export type SignatureRole = 'transaction' | 'counterparty' | 'sponsor'
 const SIGNING_ENCODERS: Record<
   SignatureRole,
   {
-    single: (tx: Transaction) => string
-    multi: (tx: Transaction, signAs: string) => string
+    single: (tx: Transaction, definitions?: XrplDefinitionsBase) => string
+    multi: (
+      tx: Transaction,
+      signAs: string,
+      definitions?: XrplDefinitionsBase,
+    ) => string
   }
 > = {
   transaction: {
-    single: (tx) => encodeForSigning(tx),
-    multi: (tx, signAs) => encodeForMultisigning(tx, signAs),
+    single: (tx, definitions) => encodeForSigning(tx, definitions),
+    multi: (tx, signAs, definitions) =>
+      encodeForMultisigning(tx, signAs, definitions),
   },
   counterparty: {
-    single: (tx) => encodeForSigningCounterparty(tx),
-    multi: (tx, signAs) => encodeForMultisigningCounterparty(tx, signAs),
+    single: (tx, definitions) => encodeForSigningCounterparty(tx, definitions),
+    multi: (tx, signAs, definitions) =>
+      encodeForMultisigningCounterparty(tx, signAs, definitions),
   },
   sponsor: {
-    single: (tx) => encodeForSigningSponsor(tx),
-    multi: (tx, signAs) => encodeForMultisigningSponsor(tx, signAs),
+    single: (tx, definitions) => encodeForSigningSponsor(tx, definitions),
+    multi: (tx, signAs, definitions) =>
+      encodeForMultisigningSponsor(tx, signAs, definitions),
   },
 }
 
@@ -117,6 +130,7 @@ const SIGNING_ENCODERS: Record<
  * @param privateKey - A key to sign the transaction with.
  * @param signAs - Multisign only. An account address to include in the Signer field.
  * Can be either a classic address or an XAddress.
+ * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
  * @param role - Which signature role to sign for. Defaults to `transaction`.
  * `counterparty` / `sponsor` use their `fixCleanup3_4_0` signing prefixes.
  * @returns A signed transaction in the proper format.
@@ -126,6 +140,7 @@ export function computeSignature(
   tx: Transaction,
   privateKey: string,
   signAs?: string,
+  definitions?: XrplDefinitionsBase,
   role: SignatureRole = 'transaction',
 ): string {
   const encoders = SIGNING_ENCODERS[role]
@@ -134,9 +149,9 @@ export function computeSignature(
       ? xAddressToClassicAddress(signAs).classicAddress
       : signAs
 
-    return sign(encoders.multi(tx, classicAddress), privateKey)
+    return sign(encoders.multi(tx, classicAddress, definitions), privateKey)
   }
-  return sign(encoders.single(tx), privateKey)
+  return sign(encoders.single(tx, definitions), privateKey)
 }
 
 const ENTROPY_LENGTH_BYTES = 16

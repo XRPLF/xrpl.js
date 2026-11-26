@@ -10,8 +10,8 @@ Functions to encode/decode to/from the ripple [binary serialization format](http
 ```
 
 
-### decode(binary: string): object
-Decode a hex-string into a transaction object.
+### decode(binary: string, definitions?: XrplDefinitionsBase): object
+Decode a hex-string into a transaction object. Optionally, a custom definition may be provided and utilized during the decoding process
 ```js
 > api.decode('1100612200000000240000000125000000072D0000000055DF530FB14C5304852F20080B0A8EEF3A6BDD044F41F4EBBD68B8B321145FE4FF6240000002540BE4008114D0F5430B66E06498D4CEEC816C7B3337F9982337')
 {
@@ -26,8 +26,8 @@ Decode a hex-string into a transaction object.
 }
 ```
 
-### encode(json: object): string
-Encode a transaction object into a hex-string. Note that encode filters out fields with undefined values.
+### encode(json: object, definitions?: XrplDefinitionsBase): string
+Encode a transaction object into a hex-string. Note that encode filters out fields with undefined values. Optionally, a custom definition may be provided and utilized during the encoding process
 ```js
 > api.encode({
   LedgerEntryType: 'AccountRoot',
@@ -54,17 +54,17 @@ Encode a transaction object into a hex-string. Note that encode filters out fiel
   * When _decoding_, if a currency code is three uppercase letters or numbers (`/^[A-Z0-9]{3}$/`), then it will be decoded into that string. For example,`0000000000000000000000004142430000000000` decodes as `ABC`.
   * When decoding, if a currency code is does not match the regex, then it is not considered to be an ISO 4217 or pseudo-ISO currency. ripple-binary-codec will return a 160-bit hex-string (40 hex characters). For example, `0000000000000000000000006142430000000000` (`aBC`) decodes as `0000000000000000000000006142430000000000` because it contains a lowercase letter.
 
-### encodeForSigning(json: object): string
+### encodeForSigning(json: object, definitions?: XrplDefinitionsBase): string
 
-Encode the transaction object for signing.
+Encode the transaction object for signing. Optionally, a custom definition may be provided and utilized during the encoding process
 
 ### encodeForSigningClaim(json: object): string
 
 Encode the transaction object for payment channel claim.
 
-### encodeForMultisigning(json: object, signer: string): string
+### encodeForMultisigning(json: object, signer: string, definitions?: XrplDefinitionsBase): string
 
-Encode the transaction object for multi-signing.
+Encode the transaction object for multi-signing. Optionally, a custom definition may be provided and utilized during the encoding process
 
 ### encodeQuality(value: string): string
 ```js

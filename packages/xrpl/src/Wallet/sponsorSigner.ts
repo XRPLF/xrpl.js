@@ -114,6 +114,7 @@ export function signAsSponsor(
               tx,
               wallet.privateKey,
               multisignAddress,
+              undefined,
               'sponsor',
             ),
           },
@@ -126,6 +127,7 @@ export function signAsSponsor(
       TxnSignature: computeSignature(
         tx,
         wallet.privateKey,
+        undefined,
         undefined,
         'sponsor',
       ),

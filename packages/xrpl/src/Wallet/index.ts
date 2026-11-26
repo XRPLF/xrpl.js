@@ -1,10 +1,11 @@
+/* eslint-disable max-lines -- Wallet class grew past the limit with custom definitions support */
 import { HDKey } from '@scure/bip32'
 import { mnemonicToSeedSync, validateMnemonic } from '@scure/bip39'
 import { wordlist } from '@scure/bip39/wordlists/english.js'
 import { bytesToHex } from '@xrplf/isomorphic/utils'
 import BigNumber from 'bignumber.js'
 import { classicAddressToXAddress, encodeSeed } from 'ripple-address-codec'
-import { encode } from 'ripple-binary-codec'
+import { encode, XrplDefinitionsBase } from 'ripple-binary-codec'
 import { deriveAddress, deriveKeypair, generateSeed } from 'ripple-keypairs'
 
 import ECDSA from '../ECDSA'
@@ -368,15 +369,17 @@ export class Wallet {
    * @param transaction - A transaction to be signed offline.
    * @param multisign - Specify true/false to use multisign or actual address (classic/x-address) to make multisign tx request.
    *                    The actual address is only needed in the case of regular key usage.
+   * @param definitions Custom rippled types to use instead of the default. Used for sidechains and amendments.
    * @returns A signed transaction.
    * @throws ValidationError if the transaction is already signed or does not encode/decode to same result.
    * @throws XrplError if the issued currency being signed is XRP ignoring case.
    */
-  // eslint-disable-next-line max-lines-per-function -- introduced more checks to support both string and boolean inputs.
+  // eslint-disable-next-line max-lines-per-function, max-params -- introduced more checks to support string and boolean inputs.
   public sign(
     this: Wallet,
     transaction: Transaction,
     multisign?: boolean | string,
+    definitions?: XrplDefinitionsBase,
   ): {
     tx_blob: string
     hash: string
@@ -407,7 +410,7 @@ export class Wallet {
      * This will throw a more clear error for JS users if the supplied transaction has incorrect formatting
      */
 
-    validate(tx)
+    validate(tx, definitions)
     if (hasFlag(tx, GlobalFlags.tfInnerBatchTxn, 'tfInnerBatchTxn')) {
       throw new ValidationError('Cannot sign a Batch inner transaction.')
     }
@@ -441,6 +444,7 @@ export class Wallet {
           txToSignAndEncode,
           this.privateKey,
           multisignAddress,
+          definitions,
         ),
       }
       txToSignAndEncode.Signers = [{ Signer: signer }]
@@ -449,13 +453,16 @@ export class Wallet {
       txToSignAndEncode.TxnSignature = computeSignature(
         txToSignAndEncode,
         this.privateKey,
+        undefined,
+        definitions,
       )
     }
 
-    const serialized = encode(txToSignAndEncode)
+    const serialized = encode(txToSignAndEncode, definitions)
+
     return {
       tx_blob: serialized,
-      hash: hashSignedTx(serialized),
+      hash: hashSignedTx(serialized, definitions),
     }
   }
 
