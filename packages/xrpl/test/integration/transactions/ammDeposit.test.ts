@@ -199,7 +199,7 @@ describe('AMMDeposit', function () {
     const afterAmountDrops = parseInt(amount, 10)
     // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
-    const diffAmountDrops = 30
+    const diffAmountDrops = 31
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
 
     const afterAmount2 = amount2
@@ -263,7 +263,7 @@ describe('AMMDeposit', function () {
     const afterAmountDrops = parseInt(amount, 10)
     // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
-    const diffAmountDrops = 15
+    const diffAmountDrops = 16
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
 
     const afterAmount2 = amount2

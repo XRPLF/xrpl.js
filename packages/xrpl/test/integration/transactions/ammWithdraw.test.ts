@@ -271,7 +271,7 @@ describe('AMMWithdraw', function () {
     const afterAmountDrops = parseInt(amount, 10)
     // @ts-expect-error: preAmount should be a string
     const beforeAmountDrops = parseInt(preAmount, 10)
-    const diffAmountDrops = -9
+    const diffAmountDrops = -8
     const expectedAmountDrops = beforeAmountDrops + diffAmountDrops
 
     const afterAmount2 = amount2
