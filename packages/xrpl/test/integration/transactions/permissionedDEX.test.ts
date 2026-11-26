@@ -2,7 +2,6 @@ import { stringToHex } from '@xrplf/isomorphic/utils'
 import { assert } from 'chai'
 
 import { Wallet, IssuedCurrencyAmount, AccountSetAsfFlags } from '../../../src'
-import DirectoryNode from '../../../src/models/ledger/DirectoryNode'
 import Offer from '../../../src/models/ledger/Offer'
 import PermissionedDomain from '../../../src/models/ledger/PermissionedDomain'
 import { BookOffersResponse } from '../../../src/models/methods/bookOffers'
@@ -217,7 +216,7 @@ describe('PermissionedDEX', function () {
             seq: offerCreateTxResponse.result.tx_json.Sequence as number,
           },
         })
-      ).result.node as Offer
+      ).result.node
 
       assert.equal(offerLedgerObject.LedgerEntryType, 'Offer')
       assert.equal(offerLedgerObject.DomainID, permDomainLedgerObject.index)
@@ -243,16 +242,17 @@ describe('PermissionedDEX', function () {
         directory: offerLedgerObject.BookDirectory,
       })
 
+      assert.ok(ledgerEntryResponse.result.node, 'node should be present')
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).index,
+        ledgerEntryResponse.result.node.index,
         offerLedgerObject.BookDirectory,
       )
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).LedgerEntryType,
+        ledgerEntryResponse.result.node.LedgerEntryType,
         'DirectoryNode',
       )
       assert.equal(
-        (ledgerEntryResponse.result.node as DirectoryNode).DomainID,
+        ledgerEntryResponse.result.node.DomainID,
         permDomainLedgerObject.index,
       )
 

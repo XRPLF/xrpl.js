@@ -3,7 +3,6 @@ import { assert } from 'chai'
 import { AMMVote } from 'xrpl'
 
 import { AMMInfoResponse } from '../../../src'
-import { AMM } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
 import {
   setupAMMPool,
@@ -106,7 +105,7 @@ describe('AMMVote', function () {
         command: 'ledger_entry',
         amm: { asset, asset2 },
       })
-    ).result.node as AMM
+    ).result.node
 
     assert.isUndefined(amm.TradingFee)
     assert.isUndefined(amm.AuctionSlot?.DiscountedFee)

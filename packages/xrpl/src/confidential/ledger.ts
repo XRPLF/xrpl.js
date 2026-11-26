@@ -136,8 +136,7 @@ export async function fetchMPToken(
     mptoken: { mpt_issuance_id: mptIssuanceID, account },
     ledger_index: ledgerIndex,
   })
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger_entry returns the requested entry type
-  return response.result.node as unknown as MPToken
+  return response.result.node
 }
 
 /**
@@ -161,8 +160,7 @@ export async function fetchMPTokenIssuance(
     mpt_issuance: mptIssuanceID,
     ledger_index: ledgerIndex,
   })
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- ledger_entry returns the requested entry type
-  return response.result.node as unknown as MPTokenIssuance
+  return response.result.node
 }
 
 /**

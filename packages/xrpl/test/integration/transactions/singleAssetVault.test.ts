@@ -22,7 +22,7 @@ import {
   Wallet,
   XRP,
 } from '../../../src'
-import { MPTokenIssuance, Vault, VaultFlags } from '../../../src/models/ledger'
+import { Vault, VaultFlags } from '../../../src/models/ledger'
 import { MPTokenIssuanceCreateMetadata } from '../../../src/models/transactions/MPTokenIssuanceCreate'
 import serverUrl from '../serverUrl'
 import {
@@ -155,8 +155,7 @@ describe('Single Asset Vault', function () {
         command: 'ledger_entry',
         mpt_issuance: vaultInfoResult.result.vault.ShareMPTID,
       })
-      const mptIssuance = ledgerEntryResult.result
-        .node as unknown as MPTokenIssuance
+      const mptIssuance = ledgerEntryResult.result.node
       assert.isDefined(
         mptIssuance.ReferenceHolding,
         'IOU-backed MPTokenIssuance should have ReferenceHolding set',
@@ -427,8 +426,7 @@ describe('Single Asset Vault', function () {
         command: 'ledger_entry',
         mpt_issuance: vaultInfoResult.result.vault.ShareMPTID,
       })
-      const mptIssuance = ledgerEntryResult.result
-        .node as unknown as MPTokenIssuance
+      const mptIssuance = ledgerEntryResult.result.node
       assert.isDefined(
         mptIssuance.ReferenceHolding,
         'MPT-backed MPTokenIssuance should have ReferenceHolding set',
