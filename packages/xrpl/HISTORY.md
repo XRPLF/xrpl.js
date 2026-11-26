@@ -4,6 +4,9 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 
 ## Unreleased
 
+### Added
+* Adds `apiVersion` option on `Client` constructor
+
 ### Changed
 * Some transaction validation error messages changed.
 

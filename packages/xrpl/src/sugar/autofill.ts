@@ -5,6 +5,7 @@ import { xAddressToClassicAddress, isValidXAddress } from 'ripple-address-codec'
 
 import { type Client } from '..'
 import { ValidationError, XrplError } from '../errors'
+import { APIVersion, DEFAULT_API_VERSION } from '../models/common'
 import { LoanBroker } from '../models/ledger'
 import {
   AccountInfoRequest,
@@ -111,7 +112,9 @@ function isNotLaterRippledVersion(source: string, target: string): boolean {
  * @param client -- The connected client.
  * @returns True if required networkID, false otherwise.
  */
-export function txNeedsNetworkID(client: Client): boolean {
+export function txNeedsNetworkID<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>): boolean {
   if (
     client.networkID !== undefined &&
     client.networkID > RESTRICTED_NETWORKS
@@ -233,10 +236,9 @@ function convertToClassicAddress(tx: Transaction, fieldName: string): void {
 }
 
 // Helper function to get the next valid sequence number for an account.
-async function getNextValidSequenceNumber(
-  client: Client,
-  account: string,
-): Promise<number> {
+async function getNextValidSequenceNumber<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, account: string): Promise<number> {
   const request: AccountInfoRequest = {
     command: 'account_info',
     account,
@@ -254,10 +256,9 @@ async function getNextValidSequenceNumber(
  * @returns A Promise that resolves when the sequence number is set.
  * @throws {Error} If there is an error retrieving the account information.
  */
-export async function setNextValidSequenceNumber(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function setNextValidSequenceNumber<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   // eslint-disable-next-line no-param-reassign, require-atomic-updates -- param reassign is safe with no race condition
   tx.Sequence = await getNextValidSequenceNumber(client, tx.Account)
 }
@@ -269,7 +270,9 @@ export async function setNextValidSequenceNumber(
  * @returns A Promise that resolves to the owner reserve fee as a BigNumber.
  * @throws {Error} Throws an error if the owner reserve fee cannot be fetched.
  */
-async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
+async function fetchOwnerReserveFee<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>): Promise<BigNumber> {
   const response = await client.request({ command: 'server_state' })
   const fee = response.result.state.validated_ledger?.reserve_inc
 
@@ -288,10 +291,9 @@ async function fetchOwnerReserveFee(client: Client): Promise<BigNumber> {
  * @returns A Promise that resolves to the number of signers for the counterparty.
  * @throws {ValidationError} Throws an error if LoanBrokerID is not provided in the transaction.
  */
-async function fetchCounterPartySignersCount(
-  client: Client,
-  tx: Transaction,
-): Promise<number> {
+async function fetchCounterPartySignersCount<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<number> {
   let counterParty: Account | undefined = tx.Counterparty as Account | undefined
   // Loan Borrower initiated the transaction, Loan Broker is the counterparty.
   if (counterParty == null) {
@@ -317,9 +319,14 @@ async function fetchCounterPartySignersCount(
     account: counterParty,
     ledger_index: 'validated',
     signer_lists: true,
+    // `signer_lists` is read from the default API version's response shape
+    api_version: DEFAULT_API_VERSION,
   }
 
-  const signerListResponse = await client.request(signerListRequest)
+  const signerListResponse = await client.request<
+    AccountInfoRequest,
+    typeof DEFAULT_API_VERSION
+  >(signerListRequest)
   const signerList = signerListResponse.result.signer_lists?.[0]
   return signerList?.SignerEntries.length ?? 1
 }
@@ -366,8 +373,10 @@ function calculateSponsorFee(
  * @returns A promise that returns the fee.
  */
 // eslint-disable-next-line max-lines-per-function, max-params, complexity -- necessary to check for many transaction types.
-async function calculateFeePerTransactionType(
-  client: Client,
+async function calculateFeePerTransactionType<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(
+  client: Client<V>,
   tx: Transaction,
   signersCount = 0,
   sponsorSignersCount = 0,
@@ -467,8 +476,10 @@ async function calculateFeePerTransactionType(
  * @returns A promise that resolves with void. Modifies the `tx` parameter to give it the calculated fee.
  */
 // eslint-disable-next-line max-params -- mirrors calculateFeePerTransactionType
-export async function getTransactionFee(
-  client: Client,
+export async function getTransactionFee<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(
+  client: Client<V>,
   tx: Transaction,
   signersCount = 0,
   sponsorSignersCount = 0,
@@ -501,10 +512,9 @@ function scaleValue(value, multiplier): string {
  * @param tx - The transaction object.
  * @returns A promise that resolves with void. Modifies the `tx` parameter setting `LastLedgerSequence`.
  */
-export async function setLatestValidatedLedgerSequence(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function setLatestValidatedLedgerSequence<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   const ledgerSequence = await client.getLedgerIndex()
   // eslint-disable-next-line no-param-reassign -- param reassign is safe
   tx.LastLedgerSequence = ledgerSequence + LEDGER_OFFSET
@@ -518,10 +528,9 @@ export async function setLatestValidatedLedgerSequence(
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
 // eslint-disable-next-line max-lines-per-function -- necessary to check for all AccountDelete blockers
-export async function checkAccountDeleteBlockers(
-  client: Client,
-  tx: Transaction,
-): Promise<void> {
+export async function checkAccountDeleteBlockers<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Transaction): Promise<void> {
   const objectsRequest: AccountObjectsRequest = {
     command: 'account_objects',
     account: tx.Account,
@@ -607,10 +616,9 @@ export function handleDeliverMax(tx: Payment): void {
  * @returns A promise that resolves with void if there are no blockers, or rejects with an XrplError if there are blockers.
  */
 // eslint-disable-next-line complexity, max-lines-per-function -- needed here, lots to check
-export async function autofillBatchTxn(
-  client: Client,
-  tx: Batch,
-): Promise<void> {
+export async function autofillBatchTxn<
+  V extends APIVersion = typeof DEFAULT_API_VERSION,
+>(client: Client<V>, tx: Batch): Promise<void> {
   const accountSequences: Record<string, number> = {}
 
   for (const rawTxn of tx.RawTransactions) {
