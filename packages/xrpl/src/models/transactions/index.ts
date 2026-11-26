@@ -1,4 +1,10 @@
-export { BaseTransaction, isMPTAmount, validateMPTokenMetadata } from './common'
+export {
+  BaseTransaction,
+  GlobalFlags,
+  GlobalFlagsInterface,
+  isMPTAmount,
+  SponsorFlags,
+} from './common'
 export {
   validate,
   PseudoTransaction,
@@ -33,11 +39,16 @@ export {
   AMMWithdrawFlagsInterface,
   AMMWithdraw,
 } from './AMMWithdraw'
-export { Batch } from './batch'
+export { Batch, BatchFlags, BatchFlagsInterface, BatchSigner } from './batch'
 export { CheckCancel } from './checkCancel'
 export { CheckCash } from './checkCash'
 export { CheckCreate } from './checkCreate'
 export { Clawback } from './clawback'
+export { ConfidentialMPTClawback } from './ConfidentialMPTClawback'
+export { ConfidentialMPTConvert } from './ConfidentialMPTConvert'
+export { ConfidentialMPTConvertBack } from './ConfidentialMPTConvertBack'
+export { ConfidentialMPTMergeInbox } from './ConfidentialMPTMergeInbox'
+export { ConfidentialMPTSend } from './ConfidentialMPTSend'
 export { CredentialAccept } from './CredentialAccept'
 export { CredentialCreate } from './CredentialCreate'
 export { CredentialDelete } from './CredentialDelete'
@@ -49,6 +60,19 @@ export { EscrowCancel } from './escrowCancel'
 export { EscrowCreate } from './escrowCreate'
 export { EscrowFinish } from './escrowFinish'
 export { EnableAmendment, EnableAmendmentFlags } from './enableAmendment'
+export { LoanBrokerSet } from './loanBrokerSet'
+export { LoanBrokerDelete } from './loanBrokerDelete'
+export { LoanBrokerCoverDeposit } from './loanBrokerCoverDeposit'
+export { LoanBrokerCoverWithdraw } from './loanBrokerCoverWithdraw'
+export { LoanBrokerCoverClawback } from './loanBrokerCoverClawback'
+export { LoanSet, LoanSetFlags, LoanSetFlagsInterface } from './loanSet'
+export { LoanDelete } from './loanDelete'
+export {
+  LoanManage,
+  LoanManageFlags,
+  LoanManageFlagsInterface,
+} from './loanManage'
+export { LoanPay, LoanPayFlags, LoanPayFlagsInterface } from './loanPay'
 export {
   MPTokenAuthorize,
   MPTokenAuthorizeFlags,
@@ -58,6 +82,8 @@ export {
   MPTokenIssuanceCreate,
   MPTokenIssuanceCreateFlags,
   MPTokenIssuanceCreateFlagsInterface,
+  MPTokenIssuanceCreateImmutableFlags,
+  MPTokenIssuanceCreateImmutableFlagsInterface,
 } from './MPTokenIssuanceCreate'
 export { MPTokenIssuanceDestroy } from './MPTokenIssuanceDestroy'
 export {
@@ -100,6 +126,16 @@ export { PermissionedDomainDelete } from './permissionedDomainDelete'
 export { SetFee, SetFeePreAmendment, SetFeePostAmendment } from './setFee'
 export { SetRegularKey } from './setRegularKey'
 export { SignerListSet } from './signerListSet'
+export {
+  SponsorshipSet,
+  SponsorshipSetFlags,
+  SponsorshipSetFlagsInterface,
+} from './sponsorshipSet'
+export {
+  SponsorshipTransfer,
+  SponsorshipTransferFlags,
+  SponsorshipTransferFlagsInterface,
+} from './sponsorshipTransfer'
 export { TicketCreate } from './ticketCreate'
 export { TrustSetFlagsInterface, TrustSetFlags, TrustSet } from './trustSet'
 export { UNLModify } from './UNLModify'
@@ -108,6 +144,7 @@ export {
   VaultCreate,
   VaultCreateFlags,
   VaultCreateFlagsInterface,
+  VaultKind,
   VaultWithdrawalPolicy,
 } from './vaultCreate'
 export { VaultDelete } from './vaultDelete'

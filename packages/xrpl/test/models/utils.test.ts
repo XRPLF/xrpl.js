@@ -5,6 +5,8 @@ import { assert } from 'chai'
 
 import {
   DepositPreauth,
+  LoanSet,
+  LoanSetFlags,
   OfferCreate,
   OfferCreateFlags,
   PaymentChannelClaim,
@@ -14,12 +16,11 @@ import {
   TrustSet,
   TrustSetFlags,
 } from '../../src'
-import { AuthorizeCredential } from '../../src/models/common'
+import { AuthorizeCredential, MPTokenMetadata } from '../../src/models/common'
 import { AccountRootFlags } from '../../src/models/ledger'
 import {
   containsDuplicates,
   GlobalFlags,
-  validateMPTokenMetadata,
 } from '../../src/models/transactions/common'
 import { isFlagEnabled } from '../../src/models/utils'
 import {
@@ -28,7 +29,13 @@ import {
   parseAccountRootFlags,
   parseTransactionFlags,
 } from '../../src/models/utils/flags'
-import mptMetadataTests from '../fixtures/transactions/mptokenMetadata.json'
+import {
+  decodeMPTokenMetadata,
+  encodeMPTokenMetadata,
+  validateMPTokenMetadata,
+} from '../../src/models/utils/mptokenMetadata'
+import mptMetadataEncodeDecodeTests from '../fixtures/transactions/mptokenMetadataEncodeDecodeData.json'
+import mptMetadataValidationTests from '../fixtures/transactions/mptokenMetadataValidationData.json'
 
 /**
  * Utils Testing.
@@ -513,6 +520,22 @@ describe('Models Utils', function () {
       assert.strictEqual(result, expected)
     })
 
+    it('converts LoanSetFlags to its numeric value', function () {
+      const tx: LoanSet = {
+        TransactionType: 'LoanSet',
+        Account: 'rUn84CUYbNjRoTQ6mSW7BVJPSVJNLb1QLo',
+        LoanBrokerID:
+          '033D9B59DBDC4F48FB6708892E7DB0E8FBF9710C3A181B99D9FAF7B9C82EF077',
+        PrincipalRequested: '5000000',
+        Flags: {
+          tfLoanOverpayment: true,
+        },
+      }
+
+      const result = convertTxFlagsToNumber(tx)
+      assert.strictEqual(result, LoanSetFlags.tfLoanOverpayment)
+    })
+
     it('converts other transaction types flags to its numeric value', function () {
       const tx: DepositPreauth = {
         TransactionType: 'DepositPreauth',
@@ -575,7 +598,7 @@ describe('Models Utils', function () {
   })
 
   describe('MPTokenMetadata validation messages', function () {
-    for (const testCase of mptMetadataTests) {
+    for (const testCase of mptMetadataValidationTests) {
       const testName: string = testCase.testName
       it(`should validate messages for: ${testName}`, function () {
         const validationMessages = validateMPTokenMetadata(
@@ -586,8 +609,48 @@ describe('Models Utils', function () {
           ),
         )
 
-        assert.deepStrictEqual(testCase.validationMessages, validationMessages)
+        assert.deepStrictEqual(validationMessages, testCase.validationMessages)
       })
     }
+  })
+
+  describe('MPTokenMetadata encode/decode', function () {
+    for (const testCase of mptMetadataEncodeDecodeTests) {
+      const testName: string = testCase.testName
+      it(`encode/decode: ${testName}`, function () {
+        const encodedHex = encodeMPTokenMetadata(
+          testCase.mptMetadata as MPTokenMetadata,
+        )
+        assert.equal(encodedHex, testCase.hex)
+
+        const decoded = decodeMPTokenMetadata(encodedHex) as unknown as Record<
+          string,
+          unknown
+        >
+        assert.deepStrictEqual(decoded, testCase.expectedLongForm)
+      })
+    }
+
+    it('throws error for invalid JSON', function () {
+      assert.throws(
+        () =>
+          encodeMPTokenMetadata('invalid json' as unknown as MPTokenMetadata),
+        `MPTokenMetadata must be JSON object.`,
+      )
+    })
+
+    it('throws error for invalid hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('invalid'),
+        `MPTokenMetadata must be in hex format.`,
+      )
+    })
+
+    it('throws error for invalid JSON underneath hex', function () {
+      assert.throws(
+        () => decodeMPTokenMetadata('464F4F'),
+        `MPTokenMetadata is not properly formatted as JSON - SyntaxError: Unexpected token 'F', "FOO" is not valid JSON`,
+      )
+    })
   })
 })

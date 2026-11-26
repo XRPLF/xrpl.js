@@ -125,16 +125,18 @@ const socketMap: {
 
 export async function destroyServer(port: number): Promise<void> {
   // loop through all sockets and destroy them
-  if (socketMap[port]) {
-    Object.keys(socketMap[port]!.sockets).forEach(function (socketKey) {
-      socketMap[port]!.sockets[socketKey].destroy()
+  const socketEntry = socketMap[port]
+  if (socketEntry) {
+    Object.keys(socketEntry.sockets).forEach(function (socketKey) {
+      socketEntry.sockets[socketKey].destroy()
     })
   }
 
   return new Promise((resolve, reject) => {
-    if (socketMap[port]) {
+    const entry = socketMap[port]
+    if (entry) {
       // after all the sockets are destroyed, we may close the server!
-      socketMap[port]!.server.close((error) => {
+      entry.server.close((error) => {
         if (error) {
           reject(error)
           return
@@ -221,7 +223,6 @@ export function ignoreWebSocketDisconnect(error: Error): void {
  * ledger. (The close time of a ledger is not yet known when executing transactions to go into that ledger.) This means that,
  * for example, an Escrow could successfully finish at a real-world time that is up to about 10 seconds later than the time-based
  * expiration specified in the Escrow object.
- *
  *
  * @param closeTime - ledger close time in ripple time
  * @returns The difference between last ledger close time and current time in seconds

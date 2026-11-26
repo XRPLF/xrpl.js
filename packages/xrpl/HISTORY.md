@@ -5,6 +5,119 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 ## Unreleased
 
 ### Added
+* Adds `apiVersion` option on `Client` constructor
+
+### Changed
+* Some transaction validation error messages changed.
+
+### Deprecated
+* Node.js v20 reached end-of-life on April 30, 2026 and is no longer tested in CI. It may still work with v5.x, but support will be removed in the next major release. Use Node.js v22 or v24.
+
+### Fixed
+* Allow `LastLedgerSequence` in inner `Batch` transactions, to match rippled.
+* `signMultiBatch` now accepts the `Sponsor` of a sponsored inner transaction as a required signer. rippled's `Batch::preflight` requires a `BatchSigners` entry from the sponsor of any inner transaction carrying a `SponsorSignature` placeholder, and rejects the Batch with `temBAD_SIGNER` without it.
+* A request now rejects with a `RippledError` when rippled replies with an `error` message (for example `jsonInvalid`). Before, the request never resolved.
+* The `Client` no longer crashes when rippled sends a WebSocket text message with invalid UTF-8.
+* Transaction validation now rejects a value that is not hex in fields that rippled stores as hex (for example `NFTokenID`, `VaultID`, and `InvoiceID`). Before, any string passed.
+* `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` now accept a `LoanSet` whose `Account` is multisigned. They previously threw `Transaction must be first signed by first party.` because they only looked for a `TxnSignature`, so a loan broker with a signer list could not originate a loan.
+* `submit` and `submitAndWait` now throw a `ValidationError` naming `CounterpartySignature` and `signLoanSetByCounterparty` when a `LoanSet` is submitted without the counterparty's signature. rippled rejects such a LoanSet with `temBAD_SIGNER` and the unrelated message `No signer may duplicate account or other signers`.
+* `LoanSet` and `VaultCreate` validation now rejects the values rippled rejects in preflight, for example a `GracePeriod` below 60 or a `WithdrawalPolicy` other than 1. Before, these passed validation and failed on submit.
+* Flags given as an object, such as `{ tfLoanOverpayment: true }`, now work for `LoanSet`, in `Wallet.sign` without `autofill` first, and on the inner transactions of a `Batch`. Before, these threw an error.
+* Mark the ledger object fields that rippled omits when their value is 0 as optional: `MPToken.MPTAmount`, `LoanBroker.DebtMaximum`, the `AMM` object's `TradingFee` and the `TradingFee` and `DiscountedFee` of its vote and auction slots, and `Loan.PaymentRemaining`, `PrincipalOutstanding`, `TotalValueOutstanding`, `NextPaymentDueDate` and `GracePeriod`. Treat a missing field as 0.
+* Add `DID`, `MPToken`, `NFTokenOffer` and `NFTokenPage` to the `LedgerEntry` union, and so to `AccountObject`, and export the `PermissionedDomain` ledger entry type. `account_objects`, `ledger_entry` and `ledger_data` results of these types could not be narrowed without a cast. These four models now match rippled: `MPToken.Account` and `NFTokenOffer.NFTokenID` are added, and fields rippled can omit are optional.
+
+## 5.3.0 (2026-09-16)
+
+### Added
+* Add `LendingProtocolV1_1` support.
+
+## 5.2.0 (2026-09-11)
+
+### BREAKING CHANGES
+* `Wallet.fromEntropy` now requires `entropy` to be a `Uint8Array` or an array of byte values of exactly 16 bytes, and throws `ValidationError` otherwise. Input of any other type or length is no longer accepted. Convert a hex string to bytes before passing it: `Wallet.fromEntropy(hexToBytes(hex))`.
+
+### Fixed
+* `signLoanSetByCounterparty` and `signAsSponsor` now sign with the `fixCleanup3_4_0` counterparty and sponsor prefixes; signatures from earlier versions are rejected on networks where the amendment is enabled.
+
+## 5.1.0 (2026-08-24)
+
+### Added
+* Add XLS-68 Sponsorship support: `SponsorshipSet`/`SponsorshipTransfer` transactions, `Sponsorship` ledger entry, `signAsSponsor`/`combineSponsorSigners`/`addPreFundedSponsor` wallet helpers, `account_sponsoring` RPC method, and sponsor-fee/reserve fields on `Payment` and other transactions.
+* Support Dynamic MPTs (XLS-94d) based on latest spec change [XRPL-Standards#583](https://github.com/XRPLF/XRPL-Standards/pull/583).
+* Add `ReferenceHolding` to `MPTokenIssuance` ledger object and `vault_info` response.
+* Add XLS-56 Batch V1_1 support to `signMultiBatch` and `combineBatchSigners` ([XRPLF/rippled#6446](https://github.com/XRPLF/rippled/pull/6446)).
+* Add support for Confidential Transfers for Multi-Purpose Tokens (XLS-0096).
+
+### Fixed
+* Add missing fields (`Sequence`, `DomainID`) to `MPTokenIssuance` ledger type, add missing fields (`VaultID` and `LoanBrokerID`) to `AccountRoot` ledger type and missing fields (`AssetScale`, `MaximumAmount`, `TransferFee`, `MPTokenMetadata`, `LockedAmount`) to `vault_info` response `shares` object. Fix incorrect optionality of `Flags`, `ShareMPTID`, `WithdrawalPolicy`, and `OwnerNode` in `VaultInfoResponse`.
+* Reverted [#3331](https://github.com/XRPLF/xrpl.js/pull/3331), which made `Client.getServerInfo()` and `Client.connect()` throw when the `server_info` request failed or the response omitted `network_id`. The SDK must not enforce `network_id` rules more strictly than a rippled node does for custom XRPL networks, so `getServerInfo()` once again logs such failures via `console.error` and leaves `client.networkID` undefined rather than throwing.
+
+
+## 5.0.0 (2026-06-05)
+
+### BREAKING CHANGES:
+* `ED25519` is the default signing-algorithm used in the `Wallet.fromMnemonic` method. Users can explicitly specify `ecdsa-secp256k1` to retrieve the cryptographic material created using older versions of this package.
+* `Wallet.fromSeed` and `Wallet.fromSecret` no longer default to ed25519 when `opts.algorithm` is omitted. The algorithm is now inferred from the seed prefix: `sEd…` seeds derive an ed25519 keypair, all other family seeds (`s…`) derive a secp256k1 keypair. This fixes the long-standing case where ingesting a secp256k1 family seed without an explicit algorithm silently produced an ed25519 keypair for an unrelated account.
+
+  Migration:
+  - **Callers that want ed25519 keys must now pass `algorithm: ECDSA.ed25519` explicitly.** This applies both to `sEd…` seeds (where the inferred result happens to match, so being explicit is defensive but recommended) and to any code that previously relied on the old ed25519 default being applied to an `s…` family seed (where explicitness is *required* to preserve the old keypair).
+  - Callers that want secp256k1 keys from an `s…` family seed can drop the now-redundant `algorithm: ECDSA.secp256k1` argument; the inference produces the same result.
+  - Callers that pass an explicit `opts.algorithm` (either curve) are unaffected.
+* `Client.getServerInfo()` and `Client.connect()` now throw if the `server_info` request fails, or if the response succeeds but does not include a `network_id`. Previously, these failures were swallowed and only logged via `console.error`, leaving `client.networkID` undefined and causing `autofill()` to omit the `NetworkID` field — producing transactions valid on the wrong network. Servers running rippled <1.11 (which do not return `network_id`) will now fail to connect; upgrade to rippled 1.11+ or set `client.networkID` manually after construction.
+
+### Added
+* Add new fields to `ServerDefinitionsResponse`: `ACCOUNT_SET_FLAGS`, `LEDGER_ENTRY_FLAGS`, `LEDGER_ENTRY_FORMATS`, `TRANSACTION_FLAGS`, and `TRANSACTION_FORMATS`, reflecting new sections returned by `server_definitions` in rippled.
+
+### Fixed
+* Fix event listener accumulation bug where `'connected'` event handlers would fire multiple times after each reconnection. The fix cleans up stale listeners from previous reconnect attempts to prevent duplicate event emissions on flaky connections with multiple sequential reconnect attempts.
+* Disallow the input of Authorization Credentials over insecure WebSocket connections (`ws[+unix]?://`) to prevent MITM eavesdropping of sensitive data.
+* Fix incorrect `MPTAmount` field type to `string` instead of `MPTAmount`.
+* Fix `Client.getServerInfo()` swallowing errors from the underlying `server_info` request, which left `client.networkID` undefined and caused `autofill()` to silently omit the `NetworkID` field — producing signed transactions valid on the wrong network (cross-network replay risk). The method now throws on request failure or when the response is missing `network_id`. ([#3321](https://github.com/XRPLF/xrpl.js/issues/3321))
+* Refuse to forward server-supplied `data.type` values that collide with `Connection`'s internal state events (`connected`, `disconnected`, `error`, `reconnect`, `reconnecting`). Previously a malicious or compromised server could inject `{"type":"connected"}` (and friends) over the wire and trigger spoofed local state transitions; the message is now dropped and surfaced as a `badMessage` error. ([`#3318`](https://github.com/XRPLF/xrpl.js/issues/3318))
+
+
+## 4.6.0 (2026-02-12)
+
+### Added
+* Add `faucetProtocol` (http or https) option to `fundWallet` method. Makes `fundWallet` work with locally running faucet servers.
+* Add `signLoanSetByCounterparty` and `combineLoanSetCounterpartySigners` helper functions to sign and combine LoanSet transactions signed by the counterparty.
+* Add newly added fields to `Loan`, `LoanBroker` and `Vault` ledger objects and lending protocol related transaction types.
+
+## 4.5.0 (2025-12-16)
+
+### Added
+* Support for `Lending Protocol` (XLS-66d).
+* Export signing and binary codec utilities.
+
+### Fixed
+* Update ripple-binary-codec to 2.5.1 to address serialization/deserialization issues in `Issue` serialized type for `MPTIssue`.
+* Better faucet error handling
+* Mark the `AssetsAvailable`, `AssetsTotal`, and `LossUnrealized` fields of the Vault object as optional.
+
+## 4.4.3 (2025-11-07)
+
+### Added
+* Export `Batch` (XLS-56) transaction types and utilities
+* Add `encodeMPTokenMetadata` and `decodeMPTokenMetadata` helper functions to encode and decode MPTokenMetadata as per XLS-89 standard.
+
+### Fixed
+* Fix incorrect type checking in `validateVaultCreate` that prevented vault creation with MPT as an asset.
+* [Breaking change] Fix `MPTokenMetadata` type to adhere to the XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `MPTokenMetadata` in your code, please verify that it adheres to the updated type definition.
+* [Breaking change] Fix `validateMPTokenMetadata` to correctly validate MPTokenMetadata as per XLS-89 standard. Since XLS-89 is still in a forming state and undergoing changes, this breaking change is being released as a bug fix via patch version bump. If you are using `validateMPTokenMetadata` in your code, expect it to change as per the XLS-89 standard.
+
+## 4.4.2 (2025-09-25)
+
+### Fixed
+* improve Batch inner transaction typing
+
+## 4.4.1 (2025-08-29)
+
+### Fixed
+* Prevent Node.js process termination when WebSocket send() errors after the connection is closed.
+
+## 4.4.0 (2025-07-29)
+
+### Added
 * Support for `PermissionedDEX` (XLS-81d)
 * Support for `Token Escrow` (XLS-85)
 * Support for `Single Asset Vault` (XLS-65)
@@ -12,15 +125,15 @@ Subscribe to [the **xrpl-announce** mailing list](https://groups.google.com/g/xr
 * Adds `ClawbackAmount` amount type used in transactions related to Clawback.
 * Fixed minified `build/xrpl-latest-min.js` to have all the latest xrpl package changes.
 * Add warning messages to `MPTokenIssuanceCreate` transaction as per [XLS-89d](https://github.com/XRPLF/XRPL-Standards/pull/293).
-* Adds `apiVersion` option on `Client` constructor
 
 ### Fixed
 * Fix `AccountRoot` ledger object to correctly parse `FirstNFTokenSequence` field
 * Fail faster on `tem` errors with `submitAndWait`
 * Improved type-checking in models
 * Fix issue with some transactions that would crash in validation
+* Improve typing of `Batch` inner transactions
 
-## 4.3.0 (2025-6-09)
+## 4.3.0 (2025-06-09)
 
 ### Added
 * Support for `NFTokenMintOffer` (XLS-52)

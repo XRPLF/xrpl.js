@@ -134,7 +134,7 @@ function getTrustlineQuantity(node: NormalizedNode): BalanceChange[] | null {
    * If an offer is placed to acquire an asset with no existing trustline,
    * the trustline can be created when the offer is taken.
    */
-  const fields = node.NewFields == null ? node.FinalFields : node.NewFields
+  const fields = node.NewFields ?? node.FinalFields
 
   // the balance is always from low node's perspective
   const result = {

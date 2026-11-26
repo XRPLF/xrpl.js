@@ -13,7 +13,7 @@ async function assertDoesNotThrow(promise: Promise<unknown>): Promise<void> {
     assert(true)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- should be type error
   } catch (err: any) {
-    assert.fail(err.message || err)
+    assert.fail(err.message ?? err)
   }
 }
 
@@ -114,6 +114,28 @@ describe('Client subscription', function () {
       // @ts-expect-error Using private method for testing
       testContext.client.connection.onMessage(
         JSON.stringify(rippled.streams.pathFind),
+      )
+    })
+  })
+
+  it('Emits path_find from a non-Unicode mock websocket payload', async function () {
+    await new Promise<void>((resolve) => {
+      testContext.client.on('path_find', (path) => {
+        assert.strictEqual(path.type, 'path_find')
+        assert.strictEqual(
+          (path as unknown as { message: string }).message,
+          '�',
+        )
+        resolve()
+      })
+
+      testContext.mockRippled!.socket.send(
+        Buffer.from([
+          ...Buffer.from('{"type":"path_find","message":"'),
+          0xff,
+          ...Buffer.from('"}'),
+        ]),
+        { binary: false },
       )
     })
   })

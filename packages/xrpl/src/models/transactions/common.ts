@@ -1,6 +1,11 @@
 /* eslint-disable max-lines -- common utility file */
-import { HEX_REGEX, hexToString } from '@xrplf/isomorphic/utils'
-import { isValidClassicAddress, isValidXAddress } from 'ripple-address-codec'
+import { bytesToHex, HEX_REGEX } from '@xrplf/isomorphic/utils'
+import {
+  decodeAccountID,
+  isValidClassicAddress,
+  isValidXAddress,
+  xAddressToClassicAddress,
+} from 'ripple-address-codec'
 import { TRANSACTION_TYPES } from 'ripple-binary-codec'
 
 import { ValidationError } from '../../errors'
@@ -12,60 +17,38 @@ import {
   IssuedCurrency,
   IssuedCurrencyAmount,
   MPTAmount,
-  MPTokenMetadata,
   Memo,
   Signer,
+  SponsorSignature,
   XChainBridge,
 } from '../common'
-import { isHex, onlyHasFields } from '../utils'
+import { INTEGER_SANITY_CHECK, isHex, onlyHasFields } from '../utils'
 
 const MEMO_SIZE = 3
 export const MAX_AUTHORIZED_CREDENTIALS = 8
 const MAX_CREDENTIAL_BYTE_LENGTH = 64
 const MAX_CREDENTIAL_TYPE_LENGTH = MAX_CREDENTIAL_BYTE_LENGTH * 2
-export const MAX_MPT_META_BYTE_LENGTH = 1024
+const SHA_512_HALF_LENGTH = 64
+
+// Confidential MPT (XLS-0096) fixed field byte lengths.
+// A compressed secp256k1 point (encryption keys and Pedersen commitments).
+export const CONFIDENTIAL_EC_POINT_BYTES = 33
+// An ElGamal ciphertext is two compressed points.
+export const CONFIDENTIAL_ELGAMAL_CIPHERTEXT_BYTES = 66
+// A scalar blinding factor (Hash256).
+export const CONFIDENTIAL_BLINDING_FACTOR_BYTES = 32
+// ZKProof byte lengths, fixed per transaction type by the mpt-crypto proof system.
+// Convert/Clawback are a compact Schnorr proof; ConvertBack and Send add a
+// (double) bulletproof range proof.
+export const CONFIDENTIAL_CONVERT_PROOF_BYTES = 64
+export const CONFIDENTIAL_CLAWBACK_PROOF_BYTES = 64
+export const CONFIDENTIAL_CONVERT_BACK_PROOF_BYTES = 816
+export const CONFIDENTIAL_SEND_PROOF_BYTES = 946
+// Max MPT amount: 2^63 - 1.
+export const MAX_MPT_AMOUNT = BigInt('9223372036854775807')
 
 // Used for Vault transactions
 export const VAULT_DATA_MAX_BYTE_LENGTH = 256
-
-// To validate MPTokenMetadata as per XLS-89d
-const TICKER_REGEX = /^[A-Z0-9]{1,6}$/u
-
-const MAX_MPT_META_TOP_LEVEL_FIELD_COUNT = 9
-
-const MPT_META_URL_FIELD_COUNT = 3
-
-const MPT_META_REQUIRED_FIELDS = [
-  'ticker',
-  'name',
-  'icon',
-  'asset_class',
-  'issuer_name',
-]
-
-const MPT_META_ASSET_CLASSES = [
-  'rwa',
-  'memes',
-  'wrapped',
-  'gaming',
-  'defi',
-  'other',
-]
-
-const MPT_META_ASSET_SUB_CLASSES = [
-  'stablecoin',
-  'commodity',
-  'real_estate',
-  'private_credit',
-  'equity',
-  'treasury',
-  'other',
-]
-
-export const MPT_META_WARNING_HEADER =
-  'MPTokenMetadata is not properly formatted as JSON as per the XLS-89d standard. ' +
-  "While adherence to this standard is not mandatory, such non-compliant MPToken's might not be discoverable " +
-  'by Explorers and Indexers in the XRPL ecosystem.'
 
 function isMemo(obj: unknown): obj is Memo {
   if (!isRecord(obj)) {
@@ -115,11 +98,86 @@ function isSigner(obj: unknown): obj is Signer {
   )
 }
 
+/**
+ * Verify the form and type of a SponsorSignature at runtime.
+ *
+ * @param obj - The object to check the form and type of.
+ * @param isInnerBatchTxn - Whether the enclosing transaction carries the
+ * `tfInnerBatchTxn` flag.
+ * @returns Whether the SponsorSignature is properly formed.
+ */
+function isSponsorSignature(
+  obj: unknown,
+  isInnerBatchTxn: boolean,
+): obj is SponsorSignature {
+  if (!isRecord(obj)) {
+    return false
+  }
+
+  if (isInnerBatchTxn) {
+    /*
+     * Inner batch transactions are never individually signed - the whole
+     * Batch is authorized together via the outer transaction's
+     * BatchSigners. rippled's Batch::preflight requires a sponsored inner
+     * txn's SponsorSignature to carry the same empty placeholder shape as
+     * the inner txn's own signature fields (SigningPubKey: '', no
+     * TxnSignature, no Signers); the sponsor's real authorization is
+     * supplied via a BatchSigners entry on the outer Batch transaction.
+     */
+    return (
+      obj.SigningPubKey === '' &&
+      obj.TxnSignature === undefined &&
+      obj.Signers === undefined
+    )
+  }
+
+  const hasSigningPubKey = obj.SigningPubKey !== undefined
+  const hasTxnSignature = obj.TxnSignature !== undefined
+  const hasSigners = obj.Signers !== undefined
+
+  /*
+   * Must have either (SigningPubKey + TxnSignature) OR Signers, but not both
+   */
+  const hasSingleSig = hasSigningPubKey && hasTxnSignature
+  const hasMultiSig = hasSigners
+
+  if (hasSingleSig && hasMultiSig) {
+    /* Cannot have both single-sig and multi-sig */
+    return false
+  }
+
+  if (!hasSingleSig && !hasMultiSig) {
+    /* Must have at least one signing method */
+    return false
+  }
+
+  // Validate single-sig fields
+  if (hasSingleSig) {
+    if (!isString(obj.SigningPubKey) || !isString(obj.TxnSignature)) {
+      return false
+    }
+  }
+
+  // Validate multi-sig fields
+  if (hasMultiSig) {
+    if (!isArray(obj.Signers) || !obj.Signers.every(isSigner)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+// Currency object sizes
 const XRP_CURRENCY_SIZE = 1
-const ISSUE_SIZE = 2
-const ISSUED_CURRENCY_SIZE = 3
+const MPT_CURRENCY_SIZE = 1
+const ISSUE_CURRENCY_SIZE = 2
+
+// Currency Amount object sizes
+const MPT_CURRENCY_AMOUNT_SIZE = 2
+const ISSUED_CURRENCY_AMOUNT_SIZE = 3
+
 const XCHAIN_BRIDGE_SIZE = 4
-const MPTOKEN_SIZE = 2
 const AUTHORIZE_CREDENTIAL_SIZE = 1
 
 /**
@@ -143,6 +201,17 @@ export function isString(str: unknown): str is string {
 }
 
 /**
+ * Verify the form and type of a hex string at runtime. An empty string is
+ * valid, since some fields (for example `Domain`) use it to clear a value.
+ *
+ * @param str - The object to check the form and type of.
+ * @returns Whether the hex string is properly formed.
+ */
+export function isHexString(str: unknown): str is string {
+  return typeof str === 'string' && (str === '' || isHex(str))
+}
+
+/**
  * Verify the form and type of a number at runtime.
  *
  * @param num - The object to check the form and type of.
@@ -150,6 +219,28 @@ export function isString(str: unknown): str is string {
  */
 export function isNumber(num: unknown): num is number {
   return typeof num === 'number'
+}
+
+/**
+ * Verify the form and type of a null value at runtime.
+ *
+ * @param inp - The value to check the form and type of.
+ * @returns Whether the value is properly formed.
+ */
+export function isNull(inp: unknown): inp is null {
+  return inp == null
+}
+
+/**
+ * Verify that a certain field has a certain exact value at runtime.
+ *
+ * @param value The value to compare against.
+ * @returns Whether the number is properly formed and within the bounds.
+ */
+export function isValue<V>(value: V): (inp: unknown) => inp is V {
+  // eslint-disable-next-line func-style -- returning a function
+  const isValueInternal = (inp: unknown): inp is V => inp === value
+  return isValueInternal
 }
 
 /**
@@ -181,7 +272,16 @@ export function isXRPLNumber(value: unknown): value is XRPLNumber {
  * @returns Whether the Currency is properly formed.
  */
 export function isCurrency(input: unknown): input is Currency {
-  return isString(input) || isIssuedCurrency(input)
+  return (
+    isRecord(input) &&
+    ((Object.keys(input).length === ISSUE_CURRENCY_SIZE &&
+      isString(input.issuer) &&
+      isString(input.currency)) ||
+      (Object.keys(input).length === XRP_CURRENCY_SIZE &&
+        input.currency === 'XRP') ||
+      (Object.keys(input).length === MPT_CURRENCY_SIZE &&
+        isString(input.mpt_issuance_id)))
+  )
 }
 
 /**
@@ -193,7 +293,7 @@ export function isCurrency(input: unknown): input is Currency {
 export function isIssuedCurrency(input: unknown): input is IssuedCurrency {
   return (
     isRecord(input) &&
-    ((Object.keys(input).length === ISSUE_SIZE &&
+    ((Object.keys(input).length === ISSUE_CURRENCY_SIZE &&
       isString(input.issuer) &&
       isString(input.currency)) ||
       (Object.keys(input).length === XRP_CURRENCY_SIZE &&
@@ -212,7 +312,7 @@ export function isIssuedCurrencyAmount(
 ): input is IssuedCurrencyAmount {
   return (
     isRecord(input) &&
-    Object.keys(input).length === ISSUED_CURRENCY_SIZE &&
+    Object.keys(input).length === ISSUED_CURRENCY_AMOUNT_SIZE &&
     isString(input.value) &&
     isString(input.issuer) &&
     isString(input.currency)
@@ -246,7 +346,7 @@ export function isAuthorizeCredential(
 export function isMPTAmount(input: unknown): input is MPTAmount {
   return (
     isRecord(input) &&
-    Object.keys(input).length === MPTOKEN_SIZE &&
+    Object.keys(input).length === MPT_CURRENCY_AMOUNT_SIZE &&
     typeof input.value === 'string' &&
     typeof input.mpt_issuance_id === 'string'
   )
@@ -293,6 +393,34 @@ export function isAccount(account: unknown): account is Account {
 }
 
 /**
+ * Normalizes an address to its classic format.
+ * If the address is an X-address, converts it to a classic address.
+ * If the address is already a classic address, returns it as-is.
+ *
+ * @param address - The address to normalize (classic or X-address format).
+ * @returns The classic address format.
+ */
+function toClassicAddress(address: string): string {
+  if (isValidXAddress(address)) {
+    return xAddressToClassicAddress(address).classicAddress
+  }
+  return address
+}
+
+/**
+ * Compares two addresses for equality, normalizing both to classic address format.
+ * This handles the case where one address might be an X-address and the other
+ * a classic address, but they refer to the same account.
+ *
+ * @param address1 - The first address to compare.
+ * @param address2 - The second address to compare.
+ * @returns True if the addresses refer to the same account, false otherwise.
+ */
+export function areAddressesEqual(address1: string, address2: string): boolean {
+  return toClassicAddress(address1) === toClassicAddress(address2)
+}
+
+/**
  * Verify the form and type of an Amount at runtime.
  *
  * @param amount - The object to check the form and type of.
@@ -304,6 +432,18 @@ export function isAmount(amount: unknown): amount is Amount {
     isIssuedCurrencyAmount(amount) ||
     isMPTAmount(amount)
   )
+}
+
+/**
+ * Verify the form and type of IOU/MPT token amount at runtime.
+ *
+ * @param amount - The object to check the form and type of.
+ * @returns Whether the Amount is properly formed.
+ */
+export function isTokenAmount(
+  amount: unknown,
+): amount is IssuedCurrencyAmount | MPTAmount {
+  return isIssuedCurrencyAmount(amount) || isMPTAmount(amount)
 }
 
 /**
@@ -331,6 +471,52 @@ export function isXChainBridge(input: unknown): input is XChainBridge {
  */
 export function isArray<T = unknown>(input: unknown): input is T[] {
   return input != null && Array.isArray(input)
+}
+
+/**
+ * Verify the input is a valid ledger entry id.
+ *
+ * @param input - The object to validate.
+ * @returns Whether the input is a valid ledger entry id.
+ */
+export function isLedgerEntryId(input: unknown): input is string {
+  return isString(input) && isHex(input) && input.length === SHA_512_HALF_LENGTH
+}
+
+/**
+ * Validate input is non-empty hex string of up to a certain length.
+ *
+ * @param input - The metadata to validate.
+ * @param lengthUpto - The maximum length of the hex string.
+ * @returns Whether the input is a valid non-empty hex string up to the specified length.
+ */
+export function validateHexMetadata(
+  input: unknown,
+  lengthUpto: number,
+): input is string {
+  return (
+    isString(input) &&
+    isHex(input) &&
+    input.length > 0 &&
+    input.length <= lengthUpto
+  )
+}
+
+/**
+ * Build a type guard that checks the input is a hex string encoding exactly
+ * `byteLength` bytes. Used by the Confidential MPT transactions to enforce
+ * fixed-size cryptographic fields (EC points, ElGamal ciphertexts, scalars).
+ *
+ * @param byteLength - The exact number of bytes the hex string must encode.
+ * @returns A type guard validating a hex string of the given byte length.
+ */
+export function isHexWithByteLength(
+  byteLength: number,
+): (inp: unknown) => inp is string {
+  // eslint-disable-next-line func-style -- returning a type guard
+  const check = (inp: unknown): inp is string =>
+    isString(inp) && isHex(inp) && inp.length === byteLength * 2
+  return check
 }
 
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- tx.TransactionType is checked before any calls */
@@ -409,7 +595,66 @@ export function validateOptionalField<
   }
 }
 
+/**
+ * Validate a Confidential MPT `MPTAmount`: a required non-negative uint64 string.
+ * ConfidentialMPTConvert permits zero (a zero-amount convert registers the holder
+ * key); ConfidentialMPTConvertBack and ConfidentialMPTClawback forbid zero.
+ *
+ * @param tx - The transaction to validate.
+ * @param allowZero - Whether a zero amount is permitted.
+ * @throws ValidationError if MPTAmount is missing, malformed, or out of range.
+ */
+export function validateConfidentialMPTAmount(
+  tx: Record<string, unknown>,
+  allowZero: boolean,
+): void {
+  validateRequiredField(tx, 'MPTAmount', isString)
+  if (!INTEGER_SANITY_CHECK.exec(tx.MPTAmount)) {
+    throw new ValidationError(`${tx.TransactionType}: Invalid MPTAmount`)
+  }
+  const amount = BigInt(tx.MPTAmount)
+  if (amount > MAX_MPT_AMOUNT || (!allowZero && amount === BigInt(0))) {
+    throw new ValidationError(`${tx.TransactionType}: MPTAmount out of range`)
+  }
+}
+
 /* eslint-enable @typescript-eslint/restrict-template-expressions -- checked before */
+
+/**
+ * An MPTokenIssuanceID is a 4-byte sequence (8 hex chars) followed by the
+ * 20-byte issuer AccountID, so the issuer begins after this many hex chars.
+ */
+const MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN = 8
+
+/**
+ * Whether `account` is the issuer encoded in `mptIssuanceID`.
+ *
+ * An MPTokenIssuanceID is a 4-byte sequence followed by the 20-byte issuer
+ * AccountID, so the issuer is its last 40 hex characters — the same derivation
+ * rippled uses (`MPTIssue::getIssuer`). The comparison is on decoded AccountIDs,
+ * so it holds whether `account` is given as a classic or an X-address. Returns
+ * `false` (rather than throwing) for a non-string or non-address input, leaving
+ * the field-level validators to report those.
+ *
+ * @param account - The classic or X-address to test.
+ * @param mptIssuanceID - The 24-byte hex MPTokenIssuanceID.
+ * @returns Whether `account` decodes to the issuer AccountID in `mptIssuanceID`.
+ */
+export function isMPTIssuer(account: unknown, mptIssuanceID: unknown): boolean {
+  if (!isString(account) || !isString(mptIssuanceID)) {
+    return false
+  }
+  const classicAddress = isValidXAddress(account)
+    ? xAddressToClassicAddress(account).classicAddress
+    : account
+  if (!isValidClassicAddress(classicAddress)) {
+    return false
+  }
+  return (
+    bytesToHex(decodeAccountID(classicAddress)).toUpperCase() ===
+    mptIssuanceID.slice(MPT_ISSUANCE_ID_SEQUENCE_HEX_LEN).toUpperCase()
+  )
+}
 
 export enum GlobalFlags {
   tfInnerBatchTxn = 0x40000000,
@@ -417,6 +662,17 @@ export enum GlobalFlags {
 
 export interface GlobalFlagsInterface {
   tfInnerBatchTxn?: boolean
+}
+
+/**
+ * Sponsor flags for transaction common fields.
+ * These flags indicate what type of sponsorship is being used in a transaction.
+ */
+export enum SponsorFlags {
+  /** Sponsor is paying the transaction fee */
+  spfSponsorFee = 0x00000001,
+  /** Sponsor is paying reserves for objects created in the transaction */
+  spfSponsorReserve = 0x00000002,
 }
 
 /**
@@ -497,6 +753,214 @@ export interface BaseTransaction extends Record<string, unknown> {
    * The delegate account that is sending the transaction.
    */
   Delegate?: Account
+  /**
+   * The account sponsoring this transaction (paying fees and/or reserves).
+   */
+  Sponsor?: string
+  /**
+   * Flags indicating sponsorship type (fee and/or reserve).
+   * Must be included if Sponsor field is present.
+   */
+  SponsorFlags?: number
+  /**
+   * Sponsor's signature information.
+   * Required for co-signed sponsorship (when no pre-funded Sponsorship object exists).
+   */
+  SponsorSignature?: SponsorSignature
+}
+
+/**
+ * Transaction types explicitly allow-listed by rippled for reserve sponsorship
+ * (see `isReserveSponsorAllowed` in rippled's SponsorHelpers.cpp). Only these
+ * transaction types may use the spfSponsorReserve flag; all others are
+ * rejected server-side with temINVALID_FLAG.
+ */
+const RESERVE_SPONSORABLE_TRANSACTIONS = new Set([
+  'DelegateSet',
+  'DepositPreauth',
+  'Payment',
+  'SignerListSet',
+  'CheckCancel',
+  'CheckCash',
+  'CheckCreate',
+  'EscrowCancel',
+  'EscrowCreate',
+  'EscrowFinish',
+  'PaymentChannelClaim',
+  'PaymentChannelCreate',
+  'PaymentChannelFund',
+  'Clawback',
+  'MPTokenAuthorize',
+  'MPTokenIssuanceCreate',
+  'MPTokenIssuanceDestroy',
+  'MPTokenIssuanceSet',
+  'TrustSet',
+  'CredentialAccept',
+  'CredentialCreate',
+  'CredentialDelete',
+  'AccountSet',
+  'SetRegularKey',
+  'SponsorshipTransfer',
+])
+
+/**
+ * Whether a transaction carries the `tfInnerBatchTxn` flag, without pulling
+ * in `models/utils`' `hasFlag` (which itself imports from this file and
+ * would create a circular dependency).
+ *
+ * @param tx - The transaction to check.
+ * @returns Whether the transaction is an inner Batch transaction.
+ */
+function isInnerBatchTransaction(tx: Record<string, unknown>): boolean {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag check */
+  if (typeof tx.Flags === 'number') {
+    return (tx.Flags & GlobalFlags.tfInnerBatchTxn) !== 0
+  }
+  /* eslint-enable no-bitwise */
+  if (isRecord(tx.Flags)) {
+    return tx.Flags.tfInnerBatchTxn === true
+  }
+  return false
+}
+
+/**
+ * Validate that SponsorFlags contains only valid flag values, and that reserve
+ * sponsorship (spfSponsorReserve) is only used where rippled allows it.
+ *
+ * @param sponsorFlags - The SponsorFlags value to validate.
+ * @param transactionType - The transaction type to validate flags against.
+ * @param hasDelegate - Whether the transaction also carries a Delegate field.
+ * @param isInnerBatchTxn - Whether the transaction carries the `tfInnerBatchTxn` flag.
+ * @throws ValidationError if flags are invalid.
+ */
+// eslint-disable-next-line max-params -- each param maps to a distinct rippled rejection rule
+function validateSponsorFlagsValue(
+  sponsorFlags: number,
+  transactionType: string | undefined,
+  hasDelegate: boolean,
+  isInnerBatchTxn: boolean,
+): void {
+  /* eslint-disable no-bitwise -- bitwise operations required for flag validation */
+  const validFlags = SponsorFlags.spfSponsorFee | SponsorFlags.spfSponsorReserve
+  if ((sponsorFlags & ~validFlags) !== 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags contains invalid flags',
+    )
+  }
+
+  if (sponsorFlags === 0) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags must have at least one flag set',
+    )
+  }
+
+  const hasReserveFlag = (sponsorFlags & SponsorFlags.spfSponsorReserve) !== 0
+  const hasFeeFlag = (sponsorFlags & SponsorFlags.spfSponsorFee) !== 0
+  /* eslint-enable no-bitwise */
+
+  // Validate that reserve sponsorship is only used for the rippled allow-listed transaction types
+  if (
+    hasReserveFlag &&
+    transactionType &&
+    !RESERVE_SPONSORABLE_TRANSACTIONS.has(transactionType)
+  ) {
+    throw new ValidationError(
+      `Transaction: ${transactionType} cannot use spfSponsorReserve flag (does not create ledger objects)`,
+    )
+  }
+
+  // Reserve sponsorship is disallowed under permissioned delegation (rippled's
+  // Transactor::checkSponsor rejects Delegate + spfSponsorReserve with temINVALID).
+  if (hasReserveFlag && hasDelegate) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorReserve cannot be combined with Delegate ' +
+        '(reserve sponsorship under permissioned delegation is disallowed)',
+    )
+  }
+
+  // Fee sponsorship is disallowed on inner Batch transactions - rippled's
+  // Batch::preflight rejects spfSponsorFee on inner txns with temINVALID_FLAG,
+  // since only the outer Batch transaction pays a fee.
+  if (hasFeeFlag && isInnerBatchTxn) {
+    throw new ValidationError(
+      'Transaction: SponsorFlags.spfSponsorFee is not allowed on inner Batch transactions',
+    )
+  }
+}
+
+/**
+ * Validate sponsor-related fields in a transaction.
+ * This is a helper function for validateBaseTransaction.
+ *
+ * @param tx - The transaction to validate sponsor fields for.
+ * @throws ValidationError if sponsor fields are invalid.
+ */
+// eslint-disable-next-line max-lines-per-function -- necessary for validation
+export function validateSponsorFields(tx: Record<string, unknown>): void {
+  const transactionType = String(tx.TransactionType)
+  const isInnerBatchTxn = isInnerBatchTransaction(tx)
+
+  const sponsor = tx.Sponsor
+  const sponsorFlags = tx.SponsorFlags
+  const sponsorSignature = tx.SponsorSignature
+
+  const hasSponsor = sponsor !== undefined
+  const hasSponsorFlags = sponsorFlags !== undefined
+  const hasSponsorSignature = sponsorSignature !== undefined
+
+  /* If any sponsor field is present, Sponsor and SponsorFlags must be present */
+  if (hasSponsor || hasSponsorFlags || hasSponsorSignature) {
+    if (!hasSponsor || !hasSponsorFlags) {
+      throw new ValidationError(
+        'Transaction: Sponsor and SponsorFlags must both be present for sponsored transactions',
+      )
+    }
+  }
+
+  /* Validate Sponsor field */
+  if (hasSponsor) {
+    if (!isString(sponsor)) {
+      throw new ValidationError('Transaction: Sponsor must be a string')
+    }
+    if (!isAccount(sponsor)) {
+      throw new ValidationError(
+        'Transaction: Sponsor must be a valid account address',
+      )
+    }
+  }
+
+  /* Validate SponsorFlags field */
+  if (hasSponsorFlags) {
+    if (!isNumber(sponsorFlags)) {
+      throw new ValidationError('Transaction: SponsorFlags must be a number')
+    }
+    validateSponsorFlagsValue(
+      sponsorFlags,
+      transactionType,
+      tx.Delegate !== undefined,
+      isInnerBatchTxn,
+    )
+  }
+
+  /* Validate SponsorSignature field */
+  if (
+    hasSponsorSignature &&
+    !isSponsorSignature(sponsorSignature, isInnerBatchTxn)
+  ) {
+    throw new ValidationError('Transaction: invalid SponsorSignature')
+  }
+
+  /* Validate no self-sponsorship */
+  if (
+    hasSponsor &&
+    isString(sponsor) &&
+    isString(tx.Account) &&
+    areAddressesEqual(sponsor, tx.Account)
+  ) {
+    throw new ValidationError(
+      'Transaction: Sponsor and Account cannot be the same (self-sponsorship not allowed)',
+    )
+  }
 }
 
 /**
@@ -568,11 +1032,19 @@ export function validateBaseTransaction(
   validateOptionalField(common, 'Delegate', isAccount)
 
   const delegate = common.Delegate
-  if (delegate != null && delegate === common.Account) {
+  if (
+    delegate != null &&
+    isString(delegate) &&
+    isString(common.Account) &&
+    areAddressesEqual(delegate, common.Account)
+  ) {
     throw new ValidationError(
       'BaseTransaction: Account and Delegate addresses cannot be the same',
     )
   }
+
+  // Validate sponsor fields using helper function
+  validateSponsorFields(common)
 }
 
 /**
@@ -738,183 +1210,7 @@ export function isDomainID(domainID: unknown): domainID is string {
   return (
     isString(domainID) &&
     domainID.length === _DOMAIN_ID_LENGTH &&
-    isHex(domainID)
-  )
-}
-
-/* eslint-disable max-lines-per-function -- Required here as structure validation is verbose. */
-/* eslint-disable max-statements -- Required here as structure validation is verbose. */
-
-/**
- * Validates if MPTokenMetadata adheres to XLS-89d standard.
- *
- * @param input - Hex encoded MPTokenMetadata.
- * @returns Validation messages if MPTokenMetadata does not adheres to XLS-89d standard.
- */
-export function validateMPTokenMetadata(input: string): string[] {
-  const validationMessages: string[] = []
-
-  if (!isHex(input)) {
-    validationMessages.push(`MPTokenMetadata must be in hex format.`)
-    return validationMessages
-  }
-
-  if (input.length / 2 > MAX_MPT_META_BYTE_LENGTH) {
-    validationMessages.push(
-      `MPTokenMetadata must be max ${MAX_MPT_META_BYTE_LENGTH} bytes.`,
-    )
-    return validationMessages
-  }
-
-  let jsonMetaData: unknown
-
-  try {
-    jsonMetaData = JSON.parse(hexToString(input))
-  } catch (err) {
-    validationMessages.push(
-      `MPTokenMetadata is not properly formatted as JSON - ${String(err)}`,
-    )
-    return validationMessages
-  }
-
-  if (
-    jsonMetaData == null ||
-    typeof jsonMetaData !== 'object' ||
-    Array.isArray(jsonMetaData)
-  ) {
-    validationMessages.push(
-      'MPTokenMetadata is not properly formatted as per XLS-89d.',
-    )
-    return validationMessages
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- It must be some JSON object.
-  const obj = jsonMetaData as Record<string, unknown>
-
-  // validating structure
-
-  // check for maximum number of fields
-  const fieldCount = Object.keys(obj).length
-  if (fieldCount > MAX_MPT_META_TOP_LEVEL_FIELD_COUNT) {
-    validationMessages.push(
-      `MPTokenMetadata must not contain more than ${MAX_MPT_META_TOP_LEVEL_FIELD_COUNT} top-level fields (found ${fieldCount}).`,
-    )
-    return validationMessages
-  }
-
-  const incorrectRequiredFields = MPT_META_REQUIRED_FIELDS.filter(
-    (field) => !isString(obj[field]),
-  )
-
-  if (incorrectRequiredFields.length > 0) {
-    incorrectRequiredFields.forEach((field) =>
-      validationMessages.push(`${field} is required and must be string.`),
-    )
-    return validationMessages
-  }
-
-  if (obj.desc != null && !isString(obj.desc)) {
-    validationMessages.push(`desc must be a string.`)
-    return validationMessages
-  }
-
-  if (obj.asset_subclass != null && !isString(obj.asset_subclass)) {
-    validationMessages.push(`asset_subclass must be a string.`)
-    return validationMessages
-  }
-
-  if (
-    obj.additional_info != null &&
-    !isString(obj.additional_info) &&
-    !isRecord(obj.additional_info)
-  ) {
-    validationMessages.push(`additional_info must be a string or JSON object.`)
-    return validationMessages
-  }
-
-  if (obj.urls != null) {
-    if (!Array.isArray(obj.urls)) {
-      validationMessages.push('urls must be an array as per XLS-89d.')
-      return validationMessages
-    }
-    if (!obj.urls.every(isValidMPTokenMetadataUrlStructure)) {
-      validationMessages.push(
-        'One or more urls are not structured per XLS-89d.',
-      )
-      return validationMessages
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
-  const mptMPTokenMetadata = obj as unknown as MPTokenMetadata
-
-  // validating content
-  if (!TICKER_REGEX.test(mptMPTokenMetadata.ticker)) {
-    validationMessages.push(
-      `ticker should have uppercase letters (A-Z) and digits (0-9) only. Max 6 characters recommended.`,
-    )
-  }
-
-  if (!mptMPTokenMetadata.icon.startsWith('https://')) {
-    validationMessages.push(`icon should be a valid https url.`)
-  }
-
-  if (
-    !MPT_META_ASSET_CLASSES.includes(
-      mptMPTokenMetadata.asset_class.toLowerCase(),
-    )
-  ) {
-    validationMessages.push(
-      `asset_class should be one of ${MPT_META_ASSET_CLASSES.join(', ')}.`,
-    )
-  }
-
-  if (
-    mptMPTokenMetadata.asset_subclass != null &&
-    !MPT_META_ASSET_SUB_CLASSES.includes(
-      mptMPTokenMetadata.asset_subclass.toLowerCase(),
-    )
-  ) {
-    validationMessages.push(
-      `asset_subclass should be one of ${MPT_META_ASSET_SUB_CLASSES.join(
-        ', ',
-      )}.`,
-    )
-  }
-
-  if (
-    mptMPTokenMetadata.asset_class.toLowerCase() === 'rwa' &&
-    mptMPTokenMetadata.asset_subclass == null
-  ) {
-    validationMessages.push(
-      `asset_subclass is required when asset_class is rwa.`,
-    )
-  }
-
-  if (
-    mptMPTokenMetadata.urls != null &&
-    !mptMPTokenMetadata.urls.every((ele) => ele.url.startsWith('https://'))
-  ) {
-    validationMessages.push(`url should be a valid https url.`)
-  }
-
-  return validationMessages
-}
-/* eslint-enable max-lines-per-function */
-/* eslint-enable max-statements */
-
-function isValidMPTokenMetadataUrlStructure(input: unknown): boolean {
-  if (input == null) {
-    return false
-  }
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Required here.
-  const obj = input as Record<string, unknown>
-
-  return (
-    typeof obj === 'object' &&
-    isString(obj.url) &&
-    isString(obj.type) &&
-    isString(obj.title) &&
-    Object.keys(obj).length === MPT_META_URL_FIELD_COUNT
+    isHex(domainID) &&
+    domainID !== '0'.repeat(_DOMAIN_ID_LENGTH)
   )
 }

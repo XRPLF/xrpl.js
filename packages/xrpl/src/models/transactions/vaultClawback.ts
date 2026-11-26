@@ -4,11 +4,11 @@ import {
   BaseTransaction,
   validateBaseTransaction,
   validateRequiredField,
-  isString,
   Account,
   isAccount,
   validateOptionalField,
   isClawbackAmount,
+  isHexString,
 } from './common'
 
 /**
@@ -49,7 +49,7 @@ export interface VaultClawback extends BaseTransaction {
 export function validateVaultClawback(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
-  validateRequiredField(tx, 'VaultID', isString)
+  validateRequiredField(tx, 'VaultID', isHexString)
   validateRequiredField(tx, 'Holder', isAccount)
   validateOptionalField(tx, 'Amount', isClawbackAmount)
 }

@@ -1,5 +1,6 @@
 /* eslint-disable no-inline-comments -- Necessary for important note */
 /* eslint-disable max-lines -- There is a lot to export */
+/* eslint-disable prettier/prettier -- Required here to keep formatting in line */
 import type { APIVersion, DEFAULT_API_VERSION } from '../common'
 
 import {
@@ -41,6 +42,10 @@ import {
   AccountOffersRequest,
   AccountOffersResponse,
 } from './accountOffers'
+import {
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
+} from './accountSponsoring'
 import {
   AccountTxRequest,
   AccountTxResponse,
@@ -107,7 +112,14 @@ import {
   LedgerDataRequest,
   LedgerDataResponse,
 } from './ledgerData'
-import { LedgerEntryRequest, LedgerEntryResponse } from './ledgerEntry'
+import {
+  LedgerEntryBinaryRequest,
+  LedgerEntryJsonRequest,
+  LedgerEntryRequest,
+  LedgerEntryBinaryResponse,
+  LedgerEntryJsonResponse,
+  LedgerEntryResponse,
+} from './ledgerEntry'
 import { ManifestRequest, ManifestResponse } from './manifest'
 import { NFTBuyOffersRequest, NFTBuyOffersResponse } from './nftBuyOffers'
 import {
@@ -202,6 +214,7 @@ type Request =
   | AccountNFTsRequest
   | AccountObjectsRequest
   | AccountOffersRequest
+  | AccountSponsoringRequest
   | AccountTxRequest
   | GatewayBalancesRequest
   | NoRippleCheckRequest
@@ -263,6 +276,7 @@ type Response<Version extends APIVersion = typeof DEFAULT_API_VERSION> =
   | AccountNFTsResponse
   | AccountObjectsResponse
   | AccountOffersResponse
+  | AccountSponsoringResponse
   | AccountTxVersionResponseMap<Version>
   | GatewayBalancesResponse
   | NoRippleCheckResponse
@@ -329,6 +343,8 @@ export type RequestResponseMap<
   ? AccountObjectsResponse
   : T extends AccountOffersRequest
   ? AccountOffersResponse
+  : T extends AccountSponsoringRequest
+  ? AccountSponsoringResponse
   : T extends AccountTxRequest
   ? AccountTxVersionResponseMap<Version>
   : T extends AMMInfoRequest
@@ -411,8 +427,12 @@ export type RequestResponseMap<
   ? LedgerCurrentResponse
   : T extends LedgerDataRequest
   ? LedgerDataResponse
+  : T extends LedgerEntryBinaryRequest
+  ? LedgerEntryBinaryResponse
+  : T extends LedgerEntryJsonRequest
+  ? LedgerEntryJsonResponse
   : T extends LedgerEntryRequest
-  ? LedgerEntryResponse
+  ? LedgerEntryJsonResponse
   : T extends SimulateBinaryRequest
   ? SimulateBinaryResponse
   : T extends SimulateJsonRequest
@@ -537,6 +557,8 @@ export {
   AccountOffer,
   AccountOffersRequest,
   AccountOffersResponse,
+  AccountSponsoringRequest,
+  AccountSponsoringResponse,
   AccountTxRequest,
   AccountTxResponse,
   AccountTxV1Response,
@@ -564,7 +586,11 @@ export {
   LedgerDataBinaryLedgerEntry,
   LedgerDataResponse,
   LedgerDataLedgerState,
+  LedgerEntryBinaryRequest,
+  LedgerEntryJsonRequest,
   LedgerEntryRequest,
+  LedgerEntryBinaryResponse,
+  LedgerEntryJsonResponse,
   LedgerEntryResponse,
   // transaction methods with types
   SimulateRequest,

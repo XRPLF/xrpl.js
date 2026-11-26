@@ -9,8 +9,7 @@ import { BaseLedgerEntry, HasPreviousTxnID } from './BaseLedgerEntry'
  * @category Ledger Entries
  */
 export default interface DepositPreauth
-  extends BaseLedgerEntry,
-    HasPreviousTxnID {
+  extends BaseLedgerEntry, HasPreviousTxnID {
   LedgerEntryType: 'DepositPreauth'
   /** The account that granted the preauthorization. */
   Account: string
@@ -28,4 +27,10 @@ export default interface DepositPreauth
   Authorize?: string
   /** The credential(s) that received the preauthorization. */
   AuthorizeCredentials?: AuthorizeCredential[]
+  /**
+   * The account sponsoring the reserve for this DepositPreauth. If present,
+   * the sponsor is responsible for the reserve requirement of this object
+   * instead of the owner.
+   */
+  Sponsor?: string
 }

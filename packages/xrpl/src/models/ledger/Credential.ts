@@ -44,4 +44,11 @@ export default interface Credential extends BaseLedgerEntry, HasPreviousTxnID {
 
   /** Additional data about the credential (such as a link to the VC document). */
   URI?: string
+
+  /**
+   * (Optional) The account sponsoring the reserve for this Credential. If
+   * present, the sponsor is responsible for the reserve requirement of this
+   * object instead of the owner.
+   */
+  Sponsor?: string
 }

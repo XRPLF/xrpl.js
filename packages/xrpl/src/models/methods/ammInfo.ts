@@ -25,6 +25,11 @@ export interface AMMInfoRequest extends BaseRequest {
    * The other asset of the AMM pool.
    */
   asset2?: Currency
+
+  /**
+   * Show only LP Tokens held by this liquidity provider.
+   */
+  account?: string
 }
 
 /**

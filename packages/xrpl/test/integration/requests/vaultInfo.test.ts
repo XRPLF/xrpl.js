@@ -5,6 +5,8 @@ import {
   VaultCreate,
   VaultInfoResponse,
   VaultWithdrawalPolicy,
+  AccountSet,
+  AccountSetAsfFlags,
 } from '../../../src'
 import { Vault } from '../../../src/models/ledger'
 import serverUrl from '../serverUrl'
@@ -23,6 +25,7 @@ describe('Single Asset Vault', function () {
   })
   afterEach(async () => teardownClient(testContext))
 
+  // eslint-disable-next-line max-statements -- comprehensive vault_info test requires multiple assertions
   it('base', async function () {
     const tx: VaultCreate = {
       TransactionType: 'VaultCreate',
@@ -32,8 +35,6 @@ describe('Single Asset Vault', function () {
       Data: stringToHex('vault metadata'),
       MPTokenMetadata: stringToHex('share metadata'),
       AssetsMaximum: '1000000000',
-      // This covers owner reserve fee with potentially high open_ledger_cost
-      Fee: '5000000',
     }
 
     await testTransaction(testContext.client, tx, testContext.wallet)
@@ -63,6 +64,13 @@ describe('Single Asset Vault', function () {
       vault,
       'vault_info (vault_id) response should include a vault',
     )
+    // Test the ledger_current_index field
+    if (vaultInfoRes.result.ledger_current_index !== undefined) {
+      assert.isNumber(
+        vaultInfoRes.result.ledger_current_index,
+        'ledger_current_index should be a number when present',
+      )
+    }
     assert.isDefined(vault.Account)
     assert.equal(
       vault.Owner,
@@ -80,12 +88,12 @@ describe('Single Asset Vault', function () {
       VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
     )
     assert.equal(
-      vault.AssetsTotal,
+      vault.AssetsTotal ?? '0',
       '0',
       'New Vault should have zero total assets',
     )
     assert.equal(
-      vault.AssetsAvailable,
+      vault.AssetsAvailable ?? '0',
       '0',
       'New Vault should have zero available assets',
     )
@@ -116,6 +124,18 @@ describe('Single Asset Vault', function () {
       'mpt_issuance_id should match ShareMPTID',
     )
 
+    assert.equal(
+      vault.AssetsMaximum,
+      '1000000000',
+      'AssetsMaximum should match the value from VaultCreate',
+    )
+
+    assert.equal(
+      vault.Data,
+      stringToHex('vault metadata'),
+      'Data should match the value from VaultCreate',
+    )
+
     // Fetch vault_info using owner and seq
     const vaultInfoRes2: VaultInfoResponse = await testContext.client.request({
       command: 'vault_info',
@@ -127,5 +147,72 @@ describe('Single Asset Vault', function () {
       'vault_info (owner, seq) response should include a vault',
     )
     assert.equal(vaultInfoRes2.result.vault.index, vault.index)
+  })
+
+  it('IOU asset with Scale', async function () {
+    // Set DefaultRipple flag on the issuer account for IOU support
+    const accountSetTx: AccountSet = {
+      TransactionType: 'AccountSet',
+      Account: testContext.wallet.classicAddress,
+      SetFlag: AccountSetAsfFlags.asfDefaultRipple,
+    }
+    await testTransaction(testContext.client, accountSetTx, testContext.wallet)
+
+    const tx: VaultCreate = {
+      TransactionType: 'VaultCreate',
+      Account: testContext.wallet.classicAddress,
+      Asset: {
+        currency: 'USD',
+        issuer: testContext.wallet.classicAddress,
+      },
+      WithdrawalPolicy: VaultWithdrawalPolicy.vaultStrategyFirstComeFirstServe,
+      Scale: 10,
+      Data: stringToHex('iou vault metadata'),
+    }
+
+    await testTransaction(testContext.client, tx, testContext.wallet)
+
+    // Fetch the vault ledger entry to get its ID
+    const result = await testContext.client.request({
+      command: 'account_objects',
+      account: testContext.wallet.classicAddress,
+      type: 'vault',
+    })
+    const vaultObj = result.result.account_objects.find((obj) => {
+      const vault = obj as Vault
+      const asset = vault.Asset as unknown as Record<string, unknown>
+      return (
+        asset.currency === 'USD' &&
+        asset.issuer === testContext.wallet.classicAddress
+      )
+    }) as Vault
+    assert.isDefined(vaultObj, 'Should find IOU vault')
+
+    // Fetch vault_info using vault_id
+    const vaultInfoRes: VaultInfoResponse = await testContext.client.request({
+      command: 'vault_info',
+      vault_id: vaultObj.index,
+    })
+    const { vault } = vaultInfoRes.result
+
+    assert.isDefined(vault, 'vault_info response should include a vault')
+    assert.deepEqual(
+      vault.Asset,
+      {
+        currency: 'USD',
+        issuer: testContext.wallet.classicAddress,
+      },
+      'Vault Asset should be USD',
+    )
+    assert.equal(
+      vault.Scale,
+      10,
+      'Scale should match the value from VaultCreate',
+    )
+    assert.equal(
+      vault.Data,
+      stringToHex('iou vault metadata'),
+      'Data should match the value from VaultCreate',
+    )
   })
 })

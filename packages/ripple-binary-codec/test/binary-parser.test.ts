@@ -45,6 +45,16 @@ function basicApiTests() {
     const parser = makeParser('FFFFFFFF')
     expect(parser.readUInt32()).toEqual(0xffffffff)
   })
+  it('rejects negative skip values', () => {
+    const parser = makeParser('00010203040506')
+    expect(() => parser.skip(-1)).toThrow(new Error('skip: negative length -1'))
+  })
+  it('rejects negative read values', () => {
+    const parser = makeParser('00010203040506')
+    // read(-1) should throw, not silently return slice(0, -1) which
+    // strips the last byte and corrupts parser state via skip(-1)
+    expect(() => parser.read(-1)).toThrow(new Error('read: negative length -1'))
+  })
 }
 
 function transactionParsingTests() {
@@ -283,30 +293,31 @@ function assertRecyclable(json, forField) {
 
 function nestedObjectTests() {
   fixtures.whole_objects.forEach((f, i) => {
-    it(`whole_objects[${i}]: can parse blob into
-          ${JSON.stringify(
-            f.tx_json,
-          )}`, /*                                              */ () => {
-      const parser = makeParser(f.blob_with_no_signing)
-      let ix = 0
-      while (!parser.end()) {
-        const [field, value] = parser.readFieldAndValue()
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
-        const expected: any = f.fields[ix]
-        const expectedJSON = expected[1].json
-        const expectedField = expected[0]
-        const actual = toJSON(value)
+    it(
+      `whole_objects[${i}]: can parse blob into
+          ${JSON.stringify(f.tx_json)}`,
+      /*                                              */ () => {
+        const parser = makeParser(f.blob_with_no_signing)
+        let ix = 0
+        while (!parser.end()) {
+          const [field, value] = parser.readFieldAndValue()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a json object
+          const expected: any = f.fields[ix]
+          const expectedJSON = expected[1].json
+          const expectedField = expected[0]
+          const actual = toJSON(value)
 
-        try {
-          expect(actual).toEqual(expectedJSON)
-        } catch (e) {
-          throw new Error(`${e} ${field} a: ${actual} e: ${expectedJSON}`)
+          try {
+            expect(actual).toEqual(expectedJSON)
+          } catch (e) {
+            throw new Error(`${e} ${field} a: ${actual} e: ${expectedJSON}`)
+          }
+          expect(field.name).toEqual(expectedField)
+          assertRecyclable(actual, field)
+          ix++
         }
-        expect(field.name).toEqual(expectedField)
-        assertRecyclable(actual, field)
-        ix++
-      }
-    })
+      },
+    )
   })
 }
 
