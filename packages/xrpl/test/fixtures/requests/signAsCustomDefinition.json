@@ -7,13 +7,13 @@
   "Sequence": 33626,
   "Fee": "10",
   "Amount": {
-      "currency": "AAA",
-      "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
-      "value": "1"
+    "currency": "AAA",
+    "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
+    "value": "1"
   },
   "AmountOther": {
-      "currency": "BBB",
-      "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
-      "value": "1"
+    "currency": "BBB",
+    "issuer": "rDCcTxoALtAryzk4TE3mxU9hpjRm5vQcxT",
+    "value": "1"
   }
 }
