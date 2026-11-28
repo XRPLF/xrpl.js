@@ -12,6 +12,7 @@ import {
 } from '../ledger/MPTokenIssuance'
 import { AccountSetTfFlags } from '../transactions/accountSet'
 import { AMMClawbackFlags } from '../transactions/AMMClawback'
+// eslint-disable-next-line import/no-cycle -- AMM flags are resolved lazily below
 import { AMMDepositFlags } from '../transactions/AMMDeposit'
 import { AMMWithdrawFlags } from '../transactions/AMMWithdraw'
 import { BatchFlags } from '../transactions/batch'
@@ -119,8 +120,13 @@ export function parseMPTokenIssuanceImmutableFlags(
 const txToFlag = {
   AccountSet: AccountSetTfFlags,
   AMMClawback: AMMClawbackFlags,
-  AMMDeposit: AMMDepositFlags,
-  AMMWithdraw: AMMWithdrawFlags,
+  // Resolve these lazily: their validators also use flag conversion.
+  get AMMDeposit(): typeof AMMDepositFlags {
+    return AMMDepositFlags
+  },
+  get AMMWithdraw(): typeof AMMWithdrawFlags {
+    return AMMWithdrawFlags
+  },
   Batch: BatchFlags,
   LoanManage: LoanManageFlags,
   LoanPay: LoanPayFlags,
