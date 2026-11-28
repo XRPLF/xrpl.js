@@ -1,6 +1,9 @@
 import { ValidationError } from '../../errors'
 import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
+import { AMM_MAX_TRADING_FEE } from './AMMCreate'
+// eslint-disable-next-line import/no-cycle -- AMM flag conversion maps transaction types to their flags
+import { validateAMMMode } from './AMMValidation'
 import {
   BaseTransaction,
   GlobalFlagsInterface,
@@ -76,6 +79,9 @@ export interface AMMDeposit extends BaseTransaction {
    * How many of the AMM's LP Tokens to buy.
    */
   LPTokenOut?: IssuedCurrencyAmount
+
+  /** Trading fee in units of 1/100,000, allowed when refilling an empty AMM. */
+  TradingFee?: number
 }
 
 /**
@@ -84,6 +90,7 @@ export interface AMMDeposit extends BaseTransaction {
  * @param tx - An AMMDeposit Transaction.
  * @throws When the AMMDeposit is Malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- keep the mode rules beside the validator
 export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -105,4 +112,55 @@ export function validateAMMDeposit(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Amount2', isAmount)
   validateOptionalField(tx, 'EPrice', isAmount)
+
+  const fields = ['Amount', 'Amount2', 'EPrice', 'LPTokenOut', 'TradingFee']
+  validateAMMMode(
+    tx,
+    [
+      {
+        flag: AMMDepositFlags.tfLPToken,
+        required: ['LPTokenOut'],
+        allowed: ['LPTokenOut', 'Amount', 'Amount2'],
+        paired: ['Amount', 'Amount2'],
+      },
+      {
+        flag: AMMDepositFlags.tfSingleAsset,
+        required: ['Amount'],
+        allowed: ['Amount', 'LPTokenOut'],
+      },
+      {
+        flag: AMMDepositFlags.tfTwoAsset,
+        required: ['Amount', 'Amount2'],
+        allowed: ['Amount', 'Amount2', 'LPTokenOut'],
+      },
+      {
+        flag: AMMDepositFlags.tfOneAssetLPToken,
+        required: ['Amount', 'LPTokenOut'],
+        allowed: ['Amount', 'LPTokenOut'],
+      },
+      {
+        flag: AMMDepositFlags.tfLimitLPToken,
+        required: ['Amount', 'EPrice'],
+        allowed: ['Amount', 'EPrice'],
+      },
+      {
+        flag: AMMDepositFlags.tfTwoAssetIfEmpty,
+        required: ['Amount', 'Amount2'],
+        allowed: ['Amount', 'Amount2', 'TradingFee'],
+      },
+    ],
+    fields,
+  )
+
+  if (
+    tx.TradingFee != null &&
+    (typeof tx.TradingFee !== 'number' ||
+      !Number.isInteger(tx.TradingFee) ||
+      tx.TradingFee < 0 ||
+      tx.TradingFee > AMM_MAX_TRADING_FEE)
+  ) {
+    throw new ValidationError(
+      `AMMDeposit: TradingFee must be an integer between 0 and ${AMM_MAX_TRADING_FEE}`,
+    )
+  }
 }

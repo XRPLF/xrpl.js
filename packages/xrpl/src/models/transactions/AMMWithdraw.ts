@@ -1,6 +1,8 @@
 import { ValidationError } from '../../errors'
 import { Amount, Currency, IssuedCurrencyAmount } from '../common'
 
+// eslint-disable-next-line import/no-cycle -- AMM flag conversion maps transaction types to their flags
+import { validateAMMMode } from './AMMValidation'
 import {
   BaseTransaction,
   GlobalFlagsInterface,
@@ -82,6 +84,7 @@ export interface AMMWithdraw extends BaseTransaction {
  * @param tx - An AMMWithdraw Transaction.
  * @throws When the AMMWithdraw is Malformed.
  */
+// eslint-disable-next-line max-lines-per-function -- keep the mode rules beside the validator
 export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateBaseTransaction(tx)
 
@@ -99,4 +102,41 @@ export function validateAMMWithdraw(tx: Record<string, unknown>): void {
   validateOptionalField(tx, 'Amount', isAmount)
   validateOptionalField(tx, 'Amount2', isAmount)
   validateOptionalField(tx, 'EPrice', isAmount)
+  validateAMMMode(
+    tx,
+    [
+      {
+        flag: AMMWithdrawFlags.tfLPToken,
+        required: ['LPTokenIn'],
+        allowed: ['LPTokenIn'],
+      },
+      { flag: AMMWithdrawFlags.tfWithdrawAll, required: [], allowed: [] },
+      {
+        flag: AMMWithdrawFlags.tfOneAssetWithdrawAll,
+        required: ['Amount'],
+        allowed: ['Amount'],
+      },
+      {
+        flag: AMMWithdrawFlags.tfSingleAsset,
+        required: ['Amount'],
+        allowed: ['Amount'],
+      },
+      {
+        flag: AMMWithdrawFlags.tfTwoAsset,
+        required: ['Amount', 'Amount2'],
+        allowed: ['Amount', 'Amount2'],
+      },
+      {
+        flag: AMMWithdrawFlags.tfOneAssetLPToken,
+        required: ['Amount', 'LPTokenIn'],
+        allowed: ['Amount', 'LPTokenIn'],
+      },
+      {
+        flag: AMMWithdrawFlags.tfLimitLPToken,
+        required: ['Amount', 'EPrice'],
+        allowed: ['Amount', 'EPrice'],
+      },
+    ],
+    ['Amount', 'Amount2', 'EPrice', 'LPTokenIn'],
+  )
 }
